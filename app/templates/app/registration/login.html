@@ -1,0 +1,23 @@
+{% extends 'registration/registration_base.html' %}
+{% load i18n %}
+
+{% block registration_content %}
+    {% if form.errors %}
+        <div class="alert alert-warning">
+            <p><strong>{% trans "Invalid credentials." %}</strong> {% trans "Note that both fields are case-sensitive." %}</p>
+        </div>
+    {% endif %}
+    <form action="{% url 'login' %}" method="post" class="form-horizontal" role="form">{% csrf_token %}
+        {% for field in form %}
+            {% include 'registration/form_field.html' %}
+        {% endfor %}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="submit" class="btn btn-default">{% trans 'Log in' %}</button>
+            </div>
+            <div class="top-buffer col-sm-offset-2 col-sm-10">
+              <p><a href="{% url 'password_reset' %}">{% trans "Reset My Password" %}</a></p>
+            </div>
+        </div>
+    </form>
+{% endblock %}

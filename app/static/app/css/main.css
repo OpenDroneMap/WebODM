@@ -1,0 +1,15 @@
+section.main{
+    padding-top: 72px;
+}
+
+.navbar-brand{
+    padding: 6px 0;
+}
+
+.navbar-text{
+    font-size: 110%;
+}
+
+.top-buffer { 
+    margin-top: 15px; 
+}
