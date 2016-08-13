@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 
 def index(request):
-    return render(request, "app/index.html", {'hello': "Hello World!"})
+    return redirect('dashboard' if request.user.is_authenticated() 
+                    else 'login')
 
 def dashboard(request):
-    return render(request, "app/dashboard.html")
+    return render(request, 'app/dashboard.html')

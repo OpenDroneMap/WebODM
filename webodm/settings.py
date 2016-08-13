@@ -129,5 +129,5 @@ STATICFILES_DIRS = [
 
 
 # Auth
-LOGIN_REDIRECT_URL = '/dashboard'
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
