@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<div class="col-sm-12 col-md-6 col-md-offset-3 top-buffer">
-    {% block registration_content %}{% endblock %}
-</div>
+{% block page-wrapper %}
+<section class="main">
+    <div class="content">
+        <div class="col-sm-12 col-md-6 col-md-offset-3 top-buffer">
+            {% block registration_content %}{% endblock %}
+        </div>
+    </div>
+</section>
 {% endblock %}

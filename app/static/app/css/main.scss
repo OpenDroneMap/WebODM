@@ -39,6 +39,15 @@
     .navbar-top-links li a.dropdown-toggle{
         height: 50px;
     }
+
+    .user-profile{
+        padding: 0 8px;
+
+        .email{
+            font-size: 90%;
+            color: gray;
+        }
+    }
 }
 
 ul#side-menu.nav{

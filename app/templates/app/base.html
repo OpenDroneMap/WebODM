@@ -15,7 +15,7 @@
     <link href="{% static 'app/css/sb-admin-2.css' %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'app/css/main.css' %}" />
     <script src="{% static 'app/js/vendor/modernizr-2.8.3.min.js' %}"></script>
-    <title>{{ title|default:"Web Open Drone Map"}}</title>
+    <title>{{ title|default:"Web OpenDroneMap"}}</title>
 </head>
 <body>
     <!--[if lt IE 8]>
@@ -48,20 +48,14 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="/"><img src="{% static 'app/img/logo36.png' %}" alt="WebODM" /></a>
-                <a class="navbar-link" href="/"><p class="navbar-text navbar-right">Open Drone Map</a></p>
+                <a class="navbar-link" href="/"><p class="navbar-text navbar-right">OpenDroneMap</a></p>
             </div>
 
             {% block navbar-top-links %}{% endblock %}
             {% block navbar-sidebar %}{% endblock %}
         </nav>
         
-        <div id="page-wrapper">
-            <section class="main">
-                <div class="content">
-                    {% block content %}{% endblock %}
-                </div>
-            </section>
-        </div>
+        {% block page-wrapper %}{% endblock %}
     </div>
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
