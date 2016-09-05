@@ -7,4 +7,4 @@ def index(request):
                     else 'login')
 
 def dashboard(request):
-    return render(request, 'app/dashboard.html')
+    return render(request, 'app/dashboard.html', {'title': "Dashboard"})
