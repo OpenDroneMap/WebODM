@@ -30,16 +30,21 @@ class TestUser(TestCase):
         # User points the browser to the landing page
         res = c.get('/')
 
-        # we are not logged in and we are redirected to the login page
+        # we are not logged in
         self.assertFalse(res.context['user'].is_authenticated)
+        # and we are redirected to the login page
         self.assertRedirects(res, '/login/')
 
-        # login page
+        # The login page
         res = c.get('/login/')
+        # is being rendered is being rendered by the correct template
         self.assertTemplateUsed(res, 'registration/login.html')
 
-        # test login process
+        # The user tries to using a set of valid credentials
         res = c.post('/login/', self.credentials, follow=True)
+
+        # The system acknowledges him
         self.assertTrue(res.context['user'].is_authenticated)
 
+        # and moves him at the dashboard
         self.assertTemplateUsed(res, 'app/dashboard.html')
