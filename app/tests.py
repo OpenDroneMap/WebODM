@@ -28,20 +28,18 @@ class TestUser(TestCase):
     def test_User_Login_Test(self):
         c = Client()
         # User points the browser to the landing page
-        res = c.get('/')
+        res = c.post('/', follow=True)
 
         # the user is not logged in
         self.assertFalse(res.context['user'].is_authenticated)
         # and is redirected to the login page
         self.assertRedirects(res, '/login/')
 
-        # The login page
-        res = c.get('/login/')
-        # is being rendered by the correct template
+        # The login page is being rendered by the correct template
         self.assertTemplateUsed(res, 'registration/login.html')
 
-        # askes the user to login using a set of valid credentials
-        res = c.post('/login/', self.credentials, follow=True)
+        # asks the user to login using a set of valid credentials
+        res = c.post('/login/', data=self.credentials, follow=True)
 
         # The system acknowledges him
         self.assertTrue(res.context['user'].is_authenticated)
