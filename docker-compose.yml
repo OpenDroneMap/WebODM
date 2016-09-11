@@ -1,0 +1,18 @@
+version: '2'
+services:
+  db:
+    build: ./db
+    container_name: db
+    ports:
+        - "5432:5432"
+  webapp:
+    build: .
+    container_name: webapp
+    entrypoint: /bin/bash /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh
+    volumes:
+      - .:/webodm
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    restart: on-failure:10

@@ -1,0 +1,6 @@
+Django==1.10
+anyjson==0.3.3
+pillow==3.3.1
+psycopg2==2.6.2
+pytz==2016.6.1
+wsgiref==0.1.2
