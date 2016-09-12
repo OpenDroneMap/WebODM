@@ -2,9 +2,69 @@
 
 A web interface for [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap).
 
+![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
+
+This is currently a work in progress! See the Roadmap below.
+
+## Getting Started
+
+The quickest way to get started is by using Docker.
+
+* From the Docker Quickstart Terminal (Windows / OSX) or from the command line (Linux) type:
+```
+git clone https://github.com/OpenDroneMap/WebODM
+cd WebODM
+docker-compose up
+```
+
+* If you're on Windows/OSX, find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
+
+```
+docker-machine ip
+```
+
+Linux users can connect to 127.0.0.1.
+
+* Open a Web Browser to `http://<yourDockerMachineIp>:8000`
+* Default username is "admin:admin"
+
+## Run it natively
+
+If you want to run WebODM natively, you will need to install:
+ * PostgreSQL (>= 9.5)
+ * Python 2.7
+
+Then these steps should be sufficient to get you up and running:
+
+```
+git clone https://github.com/OpenDroneMap/WebODM
+```
+
+Create a `WebODM\webodm\local_settings.py` file containing:
+
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'webodm_dev',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+```
+
+Then:
+
+```
+pip install -r requirements.txt
+chmod +x start.sh && ./start.sh
+```
+
 ## Roadmap
 - [X] User Registration / Authentication
-- [ ] UI mockup
+- [X] UI mockup
 - [ ] Task Processing
 - [ ] Model display (using Cesium/Leaflet) for both 2D and 3D outputs.
 - [ ] Cluster management and setup.
@@ -28,4 +88,4 @@ A web interface for [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap)
 
 ## Work in progress
 
-We will add more information to this document soon (including information on how to get started).
+We will add more information to this document soon.
