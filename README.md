@@ -26,7 +26,7 @@ docker-machine ip
 Linux users can connect to 127.0.0.1.
 
 * Open a Web Browser to `http://<yourDockerMachineIp>:8000`
-* Default username is "admin:admin"
+* Log in with the default credentials: "admin:admin"
 
 ## Run it natively
 
