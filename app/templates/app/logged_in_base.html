@@ -243,15 +243,14 @@
                 <li>
                     <a href="#"><i class="fa fa-wrench fa-fw"></i> Processing Nodes<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
+                        {% load processingnode_extras %}
+                        {% all_processing_nodes as nodes %}
+
+                        {% for node in nodes %}
                         <li>
-                            <a href="#">Server #1</a>
+                            <a href="#"><span class="fa fa-laptop"></span> {{node}}</a>
                         </li>
-                        <li>
-                            <a href="#">Server #2</a>
-                        </li>
-                        <li>
-                            <a href="#">Server #3</a>
-                        </li>
+                        {% endfor %}
                         <li>
                             <a href="/admin/app/processingnode/add/"><span class="fa fa-plus-circle"></span> Add New</a>
                         </li>

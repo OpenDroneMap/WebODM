@@ -26,7 +26,7 @@ class ProcessingNode(models.Model):
     queue_count = models.PositiveIntegerField(default=0, help_text="Number of tasks currently being processed by this node (as reported by the node itself)")
     available_options = fields.JSONField(default=dict(), help_text="Description of the options that can be used for processing")
     def __str__(self):
-        return '{}:{} ({})'.format(self.hostname, self.port, self.api_version or "?")
+        return '{}:{}'.format(self.hostname, self.port)
 
 
 def gcp_directory_path(task, filename):
