@@ -1,4 +1,5 @@
 Django==1.10
+PyYAML==3.12
 anyjson==0.3.3
 pillow==3.3.1
 psycopg2==2.6.2
