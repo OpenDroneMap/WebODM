@@ -3,24 +3,25 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from django.test import Client
 
+from .models import Project,Task
 
 # Create your tests here.
 
 class TestUser(TestCase):
+
+    fixtures = ['test_users', ]
+
     def setUp(self):
         self.credentials = {
             'username': 'testuser',
-            'password': 'secret',
+            'password': 'test1234',
             'email': 'test@mail.com'}
-        self.u = User.objects.create_user(
-            username=self.credentials['username'],
-            email=self.credentials['email'],
-            password=self.credentials['password'],
-            is_superuser=True
 
-        )
+        # Create a test Group
         my_group, created = Group.objects.get_or_create(name='test_group')
-        self.u.groups.add(my_group)
+
+        # Add user to test Group
+        User.objects.get(pk=1).groups.add(my_group)
 
     def tearDown(self):
         pass
