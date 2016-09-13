@@ -26,7 +26,7 @@ class ProcessingNode(models.Model):
     queue_count = models.PositiveIntegerField(default=0, help_text="Number of tasks currently being processed by this node (as reported by the node itself)")
     available_options = fields.JSONField(default=dict(), help_text="Description of the options that can be used for processing")
     def __str__(self):
-            return '%s %s (%s)'.format(self.hostname, self.port, self.api_version)
+        return '{}:{} ({})'.format(self.hostname, self.port, self.api_version or "?")
 
 
 def gcp_directory_path(task, filename):
@@ -57,7 +57,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
 
     def __str__(self):
-        return '%s %s'.format(self.name, self.uuid)
+        return '{} {}'.format(self.name, self.uuid)
 
 
 def image_directory_path(task, filename):
