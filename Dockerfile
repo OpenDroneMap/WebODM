@@ -12,5 +12,8 @@ WORKDIR /webodm
 ADD requirements.txt /webodm/
 RUN pip install -r requirements.txt
 
+# swagger_spec_validator is not up to date, fetch directly from github
+RUN pip install --upgrade git+git://github.com/Yelp/swagger_spec_validator
+
 # Add repository files
 ADD . /webodm/

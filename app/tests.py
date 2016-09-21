@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from django.test import Client
 
-from .models import Project,Task
+from .models import Project, Task
 
 # Create your tests here.
 
