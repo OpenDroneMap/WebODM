@@ -59,6 +59,7 @@ Then:
 
 ```
 pip install -r requirements.txt
+pip install --upgrade git+git://github.com/Yelp/swagger_spec_validator
 chmod +x start.sh && ./start.sh
 ```
 
