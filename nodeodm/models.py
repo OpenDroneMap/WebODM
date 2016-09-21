@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.postgres import fields
+from django.utils import timezone
 from .api_client import ApiClient
 
 class ProcessingNode(models.Model):
@@ -16,19 +17,24 @@ class ProcessingNode(models.Model):
         super(ProcessingNode, self).__init__(*args, **kwargs)
 
         # Initialize api client
-        if self.hostname != None and self.port != None:
-            print("HI!")
-            self.api_client = ApiClient(self.hostname, self.port)
+        self.api_client = ApiClient(self.hostname, self.port)
 
     def __str__(self):
-        print("OH!");
-        self.update_info()
         return '{}:{}'.format(self.hostname, self.port)
 
-
-    def update_info(self):
+    def update_node_info(self):
         """
-        Retrieves information from the node
+        Retrieves information and options from the node
         and saves it into the database
         """
-        print(self.api_client.info())
+        info = self.api_client.info()
+        if info != None:
+            self.api_version = info['version']
+            self.queue_count = info['taskQueueCount']
+
+            options = self.api_client.options()
+            if options != None:
+                self.available_options = options
+                self.last_refreshed = timezone.now()
+
+                self.save()
