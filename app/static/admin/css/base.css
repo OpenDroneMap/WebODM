@@ -421,9 +421,9 @@
     padding-left: 16px;
     background: url(../img/icon-deletelink.svg) 0 1px no-repeat; }
   .admin-area a.deletelink:link, .admin-area a.deletelink:visited {
-    color: #CC3434; }
+    color: #fff; }
   .admin-area a.deletelink:focus, .admin-area a.deletelink:hover {
-    color: #993333;
+    color: #fff;
     text-decoration: none; }
   .admin-area .object-tools {
     font-size: 10px;

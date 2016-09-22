@@ -67,3 +67,13 @@ ul#side-menu.nav{
 .navbar-default{
     background-color: white;
 }
+
+.alert{
+    margin-bottom: 10px;
+}
+
+table.table-first-col-bold{
+    td:first-child{
+        font-weight: bold;
+    }
+}

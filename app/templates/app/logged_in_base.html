@@ -248,7 +248,7 @@
 
                         {% for node in nodes %}
                         <li>
-                            <a href="#"><span class="fa fa-laptop"></span> {{node}}</a>
+                            <a href="{% url 'processing_node' node.id %}"><span class="fa fa-laptop"></span> {{node}}</a>
                         </li>
                         {% endfor %}
                         <li>
@@ -277,6 +277,15 @@
 <div id="page-wrapper">
     <section class="main">
         <div class="content">
+            {% block messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endblock %}
+
             {% block content %}{% endblock %}
         </div>
     </section>

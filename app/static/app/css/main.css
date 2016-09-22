@@ -39,4 +39,10 @@ ul#side-menu.nav a {
 .navbar-default {
   background-color: white; }
 
+.alert {
+  margin-bottom: 10px; }
+
+table.table-first-col-bold td:first-child {
+  font-weight: bold; }
+
 /*# sourceMappingURL=main.css.map */

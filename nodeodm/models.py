@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.postgres import fields
 from django.utils import timezone
 from .api_client import ApiClient
+import json
 
 class ProcessingNode(models.Model):
     hostname = models.CharField(max_length=255, help_text="Hostname where the node is located (can be an internal hostname as well)")
@@ -24,8 +25,10 @@ class ProcessingNode(models.Model):
 
     def update_node_info(self):
         """
-        Retrieves information and options from the node
-        and saves it into the database
+        Retrieves information and options from the node API
+        and saves it into the database.
+
+        :returns: True if information could be updated, False otherwise
         """
         info = self.api_client.info()
         if info != None:
@@ -38,3 +41,11 @@ class ProcessingNode(models.Model):
                 self.last_refreshed = timezone.now()
 
                 self.save()
+                return True
+        return False
+
+    def get_available_options_json(self):
+        """
+        :returns available options in JSON string format
+        """
+        return json.dumps(self.available_options)

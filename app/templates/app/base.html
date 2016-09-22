@@ -24,6 +24,7 @@
     {% block extra-headers %}{% endblock %}
     <link rel="stylesheet" type="text/css" href="{% static 'app/css/main.css' %}" />
     <script src="{% static 'app/js/vendor/modernizr-2.8.3.min.js' %}"></script>
+    <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
     <title>{{title|default:"Login"}} - WebODM</title>
 </head>
 <body data-admin-utc-offset="{% now "Z" %}">
@@ -67,8 +68,6 @@
         {% block page-wrapper %}{% endblock %}
     </div>
 </body>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"><\/script>')</script>
 <script src="{% static 'app/js/vendor/bootstrap.min.js' %}"></script>
 <script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
 <script src="{% static 'app/js/main.js' %}"></script>

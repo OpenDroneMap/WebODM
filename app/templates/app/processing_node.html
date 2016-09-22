@@ -1,0 +1,46 @@
+{% extends "app/logged_in_base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h3>Processing Node</h3>
+<table class="table table-bordered table-first-col-bold">
+	<tr>
+		<td>{% trans "Hostname" %}</td>
+		<td>{{ processing_node.hostname }}</td>
+	</tr>
+	<tr>
+		<td>{% trans "Port" %}</td>
+		<td>{{ processing_node.port }}</td>
+	</tr>
+	<tr>
+		<td>{% trans "API Version" %}</td>
+		<td>{{ processing_node.api_version }}</td>
+	</tr>
+	<tr>
+		<td>{% trans "Queue Count" %}</td>
+		<td>{{ processing_node.queue_count }}</td>
+	</tr>
+	<tr>
+		<td>{% trans "Last Refreshed" %}</td>
+		<td>{{ processing_node.last_refreshed }}</td> <!-- TODO: timezone? -->
+	</tr>
+	<tr>
+		<td>{% trans "Options (JSON)" %}</td>
+		<td><div id="processing_node_json"></div></td>
+	</tr>
+</table>
+<script>
+$(function(){
+	// TODO: we'll need a prettier console library to display stuff like 
+	// json, console output, etc.
+	// this is temporary!
+	var optionsText = JSON.stringify(JSON.parse("{{ available_options_json|escapejs }}"), null, 4);
+	$("#processing_node_json")
+		.html(optionsText.replace(/\n/g, "<br/>").replace(/  /g, "&nbsp;&nbsp;"))
+		.css({
+			'overflow': 'auto',
+			'max-height': '200px'
+		});
+});
+</script>
+{% endblock %}

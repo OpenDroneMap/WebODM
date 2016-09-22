@@ -2,6 +2,7 @@
 A wrapper around Bravado to communicate with a node-OpenDroneMap node.
 """
 from bravado.client import SwaggerClient
+from bravado.exception import HTTPError
 from requests import ConnectionError
 
 class ApiClient:
@@ -15,9 +16,10 @@ class ApiClient:
             if not hasattr(self, 'client'):
                 try:
                     self.client = SwaggerClient.from_url('http://{}:{}/swagger.json'.format(self.host, self.port))
-                except ConnectionError as err:
+                except (ConnectionError, HTTPError) as err:
                     print("{}:{} seems offline: {}".format(self.host, self.port, err))
                     return None
+                    
             return func(self, *args, **kwargs)
         return check
 
