@@ -1,10 +1,12 @@
 # WebODM
 
-A web interface for [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap).
+A web interface, API and Mission Planner for [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap). The project aims to be a full open source solution for drone image processing.
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
-This is currently a work in progress! See the Roadmap below.
+This is currently a work in progress! See the Roadmap below. 
+
+If you know Python, web technologies (JS, HTML, CSS, etc.) or both, consider helping us! People of all skill levels are welcome.
 
 ## Getting Started
 
