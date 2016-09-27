@@ -17,3 +17,16 @@ RUN pip install --upgrade git+git://github.com/Yelp/swagger_spec_validator
 
 # Add repository files
 ADD . /webodm/
+
+RUN git submodule init 
+RUN git submodule update
+
+# Install Node.js + npm requirements for testing node-OpenDroneMap
+RUN curl --silent --location https://deb.nodesource.com/setup_6.x | sudo bash -
+RUN apt-get install -y nodejs
+
+WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
+RUN npm install
+
+WORKDIR /webodm
+ENTRYPOINT ["python", "manage.py", "runserver"]

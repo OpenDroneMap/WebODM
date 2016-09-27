@@ -17,7 +17,6 @@ class ApiClient:
                 try:
                     self.client = SwaggerClient.from_url('http://{}:{}/swagger.json'.format(self.host, self.port))
                 except (ConnectionError, HTTPError) as err:
-                    print("{}:{} seems offline: {}".format(self.host, self.port, err))
                     return None
                     
             return func(self, *args, **kwargs)
