@@ -13,7 +13,7 @@ ADD requirements.txt /webodm/
 RUN pip install -r requirements.txt
 
 # swagger_spec_validator is not up to date, fetch directly from github
-RUN pip install --upgrade git+git://github.com/Yelp/swagger_spec_validator
+RUN pip install --upgrade git+https://github.com/Yelp/swagger_spec_validator
 
 # Add repository files
 ADD . /webodm/
@@ -22,7 +22,7 @@ RUN git submodule init
 RUN git submodule update
 
 # Install Node.js + npm requirements for testing node-OpenDroneMap
-RUN curl --silent --location https://deb.nodesource.com/setup_6.x | sudo bash -
+RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs
 
 WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
