@@ -29,3 +29,6 @@ WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install
 
 WORKDIR /webodm
+
+# Make sure all scripts are executable
+RUN chmod +x *.sh
