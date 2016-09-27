@@ -29,4 +29,3 @@ WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install
 
 WORKDIR /webodm
-ENTRYPOINT ["python", "manage.py", "runserver"]
