@@ -1,6 +1,7 @@
 #!/bin/bash
 if ! [ -a .initialized ]; then
     echo First run, migrating...
+    python manage.py makemigrations
     python manage.py migrate
 
     echo Creating default superuser...
