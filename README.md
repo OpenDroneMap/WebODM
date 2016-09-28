@@ -16,6 +16,7 @@ The quickest way to get started is by using Docker.
 ```
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
+pip install docker-compose
 docker-compose up
 ```
 

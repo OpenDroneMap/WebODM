@@ -8,7 +8,7 @@ services:
   webapp:
     build: .
     container_name: webapp
-    entrypoint: /bin/bash /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh"
     volumes:
       - .:/webodm
     ports:
