@@ -29,6 +29,12 @@
 		<td><div id="processing_node_json"></div></td>
 	</tr>
 </table>
+{% if user.is_superuser %} 
+<div class="text-center">
+	<button class="btn btn-default" onclick="location.href='{% url "admin:nodeodm_processingnode_change" processing_node.id %}';"><span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}</button>
+	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><span class="glyphicon glyphicon-trash"></span> {% trans "Delete" %}</button>
+</div>
+{% endif %}
 <script>
 $(function(){
 	// TODO: we'll need a prettier console library to display stuff like 
