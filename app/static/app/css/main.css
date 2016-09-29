@@ -49,4 +49,7 @@ ul#side-menu.nav a {
 table.table-first-col-bold td:first-child {
   font-weight: bold; }
 
+button span.glyphicon {
+  margin-right: 4px; }
+
 /*# sourceMappingURL=main.css.map */

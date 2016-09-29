@@ -31,8 +31,8 @@
 </table>
 {% if user.is_superuser %} 
 <div class="text-center">
-	<button class="btn btn-default" onclick="location.href='{% url "admin:nodeodm_processingnode_change" processing_node.id %}';"><span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}</button>
-	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><span class="glyphicon glyphicon-trash"></span> {% trans "Delete" %}</button>
+	<button class="btn btn-default" onclick="location.href='{% url "admin:nodeodm_processingnode_change" processing_node.id %}';"><i class="glyphicon glyphicon-pencil"></i> {% trans "Edit" %}</button>
+	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><i class="glyphicon glyphicon-trash"></i> {% trans "Delete" %}</button>
 </div>
 {% endif %}
 <script>

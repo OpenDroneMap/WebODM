@@ -1,5 +1,41 @@
 {% extends "app/logged_in_base.html" %}
+{% load i18n %}
 
 {% block content %}
-<div class="test">Hello dashboard</div>
+	{% if show_welcome %}
+		<h3>{% trans 'Welcome!' %}</h3>
+	{% else %}
+		<h3>{% trans 'Dashboard' %}</h3>
+	{% endif %}
+	
+	{% if no_processingnodes %}
+		{% trans 'Add a Processing Node' as add_processing_node %}
+		{% with nodeodm_link='<a href="https://github.com/pierotofy/node-OpenDroneMap" target="_blank">node-OpenDroneMap</a>' api_link='<a href="https://github.com/pierotofy/node-OpenDroneMap/blob/master/docs/index.adoc" target="_blank">API</a>' %}
+			<p>
+			{% blocktrans %} 
+				To get started, "{{ add_processing_node }}". A processing node is a computer running an instance of {{ nodeodm_link }} or some other software that implements this {{ api_link }}.
+			{% endblocktrans %}
+			</p>
+		{% endwith %}
+		<button class="btn btn-primary" onclick="location.href='{% url "admin:nodeodm_processingnode_add" %}';"><i class="fa fa-plus-circle"></i> {{ add_processing_node }}</button>
+		
+	{% else %}
+
+		{% if no_projects %}
+			{% trans 'Upload Images' as upload_images %}
+			<p>
+				{% blocktrans %} To create a new project, press the "{{ upload_images }}" button. {% endblocktrans %}
+			</p>
+			<button class="btn btn-primary"><i class="glyphicon glyphicon-upload"></i> {{ upload_images }}</button>
+		{% endif %}
+
+		
+		<p>
+			<ul>
+				<li>{% trans 'Need at least 5 images' %}</li>
+				<li>{% trans 'Images must overlap by 60% or more' %}</li>
+			</ul>
+		</p>
+	{% endif %}
+	<!-- <h4>Projects</h4> -->
 {% endblock %}
