@@ -1,5 +1,5 @@
 {% extends "app/logged_in_base.html" %}
-{% load i18n %}
+{% load i18n tz %}
 
 {% block content %}
 <h3>Processing Node</h3>
@@ -22,7 +22,7 @@
 	</tr>
 	<tr>
 		<td>{% trans "Last Refreshed" %}</td>
-		<td>{{ processing_node.last_refreshed }}</td> <!-- TODO: timezone? -->
+		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'ago' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
 	</tr>
 	<tr>
 		<td>{% trans "Options (JSON)" %}</td>
