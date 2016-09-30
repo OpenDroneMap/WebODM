@@ -4,6 +4,7 @@ from nodeodm.models import ProcessingNode
 from .models import Project
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext as _
 
 def index(request):
     return redirect('dashboard' if request.user.is_authenticated() 
@@ -11,13 +12,15 @@ def index(request):
 
 @login_required
 def dashboard(request):
-    no_projects = Project.objects.count() == 0
-    no_processingnodes = ProcessingNode.objects.count() == 0 and no_projects
+    no_processingnodes = ProcessingNode.objects.count() == 0
+
+    # Create first project automatically
+    if Project.objects.count() == 0:
+        proj = Project(owner=request.user, name=_("First Project"))
+        proj.save()
 
     return render(request, 'app/dashboard.html', {'title': 'Dashboard', 
-        'no_projects': no_projects,
-        'no_processingnodes': no_processingnodes,
-        'show_welcome': no_projects and no_processingnodes})
+        'no_processingnodes': no_processingnodes})
 
 @login_required
 def processing_node(request, processing_node_id):

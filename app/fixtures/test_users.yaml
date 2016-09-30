@@ -11,7 +11,7 @@
     email: test@mail.com
     is_staff: true
     is_active: true
-    date_joined: 2016-09-11 22:26:52.582858+00:00
+    date_joined: '2016-09-11T22:26:52.582858+00:00'
     groups: []
     user_permissions: []
 - model: auth.user
@@ -27,6 +27,6 @@
     email: test2@mail.com
     is_staff: true
     is_active: true
-    date_joined: 2016-09-11 22:26:52.582858+00:00
+    date_joined: '2016-09-11T22:26:52.582858+00:00'
     groups: []
     user_permissions: []

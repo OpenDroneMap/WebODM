@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block content %}
-	{% if show_welcome %}
+	{% if no_processingnodes %}
 		<h3>{% trans 'Welcome!' %}</h3>
 	{% else %}
 		<h3>{% trans 'Dashboard' %}</h3>
@@ -21,14 +21,11 @@
 		
 	{% else %}
 
-		{% if no_projects %}
-			{% trans 'Upload Images' as upload_images %}
-			<p>
-				{% blocktrans %} To create a new project, press the "{{ upload_images }}" button. {% endblocktrans %}
-			</p>
-			<button class="btn btn-primary"><i class="glyphicon glyphicon-upload"></i> {{ upload_images }}</button>
-		{% endif %}
-
+		{% trans 'Upload Images' as upload_images %}
+		<p>
+			{% blocktrans %} To create a new project, press the "{{ upload_images }}" button. {% endblocktrans %}
+		</p>
+		<button class="btn btn-primary"><i class="glyphicon glyphicon-upload"></i> {{ upload_images }}</button>
 		
 		<p>
 			<ul>

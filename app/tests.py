@@ -61,6 +61,9 @@ class TestApp(TestCase):
         # Login
         c.post('/login/', data=self.credentials, follow=True)
 
+        # We should have a project created from the dashboard
+        self.assertTrue(Project.objects.count() >= 1)
+
         # We can access a processingnode view that exists
         res = c.get('/processingnode/1/')
         self.assertTrue(res.status_code == 200)
