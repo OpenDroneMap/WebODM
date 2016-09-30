@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'app',
-    'nodeodm'
+    'nodeodm',
 ]
 
 MIDDLEWARE = [
@@ -141,6 +142,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger' # Bootstrap 3 compatibility
+}
+
+# REST setup
+# Use Django's standard django.contrib.auth permissions (no anonymous usage)
+REST_FRAMEWORK = {
+  'DEFAULT_PERMISSION_CLASSES': [
+    'rest_framework.permissions.DjangoModelPermissions',
+  ],
+  'PAGE_SIZE': 10,
 }
 
 try:
