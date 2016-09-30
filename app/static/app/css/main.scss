@@ -34,6 +34,10 @@
             text-decoration: none;
             background-color: #2c3e50;
         }
+
+        li{
+            word-break: break-word;
+        }
     }
 
     .navbar-top-links li a.dropdown-toggle{
@@ -58,6 +62,9 @@ ul#side-menu.nav{
 
 .content{
     clear: both;
+    h1,h2,h3,h4,h5{
+        padding-top: 4px;
+    }
 }
 
 .top-buffer { 
@@ -76,4 +83,8 @@ table.table-first-col-bold{
     td:first-child{
         font-weight: bold;
     }
+}
+
+button i.glyphicon{
+    margin-right: 4px;
 }

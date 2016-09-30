@@ -19,6 +19,8 @@
     color: white;
     text-decoration: none;
     background-color: #2c3e50; }
+  #navbar-top ul#side-menu li {
+    word-break: break-word; }
   #navbar-top .navbar-top-links li a.dropdown-toggle {
     height: 50px; }
   #navbar-top .user-profile {
@@ -32,6 +34,8 @@ ul#side-menu.nav a {
 
 .content {
   clear: both; }
+  .content h1, .content h2, .content h3, .content h4, .content h5 {
+    padding-top: 4px; }
 
 .top-buffer {
   margin-top: 15px; }
@@ -44,5 +48,8 @@ ul#side-menu.nav a {
 
 table.table-first-col-bold td:first-child {
   font-weight: bold; }
+
+button span.glyphicon {
+  margin-right: 4px; }
 
 /*# sourceMappingURL=main.css.map */

@@ -208,11 +208,11 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li class="user-profile">
-                    Hello, {{ user.username }}<br/>
+                    {% trans 'Hello' %}, {{ user.username }}<br/>
                     <span class="email">{{ user.email }}</span>
                 </li>
                 <li class="divider"></li>
-                <li><a href="/logout/"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                <li><a href="/logout/"><i class="fa fa-sign-out fa-fw"></i> {% trans 'Logout' %}</a>
                 </li>
             </ul>
             <!-- /.dropdown-user -->
@@ -235,7 +235,7 @@
                     </div>
                 </li>-->
                 <li>
-                    <a href="/dashboard/"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                    <a href="/dashboard/"><i class="fa fa-dashboard fa-fw"></i> {% trans 'Dashboard' %}</a>
                 </li>
                 <!--<li>
                     <a href="#"><i class="fa fa-plane fa-fw"></i> Mission Planner</a>
@@ -252,18 +252,18 @@
                         </li>
                         {% endfor %}
                         <li>
-                            <a href="/admin/nodeodm/processingnode/add/"><span class="fa fa-plus-circle"></span> Add New</a>
+                            <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> Add New</a>
                         </li>
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
                 {% if user.is_superuser %}    
                 <li>
-                    <a href="/admin/"><i class="fa fa-gears fa-fw"></i> Admin Panel</a>
+                    <a href="/admin/"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}</a>
                 </li>
                 {% endif %}
                 <li>
-                    <a href="#"><i class="fa fa-life-saver fa-fw"></i> Documentation</a>
+                    <a href="#"><i class="fa fa-life-saver fa-fw"></i> {% trans 'Documentation' %}</a>
                 </li>
             </ul>
         </div>

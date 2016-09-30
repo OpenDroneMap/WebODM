@@ -1,5 +1,5 @@
 {% extends "app/logged_in_base.html" %}
-{% load i18n %}
+{% load i18n tz %}
 
 {% block content %}
 <h3>Processing Node</h3>
@@ -22,13 +22,19 @@
 	</tr>
 	<tr>
 		<td>{% trans "Last Refreshed" %}</td>
-		<td>{{ processing_node.last_refreshed }}</td> <!-- TODO: timezone? -->
+		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'ago' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
 	</tr>
 	<tr>
 		<td>{% trans "Options (JSON)" %}</td>
 		<td><div id="processing_node_json"></div></td>
 	</tr>
 </table>
+{% if user.is_superuser %} 
+<div class="text-center">
+	<button class="btn btn-default" onclick="location.href='{% url "admin:nodeodm_processingnode_change" processing_node.id %}';"><i class="glyphicon glyphicon-pencil"></i> {% trans "Edit" %}</button>
+	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><i class="glyphicon glyphicon-trash"></i> {% trans "Delete" %}</button>
+</div>
+{% endif %}
 <script>
 $(function(){
 	// TODO: we'll need a prettier console library to display stuff like 
