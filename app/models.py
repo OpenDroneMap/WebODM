@@ -47,9 +47,6 @@ class ProjectUserObjectPermission(UserObjectPermissionBase):
 class ProjectGroupObjectPermission(GroupObjectPermissionBase):
     content_object = models.ForeignKey(Project)
 
-# from guardian.shortcuts import get_objects_for_user
-# ...
-# videos = get_objects_for_user(request.user, "view_video", Video.objects.all())
 
 def gcp_directory_path(task, filename):
     return assets_directory_path(task.id, task.project.id, filename)
