@@ -13,9 +13,9 @@ ADD requirements.txt /webodm/
 RUN pip install -r requirements.txt
 
 # swagger_spec_validator is not up to date, fetch directly from github
-RUN pip install --upgrade git+https://github.com/Yelp/swagger_spec_validator
+# also install django-knockout
+RUN pip install --upgrade git+https://github.com/Yelp/swagger_spec_validator git+https://github.com/pierotofy/django-knockout
 
-# Add repository files
 ADD . /webodm/
 
 RUN git submodule init 
