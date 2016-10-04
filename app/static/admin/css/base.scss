@@ -3,6 +3,10 @@
 */
 
 .admin-area{
+    #changelist-filter{
+        display: none;
+    }
+    
     a:link, a:visited {
         color: #447e9b;
         text-decoration: none;

@@ -72,8 +72,8 @@
   .admin-area .colMS .aligned .vLargeTextField, .admin-area .colMS .aligned .vXMLLargeTextField {
     width: 350px; }
   .admin-area form .aligned ul {
-    margin-left: 160px;
-    padding-left: 10px; }
+    margin-left: 6px;
+    padding-left: 3px; }
   .admin-area form .aligned ul.radiolist {
     display: inline-block;
     margin: 0;
@@ -302,8 +302,8 @@
     background-image: url(../img/search.svg); }
   .admin-area form .related-widget-wrapper ul {
     display: inline-block;
-    margin-left: 0;
-    padding-left: 0; }
+    margin-left: 6px;
+    padding-left: 3px; }
   .admin-area .clearable-file-input input {
     margin-top: 0; }
 

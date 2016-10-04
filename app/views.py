@@ -15,7 +15,7 @@ def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
 
     # Create first project automatically
-    if Project.objects.count() == 0:
+    if Project.objects.filter(owner=request.user).count() == 0:
         proj = Project(owner=request.user, name=_("First Project"))
         proj.save()
 

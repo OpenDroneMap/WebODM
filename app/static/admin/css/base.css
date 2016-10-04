@@ -19,6 +19,8 @@
   /* HEADER */
   /* SIDEBAR */
   /* POPUP */ }
+  .admin-area #changelist-filter {
+    display: none; }
   .admin-area a:link, .admin-area a:visited {
     color: #447e9b;
     text-decoration: none; }

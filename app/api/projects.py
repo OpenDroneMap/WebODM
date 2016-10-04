@@ -11,7 +11,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """
-    Projects the current user has access to, including the ability to create new ones.
+    Projects the current user has access to.
     """
     queryset = models.Project.objects.all()
     serializer_class = ProjectSerializer

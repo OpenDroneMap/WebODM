@@ -1,10 +1,15 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models import signals
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.postgres import fields
 from nodeodm.models import ProcessingNode
+from django.dispatch import receiver
+from guardian.shortcuts import get_perms_for_model, assign_perm
+from guardian.models import UserObjectPermissionBase
+from guardian.models import GroupObjectPermissionBase
 
 def assets_directory_path(taskId, projectId, filename):
     # files will be uploaded to MEDIA_ROOT/project_<id>/task_<id>/<filename>
@@ -14,12 +19,37 @@ def assets_directory_path(taskId, projectId, filename):
 class Project(models.Model):
     owner = models.ForeignKey(User, on_delete=models.PROTECT, help_text="The person who created the project")
     name = models.CharField(max_length=255, help_text="A label used to describe the project")
-    description = models.TextField(null=True, help_text="More in-depth description of the project")
+    description = models.TextField(null=True, blank=True, help_text="More in-depth description of the project")
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        permissions = (
+            ('view_project', 'Can view project'),
+        )
+
+
+@receiver(signals.post_save, sender=Project, dispatch_uid="project_post_save")
+def project_post_save(sender, instance, created, **kwargs):
+    """
+    Automatically assigns all permissions to the owner. If the owner changes
+    it's up to the user/developer to remove the previous owner's permissions.
+    """
+    for perm in get_perms_for_model(sender).all():
+        assign_perm(perm.codename, instance.owner, instance)
+
+
+class ProjectUserObjectPermission(UserObjectPermissionBase):
+    content_object = models.ForeignKey(Project)
+
+class ProjectGroupObjectPermission(GroupObjectPermissionBase):
+    content_object = models.ForeignKey(Project)
+
+# from guardian.shortcuts import get_objects_for_user
+# ...
+# videos = get_objects_for_user(request.user, "view_video", Video.objects.all())
 
 def gcp_directory_path(task, filename):
     return assets_directory_path(task.id, task.project.id, filename)

@@ -84,3 +84,32 @@ class TestApp(TestCase):
 
         res = c.get('/processingnode/abc/')
         self.assertTrue(res.status_code == 404)
+
+    def test_projects(self):
+        # Get a normal user
+        user = User.objects.get(pk=2)
+        self.assertFalse(user.is_superuser)
+
+        # Create a new project
+        p = Project(owner=user, name="test")
+        p.save()
+
+        # Have the proper permissions been set?
+        self.assertTrue(user.has_perm("view_project", p))
+        self.assertTrue(user.has_perm("add_project", p))
+        self.assertTrue(user.has_perm("change_project", p))
+        self.assertTrue(user.has_perm("delete_project", p))
+
+        # Get a superuser
+        superUser = User.objects.get(pk=1)
+        self.assertTrue(superUser.is_superuser)
+
+        # He should also have permissions, although not explicitly set
+        self.assertTrue(superUser.has_perm("delete_project", p))
+
+        # Get another user
+        anotherUser = User.objects.get(pk=3)
+        self.assertFalse(anotherUser.is_superuser)
+
+        # Should not have permission
+        self.assertFalse(anotherUser.has_perm("delete_project", p))
