@@ -11,6 +11,7 @@ services:
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh"
     volumes:
       - .:/webodm
+      - /webodm/nodeodm/external/node-OpenDroneMap/node_modules
     ports:
       - "8000:8000"
     depends_on:

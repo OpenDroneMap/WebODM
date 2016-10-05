@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import six
 import subprocess, time
-from os import path, environ
+from os import path
 from .models import ProcessingNode
 from .api_client import ApiClient
 
@@ -14,12 +14,7 @@ class TestClientApi(TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestClientApi, cls).setUpClass()
-
-        node_odm_dir = path.join(current_dir, "external", "node-OpenDroneMap")
-        cls.node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], 
-                                shell=False, 
-                                cwd=node_odm_dir, 
-                                env=dict(environ, NODE_PATH=path.join(node_odm_dir, "node_modules")))
+        cls.node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False, cwd=path.join(current_dir, "external", "node-OpenDroneMap"))
         time.sleep(5) # Wait for the server to launch
 
 
