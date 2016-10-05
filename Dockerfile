@@ -27,7 +27,7 @@ RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs
 
 WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
-RUN npm install
+RUN npm install -g
 
 WORKDIR /webodm
 
