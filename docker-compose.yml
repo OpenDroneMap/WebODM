@@ -4,7 +4,7 @@ services:
     build: ./db
     container_name: db
     ports:
-        - "5432:5432"
+        - "5432"
   webapp:
     build: .
     container_name: webapp
