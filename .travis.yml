@@ -8,7 +8,7 @@ services:
   - docker
 
 env:
-  DOCKER_COMPOSE_VERSION: 1.8.0
+  DOCKER_COMPOSE_VERSION: 1.8.1
 
 before_install:
   - sudo rm /usr/local/bin/docker-compose
