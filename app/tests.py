@@ -5,10 +5,18 @@ from django.contrib import messages
 from django.test import Client
 
 from .models import Project, Task
+from .boot import boot
+
+import api.tests
 
 class TestApp(TestCase):
 
     fixtures = ['test_users', 'test_processingnodes', ]
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestApp, cls).setUpClass()
+        boot()
 
     def setUp(self):
         self.credentials = {
@@ -84,6 +92,15 @@ class TestApp(TestCase):
 
         res = c.get('/processingnode/abc/')
         self.assertTrue(res.status_code == 404)
+
+    def test_default_group(self):
+        # It exists
+        self.assertTrue(Group.objects.filter(name='Default').count() == 1)
+
+        # Verify that all new users are assigned to default group
+        u = User.objects.create_user(username="default_user")
+        u.refresh_from_db()
+        self.assertTrue(u.groups.filter(name='Default').count() == 1)
 
     def test_projects(self):
         # Get a normal user
