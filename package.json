@@ -1,0 +1,32 @@
+{
+  "name": "webodm",
+  "version": "1.0.0",
+  "description": "Open Source Drone Image Processing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenDroneMap/WebODM.git"
+  },
+  "keywords": [
+    "opendronemap"
+  ],
+  "author": "",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/OpenDroneMap/WebODM/issues"
+  },
+  "homepage": "https://github.com/OpenDroneMap/WebODM#readme",
+  "dependencies": {
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "webpack": "^1.13.2",
+    "webpack-bundle-tracker": "0.0.93"
+  }
+}

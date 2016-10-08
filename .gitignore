@@ -88,5 +88,5 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Initialization flag
-.initialized
+node_modules/
+webpack-stats.json
