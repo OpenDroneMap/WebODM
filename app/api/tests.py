@@ -28,7 +28,7 @@ class TestApi(TestCase):
         client.login(username="testuser", password="test1234")
         res = client.get('/api/projects/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(res.data.results) > 0)
+        self.assertTrue(len(res.data["results"]) > 0)
 
         res = client.get('/api/projects/1/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
