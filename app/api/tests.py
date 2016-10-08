@@ -7,19 +7,20 @@ from django.contrib.auth.models import User
 
 class TestApi(TestCase):
 
-    fixtures = ['test_users', 'test_projects', ]
+    fixtures = ['test_users', ]
 
     def setUp(self):
-        Project(
-            owner=User.objects.get(username="testuser"),
-            name="test project"
-        ).save()
+        pass
 
     def tearDown(self):
         pass
 
     def test_project_list(self):
         client = APIClient()
+        project = Project.objects.create(
+                owner=User.objects.get(username="testuser"),
+                name="test project"
+            )
 
         # Forbidden without credentials
         res = client.get('/api/projects/')
@@ -30,7 +31,7 @@ class TestApi(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) > 0)
 
-        res = client.get('/api/projects/1/')
+        res = client.get('/api/projects/{}/'.format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         res = client.get('/api/projects/dasjkldas/')
