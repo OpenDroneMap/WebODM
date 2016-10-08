@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 class TestApi(TestCase):
 
-    fixtures = ['test_users', ]
+    fixtures = ['test_users', 'test_projects', ]
 
     def setUp(self):
         Project(

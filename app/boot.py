@@ -21,7 +21,7 @@ def boot():
                 )
         
         # Check super user
-        if User.objects.count() == 0:
+        if User.objects.filter(is_superuser=True).count() == 0:
             User.objects.create_superuser('admin', 'admin@example.com', 'admin')
             logger.info("Created superuser")
     except ProgrammingError:
