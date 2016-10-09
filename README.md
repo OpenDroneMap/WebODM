@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM)
 
-A web interface, API and Mission Planner for [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap). The project aims to be a full open source solution for drone image processing.
+An open source solution for drone image processing. The long term vision includes a web interface, API and Mission Planner.
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
-This is currently a work in progress! See the Roadmap below. 
-
-If you know Python, web technologies (JS, HTML, CSS, etc.) or both, consider helping us! People of all skill levels are welcome.
+If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork, contribute something that interests you, and make a pull request! All ideas are considered and people of all skill levels are welcome.
 
 ## Getting Started
 
