@@ -1,3 +1,9 @@
 #dashboard-app{
-    background-color: yellow;
+    .project-list-item{
+        min-height: 60px;
+    }
+
+    .project-list-item-panel{
+        min-height: 100px;
+    }
 }

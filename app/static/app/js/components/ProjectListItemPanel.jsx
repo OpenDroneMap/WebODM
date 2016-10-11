@@ -7,8 +7,8 @@ class ProjectListItemPanel extends React.Component {
 
   render() {
     return (
-      <div>
-      Sup!
+      <div className="project-list-item-panel">
+        TODO
       </div>
     );
   }

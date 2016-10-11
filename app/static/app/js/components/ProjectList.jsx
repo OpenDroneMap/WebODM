@@ -46,11 +46,11 @@ class ProjectList extends React.Component {
             return (<div>Loading projects...</div>);
         }
         else if (this.state.projects){
-            return (<div>
+            return (<ul className="list-group">
                     {this.state.projects.map(p => (
                         <ProjectListItem key={p.id} data={p} /> 
                     ))}
-                </div>);
+                </ul>);
         }else if (this.state.error){
             return (<div>An error occurred: {this.state.error}</div>);
         }else{
