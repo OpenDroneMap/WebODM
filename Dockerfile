@@ -32,8 +32,3 @@ RUN npm install
 WORKDIR /webodm
 RUN npm install -g webpack
 RUN npm install
-
-RUN webpack
-
-# Make sure all scripts are executable
-RUN chmod +x *.sh

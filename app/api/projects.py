@@ -4,6 +4,7 @@ from app import models, permissions
 from guardian.shortcuts import get_objects_for_user
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
     owner = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta:
