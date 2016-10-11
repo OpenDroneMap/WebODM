@@ -167,7 +167,7 @@ LOGGING = {
     'handlers': {
         'console': {
             'level': 'INFO',
-            'filters': ['require_debug_true'],
+            # 'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         }
@@ -205,7 +205,8 @@ REST_FRAMEWORK = {
     'app.permissions.GuardianObjectPermissions',
   ],
   'DEFAULT_FILTER_BACKENDS': [
-    'rest_framework.filters.DjangoObjectPermissionsFilter',
+    'rest_framework.filters.DjangoObjectPermissionsFilter', 
+    'rest_framework.filters.DjangoFilterBackend',
   ],
   'PAGE_SIZE': 10,
 }
