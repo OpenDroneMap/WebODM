@@ -9,14 +9,54 @@ from .boot import boot
 
 import api.tests
 
-class TestApp(TestCase):
+class BootTestCase(TestCase):
+    '''
+    This class provides optional default mock data as well as 
+    proper boot initialization code. All tests for the app
+    module should derive from this class instead of TestCase.
 
-    fixtures = ['test_users', 'test_processingnodes', ]
-
+    We don't use fixtures because we have signal initialization login
+    for some models, which doesn't play well with them, and this: http://blog.namis.me/2012/04/21/burn-your-fixtures/
+    '''
     @classmethod
     def setUpClass(cls):
-        super(TestApp, cls).setUpClass()
+        def setupUsers():
+            User.objects.create_superuser(username='testsuperuser',
+                                     email='superuser@test.com',
+                                     password='test1234')
+            User.objects.create_user(username='testuser',
+                                     email='user@test.com',
+                                     password='test1234')
+            User.objects.create_user(username='testuser2',
+                                     email='user2@test.com',
+                                     password='test1234')
+
+        def setupProjects():
+            Project.objects.create(
+                    owner=User.objects.get(username="testsuperuser"),
+                    name="Super User Test Project",
+                    description="This is a test project"
+                )
+            Project.objects.create(
+                    owner=User.objects.get(username="testuser"),
+                    name="User Test Project",
+                    description="This is a test project"
+                )
+            Project.objects.create(
+                    owner=User.objects.get(username="testuser2"),
+                    name="User 2 Test Project",
+                    description="This is a test project"
+                )
+
+        super(BootTestCase, cls).setUpClass()
         boot()
+        setupUsers()
+        setupProjects()
+
+
+class TestApp(BootTestCase):
+
+    fixtures = ['test_processingnodes', ]
 
     def setUp(self):
         self.credentials = {
@@ -104,12 +144,11 @@ class TestApp(TestCase):
 
     def test_projects(self):
         # Get a normal user
-        user = User.objects.get(pk=2)
+        user = User.objects.get(username="testuser")
         self.assertFalse(user.is_superuser)
 
         # Create a new project
-        p = Project(owner=user, name="test")
-        p.save()
+        p = Project.objects.create(owner=user, name="test")
 
         # Have the proper permissions been set?
         self.assertTrue(user.has_perm("view_project", p))
@@ -118,14 +157,14 @@ class TestApp(TestCase):
         self.assertTrue(user.has_perm("delete_project", p))
 
         # Get a superuser
-        superUser = User.objects.get(pk=1)
+        superUser = User.objects.get(username="testsuperuser")
         self.assertTrue(superUser.is_superuser)
 
         # He should also have permissions, although not explicitly set
         self.assertTrue(superUser.has_perm("delete_project", p))
 
         # Get another user
-        anotherUser = User.objects.get(pk=3)
+        anotherUser = User.objects.get(username="testuser2")
         self.assertFalse(anotherUser.is_superuser)
 
         # Should not have permission
