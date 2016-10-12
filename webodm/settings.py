@@ -137,6 +137,44 @@ STATICFILES_DIRS = [
 ]
 
 
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+        },
+        'app.logger': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
+    }
+}
+
+
 # Auth
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
@@ -154,7 +192,10 @@ MESSAGE_TAGS = {
 # Use Django's standard django.contrib.auth permissions (no anonymous usage)
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': [
-    'rest_framework.permissions.DjangoModelPermissions',
+    'app.permissions.GuardianObjectPermissions',
+  ],
+  'DEFAULT_FILTER_BACKENDS': [
+    'rest_framework.filters.DjangoObjectPermissionsFilter',
   ],
   'PAGE_SIZE': 10,
 }
