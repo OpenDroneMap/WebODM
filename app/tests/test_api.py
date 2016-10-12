@@ -1,4 +1,4 @@
-from app.tests import BootTestCase
+from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 
