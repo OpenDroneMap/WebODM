@@ -34,7 +34,7 @@ class ProjectList extends React.Component {
                     error: `Could not load projects list: ${textStatus}`,
                     loading: false
                 });
-            })
+            });
     }
 
     componentWillUnmount(){

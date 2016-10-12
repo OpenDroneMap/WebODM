@@ -1,8 +1,6 @@
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
-from .models import Project
+from .models import Project, Task
 
-class ProjectAdmin(GuardedModelAdmin):
-    pass
-
-admin.site.register(Project, ProjectAdmin)
+admin.site.register(Project, GuardedModelAdmin)
+admin.site.register(Task, GuardedModelAdmin)

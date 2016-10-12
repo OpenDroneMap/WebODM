@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from nodeodm.models import ProcessingNode
-from .models import Project
+from .models import Project, Task
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
@@ -13,14 +13,15 @@ def index(request):
 @login_required
 def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
+    no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
 
     # Create first project automatically
     if Project.objects.filter(owner=request.user).count() == 0:
-        proj = Project(owner=request.user, name=_("First Project"))
-        proj.save()
+        Project.objects.create(owner=request.user, name=_("First Project"))
 
     return render(request, 'app/dashboard.html', {'title': 'Dashboard', 
-        'no_processingnodes': no_processingnodes})
+        'no_processingnodes': no_processingnodes,
+        'no_tasks': no_tasks})
 
 @login_required
 def processing_node(request, processing_node_id):

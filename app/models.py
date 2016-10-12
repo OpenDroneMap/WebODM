@@ -25,6 +25,9 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+    def tasks(self):
+        return Task.objects.filter(project=self);
+
     class Meta:
         permissions = (
             ('view_project', 'Can view project'),
@@ -60,15 +63,15 @@ class Task(models.Model):
         (50, 'CANCELED')
     )
 
-    uuid = models.CharField(max_length=255, primary_key=True, help_text="Unique identifier of the task (as returned by OpenDroneMap's REST API)")
+    uuid = models.CharField(max_length=255, null=True, blank=True, unique=True, help_text="Unique identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
-    name = models.CharField(max_length=255, help_text="A label for the task")
+    name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
     processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
-    processing_node = models.ForeignKey(ProcessingNode, null=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
-    status = models.IntegerField(choices=STATUS_CODES, null=True, help_text="Current status of the task")
-    options = fields.JSONField(default=dict(), help_text="Options that are being used to process this task")
-    console_output = models.TextField(null=True, help_text="Console output of the OpenDroneMap's process")
-    ground_control_points = models.FileField(null=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
+    processing_node = models.ForeignKey(ProcessingNode, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
+    status = models.IntegerField(choices=STATUS_CODES, null=True, blank=True, help_text="Current status of the task")
+    options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task")
+    console_output = models.TextField(null=True, blank=True, help_text="Console output of the OpenDroneMap's process")
+    ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
     # georeferenced_model
     # orthophoto
     # textured_model

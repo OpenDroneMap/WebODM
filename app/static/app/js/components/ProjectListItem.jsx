@@ -1,5 +1,7 @@
 import React from 'react';
 import ProjectListItemPanel from './ProjectListItemPanel';
+import Dropzone from '../vendor/dropzone';
+import $ from 'jquery';
 
 class ProjectListItem extends React.Component {
   constructor(props){
@@ -8,8 +10,25 @@ class ProjectListItem extends React.Component {
     this.state = {
       showPanel: false
     };
+    this.dropzoneInitialized = false;
 
     this.togglePanel = this.togglePanel.bind(this);
+  }
+
+  initializeDropzone(domNode){
+    if (domNode != null && !this.dropzoneInitialized){
+      Dropzone.autoDiscover = false;
+
+      let dropzone = new Dropzone(domNode, {
+          url : '/api/upload'
+      });
+
+      dropzone.on("complete", function(file) {
+          console.log(file);
+      });
+
+      this.dropzoneInitialized = true;
+    }
   }
 
   togglePanel(){
@@ -42,6 +61,12 @@ class ProjectListItem extends React.Component {
         </i> <a href="javascript:void(0);" onClick={this.togglePanel}>
           {this.props.data.name}
         </a>
+
+        <div className="dropzone" ref={domNode => this.initializeDropzone(domNode)}>
+            <div className="dz-default dz-message text-center">
+                <i className="fa fa-cloud-upload fa-4x"></i>
+            </div>
+        </div>
 
         {this.state.showPanel ? <ProjectListItemPanel /> : ""}
       </li>

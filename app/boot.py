@@ -14,8 +14,8 @@ def boot():
         if created:
             logger.info("Created default group")
 
-        # Add default permissions (view_project, change_project, delete_task, etc.)
-        for permission in ('_project', '_task'):
+        # Add default permissions (view_project, change_project, delete_project, etc.)
+        for permission in ('_project'):
             default_group.permissions.add(
                     *list(Permission.objects.filter(codename__endswith=permission))
                 )
