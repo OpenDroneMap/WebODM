@@ -11,6 +11,7 @@ django-filter==0.15.2
 django-guardian==1.4.6
 django-webpack-loader==0.3.3
 djangorestframework==3.4.7
+drf-nested-routers==0.11.1
 enum34==1.1.6
 fido==3.2.0
 functools32==3.2.3.post2

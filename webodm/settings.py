@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'guardian',
     'rest_framework',
+    'rest_framework_nested',
     'webpack_loader',
     'app',
     'nodeodm',

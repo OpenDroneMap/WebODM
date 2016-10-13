@@ -25,7 +25,7 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
-    def tasks(self):
+    def tasks(self, pk=None):
         return Task.objects.filter(project=self);
 
     class Meta:
@@ -63,7 +63,7 @@ class Task(models.Model):
         (50, 'CANCELED')
     )
 
-    uuid = models.CharField(max_length=255, null=True, blank=True, unique=True, help_text="Unique identifier of the task (as returned by OpenDroneMap's REST API)")
+    uuid = models.CharField(max_length=255, null=True, blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
     name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
     processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
@@ -80,6 +80,11 @@ class Task(models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.name, self.uuid)
+
+    class Meta:
+        permissions = (
+            ('view_task', 'Can view task'),
+        )
 
 
 def image_directory_path(task, filename):

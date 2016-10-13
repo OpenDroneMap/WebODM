@@ -21,14 +21,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     access to view, add, change or delete them.<br/><br/>
     - /api/projects/&lt;projectId&gt;/tasks : list all tasks belonging to a project<br/>
     - /api/projects/&lt;projectId&gt;/tasks/&lt;taskId&gt; : get task details
-    
     """
     filter_fields = ('id', 'owner', 'name')
     serializer_class = ProjectSerializer
     queryset = models.Project.objects.all()
-
-    @detail_route(methods=['get'])
-    def tasks(self, request, pk=None):
-        tasks = self.get_object().tasks()
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data)

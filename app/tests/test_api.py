@@ -2,7 +2,7 @@ from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from app.models import Project
+from app.models import Project, Task
 from django.contrib.auth.models import User
 
 class TestApi(BootTestCase):
@@ -12,7 +12,7 @@ class TestApi(BootTestCase):
     def tearDown(self):
         pass
 
-    def test_project_list(self):
+    def test_projects(self):
         client = APIClient()
 
         user = User.objects.get(username="testuser")
@@ -46,7 +46,7 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Can filter
-        res = client.get('/api/projects/?owner=-1')
+        res = client.get('/api/projects/?owner=999')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) == 0)
 
@@ -54,3 +54,48 @@ class TestApi(BootTestCase):
         res = client.get('/api/projects/?id={}'.format(other_project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) == 0)
+
+        # Can access individual project
+        res = client.get('/api/projects/{}/'.format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data["id"] == project.id)
+
+        # Cannot access project for which we have no access to
+        res = client.get('/api/projects/{}/'.format(other_project.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+
+        # Create some tasks
+        task = Task.objects.create(project=project)
+        task2 = Task.objects.create(project=project)
+        other_task = Task.objects.create(project=other_project)
+
+        # Can list project tasks to a project we have access to
+        res = client.get('/api/projects/{}/tasks/'.format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 2)
+
+        # Cannot list project tasks for a project we don't have access to
+        res = client.get('/api/projects/{}/tasks/'.format(other_project.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Cannot list project tasks for a project that doesn't exist
+        res = client.get('/api/projects/999/tasks/')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        
+        # Can list task details for a task belonging to a project we have access to
+        res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data["id"] == task.id)
+
+        # Cannot list task details for a task belonging to a project we don't have access to
+        res = client.get('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # As above, but by trying to trick the API by using a project we have access to
+        res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, other_task.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Cannot access task details for a task that doesn't exist
+        res = client.get('/api/projects/{}/tasks/999/'.format(project.id, other_task.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
