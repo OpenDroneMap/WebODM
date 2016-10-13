@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from guardian.shortcuts import get_perms_for_model, assign_perm
 from guardian.models import UserObjectPermissionBase
 from guardian.models import GroupObjectPermissionBase
+from django.db import transaction
 
 def assets_directory_path(taskId, projectId, filename):
     # files will be uploaded to MEDIA_ROOT/project_<id>/task_<id>/<filename>
@@ -79,7 +80,25 @@ class Task(models.Model):
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
 
     def __str__(self):
-        return '{} {}'.format(self.name, self.uuid)
+        return 'Task ID: {}'.format(self.id)
+
+    @staticmethod
+    def create_from_images(images, project):
+        '''
+        Create a new task from a set of input images (such as the ones coming from request.FILES). 
+        This will happen inside a transaction so if one of the images 
+        fails to load, the task will not be created.
+        '''
+        with transaction.atomic():
+            task = Task.objects.create(project=project)
+
+            for image in images:
+                ImageUpload.objects.create(task=task, image=image)
+
+            return task
+
+        # In case of error
+        return None
 
     class Meta:
         permissions = (
@@ -87,7 +106,7 @@ class Task(models.Model):
         )
 
 
-def image_directory_path(task, filename):
+def image_directory_path(imageUpload, filename):
     return assets_directory_path(imageUpload.task.id, imageUpload.task.project.id, filename)
 
 class ImageUpload(models.Model):

@@ -1,6 +1,7 @@
 import React from 'react';
 import ProjectListItemPanel from './ProjectListItemPanel';
 import Dropzone from '../vendor/dropzone';
+import csrf from '../django/csrf';
 import $ from 'jquery';
 
 class ProjectListItem extends React.Component {
@@ -20,7 +21,12 @@ class ProjectListItem extends React.Component {
       Dropzone.autoDiscover = false;
 
       let dropzone = new Dropzone(domNode, {
-          url : '/api/upload'
+          url : `/api/projects/${this.props.data.id}/tasks/`,
+          parallelUploads: 9999999,
+          uploadMultiple: true,
+          headers: {
+            [csrf.header]: csrf.token
+          }
       });
 
       dropzone.on("complete", function(file) {

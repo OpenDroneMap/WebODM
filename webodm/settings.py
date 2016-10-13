@@ -191,7 +191,7 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
 
 # File uploads
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
 
 # Store flash messages in cookies
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
