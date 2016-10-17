@@ -13,8 +13,8 @@ from guardian.models import GroupObjectPermissionBase
 from django.db import transaction
 
 def assets_directory_path(taskId, projectId, filename):
-    # files will be uploaded to MEDIA_ROOT/project_<id>/task_<id>/<filename>
-    return 'project_{0}/task_{1}/{2}'.format(taskId, projectId, filename)
+    # files will be uploaded to MEDIA_ROOT/project/<id>/task/<id>/<filename>
+    return 'project/{0}/task/{1}/{2}'.format(projectId, taskId, filename)
 
 
 class Project(models.Model):
