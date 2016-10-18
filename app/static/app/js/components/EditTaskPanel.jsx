@@ -35,7 +35,7 @@ class EditTaskPanel extends React.Component {
     return (
       <div className="edit-task-panel">
         <form className="form-horizontal">
-          <p>Your images are being uploaded. In the meanwhile, set these additional options:</p>
+          <p>Your images are being uploaded. In the meanwhile, check these additional options:</p>
           <div className="form-group">
             <label className="col-sm-2 control-label">Name</label>
             <div className="col-sm-10">

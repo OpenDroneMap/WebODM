@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers, viewsets, filters
+from rest_framework import serializers, viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
 from app import models
 from .tasks import TaskIDsSerializer, TaskSerializer
 

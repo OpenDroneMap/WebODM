@@ -257,7 +257,7 @@
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
-                {% if user.is_superuser %}    
+                {% if user.is_staff %}    
                 <li>
                     <a href="/admin/"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}</a>
                 </li>

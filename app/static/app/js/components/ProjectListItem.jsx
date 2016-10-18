@@ -169,6 +169,8 @@ class ProjectListItem extends React.Component {
               </div>
           </div>
 
+          {this.state.showPanel ? <ProjectListItemPanel /> : ""}
+
           {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload}/> : ""}
           
           {this.state.upload.error !== "" ? 
@@ -180,7 +182,6 @@ class ProjectListItem extends React.Component {
 
           <EditTaskPanel className={!this.state.upload.showEditTask ? "hide" : ""} />
 
-          {this.state.showPanel ? <ProjectListItemPanel /> : ""}
         </div>
       </li>
     );
