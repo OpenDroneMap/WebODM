@@ -24,7 +24,7 @@ class TaskViewSet(viewsets.ViewSet):
     Once a processing node completes processing, results are stored in the task.
     """
     queryset = models.Task.objects.all()
-
+    
     # We don't use object level permissions on tasks, relying on
     # project's object permissions instead (but standard model permissions still apply)
     permission_classes = (permissions.DjangoModelPermissions, )

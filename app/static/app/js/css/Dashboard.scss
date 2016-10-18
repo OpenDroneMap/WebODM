@@ -3,8 +3,10 @@
         min-height: 100px;
     }
 
-    .row.no-margin{
-        margin: 0;
+    .row{
+        &.no-margin{
+            margin: 0;
+        }
     }
 
     .progress{
