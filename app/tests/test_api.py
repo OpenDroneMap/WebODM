@@ -153,3 +153,6 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
         self.assertTrue(res.data[0]["port"] == 1000)
+
+        # TODO: test PATCH operation on tasks
+        
