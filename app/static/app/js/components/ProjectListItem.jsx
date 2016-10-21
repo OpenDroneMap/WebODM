@@ -14,14 +14,14 @@ class ProjectListItem extends React.Component {
 
     this.state = {
       showPanel: false,
-      upload: this.getDefaultUploadState(),
-      taskId: null
+      upload: this.getDefaultUploadState()
     };
 
     this.togglePanel = this.togglePanel.bind(this);
     this.handleUpload = this.handleUpload.bind(this);
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
+    this.handleTaskSaved = this.handleTaskSaved.bind(this);
   }
 
   getDefaultUploadState(){
@@ -32,7 +32,9 @@ class ProjectListItem extends React.Component {
       progress: 0,
       totalCount: 0,
       totalBytes: 0,
-      totalBytesSent: 0
+      totalBytesSent: 0,
+      taskInfo: null,
+      taskId: null
     };
   }
 
@@ -84,20 +86,52 @@ class ProjectListItem extends React.Component {
       })
       .on("completemultiple", (files) => {
         // Check
-        let success = files.filter(file => file.status !== "success").length === 0;
+        let success = files.length > 0 && files.filter(file => file.status !== "success").length === 0;
 
+        // All files have uploaded!
         if (success){
           this.setUploadState({uploading: false});
+
+          try{
+            let response = JSON.parse(files[0].xhr.response);
+            if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
+            
+            let taskId = response.id;
+            this.setUploadState({taskId});
+
+            // Update task information (if the user has completed this step)
+            if (this.state.upload.taskInfo !== null){
+              this.updateTaskInfo();
+            }else{
+              // Need to wait for user to confirm task options
+            }
+          }catch(e){
+            this.setUploadState({error: `Invalid response from server: ${e.message}`})
+          }
+
         }else{
           this.setUploadState({
             uploading: false,
-            error: "Could not upload all files. An error occured."
+            error: "Could not upload all files. An error occured. Please try again."
           });
         }
       })
       .on("reset", () => {
         this.resetUploadState();
       });
+  }
+
+  updateTaskInfo(){
+    if (this.state.upload.taskId === null) throw new Error("taskId is null");
+    if (this.state.upload.taskInfo === null) throw new Error("taskInfo is null");
+
+    // TODO: update task via API call
+    // if (this.state.showPanel){
+    //   this.projectListItemPanel.refresh();
+    // }else{
+    //   this.setState({showPanel: true});
+    // }
+    // this.setState({showEditTask: false});
   }
 
   setRef(prop){
@@ -124,8 +158,16 @@ class ProjectListItem extends React.Component {
     this.resetUploadState();
   }
 
-  render() {
+  handleTaskSaved(taskInfo){
+    this.setUploadState({taskInfo});
 
+    // Has the upload finished?
+    if (!this.state.upload.uploading && this.state.upload.taskId !== null){
+      this.updateTaskInfo();
+    }
+  }
+
+  render() {
     return (
       <li className="project-list-item list-group-item"
          href="javascript:void(0);">
@@ -169,9 +211,9 @@ class ProjectListItem extends React.Component {
               </div>
           </div>
 
-          {this.state.showPanel ? <ProjectListItemPanel /> : ""}
+          {this.state.showPanel ? <ProjectListItemPanel ref={this.setRef("projectListItemPanel")}/> : ""}
 
-          {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload}/> : ""}
+          {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
           
           {this.state.upload.error !== "" ? 
             <div className="alert alert-warning alert-dismissible">
@@ -180,7 +222,11 @@ class ProjectListItem extends React.Component {
             </div>
             : ""}
 
-          <EditTaskPanel className={!this.state.upload.showEditTask ? "hide" : ""} />
+          <EditTaskPanel 
+            uploading={this.state.upload.uploading} 
+            show={this.state.upload.showEditTask} 
+            onSave={this.handleTaskSaved}
+            />
 
         </div>
       </li>

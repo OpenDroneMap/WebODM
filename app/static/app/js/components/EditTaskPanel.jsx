@@ -124,6 +124,11 @@ class EditTaskPanel extends React.Component {
     // console.log(this.state.selectedNode);
     // console.log(this.state.name || this.namePlaceholder);
     this.setState({editing: false});
+    this.props.onSave({
+      name: this.state.name !== "" ? this.state.name : this.namePlaceholder,
+      selectedNode: this.state.selectedNode,
+      options: this.getOptions()
+    });
   }
 
   edit(e){
@@ -174,9 +179,11 @@ class EditTaskPanel extends React.Component {
       }
 
       return (
-        <div className="edit-task-panel">
+        <div className={"edit-task-panel " + (!this.props.show ? "hide" : "")}>
           <form className="form-horizontal">
-            <p>Your images are being uploaded. In the meanwhile, check these additional options:</p>
+            <p>{this.props.uploading ? 
+              "Your images are being uploaded. In the meanwhile, check these additional options:"
+            : "Please check these additional options:"}</p>
             <div className="form-group">
               <label className="col-sm-2 control-label">Name</label>
               <div className="col-sm-10">
@@ -186,21 +193,23 @@ class EditTaskPanel extends React.Component {
             {processingNodesOptions}
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10 text-right">
-                <button type="submit" className="btn btn-primary" onClick={this.save}><i className="glyphicon glyphicon-saved"></i> Save</button>
+                <button type="submit" className="btn btn-primary" onClick={this.save}><i className="glyphicon glyphicon-saved"></i> {this.props.uploading ? "Save" : "Start Processing"}</button>
               </div>
             </div>
           </form>
         </div>
       );
-    }else{
+    }else if (this.props.uploading){
       return (
-          <div className="edit-task-panel">
+          <div className={"edit-task-panel " + (!this.props.show ? "hide" : "")}>
             <div className="pull-right">
               <button type="submit" className="btn btn-primary btn-sm glyphicon glyphicon-pencil" onClick={this.edit}></button>
             </div>
             <p className="header"><strong>Thank you!</strong> Please wait for the upload to complete.</p>
           </div>
         );
+    }else{
+      return (<div></div>);
     }
   }
 }

@@ -23,6 +23,10 @@ class UploadProgressBar extends React.Component {
 
     let active = percentage < 100 ? "active" : "";
 
+    let label = active ? 
+                `${this.props.totalCount} files${bytes}` :
+                `${this.props.totalCount} files uploaded successfully`;
+
     return (
       <div>
         <div className="progress">
@@ -31,7 +35,7 @@ class UploadProgressBar extends React.Component {
           </div>
         </div>
         <div className="text-left small">
-          {this.props.totalCount} files{bytes}
+          {label}
         </div>
       </div>
     );
