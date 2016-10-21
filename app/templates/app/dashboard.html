@@ -1,5 +1,6 @@
 {% extends "app/logged_in_base.html" %}
 {% load i18n %}
+{% load render_bundle from webpack_loader %}
 
 {% block content %}
 	{% if no_processingnodes %}
@@ -20,19 +21,22 @@
 		<button class="btn btn-primary" onclick="location.href='{% url "admin:nodeodm_processingnode_add" %}';"><i class="fa fa-plus-circle"></i> {{ add_processing_node }}</button>
 		
 	{% else %}
-
-		{% trans 'Upload Images' as upload_images %}
-		<p>
-			{% blocktrans %} To create a new project, press the "{{ upload_images }}" button. {% endblocktrans %}
-		</p>
-		<button class="btn btn-primary"><i class="glyphicon glyphicon-upload"></i> {{ upload_images }}</button>
 		
-		<p>
-			<ul>
-				<li>{% trans 'Need at least 5 images' %}</li>
-				<li>{% trans 'Images must overlap by 60% or more' %}</li>
-			</ul>
-		</p>
+		{% if no_tasks %}
+			{% trans 'Upload Images' as upload_images %}
+			<p>
+				{% blocktrans %} To create a map, press the "{{ upload_images }}" button. {% endblocktrans %}
+			</p>
+			<p>
+				<ul>
+					<li>{% trans 'You need at least 5 images' %}</li>
+					<li>{% trans 'Images must overlap by 60% or more' %}</li>
+				</ul>
+			</p>
+		{% endif %}
+
+		<div id="dashboard-app"></div>
+	    {% render_bundle 'main' %}
+
 	{% endif %}
-	<!-- <h4>Projects</h4> -->
 {% endblock %}

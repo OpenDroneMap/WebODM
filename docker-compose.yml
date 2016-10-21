@@ -12,6 +12,7 @@ services:
     volumes:
       - .:/webodm
       - /webodm/nodeodm/external/node-OpenDroneMap/node_modules
+      - /webodm/node_modules
     ports:
       - "8000:8000"
     depends_on:

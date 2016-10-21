@@ -1,4 +1,7 @@
 #!/bin/bash
+echo Building asssets...
+webpack
+
 echo Running migrations
 python manage.py makemigrations
 python manage.py migrate

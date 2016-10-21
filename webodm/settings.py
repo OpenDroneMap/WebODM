@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'guardian',
     'rest_framework',
+    'rest_framework_nested',
+    'webpack_loader',
     'app',
     'nodeodm',
 ]
@@ -137,6 +139,15 @@ STATICFILES_DIRS = [
 ]
 
 
+# Webpack
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'app/bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
+
+
 # Logging
 LOGGING = {
     'version': 1,
@@ -157,7 +168,7 @@ LOGGING = {
     'handlers': {
         'console': {
             'level': 'INFO',
-            'filters': ['require_debug_true'],
+            # 'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         }
@@ -180,7 +191,7 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
 
 # File uploads
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
 
 # Store flash messages in cookies
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
@@ -195,7 +206,8 @@ REST_FRAMEWORK = {
     'app.permissions.GuardianObjectPermissions',
   ],
   'DEFAULT_FILTER_BACKENDS': [
-    'rest_framework.filters.DjangoObjectPermissionsFilter',
+    'rest_framework.filters.DjangoObjectPermissionsFilter', 
+    'rest_framework.filters.DjangoFilterBackend',
   ],
   'PAGE_SIZE': 10,
 }

@@ -22,7 +22,7 @@ ADD . /webodm/
 RUN git submodule init 
 RUN git submodule update
 
-# Install Node.js + npm requirements for testing node-OpenDroneMap
+# Install Node.js + npm requirements for testing node-OpenDroneMap and React
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs
 
@@ -30,6 +30,5 @@ WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install
 
 WORKDIR /webodm
-
-# Make sure all scripts are executable
-RUN chmod +x *.sh
+RUN npm install -g webpack
+RUN npm install

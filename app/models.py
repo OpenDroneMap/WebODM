@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from guardian.shortcuts import get_perms_for_model, assign_perm
 from guardian.models import UserObjectPermissionBase
 from guardian.models import GroupObjectPermissionBase
+from django.db import transaction
 
 def assets_directory_path(taskId, projectId, filename):
     # files will be uploaded to MEDIA_ROOT/project_<id>/task_<id>/<filename>
@@ -24,6 +25,9 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+    def tasks(self, pk=None):
+        return Task.objects.filter(project=self);
 
     class Meta:
         permissions = (
@@ -60,15 +64,15 @@ class Task(models.Model):
         (50, 'CANCELED')
     )
 
-    uuid = models.CharField(max_length=255, primary_key=True, help_text="Unique identifier of the task (as returned by OpenDroneMap's REST API)")
+    uuid = models.CharField(max_length=255, null=True, blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
-    name = models.CharField(max_length=255, help_text="A label for the task")
+    name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
     processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
-    processing_node = models.ForeignKey(ProcessingNode, null=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
-    status = models.IntegerField(choices=STATUS_CODES, null=True, help_text="Current status of the task")
-    options = fields.JSONField(default=dict(), help_text="Options that are being used to process this task")
-    console_output = models.TextField(null=True, help_text="Console output of the OpenDroneMap's process")
-    ground_control_points = models.FileField(null=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
+    processing_node = models.ForeignKey(ProcessingNode, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
+    status = models.IntegerField(choices=STATUS_CODES, null=True, blank=True, help_text="Current status of the task")
+    options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task")
+    console_output = models.TextField(null=True, blank=True, help_text="Console output of the OpenDroneMap's process")
+    ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
     # georeferenced_model
     # orthophoto
     # textured_model
@@ -76,10 +80,33 @@ class Task(models.Model):
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
 
     def __str__(self):
-        return '{} {}'.format(self.name, self.uuid)
+        return 'Task ID: {}'.format(self.id)
+
+    @staticmethod
+    def create_from_images(images, project):
+        '''
+        Create a new task from a set of input images (such as the ones coming from request.FILES). 
+        This will happen inside a transaction so if one of the images 
+        fails to load, the task will not be created.
+        '''
+        with transaction.atomic():
+            task = Task.objects.create(project=project)
+
+            for image in images:
+                ImageUpload.objects.create(task=task, image=image)
+
+            return task
+
+        # In case of error
+        return None
+
+    class Meta:
+        permissions = (
+            ('view_task', 'Can view task'),
+        )
 
 
-def image_directory_path(task, filename):
+def image_directory_path(imageUpload, filename):
     return assets_directory_path(imageUpload.task.id, imageUpload.task.project.id, filename)
 
 class ImageUpload(models.Model):

@@ -1,22 +1,12 @@
-from django.test import TestCase
-
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.test import Client
 
-from .models import Project, Task
-from .boot import boot
+from app.models import Project, Task
+from .classes import BootTestCase
 
-import api.tests
-
-class TestApp(TestCase):
-
-    fixtures = ['test_users', 'test_processingnodes', ]
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestApp, cls).setUpClass()
-        boot()
+class TestApp(BootTestCase):
+    fixtures = ['test_processingnodes', ]
 
     def setUp(self):
         self.credentials = {
@@ -104,12 +94,11 @@ class TestApp(TestCase):
 
     def test_projects(self):
         # Get a normal user
-        user = User.objects.get(pk=2)
+        user = User.objects.get(username="testuser")
         self.assertFalse(user.is_superuser)
 
         # Create a new project
-        p = Project(owner=user, name="test")
-        p.save()
+        p = Project.objects.create(owner=user, name="test")
 
         # Have the proper permissions been set?
         self.assertTrue(user.has_perm("view_project", p))
@@ -118,14 +107,14 @@ class TestApp(TestCase):
         self.assertTrue(user.has_perm("delete_project", p))
 
         # Get a superuser
-        superUser = User.objects.get(pk=1)
+        superUser = User.objects.get(username="testsuperuser")
         self.assertTrue(superUser.is_superuser)
 
         # He should also have permissions, although not explicitly set
         self.assertTrue(superUser.has_perm("delete_project", p))
 
         # Get another user
-        anotherUser = User.objects.get(pk=3)
+        anotherUser = User.objects.get(username="testuser2")
         self.assertFalse(anotherUser.is_superuser)
 
         # Should not have permission

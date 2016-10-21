@@ -1,9 +1,0 @@
-- model: app.project
-  pk: 1
-  fields: {owner: 2, name: Test_Project2, description: This is a test project, created_at: '2016-09-11T22:26:52.582858+00:00'}
-- model: app.project
-  pk: 2
-  fields: {owner: 1, name: Test_Project1, description: This is a test project, created_at: '2016-09-11T22:26:52.582858+00:00'}
-- model: app.project
-  pk: 3
-  fields: {owner: 1, name: Test_Project3, description: This is a test project, created_at: '2016-09-11T22:26:52.582858+00:00'}

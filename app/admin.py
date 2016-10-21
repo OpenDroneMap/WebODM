@@ -1,8 +1,10 @@
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
-from .models import Project
+from .models import Project, Task, ImageUpload
 
-class ProjectAdmin(GuardedModelAdmin):
-    pass
+admin.site.register(Project, GuardedModelAdmin)
+admin.site.register(Task, admin.ModelAdmin)
 
-admin.site.register(Project, ProjectAdmin)
+class ImageUploadAdmin(admin.ModelAdmin):
+    readonly_fields = ('image',)
+admin.site.register(ImageUpload, ImageUploadAdmin)
