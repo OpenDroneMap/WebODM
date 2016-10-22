@@ -120,15 +120,16 @@ class EditTaskPanel extends React.Component {
 
   save(e){
     e.preventDefault();
-    // console.log(this.getOptions());
-    // console.log(this.state.selectedNode);
-    // console.log(this.state.name || this.namePlaceholder);
     this.setState({editing: false});
-    this.props.onSave({
+    if (this.props.onSave) this.props.onSave(this.getTaskInfo());
+  }
+
+  getTaskInfo(){
+    return {
       name: this.state.name !== "" ? this.state.name : this.namePlaceholder,
       selectedNode: this.state.selectedNode,
       options: this.getOptions()
-    });
+    };
   }
 
   edit(e){
@@ -179,7 +180,7 @@ class EditTaskPanel extends React.Component {
       }
 
       return (
-        <div className={"edit-task-panel " + (!this.props.show ? "hide" : "")}>
+        <div className="edit-task-panel">
           <form className="form-horizontal">
             <p>{this.props.uploading ? 
               "Your images are being uploaded. In the meanwhile, check these additional options:"
@@ -200,8 +201,9 @@ class EditTaskPanel extends React.Component {
         </div>
       );
     }else if (this.props.uploading){
+      // Done editing, but still uploading
       return (
-          <div className={"edit-task-panel " + (!this.props.show ? "hide" : "")}>
+          <div className="edit-task-panel">
             <div className="pull-right">
               <button type="submit" className="btn btn-primary btn-sm glyphicon glyphicon-pencil" onClick={this.edit}></button>
             </div>
@@ -209,7 +211,7 @@ class EditTaskPanel extends React.Component {
           </div>
         );
     }else{
-      return (<div></div>);
+      return (<div><i className="fa fa-refresh fa-spin fa-fw"></i></div>);
     }
   }
 }

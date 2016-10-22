@@ -13,7 +13,7 @@ class TestApi(BootTestCase):
     def tearDown(self):
         pass
 
-    def test_projects(self):
+    def test_projects_and_tasks(self):
         client = APIClient()
 
         user = User.objects.get(username="testuser")
@@ -101,6 +101,18 @@ class TestApi(BootTestCase):
         res = client.get('/api/projects/{}/tasks/999/'.format(project.id, other_task.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
+        # Can update a task
+        res = client.patch('/api/projects/{}/tasks/{}/'.format(project.id, task.id), {'name': 'updated!'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Verify the task has been updated
+        res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
+        self.assertTrue(res.data["name"] == "updated!")
+
+        # Cannot update a task we have no access to
+        res = client.patch('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id), {'name': 'updated!'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
 
     def test_processingnodes(self):
         client = APIClient()
@@ -154,5 +166,3 @@ class TestApi(BootTestCase):
         self.assertTrue(len(res.data) == 1)
         self.assertTrue(res.data[0]["port"] == 1000)
 
-        # TODO: test PATCH operation on tasks
-        

@@ -14,6 +14,7 @@ class ProjectListItem extends React.Component {
 
     this.state = {
       showPanel: false,
+      updatingTask: false,
       upload: this.getDefaultUploadState()
     };
 
@@ -22,6 +23,10 @@ class ProjectListItem extends React.Component {
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
     this.handleTaskSaved = this.handleTaskSaved.bind(this);
+  }
+
+  componentWillUnmount(){
+    if (this.updateTaskRequest) this.updateTaskRequest.abort();
   }
 
   getDefaultUploadState(){
@@ -33,7 +38,7 @@ class ProjectListItem extends React.Component {
       totalCount: 0,
       totalBytes: 0,
       totalBytesSent: 0,
-      taskInfo: null,
+      savedTaskInfo: false,
       taskId: null
     };
   }
@@ -100,8 +105,8 @@ class ProjectListItem extends React.Component {
             this.setUploadState({taskId});
 
             // Update task information (if the user has completed this step)
-            if (this.state.upload.taskInfo !== null){
-              this.updateTaskInfo();
+            if (this.state.upload.savedTaskInfo){
+              this.updateTaskInfo(taskId, this.editTaskPanel.getTaskInfo());
             }else{
               // Need to wait for user to confirm task options
             }
@@ -121,17 +126,34 @@ class ProjectListItem extends React.Component {
       });
   }
 
-  updateTaskInfo(){
-    if (this.state.upload.taskId === null) throw new Error("taskId is null");
-    if (this.state.upload.taskInfo === null) throw new Error("taskInfo is null");
+  updateTaskInfo(taskId, taskInfo){
+    if (!taskId) throw new Error("taskId is not set");
+    if (!taskInfo) throw new Error("taskId is not set");
+    
+    this.setUploadState({showEditTask: false});
+    this.setState({updatingTask: true});
 
-    // TODO: update task via API call
-    // if (this.state.showPanel){
-    //   this.projectListItemPanel.refresh();
-    // }else{
-    //   this.setState({showPanel: true});
-    // }
-    // this.setState({showEditTask: false});
+    this.updateTaskRequest = $.ajax({
+        url: `/api/projects/${this.props.data.id}/tasks/${this.state.upload.taskId}/`,
+        contentType: 'application/json',
+        data: JSON.stringify({
+          name: taskInfo.name,
+          options: taskInfo.options,
+          processing_node: taskInfo.selectedNode.id
+        }),
+        dataType: 'json',
+        type: 'PATCH'
+      }).done(() => {
+        if (this.state.showPanel){
+          this.projectListItemPanel.refresh();
+        }else{
+          this.setState({showPanel: true});
+        }
+      }).fail(() => {
+        this.setUploadState({error: "Could not update task information. Plese try again."});
+      }).always(() => {
+        this.setState({updatingTask: false});
+      });
   }
 
   setRef(prop){
@@ -159,11 +181,11 @@ class ProjectListItem extends React.Component {
   }
 
   handleTaskSaved(taskInfo){
-    this.setUploadState({taskInfo});
+    this.setUploadState({savedTaskInfo: true});
 
     // Has the upload finished?
     if (!this.state.upload.uploading && this.state.upload.taskId !== null){
-      this.updateTaskInfo();
+      this.updateTaskInfo(this.state.upload.taskId, taskInfo);
     }
   }
 
@@ -222,11 +244,17 @@ class ProjectListItem extends React.Component {
             </div>
             : ""}
 
-          <EditTaskPanel 
-            uploading={this.state.upload.uploading} 
-            show={this.state.upload.showEditTask} 
-            onSave={this.handleTaskSaved}
+          {this.state.upload.showEditTask ? 
+            <EditTaskPanel 
+              uploading={this.state.upload.uploading} 
+              onSave={this.handleTaskSaved}
+              ref={this.setRef("editTaskPanel")}
             />
+          : ""}
+
+          {this.state.updatingTask ? 
+            <span>Updating task information... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
+          : ""}
 
         </div>
       </li>
