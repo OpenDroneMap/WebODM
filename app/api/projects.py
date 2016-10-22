@@ -10,6 +10,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Project
+        fields = '__all__'
 
 
 class ProjectViewSet(viewsets.ModelViewSet):

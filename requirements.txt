@@ -6,11 +6,12 @@ cffi==1.8.3
 crochet==1.5.0
 cryptography==1.5
 Django==1.10
+django-background-task==0.1.8
 django-common-helpers==0.8.0
-django-filter==0.15.2
+django-filter==0.15.3
 django-guardian==1.4.6
 django-webpack-loader==0.3.3
-djangorestframework==3.4.7
+djangorestframework==3.5.1
 drf-nested-routers==0.11.1
 enum34==1.1.6
 fido==3.2.0

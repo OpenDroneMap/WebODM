@@ -8,7 +8,7 @@ from nodeodm.models import ProcessingNode
 class ProcessingNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProcessingNode
-
+        fields = '__all__'
 
 class ProcessingNodeViewSet(viewsets.ModelViewSet):
     """
