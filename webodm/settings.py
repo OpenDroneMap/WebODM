@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os
+import os, sys
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -181,6 +181,10 @@ LOGGING = {
         'app.logger': {
             'handlers': ['console'],
             'level': 'INFO',
+        },
+        'apscheduler.executors.default': {
+            'handlers': ['console'],
+            'level': 'WARN',
         }
     }
 }
@@ -211,6 +215,8 @@ REST_FRAMEWORK = {
   ],
   'PAGE_SIZE': 10,
 }
+
+TESTING = sys.argv[1:2] == ['test']
 
 try:
     from .local_settings import *

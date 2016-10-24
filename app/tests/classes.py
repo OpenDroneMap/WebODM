@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from app.models import Project
 from app.boot import boot
+from app import scheduler
 
 class BootTestCase(TestCase):
     '''
@@ -10,7 +11,7 @@ class BootTestCase(TestCase):
     module should derive from this class instead of TestCase.
 
     We don't use fixtures because we have signal initialization login
-    for some models, which doesn't play well with them, and this: http://blog.namis.me/2012/04/21/burn-your-fixtures/
+    for some models, which doesn't play well with them.
     '''
     @classmethod
     def setUpClass(cls):
@@ -46,3 +47,8 @@ class BootTestCase(TestCase):
         boot()
         setupUsers()
         setupProjects()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(BootTestCase, cls).tearDownClass()
+        scheduler.teardown()

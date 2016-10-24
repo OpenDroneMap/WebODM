@@ -36,9 +36,9 @@ class EditTaskPanel extends React.Component {
         setTimeout(loadProcessingNodes, 1000);
       }
 
-      this.nodesRequest = $.getJSON("/api/processingnodes/", json => {
+      this.nodesRequest = 
+        $.getJSON("/api/processingnodes/?online=True", json => {
           if (Array.isArray(json)){
-
             let nodes = json.map(node => {
               return {
                 id: node.id,

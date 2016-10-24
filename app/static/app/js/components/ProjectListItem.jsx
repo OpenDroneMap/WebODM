@@ -133,7 +133,8 @@ class ProjectListItem extends React.Component {
     this.setUploadState({showEditTask: false});
     this.setState({updatingTask: true});
 
-    this.updateTaskRequest = $.ajax({
+    this.updateTaskRequest = 
+      $.ajax({
         url: `/api/projects/${this.props.data.id}/tasks/${this.state.upload.taskId}/`,
         contentType: 'application/json',
         data: JSON.stringify({

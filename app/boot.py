@@ -3,8 +3,8 @@ def boot():
     from django.contrib.auth.models import Permission
     from django.contrib.auth.models import User, Group
     from django.db.utils import ProgrammingError
-    from . import signals
-    import logging
+    from . import signals, scheduler
+    import logging, os
 
     logger = logging.getLogger('app.logger')
 
@@ -26,3 +26,9 @@ def boot():
             logger.info("Created superuser")
     except ProgrammingError:
         logger.warn("Could not create default group/user. If running a migration, this is expected.")
+
+    # Run only on the main runserver process 
+    # (do not start again on the auto-reloader process)
+    if os.environ.get('RUN_MAIN') != 'true':
+        # Setup and start scheduler
+        scheduler.setup()

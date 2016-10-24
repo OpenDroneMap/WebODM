@@ -137,10 +137,25 @@ class TestApi(BootTestCase):
         self.assertTrue(len(res.data) == 1)
         self.assertTrue(res.data[0]["hostname"] == "localhost")
 
+        # Can use filters
+        res = client.get('/api/processingnodes/?id={}'.format(pnode.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 1)
+
+        # Can filter online
+        res = client.get('/api/processingnodes/?online=true')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 0)
+
+        res = client.get('/api/processingnodes/?online=false')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 1)
+
         # Can get single processing node as normal user
         res = client.get('/api/processingnodes/{}/'.format(pnode.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data["hostname"] == "localhost")
+
 
         # Cannot delete a processing node as normal user
         res = client.delete('/api/processingnodes/{}/'.format(pnode.id))

@@ -4,6 +4,7 @@ from django.test import Client
 
 from app.models import Project, Task
 from .classes import BootTestCase
+from app import scheduler
 
 class TestApp(BootTestCase):
     fixtures = ['test_processingnodes', ]
@@ -119,3 +120,10 @@ class TestApp(BootTestCase):
 
         # Should not have permission
         self.assertFalse(anotherUser.has_perm("delete_project", p))
+
+    def test_scheduler(self):
+        # Can call update_nodes_info()
+        self.assertTrue(scheduler.update_nodes_info() == None)
+
+        # Can call function in background
+        self.assertTrue(scheduler.update_nodes_info(background=True).join() == None)
