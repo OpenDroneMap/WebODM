@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.postgres import fields
 from django.utils import timezone
+from django.dispatch import receiver
 from .api_client import ApiClient
 import json
+from django.db.models import signals
 
 class ProcessingNode(models.Model):
     hostname = models.CharField(max_length=255, help_text="Hostname where the node is located (can be an internal hostname as well)")
@@ -49,3 +51,9 @@ class ProcessingNode(models.Model):
         :returns available options in JSON string format
         """
         return json.dumps(self.available_options)
+
+# First time a processing node is created, automatically try to update
+@receiver(signals.post_save, sender=ProcessingNode, dispatch_uid="update_processing_node_info")
+def auto_update_node_info(sender, instance, created, **kwargs):
+    if created:
+        instance.update_node_info()

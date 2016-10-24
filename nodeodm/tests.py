@@ -46,12 +46,12 @@ class TestClientApi(TestCase):
     def test_online_processing_node(self):
         online_node = ProcessingNode.objects.get(pk=1)
         self.assertTrue(str(online_node) == "localhost:11223", "Formatting string works")
-        self.assertTrue(online_node.last_refreshed != 0, "Last refreshed not yet set")
+        self.assertTrue(online_node.last_refreshed == None, "Last refreshed not yet set")
         self.assertTrue(len(online_node.available_options) == 0, "Available options not yet set")
         self.assertTrue(online_node.api_version == "", "API version is not set")
 
         self.assertTrue(online_node.update_node_info(), "Could update info")
-        self.assertTrue(online_node.last_refreshed != 0, "Last refreshed is set")
+        self.assertTrue(online_node.last_refreshed != None, "Last refreshed is set")
         self.assertTrue(len(online_node.available_options) > 0, "Available options are set")
         self.assertTrue(online_node.api_version != "", "API version is set")
         
@@ -61,3 +61,7 @@ class TestClientApi(TestCase):
         offline_node = ProcessingNode.objects.get(pk=2)
         self.assertFalse(offline_node.update_node_info(), "Could not update info (offline)")
         self.assertTrue(offline_node.api_version == "", "API version is not set")
+
+    def test_auto_update_node_info(self):
+        online_node = ProcessingNode.objects.create(hostname="localhost", port=11223)
+        self.assertTrue(online_node.last_refreshed != None, "Last refreshed info is here (update_node_info() was called)")
