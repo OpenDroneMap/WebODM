@@ -4,6 +4,7 @@ import subprocess, time
 from os import path
 from .models import ProcessingNode
 from .api_client import ApiClient
+from requests.exceptions import ConnectionError
 
 current_dir = path.dirname(path.realpath(__file__))
 
@@ -31,8 +32,8 @@ class TestClientApi(TestCase):
 
     def test_offline_api(self):
         api = ApiClient("offline-host", 3000)
-        self.assertTrue(api.info() == None)
-        self.assertTrue(api.options() == None)
+        self.assertRaises(ConnectionError, api.info)
+        self.assertRaises(ConnectionError, api.options)
 
     def test_info(self):
         info = self.api_client.info()

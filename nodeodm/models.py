@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from .api_client import ApiClient
 import json
 from django.db.models import signals
+from requests.exceptions import ConnectionError
 
 class ProcessingNode(models.Model):
     hostname = models.CharField(max_length=255, help_text="Hostname where the node is located (can be an internal hostname as well)")
@@ -27,19 +28,18 @@ class ProcessingNode(models.Model):
         :returns: True if information could be updated, False otherwise
         """
         api_client = self.api_client()
-        info = api_client.info()
-        if info != None:
+        try:
+            info = api_client.info()
             self.api_version = info['version']
             self.queue_count = info['taskQueueCount']
 
             options = api_client.options()
-            if options != None:
-                self.available_options = options
-                self.last_refreshed = timezone.now()
-
-                self.save()
-                return True
-        return False
+            self.available_options = options
+            self.last_refreshed = timezone.now()
+            self.save()
+            return True
+        except ConnectionError:
+            return False
 
     def api_client(self):
         return ApiClient(self.hostname, self.port)

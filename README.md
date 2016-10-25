@@ -64,7 +64,6 @@ Then:
 
 ```
 pip install -r requirements.txt
-pip install --upgrade git+git://github.com/Yelp/swagger_spec_validator
 npm install -g webpack
 npm install
 webpack
