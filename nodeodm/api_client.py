@@ -1,7 +1,11 @@
 """
-An interface to 
+An interface to node-OpenDroneMap's API
+https://github.com/pierotofy/node-OpenDroneMap/blob/master/docs/index.adoc
 """
 import requests
+import mimetypes
+import json
+import os
 
 class ApiClient:
     def __init__(self, host, port):
@@ -17,10 +21,17 @@ class ApiClient:
     def options(self):
         return requests.get(self.url('/options')).json()
 
-    def new_task(self):
-        pass
-        #print(dir(self.client.task.post_task_new))
-        #return self.client.task.post_task_new(images=dict(images="../Gruntfile.js")).result()
-
-#a = ApiClient("localhostaa", 3000)
-#print(a.info())
+    def new_task(self, images, name=None, options=[]):
+        """
+        Starts processing of a new task
+        :param images: list of path images
+        :param name: name of the task
+        :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
+        :return: UUID or error
+        """
+        files = [('images',
+                  (os.path.basename(image), open(image, 'rb'), (mimetypes.guess_type(image)[0] or "image/jpg"))
+                 ) for image in images]
+        return requests.post(self.url("/task/new"),
+                             files=files,
+                             data={'name': name, 'options': json.dumps(options)}).json()

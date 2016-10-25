@@ -1,5 +1,7 @@
 from django.conf.urls import url, include
 from . import views
+from app.boot import boot
+from webodm import settings
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -8,3 +10,7 @@ urlpatterns = [
 
     url(r'^api/', include("app.api.urls")),
 ]
+
+# Test cases call boot() independently
+if not settings.TESTING:
+    boot()

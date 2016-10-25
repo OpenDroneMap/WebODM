@@ -67,12 +67,14 @@ class Task(models.Model):
     uuid = models.CharField(max_length=255, null=True, blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
     name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
+    processing_lock = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently locked for processing. When this flag is turned on, the task is in the middle of a processing step.")
     processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
     processing_node = models.ForeignKey(ProcessingNode, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
     status = models.IntegerField(choices=STATUS_CODES, null=True, blank=True, help_text="Current status of the task")
     options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task")
     console_output = models.TextField(null=True, blank=True, help_text="Console output of the OpenDroneMap's process")
     ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
+
     # georeferenced_model
     # orthophoto
     # textured_model
@@ -99,6 +101,13 @@ class Task(models.Model):
 
         # In case of error
         return None
+
+    def process(self):
+        if not self.uuid and self.processing_node:
+            print("Processing... {}".format(self))
+            import time
+            time.sleep(30)
+            print("Done! {}".format(self))
 
     class Meta:
         permissions = (

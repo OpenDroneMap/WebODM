@@ -18,7 +18,6 @@ class TaskSerializer(serializers.ModelSerializer):
         model = models.Task
         fields = '__all__'
 
-
 class TaskViewSet(viewsets.ViewSet):
     """
     A task represents a set of images and other input to be sent to a processing node.

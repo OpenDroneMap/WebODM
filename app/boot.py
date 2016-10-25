@@ -1,11 +1,13 @@
-def boot():
-    from django.contrib.contenttypes.models import ContentType
-    from django.contrib.auth.models import Permission
-    from django.contrib.auth.models import User, Group
-    from django.db.utils import ProgrammingError
-    from . import signals, scheduler
-    import logging, os
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User, Group
+from django.db.utils import ProgrammingError
+from . import signals, scheduler
+import logging, os
+from .models import Task
+from webodm import settings
 
+def boot():
     logger = logging.getLogger('app.logger')
 
     # Check default group
@@ -27,8 +29,11 @@ def boot():
     except ProgrammingError:
         logger.warn("Could not create default group/user. If running a migration, this is expected.")
 
-    # Run only on the main runserver process 
-    # (do not start again on the auto-reloader process)
-    if os.environ.get('RUN_MAIN') != 'true':
+    # Unlock any Task that might have been locked
+    Task.objects.filter(processing_lock=True).update(processing_lock=False)
+    
+    if not settings.TESTING:
         # Setup and start scheduler
         scheduler.setup()
+
+        scheduler.update_nodes_info(background=True)

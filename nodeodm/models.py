@@ -8,6 +8,7 @@ from .api_client import ApiClient
 import json
 from django.db.models import signals
 from requests.exceptions import ConnectionError
+from .exceptions import NewTaskException
 
 class ProcessingNode(models.Model):
     hostname = models.CharField(max_length=255, help_text="Hostname where the node is located (can be an internal hostname as well)")
@@ -50,14 +51,19 @@ class ProcessingNode(models.Model):
         """
         return json.dumps(self.available_options)
 
-    def process_new_task(self):
+    def process_new_task(self, images, name=None, options=[]):
         """
         Sends a set of images (and optional GCP file) via the API
         to start processing.
 
-        :returns UUID of the newly created task or ... ?
+        :returns UUID of the newly created task
         """
         api_client = self.api_client()
+        result = api_client.new_task(images, name, options)
+        if result['uuid']:
+            return result['uuid']
+        elif result['error']:
+            raise NewTaskException(result['error'])
         
 
 # First time a processing node is created, automatically try to update

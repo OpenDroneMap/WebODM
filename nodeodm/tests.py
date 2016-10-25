@@ -66,3 +66,11 @@ class TestClientApi(TestCase):
     def test_auto_update_node_info(self):
         online_node = ProcessingNode.objects.create(hostname="localhost", port=11223)
         self.assertTrue(online_node.last_refreshed != None, "Last refreshed info is here (update_node_info() was called)")
+
+    def test_add_new_task(self):
+        pass #TODO
+
+        # import glob
+        # a = ApiClient("localhost", 3000)
+        # print(a.info())
+        # print(a.new_task(glob.glob("fixtures/test_images/*.JPG"), "test", [{'name': 'cmvs-maxImages', 'value': 5}]))
