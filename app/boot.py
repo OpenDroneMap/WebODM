@@ -26,14 +26,15 @@ def boot():
         if User.objects.filter(is_superuser=True).count() == 0:
             User.objects.create_superuser('admin', 'admin@example.com', 'admin')
             logger.info("Created superuser")
+
+        # Unlock any Task that might have been locked
+        Task.objects.filter(processing_lock=True).update(processing_lock=False)
+        
+        if not settings.TESTING:
+            # Setup and start scheduler
+            scheduler.setup()
+
+            scheduler.update_nodes_info(background=True)
+
     except ProgrammingError:
-        logger.warn("Could not create default group/user. If running a migration, this is expected.")
-
-    # Unlock any Task that might have been locked
-    Task.objects.filter(processing_lock=True).update(processing_lock=False)
-    
-    if not settings.TESTING:
-        # Setup and start scheduler
-        scheduler.setup()
-
-        scheduler.update_nodes_info(background=True)
+        logger.warn("Could not touch the database. If running a migration, this is expected.")
