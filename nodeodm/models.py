@@ -16,12 +16,6 @@ class ProcessingNode(models.Model):
     queue_count = models.PositiveIntegerField(default=0, help_text="Number of tasks currently being processed by this node (as reported by the node itself)")
     available_options = fields.JSONField(default=dict(), help_text="Description of the options that can be used for processing")
     
-    def __init__(self, *args, **kwargs):
-        super(ProcessingNode, self).__init__(*args, **kwargs)
-
-        # Initialize api client
-        self.api_client = ApiClient(self.hostname, self.port)
-
     def __str__(self):
         return '{}:{}'.format(self.hostname, self.port)
 
@@ -32,12 +26,13 @@ class ProcessingNode(models.Model):
 
         :returns: True if information could be updated, False otherwise
         """
-        info = self.api_client.info()
+        api_client = self.api_client()
+        info = api_client.info()
         if info != None:
             self.api_version = info['version']
             self.queue_count = info['taskQueueCount']
 
-            options = self.api_client.options()
+            options = api_client.options()
             if options != None:
                 self.available_options = options
                 self.last_refreshed = timezone.now()
@@ -46,11 +41,24 @@ class ProcessingNode(models.Model):
                 return True
         return False
 
+    def api_client(self):
+        return ApiClient(self.hostname, self.port)
+
     def get_available_options_json(self):
         """
         :returns available options in JSON string format
         """
         return json.dumps(self.available_options)
+
+    def process_new_task(self):
+        """
+        Sends a set of images (and optional GCP file) via the API
+        to start processing.
+
+        :returns UUID of the newly created task or ... ?
+        """
+        api_client = self.api_client()
+        
 
 # First time a processing node is created, automatically try to update
 @receiver(signals.post_save, sender=ProcessingNode, dispatch_uid="update_processing_node_info")

@@ -33,3 +33,11 @@ class ApiClient:
     @check_client
     def options(self):
         return self.client.server.get_options().result()
+
+    @check_client
+    def new_task(self):
+        print(dir(self.client.task.post_task_new))
+        return self.client.task.post_task_new(images=[])
+
+a = ApiClient("localhost", 3000)
+a.new_task()

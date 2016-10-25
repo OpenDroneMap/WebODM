@@ -1,5 +1,16 @@
 .project-list-item{
     min-height: 60px;
+
+    .project-name{
+        font-weight: bold;
+    }
+
+    .project-links{
+        font-size: 90%;
+        i{
+            margin-right: 4px;
+        }
+    }
     
     .dz-preview{
         display: none;

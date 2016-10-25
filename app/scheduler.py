@@ -14,9 +14,9 @@ scheduler = None
 def job(func):
     def wrapper(*args,**kwargs):
         if (kwargs.get('background', False)):
-            thread = (threading.Thread(target=func))
-            thread.start()
-            return thread
+            t = (threading.Thread(target=func))
+            t.start()
+            return t
         else:
             return func(*args, **kwargs)
     return wrapper
