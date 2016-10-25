@@ -18,6 +18,6 @@ before_install:
 
 install:
   - docker-compose up --build -d
-  - sleep 30
+  - sleep 40
 
 script: docker-compose exec webapp python manage.py test
