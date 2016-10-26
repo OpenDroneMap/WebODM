@@ -67,10 +67,23 @@ class TestClientApi(TestCase):
         online_node = ProcessingNode.objects.create(hostname="localhost", port=11223)
         self.assertTrue(online_node.last_refreshed != None, "Last refreshed info is here (update_node_info() was called)")
 
-    def test_add_new_task(self):
-        pass #TODO
+    def test_client_api(self):
+        api = ApiClient("localhost", 11223)
 
-        # import glob
-        # a = ApiClient("localhost", 3000)
-        # print(a.info())
-        # print(a.new_task(glob.glob("fixtures/test_images/*.JPG"), "test", [{'name': 'cmvs-maxImages', 'value': 5}]))
+        # Can call info(), options()
+        self.assertTrue(type(api.info()['version']) in [str, unicode])
+        self.assertTrue(len(api.options()) > 0)
+        
+        # Can call new_task()
+        import glob
+        res = api.new_task(
+                glob.glob("nodeodm/fixtures/test_images/*.JPG"), 
+                "test", 
+                [{'name': 'cmvs-maxImages', 'value': 5}])
+        uuid = res['uuid']
+        self.assertTrue(uuid != None)
+
+        # Can call task_info()
+        task_info = api.task_info(uuid)
+        self.assertTrue(type(task_info['dateCreated']) == long)
+        self.assertTrue(type(task_info['uuid']) in [str, unicode])

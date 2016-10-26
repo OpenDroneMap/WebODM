@@ -5,6 +5,7 @@ from django.test import Client
 from app.models import Project, Task
 from .classes import BootTestCase
 from app import scheduler
+from django.core.exceptions import ValidationError
 
 class TestApp(BootTestCase):
     fixtures = ['test_processingnodes', ]
@@ -121,9 +122,29 @@ class TestApp(BootTestCase):
         # Should not have permission
         self.assertFalse(anotherUser.has_perm("delete_project", p))
 
+    def test_tasks(self):
+        # Create a new task
+        p = Project.objects.create(owner=User.objects.get(username="testuser"), name="test")
+        task = Task.objects.create(project=p)
+
+        # Test options validation
+        task.options = [{'name': 'test', 'value': 1}]
+        self.assertTrue(task.save() == None)
+
+        task.options = {'test': 1}
+        self.assertRaises(ValidationError, task.save)
+
+        task.options = [{'name': 'test', 'value': 1}, {"invalid": 1}]
+        self.assertRaises(ValidationError, task.save)
+
+
     def test_scheduler(self):
+        self.assertTrue(scheduler.setup() == None)
+
         # Can call update_nodes_info()
         self.assertTrue(scheduler.update_nodes_info() == None)
 
         # Can call function in background
         self.assertTrue(scheduler.update_nodes_info(background=True).join() == None)
+
+        self.assertTrue(scheduler.teardown() == None)

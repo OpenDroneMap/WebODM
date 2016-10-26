@@ -1,2 +1,2 @@
-class NewTaskException(Exception):
+class ProcessingException(Exception):
     pass

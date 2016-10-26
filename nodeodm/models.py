@@ -8,7 +8,7 @@ from .api_client import ApiClient
 import json
 from django.db.models import signals
 from requests.exceptions import ConnectionError
-from .exceptions import NewTaskException
+from .exceptions import ProcessingException
 
 class ProcessingNode(models.Model):
     hostname = models.CharField(max_length=255, help_text="Hostname where the node is located (can be an internal hostname as well)")
@@ -56,15 +56,33 @@ class ProcessingNode(models.Model):
         Sends a set of images (and optional GCP file) via the API
         to start processing.
 
+        :param images: list of path images
+        :param name: name of the task
+        :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
+
         :returns UUID of the newly created task
         """
+        if len(images) < 2: raise ProcessingException("Need at least 2 images")
+
         api_client = self.api_client()
         result = api_client.new_task(images, name, options)
         if result['uuid']:
             return result['uuid']
         elif result['error']:
-            raise NewTaskException(result['error'])
-        
+            raise ProcessingException(result['error'])
+
+    def get_task_info(self, uuid):
+        """
+        Gets information about this task, such as name, creation date, 
+        processing time, status, command line options and number of 
+        images being processed.
+        """
+        api_client = self.api_client()
+        result = api_client.task_info(uuid)
+        if result['uuid']:
+            return result
+        elif result['error']:
+            raise ProcessingException(result['error'])
 
 # First time a processing node is created, automatically try to update
 @receiver(signals.post_save, sender=ProcessingNode, dispatch_uid="update_processing_node_info")
