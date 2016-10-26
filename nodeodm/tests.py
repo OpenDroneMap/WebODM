@@ -85,5 +85,5 @@ class TestClientApi(TestCase):
 
         # Can call task_info()
         task_info = api.task_info(uuid)
-        self.assertTrue(type(task_info['dateCreated']) == long)
-        self.assertTrue(type(task_info['uuid']) in [str, unicode])
+        self.assertTrue(isinstance(task_info['dateCreated'], (int, long)))
+        self.assertTrue(isinstance(task_info['uuid'], (str, unicode)))

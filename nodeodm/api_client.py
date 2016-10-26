@@ -32,7 +32,7 @@ class ApiClient:
         :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
         :return: UUID or error
         """
-        print(options)
+
         files = [('images',
                   (os.path.basename(image), open(image, 'rb'), (mimetypes.guess_type(image)[0] or "image/jpg"))
                  ) for image in images]
