@@ -6,6 +6,7 @@ import requests
 import mimetypes
 import json
 import os
+from urlparse import urlunparse
 
 class ApiClient:
     def __init__(self, host, port):
@@ -13,7 +14,10 @@ class ApiClient:
         self.port = port
 
     def url(self, url):
-        return "http://{}:{}{}".format(self.host, self.port, url)
+        netloc = self.host if self.port == 80 else "{}:{}".format(self.host, self.port)
+
+        # TODO: https support
+        return urlunparse(('http', netloc, url, '', '', ''))
 
     def info(self):
         return requests.get(self.url('/info')).json()

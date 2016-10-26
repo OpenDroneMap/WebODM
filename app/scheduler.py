@@ -9,7 +9,7 @@ from django.db.models import Q
 import random
 
 logger = logging.getLogger('app.logger')
-scheduler = None
+scheduler = BackgroundScheduler()
 
 def job(func):
     """
@@ -17,7 +17,8 @@ def job(func):
     so that we can call update_nodes_info(background=True) from the outside
     """
     def wrapper(*args,**kwargs):
-        if (kwargs.get('background', False)):
+        background = kwargs.get('background', False)
+        if background:
             t = Thread(target=func)
             t.start()
             return t
@@ -59,16 +60,14 @@ def process_pending_tasks():
 
     if tasks.count() > 0:
         pool = ThreadPool(tasks.count())
-        pool.map(process, tasks)
+        for task in tasks:
+           pool.apply_async(process, args=(task, ))
         pool.close()
         pool.join()
 
 def setup():
-    global scheduler
-
     logger.info("Starting background scheduler...")
     try:
-        scheduler = BackgroundScheduler()
         scheduler.start()
         scheduler.add_job(update_nodes_info, 'interval', seconds=30)
         scheduler.add_job(process_pending_tasks, 'interval', seconds=5)
@@ -76,9 +75,8 @@ def setup():
         logger.warn("Scheduler already running (this is OK while testing)")
 
 def teardown():
-    if scheduler != None:
-        logger.info("Stopping scheduler...")
-        try:
-            scheduler.shutdown()
-        except SchedulerNotRunningError:
-            logger.warn("Scheduler not running")
+    logger.info("Stopping scheduler...")
+    try:
+        scheduler.shutdown()
+    except SchedulerNotRunningError:
+        logger.warn("Scheduler not running")
