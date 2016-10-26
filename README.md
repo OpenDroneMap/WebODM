@@ -74,11 +74,11 @@ chmod +x start.sh && ./start.sh
 - [X] UI mockup
 - [ ] Task Processing
 - [ ] Model display (using Cesium/Leaflet) for both 2D and 3D outputs.
-- [ ] Cluster management and setup.
+- [X] Cluster management and setup.
 - [ ] Mission Planner
-- [ ] API
+- [X] API
 - [ ] Documentation
-- [ ] Unit Testing
+- [X] Unit Testing
 
 ## Terminology
 
