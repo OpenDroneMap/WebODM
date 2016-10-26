@@ -1,7 +1,7 @@
 import '../css/ProjectListItem.scss';
 import React from 'react';
 import update from 'react-addons-update';
-import ProjectListItemPanel from './ProjectListItemPanel';
+import TaskList from './TaskList';
 import EditTaskPanel from './EditTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import Dropzone from '../vendor/dropzone';
@@ -13,12 +13,12 @@ class ProjectListItem extends React.Component {
     super(props);
 
     this.state = {
-      showPanel: false,
+      showTaskList: false,
       updatingTask: false,
       upload: this.getDefaultUploadState()
     };
 
-    this.togglePanel = this.togglePanel.bind(this);
+    this.toggleTaskList = this.toggleTaskList.bind(this);
     this.handleUpload = this.handleUpload.bind(this);
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
@@ -133,7 +133,8 @@ class ProjectListItem extends React.Component {
     this.setUploadState({showEditTask: false});
     this.setState({updatingTask: true});
 
-    this.updateTaskRequest = $.ajax({
+    this.updateTaskRequest = 
+      $.ajax({
         url: `/api/projects/${this.props.data.id}/tasks/${this.state.upload.taskId}/`,
         contentType: 'application/json',
         data: JSON.stringify({
@@ -144,10 +145,10 @@ class ProjectListItem extends React.Component {
         dataType: 'json',
         type: 'PATCH'
       }).done(() => {
-        if (this.state.showPanel){
-          this.projectListItemPanel.refresh();
+        if (this.state.showTaskList){
+          this.taskList.refresh();
         }else{
-          this.setState({showPanel: true});
+          this.setState({showTaskList: true});
         }
       }).fail(() => {
         this.setUploadState({error: "Could not update task information. Plese try again."});
@@ -162,9 +163,9 @@ class ProjectListItem extends React.Component {
     }
   }
 
-  togglePanel(){
+  toggleTaskList(){
     this.setState({
-      showPanel: !this.state.showPanel
+      showTaskList: !this.state.showTaskList
     });
   }
 
@@ -222,10 +223,18 @@ class ProjectListItem extends React.Component {
             </ul>
           </div>
 
-          <i style={{width: 14}} className={'fa ' + (this.state.showPanel ? 'fa-caret-down' : 'fa-caret-right')}>
-          </i> <a href="javascript:void(0);" onClick={this.togglePanel}>
+          <span className="project-name">
             {this.props.data.name}
-          </a>
+          </span>
+          <div className="project-description">
+            {this.props.data.description}
+          </div>
+          <div className="row project-links">
+            <i className='fa fa-tasks'>
+            </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+              {(this.state.showTaskList ? 'Hide' : 'Show')} Tasks
+            </a>
+          </div>
         </div>
         <div className="row">
           <div className="dropzone" ref={this.setRef("dropzone")}>
@@ -233,7 +242,7 @@ class ProjectListItem extends React.Component {
               </div>
           </div>
 
-          {this.state.showPanel ? <ProjectListItemPanel ref={this.setRef("projectListItemPanel")}/> : ""}
+          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")}/> : ""}
 
           {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
           

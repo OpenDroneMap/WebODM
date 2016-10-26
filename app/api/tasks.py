@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.response import Response
 from rest_framework.decorators import parser_classes, api_view
-from app import models
+from app import models, scheduler
 from nodeodm.models import ProcessingNode
 
 class TaskIDsSerializer(serializers.BaseSerializer):
@@ -16,7 +16,7 @@ class TaskSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.Task
-
+        fields = '__all__'
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -83,6 +83,10 @@ class TaskViewSet(viewsets.ViewSet):
         serializer = TaskSerializer(task, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        # Call the scheduler (speed things up)
+        scheduler.process_pending_tasks(background=True)
+
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):

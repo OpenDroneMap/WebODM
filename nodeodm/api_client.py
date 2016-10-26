@@ -1,35 +1,45 @@
 """
-A wrapper around Bravado to communicate with a node-OpenDroneMap node.
+An interface to node-OpenDroneMap's API
+https://github.com/pierotofy/node-OpenDroneMap/blob/master/docs/index.adoc
 """
-from bravado.client import SwaggerClient
-from bravado.exception import HTTPError
-from requests import ConnectionError
+import requests
+import mimetypes
+import json
+import os
+from urlparse import urlunparse
 
 class ApiClient:
-    def check_client(func):
-        def check(self, *args, **kwargs):
-            """
-            Makes sure that the client has been instantiated. 
-            Sometimes this will fail (rest endpoint might be offline), 
-            so we need to handle it gracefully...
-            """
-            if not hasattr(self, 'client'):
-                try:
-                    self.client = SwaggerClient.from_url('http://{}:{}/swagger.json'.format(self.host, self.port))
-                except (ConnectionError, HTTPError) as err:
-                    return None
-                    
-            return func(self, *args, **kwargs)
-        return check
-
     def __init__(self, host, port):
         self.host = host
         self.port = port
 
-    @check_client
-    def info(self):
-        return self.client.server.get_info().result()
+    def url(self, url):
+        netloc = self.host if self.port == 80 else "{}:{}".format(self.host, self.port)
 
-    @check_client
+        # TODO: https support
+        return urlunparse(('http', netloc, url, '', '', ''))
+
+    def info(self):
+        return requests.get(self.url('/info')).json()
+
     def options(self):
-        return self.client.server.get_options().result()
+        return requests.get(self.url('/options')).json()
+
+    def task_info(self, uuid):
+        return requests.get(self.url('/task/{}/info').format(uuid)).json()
+
+    def new_task(self, images, name=None, options=[]):
+        """
+        Starts processing of a new task
+        :param images: list of path images
+        :param name: name of the task
+        :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
+        :return: UUID or error
+        """
+
+        files = [('images',
+                  (os.path.basename(image), open(image, 'rb'), (mimetypes.guess_type(image)[0] or "image/jpg"))
+                 ) for image in images]
+        return requests.post(self.url("/task/new"),
+                             files=files,
+                             data={'name': name, 'options': json.dumps(options)}).json()

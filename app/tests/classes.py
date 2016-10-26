@@ -10,7 +10,7 @@ class BootTestCase(TestCase):
     module should derive from this class instead of TestCase.
 
     We don't use fixtures because we have signal initialization login
-    for some models, which doesn't play well with them, and this: http://blog.namis.me/2012/04/21/burn-your-fixtures/
+    for some models, which doesn't play well with them.
     '''
     @classmethod
     def setUpClass(cls):
@@ -46,3 +46,7 @@ class BootTestCase(TestCase):
         boot()
         setupUsers()
         setupProjects()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(BootTestCase, cls).tearDownClass()

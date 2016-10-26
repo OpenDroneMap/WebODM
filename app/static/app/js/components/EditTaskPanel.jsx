@@ -10,6 +10,7 @@ class EditTaskPanel extends React.Component {
 
     this.state = {
       name: "",
+      error: "",
       advancedOptions: false,
       loadedProcessingNodes: false,
       selectedNode: null,
@@ -36,8 +37,14 @@ class EditTaskPanel extends React.Component {
         setTimeout(loadProcessingNodes, 1000);
       }
 
-      this.nodesRequest = $.getJSON("/api/processingnodes/", json => {
+      this.nodesRequest = 
+        $.getJSON("/api/processingnodes/?online=True", json => {
           if (Array.isArray(json)){
+            // All nodes offline?
+            if (json.length === 0){
+              this.setState({error: "There are no processing nodes online. Make sure at least one of them is reachable."});
+              return;
+            }
 
             let nodes = json.map(node => {
               return {
@@ -138,6 +145,12 @@ class EditTaskPanel extends React.Component {
   }
 
   render() {
+    if (this.state.error){
+      return (<div className="alert alert-warning alert-dismissible">
+            {this.state.error}
+        </div>);
+    }
+
     if (this.state.editing){
       let processingNodesOptions = "";
       if (this.state.loadedProcessingNodes){

@@ -16,7 +16,8 @@ class ProjectList extends React.Component {
 
     componentDidMount(){
         // Load projects from API
-        this.serverRequest = $.getJSON(this.props.source, json => {
+        this.serverRequest = 
+            $.getJSON(this.props.source, json => {
                 if (json.results){
                     this.setState({
                         projects: json.results,

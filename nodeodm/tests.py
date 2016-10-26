@@ -4,6 +4,7 @@ import subprocess, time
 from os import path
 from .models import ProcessingNode
 from .api_client import ApiClient
+from requests.exceptions import ConnectionError
 
 current_dir = path.dirname(path.realpath(__file__))
 
@@ -31,8 +32,8 @@ class TestClientApi(TestCase):
 
     def test_offline_api(self):
         api = ApiClient("offline-host", 3000)
-        self.assertTrue(api.info() == None)
-        self.assertTrue(api.options() == None)
+        self.assertRaises(ConnectionError, api.info)
+        self.assertRaises(ConnectionError, api.options)
 
     def test_info(self):
         info = self.api_client.info()
@@ -46,12 +47,12 @@ class TestClientApi(TestCase):
     def test_online_processing_node(self):
         online_node = ProcessingNode.objects.get(pk=1)
         self.assertTrue(str(online_node) == "localhost:11223", "Formatting string works")
-        self.assertTrue(online_node.last_refreshed != 0, "Last refreshed not yet set")
+        self.assertTrue(online_node.last_refreshed == None, "Last refreshed not yet set")
         self.assertTrue(len(online_node.available_options) == 0, "Available options not yet set")
         self.assertTrue(online_node.api_version == "", "API version is not set")
 
         self.assertTrue(online_node.update_node_info(), "Could update info")
-        self.assertTrue(online_node.last_refreshed != 0, "Last refreshed is set")
+        self.assertTrue(online_node.last_refreshed != None, "Last refreshed is set")
         self.assertTrue(len(online_node.available_options) > 0, "Available options are set")
         self.assertTrue(online_node.api_version != "", "API version is set")
         
@@ -61,3 +62,28 @@ class TestClientApi(TestCase):
         offline_node = ProcessingNode.objects.get(pk=2)
         self.assertFalse(offline_node.update_node_info(), "Could not update info (offline)")
         self.assertTrue(offline_node.api_version == "", "API version is not set")
+
+    def test_auto_update_node_info(self):
+        online_node = ProcessingNode.objects.create(hostname="localhost", port=11223)
+        self.assertTrue(online_node.last_refreshed != None, "Last refreshed info is here (update_node_info() was called)")
+
+    def test_client_api(self):
+        api = ApiClient("localhost", 11223)
+
+        # Can call info(), options()
+        self.assertTrue(type(api.info()['version']) in [str, unicode])
+        self.assertTrue(len(api.options()) > 0)
+        
+        # Can call new_task()
+        import glob
+        res = api.new_task(
+                glob.glob("nodeodm/fixtures/test_images/*.JPG"), 
+                "test", 
+                [{'name': 'cmvs-maxImages', 'value': 5}])
+        uuid = res['uuid']
+        self.assertTrue(uuid != None)
+
+        # Can call task_info()
+        task_info = api.task_info(uuid)
+        self.assertTrue(isinstance(task_info['dateCreated'], (int, long)))
+        self.assertTrue(isinstance(task_info['uuid'], (str, unicode)))
