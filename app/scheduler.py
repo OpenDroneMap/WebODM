@@ -60,8 +60,7 @@ def process_pending_tasks():
 
     if tasks.count() > 0:
         pool = ThreadPool(tasks.count())
-        for task in tasks:
-           pool.apply_async(process, args=(task, ))
+        pool.map(process, tasks, chunksize=1)
         pool.close()
         pool.join()
 
