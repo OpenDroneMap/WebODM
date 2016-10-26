@@ -43,7 +43,7 @@ class ProjectList extends React.Component {
 
     render() {
         if (this.state.loading){
-            return (<div>Loading projects...</div>);
+            return (<div>Loading projects... <i className="fa fa-refresh fa-spin fa-fw"></i></div>);
         }
         else if (this.state.projects){
             return (<ul className="list-group">

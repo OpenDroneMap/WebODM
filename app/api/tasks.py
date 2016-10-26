@@ -24,11 +24,11 @@ class TaskViewSet(viewsets.ViewSet):
     Once a processing node completes processing, results are stored in the task.
     """
     queryset = models.Task.objects.all()
-
+    
     # We don't use object level permissions on tasks, relying on
     # project's object permissions instead (but standard model permissions still apply)
     permission_classes = (permissions.DjangoModelPermissions, )
-    parser_classes = (parsers.MultiPartParser, )
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
 
     def get_and_check_project(self, request, project_pk, perms = ('view_project', )):
         '''
@@ -72,3 +72,19 @@ class TaskViewSet(viewsets.ViewSet):
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)
         else:
             raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
+
+    def update(self, request, pk=None, project_pk=None, partial=False):
+        project = self.get_and_check_project(request, project_pk, ('change_project', ))
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except ObjectDoesNotExist:
+            raise exceptions.NotFound()
+
+        serializer = TaskSerializer(task, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)

@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from app.models import Project, Task
+from nodeodm.models import ProcessingNode
 from django.contrib.auth.models import User
 
 class TestApi(BootTestCase):
@@ -12,7 +13,7 @@ class TestApi(BootTestCase):
     def tearDown(self):
         pass
 
-    def test_projects(self):
+    def test_projects_and_tasks(self):
         client = APIClient()
 
         user = User.objects.get(username="testuser")
@@ -99,3 +100,69 @@ class TestApi(BootTestCase):
         # Cannot access task details for a task that doesn't exist
         res = client.get('/api/projects/{}/tasks/999/'.format(project.id, other_task.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can update a task
+        res = client.patch('/api/projects/{}/tasks/{}/'.format(project.id, task.id), {'name': 'updated!'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Verify the task has been updated
+        res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
+        self.assertTrue(res.data["name"] == "updated!")
+
+        # Cannot update a task we have no access to
+        res = client.patch('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id), {'name': 'updated!'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_processingnodes(self):
+        client = APIClient()
+
+        pnode = ProcessingNode.objects.create(
+                hostname="localhost",
+                port=999
+            )
+
+        # Cannot list processing nodes as guest
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        res = client.get('/api/processingnodes/{}/'.format(pnode.id))
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        client.login(username="testuser", password="test1234")
+
+        # Can list processing nodes as normal user
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 1)
+        self.assertTrue(res.data[0]["hostname"] == "localhost")
+
+        # Can get single processing node as normal user
+        res = client.get('/api/processingnodes/{}/'.format(pnode.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data["hostname"] == "localhost")
+
+        # Cannot delete a processing node as normal user
+        res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
+        self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Cannot create a processing node as normal user
+        res = client.post('/api/processingnodes/', {'hostname': 'localhost', 'port':'1000'})
+        self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        client.login(username="testsuperuser", password="test1234")
+
+        # Can delete a processing node as super user
+        res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
+        self.assertTrue(res.status_code, status.HTTP_200_OK)
+
+        # Can create a processing node as super user
+        res = client.post('/api/processingnodes/', {'hostname': 'localhost', 'port':'1000'})
+        self.assertTrue(res.status_code, status.HTTP_200_OK)
+
+        # Verify node has been created
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 1)
+        self.assertTrue(res.data[0]["port"] == 1000)
+
