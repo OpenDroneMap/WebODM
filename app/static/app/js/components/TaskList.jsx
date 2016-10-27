@@ -47,14 +47,18 @@ class TaskList extends React.Component {
   }
 
   render() {
+    let message = "";
+    if (this.state.loading){
+      message = (<span>Loading... <i className="fa fa-refresh fa-spin fa-fw"></i></span>);
+    }else if (this.state.error){
+      message = (<span>Could not get tasks: {this.state.error}. <a href="javascript:void(0);" onClick={this.refresh}>Try again</a></span>);
+    }else if (this.state.tasks.length === 0){
+      message = (<span>This project has no tasks. Create one by uploading some images!</span>);
+    }
+
     return (
       <div className="task-list">
-        {this.state.loading ? 
-          <span>Loading... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
-        : ""}
-        {this.state.error ? 
-          <span>Could not get tasks: {this.state.error}. <a href="javascript:void(0);" onClick={this.refresh}>Try again</a></span>
-        : ""}
+        {message}
 
         {this.state.tasks.map(task => (
           <TaskListItem data={task} key={task.id} />
