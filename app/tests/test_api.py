@@ -76,6 +76,15 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 2)
 
+        # Can sort
+        res = client.get('/api/projects/{}/tasks/?ordering=id'.format(project.id))
+        self.assertTrue(res.data[0]['id'] == task.id)
+        self.assertTrue(res.data[1]['id'] == task2.id)
+
+        res = client.get('/api/projects/{}/tasks/?ordering=-id'.format(project.id))
+        self.assertTrue(res.data[0]['id'] == task2.id)
+        self.assertTrue(res.data[1]['id'] == task.id)
+
         # Cannot list project tasks for a project we don't have access to
         res = client.get('/api/projects/{}/tasks/'.format(other_project.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
@@ -88,6 +97,9 @@ class TestApi(BootTestCase):
         res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data["id"] == task.id)
+
+        # images_count field exists
+        self.assertTrue(res.data["images_count"] == 0)
 
         # Cannot list task details for a task belonging to a project we don't have access to
         res = client.get('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id))

@@ -1,13 +1,18 @@
 import React from 'react';
 import '../css/TaskList.scss';
+import TaskListItem from './TaskListItem';
 
 class TaskList extends React.Component {
   constructor(){
     super();
 
     this.state = {
-      tasks: []
+      tasks: [],
+      error: "",
+      loading: true
     };
+
+    this.refresh = this.refresh.bind(this);
   }
 
   componentDidMount(){
@@ -21,24 +26,20 @@ class TaskList extends React.Component {
   loadTaskList(){
     this.taskListRequest = 
       $.getJSON(this.props.source, json => {
-                if (json.results){
-                    this.setState({
-                        projects: json.results,
-                        loading: false
-                    });
-                }else{
-                    this.setState({ 
-                        error: `Invalid JSON response: ${JSON.stringify(json)}`,
-                        loading: false
-                    });
-                }
-            })
-            .fail((jqXHR, textStatus, errorThrown) => {
-                this.setState({ 
-                    error: `Could not load projects list: ${textStatus}`,
-                    loading: false
-                });
-            });
+          this.setState({
+              tasks: json
+          });
+        })
+        .fail((jqXHR, textStatus, errorThrown) => {
+          this.setState({ 
+              error: `Could not load projects list: ${textStatus}`,
+          });
+        })
+        .always(() => {
+          this.setState({
+            loading: false
+          })
+        });
   }
 
   componentWillUnmount(){
@@ -48,7 +49,16 @@ class TaskList extends React.Component {
   render() {
     return (
       <div className="task-list">
-        <span>Loading... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
+        {this.state.loading ? 
+          <span>Loading... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
+        : ""}
+        {this.state.error ? 
+          <span>Could not get tasks: {this.state.error}. <a href="javascript:void(0);" onClick={this.refresh}>Try again</a></span>
+        : ""}
+
+        {this.state.tasks.map(task => (
+          <TaskListItem data={task} key={task.id} />
+        ))}
       </div>
     );
   }

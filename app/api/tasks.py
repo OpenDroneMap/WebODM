@@ -13,10 +13,14 @@ class TaskIDsSerializer(serializers.BaseSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
-    
+    images_count = serializers.IntegerField(
+            source='imageupload_set.count',
+            read_only=True
+        )
+
     class Meta:
         model = models.Task
-        fields = '__all__'
+        exclude = ('processing_lock', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -29,7 +33,8 @@ class TaskViewSet(viewsets.ViewSet):
     # project's object permissions instead (but standard model permissions still apply)
     permission_classes = (permissions.DjangoModelPermissions, )
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
-
+    ordering_fields = '__all__'
+    
     def get_and_check_project(self, request, project_pk, perms = ('view_project', )):
         '''
         Retrieves a project and raises an exeption if the current user
@@ -42,10 +47,11 @@ class TaskViewSet(viewsets.ViewSet):
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
         return project
-    
+
     def list(self, request, project_pk=None):
         project = self.get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
+        tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 

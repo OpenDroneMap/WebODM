@@ -242,7 +242,7 @@ class ProjectListItem extends React.Component {
               </div>
           </div>
 
-          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/`}/> : ""}
+          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-id`}/> : ""}
 
           {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
           
