@@ -17,21 +17,14 @@ class ProcessingNodeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProcessingNodeFilter(FilterSet):
-    online = django_filters.MethodFilter()
+    has_available_options = django_filters.MethodFilter()
 
-    def filter_online(self, queryset, value):
-        online_threshold = timezone.now() - timedelta(minutes=5)
-
-        if value.lower() in ['true', '1']:
-            return queryset.filter(last_refreshed__isnull=False, last_refreshed__gte=online_threshold)
-        elif value.lower() in ['false', '0']:
-            return queryset.filter(Q(last_refreshed__isnull=True) | Q(last_refreshed__lt=online_threshold))
-        
-        return queryset
+    def filter_has_available_options(self, queryset, value):
+        return queryset.filter(available_options__isnull=(not value.lower() in ['true', '1']))
 
     class Meta:
         model = ProcessingNode
-        fields = ['online', 'id', 'hostname', 'port', 'api_version', 'queue_count', ]
+        fields = ['has_available_options', 'id', 'hostname', 'port', 'api_version', 'queue_count', ]
 
 class ProcessingNodeViewSet(viewsets.ModelViewSet):
     """
