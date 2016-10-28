@@ -1,9 +1,9 @@
 import React from 'react';
-import '../css/Console.scss';
-import '../vendor/google-code-prettify/prettify';
-import '../vendor/google-code-prettify/prettify.css';
+import './css/Console.scss';
+import './vendor/google-code-prettify/prettify';
+import './vendor/google-code-prettify/prettify.css';
 import update from 'react-addons-update';
-import $ from 'jquery';
+import Utils from './classes/Utils';
 
 class Console extends React.Component {
   constructor(props){
@@ -14,11 +14,10 @@ class Console extends React.Component {
     };
 
     if (typeof props.children === "string"){
-      console.log(props.children);
       this.state.lines = props.children.split('\n');
     }
 
-    this.autoscroll = true;
+    this.autoscroll = props.autoscroll === true;
 
     this.setRef = this.setRef.bind(this);
     this.handleMouseOver = this.handleMouseOver.bind(this);
@@ -26,7 +25,6 @@ class Console extends React.Component {
   }
 
   componentDidMount(){
-    if (this.props.lang) prettyPrint();
     this.checkAutoscroll();
   }
 
@@ -41,7 +39,7 @@ class Console extends React.Component {
   }
 
   handleMouseOut(){
-    this.autoscroll = true;
+    this.autoscroll = this.props.autoscroll === true;
   }
 
   checkAutoscroll(){
@@ -58,6 +56,12 @@ class Console extends React.Component {
   }
 
   render() {
+    const prettyLine = (line) => {
+      // TODO Escape
+      return {__html: prettyPrintOne(Utils.escapeHtml(line), this.props.lang, this.props.lines)};
+    }
+    let i = 0;
+
     return (
       <pre className={`console prettyprint 
           ${this.props.lang ? `lang-${this.props.lang}` : ""} 
@@ -66,10 +70,12 @@ class Console extends React.Component {
           onMouseOver={this.handleMouseOver}
           onMouseOut={this.handleMouseOut}
           ref={this.setRef}
-
         >
 
-        {this.state.lines.map(line => line + "\n")}
+        {this.state.lines.map(line => {
+          if (this.props.lang) return (<div key={i++} dangerouslySetInnerHTML={prettyLine(line)}></div>);
+          else return line + "\n";
+        })}
       </pre>
     );
   }

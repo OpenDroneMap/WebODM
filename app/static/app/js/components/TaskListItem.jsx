@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/TaskListItem.scss';
-import Console from './Console';
+import Console from '../Console';
 
 class TaskListItem extends React.Component {
   constructor(){

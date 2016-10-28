@@ -45,11 +45,12 @@ class ProcessingNode(models.Model):
     def api_client(self):
         return ApiClient(self.hostname, self.port)
 
-    def get_available_options_json(self):
+    def get_available_options_json(self, pretty=False):
         """
         :returns available options in JSON string format
         """
-        return json.dumps(self.available_options)
+        kwargs = dict(indent=4, separators=(',', ": ")) if pretty else dict() 
+        return json.dumps(self.available_options, **kwargs)
 
     def process_new_task(self, images, name=None, options=[]):
         """

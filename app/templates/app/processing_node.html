@@ -1,5 +1,6 @@
 {% extends "app/logged_in_base.html" %}
 {% load i18n tz %}
+{% load render_bundle from webpack_loader %}
 
 {% block content %}
 <h3>Processing Node</h3>
@@ -26,7 +27,7 @@
 	</tr>
 	<tr>
 		<td>{% trans "Options (JSON)" %}</td>
-		<td><div id="processing_node_json"></div></td>
+		<td><div data-console data-console-lang="js" data-console-height="300">{{ available_options_json}}</div></td>
 	</tr>
 </table>
 {% if user.is_superuser %} 
@@ -35,26 +36,7 @@
 	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><i class="glyphicon glyphicon-trash"></i> {% trans "Delete" %}</button>
 </div>
 {% endif %}
-<script>
-$(function(){
 
-/*
-              <Console height={100} lang="py" ref={(n) => { if (n) setInterval(() => { n.addLine("print(" + Math.random() + ")")}, 500)}}>
-{`print('hi')
-hello world!`}
-              </Console>
-*/
+{% render_bundle 'main' %}
 
-	// TODO: we'll need a prettier console library to display stuff like 
-	// json, console output, etc.
-	// this is temporary!
-	var optionsText = JSON.stringify(JSON.parse("{{ available_options_json|escapejs }}"), null, 4);
-	$("#processing_node_json")
-		.html(optionsText.replace(/\n/g, "<br/>").replace(/  /g, "&nbsp;&nbsp;"))
-		.css({
-			'overflow': 'auto',
-			'max-height': '200px'
-		});
-});
-</script>
 {% endblock %}

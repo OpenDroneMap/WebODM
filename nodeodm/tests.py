@@ -57,6 +57,7 @@ class TestClientApi(TestCase):
         self.assertTrue(online_node.api_version != "", "API version is set")
         
         self.assertTrue(isinstance(online_node.get_available_options_json(), six.string_types), "Available options json works")
+        self.assertTrue(isinstance(online_node.get_available_options_json(pretty=True), six.string_types), "Available options json works with pretty")
 
     def test_offline_processing_node(self):
         offline_node = ProcessingNode.objects.get(pk=2)
