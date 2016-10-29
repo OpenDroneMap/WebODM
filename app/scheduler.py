@@ -81,9 +81,9 @@ def setup():
 
 def teardown():
     logger.info("Stopping scheduler...")
+    for t in threads: t.join()
     try:
-        for t in threads: t.join()
         scheduler.shutdown()
-        logger.info("Scheduler stopped")
     except SchedulerNotRunningError:
         logger.warn("Scheduler not running")
+    logger.info("Scheduler stopped")
