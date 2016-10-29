@@ -79,7 +79,7 @@ class Task(models.Model):
         (50, 'CANCELED')
     )
 
-    uuid = models.CharField(max_length=255, db_index=True, null=True, blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
+    uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
     name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
     processing_lock = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently locked for processing. When this flag is turned on, the task is in the middle of a processing step.")

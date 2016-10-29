@@ -154,14 +154,16 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
 
-        # Can filter online
+        # Can filter nodes with valid options
         res = client.get('/api/processingnodes/?has_available_options=true')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 0)
 
         res = client.get('/api/processingnodes/?has_available_options=false')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(res.data) == 2)
+        self.assertTrue(len(res.data) == 1)
+        self.assertTrue(res.data[0]['hostname'] == 'localhost')
+
 
         # Can get single processing node as normal user
         res = client.get('/api/processingnodes/{}/'.format(pnode.id))

@@ -45,7 +45,7 @@ def process_pending_tasks():
         # All tasks that have a processing node assigned
         # but don't have a UUID
         # and that are not locked (being processed by another thread)
-        tasks = Task.objects.filter(Q(uuid=None) | Q(status=10) | Q(status=20)).exclude(Q(processing_node=None) | Q(processing_lock=True))
+        tasks = Task.objects.filter(Q(uuid='') | Q(status__in=[10, 20])).exclude(Q(processing_node=None) | Q(processing_lock=True))
         for task in tasks:
             logger.info("Acquiring lock: {}".format(task))
             task.processing_lock = True

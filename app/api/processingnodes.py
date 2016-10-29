@@ -20,7 +20,10 @@ class ProcessingNodeFilter(FilterSet):
     has_available_options = django_filters.MethodFilter()
 
     def filter_has_available_options(self, queryset, value):
-        return queryset.filter(available_options__isnull=(not value.lower() in ['true', '1']))
+        if value.lower() in ['true', '1']:
+            return queryset.exclude(available_options=dict())
+        else:
+            return queryset.filter(available_options=dict())
 
     class Meta:
         model = ProcessingNode
