@@ -77,5 +77,6 @@ def teardown():
     logger.info("Stopping scheduler...")
     try:
         scheduler.shutdown()
+        logger.info("Scheduler stopped")
     except SchedulerNotRunningError:
         logger.warn("Scheduler not running")
