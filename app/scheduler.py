@@ -10,8 +10,9 @@ import random
 
 logger = logging.getLogger('app.logger')
 scheduler = BackgroundScheduler()
+threads = [] # Keep track of alive threads
 
-def job(func):
+def background(func):
     """
     Adds background={True|False} param to any function
     so that we can call update_nodes_info(background=True) from the outside
@@ -19,15 +20,20 @@ def job(func):
     def wrapper(*args,**kwargs):
         background = kwargs.get('background', False)
         if background:
+            # Need to initialize reference to variable in order 
+            # to use it from a decorator: http://stackoverflow.com/questions/10913060/local-variable-referenced-before-assignment-for-decorator 
+            threads_local = threads
+
             t = Thread(target=func)
+            threads_local.append(t)
+            threads_local = filter(lambda u: u.is_alive(), threads_local)
             t.start()
             return t
         else:
             return func(*args, **kwargs)
     return wrapper
 
-
-@job
+@background
 def update_nodes_info():
     processing_nodes = ProcessingNode.objects.all()
     for processing_node in processing_nodes:
@@ -36,7 +42,7 @@ def update_nodes_info():
 
 tasks_mutex = Lock()
 
-@job
+@background
 def process_pending_tasks():
     tasks = []
     try:
@@ -76,6 +82,7 @@ def setup():
 def teardown():
     logger.info("Stopping scheduler...")
     try:
+        for t in threads: t.join()
         scheduler.shutdown()
         logger.info("Scheduler stopped")
     except SchedulerNotRunningError:
