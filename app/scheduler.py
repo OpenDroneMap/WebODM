@@ -6,11 +6,11 @@ from multiprocessing.dummy import Pool as ThreadPool
 from nodeodm.models import ProcessingNode
 from app.models import Task
 from django.db.models import Q
+from django import db
 import random
 
 logger = logging.getLogger('app.logger')
 scheduler = BackgroundScheduler()
-threads = [] # Keep track of alive threads
 
 def background(func):
     """
@@ -19,19 +19,28 @@ def background(func):
     """
     def wrapper(*args,**kwargs):
         background = kwargs.get('background', False)
-        if background:
-            # Need to initialize reference to variable in order 
-            # to use it from a decorator: http://stackoverflow.com/questions/10913060/local-variable-referenced-before-assignment-for-decorator 
-            threads_local = threads
+        if 'background' in kwargs: del kwargs['background']
 
-            t = Thread(target=func)
-            threads_local.append(t)
-            threads_local = filter(lambda u: u.is_alive(), threads_local)
+        if background:
+            # Create a function that closes all 
+            # db connections at the end of the thread
+            # This is necessary to make sure we don't leave
+            # open connections lying around. 
+            def execute_and_close_db():
+                ret = None
+                try:
+                    ret = func(*args, **kwargs)
+                finally:
+                    db.connections.close_all()
+                return ret
+
+            t = Thread(target=execute_and_close_db)
             t.start()
             return t
         else:
             return func(*args, **kwargs)
     return wrapper
+
 
 @background
 def update_nodes_info():
@@ -81,9 +90,8 @@ def setup():
 
 def teardown():
     logger.info("Stopping scheduler...")
-    for t in threads: t.join()
     try:
         scheduler.shutdown()
+        logger.info("Scheduler stopped")
     except SchedulerNotRunningError:
         logger.warn("Scheduler not running")
-    logger.info("Scheduler stopped")
