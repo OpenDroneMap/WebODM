@@ -6,6 +6,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 from nodeodm.models import ProcessingNode
 from app.models import Task
 from django.db.models import Q
+from django import db
 import random
 
 logger = logging.getLogger('app.logger')
@@ -18,8 +19,22 @@ def background(func):
     """
     def wrapper(*args,**kwargs):
         background = kwargs.get('background', False)
+        if 'background' in kwargs: del kwargs['background']
+
         if background:
-            t = Thread(target=func)
+            # Create a function that closes all 
+            # db connections at the end of the thread
+            # This is necessary to make sure we don't leave
+            # open connections lying around. 
+            def execute_and_close_db():
+                ret = None
+                try:
+                    ret = func(*args, **kwargs)
+                finally:
+                    db.connections.close_all()
+                return ret
+
+            t = Thread(target=execute_and_close_db)
             t.start()
             return t
         else:

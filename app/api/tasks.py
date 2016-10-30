@@ -91,7 +91,7 @@ class TaskViewSet(viewsets.ViewSet):
         serializer.save()
 
         # Call the scheduler (speed things up)
-        #scheduler.process_pending_tasks(background=True)
+        scheduler.process_pending_tasks(background=True)
 
         return Response(serializer.data)
 
