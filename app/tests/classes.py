@@ -51,6 +51,3 @@ class BootTestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
         super(BootTestCase, cls).tearDownClass()
-
-        # Wait for background threads
-        scheduler.teardown()
