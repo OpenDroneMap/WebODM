@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from app.models import Project
 from app.boot import boot
-from app import scheduler
 
 class BootTestCase(TestCase):
     '''

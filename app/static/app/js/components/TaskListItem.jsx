@@ -11,9 +11,11 @@ class TaskListItem extends React.Component {
     }
 
     this.toggleExpanded = this.toggleExpanded.bind(this);
+    this.consoleOutputUrl = this.consoleOutputUrl.bind(this);
   }
 
   componentDidMount(){
+
   }
 
   toggleExpanded(){
@@ -22,17 +24,32 @@ class TaskListItem extends React.Component {
     });
   }
 
+  consoleOutputUrl(line){
+    return `/api/projects/${this.props.data.project}/tasks/${this.props.data.id}/?output_only=true&line=${line}`;
+  }
+
   render() {
     let name = this.props.data.name !== null ? this.props.data.name : `Task #${this.props.data.id}`;
     
     let expanded = "";
     if (this.state.expanded){
       expanded = (
-          <div className="row expanded-panel">
-            <div className="labels">
-              <strong>Status: </strong> Running<br/>
+        <div className="expanded-panel">
+          <div className="row">
+            <div className="col-md-4 no-padding">
+              <div className="labels">
+                <strong>Status: </strong> Running<br/>
+              </div>
             </div>
-
+            <div className="col-md-8">
+              <Console 
+                source={this.consoleOutputUrl} 
+                refreshInterval={3000} 
+                autoscroll={true}
+                height={200} />
+            </div>
+          </div>
+          <div className="row">
             <button type="button" className="btn btn-primary btn-sm">
               <i className="glyphicon glyphicon-remove-circle"></i>
               Restart
@@ -44,7 +61,8 @@ class TaskListItem extends React.Component {
               Delete
             </button>
           </div>
-        );
+        </div>
+      );
     }
 
     return (

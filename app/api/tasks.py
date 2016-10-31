@@ -48,6 +48,12 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
         return project
 
+    @staticmethod
+    def task_output_only(request, task):
+        line_num = max(0, int(request.query_params.get('line', 0)))
+        output = task.console_output or ""
+        return '\n'.join(output.split('\n')[line_num:])
+
     def list(self, request, project_pk=None):
         project = self.get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
@@ -61,8 +67,16 @@ class TaskViewSet(viewsets.ViewSet):
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
-        serializer = TaskSerializer(task)
-        return Response(serializer.data)
+
+        response_data = None
+
+        if request.query_params.get('output_only', '').lower() in ['true', '1']:
+            response_data = self.task_output_only(request, task)
+        else:
+            serializer = TaskSerializer(task)
+            response_data = serializer.data
+
+        return Response(response_data)
 
     def create(self, request, project_pk=None):
         project = self.get_and_check_project(request, project_pk, ('change_project', ))

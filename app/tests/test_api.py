@@ -101,6 +101,28 @@ class TestApi(BootTestCase):
         # images_count field exists
         self.assertTrue(res.data["images_count"] == 0)
 
+        # Get console output
+        res = client.get('/api/projects/{}/tasks/{}/?output_only=true'.format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data == "")
+
+        task.console_output = "line1\nline2\nline3"
+        task.save()
+
+        res = client.get('/api/projects/{}/tasks/{}/?output_only=true'.format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data == task.console_output)
+
+        # Console output with line num
+        res = client.get('/api/projects/{}/tasks/{}/?output_only=true&line=2'.format(project.id, task.id))
+        self.assertTrue(res.data == "line3")
+
+        # Console output with line num out of bounds
+        res = client.get('/api/projects/{}/tasks/{}/?output_only=true&line=3'.format(project.id, task.id))
+        self.assertTrue(res.data == "")
+        res = client.get('/api/projects/{}/tasks/{}/?output_only=true&line=-1'.format(project.id, task.id))
+        self.assertTrue(res.data == task.console_output)
+
         # Cannot list task details for a task belonging to a project we don't have access to
         res = client.get('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)

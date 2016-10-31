@@ -6,6 +6,10 @@
     .row{
         margin: 0;
         padding: 4px;
+
+        .no-padding{
+            padding: 0;
+        }
     }
 
     .name{

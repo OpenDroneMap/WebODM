@@ -26,6 +26,36 @@ class Console extends React.Component {
 
   componentDidMount(){
     this.checkAutoscroll();
+
+    // Dynamic source?
+    if (this.props.source !== undefined){
+      let currentLineNumber = 0;
+
+      const updateFromSource = () => {
+        let sourceUrl = typeof this.props.source === 'function' ?
+                       this.props.source(currentLineNumber) :
+                       this.props.source;
+
+        // Fetch
+        this.sourceRequest = $.get(sourceUrl, text => {
+          let lines = text.split("\n");
+          lines.forEach(line => this.addLine(line));
+          currentLineNumber += (lines.length - 1);
+        })
+        .always(() => {
+          if (this.props.refreshInterval !== undefined){
+            this.sourceTimeout = setTimeout(updateFromSource, this.props.refreshInterval);
+          }
+        });
+      };
+
+      updateFromSource();
+    }
+  }
+
+  componentWillUnmount(){
+    if (this.sourceTimeout) clearTimeout(this.sourceTimeout);
+    if (this.sourceRequest) this.sourceRequest.abort();
   }
 
   setRef(domNode){
