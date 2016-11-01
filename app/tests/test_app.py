@@ -129,7 +129,7 @@ class TestApp(BootTestCase):
 
         # Test options validation
         task.options = [{'name': 'test', 'value': 1}]
-        self.assertTrue(task.save() == None)
+        self.assertTrue(task.save() is None)
 
         task.options = {'test': 1}
         self.assertRaises(ValidationError, task.save)
@@ -139,12 +139,12 @@ class TestApp(BootTestCase):
 
 
     def test_scheduler(self):
-        self.assertTrue(scheduler.setup() == None)
+        self.assertTrue(scheduler.setup() is None)
 
         # Can call update_nodes_info()
-        self.assertTrue(scheduler.update_nodes_info() == None)
+        self.assertTrue(scheduler.update_nodes_info() is None)
 
         # Can call function in background
-        self.assertTrue(scheduler.update_nodes_info(background=True).join() == None)
+        self.assertTrue(scheduler.update_nodes_info(background=True).join() is None)
 
-        self.assertTrue(scheduler.teardown() == None)
+        self.assertTrue(scheduler.teardown() is None)

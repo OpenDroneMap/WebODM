@@ -1,14 +1,10 @@
-from rest_framework import serializers, viewsets
-from rest_framework.response import Response
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import DjangoModelPermissions
-from rest_framework.filters import DjangoFilterBackend
-from django_filters.rest_framework import FilterSet
-from nodeodm.models import ProcessingNode
 import django_filters
-from django.utils import timezone
-from datetime import timedelta
-from django.db.models import Q
+from django_filters.rest_framework import FilterSet
+from rest_framework import serializers, viewsets
+from rest_framework.filters import DjangoFilterBackend
+from rest_framework.permissions import DjangoModelPermissions
+
+from nodeodm.models import ProcessingNode
 
 
 class ProcessingNodeSerializer(serializers.ModelSerializer):
@@ -19,6 +15,7 @@ class ProcessingNodeSerializer(serializers.ModelSerializer):
 class ProcessingNodeFilter(FilterSet):
     has_available_options = django_filters.MethodFilter()
 
+    # noinspection PyMethodMayBeStatic
     def filter_has_available_options(self, queryset, value):
         if value.lower() in ['true', '1']:
             return queryset.exclude(available_options=dict())

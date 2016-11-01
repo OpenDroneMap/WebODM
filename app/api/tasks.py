@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.response import Response
-from rest_framework.decorators import parser_classes, api_view
+
 from app import models, scheduler
 from nodeodm.models import ProcessingNode
+
 
 class TaskIDsSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
@@ -34,8 +34,9 @@ class TaskViewSet(viewsets.ViewSet):
     permission_classes = (permissions.DjangoModelPermissions, )
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
     ordering_fields = '__all__'
-    
-    def get_and_check_project(self, request, project_pk, perms = ('view_project', )):
+
+    @staticmethod
+    def get_and_check_project(request, project_pk, perms = ('view_project', )):
         '''
         Retrieves a project and raises an exeption if the current user
         has no access to it.
@@ -55,7 +56,7 @@ class TaskViewSet(viewsets.ViewSet):
         return '\n'.join(output.split('\n')[line_num:])
 
     def list(self, request, project_pk=None):
-        project = self.get_and_check_project(request, project_pk)
+        self.get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
         tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
         serializer = TaskSerializer(tasks, many=True)
@@ -67,8 +68,6 @@ class TaskViewSet(viewsets.ViewSet):
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
-
-        response_data = None
 
         if request.query_params.get('output_only', '').lower() in ['true', '1']:
             response_data = self.task_output_only(request, task)
@@ -88,13 +87,13 @@ class TaskViewSet(viewsets.ViewSet):
                     for file in filesList]
 
         task = models.Task.create_from_images(files, project)
-        if task != None:
+        if not task is None:
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)
         else:
             raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
 
     def update(self, request, pk=None, project_pk=None, partial=False):
-        project = self.get_and_check_project(request, project_pk, ('change_project', ))
+        self.get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:

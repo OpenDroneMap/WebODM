@@ -139,7 +139,7 @@ class Task(models.Model):
 
                 # TODO: log process has started processing
 
-            except ProcessingException, e:
+            except ProcessingException as e:
                 print("TASK ERROR: " + e.message)
 
         # Need to update status (first time, queued or running?)
