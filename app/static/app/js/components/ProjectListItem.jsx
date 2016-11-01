@@ -179,6 +179,9 @@ class ProjectListItem extends React.Component {
 
   handleUpload(){
     this.resetUploadState();
+
+    // Hide task list
+    if (this.state.showTaskList) this.toggleTaskList();
   }
 
   handleTaskSaved(taskInfo){

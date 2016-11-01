@@ -38,12 +38,14 @@ class Console extends React.Component {
 
         // Fetch
         this.sourceRequest = $.get(sourceUrl, text => {
-          let lines = text.split("\n");
-          lines.forEach(line => this.addLine(line));
-          currentLineNumber += (lines.length - 1);
+          if (text !== ""){
+            let lines = text.split("\n");
+            lines.forEach(line => this.addLine(line));
+            currentLineNumber += (lines.length - 1);
+          }
         })
-        .always(() => {
-          if (this.props.refreshInterval !== undefined){
+        .always((_, textStatus) => {
+          if (textStatus !== "abort" && this.props.refreshInterval !== undefined){
             this.sourceTimeout = setTimeout(updateFromSource, this.props.refreshInterval);
           }
         });

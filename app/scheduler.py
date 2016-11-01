@@ -60,7 +60,7 @@ def process_pending_tasks():
         # All tasks that have a processing node assigned
         # but don't have a UUID
         # and that are not locked (being processed by another thread)
-        tasks = Task.objects.filter(Q(uuid='') | Q(status__in=[10, 20])).exclude(Q(processing_node=None) | Q(processing_lock=True))
+        tasks = Task.objects.filter(Q(uuid='') | Q(status__in=[10, 20]) | Q(status=None)).exclude(Q(processing_node=None) | Q(processing_lock=True) | Q(last_error__isnull=False))
         for task in tasks:
             logger.info("Acquiring lock: {}".format(task))
             task.processing_lock = True
@@ -84,7 +84,7 @@ def setup():
     try:
         scheduler.start()
         scheduler.add_job(update_nodes_info, 'interval', seconds=30)
-        scheduler.add_job(process_pending_tasks, 'interval', seconds=15)
+        scheduler.add_job(process_pending_tasks, 'interval', seconds=5)
     except SchedulerAlreadyRunningError:
         logger.warn("Scheduler already running (this is OK while testing)")
 

@@ -88,7 +88,7 @@ class Task(models.Model):
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
     options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
-    console_output = models.TextField(null=True, blank=True, help_text="Console output of the OpenDroneMap's process")
+    console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
     ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
     # georeferenced_model
@@ -140,7 +140,7 @@ class Task(models.Model):
                 # TODO: log process has started processing
 
             except ProcessingException as e:
-                print("TASK ERROR: " + e.message)
+                self.set_failure(e.message)
 
         # Need to update status (first time, queued or running?)
         if self.uuid and self.status in [None, 10, 20]:
@@ -149,9 +149,12 @@ class Task(models.Model):
             # Update task info from processing node
             try:
                 info = self.processing_node.get_task_info(self.uuid)
-                
+
                 self.processing_time = info["processingTime"]
                 self.status = info["status"]["code"]
+
+                current_lines_count = len(self.console_output.split("\n")) - 1
+                self.console_output += self.processing_node.get_task_console_output(self.uuid, current_lines_count)
 
                 if "errorMessage" in info["status"]:
                     self.last_error = info["status"]["errorMessage"]
@@ -171,9 +174,14 @@ class Task(models.Model):
                 else:
                     # Still waiting...
                     self.save()
-            except ProcessingException, e:
-                print("TASK ERROR 2: " + e.message)
+            except ProcessingException as e:
+                self.set_failure(e.message)
 
+    def set_failure(self, error_message):
+        print("{} ERROR: {}".format(self, error_message))
+        self.last_error = error_message
+        self.status = 30  # failed
+        self.save()
 
     class Meta:
         permissions = (
