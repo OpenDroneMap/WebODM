@@ -6,6 +6,7 @@
     .row{
         margin: 0;
         padding: 4px;
+        padding-left: 8px;
 
         .no-padding{
             padding: 0;
@@ -28,6 +29,19 @@
             &:first-child{
                 margin-left: 4px;
             }
+        }
+    }
+
+    .status-label{
+        padding: 4px;
+        width: 100%;
+        font-size: 90%;
+
+        &.done{
+            background-color: #cbffcd;
+        }
+        &.error{
+            background-color: #ffcbcb;
         }
     }
 

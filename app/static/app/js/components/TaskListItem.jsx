@@ -1,6 +1,7 @@
 import React from 'react';
 import '../css/TaskListItem.scss';
 import Console from '../Console';
+import statusCodes from '../classes/StatusCodes';
 
 class TaskListItem extends React.Component {
   constructor(){
@@ -38,7 +39,7 @@ class TaskListItem extends React.Component {
           <div className="row">
             <div className="col-md-4 no-padding">
               <div className="labels">
-                <strong>Status: </strong> Running<br/>
+                <strong>Status: </strong> {statusCodes.description(this.props.data.status)}<br/>
               </div>
             </div>
             <div className="col-md-8">
@@ -65,18 +66,28 @@ class TaskListItem extends React.Component {
       );
     }
 
+    let statusLabel = "";
+    if (this.props.data.last_error){
+      statusLabel = (<div className="status-label error" title={this.props.data.last_error}>{this.props.data.last_error}</div>);
+    }else{
+      statusLabel = (<div className={"status-label " + (this.props.data.status == 40 ? "done" : "")} title={statusCodes.description(this.props.data.status)}>{statusCodes.description(this.props.data.status)}</div>);
+    }
+
     return (
       <div className="task-list-item">
         <div className="row">
           <div className="col-md-5 name">
             <i onClick={this.toggleExpanded} className={"clickable fa " + (this.state.expanded ? "fa-minus-square-o" : " fa-plus-square-o")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
           </div>
-          <div className="col-md-6 details">
+          <div className="col-md-3 details">
             <i className="fa fa-clock-o"></i> 00:00:00
             <i className="fa fa-image"></i> {this.props.data.images_count}
           </div> 
-          <div className="col-md-1 details text-right">
-            <i className="fa fa-gear fa-spin fa-fw"></i>
+          <div className="col-md-3">
+            {statusLabel}
+          </div>
+          <div className="col-md-1 text-right">
+            <i className={statusCodes.icon(this.props.data.status)}></i>
           </div>
         </div>
         {expanded}
