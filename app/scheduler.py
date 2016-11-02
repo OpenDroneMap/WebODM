@@ -7,6 +7,7 @@ from nodeodm.models import ProcessingNode
 from app.models import Task
 from django.db.models import Q
 from django import db
+from nodeodm import status_codes
 import random
 
 logger = logging.getLogger('app.logger')
@@ -59,8 +60,12 @@ def process_pending_tasks():
 
         # All tasks that have a processing node assigned
         # but don't have a UUID
+        # or tasks that have a pending action
         # and that are not locked (being processed by another thread)
-        tasks = Task.objects.filter(Q(uuid='') | Q(status__in=[10, 20]) | Q(status=None)).exclude(Q(processing_node=None) | Q(processing_lock=True) | Q(last_error__isnull=False))
+        tasks = Task.objects.filter(Q(uuid='', last_error__isnull=True, processing_node__isnull=False) |
+                                    Q(status__in=[status_codes.QUEUED, status_codes.RUNNING], processing_node__isnull=False) |
+                                    Q(status=None, processing_node__isnull=False) |
+                                    Q(pending_action__isnull=False)).exclude(Q(processing_lock=True))
         for task in tasks:
             logger.info("Acquiring lock: {}".format(task))
             task.processing_lock = True

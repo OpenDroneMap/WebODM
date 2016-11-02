@@ -99,6 +99,28 @@ class ProcessingNode(models.Model):
         else:
             raise ProcessingException("Unknown response for console output: {}".format(result))
 
+    def cancel_task(self, uuid):
+        """
+        Cancels a task (stops its execution, or prevents it from being executed)
+        """
+        api_client = self.api_client()
+        return self.handle_generic_post_response(api_client.task_cancel(uuid))
+    
+    @staticmethod
+    def handle_generic_post_response(result):
+        """
+        Handles a POST response that has either a "success" flag, or an error message.
+        This is a common response in node-OpenDroneMap POST calls.
+        :param result: result of API call
+        :return: True on success, raises ProcessingException otherwise
+        """
+        if isinstance(result, dict) and 'error' in result:
+            raise ProcessingException(result['error'])
+        elif isinstance(result, dict) and 'success' in result:
+            return True
+        else:
+            raise ProcessingException("Unknown response: {}".format(result))
+
 # First time a processing node is created, automatically try to update
 @receiver(signals.post_save, sender=ProcessingNode, dispatch_uid="update_processing_node_info")
 def auto_update_node_info(sender, instance, created, **kwargs):

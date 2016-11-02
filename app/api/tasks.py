@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.response import Response
+from rest_framework.decorators import detail_route
 
 from app import models, scheduler
 from nodeodm.models import ProcessingNode
@@ -20,7 +21,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Task
-        exclude = ('processing_lock', )
+        exclude = ('processing_lock', 'console_output', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -49,11 +50,36 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
         return project
 
-    @staticmethod
-    def task_output_only(request, task):
+    @detail_route(methods=['post'])
+    def cancel(self, request, pk=None, project_pk=None):
+        self.get_and_check_project(request, project_pk, ('change_project',))
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except ObjectDoesNotExist:
+            raise exceptions.NotFound()
+
+        task.pending_action = task.PendingActions.CANCEL
+        task.last_error = None
+        task.save()
+
+        return Response({'success': True})
+
+    @detail_route(methods=['get'])
+    def output(self, request, pk=None, project_pk=None):
+        """
+        Retrieve the console output for this task.
+        An optional "line" query param can be passed to retrieve
+        only the output starting from a certain line number.
+        """
+        self.get_and_check_project(request, project_pk)
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except ObjectDoesNotExist:
+            raise exceptions.NotFound()
+
         line_num = max(0, int(request.query_params.get('line', 0)))
         output = task.console_output or ""
-        return '\n'.join(output.split('\n')[line_num:])
+        return Response('\n'.join(output.split('\n')[line_num:]))
 
     def list(self, request, project_pk=None):
         self.get_and_check_project(request, project_pk)
@@ -69,13 +95,8 @@ class TaskViewSet(viewsets.ViewSet):
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
 
-        if request.query_params.get('output_only', '').lower() in ['true', '1']:
-            response_data = self.task_output_only(request, task)
-        else:
-            serializer = TaskSerializer(task)
-            response_data = serializer.data
-
-        return Response(response_data)
+        serializer = TaskSerializer(task)
+        return Response(serializer.data)
 
     def create(self, request, project_pk=None):
         project = self.get_and_check_project(request, project_pk, ('change_project', ))

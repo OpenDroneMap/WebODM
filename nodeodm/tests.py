@@ -96,3 +96,8 @@ class TestClientApi(TestCase):
         self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), (str, unicode)))
 
         self.assertRaises(ProcessingException, online_node.get_task_console_output, "wrong-uuid", 0)
+
+        # Can cancel task
+        self.assertTrue(online_node.cancel_task(uuid))
+        self.assertRaises(ProcessingException, online_node.cancel_task, "wrong-uuid")
+

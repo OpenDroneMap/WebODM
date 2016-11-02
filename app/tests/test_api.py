@@ -102,25 +102,25 @@ class TestApi(BootTestCase):
         self.assertTrue(res.data["images_count"] == 0)
 
         # Get console output
-        res = client.get('/api/projects/{}/tasks/{}/?output_only=true'.format(project.id, task.id))
+        res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data == "")
 
         task.console_output = "line1\nline2\nline3"
         task.save()
 
-        res = client.get('/api/projects/{}/tasks/{}/?output_only=true'.format(project.id, task.id))
+        res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data == task.console_output)
 
         # Console output with line num
-        res = client.get('/api/projects/{}/tasks/{}/?output_only=true&line=2'.format(project.id, task.id))
+        res = client.get('/api/projects/{}/tasks/{}/output/?line=2'.format(project.id, task.id))
         self.assertTrue(res.data == "line3")
 
         # Console output with line num out of bounds
-        res = client.get('/api/projects/{}/tasks/{}/?output_only=true&line=3'.format(project.id, task.id))
+        res = client.get('/api/projects/{}/tasks/{}/output/?line=3'.format(project.id, task.id))
         self.assertTrue(res.data == "")
-        res = client.get('/api/projects/{}/tasks/{}/?output_only=true&line=-1'.format(project.id, task.id))
+        res = client.get('/api/projects/{}/tasks/{}/output/?line=-1'.format(project.id, task.id))
         self.assertTrue(res.data == task.console_output)
 
         # Cannot list task details for a task belonging to a project we don't have access to
@@ -145,6 +145,18 @@ class TestApi(BootTestCase):
 
         # Cannot update a task we have no access to
         res = client.patch('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id), {'name': 'updated!'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can cancel a task for which we have permission
+        self.assertTrue(task.pending_action is None)
+        res = client.post('/api/projects/{}/tasks/{}/cancel/'.format(project.id, task.id))
+        self.assertTrue(res.data["success"])
+        task.refresh_from_db()
+        self.assertTrue(task.last_error is None)
+        self.assertTrue(task.pending_action == task.PendingActions.CANCEL)
+
+        # Cannot cancel a task for which we don't have permission
+        res = client.post('/api/projects/{}/tasks/{}/cancel/'.format(other_project.id, other_task.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
 

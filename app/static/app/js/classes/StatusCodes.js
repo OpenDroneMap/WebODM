@@ -1,35 +1,47 @@
+const QUEUED = 10,
+      RUNNING = 20,
+      FAILED = 30,
+      COMPLETED = 40,
+      CANCELED = 50;
+
 let statusCodes = {
-    10: {
+    [QUEUED]: {
         descr: "Queued",
-        icon: "glyphicon glyphicon-hourglass"
+        icon: "fa fa-hourglass-3"
     },
-    20: {
+    [RUNNING]: {
         descr: "Running",
         icon: "fa fa-gear fa-spin fa-fw"
     },
-    30: {
+    [FAILED]: {
         descr: "Failed",
-        icon: "glyphicon glyphicon-remove-circle"
+        icon: "fa fa-remove"
     },
-    40: {
+    [COMPLETED]: {
         descr: "Completed",
-        icon: "glyphicon glyphicon-ok-circle"
+        icon: "fa fa-check"
     },
-    50: {
+    [CANCELED]: {
         descr: "Canceled",
-        icon: "glyphicon glyphicon-ban-circle"
+        icon: "fa fa-ban"
     }
 };
 
 export default {
+    QUEUED: QUEUED,
+    RUNNING: RUNNING,
+    FAILED: FAILED,
+    COMPLETED: COMPLETED,
+    CANCELED: CANCELED,
+
     description: function(statusCode) {
       if (statusCodes[statusCode]) return statusCodes[statusCode].descr;
-      else return "Uploading";
+      else return "";
     },
 
     icon: function(statusCode){
       if (statusCodes[statusCode]) return statusCodes[statusCode].icon;
-      else return "glyphicon glyphicon-upload";
+      else return "fa fa-gear fa-spin";
     }
 };
 

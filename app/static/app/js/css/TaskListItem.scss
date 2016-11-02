@@ -20,15 +20,20 @@
     .details{
         font-size: 90%;
         padding-right: 0;
+        margin-top: 4px;
 
         i{
             margin-left: 16px;
-            &.fa-spin{
-                margin-left: 10px;
-            }
             &:first-child{
                 margin-left: 4px;
             }
+        }
+    }
+    
+    .status-icon{
+        margin-top: 3px;
+        .fa-gear{
+            width: auto;
         }
     }
 
@@ -53,9 +58,5 @@
         padding-top: 4px;
         padding-bottom: 16px;
         padding-left: 16px;
-
-        .labels{
-            margin-bottom: 8px;
-        }
     }
 }

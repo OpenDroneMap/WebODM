@@ -181,7 +181,7 @@ class ProjectListItem extends React.Component {
     this.resetUploadState();
 
     // Hide task list
-    if (this.state.showTaskList) this.toggleTaskList();
+    // if (this.state.showTaskList) this.toggleTaskList();
   }
 
   handleTaskSaved(taskInfo){
@@ -245,8 +245,6 @@ class ProjectListItem extends React.Component {
               </div>
           </div>
 
-          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-id`}/> : ""}
-
           {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
           
           {this.state.upload.error !== "" ? 
@@ -267,6 +265,8 @@ class ProjectListItem extends React.Component {
           {this.state.updatingTask ? 
             <span>Updating task information... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
           : ""}
+
+          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-id`}/> : ""}
 
         </div>
       </li>
