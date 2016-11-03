@@ -33,5 +33,5 @@ def processing_node(request, processing_node_id):
             {
                 'title': 'Processing Node', 
                 'processing_node': pn,
-                'available_options_json': pn.get_available_options_json()
+                'available_options_json': pn.get_available_options_json(pretty=True)
             })

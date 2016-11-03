@@ -1,0 +1,68 @@
+.task-list-item{
+    &:nth-child(odd){
+        background-color: #f7f7f7;
+    }
+
+    .row{
+        margin: 0;
+        padding: 4px;
+        padding-left: 8px;
+
+        .no-padding{
+            padding: 0;
+        }
+    }
+
+    .name{
+        padding-left: 0;
+    }
+    
+    .details{
+        font-size: 90%;
+        padding-right: 0;
+        margin-top: 4px;
+
+        i{
+            margin-left: 16px;
+            &:first-child{
+                margin-left: 4px;
+            }
+        }
+    }
+    
+    .status-icon{
+        margin-top: 3px;
+        .fa-gear{
+            width: auto;
+        }
+    }
+
+    .status-label{
+        padding: 4px;
+        width: 100%;
+        font-size: 90%;
+
+        &.done{
+            background-color: #cbffcd;
+        }
+        &.error{
+            background-color: #ffcbcb;
+        }
+    }
+
+    .clickable:hover{
+        cursor: pointer;
+    }
+
+    .expanded-panel{
+        padding-top: 4px;
+        padding-bottom: 16px;
+        padding-left: 16px;
+
+        .action-buttons{
+            button{
+                margin-right: 4px;
+            }
+        }
+    }
+}

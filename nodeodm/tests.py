@@ -5,7 +5,7 @@ from os import path
 from .models import ProcessingNode
 from .api_client import ApiClient
 from requests.exceptions import ConnectionError
-
+from .exceptions import ProcessingException
 current_dir = path.dirname(path.realpath(__file__))
 
 
@@ -57,6 +57,8 @@ class TestClientApi(TestCase):
         self.assertTrue(online_node.api_version != "", "API version is set")
         
         self.assertTrue(isinstance(online_node.get_available_options_json(), six.string_types), "Available options json works")
+        self.assertTrue(isinstance(online_node.get_available_options_json(pretty=True), six.string_types), "Available options json works with pretty")
+
 
     def test_offline_processing_node(self):
         offline_node = ProcessingNode.objects.get(pk=2)
@@ -67,8 +69,9 @@ class TestClientApi(TestCase):
         online_node = ProcessingNode.objects.create(hostname="localhost", port=11223)
         self.assertTrue(online_node.last_refreshed != None, "Last refreshed info is here (update_node_info() was called)")
 
-    def test_client_api(self):
+    def test_client_api_and_task_methods(self):
         api = ApiClient("localhost", 11223)
+        online_node = ProcessingNode.objects.get(pk=1)
 
         # Can call info(), options()
         self.assertTrue(type(api.info()['version']) in [str, unicode])
@@ -87,3 +90,14 @@ class TestClientApi(TestCase):
         task_info = api.task_info(uuid)
         self.assertTrue(isinstance(task_info['dateCreated'], (int, long)))
         self.assertTrue(isinstance(task_info['uuid'], (str, unicode)))
+
+        # task_output
+        self.assertTrue(isinstance(api.task_output(uuid, 0), list))
+        self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), (str, unicode)))
+
+        self.assertRaises(ProcessingException, online_node.get_task_console_output, "wrong-uuid", 0)
+
+        # Can cancel task
+        self.assertTrue(online_node.cancel_task(uuid))
+        self.assertRaises(ProcessingException, online_node.cancel_task, "wrong-uuid")
+

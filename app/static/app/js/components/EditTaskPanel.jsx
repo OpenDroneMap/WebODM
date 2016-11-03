@@ -38,35 +38,51 @@ class EditTaskPanel extends React.Component {
       }
 
       this.nodesRequest = 
-        $.getJSON("/api/processingnodes/?online=True", json => {
+        $.getJSON("/api/processingnodes/?has_available_options=True", json => {
           if (Array.isArray(json)){
-            // All nodes offline?
+            // No nodes with options?
+            const noProcessingNodesError = () => {
+              this.setState({error: "There are no processing nodes available. Make sure at least one of them is reachable."});
+            }
             if (json.length === 0){
-              this.setState({error: "There are no processing nodes online. Make sure at least one of them is reachable."});
+              noProcessingNodesError();
               return;
             }
 
+            let now = new Date();
+
             let nodes = json.map(node => {
+              let last_refreshed = new Date(node.last_refreshed);
+              let enabled = (now - last_refreshed) < 1000 * 60 * 5; // 5 minutes
+
               return {
                 id: node.id,
                 key: node.id,
                 label: `${node.hostname}:${node.port} (queue: ${node.queue_count})`,
-                options: node.available_options
+                options: node.available_options,
+                queue_count: node.queue_count,
+                enabled: enabled
               };
             });
 
             // Find a node with lowest queue count
-            let minQueueCount = Math.min(...json.map(node => node.queue_count));
-            let minQueueCountnodes = json.filter(node => node.queue_count === minQueueCount);
+            let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
+            let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
+
+            if (minQueueCountNodes.length === 0){
+              noProcessingNodesError();
+              return;
+            }
 
             // Choose at random
-            let autoNode = minQueueCountnodes[~~(Math.random() * minQueueCountnodes.length)];
+            let autoNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
 
             nodes.unshift({
               id: autoNode.id,
               key: "auto",
               label: "Auto",
-              options: autoNode.available_options
+              options: autoNode.options,
+              enabled: true
             });
 
             this.setState({
@@ -161,7 +177,7 @@ class EditTaskPanel extends React.Component {
                 <div className="col-sm-10">
                   <select className="form-control" value={this.state.selectedNode.key} onChange={this.handleSelectNode}>
                   {this.state.processingNodes.map(node => 
-                    <option value={node.key} key={node.key}>{node.label}</option>
+                    <option value={node.key} key={node.key} disabled={!node.enabled}>{node.label}</option>
                   )}
                   </select>
                 </div>

@@ -167,6 +167,7 @@ class ProjectListItem extends React.Component {
     this.setState({
       showTaskList: !this.state.showTaskList
     });
+    console.log(this.props);
   }
 
   closeUploadError(){
@@ -242,8 +243,6 @@ class ProjectListItem extends React.Component {
               </div>
           </div>
 
-          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")}/> : ""}
-
           {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
           
           {this.state.upload.error !== "" ? 
@@ -264,6 +263,8 @@ class ProjectListItem extends React.Component {
           {this.state.updatingTask ? 
             <span>Updating task information... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
           : ""}
+
+          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-id`}/> : ""}
 
         </div>
       </li>

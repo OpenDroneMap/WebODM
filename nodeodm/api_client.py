@@ -28,6 +28,13 @@ class ApiClient:
     def task_info(self, uuid):
         return requests.get(self.url('/task/{}/info').format(uuid)).json()
 
+    def task_output(self, uuid, line = 0):
+        return requests.get(self.url('/task/{}/output?line={}').format(uuid, line)).json()
+
+    def task_cancel(self, uuid):
+        return requests.post(self.url('/task/cancel'), data={'uuid': uuid}).json()
+
+
     def new_task(self, images, name=None, options=[]):
         """
         Starts processing of a new task

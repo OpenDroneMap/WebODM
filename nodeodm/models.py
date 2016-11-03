@@ -45,11 +45,12 @@ class ProcessingNode(models.Model):
     def api_client(self):
         return ApiClient(self.hostname, self.port)
 
-    def get_available_options_json(self):
+    def get_available_options_json(self, pretty=False):
         """
         :returns available options in JSON string format
         """
-        return json.dumps(self.available_options)
+        kwargs = dict(indent=4, separators=(',', ": ")) if pretty else dict() 
+        return json.dumps(self.available_options, **kwargs)
 
     def process_new_task(self, images, name=None, options=[]):
         """
@@ -83,6 +84,42 @@ class ProcessingNode(models.Model):
             return result
         elif result['error']:
             raise ProcessingException(result['error'])
+
+    def get_task_console_output(self, uuid, line):
+        """
+        Retrieves the console output of the OpenDroneMap's process.
+        Useful for monitoring execution and to provide updates to the user.
+        """
+        api_client = self.api_client()
+        result = api_client.task_output(uuid, line)
+        if isinstance(result, dict) and 'error' in result:
+            raise ProcessingException(result['error'])
+        elif isinstance(result, list):
+            return "".join(result)
+        else:
+            raise ProcessingException("Unknown response for console output: {}".format(result))
+
+    def cancel_task(self, uuid):
+        """
+        Cancels a task (stops its execution, or prevents it from being executed)
+        """
+        api_client = self.api_client()
+        return self.handle_generic_post_response(api_client.task_cancel(uuid))
+    
+    @staticmethod
+    def handle_generic_post_response(result):
+        """
+        Handles a POST response that has either a "success" flag, or an error message.
+        This is a common response in node-OpenDroneMap POST calls.
+        :param result: result of API call
+        :return: True on success, raises ProcessingException otherwise
+        """
+        if isinstance(result, dict) and 'error' in result:
+            raise ProcessingException(result['error'])
+        elif isinstance(result, dict) and 'success' in result:
+            return True
+        else:
+            raise ProcessingException("Unknown response: {}".format(result))
 
 # First time a processing node is created, automatically try to update
 @receiver(signals.post_save, sender=ProcessingNode, dispatch_uid="update_processing_node_info")

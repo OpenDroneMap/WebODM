@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers, viewsets
-from rest_framework.response import Response
+
 from app import models
-from .tasks import TaskIDsSerializer, TaskSerializer
+from .tasks import TaskIDsSerializer
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())

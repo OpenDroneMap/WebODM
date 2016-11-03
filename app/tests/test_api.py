@@ -76,6 +76,15 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 2)
 
+        # Can sort
+        res = client.get('/api/projects/{}/tasks/?ordering=id'.format(project.id))
+        self.assertTrue(res.data[0]['id'] == task.id)
+        self.assertTrue(res.data[1]['id'] == task2.id)
+
+        res = client.get('/api/projects/{}/tasks/?ordering=-id'.format(project.id))
+        self.assertTrue(res.data[0]['id'] == task2.id)
+        self.assertTrue(res.data[1]['id'] == task.id)
+
         # Cannot list project tasks for a project we don't have access to
         res = client.get('/api/projects/{}/tasks/'.format(other_project.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
@@ -88,6 +97,31 @@ class TestApi(BootTestCase):
         res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data["id"] == task.id)
+
+        # images_count field exists
+        self.assertTrue(res.data["images_count"] == 0)
+
+        # Get console output
+        res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data == "")
+
+        task.console_output = "line1\nline2\nline3"
+        task.save()
+
+        res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data == task.console_output)
+
+        # Console output with line num
+        res = client.get('/api/projects/{}/tasks/{}/output/?line=2'.format(project.id, task.id))
+        self.assertTrue(res.data == "line3")
+
+        # Console output with line num out of bounds
+        res = client.get('/api/projects/{}/tasks/{}/output/?line=3'.format(project.id, task.id))
+        self.assertTrue(res.data == "")
+        res = client.get('/api/projects/{}/tasks/{}/output/?line=-1'.format(project.id, task.id))
+        self.assertTrue(res.data == task.console_output)
 
         # Cannot list task details for a task belonging to a project we don't have access to
         res = client.get('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id))
@@ -111,6 +145,18 @@ class TestApi(BootTestCase):
 
         # Cannot update a task we have no access to
         res = client.patch('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id), {'name': 'updated!'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can cancel a task for which we have permission
+        self.assertTrue(task.pending_action is None)
+        res = client.post('/api/projects/{}/tasks/{}/cancel/'.format(project.id, task.id))
+        self.assertTrue(res.data["success"])
+        task.refresh_from_db()
+        self.assertTrue(task.last_error is None)
+        self.assertTrue(task.pending_action == task.PendingActions.CANCEL)
+
+        # Cannot cancel a task for which we don't have permission
+        res = client.post('/api/projects/{}/tasks/{}/cancel/'.format(other_project.id, other_task.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -142,14 +188,16 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
 
-        # Can filter online
-        res = client.get('/api/processingnodes/?online=true')
+        # Can filter nodes with valid options
+        res = client.get('/api/processingnodes/?has_available_options=true')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 0)
 
-        res = client.get('/api/processingnodes/?online=false')
+        res = client.get('/api/processingnodes/?has_available_options=false')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
+        self.assertTrue(res.data[0]['hostname'] == 'localhost')
+
 
         # Can get single processing node as normal user
         res = client.get('/api/processingnodes/{}/'.format(pnode.id))
