@@ -111,7 +111,7 @@ class TaskViewSet(viewsets.ViewSet):
                     for file in filesList]
 
         task = models.Task.create_from_images(files, project)
-        if not task is None:
+        if task is not None:
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)
         else:
             raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")

@@ -118,6 +118,33 @@ class TaskListItem extends React.Component {
     return [pad(h), pad(m), pad(s)].join(':');
   }
 
+  genActionApiCall(action){
+    return () => {
+      this.setState({actionButtonsDisabled: true});
+
+      $.post(`/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/${action}/`,
+        {
+          uuid: this.state.task.uuid
+        }
+      ).done(json => {
+          if (json.success){
+            this.refresh();
+          }else{
+            this.setState({
+              actionError: json.error,
+              actionButtonsDisabled: false
+            });
+          }
+      })
+      .fail(() => {
+          this.setState({
+            error: url + " is unreachable.",
+            actionButtonsDisabled: false
+          });
+      });
+    };
+  }
+
   render() {
     let name = this.state.task.name !== null ? this.state.task.name : `Task #${this.state.task.id}`;
     
@@ -133,36 +160,9 @@ class TaskListItem extends React.Component {
           className, icon, label, onClick
         });
       };
-      const genActionApiCall = (action) => {
-        return () => {
-          this.setState({actionButtonsDisabled: true});
-
-          $.post(`/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/${action}/`,
-            {
-              uuid: this.state.task.uuid
-            }
-          ).done(json => {
-              if (json.success){
-                this.refresh();
-              }else{
-                this.setState({
-                  actionError: json.error,
-                  actionButtonsDisabled: false
-                });
-              }
-          })
-          .fail(() => {
-              this.setState({
-                error: url + " is unreachable.",
-                actionButtonsDisabled: false
-              });
-          });
-        };
-      };
-
       
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(this.state.task.status) !== -1){
-        addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", genActionApiCall("cancel"));
+        addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel"));
       }
 
       // addActionButton("Restart", "btn-primary", "glyphicon glyphicon-play", genActionApiCall("cancel"));

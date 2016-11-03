@@ -167,6 +167,7 @@ class ProjectListItem extends React.Component {
     this.setState({
       showTaskList: !this.state.showTaskList
     });
+    console.log(this.props);
   }
 
   closeUploadError(){
@@ -179,9 +180,6 @@ class ProjectListItem extends React.Component {
 
   handleUpload(){
     this.resetUploadState();
-
-    // Hide task list
-    // if (this.state.showTaskList) this.toggleTaskList();
   }
 
   handleTaskSaved(taskInfo){
