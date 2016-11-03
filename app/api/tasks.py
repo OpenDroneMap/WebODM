@@ -33,7 +33,7 @@ class TaskViewSet(viewsets.ViewSet):
     # We don't use object level permissions on tasks, relying on
     # project's object permissions instead (but standard model permissions still apply)
     permission_classes = (permissions.DjangoModelPermissions, )
-    parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
 
     @staticmethod
@@ -61,6 +61,9 @@ class TaskViewSet(viewsets.ViewSet):
         task.pending_action = task.PendingActions.CANCEL
         task.last_error = None
         task.save()
+
+        # Call the scheduler (speed things up)
+        scheduler.process_pending_tasks(background=True)
 
         return Response({'success': True})
 

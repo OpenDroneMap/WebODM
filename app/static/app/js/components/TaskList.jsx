@@ -61,7 +61,7 @@ class TaskList extends React.Component {
         {message}
 
         {this.state.tasks.map(task => (
-          <TaskListItem data={task} key={task.id} />
+          <TaskListItem data={task} key={task.id} refreshInterval={3000} />
         ))}
       </div>
     );

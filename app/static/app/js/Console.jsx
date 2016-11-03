@@ -40,7 +40,7 @@ class Console extends React.Component {
         this.sourceRequest = $.get(sourceUrl, text => {
           if (text !== ""){
             let lines = text.split("\n");
-            lines.forEach(line => this.addLine(line));
+            this.addLines(lines);
             currentLineNumber += (lines.length - 1);
           }
         })
@@ -48,6 +48,7 @@ class Console extends React.Component {
           if (textStatus !== "abort" && this.props.refreshInterval !== undefined){
             this.sourceTimeout = setTimeout(updateFromSource, this.props.refreshInterval);
           }
+          this.checkAutoscroll();
         });
       };
 
@@ -80,9 +81,10 @@ class Console extends React.Component {
     }
   }
 
-  addLine(text){
+  addLines(lines){
+    if (!Array.isArray(lines)) lines = [lines];
     this.setState(update(this.state, {
-      lines: {$push: [text]}
+      lines: {$push: lines}
     }));
     this.checkAutoscroll();
   }

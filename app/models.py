@@ -154,7 +154,12 @@ class Task(models.Model):
                 images = [image.path() for image in self.imageupload_set.all()]
 
                 try:
-                    self.uuid = self.processing_node.process_new_task(images, self.name, self.options)
+                    # This takes a while
+                    uuid = self.processing_node.process_new_task(images, self.name, self.options)
+
+                    # Refresh task object before committing change
+                    self.refresh_from_db()
+                    self.uuid = uuid
                     self.save()
 
                     # TODO: log process has started processing
@@ -162,6 +167,24 @@ class Task(models.Model):
                 except ProcessingException as e:
                     self.set_failure(e.message)
 
+
+        if self.pending_action is not None:
+            try:
+                if self.pending_action == self.PendingActions.CANCEL:
+                    # Do we need to cancel the task on the processing node?
+                    logger.info("Canceling task {}".format(self))
+                    if self.processing_node and self.uuid:
+                        self.processing_node.cancel_task(self.uuid)
+                        self.pending_action = None
+                    else:
+                        raise ProcessingException("Cannot cancel a task that has no processing node or UUID assigned")
+            except ProcessingException as e:
+                self.last_error = e.message
+            finally:
+                self.save()
+
+
+        if self.processing_node:
             # Need to update status (first time, queued or running?)
             if self.uuid and self.status in [None, status_codes.QUEUED, status_codes.RUNNING]:
                 # Update task info from processing node
@@ -193,21 +216,6 @@ class Task(models.Model):
                         self.save()
                 except ProcessingException as e:
                     self.set_failure(e.message)
-
-        if self.pending_action is not None:
-            try:
-                if self.pending_action == self.PendingActions.CANCEL:
-                    # Do we need to cancel the task on the processing node?
-                    logger.info("Canceling task {}".format(self))
-                    if self.processing_node and self.uuid:
-                        self.processing_node.cancel_task(self.uuid)
-                    else:
-                        raise ProcessingException("Cannot cancel a task that has no processing node or UUID assigned")
-            except ProcessingException as e:
-                self.last_error = e.message
-            finally:
-                self.pending_action = None
-                self.save()
 
 
     def set_failure(self, error_message):
