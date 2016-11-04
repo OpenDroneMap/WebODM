@@ -50,15 +50,14 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
         return project
 
-    @detail_route(methods=['post'])
-    def cancel(self, request, pk=None, project_pk=None):
+    def set_pending_action(self, pending_action, request, pk=None, project_pk=None):
         self.get_and_check_project(request, project_pk, ('change_project',))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
 
-        task.pending_action = task.PendingActions.CANCEL
+        task.pending_action = pending_action
         task.last_error = None
         task.save()
 
@@ -66,6 +65,19 @@ class TaskViewSet(viewsets.ViewSet):
         scheduler.process_pending_tasks(background=True)
 
         return Response({'success': True})
+
+    @detail_route(methods=['post'])
+    def cancel(self, *args, **kwargs):
+        return self.set_pending_action(models.Task.PendingActions.CANCEL, *args, **kwargs)
+
+    @detail_route(methods=['post'])
+    def restart(self, *args, **kwargs):
+        return self.set_pending_action(models.Task.PendingActions.RESTART, *args, **kwargs)
+
+    @detail_route(methods=['post'])
+    def remove(self, *args, **kwargs):
+        # TODO: this should check for delete_project perms
+        return self.set_pending_action(models.Task.PendingActions.REMOVE, *args, **kwargs)
 
     @detail_route(methods=['get'])
     def output(self, request, pk=None, project_pk=None):

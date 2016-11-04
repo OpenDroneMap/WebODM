@@ -97,7 +97,20 @@ class TestClientApi(TestCase):
 
         self.assertRaises(ProcessingException, online_node.get_task_console_output, "wrong-uuid", 0)
 
+        # Can restart task
+        self.assertTrue(online_node.restart_task(uuid))
+        self.assertRaises(ProcessingException, online_node.restart_task, "wrong-uuid")
+
         # Can cancel task
         self.assertTrue(online_node.cancel_task(uuid))
         self.assertRaises(ProcessingException, online_node.cancel_task, "wrong-uuid")
 
+        # Can delete task
+        self.assertTrue(online_node.remove_task(uuid))
+        self.assertRaises(ProcessingException, online_node.remove_task, "wrong-uuid")
+
+        # Cannot delete task again
+        self.assertRaises(ProcessingException, online_node.remove_task, uuid)
+
+        # Task has been deleted
+        self.assertRaises(ProcessingException, online_node.get_task_info, uuid)

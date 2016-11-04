@@ -80,10 +80,12 @@ class ProcessingNode(models.Model):
         """
         api_client = self.api_client()
         result = api_client.task_info(uuid)
-        if result['uuid']:
+        if isinstance(result, dict) and 'uuid' in result:
             return result
-        elif result['error']:
+        elif isinstance(result, dict) and 'error' in result:
             raise ProcessingException(result['error'])
+        else:
+            raise ProcessingException("Unknown result from task info: {}".format(result))
 
     def get_task_console_output(self, uuid, line):
         """
@@ -105,7 +107,21 @@ class ProcessingNode(models.Model):
         """
         api_client = self.api_client()
         return self.handle_generic_post_response(api_client.task_cancel(uuid))
-    
+
+    def remove_task(self, uuid):
+        """
+        Removes a task and deletes all of its assets
+        """
+        api_client = self.api_client()
+        return self.handle_generic_post_response(api_client.task_remove(uuid))
+
+    def restart_task(self, uuid):
+        """
+        Restarts a task that was previously canceled or that had failed to process
+        """
+        api_client = self.api_client()
+        return self.handle_generic_post_response(api_client.task_restart(uuid))
+
     @staticmethod
     def handle_generic_post_response(result):
         """

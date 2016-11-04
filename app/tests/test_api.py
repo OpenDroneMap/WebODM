@@ -37,6 +37,11 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) > 0)
 
+        # Can sort
+        res = client.get('/api/projects/?ordering=-created_at')
+        last_project = Project.objects.filter(owner=user).latest('created_at')
+        self.assertTrue(res.data["results"][0]['id'] == last_project.id)
+
         res = client.get('/api/projects/{}/'.format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -77,11 +82,11 @@ class TestApi(BootTestCase):
         self.assertTrue(len(res.data) == 2)
 
         # Can sort
-        res = client.get('/api/projects/{}/tasks/?ordering=id'.format(project.id))
+        res = client.get('/api/projects/{}/tasks/?ordering=created_at'.format(project.id))
         self.assertTrue(res.data[0]['id'] == task.id)
         self.assertTrue(res.data[1]['id'] == task2.id)
 
-        res = client.get('/api/projects/{}/tasks/?ordering=-id'.format(project.id))
+        res = client.get('/api/projects/{}/tasks/?ordering=-created_at'.format(project.id))
         self.assertTrue(res.data[0]['id'] == task2.id)
         self.assertTrue(res.data[1]['id'] == task.id)
 
@@ -158,6 +163,8 @@ class TestApi(BootTestCase):
         # Cannot cancel a task for which we don't have permission
         res = client.post('/api/projects/{}/tasks/{}/cancel/'.format(other_project.id, other_task.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # TODO: test restart and delete operations
 
 
     def test_processingnodes(self):

@@ -1,18 +1,23 @@
 const CANCEL = 1,
-      DELETE = 2;
+      REMOVE = 2,
+      RESTART = 3;
 
 let pendingActions = {
     [CANCEL]: {
         descr: "Canceling..."
     },
-    [DELETE]: {
+    [REMOVE]: {
         descr: "Deleting..."
+    },
+    [RESTART]: {
+        descr: "Restarting..."
     }
 };
 
 export default {
     CANCEL: CANCEL,
-    DELETE: DELETE,
+    REMOVE: REMOVE,
+    RESTART: RESTART,
 
     description: function(pendingAction) {
       if (pendingActions[pendingAction]) return pendingActions[pendingAction].descr;

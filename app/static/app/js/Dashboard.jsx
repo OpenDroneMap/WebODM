@@ -5,7 +5,7 @@ import ProjectList from './components/ProjectList';
 class Dashboard extends React.Component {
   render() {
     return (
-      <ProjectList source="/api/projects/"/>
+      <ProjectList source="/api/projects/?ordering=-created_at"/>
     );
   }
 }

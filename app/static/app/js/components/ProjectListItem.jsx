@@ -74,9 +74,9 @@ class ProjectListItem extends React.Component {
     });
 
     this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
-          this.setUploadState({
-            progress, totalBytes, totalBytesSent
-          });
+        this.setUploadState({
+          progress, totalBytes, totalBytesSent
+        });
       })
       .on("addedfile", () => {
         this.setUploadState({
@@ -167,7 +167,6 @@ class ProjectListItem extends React.Component {
     this.setState({
       showTaskList: !this.state.showTaskList
     });
-    console.log(this.props);
   }
 
   closeUploadError(){
@@ -264,7 +263,7 @@ class ProjectListItem extends React.Component {
             <span>Updating task information... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
           : ""}
 
-          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-id`}/> : ""}
+          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-created_at`}/> : ""}
 
         </div>
       </li>

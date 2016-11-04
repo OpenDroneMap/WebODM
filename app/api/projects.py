@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers, viewsets
+from rest_framework import serializers, viewsets, filters
 
 from app import models
 from .tasks import TaskIDsSerializer
@@ -26,3 +26,4 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filter_fields = ('id', 'owner', 'name')
     serializer_class = ProjectSerializer
     queryset = models.Project.objects.all()
+    ordering_fields = '__all__'

@@ -78,7 +78,8 @@ def validate_task_options(value):
 class Task(models.Model):
     class PendingActions:
         CANCEL = 1
-        DELETE = 2
+        REMOVE = 2
+        RESTART = 3
 
     STATUS_CODES = (
         (status_codes.QUEUED, 'QUEUED'),
@@ -90,7 +91,8 @@ class Task(models.Model):
 
     PENDING_ACTIONS = (
         (PendingActions.CANCEL, 'CANCEL'),
-        (PendingActions.DELETE, 'DELETE'),
+        (PendingActions.REMOVE, 'REMOVE'),
+        (PendingActions.RESTART, 'RESTART'),
     )
 
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
@@ -176,11 +178,62 @@ class Task(models.Model):
                     if self.processing_node and self.uuid:
                         self.processing_node.cancel_task(self.uuid)
                         self.pending_action = None
+                        self.save()
                     else:
-                        raise ProcessingException("Cannot cancel a task that has no processing node or UUID assigned")
+                        raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
+
+                elif self.pending_action == self.PendingActions.RESTART:
+                    logger.info("Restarting task {}".format(self))
+                    if self.processing_node and self.uuid:
+
+                        # Check if the UUID is still valid, as processing nodes purge
+                        # results after a set amount of time, the UUID might have eliminated.
+                        try:
+                            info = self.processing_node.get_task_info(self.uuid)
+                            uuid_still_exists = info['uuid'] == self.uuid
+                        except ProcessingException:
+                            uuid_still_exists = False
+
+                        if uuid_still_exists:
+                            # Good to go
+                            self.processing_node.restart_task(self.uuid)
+                        else:
+                            # Task has been purged (or processing node is offline)
+                            # TODO: what if processing node went offline?
+
+                            # Process this as a new task
+                            # Removing its UUID will cause the scheduler
+                            # to process this the next tick
+                            self.uuid = None
+
+                        self.console_output = ""
+                        self.processing_time = -1
+                        self.status = None
+                        self.last_error = None
+                        self.pending_action = None
+                        self.save()
+                    else:
+                        raise ProcessingException("Cannot restart a task that has no processing node or UUID")
+
+                elif self.pending_action == self.PendingActions.REMOVE:
+                    logger.info("Removing task {}".format(self))
+                    if self.processing_node and self.uuid:
+                        # Attempt to delete the resources on the processing node
+                        # We don't care if this fails, as resources on processing nodes
+                        # Are expected to be purged on their own after a set amount of time anyway
+                        try:
+                            self.processing_node.remove_task(self.uuid)
+                        except ProcessingException:
+                            pass
+
+                    # What's more important is that we delete our task properly here
+                    self.delete()
+
+                    # Stop right here!
+                    return
+
             except ProcessingException as e:
                 self.last_error = e.message
-            finally:
                 self.save()
 
 
@@ -223,6 +276,7 @@ class Task(models.Model):
         self.last_error = error_message
         self.status = status_codes.FAILED
         self.save()
+
 
     class Meta:
         permissions = (

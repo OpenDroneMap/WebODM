@@ -13,6 +13,7 @@ class TaskList extends React.Component {
     };
 
     this.refresh = this.refresh.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
   }
 
   componentDidMount(){
@@ -46,6 +47,12 @@ class TaskList extends React.Component {
     this.taskListRequest.abort();
   }
 
+  deleteTask(id){
+    this.setState({
+      tasks: this.state.tasks.filter(t => t.id !== id)
+    });
+  }
+
   render() {
     let message = "";
     if (this.state.loading){
@@ -61,7 +68,7 @@ class TaskList extends React.Component {
         {message}
 
         {this.state.tasks.map(task => (
-          <TaskListItem data={task} key={task.id} refreshInterval={3000} />
+          <TaskListItem data={task} key={task.id} refreshInterval={3000} onDelete={this.deleteTask} />
         ))}
       </div>
     );

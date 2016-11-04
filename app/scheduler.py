@@ -75,8 +75,11 @@ def process_pending_tasks():
 
     def process(task):
         task.process()
-        task.processing_lock = False
-        task.save()
+
+        # Might have been deleted
+        if task.pk is not None:
+            task.processing_lock = False
+            task.save()
 
     if tasks.count() > 0:
         pool = ThreadPool(tasks.count())

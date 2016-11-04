@@ -34,6 +34,11 @@ class ApiClient:
     def task_cancel(self, uuid):
         return requests.post(self.url('/task/cancel'), data={'uuid': uuid}).json()
 
+    def task_remove(self, uuid):
+        return requests.post(self.url('/task/remove'), data={'uuid': uuid}).json()
+
+    def task_restart(self, uuid):
+        return requests.post(self.url('/task/restart'), data={'uuid': uuid}).json()
 
     def new_task(self, images, name=None, options=[]):
         """
