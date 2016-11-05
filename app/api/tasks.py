@@ -50,8 +50,8 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
         return project
 
-    def set_pending_action(self, pending_action, request, pk=None, project_pk=None):
-        self.get_and_check_project(request, project_pk, ('change_project',))
+    def set_pending_action(self, pending_action, request, pk=None, project_pk=None, perms=('change_project', )):
+        self.get_and_check_project(request, project_pk, perms)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -76,8 +76,7 @@ class TaskViewSet(viewsets.ViewSet):
 
     @detail_route(methods=['post'])
     def remove(self, *args, **kwargs):
-        # TODO: this should check for delete_project perms
-        return self.set_pending_action(models.Task.PendingActions.REMOVE, *args, **kwargs)
+        return self.set_pending_action(models.Task.PendingActions.REMOVE, *args, perms=('delete_project', ), **kwargs)
 
     @detail_route(methods=['get'])
     def output(self, request, pk=None, project_pk=None):
