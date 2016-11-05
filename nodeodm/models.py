@@ -115,6 +115,17 @@ class ProcessingNode(models.Model):
         api_client = self.api_client()
         return self.handle_generic_post_response(api_client.task_remove(uuid))
 
+    def download_task_asset(self, uuid, asset):
+        """
+        Downloads a task asset
+        """
+        api_client = self.api_client()
+        res = api_client.task_download(uuid, asset)
+        if isinstance(res, dict) and 'error' in res:
+            raise ProcessingException(res['error'])
+        else:
+            return res
+
     def restart_task(self, uuid):
         """
         Restarts a task that was previously canceled or that had failed to process

@@ -6,6 +6,8 @@ from .models import ProcessingNode
 from .api_client import ApiClient
 from requests.exceptions import ConnectionError
 from .exceptions import ProcessingException
+import status_codes
+
 current_dir = path.dirname(path.realpath(__file__))
 
 
@@ -90,6 +92,25 @@ class TestClientApi(TestCase):
         task_info = api.task_info(uuid)
         self.assertTrue(isinstance(task_info['dateCreated'], (int, long)))
         self.assertTrue(isinstance(task_info['uuid'], (str, unicode)))
+
+        # Can download assets?
+        # Here we are waiting for the task to be completed
+        retries = 0
+        while True:
+            try:
+                task_info = api.task_info(uuid)
+                if task_info['status']['code'] == status_codes.COMPLETED:
+                    asset = api.task_download(uuid, "all.zip")
+                    self.assertTrue(isinstance(asset, (str, unicode))) # Binary content, really
+                    break
+            except ProcessingException:
+                pass
+
+            time.sleep(0.5)
+            retries += 1
+            if retries >= 10:
+                self.assertTrue(False, "Could not download assets")
+                break
 
         # task_output
         self.assertTrue(isinstance(api.task_output(uuid, 0), list))

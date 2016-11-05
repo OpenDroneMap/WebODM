@@ -40,6 +40,13 @@ class ApiClient:
     def task_restart(self, uuid):
         return requests.post(self.url('/task/restart'), data={'uuid': uuid}).json()
 
+    def task_download(self, uuid, asset):
+        res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset))
+        if "Content-Type" in res.headers and "application/json" in res.headers['Content-Type']:
+            return res.json()
+        else:
+            return res.content
+
     def new_task(self, images, name=None, options=[]):
         """
         Starts processing of a new task
