@@ -38,6 +38,14 @@ If you want to run WebODM natively, you will need to install:
  * PostGIS 2.3
  * Python 3.5
 
+On Linux, make sure you have:
+
+```
+apt-get install binutils libproj-dev gdal-bin
+```
+
+On Windows use the [OSGeo4W](https://trac.osgeo.org/osgeo4w/) installer to install GDAL.
+
 Then these steps should be sufficient to get you up and running:
 
 ```
