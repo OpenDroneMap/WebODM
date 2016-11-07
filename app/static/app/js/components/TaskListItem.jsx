@@ -127,7 +127,8 @@ class TaskListItem extends React.Component {
       const doAction = () => {
         this.setState({actionButtonsDisabled: true});
 
-        $.post(`/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/${action}/`,
+        let url = `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/${action}/`;
+        $.post(url,
           {
             uuid: this.state.task.uuid
           }

@@ -14,10 +14,10 @@ class TaskIDsSerializer(serializers.BaseSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
-    images_count = serializers.IntegerField(
-            source='imageupload_set.count',
-            read_only=True
-        )
+    images_count = serializers.SerializerMethodField()
+
+    def get_images_count(self, obj):
+        return obj.imageupload_set.count()
 
     class Meta:
         model = models.Task

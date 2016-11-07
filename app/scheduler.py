@@ -1,4 +1,4 @@
-import logging
+import logging, traceback
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import SchedulerAlreadyRunningError, SchedulerNotRunningError
 from threading import Thread, Lock
@@ -74,12 +74,15 @@ def process_pending_tasks():
         tasks_mutex.release()
 
     def process(task):
-        task.process()
+        try:
+            task.process()
 
-        # Might have been deleted
-        if task.pk is not None:
-            task.processing_lock = False
-            task.save()
+            # Might have been deleted
+            if task.pk is not None:
+                task.processing_lock = False
+                task.save()
+        except Exception as e:
+            logger.error("Uncaught error: {} {}".format(e, traceback.format_exc()))
 
     if tasks.count() > 0:
         pool = ThreadPool(tasks.count())

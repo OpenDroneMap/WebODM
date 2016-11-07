@@ -1,3 +1,4 @@
+import requests
 from django.test import TestCase
 from django.utils import six
 import subprocess, time
@@ -6,7 +7,7 @@ from .models import ProcessingNode
 from .api_client import ApiClient
 from requests.exceptions import ConnectionError
 from .exceptions import ProcessingException
-import status_codes
+from . import status_codes
 
 current_dir = path.dirname(path.realpath(__file__))
 
@@ -76,7 +77,7 @@ class TestClientApi(TestCase):
         online_node = ProcessingNode.objects.get(pk=1)
 
         # Can call info(), options()
-        self.assertTrue(type(api.info()['version']) in [str, unicode])
+        self.assertTrue(type(api.info()['version']) == str)
         self.assertTrue(len(api.options()) > 0)
         
         # Can call new_task()
@@ -90,8 +91,8 @@ class TestClientApi(TestCase):
 
         # Can call task_info()
         task_info = api.task_info(uuid)
-        self.assertTrue(isinstance(task_info['dateCreated'], (int, long)))
-        self.assertTrue(isinstance(task_info['uuid'], (str, unicode)))
+        self.assertTrue(isinstance(task_info['dateCreated'], int))
+        self.assertTrue(isinstance(task_info['uuid'], str))
 
         # Can download assets?
         # Here we are waiting for the task to be completed
@@ -101,7 +102,7 @@ class TestClientApi(TestCase):
                 task_info = api.task_info(uuid)
                 if task_info['status']['code'] == status_codes.COMPLETED:
                     asset = api.task_download(uuid, "all.zip")
-                    self.assertTrue(isinstance(asset, (str, unicode))) # Binary content, really
+                    self.assertTrue(isinstance(asset, requests.Response)) # Binary content, really
                     break
             except ProcessingException:
                 pass
@@ -114,7 +115,7 @@ class TestClientApi(TestCase):
 
         # task_output
         self.assertTrue(isinstance(api.task_output(uuid, 0), list))
-        self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), (str, unicode)))
+        self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), str))
 
         self.assertRaises(ProcessingException, online_node.get_task_console_output, "wrong-uuid", 0)
 
