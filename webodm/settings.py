@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'guardian',
     'rest_framework',
     'rest_framework_nested',
@@ -86,7 +87,7 @@ WSGI_APPLICATION = 'webodm.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'webodm_dev',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
@@ -216,6 +217,10 @@ REST_FRAMEWORK = {
   ],
   'PAGE_SIZE': 10,
 }
+
+# Raster
+RASTER_USE_CELERY = False
+
 
 TESTING = sys.argv[1:2] == ['test']
 

@@ -6,7 +6,7 @@ import requests
 import mimetypes
 import json
 import os
-from urlparse import urlunparse
+from urllib.parse import urlunparse
 
 class ApiClient:
     def __init__(self, host, port):
@@ -41,11 +41,11 @@ class ApiClient:
         return requests.post(self.url('/task/restart'), data={'uuid': uuid}).json()
 
     def task_download(self, uuid, asset):
-        res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset))
+        res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset), stream=True)
         if "Content-Type" in res.headers and "application/json" in res.headers['Content-Type']:
             return res.json()
         else:
-            return res.content
+            return res
 
     def new_task(self, images, name=None, options=[]):
         """

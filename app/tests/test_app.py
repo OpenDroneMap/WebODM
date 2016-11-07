@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User, Group
-from django.contrib import messages
 from django.test import Client
 
 from app.models import Project, Task
