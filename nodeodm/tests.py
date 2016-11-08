@@ -101,7 +101,7 @@ class TestClientApi(TestCase):
         res = api.new_task(
                 glob.glob("nodeodm/fixtures/test_images/*.JPG"), 
                 "test", 
-                [{'name': 'cmvs-maxImages', 'value': 5}])
+                [{'name': 'force-ccd', 'value': 6.16}])
         uuid = res['uuid']
         self.assertTrue(uuid != None)
 
@@ -114,7 +114,7 @@ class TestClientApi(TestCase):
         # Here we are waiting for the task to be completed
         wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not download assets")
         asset = api.task_download(uuid, "all.zip")
-        self.assertTrue(isinstance(asset, requests.Response))  # Binary content, really
+        self.assertTrue(isinstance(asset, requests.Response))
 
         # task_output
         self.assertTrue(isinstance(api.task_output(uuid, 0), list))
@@ -126,7 +126,9 @@ class TestClientApi(TestCase):
         self.assertTrue(online_node.restart_task(uuid))
         self.assertRaises(ProcessingException, online_node.restart_task, "wrong-uuid")
 
-        # Can cancel task
+        wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not restart task")
+
+        # Can cancel task (should work even if we completed the task)
         self.assertTrue(online_node.cancel_task(uuid))
         self.assertRaises(ProcessingException, online_node.cancel_task, "wrong-uuid")
 
