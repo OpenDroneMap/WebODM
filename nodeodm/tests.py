@@ -73,6 +73,22 @@ class TestClientApi(TestCase):
         self.assertTrue(online_node.last_refreshed != None, "Last refreshed info is here (update_node_info() was called)")
 
     def test_client_api_and_task_methods(self):
+        def wait_for_status(api, uuid, status, num_retries = 10, error_description = "Failed to wait for status"):
+            retries = 0
+            while True:
+                try:
+                    task_info = api.task_info(uuid)
+                    if task_info['status']['code'] == status:
+                        return True
+                except ProcessingException:
+                    pass
+
+                time.sleep(0.5)
+                retries += 1
+                if retries >= num_retries:
+                    self.assertTrue(False, error_description)
+                    return False
+
         api = ApiClient("localhost", 11223)
         online_node = ProcessingNode.objects.get(pk=1)
 
@@ -96,22 +112,9 @@ class TestClientApi(TestCase):
 
         # Can download assets?
         # Here we are waiting for the task to be completed
-        retries = 0
-        while True:
-            try:
-                task_info = api.task_info(uuid)
-                if task_info['status']['code'] == status_codes.COMPLETED:
-                    asset = api.task_download(uuid, "all.zip")
-                    self.assertTrue(isinstance(asset, requests.Response)) # Binary content, really
-                    break
-            except ProcessingException:
-                pass
-
-            time.sleep(0.5)
-            retries += 1
-            if retries >= 10:
-                self.assertTrue(False, "Could not download assets")
-                break
+        wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not download assets")
+        asset = api.task_download(uuid, "all.zip")
+        self.assertTrue(isinstance(asset, requests.Response))  # Binary content, really
 
         # task_output
         self.assertTrue(isinstance(api.task_output(uuid, 0), list))
@@ -127,7 +130,8 @@ class TestClientApi(TestCase):
         self.assertTrue(online_node.cancel_task(uuid))
         self.assertRaises(ProcessingException, online_node.cancel_task, "wrong-uuid")
 
-        # Can delete task
+        # Wait for task to be canceled
+        wait_for_status(api, uuid, status_codes.CANCELED, 5, "Could not remove task")
         self.assertTrue(online_node.remove_task(uuid))
         self.assertRaises(ProcessingException, online_node.remove_task, "wrong-uuid")
 
