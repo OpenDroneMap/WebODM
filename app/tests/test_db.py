@@ -13,7 +13,7 @@ class TestApi(BootTestCase):
 
     def test_db(self):
         # Make sure we can use PostGIS raster type
-        task = Task.objects.create(project=Project.objects.get(pk=1),
+        task = Task.objects.create(project=Project.objects.latest("created_at"),
                                    orthophoto=GDALRaster(os.path.join("app", "fixtures", "orthophoto.tif"), write=True))
         task.refresh_from_db()
         self.assertTrue(task.orthophoto.srid == 4326)
