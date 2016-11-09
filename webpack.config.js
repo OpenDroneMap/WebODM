@@ -36,13 +36,21 @@ module.exports = {
         exclude: /(node_modules|bower_components)/, 
         loader: 'babel-loader',
         query: {
-          // plugins: ['react-hot-loader/babel'],
+          "plugins": [
+             'syntax-class-properties',
+             'transform-class-properties'
+             // 'react-hot-loader/babel'
+          ],
           presets: ['es2015', 'react']
         }
       },
       {
         test: /\.s?css$/,
         loader: ExtractTextPlugin.extract('css!sass')
+      },
+      {
+        test: /\.(png|jpg|jpeg|svg)/,
+        loader: "url-loader?limit=100000"
       }
     ]
   },

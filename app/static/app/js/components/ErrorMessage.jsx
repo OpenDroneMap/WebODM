@@ -16,7 +16,7 @@ class ErrorMessage extends React.Component {
     }
 
     render(){
-        if (this.state.error !== ""){
+        if (this.state.error){
             return (
                 <div className="alert alert-warning alert-dismissible">
                     <button type="button" className="close" aria-label="Close" onClick={this.close}><span aria-hidden="true">&times;</span></button>

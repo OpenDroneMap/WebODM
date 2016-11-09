@@ -13,6 +13,7 @@ class TaskList extends React.Component {
     };
 
     this.refresh = this.refresh.bind(this);
+    this.retry = this.retry.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
   }
 
@@ -24,6 +25,11 @@ class TaskList extends React.Component {
     this.loadTaskList();
   }
 
+  retry(){
+    this.setState({error: "", loading: true});
+    this.refresh();
+  }
+
   loadTaskList(){
     this.taskListRequest = 
       $.getJSON(this.props.source, json => {
@@ -33,7 +39,7 @@ class TaskList extends React.Component {
         })
         .fail((jqXHR, textStatus, errorThrown) => {
           this.setState({ 
-              error: `Could not load projects list: ${textStatus}`,
+              error: `Could not load task list: ${textStatus}`,
           });
         })
         .always(() => {
@@ -58,7 +64,7 @@ class TaskList extends React.Component {
     if (this.state.loading){
       message = (<span>Loading... <i className="fa fa-refresh fa-spin fa-fw"></i></span>);
     }else if (this.state.error){
-      message = (<span>Could not get tasks: {this.state.error}. <a href="javascript:void(0);" onClick={this.refresh}>Try again</a></span>);
+      message = (<span>Error: {this.state.error}. <a href="javascript:void(0);" onClick={this.retry}>Try again</a></span>);
     }else if (this.state.tasks.length === 0){
       message = (<span>This project has no tasks. Create one by uploading some images!</span>);
     }

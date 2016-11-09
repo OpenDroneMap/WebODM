@@ -84,6 +84,9 @@ class TestApp(BootTestCase):
         res = c.get('/processingnode/abc/')
         self.assertTrue(res.status_code == 404)
 
+        # TODO:
+        # - test /map/ urls
+
     def test_default_group(self):
         # It exists
         self.assertTrue(Group.objects.filter(name='Default').count() == 1)

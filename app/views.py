@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from nodeodm.models import ProcessingNode
@@ -22,6 +23,34 @@ def dashboard(request):
     return render(request, 'app/dashboard.html', {'title': 'Dashboard', 
         'no_processingnodes': no_processingnodes,
         'no_tasks': no_tasks})
+
+
+@login_required
+def map(request):
+    project_id = request.GET.get('project', '')
+    task_id = request.GET.get('task', '')
+
+    title = _("Map")
+
+    if project_id != '':
+        project = get_object_or_404(Project, pk=int(project_id))
+        if not request.user.has_perm('projects.view_project', project):
+            raise Http404()
+        
+        if task_id != '':
+            task = get_object_or_404(Task, pk=int(task_id), project=project)
+            title = task.name
+        else:
+            title = project.name
+
+    return render(request, 'app/map.html', {
+            'title': title,
+            'params': {
+                'task': request.GET.get('task', ''),
+                'project': request.GET.get('project', '')
+            }.items()
+        })
+
 
 @login_required
 def processing_node(request, processing_node_id):

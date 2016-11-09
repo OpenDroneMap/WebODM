@@ -3,11 +3,18 @@ import './django/csrf';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Dashboard from './Dashboard';
+import MapView from './MapView';
 import Console from './Console';
 import $ from 'jquery';
 
 $("[data-dashboard]").each(function(){
     ReactDOM.render(<Dashboard/>, $(this).get(0));
+});
+
+$("[data-mapview]").each(function(){
+    let props = $(this).data();
+    delete(props.mapview);
+    ReactDOM.render(<MapView {...props}/>, $(this).get(0));
 });
 
 $("[data-console]").each(function(){

@@ -1,7 +1,12 @@
+import os
+
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
+from rest_framework.views import APIView
 
 from app import models, scheduler
 from nodeodm.models import ProcessingNode
@@ -23,6 +28,21 @@ class TaskSerializer(serializers.ModelSerializer):
         model = models.Task
         exclude = ('processing_lock', 'console_output', )
 
+
+def get_and_check_project(request, project_pk, perms=('view_project',)):
+    '''
+    Retrieves a project and raises an exeption if the current user
+    has no access to it.
+    '''
+    try:
+        project = models.Project.objects.get(pk=project_pk)
+        for perm in perms:
+            if not request.user.has_perm(perm, project): raise ObjectDoesNotExist()
+    except ObjectDoesNotExist:
+        raise exceptions.NotFound()
+    return project
+
+
 class TaskViewSet(viewsets.ViewSet):
     """
     A task represents a set of images and other input to be sent to a processing node.
@@ -36,22 +56,8 @@ class TaskViewSet(viewsets.ViewSet):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
 
-    @staticmethod
-    def get_and_check_project(request, project_pk, perms = ('view_project', )):
-        '''
-        Retrieves a project and raises an exeption if the current user
-        has no access to it.
-        '''
-        try:
-            project = models.Project.objects.get(pk=project_pk)
-            for perm in perms:
-                if not request.user.has_perm(perm, project): raise ObjectDoesNotExist()
-        except ObjectDoesNotExist:
-            raise exceptions.NotFound()
-        return project
-
     def set_pending_action(self, pending_action, request, pk=None, project_pk=None, perms=('change_project', )):
-        self.get_and_check_project(request, project_pk, perms)
+        get_and_check_project(request, project_pk, perms)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -85,7 +91,7 @@ class TaskViewSet(viewsets.ViewSet):
         An optional "line" query param can be passed to retrieve
         only the output starting from a certain line number.
         """
-        self.get_and_check_project(request, project_pk)
+        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -96,14 +102,14 @@ class TaskViewSet(viewsets.ViewSet):
         return Response('\n'.join(output.split('\n')[line_num:]))
 
     def list(self, request, project_pk=None):
-        self.get_and_check_project(request, project_pk)
+        get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
         tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, project_pk=None):
-        self.get_and_check_project(request, project_pk)
+        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -113,7 +119,7 @@ class TaskViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request, project_pk=None):
-        project = self.get_and_check_project(request, project_pk, ('change_project', ))
+        project = get_and_check_project(request, project_pk, ('change_project', ))
         
         # MultiValueDict in, flat array of files out
         files = [file for filesList in map(
@@ -128,7 +134,7 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
 
     def update(self, request, pk=None, project_pk=None, partial=False):
-        self.get_and_check_project(request, project_pk, ('change_project', ))
+        get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -146,3 +152,50 @@ class TaskViewSet(viewsets.ViewSet):
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
+
+
+class TaskTilesBase(APIView):
+    queryset = models.Task.objects.all()
+
+    def get_and_check_task(self, request, pk, project_pk):
+        get_and_check_project(request, project_pk)
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except ObjectDoesNotExist:
+            raise exceptions.NotFound()
+        return task
+
+
+class TaskTiles(TaskTilesBase):
+    def get(self, request, pk=None, project_pk=None, z="", x="", y=""):
+        """
+        Returns a prerendered orthophoto tile for a task
+        """
+        task = self.get_and_check_task(request, pk, project_pk)
+        tile_path = task.get_tile_path(z, x, y)
+        if os.path.isfile(tile_path):
+            tile = open(tile_path, "rb")
+            return HttpResponse(FileWrapper(tile), content_type="image/png")
+        else:
+            raise exceptions.NotFound()
+
+
+class TaskTilesJson(TaskTilesBase):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Returns a tiles.json file for consumption by a client
+        """
+        task = self.get_and_check_task(request, pk, project_pk)
+        json = {
+            'tilejson': '2.1.0',
+            'name': task.name,
+            'version': '1.0.0',
+            'scheme': 'tms',
+            'tiles': [
+                '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
+            ],
+            'minzoom': 0,
+            'maxzoom': 22,
+            'bounds': task.orthophoto.extent
+        }
+        return Response(json)

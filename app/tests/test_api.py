@@ -179,6 +179,13 @@ class TestApi(BootTestCase):
         self.assertTrue(task.last_error is None)
         self.assertTrue(task.pending_action == task.PendingActions.REMOVE)
 
+
+        # TODO test:
+        # - tiles.json requests
+        # - task creation via file upload
+        # - scheduler processing steps
+        # - tiles API urls (permissions, 404s)
+
     def test_processingnodes(self):
         client = APIClient()
 

@@ -17,13 +17,18 @@ from nodeodm.exceptions import ProcessingException
 from django.db import transaction
 from nodeodm import status_codes
 from webodm import settings
-import logging
+import logging, zipfile, shutil
 
 logger = logging.getLogger('app.logger')
 
+
+def task_directory_path(taskId, projectId):
+    return 'project/{0}/task/{1}/'.format(projectId, taskId)
+
+
 def assets_directory_path(taskId, projectId, filename):
     # files will be uploaded to MEDIA_ROOT/project/<id>/task/<id>/<filename>
-    return 'project/{0}/task/{1}/{2}'.format(projectId, taskId, filename)
+    return '{0}{1}'.format(task_directory_path(taskId, projectId), filename)
 
 
 class Project(models.Model):
@@ -126,6 +131,13 @@ class Task(models.Model):
         # Autovalidate on save
         self.full_clean()
         super(Task, self).save(*args, **kwargs)
+
+    def media_path(self, path):
+        """
+        Get a path relative to the media directory of this task
+        """
+        return os.path.join(settings.MEDIA_ROOT,
+                           assets_directory_path(self.id, self.project.id, path))
 
     @staticmethod
     def create_from_images(images, project):
@@ -265,8 +277,7 @@ class Task(models.Model):
                         if self.status == status_codes.COMPLETED:
                             try:
                                 orthophoto_stream = self.processing_node.download_task_asset(self.uuid, "orthophoto.tif")
-                                orthophoto_path = os.path.join(settings.MEDIA_ROOT,
-                                                                assets_directory_path(self.id, self.project.id, "orthophoto.tif"))
+                                orthophoto_path = self.media_path("orthophoto.tif")
 
                                 # Save to disk original photo
                                 with open(orthophoto_path, 'wb') as fd:
@@ -276,12 +287,19 @@ class Task(models.Model):
                                 # Add to database another copy
                                 self.orthophoto = GDALRaster(orthophoto_path, write=True)
 
-                                # TODO:
-                                # 1. Download tiles
-                                # 2. Extract from zip
-                                # 3. Add onDelete method to cleanup stuff
-                                # 4. Add tile map API
-                                # 5. Create map view
+                                # Download tiles
+                                tiles_zip_stream = self.processing_node.download_task_asset(self.uuid, "orthophoto_tiles.zip")
+                                tiles_zip_path = self.media_path("orthophoto_tiles.zip")
+                                with open(tiles_zip_path, 'wb') as fd:
+                                    for chunk in tiles_zip_stream.iter_content(4096):
+                                        fd.write(chunk)
+
+                                # Extract from zip
+                                with zipfile.ZipFile(tiles_zip_path, "r") as zip_h:
+                                    zip_h.extractall(self.media_path(""))
+
+                                # Delete zip archive
+                                os.remove(tiles_zip_path)
 
                                 self.save()
                             except ProcessingException as e:
@@ -294,6 +312,21 @@ class Task(models.Model):
                         self.save()
                 except ProcessingException as e:
                     self.set_failure(str(e))
+
+    def get_tile_path(self, z, x, y):
+        return self.media_path(os.path.join("orthophoto_tiles", z, x, "{}.png".format(y)))
+
+    def delete(self, using=None, keep_parents=False):
+        directory_to_delete = os.path.join(settings.MEDIA_ROOT,
+                                           task_directory_path(self.id, self.project.id))
+
+        super(Task, self).delete(using, keep_parents)
+
+        # Remove files related to this task
+        try:
+            shutil.rmtree(directory_to_delete)
+        except FileNotFoundError as e:
+            logger.warn(e)
 
 
     def set_failure(self, error_message):

@@ -170,12 +170,13 @@ class TaskListItem extends React.Component {
   }
 
   render() {
-    let name = this.state.task.name !== null ? this.state.task.name : `Task #${this.state.task.id}`;
+    const task = this.state.task;
+    const name = task.name !== null ? task.name : `Task #${task.id}`;
     
-    let status = statusCodes.description(this.state.task.status);
+    let status = statusCodes.description(task.status);
     if (status === "") status = "Uploading images";
-    if (!this.state.task.processing_node) status = "";
-    if (this.state.task.pending_action !== null) status = pendingActions.description(this.state.task.pending_action);
+    if (!task.processing_node) status = "";
+    if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
     let expanded = "";
     if (this.state.expanded){
@@ -186,13 +187,19 @@ class TaskListItem extends React.Component {
         });
       };
       
-      if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(this.state.task.status) !== -1 &&
-          this.state.task.processing_node){
+      if (task.status === statusCodes.COMPLETED){
+        addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
+          location.href = `/map/?project=${task.project}&task=${task.id}`;
+        });
+      }
+
+      if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
+          task.processing_node){
         addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel"));
       }
 
-      if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(this.state.task.status) !== -1 &&
-            this.state.task.processing_node){
+      if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
+            task.processing_node){
           addActionButton("Restart", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("restart", {
             success: () => {
                 if (this.console) this.console.clear();
@@ -214,7 +221,7 @@ class TaskListItem extends React.Component {
       actionButtons = (<div className="action-buttons">
             {actionButtons.map(button => {
               return (
-                  <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={this.state.actionButtonsDisabled || !!this.state.task.pending_action}>
+                  <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={this.state.actionButtonsDisabled || !!task.pending_action}>
                     <i className={button.icon}></i>
                     {button.label}
                   </button> 
@@ -227,13 +234,13 @@ class TaskListItem extends React.Component {
           <div className="row">
             <div className="col-md-4 no-padding">
               <div className="labels">
-                <strong>Created on: </strong> {(new Date(this.state.task.created_at)).toLocaleString()}<br/>
+                <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
               </div>
               <div className="labels">
                 <strong>Status: </strong> {status}<br/>
               </div>
                <div className="labels">
-                <strong>Options: </strong> {this.optionsToList(this.state.task.options)}<br/>
+                <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
               </div>
               {/* TODO: List of images? */}
             </div>
@@ -260,15 +267,15 @@ class TaskListItem extends React.Component {
     }
 
     let statusLabel = "";
-    let statusIcon = statusCodes.icon(this.state.task.status);
+    let statusIcon = statusCodes.icon(task.status);
 
-    if (this.state.task.last_error){
-      statusLabel = getStatusLabel(this.state.task.last_error, "error");
-    }else if (!this.state.task.processing_node){
+    if (task.last_error){
+      statusLabel = getStatusLabel(task.last_error, "error");
+    }else if (!task.processing_node){
       statusLabel = getStatusLabel("Processing node not set");
       statusIcon = "fa fa-hourglass-3";
     }else{
-      statusLabel = getStatusLabel(status, this.state.task.status == 40 ? "done" : "");
+      statusLabel = getStatusLabel(status, task.status == 40 ? "done" : "");
     }
 
     return (
@@ -278,7 +285,7 @@ class TaskListItem extends React.Component {
             <i onClick={this.toggleExpanded} className={"clickable fa " + (this.state.expanded ? "fa-minus-square-o" : " fa-plus-square-o")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
           </div>
           <div className="col-md-1 details">
-            <i className="fa fa-image"></i> {this.state.task.images_count}
+            <i className="fa fa-image"></i> {task.images_count}
           </div> 
           <div className="col-md-2 details">
             <i className="fa fa-clock-o"></i> {this.hoursMinutesSecs(this.state.time)}

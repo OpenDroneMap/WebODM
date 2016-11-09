@@ -23,6 +23,8 @@ class ProjectListItem extends React.Component {
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
     this.handleTaskSaved = this.handleTaskSaved.bind(this);
+    this.viewMap = this.viewMap.bind(this);
+
   }
 
   componentWillUnmount(){
@@ -190,6 +192,10 @@ class ProjectListItem extends React.Component {
     }
   }
 
+  viewMap(){
+    location.href = `/map/?project=${this.props.data.id}`;
+  }
+
   render() {
     return (
       <li className="project-list-item list-group-item"
@@ -212,8 +218,8 @@ class ProjectListItem extends React.Component {
               Cancel Upload
             </button> 
 
-            <button type="button" className="btn btn-default btn-sm">
-              <i className="fa fa-globe"></i> Map View
+            <button type="button" className="btn btn-default btn-sm" onClick={this.viewMap}>
+              <i className="fa fa-globe"></i> View Map
             </button>
             <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
               <span className="caret"></span>
