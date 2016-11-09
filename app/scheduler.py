@@ -11,7 +11,10 @@ from nodeodm import status_codes
 import random
 
 logger = logging.getLogger('app.logger')
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler({
+    'apscheduler.job_defaults.coalesce': 'false',
+    'apscheduler.job_defaults.max_instances': '3',
+})
 
 def background(func):
     """

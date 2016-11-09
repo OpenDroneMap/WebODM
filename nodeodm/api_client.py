@@ -8,6 +8,7 @@ import json
 import os
 from urllib.parse import urlunparse
 
+
 class ApiClient:
     def __init__(self, host, port):
         self.host = host
@@ -55,7 +56,6 @@ class ApiClient:
         :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
         :return: UUID or error
         """
-
         files = [('images',
                   (os.path.basename(image), open(image, 'rb'), (mimetypes.guess_type(image)[0] or "image/jpg"))
                  ) for image in images]

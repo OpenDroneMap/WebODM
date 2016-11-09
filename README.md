@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM)
 
-A free, user-friendly application and API for drone image processing.
+A free, user-friendly, extendable application and API for drone image processing.
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
+
+![Alt text](/screenshots/dashboard.png?raw=true "Dashboard")
 
 If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork, contribute something that interests you, and make a pull request! All ideas are considered and people of all skill levels are welcome.
 
