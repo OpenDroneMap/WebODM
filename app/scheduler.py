@@ -1,4 +1,4 @@
-import logging, traceback
+import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import SchedulerAlreadyRunningError, SchedulerNotRunningError
 from threading import Thread, Lock

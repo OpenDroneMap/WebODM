@@ -218,10 +218,6 @@ REST_FRAMEWORK = {
   'PAGE_SIZE': 10,
 }
 
-# Raster
-RASTER_USE_CELERY = False
-
-
 TESTING = sys.argv[1:2] == ['test']
 
 try:
