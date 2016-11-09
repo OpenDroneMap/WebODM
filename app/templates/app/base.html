@@ -57,11 +57,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
+                {% block navbar-top-links %}{% endblock %}
                 <a class="navbar-brand" href="/"><img src="{% static 'app/img/logo36.png' %}" alt="WebODM" /></a>
-                <a class="navbar-link" href="/"><p class="navbar-text navbar-right">OpenDroneMap</a></p>
+                <a class="navbar-link" href="/"><p class="navbar-text">OpenDroneMap</a></p>
             </div>
 
-            {% block navbar-top-links %}{% endblock %}
             {% block navbar-sidebar %}{% endblock %}
         </nav>
         

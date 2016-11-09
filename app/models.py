@@ -276,7 +276,12 @@ class Task(models.Model):
                                 # Add to database another copy
                                 self.orthophoto = GDALRaster(orthophoto_path, write=True)
 
-                                # TODO: Create tiles
+                                # TODO:
+                                # 1. Download tiles
+                                # 2. Extract from zip
+                                # 3. Add onDelete method to cleanup stuff
+                                # 4. Add tile map API
+                                # 5. Create map view
 
                                 self.save()
                             except ProcessingException as e:

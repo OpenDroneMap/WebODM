@@ -65,7 +65,7 @@ class TaskListItem extends React.Component {
         // Update timer if we switched to running
         if (oldStatus !== this.state.task.status){
           if (this.state.task.status === statusCodes.RUNNING){
-            this.console.clear();
+            if (this.console) this.console.clear();
             this.loadTimer(this.state.task.processing_time);
           }else{
             this.setState({time: this.state.task.processing_time});
@@ -195,7 +195,7 @@ class TaskListItem extends React.Component {
             this.state.task.processing_node){
           addActionButton("Restart", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("restart", {
             success: () => {
-                this.console.clear();
+                if (this.console) this.console.clear();
                 this.setState({time: -1});
               }
             }
