@@ -16,6 +16,7 @@ class TaskIDsSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return obj.id
 
+
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
@@ -26,7 +27,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Task
-        exclude = ('processing_lock', 'console_output', )
+        exclude = ('processing_lock', 'console_output', 'orthophoto', )
 
 
 def get_and_check_project(request, project_pk, perms=('view_project',)):
@@ -48,7 +49,7 @@ class TaskViewSet(viewsets.ViewSet):
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all()
+    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
     
     # We don't use object level permissions on tasks, relying on
     # project's object permissions instead (but standard model permissions still apply)
@@ -157,10 +158,10 @@ class TaskViewSet(viewsets.ViewSet):
 class TaskTilesBase(APIView):
     queryset = models.Task.objects.all()
 
-    def get_and_check_task(self, request, pk, project_pk):
+    def get_and_check_task(self, request, pk, project_pk, defer=(None, )):
         get_and_check_project(request, project_pk)
         try:
-            task = self.queryset.get(pk=pk, project=project_pk)
+            task = self.queryset.defer(*defer).get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
         return task
@@ -171,7 +172,7 @@ class TaskTiles(TaskTilesBase):
         """
         Returns a prerendered orthophoto tile for a task
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
         tile_path = task.get_tile_path(z, x, y)
         if os.path.isfile(tile_path):
             tile = open(tile_path, "rb")

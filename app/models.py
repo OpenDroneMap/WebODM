@@ -41,7 +41,7 @@ class Project(models.Model):
         return self.name
 
     def tasks(self, pk=None):
-        return Task.objects.filter(project=self);
+        return Task.objects.filter(project=self).only('id')
 
     class Meta:
         permissions = (

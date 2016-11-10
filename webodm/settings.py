@@ -25,6 +25,7 @@ SECRET_KEY = 'gmarsutd!fee6_58=6k)2je#o2^&&)ovu1svjg8k^(a!7qa7r&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = []
 
@@ -43,11 +44,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_nested',
     'webpack_loader',
+#    'debug_toolbar',
     'app',
     'nodeodm',
 ]
 
 MIDDLEWARE = [
+   # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

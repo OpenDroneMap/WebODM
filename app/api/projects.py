@@ -6,7 +6,6 @@ from .tasks import TaskIDsSerializer
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    owner = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     tasks = TaskIDsSerializer(many=True)
 
     class Meta:
