@@ -125,6 +125,9 @@ class ProjectListItem extends React.Component {
       })
       .on("reset", () => {
         this.resetUploadState();
+      })
+      .on("dragenter", () => {
+        this.resetUploadState();
       });
   }
 
