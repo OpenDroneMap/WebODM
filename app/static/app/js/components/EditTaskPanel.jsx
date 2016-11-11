@@ -1,6 +1,11 @@
 import '../css/EditTaskPanel.scss';
 import React from 'react';
 import ProcessingNodeOption from './ProcessingNodeOption';
+import values from 'object.values';
+
+if (!Object.values) {
+    values.shim();
+}
 
 class EditTaskPanel extends React.Component {
   constructor(){
