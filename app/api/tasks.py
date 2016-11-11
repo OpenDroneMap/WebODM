@@ -1,3 +1,4 @@
+import mimetypes
 import os
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -102,6 +103,7 @@ class TaskViewSet(viewsets.ViewSet):
         output = task.console_output or ""
         return Response('\n'.join(output.split('\n')[line_num:]))
 
+
     def list(self, request, project_pk=None):
         get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
@@ -155,7 +157,7 @@ class TaskViewSet(viewsets.ViewSet):
         return self.update(request, *args, **kwargs)
 
 
-class TaskTilesBase(APIView):
+class TaskNestedView(APIView):
     queryset = models.Task.objects.all()
 
     def get_and_check_task(self, request, pk, project_pk, defer=(None, )):
@@ -167,7 +169,7 @@ class TaskTilesBase(APIView):
         return task
 
 
-class TaskTiles(TaskTilesBase):
+class TaskTiles(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, z="", x="", y=""):
         """
         Returns a prerendered orthophoto tile for a task
@@ -181,7 +183,7 @@ class TaskTiles(TaskTilesBase):
             raise exceptions.NotFound()
 
 
-class TaskTilesJson(TaskTilesBase):
+class TaskTilesJson(TaskNestedView):
     def get(self, request, pk=None, project_pk=None):
         """
         Returns a tiles.json file for consumption by a client
@@ -200,3 +202,35 @@ class TaskTilesJson(TaskTilesBase):
             'bounds': task.orthophoto.extent
         }
         return Response(json)
+
+
+class TaskAssets(TaskNestedView):
+        def get(self, request, pk=None, project_pk=None, asset=""):
+            """
+            Downloads a task asset (if available)
+            """
+            task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
+
+            allowed_assets = {
+                'all': 'all.zip',
+                'geotiff': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+                'las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply.las'),
+                'ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
+                'csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv')
+            }
+
+            if asset in allowed_assets:
+                asset_path = task.assets_path(allowed_assets[asset])
+
+                if not os.path.exists(asset_path):
+                    raise exceptions.NotFound("Asset does not exist")
+
+                asset_filename = os.path.basename(asset_path)
+
+                file = open(asset_path, "rb")
+                response = HttpResponse(FileWrapper(file),
+                                        content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
+                response['Content-Disposition'] = "attachment; filename={}".format(asset_filename)
+                return response
+            else:
+                raise exceptions.NotFound()

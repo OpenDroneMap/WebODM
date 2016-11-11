@@ -82,6 +82,13 @@ class Map extends React.Component {
 
     if (showBackground) {
       const basemaps = [
+        L.tileLayer('//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            attribution: 'Map data: &copy; Google Maps',
+            subdomains: ['mt0','mt1','mt2','mt3'],
+            maxZoom: 22,
+            minZoom: 0,
+            label: 'Google Maps Hybrid'
+        }),
         L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
             maxZoom: 22,
@@ -93,12 +100,6 @@ class Map extends React.Component {
             maxZoom: 22,
             minZoom: 0,
             label: 'OSM Mapnik'  // optional label used for tooltip
-        }),
-        L.tileLayer('//{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>',
-            maxZoom: 22,
-            minZoom: 0,
-            label: 'OpenTopoMap'
         })
       ];
 

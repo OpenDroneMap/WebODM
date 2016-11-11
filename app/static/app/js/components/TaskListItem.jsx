@@ -189,7 +189,7 @@ class TaskListItem extends React.Component {
       };
       
       if (task.status === statusCodes.COMPLETED){
-        addActionButton(" View Orthophoto", "btn-primary first", "fa fa-globe", () => {
+        addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
           location.href = `/map/project/${task.project}/task/${task.id}/`;
         });
       }
@@ -232,7 +232,6 @@ class TaskListItem extends React.Component {
                 )
             })}
           </div>);
-
       expanded = (
         <div className="expanded-panel">
           <div className="row">
@@ -240,12 +239,15 @@ class TaskListItem extends React.Component {
               <div className="labels">
                 <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
               </div>
-              <div className="labels">
-                <strong>Status: </strong> {status}<br/>
-              </div>
-               <div className="labels">
-                <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
-              </div>
+              {status ? <div className="labels">
+                  <strong>Status: </strong> {status}<br/>
+                </div>
+              : ""}
+              {Array.isArray(task.options) ?
+                 <div className="labels">
+                  <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
+                </div>
+              : ""}
               {/* TODO: List of images? */}
             </div>
             <div className="col-md-8">

@@ -99,3 +99,10 @@ button i.glyphicon{
 .btn.btn-secondary{
     background-color: #dddddd;
 }
+
+.dropdown-menu>li>a{
+    padding-left: 10px;
+    .fa{
+        margin-right: 4px;
+    }
+}

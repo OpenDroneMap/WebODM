@@ -132,12 +132,15 @@ class Task(models.Model):
         self.full_clean()
         super(Task, self).save(*args, **kwargs)
 
-    def media_path(self, path):
+
+    def assets_path(self, *args):
         """
-        Get a path relative to the media directory of this task
+        Get a path relative to the place where assets are stored
         """
         return os.path.join(settings.MEDIA_ROOT,
-                           assets_directory_path(self.id, self.project.id, path))
+                            assets_directory_path(self.id, self.project.id, ""),
+                            "assets",
+                            *args)
 
     @staticmethod
     def create_from_images(images, project):
@@ -276,30 +279,25 @@ class Task(models.Model):
 
                         if self.status == status_codes.COMPLETED:
                             try:
-                                orthophoto_stream = self.processing_node.download_task_asset(self.uuid, "orthophoto.tif")
-                                orthophoto_path = self.media_path("orthophoto.tif")
+                                assets_dir = self.assets_path("")
+                                if not os.path.exists(assets_dir):
+                                    os.makedirs(assets_dir)
 
-                                # Save to disk original photo
-                                with open(orthophoto_path, 'wb') as fd:
-                                    for chunk in orthophoto_stream.iter_content(4096):
-                                        fd.write(chunk)
-
-                                # Add to database another copy
-                                self.orthophoto = GDALRaster(orthophoto_path, write=True)
-
-                                # Download tiles
-                                tiles_zip_stream = self.processing_node.download_task_asset(self.uuid, "orthophoto_tiles.zip")
-                                tiles_zip_path = self.media_path("orthophoto_tiles.zip")
-                                with open(tiles_zip_path, 'wb') as fd:
-                                    for chunk in tiles_zip_stream.iter_content(4096):
+                                # Download all assets
+                                zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
+                                zip_path = os.path.join(assets_dir, "all.zip")
+                                with open(zip_path, 'wb') as fd:
+                                    for chunk in zip_stream.iter_content(4096):
                                         fd.write(chunk)
 
                                 # Extract from zip
-                                with zipfile.ZipFile(tiles_zip_path, "r") as zip_h:
-                                    zip_h.extractall(self.media_path(""))
+                                with zipfile.ZipFile(zip_path, "r") as zip_h:
+                                    zip_h.extractall(assets_dir)
 
-                                # Delete zip archive
-                                os.remove(tiles_zip_path)
+                                # Add to database orthophoto
+                                orthophoto_path = self.assets_path("odm_orthophoto", "odm_orthophoto.tif")
+                                if os.path.exists(orthophoto_path):
+                                    self.orthophoto = GDALRaster(orthophoto_path, write=True)
 
                                 self.save()
                             except ProcessingException as e:
@@ -314,7 +312,7 @@ class Task(models.Model):
                     self.set_failure(str(e))
 
     def get_tile_path(self, z, x, y):
-        return self.media_path(os.path.join("orthophoto_tiles", z, x, "{}.png".format(y)))
+        return self.assets_path("orthophoto_tiles", z, x, "{}.png".format(y))
 
     def delete(self, using=None, keep_parents=False):
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
@@ -342,8 +340,9 @@ class Task(models.Model):
         )
 
 
-def image_directory_path(imageUpload, filename):
-    return assets_directory_path(imageUpload.task.id, imageUpload.task.project.id, filename)
+def image_directory_path(image_upload, filename):
+    return assets_directory_path(image_upload.task.id, image_upload.task.project.id, filename)
+
 
 class ImageUpload(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, help_text="Task this image belongs to")

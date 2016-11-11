@@ -91,7 +91,8 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
 - [X] User Registration / Authentication
 - [X] UI mockup
 - [X] Task Processing
-- [ ] Model display (using Cesium/Leaflet) for both 2D and 3D outputs.
+- [X] 2D Map Display 
+- [ ] 3D model display
 - [X] Cluster management and setup.
 - [ ] Mission Planner
 - [X] API
@@ -112,8 +113,3 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
 ![image](https://cloud.githubusercontent.com/assets/1951843/17680196/9bfe878e-6304-11e6-852e-c09f1e02f3c0.png)
 
 ![er diagram - webodm 2](https://cloud.githubusercontent.com/assets/1951843/17717379/4a227e28-63d3-11e6-9518-6a63cc1bcd3b.png)
-
-
-## Work in progress
-
-We will add more information to this document soon.

@@ -22,8 +22,9 @@ class AssetDownloadButtons extends React.Component {
     }
 
     downloadAsset(type){
-        return () => {
-            location.href = ``;
+        return (e) => {
+            e.preventDefault();
+            location.href = `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/download/${type}/`;
         };
     }
 
@@ -39,6 +40,9 @@ class AssetDownloadButtons extends React.Component {
             <li><a href="javascript:void(0);" onClick={this.downloadAsset("geotiff")}><i className="fa fa-map-o"></i> GeoTIFF</a></li>
             <li><a href="javascript:void(0);" onClick={this.downloadAsset("las")}><i className="fa fa-cube"></i> LAS</a></li>
             <li><a href="javascript:void(0);" onClick={this.downloadAsset("ply")}><i className="fa fa-cube"></i> PLY</a></li>
+            <li><a href="javascript:void(0);" onClick={this.downloadAsset("ply")}><i className="fa fa-cube"></i> CSV</a></li>
+            <li className="divider"></li>
+            <li><a href="javascript:void(0);" onClick={this.downloadAsset("all")}><i className="fa fa-file-archive-o"></i> All Assets</a></li>
           </ul>
         </div>);
     }

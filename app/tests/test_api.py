@@ -185,6 +185,7 @@ class TestApi(BootTestCase):
         # - task creation via file upload
         # - scheduler processing steps
         # - tiles API urls (permissions, 404s)
+        # - assets download
 
     def test_processingnodes(self):
         client = APIClient()

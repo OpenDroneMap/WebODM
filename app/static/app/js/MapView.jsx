@@ -55,7 +55,7 @@ class MapView extends React.Component {
           <div className="col-md-3">
             <AssetDownloadButtons task={{id: this.props.task, project: this.props.project}} />
           </div>
-          <div className="col-md-9">
+          <div className="col-md-9 text-right">
             Orthophoto opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
           </div>
         </div>
