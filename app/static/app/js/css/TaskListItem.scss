@@ -62,6 +62,9 @@
         .action-buttons{
             button{
                 margin-right: 4px;
+                &.first{
+                    margin-left: 4px;
+                }
             }
         }
     }

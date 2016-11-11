@@ -1,18 +1,21 @@
 import React from 'react';
 import '../css/Map.scss';
-import '../vendor/leaflet/leaflet.css';
-import Leaflet from '../vendor/leaflet/leaflet';
+//import 'leaflet.css';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-basemaps/L.Control.Basemaps.css';
+import Leaflet from 'leaflet';
+import 'leaflet-basemaps/L.Control.Basemaps';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 
 class Map extends React.Component {
   static defaultProps = {
-    bounds: [[-85.05112877980659, -180], [85.0511287798066, 180]],
+    bounds: [[-90, -180], [90, 180]],
     maxzoom: 18,
     minzoom: 0,
     scheme: 'tms',
     showBackground: false,
-    showControls: true,
+    opacity: 100,
     url: "",
     error: ""
   }
@@ -36,23 +39,13 @@ class Map extends React.Component {
     this.state = {
         bounds: this.props.bounds,
         maxzoom: this.props.maxzoom,
-        minzoom: this.props.minzoom,
-        opacity: 100
+        minzoom: this.props.minzoom
     };
-
-    this.updateOpacity = this.updateOpacity.bind(this);
   }
 
   componentDidMount() {
     const { showBackground, tileJSON } = this.props;
     const { bounds, maxzoom, minzoom, scheme, url } = this.state;
-
-    // TODO: https, other basemaps selection
-    let backgroundTileLayer = Leaflet.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-            }
-        );
 
     if (tileJSON != null) {
         this.tileJsonRequest = $.getJSON(tileJSON)
@@ -72,10 +65,6 @@ class Map extends React.Component {
 
     const layers = [];
 
-    if (showBackground) {
-        layers.push(backgroundTileLayer);
-    }
-
     if (url != null) {
       this.imageryLayer = Leaflet.tileLayer(url, {
         minZoom: minzoom,
@@ -91,6 +80,36 @@ class Map extends React.Component {
       layers
     });
 
+    if (showBackground) {
+      const basemaps = [
+        L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+            maxZoom: 22,
+            minZoom: 0,
+            label: 'ESRI Satellite'  // optional label used for tooltip
+        }),
+        L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 22,
+            minZoom: 0,
+            label: 'OSM Mapnik'  // optional label used for tooltip
+        }),
+        L.tileLayer('//{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>',
+            maxZoom: 22,
+            minZoom: 0,
+            label: 'OpenTopoMap'
+        })
+      ];
+
+      this.leaflet.addControl(Leaflet.control.basemaps({
+          basemaps: basemaps,
+          tileX: 0,  // tile X coordinate
+          tileY: 0,  // tile Y coordinate
+          tileZ: 1   // tile zoom level
+      }));
+    }
+
     this.leaflet.fitBounds(bounds);
 
     Leaflet.control.scale({
@@ -100,7 +119,7 @@ class Map extends React.Component {
   }
 
   componentDidUpdate() {
-    const { bounds, maxzoom, minzoom, opacity, scheme, url } = this.state;
+    const { bounds, maxzoom, minzoom, scheme, url } = this.state;
 
     if (!this.imageryLayer) {
       this.imageryLayer = Leaflet.tileLayer(url, {
@@ -112,18 +131,12 @@ class Map extends React.Component {
       this.leaflet.fitBounds(bounds);
     }
 
-    this.imageryLayer.setOpacity(opacity / 100);
+    this.imageryLayer.setOpacity(this.props.opacity / 100);
   }
 
   componentWillUnmount() {
     this.leaflet.remove();
     if (this.tileJsonRequest) this.tileJsonRequest.abort();
-  }
-
-  updateOpacity(evt) {
-    this.setState({
-      opacity: evt.target.value,
-    });
   }
 
   render() {
@@ -136,13 +149,6 @@ class Map extends React.Component {
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}
         />
-        {this.props.showControls ?
-            <div className="row">
-              <div className="col-md-3">
-                Layer opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
-              </div>
-            </div>
-        : ""}
       </div>
     );
   }

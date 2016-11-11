@@ -26,19 +26,16 @@ def dashboard(request):
 
 
 @login_required
-def map(request):
-    project_id = request.GET.get('project', '')
-    task_id = request.GET.get('task', '')
-
+def map(request, project_pk=None, task_pk=None):
     title = _("Map")
 
-    if project_id != '':
-        project = get_object_or_404(Project, pk=int(project_id))
+    if project_pk != '':
+        project = get_object_or_404(Project, pk=project_pk)
         if not request.user.has_perm('projects.view_project', project):
             raise Http404()
         
-        if task_id != '':
-            task = get_object_or_404(Task, pk=int(task_id), project=project)
+        if task_pk != '':
+            task = get_object_or_404(Task, pk=task_pk, project=project)
             title = task.name
         else:
             title = project.name
@@ -46,8 +43,8 @@ def map(request):
     return render(request, 'app/map.html', {
             'title': title,
             'params': {
-                'task': request.GET.get('task', ''),
-                'project': request.GET.get('project', '')
+                'task': task_pk,
+                'project': project_pk
             }.items()
         })
 

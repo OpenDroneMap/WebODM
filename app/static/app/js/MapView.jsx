@@ -1,6 +1,7 @@
 import React from 'react';
 import './css/MapView.scss';
 import Map from './components/Map';
+import AssetDownloadButtons from './components/AssetDownloadButtons';
 
 class MapView extends React.Component {
   static defaultProps = {
@@ -31,11 +32,33 @@ class MapView extends React.Component {
     }else{
       this.tileJSON = `/api/projects/${this.props.project}/tasks/${this.props.task}/tiles.json`;
     }
+
+    this.state = {
+      opacity: 100
+    };
+
+    this.updateOpacity = this.updateOpacity.bind(this);
+  }
+
+  updateOpacity(evt) {
+    this.setState({
+      opacity: evt.target.value,
+    });
   }
 
   render(){
+    const { opacity } = this.state;
+
     return (<div className="map-view">
-        <Map tileJSON={this.tileJSON} showBackground={true}/>
+        <Map tileJSON={this.tileJSON} showBackground={true} opacity={opacity}/>
+        <div className="row controls">
+          <div className="col-md-3">
+            <AssetDownloadButtons task={{id: this.props.task, project: this.props.project}} />
+          </div>
+          <div className="col-md-9">
+            Orthophoto opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
+          </div>
+        </div>
       </div>);
   }
 }

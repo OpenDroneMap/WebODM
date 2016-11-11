@@ -240,6 +240,7 @@
                 <!--<li>
                     <a href="#"><i class="fa fa-plane fa-fw"></i> Mission Planner</a>
                 </li> -->
+                {% if user.is_staff %}   
                 <li>
                     <a href="#"><i class="fa fa-wrench fa-fw"></i> Processing Nodes<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
@@ -257,7 +258,6 @@
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
-                {% if user.is_staff %}    
                 <li>
                     <a href="/admin/"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}</a>
                 </li>

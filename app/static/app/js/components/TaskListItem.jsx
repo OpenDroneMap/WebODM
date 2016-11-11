@@ -4,6 +4,7 @@ import Console from '../Console';
 import statusCodes from '../classes/StatusCodes';
 import pendingActions from '../classes/PendingActions';
 import ErrorMessage from './ErrorMessage';
+import AssetDownloadButtons from './AssetDownloadButtons';
 
 class TaskListItem extends React.Component {
   constructor(props){
@@ -188,8 +189,8 @@ class TaskListItem extends React.Component {
       };
       
       if (task.status === statusCodes.COMPLETED){
-        addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
-          location.href = `/map/?project=${task.project}&task=${task.id}`;
+        addActionButton(" View Orthophoto", "btn-primary first", "fa fa-globe", () => {
+          location.href = `/map/project/${task.project}/task/${task.id}/`;
         });
       }
 
@@ -218,10 +219,13 @@ class TaskListItem extends React.Component {
         confirm: "All information related to this task, including images, maps and models will be deleted. Continue?"
       }));
 
+      const disabled = this.state.actionButtonsDisabled || !!task.pending_action;
+
       actionButtons = (<div className="action-buttons">
+            <AssetDownloadButtons task={this.state.task} disabled={disabled} />
             {actionButtons.map(button => {
               return (
-                  <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={this.state.actionButtonsDisabled || !!task.pending_action}>
+                  <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
                     <i className={button.icon}></i>
                     {button.label}
                   </button> 
