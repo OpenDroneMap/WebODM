@@ -199,7 +199,8 @@ class ProjectListItem extends React.Component {
   render() {
     return (
       <li className="project-list-item list-group-item"
-         href="javascript:void(0);">
+         href="javascript:void(0);"
+         ref={this.setRef("dropzone")}>
         <div className="row no-margin">
           <div className="btn-group pull-right">
             <button type="button" 
@@ -242,12 +243,8 @@ class ProjectListItem extends React.Component {
             </a>
           </div>
         </div>
+        <i className="drag-drop-icon fa fa-inbox"></i>
         <div className="row">
-          <div className="dropzone" ref={this.setRef("dropzone")}>
-              <div className="dz-default dz-message text-center">
-              </div>
-          </div>
-
           {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
           
           {this.state.upload.error !== "" ? 

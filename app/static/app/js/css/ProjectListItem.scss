@@ -5,6 +5,39 @@
         font-weight: bold;
     }
 
+    .drag-drop-icon{
+        display: none;
+        position: absolute;
+        border-radius: 100%;
+        padding: 16px;
+        left: 48%;
+        top: 0;
+        font-size: 300%;
+        -webkit-animation: pulsate 0.5s ease-out;
+        -webkit-animation-iteration-count: infinite; 
+        animation: pulsate 0.5s ease-out;
+        animation-iteration-count: infinite; 
+        opacity: 0.5;
+    }
+
+    @-webkit-keyframes pulsate {
+        0% {opacity: 0.5;}
+        50% {opacity: 1.0;}
+        100% {opacity: 0.5;}
+    }
+     @keyframes pulsate {
+        0% {opacity: 0.5;}
+        50% {opacity: 1.0;}
+        100% {opacity: 0.5;}
+    }
+
+    &.dz-drag-hover{
+        .drag-drop-icon{
+            display: block;
+        }
+        background-color: #f7f7f7;
+    }
+
     .project-links{
         font-size: 90%;
         i{
