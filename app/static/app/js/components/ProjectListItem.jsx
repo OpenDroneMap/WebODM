@@ -4,6 +4,7 @@ import update from 'react-addons-update';
 import TaskList from './TaskList';
 import EditTaskPanel from './EditTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
+import ErrorMessage from './ErrorMessage';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import $ from 'jquery';
@@ -15,7 +16,8 @@ class ProjectListItem extends React.Component {
     this.state = {
       showTaskList: false,
       updatingTask: false,
-      upload: this.getDefaultUploadState()
+      upload: this.getDefaultUploadState(),
+      error: ""
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
@@ -24,11 +26,12 @@ class ProjectListItem extends React.Component {
     this.cancelUpload = this.cancelUpload.bind(this);
     this.handleTaskSaved = this.handleTaskSaved.bind(this);
     this.viewMap = this.viewMap.bind(this);
-
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   componentWillUnmount(){
     if (this.updateTaskRequest) this.updateTaskRequest.abort();
+    if (this.deleteProjectRequest) this.deleteProjectRequest.abort();
   }
 
   getDefaultUploadState(){
@@ -186,6 +189,24 @@ class ProjectListItem extends React.Component {
     this.resetUploadState();
   }
 
+  handleDelete(){
+    this.setState({error: "HI!" + Math.random()});
+    // if (window.confirm("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?")){
+    //   return;
+    //   this.deleteProjectRequest = 
+    //     $.ajax({
+    //       url: `/api/projects/${this.props.data.id}/`,
+    //       contentType: 'application/json',
+    //       dataType: 'json',
+    //       type: 'DELETE'
+    //     }).done((json) => {
+    //       console.log("REs", json);
+    //     }).fail(() => {
+    //       this.setState({error: "The project could not be deleted"});
+    //     });
+    // }
+  }
+
   handleTaskSaved(taskInfo){
     this.setUploadState({savedTaskInfo: true});
 
@@ -205,6 +226,7 @@ class ProjectListItem extends React.Component {
          href="javascript:void(0);"
          ref={this.setRef("dropzone")}>
         <div className="row no-margin">
+          <ErrorMessage bind={[this, 'error']} />
           <div className="btn-group pull-right">
             <button type="button" 
                     className={"btn btn-primary btn-sm " + (this.state.upload.uploading ? "hide" : "")} 
@@ -230,6 +252,8 @@ class ProjectListItem extends React.Component {
             </button>
             <ul className="dropdown-menu">
               <li><a href="javascript:alert('TODO!');"><i className="fa fa-cube"></i> 3D View</a></li>
+              <li className="divider"></li>
+              <li><a href="javascript:void(0);" onClick={this.handleDelete}><i className="glyphicon glyphicon-trash"></i> Delete Project</a></li>
             </ul>
           </div>
 

@@ -261,7 +261,7 @@ class TaskListItem extends React.Component {
             </div>
           </div>
           <div className="row">
-            <ErrorMessage message={this.state.actionError} />
+            <ErrorMessage bind={[this, 'actionError']} />
             {actionButtons}
           </div>
         </div>

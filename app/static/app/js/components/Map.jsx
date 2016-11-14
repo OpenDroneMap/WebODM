@@ -145,7 +145,7 @@ class Map extends React.Component {
 
     return (
       <div style={{height: "100%"}}>
-        <ErrorMessage message={error} />
+        <ErrorMessage bind={[this, 'error']} />
         <div 
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}
