@@ -6,7 +6,11 @@ from .tasks import TaskIDsSerializer
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    tasks = TaskIDsSerializer(many=True)
+    tasks = TaskIDsSerializer(many=True, read_only=True)
+    owner = serializers.HiddenField(
+            default=serializers.CurrentUserDefault()
+        )
+    created_at = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Project
@@ -22,7 +26,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     - /api/projects/&lt;projectId&gt;/tasks : list all tasks belonging to a project<br/>
     - /api/projects/&lt;projectId&gt;/tasks/&lt;taskId&gt; : get task details
     """
-    filter_fields = ('id', 'owner', 'name')
+    filter_fields = ('id', 'name', 'description', 'created_at')
     serializer_class = ProjectSerializer
     queryset = models.Project.objects.all()
     ordering_fields = '__all__'

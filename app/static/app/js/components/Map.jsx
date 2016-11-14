@@ -20,17 +20,15 @@ class Map extends React.Component {
     error: ""
   }
 
-  static propTypes() {
-    return {
-      bounds: React.PropTypes.array,
-      maxzoom: React.PropTypes.integer,
-      minzoom: React.PropTypes.integer,
-      scheme: React.PropTypes.string, // either 'tms' or 'xyz'
-      showBackground: React.PropTypes.boolean,
-      showControls: React.PropTypes.boolean,
-      tileJSON: React.PropTypes.string,
-      url: React.PropTypes.string
-    };
+  static propTypes = {
+    bounds: React.PropTypes.array,
+    maxzoom: React.PropTypes.integer,
+    minzoom: React.PropTypes.integer,
+    scheme: React.PropTypes.string, // either 'tms' or 'xyz'
+    showBackground: React.PropTypes.bool,
+    showControls: React.PropTypes.bool,
+    tileJSON: React.PropTypes.string,
+    url: React.PropTypes.string
   }
 
   constructor(props) {

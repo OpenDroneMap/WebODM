@@ -15,6 +15,10 @@ class ProjectList extends React.Component {
     }
 
     componentDidMount(){
+        this.refresh();
+    }
+
+    refresh(){
         // Load projects from API
         this.serverRequest = 
             $.getJSON(this.props.source, json => {
@@ -36,6 +40,7 @@ class ProjectList extends React.Component {
                     loading: false
                 });
             });
+
     }
 
     componentWillUnmount(){

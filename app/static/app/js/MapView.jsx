@@ -7,17 +7,15 @@ class MapView extends React.Component {
   static defaultProps = {
     task: "",
     project: ""
-  }
+  };
 
-  static propTypes() {
-    return {
+  static propTypes = {
       // task id to display, if empty display all for a particular project
       task: React.PropTypes.string,
 
       // project id to display, if empty display all
       project: React.PropTypes.string
-    };
-  }
+  };
 
   constructor(props){
     super(props);

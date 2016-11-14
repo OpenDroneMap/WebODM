@@ -53,7 +53,7 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Can filter
-        res = client.get('/api/projects/?owner=999')
+        res = client.get('/api/projects/?name=999')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) == 0)
 
@@ -70,6 +70,15 @@ class TestApi(BootTestCase):
         # Cannot access project for which we have no access to
         res = client.get('/api/projects/{}/'.format(other_project.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can create project, but owner cannot be set
+        res = client.post('/api/projects/', {'name': 'test', 'description': 'test descr'})
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Project.objects.get(pk=res.data['id']).owner.id == user.id)
+
+        # Cannot leave name empty
+        res = client.post('/api/projects/', {'description': 'test descr'})
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
         # Create some tasks

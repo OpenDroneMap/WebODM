@@ -5,15 +5,12 @@ class AssetDownloadButtons extends React.Component {
     static defaultProps = {
         disabled: false,
         task: null
-    }
+    };
 
-    static propTypes() {
-        return {
-            disabled: React.PropTypes.boolean,
-            task: React.PropTypes.object.isRequired
-        };
-    }
-
+    static propTypes = {
+        disabled: React.PropTypes.bool,
+        task: React.PropTypes.object.isRequired
+    };
 
     constructor(props){
         super();

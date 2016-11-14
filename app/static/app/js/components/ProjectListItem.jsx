@@ -5,6 +5,7 @@ import TaskList from './TaskList';
 import EditTaskPanel from './EditTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import ErrorMessage from './ErrorMessage';
+import EditProjectDialog from './EditProjectDialog';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import $ from 'jquery';
@@ -17,7 +18,8 @@ class ProjectListItem extends React.Component {
       showTaskList: false,
       updatingTask: false,
       upload: this.getDefaultUploadState(),
-      error: ""
+      error: "",
+      numTasks: props.data.tasks.length
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
@@ -27,6 +29,9 @@ class ProjectListItem extends React.Component {
     this.handleTaskSaved = this.handleTaskSaved.bind(this);
     this.viewMap = this.viewMap.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleEditProject = this.handleEditProject.bind(this);
+    this.updateProject = this.updateProject.bind(this);
+    this.taskDeleted = this.taskDeleted.bind(this);
   }
 
   componentWillUnmount(){
@@ -158,6 +163,7 @@ class ProjectListItem extends React.Component {
         }else{
           this.setState({showTaskList: true});
         }
+        this.setState({numTasks: this.state.numTasks + 1});
       }).fail(() => {
         this.setUploadState({error: "Could not update task information. Plese try again."});
       }).always(() => {
@@ -189,6 +195,13 @@ class ProjectListItem extends React.Component {
     this.resetUploadState();
   }
 
+  taskDeleted(){
+    this.setState({numTasks: this.state.numTasks - 1});
+    if (this.state.numTasks === 0){
+      this.setState({showTaskList: false});
+    }
+  }
+
   handleDelete(){
     this.setState({error: "HI!" + Math.random()});
     // if (window.confirm("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?")){
@@ -216,6 +229,14 @@ class ProjectListItem extends React.Component {
     }
   }
 
+  handleEditProject(){
+    this.editProjectDialog.show();
+  }
+
+  updateProject(project){
+    console.log("OK", project);
+  }
+
   viewMap(){
     location.href = `/map/?project=${this.props.data.id}`;
   }
@@ -225,6 +246,19 @@ class ProjectListItem extends React.Component {
       <li className="project-list-item list-group-item"
          href="javascript:void(0);"
          ref={this.setRef("dropzone")}>
+
+        <EditProjectDialog 
+          ref={(domNode) => { this.editProjectDialog = domNode; }}
+          title="Edit Project"
+          saveLabel="Save Changes"
+          savingLabel="Saving changes..."
+          saveIcon="fa fa-edit"
+          projectName={this.props.data.name}
+          projectDescr={this.props.data.description}
+          saveAction={this.updateProject}
+          deleteAction={this.handleDelete}
+        />
+
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
           <div className="btn-group pull-right">
@@ -252,8 +286,6 @@ class ProjectListItem extends React.Component {
             </button>
             <ul className="dropdown-menu">
               <li><a href="javascript:alert('TODO!');"><i className="fa fa-cube"></i> 3D View</a></li>
-              <li className="divider"></li>
-              <li><a href="javascript:void(0);" onClick={this.handleDelete}><i className="glyphicon glyphicon-trash"></i> Delete Project</a></li>
             </ul>
           </div>
 
@@ -264,9 +296,17 @@ class ProjectListItem extends React.Component {
             {this.props.data.description}
           </div>
           <div className="row project-links">
-            <i className='fa fa-tasks'>
-            </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
-              {(this.state.showTaskList ? 'Hide' : 'Show')} Tasks
+            {this.state.numTasks > 0 ? 
+              <span>
+                <i className='fa fa-tasks'>
+                </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+                  {this.state.numTasks} Tasks <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                </a>
+              </span>
+              : ""}
+
+            <i className='fa fa-edit'>
+            </i> <a href="javascript:void(0);" onClick={this.handleEditProject}> Edit
             </a>
           </div>
         </div>
@@ -293,7 +333,12 @@ class ProjectListItem extends React.Component {
             <span>Updating task information... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
           : ""}
 
-          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-created_at`}/> : ""}
+          {this.state.showTaskList ? 
+            <TaskList 
+                ref={this.setRef("taskList")} 
+                source={`/api/projects/${this.props.data.id}/tasks/?ordering=-created_at`}
+                onDelete={this.taskDeleted}
+            /> : ""}
 
         </div>
       </li>
