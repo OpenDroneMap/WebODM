@@ -8,6 +8,7 @@ from rest_framework import status, serializers, viewsets, filters, exceptions, p
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
+from .common import get_and_check_project, get_tiles_json
 
 from app import models, scheduler, pending_actions
 from nodeodm.models import ProcessingNode
@@ -29,20 +30,6 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
         exclude = ('processing_lock', 'console_output', 'orthophoto', )
-
-
-def get_and_check_project(request, project_pk, perms=('view_project',)):
-    '''
-    Retrieves a project and raises an exeption if the current user
-    has no access to it.
-    '''
-    try:
-        project = models.Project.objects.get(pk=project_pk)
-        for perm in perms:
-            if not request.user.has_perm(perm, project): raise ObjectDoesNotExist()
-    except ObjectDoesNotExist:
-        raise exceptions.NotFound()
-    return project
 
 
 class TaskViewSet(viewsets.ViewSet):
@@ -189,18 +176,9 @@ class TaskTilesJson(TaskNestedView):
         Returns a tiles.json file for consumption by a client
         """
         task = self.get_and_check_task(request, pk, project_pk)
-        json = {
-            'tilejson': '2.1.0',
-            'name': task.name,
-            'version': '1.0.0',
-            'scheme': 'tms',
-            'tiles': [
+        json = get_tiles_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
-            ],
-            'minzoom': 0,
-            'maxzoom': 22,
-            'bounds': task.orthophoto.extent
-        }
+            ], task.orthophoto.extent)
         return Response(json)
 
 

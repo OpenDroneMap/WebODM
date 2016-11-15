@@ -61,7 +61,7 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
-    def tasks(self, pk=None):
+    def tasks(self):
         return self.task_set.only('id')
 
     class Meta:

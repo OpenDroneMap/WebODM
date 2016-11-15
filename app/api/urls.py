@@ -1,5 +1,5 @@
 from django.conf.urls import url, include
-from .projects import ProjectViewSet
+from .projects import ProjectViewSet, ProjectTilesJson
 from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskAssets
 from .processingnodes import ProcessingNodeViewSet
 from rest_framework_nested import routers
@@ -14,6 +14,8 @@ tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^', include(tasks_router.urls)),
+
+    url(r'projects/(?P<pk>[^/.]+)/tiles\.json$', ProjectTilesJson.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.png$', TaskTiles.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/tiles\.json$', TaskTilesJson.as_view()),
