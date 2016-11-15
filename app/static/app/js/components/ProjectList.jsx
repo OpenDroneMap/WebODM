@@ -12,6 +12,8 @@ class ProjectList extends React.Component {
             error: "",
             projects: null
         }
+
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount(){
@@ -47,6 +49,11 @@ class ProjectList extends React.Component {
         this.serverRequest.abort();
     }
 
+    handleDelete(projectId){
+        let projects = this.state.projects.filter(p => p.id !== projectId);
+        this.setState({projects: projects});
+    }
+
     render() {
         if (this.state.loading){
             return (<div>Loading projects... <i className="fa fa-refresh fa-spin fa-fw"></i></div>);
@@ -54,7 +61,7 @@ class ProjectList extends React.Component {
         else if (this.state.projects){
             return (<ul className="list-group">
                     {this.state.projects.map(p => (
-                        <ProjectListItem key={p.id} data={p} /> 
+                        <ProjectListItem key={p.id} data={p} onDelete={this.handleDelete} /> 
                     ))}
                 </ul>);
         }else if (this.state.error){

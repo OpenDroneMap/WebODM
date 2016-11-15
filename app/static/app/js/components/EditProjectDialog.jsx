@@ -33,12 +33,14 @@ class EditProjectDialog extends React.Component {
         this.state = {
             showModal: props.show,
             saving: false,
+            deleting: false,
             error: ""
         };
 
         this.show = this.show.bind(this);
         this.hide = this.hide.bind(this);
         this.handleSave = this.handleSave.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount(){
@@ -91,12 +93,24 @@ class EditProjectDialog extends React.Component {
             name: this.nameInput.value,
             descr: this.descrInput.value
         }).fail(e => {
-            this.setState({error: e.message || e.responseText || e});
-        }).done(() => {
-            this.hide();
+            this.setState({error: e.message || e.responseText || "Could not apply changes"});
         }).always(() => {
             this.setState({saving: false});
-        })
+        }).done(() => {
+            this.hide();
+        });
+    }
+
+    handleDelete(){
+        if (this.props.deleteAction){
+            if (window.confirm("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?")){
+                this.setState({deleting: true});
+                this.props.deleteAction()
+                    .fail(e => {
+                        this.setState({error: e.message || e.responseText || "Could not delete project", deleting: false});
+                    });
+            }
+        }
     }
 
     render(){
@@ -143,7 +157,18 @@ class EditProjectDialog extends React.Component {
                     </div>
                     {this.props.deleteAction ?
                         <div className="text-left">
-                            <button className="btn btn-danger" onClick={this.props.deleteAction}><i className="glyphicon glyphicon-trash"></i> Delete</button>
+                            <button 
+                                disabled={this.state.deleting}
+                                className="btn btn-danger" 
+                                onClick={this.handleDelete}>
+                                {this.state.deleting ? 
+                                    <span>
+                                        <i className="fa fa-circle-o-notch fa-spin"></i> Deleting...
+                                    </span>
+                                :   <span>
+                                        <i className="glyphicon glyphicon-trash"></i> Delete
+                                    </span>}
+                            </button>
                         </div>
                     : ""}
                   </div>

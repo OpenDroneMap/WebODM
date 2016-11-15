@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
 
-from app import models, scheduler
+from app import models, scheduler, pending_actions
 from nodeodm.models import ProcessingNode
 
 
@@ -76,15 +76,15 @@ class TaskViewSet(viewsets.ViewSet):
 
     @detail_route(methods=['post'])
     def cancel(self, *args, **kwargs):
-        return self.set_pending_action(models.Task.PendingActions.CANCEL, *args, **kwargs)
+        return self.set_pending_action(pending_actions.CANCEL, *args, **kwargs)
 
     @detail_route(methods=['post'])
     def restart(self, *args, **kwargs):
-        return self.set_pending_action(models.Task.PendingActions.RESTART, *args, **kwargs)
+        return self.set_pending_action(pending_actions.RESTART, *args, **kwargs)
 
     @detail_route(methods=['post'])
     def remove(self, *args, **kwargs):
-        return self.set_pending_action(models.Task.PendingActions.REMOVE, *args, perms=('delete_project', ), **kwargs)
+        return self.set_pending_action(pending_actions.REMOVE, *args, perms=('delete_project', ), **kwargs)
 
     @detail_route(methods=['get'])
     def output(self, request, pk=None, project_pk=None):

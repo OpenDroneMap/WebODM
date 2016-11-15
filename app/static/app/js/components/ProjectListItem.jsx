@@ -19,7 +19,8 @@ class ProjectListItem extends React.Component {
       updatingTask: false,
       upload: this.getDefaultUploadState(),
       error: "",
-      numTasks: props.data.tasks.length
+      data: props.data,
+      refreshing: false
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
@@ -34,9 +35,27 @@ class ProjectListItem extends React.Component {
     this.taskDeleted = this.taskDeleted.bind(this);
   }
 
+  refresh(){
+    // Update project information based on server
+    this.setState({refreshing: true});
+
+    this.refreshRequest = 
+      $.getJSON(`/api/projects/${this.state.data.id}/`)
+        .done((json) => {
+          this.setState({data: json});
+        })
+        .fail((_, __, e) => {
+          this.setState({error: e.message});
+        })
+        .always(() => {
+          this.setState({refreshing: false});
+        });
+  }
+
   componentWillUnmount(){
     if (this.updateTaskRequest) this.updateTaskRequest.abort();
     if (this.deleteProjectRequest) this.deleteProjectRequest.abort();
+    if (this.refreshRequest) this.refreshRequest.abort();
   }
 
   getDefaultUploadState(){
@@ -70,7 +89,7 @@ class ProjectListItem extends React.Component {
 
     this.dz = new Dropzone(this.dropzone, {
         paramName: "images",
-        url : `/api/projects/${this.props.data.id}/tasks/`,
+        url : `/api/projects/${this.state.data.id}/tasks/`,
         parallelUploads: 9999999,
         uploadMultiple: true,
         acceptedFiles: "image/*",
@@ -148,7 +167,7 @@ class ProjectListItem extends React.Component {
 
     this.updateTaskRequest = 
       $.ajax({
-        url: `/api/projects/${this.props.data.id}/tasks/${this.state.upload.taskId}/`,
+        url: `/api/projects/${this.state.data.id}/tasks/${this.state.upload.taskId}/`,
         contentType: 'application/json',
         data: JSON.stringify({
           name: taskInfo.name,
@@ -157,13 +176,13 @@ class ProjectListItem extends React.Component {
         }),
         dataType: 'json',
         type: 'PATCH'
-      }).done(() => {
+      }).done((json) => {
         if (this.state.showTaskList){
           this.taskList.refresh();
         }else{
           this.setState({showTaskList: true});
         }
-        this.setState({numTasks: this.state.numTasks + 1});
+        this.refresh();
       }).fail(() => {
         this.setUploadState({error: "Could not update task information. Plese try again."});
       }).always(() => {
@@ -196,28 +215,16 @@ class ProjectListItem extends React.Component {
   }
 
   taskDeleted(){
-    this.setState({numTasks: this.state.numTasks - 1});
-    if (this.state.numTasks === 0){
-      this.setState({showTaskList: false});
-    }
+    this.refresh();
   }
 
   handleDelete(){
-    this.setState({error: "HI!" + Math.random()});
-    // if (window.confirm("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?")){
-    //   return;
-    //   this.deleteProjectRequest = 
-    //     $.ajax({
-    //       url: `/api/projects/${this.props.data.id}/`,
-    //       contentType: 'application/json',
-    //       dataType: 'json',
-    //       type: 'DELETE'
-    //     }).done((json) => {
-    //       console.log("REs", json);
-    //     }).fail(() => {
-    //       this.setState({error: "The project could not be deleted"});
-    //     });
-    // }
+    return $.ajax({
+          url: `/api/projects/${this.state.data.id}/`,
+          type: 'DELETE'
+        }).done(() => {
+          if (this.props.onDelete) this.props.onDelete(this.state.data.id);
+        });
   }
 
   handleTaskSaved(taskInfo){
@@ -234,16 +241,30 @@ class ProjectListItem extends React.Component {
   }
 
   updateProject(project){
-    console.log("OK", project);
+    return $.ajax({
+        url: `/api/projects/${this.state.data.id}/`,
+        contentType: 'application/json',
+        data: JSON.stringify({
+          name: project.name,
+          description: project.descr,
+        }),
+        dataType: 'json',
+        type: 'PATCH'
+      }).done(() => {
+        this.refresh();
+      });
   }
 
   viewMap(){
-    location.href = `/map/?project=${this.props.data.id}`;
+    location.href = `/map/project/${this.state.data.id}/`;
   }
 
   render() {
+    const { refreshing, data } = this.state;
+    const numTasks = data.tasks.length;
+
     return (
-      <li className="project-list-item list-group-item"
+      <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
          href="javascript:void(0);"
          ref={this.setRef("dropzone")}>
 
@@ -253,8 +274,8 @@ class ProjectListItem extends React.Component {
           saveLabel="Save Changes"
           savingLabel="Saving changes..."
           saveIcon="fa fa-edit"
-          projectName={this.props.data.name}
-          projectDescr={this.props.data.description}
+          projectName={data.name}
+          projectDescr={data.description}
           saveAction={this.updateProject}
           deleteAction={this.handleDelete}
         />
@@ -290,17 +311,17 @@ class ProjectListItem extends React.Component {
           </div>
 
           <span className="project-name">
-            {this.props.data.name}
+            {data.name}
           </span>
           <div className="project-description">
-            {this.props.data.description}
+            {data.description}
           </div>
           <div className="row project-links">
-            {this.state.numTasks > 0 ? 
+            {numTasks > 0 ? 
               <span>
                 <i className='fa fa-tasks'>
                 </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
-                  {this.state.numTasks} Tasks <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                  {numTasks} Tasks <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
                 </a>
               </span>
               : ""}
@@ -336,7 +357,7 @@ class ProjectListItem extends React.Component {
           {this.state.showTaskList ? 
             <TaskList 
                 ref={this.setRef("taskList")} 
-                source={`/api/projects/${this.props.data.id}/tasks/?ordering=-created_at`}
+                source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
                 onDelete={this.taskDeleted}
             /> : ""}
 

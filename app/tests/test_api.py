@@ -1,3 +1,4 @@
+from app import pending_actions
 from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -168,13 +169,13 @@ class TestApi(BootTestCase):
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == task.PendingActions.CANCEL)
+        self.assertTrue(task.pending_action == pending_actions.CANCEL)
 
         res = client.post('/api/projects/{}/tasks/{}/restart/'.format(project.id, task.id))
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == task.PendingActions.RESTART)
+        self.assertTrue(task.pending_action == pending_actions.RESTART)
 
         # Cannot cancel, restart or delete a task for which we don't have permission
         for action in ['cancel', 'remove', 'restart']:
@@ -186,7 +187,7 @@ class TestApi(BootTestCase):
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == task.PendingActions.REMOVE)
+        self.assertTrue(task.pending_action == pending_actions.REMOVE)
 
 
         # TODO test:
@@ -195,6 +196,7 @@ class TestApi(BootTestCase):
         # - scheduler processing steps
         # - tiles API urls (permissions, 404s)
         # - assets download
+        # - project deletion
 
     def test_processingnodes(self):
         client = APIClient()

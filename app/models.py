@@ -1,23 +1,27 @@
-import time, os
+import logging
+import os
+import shutil
+import zipfile
 
-from django.contrib.gis.gdal import GDALRaster
-from django.db import models
-from django.db.models import signals
-from django.contrib.gis.db import models as gismodels
-from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.gis.db import models as gismodels
+from django.contrib.gis.gdal import GDALRaster
 from django.contrib.postgres import fields
-from nodeodm.models import ProcessingNode
-from guardian.shortcuts import get_perms_for_model, assign_perm
-from guardian.models import UserObjectPermissionBase
-from guardian.models import GroupObjectPermissionBase
 from django.core.exceptions import ValidationError
-from django.dispatch import receiver
-from nodeodm.exceptions import ProcessingException
+from django.db import models
 from django.db import transaction
+from django.db.models import signals
+from django.dispatch import receiver
+from django.utils import timezone
+from guardian.models import GroupObjectPermissionBase
+from guardian.models import UserObjectPermissionBase
+from guardian.shortcuts import get_perms_for_model, assign_perm
+
+from app import pending_actions
 from nodeodm import status_codes
+from nodeodm.exceptions import ProcessingException
+from nodeodm.models import ProcessingNode
 from webodm import settings
-import logging, zipfile, shutil
 
 logger = logging.getLogger('app.logger')
 
@@ -36,12 +40,29 @@ class Project(models.Model):
     name = models.CharField(max_length=255, help_text="A label used to describe the project")
     description = models.TextField(null=True, blank=True, help_text="More in-depth description of the project")
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
+    deleting = models.BooleanField(db_index=True, default=False,
+                                         help_text="Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted.")
+
+    def delete(self, *args):
+        # No tasks?
+        if self.task_set.count() == 0:
+            # Just delete normally
+            logger.info("Deleted project {}".format(self.id))
+            super().delete(*args)
+        else:
+            # Need to remove all tasks before we can remove this project
+            # which will be deleted on the scheduler after pending actions
+            # have been completed
+            self.task_set.update(pending_action=pending_actions.REMOVE)
+            self.deleting = True
+            self.save()
+            logger.info("Tasks pending, set project {} deleting flag".format(self.id))
 
     def __str__(self):
         return self.name
 
     def tasks(self, pk=None):
-        return Task.objects.filter(project=self).only('id')
+        return self.task_set.only('id')
 
     class Meta:
         permissions = (
@@ -86,11 +107,6 @@ def validate_task_options(value):
 
 
 class Task(models.Model):
-    class PendingActions:
-        CANCEL = 1
-        REMOVE = 2
-        RESTART = 3
-
     STATUS_CODES = (
         (status_codes.QUEUED, 'QUEUED'),
         (status_codes.RUNNING, 'RUNNING'),
@@ -100,9 +116,9 @@ class Task(models.Model):
     )
 
     PENDING_ACTIONS = (
-        (PendingActions.CANCEL, 'CANCEL'),
-        (PendingActions.REMOVE, 'REMOVE'),
-        (PendingActions.RESTART, 'RESTART'),
+        (pending_actions.CANCEL, 'CANCEL'),
+        (pending_actions.REMOVE, 'REMOVE'),
+        (pending_actions.RESTART, 'RESTART'),
     )
 
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
@@ -122,7 +138,7 @@ class Task(models.Model):
     # textured_model
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
-    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. When set to a value other than NONE, the selected action will be performed by the scheduler at the next iteration.")
+    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
 
     def __str__(self):
         return 'Task ID: {}'.format(self.id)
@@ -157,8 +173,6 @@ class Task(models.Model):
 
             return task
 
-        # In case of error
-        return None
 
     def process(self):
         """
@@ -189,10 +203,9 @@ class Task(models.Model):
                 except ProcessingException as e:
                     self.set_failure(str(e))
 
-
         if self.pending_action is not None:
             try:
-                if self.pending_action == self.PendingActions.CANCEL:
+                if self.pending_action == pending_actions.CANCEL:
                     # Do we need to cancel the task on the processing node?
                     logger.info("Canceling task {}".format(self))
                     if self.processing_node and self.uuid:
@@ -202,7 +215,7 @@ class Task(models.Model):
                     else:
                         raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
 
-                elif self.pending_action == self.PendingActions.RESTART:
+                elif self.pending_action == pending_actions.RESTART:
                     logger.info("Restarting task {}".format(self))
                     if self.processing_node and self.uuid:
 
@@ -235,7 +248,7 @@ class Task(models.Model):
                     else:
                         raise ProcessingException("Cannot restart a task that has no processing node or UUID")
 
-                elif self.pending_action == self.PendingActions.REMOVE:
+                elif self.pending_action == pending_actions.REMOVE:
                     logger.info("Removing task {}".format(self))
                     if self.processing_node and self.uuid:
                         # Attempt to delete the resources on the processing node
@@ -255,7 +268,6 @@ class Task(models.Model):
             except ProcessingException as e:
                 self.last_error = str(e)
                 self.save()
-
 
         if self.processing_node:
             # Need to update status (first time, queued or running?)
@@ -332,7 +344,6 @@ class Task(models.Model):
         self.last_error = error_message
         self.status = status_codes.FAILED
         self.save()
-
 
     class Meta:
         permissions = (

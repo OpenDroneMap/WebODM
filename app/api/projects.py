@@ -14,7 +14,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Project
-        fields = '__all__'
+        exclude = ('deleting', )
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -28,5 +28,5 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     filter_fields = ('id', 'name', 'description', 'created_at')
     serializer_class = ProjectSerializer
-    queryset = models.Project.objects.all()
+    queryset = models.Project.objects.filter(deleting=False)
     ordering_fields = '__all__'

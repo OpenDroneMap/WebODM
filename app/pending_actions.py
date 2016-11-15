@@ -1,0 +1,3 @@
+CANCEL = 1
+REMOVE = 2
+RESTART = 3
