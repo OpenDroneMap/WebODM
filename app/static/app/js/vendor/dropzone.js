@@ -586,11 +586,13 @@
         eventName = _ref1[_i];
         this.on(eventName, this.options[eventName]);
       }
+
       this.on("uploadprogress", (function(_this) {
         return function() {
           return _this.updateTotalUploadProgress();
         };
       })(this));
+
       this.on("removedfile", (function(_this) {
         return function() {
           return _this.updateTotalUploadProgress();
@@ -703,8 +705,9 @@
         _ref = this.getActiveFiles();
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           file = _ref[_i];
-          totalBytesSent += file.upload.bytesSent;
-          totalBytes += file.upload.total;
+          totalBytesSent = file.upload.bytesSent;
+          totalBytes = file.upload.total;
+          break;
         }
         totalUploadProgress = 100 * totalBytesSent / totalBytes;
       } else {
@@ -1288,6 +1291,7 @@
           for (_l = 0, _len3 = files.length; _l < _len3; _l++) {
             file = files[_l];
             _results.push(_this.emit("uploadprogress", file, progress, file.upload.bytesSent));
+            break;
           }
           return _results;
         };

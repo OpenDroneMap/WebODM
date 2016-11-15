@@ -26,14 +26,14 @@ class Console extends React.Component {
 
   componentDidMount(){
     this.checkAutoscroll();
+    this.setupDynamicSource();    
+  }
 
-    // Dynamic source?
+  setupDynamicSource(){
     if (this.props.source !== undefined){
-      let currentLineNumber = 0;
-
       const updateFromSource = () => {
         let sourceUrl = typeof this.props.source === 'function' ?
-                       this.props.source(currentLineNumber) :
+                       this.props.source(this.state.lines.length) :
                        this.props.source;
 
         // Fetch
@@ -41,7 +41,6 @@ class Console extends React.Component {
           if (text !== ""){
             let lines = text.split("\n");
             this.addLines(lines);
-            currentLineNumber += (lines.length - 1);
           }
         })
         .always((_, textStatus) => {
@@ -56,9 +55,19 @@ class Console extends React.Component {
     }
   }
 
-  componentWillUnmount(){
+  clear(){
+    this.tearDownDynamicSource();
+    this.setState({lines: []});
+    this.setupDynamicSource();
+  }
+
+  tearDownDynamicSource(){
     if (this.sourceTimeout) clearTimeout(this.sourceTimeout);
     if (this.sourceRequest) this.sourceRequest.abort();
+  }
+
+  componentWillUnmount(){
+    this.tearDownDynamicSource();
   }
 
   setRef(domNode){
@@ -91,7 +100,6 @@ class Console extends React.Component {
 
   render() {
     const prettyLine = (line) => {
-      // TODO Escape
       return {__html: prettyPrintOne(Utils.escapeHtml(line), this.props.lang, this.props.lines)};
     }
     let i = 0;

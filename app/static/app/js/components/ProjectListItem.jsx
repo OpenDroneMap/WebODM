@@ -4,6 +4,7 @@ import update from 'react-addons-update';
 import TaskList from './TaskList';
 import EditTaskPanel from './EditTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
+import ErrorMessage from './ErrorMessage';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import $ from 'jquery';
@@ -15,7 +16,8 @@ class ProjectListItem extends React.Component {
     this.state = {
       showTaskList: false,
       updatingTask: false,
-      upload: this.getDefaultUploadState()
+      upload: this.getDefaultUploadState(),
+      error: ""
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
@@ -23,10 +25,13 @@ class ProjectListItem extends React.Component {
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
     this.handleTaskSaved = this.handleTaskSaved.bind(this);
+    this.viewMap = this.viewMap.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   componentWillUnmount(){
     if (this.updateTaskRequest) this.updateTaskRequest.abort();
+    if (this.deleteProjectRequest) this.deleteProjectRequest.abort();
   }
 
   getDefaultUploadState(){
@@ -74,9 +79,9 @@ class ProjectListItem extends React.Component {
     });
 
     this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
-          this.setUploadState({
-            progress, totalBytes, totalBytesSent
-          });
+        this.setUploadState({
+          progress, totalBytes, totalBytesSent
+        });
       })
       .on("addedfile", () => {
         this.setUploadState({
@@ -123,6 +128,9 @@ class ProjectListItem extends React.Component {
       })
       .on("reset", () => {
         this.resetUploadState();
+      })
+      .on("dragenter", () => {
+        this.resetUploadState();
       });
   }
 
@@ -167,7 +175,6 @@ class ProjectListItem extends React.Component {
     this.setState({
       showTaskList: !this.state.showTaskList
     });
-    console.log(this.props);
   }
 
   closeUploadError(){
@@ -182,6 +189,24 @@ class ProjectListItem extends React.Component {
     this.resetUploadState();
   }
 
+  handleDelete(){
+    this.setState({error: "HI!" + Math.random()});
+    // if (window.confirm("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?")){
+    //   return;
+    //   this.deleteProjectRequest = 
+    //     $.ajax({
+    //       url: `/api/projects/${this.props.data.id}/`,
+    //       contentType: 'application/json',
+    //       dataType: 'json',
+    //       type: 'DELETE'
+    //     }).done((json) => {
+    //       console.log("REs", json);
+    //     }).fail(() => {
+    //       this.setState({error: "The project could not be deleted"});
+    //     });
+    // }
+  }
+
   handleTaskSaved(taskInfo){
     this.setUploadState({savedTaskInfo: true});
 
@@ -191,11 +216,17 @@ class ProjectListItem extends React.Component {
     }
   }
 
+  viewMap(){
+    location.href = `/map/?project=${this.props.data.id}`;
+  }
+
   render() {
     return (
       <li className="project-list-item list-group-item"
-         href="javascript:void(0);">
+         href="javascript:void(0);"
+         ref={this.setRef("dropzone")}>
         <div className="row no-margin">
+          <ErrorMessage bind={[this, 'error']} />
           <div className="btn-group pull-right">
             <button type="button" 
                     className={"btn btn-primary btn-sm " + (this.state.upload.uploading ? "hide" : "")} 
@@ -213,14 +244,16 @@ class ProjectListItem extends React.Component {
               Cancel Upload
             </button> 
 
-            <button type="button" className="btn btn-default btn-sm">
-              <i className="fa fa-globe"></i> Map View
+            <button type="button" className="btn btn-default btn-sm" onClick={this.viewMap}>
+              <i className="fa fa-globe"></i> View Map
             </button>
             <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
               <span className="caret"></span>
             </button>
             <ul className="dropdown-menu">
               <li><a href="javascript:alert('TODO!');"><i className="fa fa-cube"></i> 3D View</a></li>
+              <li className="divider"></li>
+              <li><a href="javascript:void(0);" onClick={this.handleDelete}><i className="glyphicon glyphicon-trash"></i> Delete Project</a></li>
             </ul>
           </div>
 
@@ -237,12 +270,8 @@ class ProjectListItem extends React.Component {
             </a>
           </div>
         </div>
+        <i className="drag-drop-icon fa fa-inbox"></i>
         <div className="row">
-          <div className="dropzone" ref={this.setRef("dropzone")}>
-              <div className="dz-default dz-message text-center">
-              </div>
-          </div>
-
           {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
           
           {this.state.upload.error !== "" ? 
@@ -264,7 +293,7 @@ class ProjectListItem extends React.Component {
             <span>Updating task information... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
           : ""}
 
-          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-id`}/> : ""}
+          {this.state.showTaskList ? <TaskList ref={this.setRef("taskList")} source={`/api/projects/${this.props.data.id}/tasks/?ordering=-created_at`}/> : ""}
 
         </div>
       </li>

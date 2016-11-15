@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM)
 
-An open source solution for drone image processing. The long term vision includes a web interface, API and Mission Planner.
+A free, user-friendly, extendable application and API for drone image processing.
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
+
+![Alt text](/screenshots/dashboard.png?raw=true "Dashboard")
 
 If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork, contribute something that interests you, and make a pull request! All ideas are considered and people of all skill levels are welcome.
 
@@ -35,7 +37,16 @@ Linux users can connect to 127.0.0.1.
 
 If you want to run WebODM natively, you will need to install:
  * PostgreSQL (>= 9.5)
- * Python 2.7
+ * PostGIS 2.3
+ * Python 3.5
+
+On Linux, make sure you have:
+
+```
+apt-get install binutils libproj-dev gdal-bin
+```
+
+On Windows use the [OSGeo4W](https://trac.osgeo.org/osgeo4w/) installer to install GDAL.
 
 Then these steps should be sufficient to get you up and running:
 
@@ -48,7 +59,7 @@ Create a `WebODM\webodm\local_settings.py` file containing:
 ```
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'webodm_dev',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
@@ -68,15 +79,27 @@ webpack
 chmod +x start.sh && ./start.sh
 ```
 
+If you are getting a `rt_raster_gdal_warp: Could not create GDAL transformation object for output dataset creation`, make sure that your PostGIS installation has PROJ support:
+
+```
+SELECT PostGIS_Full_Version();
+```
+
+You may also need to set the environment variable PROJSO to the .so or .dll projection library your PostGIS is using. This just needs to have the name of the file. So for example on Windows, you would in Control Panel -> System -> Environment Variables add a system variable called PROJSO and set it to libproj.dll (if you are using proj 4.6.1). You'll have to restart your PostgreSQL service/daemon after this change. [http://postgis.net/docs/manual-2.0/RT_ST_Transform.html](http://postgis.net/docs/manual-2.0/RT_ST_Transform.html)
+
 ## Roadmap
 - [X] User Registration / Authentication
 - [X] UI mockup
-- [ ] Task Processing
-- [ ] Model display (using Cesium/Leaflet) for both 2D and 3D outputs.
+- [X] Task Processing
+- [X] 2D Map Display 
+- [ ] 3D model display
 - [X] Cluster management and setup.
 - [ ] Mission Planner
 - [X] API
 - [ ] Documentation
+- [ ] Android Mobile App
+- [ ] iOS Mobile App
+- [ ] Processing Nodes Volunteer Network
 - [X] Unit Testing
 
 ## Terminology
@@ -90,8 +113,3 @@ chmod +x start.sh && ./start.sh
 ![image](https://cloud.githubusercontent.com/assets/1951843/17680196/9bfe878e-6304-11e6-852e-c09f1e02f3c0.png)
 
 ![er diagram - webodm 2](https://cloud.githubusercontent.com/assets/1951843/17717379/4a227e28-63d3-11e6-9518-6a63cc1bcd3b.png)
-
-
-## Work in progress
-
-We will add more information to this document soon.

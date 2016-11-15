@@ -1,6 +1,7 @@
 from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
+import datetime
 
 from app.models import Project, Task
 from nodeodm.models import ProcessingNode
@@ -37,6 +38,11 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) > 0)
 
+        # Can sort
+        res = client.get('/api/projects/?ordering=-created_at')
+        last_project = Project.objects.filter(owner=user).latest('created_at')
+        self.assertTrue(res.data["results"][0]['id'] == last_project.id)
+
         res = client.get('/api/projects/{}/'.format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -68,7 +74,7 @@ class TestApi(BootTestCase):
 
         # Create some tasks
         task = Task.objects.create(project=project)
-        task2 = Task.objects.create(project=project)
+        task2 = Task.objects.create(project=project, created_at=task.created_at + datetime.timedelta(0, 1))
         other_task = Task.objects.create(project=other_project)
 
         # Can list project tasks to a project we have access to
@@ -77,11 +83,11 @@ class TestApi(BootTestCase):
         self.assertTrue(len(res.data) == 2)
 
         # Can sort
-        res = client.get('/api/projects/{}/tasks/?ordering=id'.format(project.id))
+        res = client.get('/api/projects/{}/tasks/?ordering=created_at'.format(project.id))
         self.assertTrue(res.data[0]['id'] == task.id)
         self.assertTrue(res.data[1]['id'] == task2.id)
 
-        res = client.get('/api/projects/{}/tasks/?ordering=-id'.format(project.id))
+        res = client.get('/api/projects/{}/tasks/?ordering=-created_at'.format(project.id))
         self.assertTrue(res.data[0]['id'] == task2.id)
         self.assertTrue(res.data[1]['id'] == task.id)
 
@@ -155,10 +161,31 @@ class TestApi(BootTestCase):
         self.assertTrue(task.last_error is None)
         self.assertTrue(task.pending_action == task.PendingActions.CANCEL)
 
-        # Cannot cancel a task for which we don't have permission
-        res = client.post('/api/projects/{}/tasks/{}/cancel/'.format(other_project.id, other_task.id))
-        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = client.post('/api/projects/{}/tasks/{}/restart/'.format(project.id, task.id))
+        self.assertTrue(res.data["success"])
+        task.refresh_from_db()
+        self.assertTrue(task.last_error is None)
+        self.assertTrue(task.pending_action == task.PendingActions.RESTART)
 
+        # Cannot cancel, restart or delete a task for which we don't have permission
+        for action in ['cancel', 'remove', 'restart']:
+            res = client.post('/api/projects/{}/tasks/{}/{}/'.format(other_project.id, other_task.id, action))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can delete
+        res = client.post('/api/projects/{}/tasks/{}/remove/'.format(project.id, task.id))
+        self.assertTrue(res.data["success"])
+        task.refresh_from_db()
+        self.assertTrue(task.last_error is None)
+        self.assertTrue(task.pending_action == task.PendingActions.REMOVE)
+
+
+        # TODO test:
+        # - tiles.json requests
+        # - task creation via file upload
+        # - scheduler processing steps
+        # - tiles API urls (permissions, 404s)
+        # - assets download
 
     def test_processingnodes(self):
         client = APIClient()

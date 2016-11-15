@@ -1,0 +1,15 @@
+{% extends "app/logged_in_base.html" %}
+{% load i18n %}
+{% load render_bundle from webpack_loader %}
+
+{% block content %}
+	<h3>{{title}}</h3>
+	
+	<div data-mapview 
+		{% for key, value in params %}
+			data-{{key}}="{{value}}"
+		{% endfor %}
+	></div>
+    {% render_bundle 'main' %}
+
+{% endblock %}

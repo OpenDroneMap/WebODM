@@ -1,7 +1,9 @@
-from __future__ import unicode_literals
+import time, os
 
+from django.contrib.gis.gdal import GDALRaster
 from django.db import models
 from django.db.models import signals
+from django.contrib.gis.db import models as gismodels
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.postgres import fields
@@ -14,13 +16,19 @@ from django.dispatch import receiver
 from nodeodm.exceptions import ProcessingException
 from django.db import transaction
 from nodeodm import status_codes
-import logging
+from webodm import settings
+import logging, zipfile, shutil
 
 logger = logging.getLogger('app.logger')
 
+
+def task_directory_path(taskId, projectId):
+    return 'project/{0}/task/{1}/'.format(projectId, taskId)
+
+
 def assets_directory_path(taskId, projectId, filename):
     # files will be uploaded to MEDIA_ROOT/project/<id>/task/<id>/<filename>
-    return 'project/{0}/task/{1}/{2}'.format(projectId, taskId, filename)
+    return '{0}{1}'.format(task_directory_path(taskId, projectId), filename)
 
 
 class Project(models.Model):
@@ -33,7 +41,7 @@ class Project(models.Model):
         return self.name
 
     def tasks(self, pk=None):
-        return Task.objects.filter(project=self);
+        return Task.objects.filter(project=self).only('id')
 
     class Meta:
         permissions = (
@@ -54,12 +62,14 @@ def project_post_save(sender, instance, created, **kwargs):
 class ProjectUserObjectPermission(UserObjectPermissionBase):
     content_object = models.ForeignKey(Project)
 
+
 class ProjectGroupObjectPermission(GroupObjectPermissionBase):
     content_object = models.ForeignKey(Project)
 
 
 def gcp_directory_path(task, filename):
     return assets_directory_path(task.id, task.project.id, filename)
+
 
 def validate_task_options(value):
     """
@@ -78,7 +88,8 @@ def validate_task_options(value):
 class Task(models.Model):
     class PendingActions:
         CANCEL = 1
-        DELETE = 2
+        REMOVE = 2
+        RESTART = 3
 
     STATUS_CODES = (
         (status_codes.QUEUED, 'QUEUED'),
@@ -90,7 +101,8 @@ class Task(models.Model):
 
     PENDING_ACTIONS = (
         (PendingActions.CANCEL, 'CANCEL'),
-        (PendingActions.DELETE, 'DELETE'),
+        (PendingActions.REMOVE, 'REMOVE'),
+        (PendingActions.RESTART, 'RESTART'),
     )
 
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
@@ -106,7 +118,7 @@ class Task(models.Model):
     ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
     # georeferenced_model
-    # orthophoto
+    orthophoto = gismodels.RasterField(null=True, blank=True, srid=4326, help_text="Orthophoto created by OpenDroneMap")
     # textured_model
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
@@ -119,6 +131,16 @@ class Task(models.Model):
         # Autovalidate on save
         self.full_clean()
         super(Task, self).save(*args, **kwargs)
+
+
+    def assets_path(self, *args):
+        """
+        Get a path relative to the place where assets are stored
+        """
+        return os.path.join(settings.MEDIA_ROOT,
+                            assets_directory_path(self.id, self.project.id, ""),
+                            "assets",
+                            *args)
 
     @staticmethod
     def create_from_images(images, project):
@@ -165,7 +187,7 @@ class Task(models.Model):
                     # TODO: log process has started processing
 
                 except ProcessingException as e:
-                    self.set_failure(e.message)
+                    self.set_failure(str(e))
 
 
         if self.pending_action is not None:
@@ -176,11 +198,62 @@ class Task(models.Model):
                     if self.processing_node and self.uuid:
                         self.processing_node.cancel_task(self.uuid)
                         self.pending_action = None
+                        self.save()
                     else:
-                        raise ProcessingException("Cannot cancel a task that has no processing node or UUID assigned")
+                        raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
+
+                elif self.pending_action == self.PendingActions.RESTART:
+                    logger.info("Restarting task {}".format(self))
+                    if self.processing_node and self.uuid:
+
+                        # Check if the UUID is still valid, as processing nodes purge
+                        # results after a set amount of time, the UUID might have eliminated.
+                        try:
+                            info = self.processing_node.get_task_info(self.uuid)
+                            uuid_still_exists = info['uuid'] == self.uuid
+                        except ProcessingException:
+                            uuid_still_exists = False
+
+                        if uuid_still_exists:
+                            # Good to go
+                            self.processing_node.restart_task(self.uuid)
+                        else:
+                            # Task has been purged (or processing node is offline)
+                            # TODO: what if processing node went offline?
+
+                            # Process this as a new task
+                            # Removing its UUID will cause the scheduler
+                            # to process this the next tick
+                            self.uuid = None
+
+                        self.console_output = ""
+                        self.processing_time = -1
+                        self.status = None
+                        self.last_error = None
+                        self.pending_action = None
+                        self.save()
+                    else:
+                        raise ProcessingException("Cannot restart a task that has no processing node or UUID")
+
+                elif self.pending_action == self.PendingActions.REMOVE:
+                    logger.info("Removing task {}".format(self))
+                    if self.processing_node and self.uuid:
+                        # Attempt to delete the resources on the processing node
+                        # We don't care if this fails, as resources on processing nodes
+                        # Are expected to be purged on their own after a set amount of time anyway
+                        try:
+                            self.processing_node.remove_task(self.uuid)
+                        except ProcessingException:
+                            pass
+
+                    # What's more important is that we delete our task properly here
+                    self.delete()
+
+                    # Stop right here!
+                    return
+
             except ProcessingException as e:
-                self.last_error = e.message
-            finally:
+                self.last_error = str(e)
                 self.save()
 
 
@@ -201,21 +274,57 @@ class Task(models.Model):
                         self.last_error = info["status"]["errorMessage"]
 
                     # Has the task just been canceled, failed, or completed?
-                    # Note that we don't save the status code right away,
-                    # if the assets retrieval fails we want to retry again.
                     if self.status in [status_codes.FAILED, status_codes.COMPLETED, status_codes.CANCELED]:
                         logger.info("Processing status: {} for {}".format(self.status, self))
 
                         if self.status == status_codes.COMPLETED:
-                            # TODO: retrieve assets
-                            pass
+                            try:
+                                assets_dir = self.assets_path("")
+                                if not os.path.exists(assets_dir):
+                                    os.makedirs(assets_dir)
+
+                                # Download all assets
+                                zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
+                                zip_path = os.path.join(assets_dir, "all.zip")
+                                with open(zip_path, 'wb') as fd:
+                                    for chunk in zip_stream.iter_content(4096):
+                                        fd.write(chunk)
+
+                                # Extract from zip
+                                with zipfile.ZipFile(zip_path, "r") as zip_h:
+                                    zip_h.extractall(assets_dir)
+
+                                # Add to database orthophoto
+                                orthophoto_path = self.assets_path("odm_orthophoto", "odm_orthophoto.tif")
+                                if os.path.exists(orthophoto_path):
+                                    self.orthophoto = GDALRaster(orthophoto_path, write=True)
+
+                                self.save()
+                            except ProcessingException as e:
+                                self.set_failure(str(e))
                         else:
+                            # FAILED, CANCELED
                             self.save()
                     else:
                         # Still waiting...
                         self.save()
                 except ProcessingException as e:
-                    self.set_failure(e.message)
+                    self.set_failure(str(e))
+
+    def get_tile_path(self, z, x, y):
+        return self.assets_path("orthophoto_tiles", z, x, "{}.png".format(y))
+
+    def delete(self, using=None, keep_parents=False):
+        directory_to_delete = os.path.join(settings.MEDIA_ROOT,
+                                           task_directory_path(self.id, self.project.id))
+
+        super(Task, self).delete(using, keep_parents)
+
+        # Remove files related to this task
+        try:
+            shutil.rmtree(directory_to_delete)
+        except FileNotFoundError as e:
+            logger.warn(e)
 
 
     def set_failure(self, error_message):
@@ -224,14 +333,16 @@ class Task(models.Model):
         self.status = status_codes.FAILED
         self.save()
 
+
     class Meta:
         permissions = (
             ('view_task', 'Can view task'),
         )
 
 
-def image_directory_path(imageUpload, filename):
-    return assets_directory_path(imageUpload.task.id, imageUpload.task.project.id, filename)
+def image_directory_path(image_upload, filename):
+    return assets_directory_path(image_upload.task.id, image_upload.task.project.id, filename)
+
 
 class ImageUpload(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, help_text="Task this image belongs to")

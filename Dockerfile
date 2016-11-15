@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.5
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -17,9 +17,9 @@ ADD . /webodm/
 RUN git submodule init 
 RUN git submodule update
 
-# Install Node.js + npm requirements for testing node-OpenDroneMap and React
+# Install Node.js + other packages
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
-RUN apt-get install -y nodejs
+RUN apt-get install -y nodejs binutils libproj-dev gdal-bin
 
 WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install

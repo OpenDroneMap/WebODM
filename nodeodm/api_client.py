@@ -6,7 +6,8 @@ import requests
 import mimetypes
 import json
 import os
-from urlparse import urlunparse
+from urllib.parse import urlunparse
+
 
 class ApiClient:
     def __init__(self, host, port):
@@ -34,6 +35,18 @@ class ApiClient:
     def task_cancel(self, uuid):
         return requests.post(self.url('/task/cancel'), data={'uuid': uuid}).json()
 
+    def task_remove(self, uuid):
+        return requests.post(self.url('/task/remove'), data={'uuid': uuid}).json()
+
+    def task_restart(self, uuid):
+        return requests.post(self.url('/task/restart'), data={'uuid': uuid}).json()
+
+    def task_download(self, uuid, asset):
+        res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset), stream=True)
+        if "Content-Type" in res.headers and "application/json" in res.headers['Content-Type']:
+            return res.json()
+        else:
+            return res
 
     def new_task(self, images, name=None, options=[]):
         """
@@ -43,7 +56,6 @@ class ApiClient:
         :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
         :return: UUID or error
         """
-
         files = [('images',
                   (os.path.basename(image), open(image, 'rb'), (mimetypes.guess_type(image)[0] or "image/jpg"))
                  ) for image in images]

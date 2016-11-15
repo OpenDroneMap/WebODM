@@ -1,7 +1,13 @@
+import mimetypes
+import os
+
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
+from rest_framework.views import APIView
 
 from app import models, scheduler
 from nodeodm.models import ProcessingNode
@@ -11,24 +17,40 @@ class TaskIDsSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return obj.id
 
+
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
-    images_count = serializers.IntegerField(
-            source='imageupload_set.count',
-            read_only=True
-        )
+    images_count = serializers.SerializerMethodField()
+
+    def get_images_count(self, obj):
+        return obj.imageupload_set.count()
 
     class Meta:
         model = models.Task
-        exclude = ('processing_lock', 'console_output', )
+        exclude = ('processing_lock', 'console_output', 'orthophoto', )
+
+
+def get_and_check_project(request, project_pk, perms=('view_project',)):
+    '''
+    Retrieves a project and raises an exeption if the current user
+    has no access to it.
+    '''
+    try:
+        project = models.Project.objects.get(pk=project_pk)
+        for perm in perms:
+            if not request.user.has_perm(perm, project): raise ObjectDoesNotExist()
+    except ObjectDoesNotExist:
+        raise exceptions.NotFound()
+    return project
+
 
 class TaskViewSet(viewsets.ViewSet):
     """
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all()
+    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
     
     # We don't use object level permissions on tasks, relying on
     # project's object permissions instead (but standard model permissions still apply)
@@ -36,29 +58,14 @@ class TaskViewSet(viewsets.ViewSet):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
 
-    @staticmethod
-    def get_and_check_project(request, project_pk, perms = ('view_project', )):
-        '''
-        Retrieves a project and raises an exeption if the current user
-        has no access to it.
-        '''
-        try:
-            project = models.Project.objects.get(pk=project_pk)
-            for perm in perms:
-                if not request.user.has_perm(perm, project): raise ObjectDoesNotExist()
-        except ObjectDoesNotExist:
-            raise exceptions.NotFound()
-        return project
-
-    @detail_route(methods=['post'])
-    def cancel(self, request, pk=None, project_pk=None):
-        self.get_and_check_project(request, project_pk, ('change_project',))
+    def set_pending_action(self, pending_action, request, pk=None, project_pk=None, perms=('change_project', )):
+        get_and_check_project(request, project_pk, perms)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
 
-        task.pending_action = task.PendingActions.CANCEL
+        task.pending_action = pending_action
         task.last_error = None
         task.save()
 
@@ -67,6 +74,18 @@ class TaskViewSet(viewsets.ViewSet):
 
         return Response({'success': True})
 
+    @detail_route(methods=['post'])
+    def cancel(self, *args, **kwargs):
+        return self.set_pending_action(models.Task.PendingActions.CANCEL, *args, **kwargs)
+
+    @detail_route(methods=['post'])
+    def restart(self, *args, **kwargs):
+        return self.set_pending_action(models.Task.PendingActions.RESTART, *args, **kwargs)
+
+    @detail_route(methods=['post'])
+    def remove(self, *args, **kwargs):
+        return self.set_pending_action(models.Task.PendingActions.REMOVE, *args, perms=('delete_project', ), **kwargs)
+
     @detail_route(methods=['get'])
     def output(self, request, pk=None, project_pk=None):
         """
@@ -74,7 +93,7 @@ class TaskViewSet(viewsets.ViewSet):
         An optional "line" query param can be passed to retrieve
         only the output starting from a certain line number.
         """
-        self.get_and_check_project(request, project_pk)
+        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -84,15 +103,16 @@ class TaskViewSet(viewsets.ViewSet):
         output = task.console_output or ""
         return Response('\n'.join(output.split('\n')[line_num:]))
 
+
     def list(self, request, project_pk=None):
-        self.get_and_check_project(request, project_pk)
+        get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
         tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, project_pk=None):
-        self.get_and_check_project(request, project_pk)
+        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -102,7 +122,7 @@ class TaskViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request, project_pk=None):
-        project = self.get_and_check_project(request, project_pk, ('change_project', ))
+        project = get_and_check_project(request, project_pk, ('change_project', ))
         
         # MultiValueDict in, flat array of files out
         files = [file for filesList in map(
@@ -117,7 +137,7 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
 
     def update(self, request, pk=None, project_pk=None, partial=False):
-        self.get_and_check_project(request, project_pk, ('change_project', ))
+        get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
@@ -135,3 +155,82 @@ class TaskViewSet(viewsets.ViewSet):
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
+
+
+class TaskNestedView(APIView):
+    queryset = models.Task.objects.all()
+
+    def get_and_check_task(self, request, pk, project_pk, defer=(None, )):
+        get_and_check_project(request, project_pk)
+        try:
+            task = self.queryset.defer(*defer).get(pk=pk, project=project_pk)
+        except ObjectDoesNotExist:
+            raise exceptions.NotFound()
+        return task
+
+
+class TaskTiles(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None, z="", x="", y=""):
+        """
+        Returns a prerendered orthophoto tile for a task
+        """
+        task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
+        tile_path = task.get_tile_path(z, x, y)
+        if os.path.isfile(tile_path):
+            tile = open(tile_path, "rb")
+            return HttpResponse(FileWrapper(tile), content_type="image/png")
+        else:
+            raise exceptions.NotFound()
+
+
+class TaskTilesJson(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Returns a tiles.json file for consumption by a client
+        """
+        task = self.get_and_check_task(request, pk, project_pk)
+        json = {
+            'tilejson': '2.1.0',
+            'name': task.name,
+            'version': '1.0.0',
+            'scheme': 'tms',
+            'tiles': [
+                '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
+            ],
+            'minzoom': 0,
+            'maxzoom': 22,
+            'bounds': task.orthophoto.extent
+        }
+        return Response(json)
+
+
+class TaskAssets(TaskNestedView):
+        def get(self, request, pk=None, project_pk=None, asset=""):
+            """
+            Downloads a task asset (if available)
+            """
+            task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
+
+            allowed_assets = {
+                'all': 'all.zip',
+                'geotiff': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+                'las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply.las'),
+                'ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
+                'csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv')
+            }
+
+            if asset in allowed_assets:
+                asset_path = task.assets_path(allowed_assets[asset])
+
+                if not os.path.exists(asset_path):
+                    raise exceptions.NotFound("Asset does not exist")
+
+                asset_filename = os.path.basename(asset_path)
+
+                file = open(asset_path, "rb")
+                response = HttpResponse(FileWrapper(file),
+                                        content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
+                response['Content-Disposition'] = "attachment; filename={}".format(asset_filename)
+                return response
+            else:
+                raise exceptions.NotFound()

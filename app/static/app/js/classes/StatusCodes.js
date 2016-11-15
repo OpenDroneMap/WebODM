@@ -15,7 +15,7 @@ let statusCodes = {
     },
     [FAILED]: {
         descr: "Failed",
-        icon: "fa fa-remove"
+        icon: "fa fa-frown-o"
     },
     [COMPLETED]: {
         descr: "Completed",

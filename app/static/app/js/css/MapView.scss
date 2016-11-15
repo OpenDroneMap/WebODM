@@ -1,0 +1,15 @@
+.map-view{
+    height: 500px;
+
+    input[type="range"]{
+        margin-left: 4px;
+        display: inline-block;
+        width: auto;
+        position: relative;
+        top: 6px;
+    }
+
+    .controls{
+        margin-top: 8px;
+    }
+}

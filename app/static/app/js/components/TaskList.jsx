@@ -13,6 +13,8 @@ class TaskList extends React.Component {
     };
 
     this.refresh = this.refresh.bind(this);
+    this.retry = this.retry.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
   }
 
   componentDidMount(){
@@ -21,6 +23,11 @@ class TaskList extends React.Component {
 
   refresh(){
     this.loadTaskList();
+  }
+
+  retry(){
+    this.setState({error: "", loading: true});
+    this.refresh();
   }
 
   loadTaskList(){
@@ -32,7 +39,7 @@ class TaskList extends React.Component {
         })
         .fail((jqXHR, textStatus, errorThrown) => {
           this.setState({ 
-              error: `Could not load projects list: ${textStatus}`,
+              error: `Could not load task list: ${textStatus}`,
           });
         })
         .always(() => {
@@ -46,12 +53,18 @@ class TaskList extends React.Component {
     this.taskListRequest.abort();
   }
 
+  deleteTask(id){
+    this.setState({
+      tasks: this.state.tasks.filter(t => t.id !== id)
+    });
+  }
+
   render() {
     let message = "";
     if (this.state.loading){
       message = (<span>Loading... <i className="fa fa-refresh fa-spin fa-fw"></i></span>);
     }else if (this.state.error){
-      message = (<span>Could not get tasks: {this.state.error}. <a href="javascript:void(0);" onClick={this.refresh}>Try again</a></span>);
+      message = (<span>Error: {this.state.error}. <a href="javascript:void(0);" onClick={this.retry}>Try again</a></span>);
     }else if (this.state.tasks.length === 0){
       message = (<span>This project has no tasks. Create one by uploading some images!</span>);
     }
@@ -61,7 +74,7 @@ class TaskList extends React.Component {
         {message}
 
         {this.state.tasks.map(task => (
-          <TaskListItem data={task} key={task.id} refreshInterval={3000} />
+          <TaskListItem data={task} key={task.id} refreshInterval={3000} onDelete={this.deleteTask} />
         ))}
       </div>
     );

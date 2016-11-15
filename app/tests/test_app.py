@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User, Group
-from django.contrib import messages
 from django.test import Client
 
 from app.models import Project, Task
@@ -84,6 +83,9 @@ class TestApp(BootTestCase):
 
         res = c.get('/processingnode/abc/')
         self.assertTrue(res.status_code == 404)
+
+        # TODO:
+        # - test /map/ urls
 
     def test_default_group(self):
         # It exists

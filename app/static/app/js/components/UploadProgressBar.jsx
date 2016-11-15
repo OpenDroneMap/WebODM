@@ -16,7 +16,6 @@ class UploadProgressBar extends React.Component {
     let percentage = (this.props.progress !== undefined ? 
                      this.props.progress : 
                      0).toFixed(2);
-
     let bytes = this.props.totalBytesSent !== undefined && this.props.totalBytes !== undefined ? 
               `, remaining to upload: ${this.bytesToSize(this.props.totalBytes - this.props.totalBytesSent)}` : 
                "";
