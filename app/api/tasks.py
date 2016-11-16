@@ -1,7 +1,10 @@
 import mimetypes
 import os
 
+from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models.functions import Envelope
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.functions import Cast
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
@@ -145,12 +148,12 @@ class TaskViewSet(viewsets.ViewSet):
 
 
 class TaskNestedView(APIView):
-    queryset = models.Task.objects.all()
+    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
 
-    def get_and_check_task(self, request, pk, project_pk, defer=(None, )):
+    def get_and_check_task(self, request, pk, project_pk, annotate={}):
         get_and_check_project(request, project_pk)
         try:
-            task = self.queryset.defer(*defer).get(pk=pk, project=project_pk)
+            task = self.queryset.annotate(**annotate).get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
         return task
@@ -161,7 +164,7 @@ class TaskTiles(TaskNestedView):
         """
         Returns a prerendered orthophoto tile for a task
         """
-        task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
+        task = self.get_and_check_task(request, pk, project_pk)
         tile_path = task.get_tile_path(z, x, y)
         if os.path.isfile(tile_path):
             tile = open(tile_path, "rb")
@@ -175,10 +178,12 @@ class TaskTilesJson(TaskNestedView):
         """
         Returns a tiles.json file for consumption by a client
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk, project_pk, annotate={
+                'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))
+            })
         json = get_tiles_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
-            ], task.orthophoto.extent)
+            ], task.orthophoto_area.extent)
         return Response(json)
 
 
@@ -187,7 +192,7 @@ class TaskAssets(TaskNestedView):
             """
             Downloads a task asset (if available)
             """
-            task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
+            task = self.get_and_check_task(request, pk, project_pk)
 
             allowed_assets = {
                 'all': 'all.zip',

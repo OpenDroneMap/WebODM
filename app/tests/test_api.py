@@ -197,7 +197,6 @@ class TestApi(BootTestCase):
         # - tiles API urls (permissions, 404s)
         # - assets download
         # - project deletion
-        # - project tiles API urls
 
     def test_processingnodes(self):
         client = APIClient()

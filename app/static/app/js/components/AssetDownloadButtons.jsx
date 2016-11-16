@@ -4,12 +4,14 @@ import '../css/AssetDownloadButtons.scss';
 class AssetDownloadButtons extends React.Component {
     static defaultProps = {
         disabled: false,
+        direction: "down", // or "up"
         task: null
     };
 
     static propTypes = {
         disabled: React.PropTypes.bool,
-        task: React.PropTypes.object.isRequired
+        task: React.PropTypes.object.isRequired,
+        direction: React.PropTypes.string
     };
 
     constructor(props){
@@ -26,7 +28,7 @@ class AssetDownloadButtons extends React.Component {
     }
 
     render(){
-        return (<div className="asset-download-buttons btn-group">
+        return (<div className={"asset-download-buttons btn-group " + (this.props.direction === "up" ? "dropup" : "")}>
           <button type="button" className="btn btn-sm btn-primary" disabled={this.props.disabled} data-toggle="dropdown">
             <i className="glyphicon glyphicon-download"></i> Download Assets
           </button>
