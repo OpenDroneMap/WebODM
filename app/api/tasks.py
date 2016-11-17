@@ -37,6 +37,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
 class TaskViewSet(viewsets.ViewSet):
     """
+    Task get/add/delete/update
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
@@ -162,7 +163,7 @@ class TaskNestedView(APIView):
 class TaskTiles(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, z="", x="", y=""):
         """
-        Returns a prerendered orthophoto tile for a task
+        Get an orthophoto tile
         """
         task = self.get_and_check_task(request, pk, project_pk)
         tile_path = task.get_tile_path(z, x, y)
@@ -176,7 +177,7 @@ class TaskTiles(TaskNestedView):
 class TaskTilesJson(TaskNestedView):
     def get(self, request, pk=None, project_pk=None):
         """
-        Returns a tiles.json file for consumption by a client
+        Get tiles.json for this tasks's orthophoto
         """
         task = self.get_and_check_task(request, pk, project_pk, annotate={
                 'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))

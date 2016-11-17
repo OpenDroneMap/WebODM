@@ -1,3 +1,5 @@
+from guardian.shortcuts import assign_perm
+
 from app import pending_actions
 from .classes import BootTestCase
 from rest_framework.test import APIClient
@@ -206,6 +208,11 @@ class TestApi(BootTestCase):
                 port=999
             )
 
+        another_pnode = ProcessingNode.objects.create(
+            hostname="localhost",
+            port=998
+        )
+
         # Cannot list processing nodes as guest
         res = client.get('/api/processingnodes/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -215,7 +222,19 @@ class TestApi(BootTestCase):
 
         client.login(username="testuser", password="test1234")
 
-        # Can list processing nodes as normal user
+        # Cannot list processing nodes, unless permissions have been granted
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 0)
+
+        user = User.objects.get(username="testuser")
+        self.assertFalse(user.is_staff)
+        self.assertFalse(user.is_superuser)
+        self.assertFalse(user.has_perm('view_processingnode', pnode))
+        assign_perm('view_processingnode', user, pnode)
+        self.assertTrue(user.has_perm('view_processingnode', pnode))
+
+        # Now we can list processing nodes as normal user
         res = client.get('/api/processingnodes/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
@@ -225,6 +244,10 @@ class TestApi(BootTestCase):
         res = client.get('/api/processingnodes/?id={}'.format(pnode.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
+
+        res = client.get('/api/processingnodes/?id={}'.format(another_pnode.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 0)
 
         # Can filter nodes with valid options
         res = client.get('/api/processingnodes/?has_available_options=true')
@@ -264,6 +287,6 @@ class TestApi(BootTestCase):
         # Verify node has been created
         res = client.get('/api/processingnodes/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(res.data) == 1)
-        self.assertTrue(res.data[0]["port"] == 1000)
+        self.assertTrue(len(res.data) == 2)
+        self.assertTrue(res.data[1]["port"] == 1000)
 

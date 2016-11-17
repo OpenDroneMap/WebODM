@@ -28,14 +28,11 @@ class ProcessingNodeFilter(FilterSet):
 
 class ProcessingNodeViewSet(viewsets.ModelViewSet):
     """
-    Processing nodes available. Processing nodes are associated with 
-    zero or more tasks and take care of processing input images.
+    Processing node get/add/delete/update
+    Processing nodes are associated with zero or more tasks and
+    take care of processing input images.
     """
 
-    # Don't need a "view node" permission. If you are logged-in, you can view nodes.
-    permission_classes = (DjangoModelPermissions, )
-
-    filter_backends = (DjangoFilterBackend, )
     filter_class = ProcessingNodeFilter
 
     pagination_class = None

@@ -1,12 +1,16 @@
 import React from 'react';
 import '../css/Map.scss';
-//import 'leaflet.css';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-basemaps/L.Control.Basemaps.css';
 import Leaflet from 'leaflet';
-import 'leaflet-basemaps/L.Control.Basemaps';
+import 'leaflet-measure/dist/leaflet-measure.css';
+import 'leaflet-measure/dist/leaflet-measure';
+import '../vendor/leaflet/L.Control.MousePosition.css';
+import '../vendor/leaflet/L.Control.MousePosition';
+import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
+import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
+import AssetDownloads from '../classes/AssetDownloads';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -28,82 +32,124 @@ class Map extends React.Component {
     super(props);
     
     this.state = {
-      error: "",
-      bounds: null
+      error: ""
     };
 
     this.imageryLayers = [];
+    this.basemaps = {};
+    this.mapBounds = null;
   }
 
   componentDidMount() {
     const { showBackground, tiles } = this.props;
+    const assets = AssetDownloads.excludeSeparators();
 
-    this.leaflet = Leaflet.map(this.container, {
-      scrollWheelZoom: true
+    this.map = Leaflet.map(this.container, {
+      scrollWheelZoom: true,
+      measureControl: true,
+      positionControl: true
     });
 
     if (showBackground) {
-      const basemaps = [
-        L.tileLayer('//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+      this.basemaps = {
+        "Google Maps Hybrid": L.tileLayer('//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
             attribution: 'Map data: &copy; Google Maps',
             subdomains: ['mt0','mt1','mt2','mt3'],
             maxZoom: 22,
             minZoom: 0,
             label: 'Google Maps Hybrid'
-        }),
-        L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        }).addTo(this.map),
+        "ESRI Satellite": L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
             maxZoom: 22,
             minZoom: 0,
             label: 'ESRI Satellite'  // optional label used for tooltip
         }),
-        L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        "OSM Mapnik": L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             maxZoom: 22,
             minZoom: 0,
             label: 'OSM Mapnik'  // optional label used for tooltip
         })
-      ];
-
-      this.leaflet.addControl(Leaflet.control.basemaps({
-          basemaps: basemaps,
-          tileX: 0,  // tile X coordinate
-          tileY: 0,  // tile Y coordinate
-          tileZ: 1   // tile zoom level
-      }));
+      };
     }
 
-    this.leaflet.fitWorld();
+    this.map.fitWorld();
 
     Leaflet.control.scale({
       maxWidth: 250,
-    }).addTo(this.leaflet);
-    this.leaflet.attributionControl.setPrefix("");
+    }).addTo(this.map);
+    this.map.attributionControl.setPrefix("");
 
     this.tileJsonRequests = [];
+
+    let tilesLoaded = 0;
 
     tiles.forEach(tile => {
       const { url, meta } = tile;
 
       this.tileJsonRequests.push($.getJSON(url)
           .done(info => {
-            const bounds = [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()];
-
+            const bounds = Leaflet.latLngBounds(
+                [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()]
+              );
             const layer = Leaflet.tileLayer(info.tiles[0], {
-              bounds,
-              minZoom: info.minzoom,
-              maxZoom: info.maxzoom,
-              tms: info.scheme === 'tms'
-            }).addTo(this.leaflet);
+                  bounds,
+                  minZoom: info.minzoom,
+                  maxZoom: info.maxzoom,
+                  tms: info.scheme === 'tms'
+                }).addTo(this.map);
+
+            // For some reason, getLatLng is not defined for tileLayer?
+            layer.getLatLng = function(){
+              return this.options.bounds.getCenter();
+            };
+            layer.bindPopup(`<div class="title">${info.name}</div>
+              <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
+              <ul class="asset-links">
+                ${assets.map(asset => {
+                    return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
+                }).join("")}
+              </ul>
+            `);
 
             // Associate metadata with this layer
+            meta.name = info.name;
             layer[Symbol.for("meta")] = meta;
 
             this.imageryLayers.push(layer);
 
-            let mapBounds = this.state.bounds || Leaflet.latLngBounds(bounds);
+            let mapBounds = this.mapBounds || Leaflet.latLngBounds();
             mapBounds.extend(bounds);
-            this.setState({bounds: mapBounds});
+            this.mapBounds = mapBounds;
+
+            // Done loading all tiles?
+            if (++tilesLoaded === tiles.length){
+              this.map.fitBounds(mapBounds);
+
+              // Add basemaps / layers control
+              let overlays = {};
+              this.imageryLayers.forEach(layer => {
+                  const meta = layer[Symbol.for("meta")];
+                  overlays[meta.name] = layer;
+                });
+
+              Leaflet.control.autolayers({
+                overlays: overlays,
+                selectedOverlays: [],
+                baseLayers: this.basemaps
+              }).addTo(this.map);
+
+              this.map.on('click', e => {
+                // Find first tile layer at the selected coordinates 
+                for (let layer of this.imageryLayers){
+                  if (layer._map && layer.options.bounds.contains(e.latlng)){
+                    layer.openPopup();
+                    break;
+                  }
+                }
+              });
+            }
           })
           .fail((_, __, err) => this.setState({error: err.message}))
         );
@@ -111,17 +157,13 @@ class Map extends React.Component {
   }
 
   componentDidUpdate() {
-    const { bounds } = this.state;
-
-    if (bounds) this.leaflet.fitBounds(bounds);
-    
     this.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.props.opacity / 100);
     });
   }
 
   componentWillUnmount() {
-    this.leaflet.remove();
+    this.map.remove();
 
     if (this.tileJsonRequests) {
       this.tileJsonRequests.forEach(tileJsonRequest => this.tileJsonRequest.abort());
@@ -131,7 +173,7 @@ class Map extends React.Component {
 
   render() {
     return (
-      <div style={{height: "100%"}}>
+      <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div 
           style={{height: "100%"}}

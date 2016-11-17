@@ -35,7 +35,7 @@ class MapView extends React.Component {
         <Map tiles={this.props.tiles} showBackground={true} opacity={opacity}/>
         <div className="row controls">
           <div className="col-md-12 text-right">
-            Orthophoto opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
+            Orthophotos opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
           </div>
         </div>
       </div>);

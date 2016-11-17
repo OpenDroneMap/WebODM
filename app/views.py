@@ -38,7 +38,7 @@ def map(request, project_pk=None, task_pk=None):
             raise Http404()
         
         if task_pk is not None:
-            tassek = get_object_or_404(Task.objects.defer('orthophoto'), pk=task_pk, project=project)
+            task = get_object_or_404(Task.objects.defer('orthophoto'), pk=task_pk, project=project)
             title = task.name
             tiles = [task.get_tiles_json_data()]
         else:

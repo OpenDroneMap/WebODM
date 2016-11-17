@@ -4,6 +4,9 @@ from django.db import models
 from django.contrib.postgres import fields
 from django.utils import timezone
 from django.dispatch import receiver
+from guardian.models import GroupObjectPermissionBase
+from guardian.models import UserObjectPermissionBase
+
 from .api_client import ApiClient
 import json
 from django.db.models import signals
@@ -169,8 +172,21 @@ class ProcessingNode(models.Model):
         else:
             raise ProcessingException("Unknown response: {}".format(result))
 
+    class Meta:
+        permissions = (
+            ('view_processingnode', 'Can view processing node'),
+        )
+
+
 # First time a processing node is created, automatically try to update
 @receiver(signals.post_save, sender=ProcessingNode, dispatch_uid="update_processing_node_info")
 def auto_update_node_info(sender, instance, created, **kwargs):
     if created:
         instance.update_node_info()
+
+
+class ProcessingNodeUserObjectPermission(UserObjectPermissionBase):
+    content_object = models.ForeignKey(ProcessingNode)
+
+class ProcessingNodeGroupObjectPermission(GroupObjectPermissionBase):
+        content_object = models.ForeignKey(ProcessingNode)
