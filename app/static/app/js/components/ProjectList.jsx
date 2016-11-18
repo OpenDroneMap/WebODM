@@ -2,8 +2,10 @@ import React from 'react';
 import $ from 'jquery';
 
 import ProjectListItem from './ProjectListItem';
+import Paginated from './Paginated';
+import Paginator from './Paginator';
 
-class ProjectList extends React.Component {
+class ProjectList extends Paginated {
     constructor(){
         super();
 
@@ -29,6 +31,7 @@ class ProjectList extends React.Component {
                         projects: json.results,
                         loading: false
                     });
+                    this.setupPagination(10, json.count);
                 }else{
                     this.setState({ 
                         error: `Invalid JSON response: ${JSON.stringify(json)}`,
@@ -59,11 +62,14 @@ class ProjectList extends React.Component {
             return (<div>Loading projects... <i className="fa fa-refresh fa-spin fa-fw"></i></div>);
         }
         else if (this.state.projects){
-            return (<ul className="list-group">
+            return (
+              <Paginator className="text-right" {...this.state.pagination}>
+                <ul className="list-group">
                     {this.state.projects.map(p => (
                         <ProjectListItem key={p.id} data={p} onDelete={this.handleDelete} /> 
                     ))}
-                </ul>);
+                </ul>
+            </Paginator>);
         }else if (this.state.error){
             return (<div>An error occurred: {this.state.error}</div>);
         }else{

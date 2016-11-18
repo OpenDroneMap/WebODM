@@ -42,12 +42,13 @@ class Dashboard extends React.Component {
               Add Project
             </button>
           </div>
+
           <EditProjectDialog 
             saveAction={this.addNewProject}
             ref={(domNode) => { this.projectDialog = domNode; }}
             />
           <ProjectList 
-            source="/api/projects/?ordering=-created_at"
+            source="/api/projects/?ordering=-created_at&page=1"
             ref={(domNode) => { this.projectList = domNode; }} />
         </div>
     );
