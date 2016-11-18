@@ -6,8 +6,8 @@ from apscheduler.schedulers import SchedulerAlreadyRunningError, SchedulerNotRun
 from threading import Thread, Lock
 from multiprocessing.dummy import Pool as ThreadPool 
 from nodeodm.models import ProcessingNode
-from app.models import Task
-from django.db.models import Q
+from app.models import Task, Project
+from django.db.models import Q, Count
 from django import db
 from nodeodm import status_codes
 import random
@@ -95,12 +95,23 @@ def process_pending_tasks():
         pool.close()
         pool.join()
 
+
+def cleanup_projects():
+    # Delete all projects that are marked for deletion
+    # and that have no tasks left
+    total, count_dict = Project.objects.filter(deleting=True).annotate(
+                    tasks_count=Count('task')
+                ).filter(tasks_count=0).delete()
+    if total > 0 and 'app.Project' in count_dict:
+        logger.info("Deleted {} projects".format(count_dict['app.Project']))
+
 def setup():
     logger.info("Starting background scheduler...")
     try:
         scheduler.start()
         scheduler.add_job(update_nodes_info, 'interval', seconds=30)
         scheduler.add_job(process_pending_tasks, 'interval', seconds=5)
+        scheduler.add_job(cleanup_projects, 'interval', seconds=15)
     except SchedulerAlreadyRunningError:
         logger.warn("Scheduler already running (this is OK while testing)")
 

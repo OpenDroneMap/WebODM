@@ -21,6 +21,9 @@ def boot():
             default_group.permissions.add(
                     *list(Permission.objects.filter(codename__endswith=permission))
                 )
+
+        # Add permission to view processing nodes
+        default_group.permissions.add(Permission.objects.get(codename="view_processingnode"))
         
         # Check super user
         if User.objects.filter(is_superuser=True).count() == 0:

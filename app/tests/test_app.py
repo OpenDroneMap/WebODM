@@ -150,3 +150,5 @@ class TestApp(BootTestCase):
         self.assertTrue(scheduler.update_nodes_info(background=True).join() is None)
 
         self.assertTrue(scheduler.teardown() is None)
+
+

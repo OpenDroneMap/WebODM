@@ -1,3 +1,5 @@
+import json
+
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
@@ -28,23 +30,25 @@ def dashboard(request):
 @login_required
 def map(request, project_pk=None, task_pk=None):
     title = _("Map")
+    tiles = []
 
-    if project_pk != '':
+    if project_pk is not None:
         project = get_object_or_404(Project, pk=project_pk)
         if not request.user.has_perm('projects.view_project', project):
             raise Http404()
         
-        if task_pk != '':
-            task = get_object_or_404(Task, pk=task_pk, project=project)
+        if task_pk is not None:
+            task = get_object_or_404(Task.objects.defer('orthophoto'), pk=task_pk, project=project)
             title = task.name
+            tiles = [task.get_tiles_json_data()]
         else:
             title = project.name
+            tiles = project.get_tiles_json_data()
 
     return render(request, 'app/map.html', {
             'title': title,
             'params': {
-                'task': task_pk,
-                'project': project_pk
+                'tiles': json.dumps(tiles)
             }.items()
         })
 

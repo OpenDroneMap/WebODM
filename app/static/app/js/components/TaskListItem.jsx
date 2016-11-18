@@ -222,7 +222,9 @@ class TaskListItem extends React.Component {
       const disabled = this.state.actionButtonsDisabled || !!task.pending_action;
 
       actionButtons = (<div className="action-buttons">
-            <AssetDownloadButtons task={this.state.task} disabled={disabled} />
+            {task.status === statusCodes.COMPLETED ? 
+              <AssetDownloadButtons task={this.state.task} disabled={disabled} />
+            : ""}
             {actionButtons.map(button => {
               return (
                   <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>

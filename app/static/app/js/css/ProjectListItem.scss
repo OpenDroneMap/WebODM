@@ -31,6 +31,13 @@
         100% {opacity: 0.5;}
     }
 
+    &.refreshing{
+        background-color: #eee;
+    }
+
+     -webkit-transition: background-color 1s ease;
+    transition: background-color 1s ease;
+
     &.dz-drag-hover{
         .drag-drop-icon{
             display: block;
@@ -44,7 +51,7 @@
             margin-right: 4px;
         }
         a{
-            margin-right: 8px;
+            margin-right: 12px;
         }
     }
     

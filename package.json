@@ -30,7 +30,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
     "leaflet": "^1.0.1",
-    "leaflet-basemaps": "^0.1.1",
+    "leaflet-measure": "^2.0.5",
     "node-sass": "^3.10.1",
     "object.values": "^1.0.3",
     "react": "^15.3.2",

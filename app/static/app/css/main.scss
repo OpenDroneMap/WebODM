@@ -1,3 +1,7 @@
+html{
+    height: 100%;
+}
+
 #navbar-top{
     height: 50px;
     min-height: 50px;
@@ -84,6 +88,10 @@ ul#side-menu.nav{
 
 .alert{
     margin-bottom: 10px;
+}
+
+.modal-dialog{
+    z-index: 999999;
 }
 
 table.table-first-col-bold{

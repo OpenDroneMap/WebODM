@@ -1,19 +1,19 @@
 import React from 'react';
 import '../css/AssetDownloadButtons.scss';
+import AssetDownloads from '../classes/AssetDownloads';
 
 class AssetDownloadButtons extends React.Component {
     static defaultProps = {
         disabled: false,
+        direction: "down", // or "up"
         task: null
-    }
+    };
 
-    static propTypes() {
-        return {
-            disabled: React.PropTypes.boolean,
-            task: React.PropTypes.object.isRequired
-        };
-    }
-
+    static propTypes = {
+        disabled: React.PropTypes.bool,
+        task: React.PropTypes.object.isRequired,
+        direction: React.PropTypes.string
+    };
 
     constructor(props){
         super();
@@ -21,15 +21,18 @@ class AssetDownloadButtons extends React.Component {
         this.downloadAsset = this.downloadAsset.bind(this);
     }
 
-    downloadAsset(type){
+    downloadAsset(asset){
         return (e) => {
             e.preventDefault();
-            location.href = `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/download/${type}/`;
+            location.href = asset.downloadUrl(this.props.task.project, this.props.task.id)
         };
     }
 
     render(){
-        return (<div className="asset-download-buttons btn-group">
+        const assetDownloads = AssetDownloads.all();
+        let i = 0;
+
+        return (<div className={"asset-download-buttons btn-group " + (this.props.direction === "up" ? "dropup" : "")}>
           <button type="button" className="btn btn-sm btn-primary" disabled={this.props.disabled} data-toggle="dropdown">
             <i className="glyphicon glyphicon-download"></i> Download Assets
           </button>
@@ -37,12 +40,15 @@ class AssetDownloadButtons extends React.Component {
                 <span className="caret"></span>
           </button>
           <ul className="dropdown-menu">
-            <li><a href="javascript:void(0);" onClick={this.downloadAsset("geotiff")}><i className="fa fa-map-o"></i> GeoTIFF</a></li>
-            <li><a href="javascript:void(0);" onClick={this.downloadAsset("las")}><i className="fa fa-cube"></i> LAS</a></li>
-            <li><a href="javascript:void(0);" onClick={this.downloadAsset("ply")}><i className="fa fa-cube"></i> PLY</a></li>
-            <li><a href="javascript:void(0);" onClick={this.downloadAsset("ply")}><i className="fa fa-cube"></i> CSV</a></li>
-            <li className="divider"></li>
-            <li><a href="javascript:void(0);" onClick={this.downloadAsset("all")}><i className="fa fa-file-archive-o"></i> All Assets</a></li>
+            {assetDownloads.map(asset => {
+                if (!asset.separator){
+                    return (<li key={i++}>
+                            <a href="javascript:void(0);" onClick={this.downloadAsset(asset)}><i className={asset.icon}></i> {asset.label}</a>
+                        </li>);
+                }else{
+                    return (<li key={i++} className="divider"></li>);
+                }
+            })}
           </ul>
         </div>);
     }
