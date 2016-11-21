@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/OpenDroneMap/WebODM#readme",
   "dependencies": {
+    "async": "^2.1.2",
     "babel-core": "^6.17.0",
     "babel-loader": "^6.2.5",
     "babel-plugin-syntax-class-properties": "^6.13.0",
@@ -30,7 +31,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
     "leaflet": "^1.0.1",
-    "leaflet-basemaps": "^0.1.1",
+    "leaflet-measure": "^2.0.5",
     "node-sass": "^3.10.1",
     "object.values": "^1.0.3",
     "react": "^15.3.2",

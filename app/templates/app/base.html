@@ -25,6 +25,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/bundles/css/main.css' %}" />
     <script src="{% static 'app/js/vendor/modernizr-2.8.3.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle 'main' %}
     <title>{{title|default:"Login"}} - WebODM</title>
 </head>
 <body data-admin-utc-offset="{% now "Z" %}">
@@ -68,7 +70,6 @@
         {% block page-wrapper %}{% endblock %}
     </div>
 </body>
-<script src="{% static 'app/js/vendor/bootstrap.min.js' %}"></script>
 <script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
 <script>
 $(function(){
@@ -110,4 +111,5 @@ $(function(){
 });
 
 </script>
+<script src="{% static 'app/js/vendor/bootstrap.min.js' %}"></script>
 </html>

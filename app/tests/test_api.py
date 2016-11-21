@@ -1,3 +1,6 @@
+from guardian.shortcuts import assign_perm
+
+from app import pending_actions
 from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -53,7 +56,7 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Can filter
-        res = client.get('/api/projects/?owner=999')
+        res = client.get('/api/projects/?name=999')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) == 0)
 
@@ -70,6 +73,15 @@ class TestApi(BootTestCase):
         # Cannot access project for which we have no access to
         res = client.get('/api/projects/{}/'.format(other_project.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can create project, but owner cannot be set
+        res = client.post('/api/projects/', {'name': 'test', 'description': 'test descr'})
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Project.objects.get(pk=res.data['id']).owner.id == user.id)
+
+        # Cannot leave name empty
+        res = client.post('/api/projects/', {'description': 'test descr'})
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
         # Create some tasks
@@ -159,13 +171,13 @@ class TestApi(BootTestCase):
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == task.PendingActions.CANCEL)
+        self.assertTrue(task.pending_action == pending_actions.CANCEL)
 
         res = client.post('/api/projects/{}/tasks/{}/restart/'.format(project.id, task.id))
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == task.PendingActions.RESTART)
+        self.assertTrue(task.pending_action == pending_actions.RESTART)
 
         # Cannot cancel, restart or delete a task for which we don't have permission
         for action in ['cancel', 'remove', 'restart']:
@@ -177,7 +189,7 @@ class TestApi(BootTestCase):
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == task.PendingActions.REMOVE)
+        self.assertTrue(task.pending_action == pending_actions.REMOVE)
 
 
         # TODO test:
@@ -186,6 +198,7 @@ class TestApi(BootTestCase):
         # - scheduler processing steps
         # - tiles API urls (permissions, 404s)
         # - assets download
+        # - project deletion
 
     def test_processingnodes(self):
         client = APIClient()
@@ -194,6 +207,11 @@ class TestApi(BootTestCase):
                 hostname="localhost",
                 port=999
             )
+
+        another_pnode = ProcessingNode.objects.create(
+            hostname="localhost",
+            port=998
+        )
 
         # Cannot list processing nodes as guest
         res = client.get('/api/processingnodes/')
@@ -204,7 +222,19 @@ class TestApi(BootTestCase):
 
         client.login(username="testuser", password="test1234")
 
-        # Can list processing nodes as normal user
+        # Cannot list processing nodes, unless permissions have been granted
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 0)
+
+        user = User.objects.get(username="testuser")
+        self.assertFalse(user.is_staff)
+        self.assertFalse(user.is_superuser)
+        self.assertFalse(user.has_perm('view_processingnode', pnode))
+        assign_perm('view_processingnode', user, pnode)
+        self.assertTrue(user.has_perm('view_processingnode', pnode))
+
+        # Now we can list processing nodes as normal user
         res = client.get('/api/processingnodes/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
@@ -214,6 +244,10 @@ class TestApi(BootTestCase):
         res = client.get('/api/processingnodes/?id={}'.format(pnode.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 1)
+
+        res = client.get('/api/processingnodes/?id={}'.format(another_pnode.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 0)
 
         # Can filter nodes with valid options
         res = client.get('/api/processingnodes/?has_available_options=true')
@@ -253,6 +287,6 @@ class TestApi(BootTestCase):
         # Verify node has been created
         res = client.get('/api/processingnodes/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(res.data) == 1)
-        self.assertTrue(res.data[0]["port"] == 1000)
+        self.assertTrue(len(res.data) == 2)
+        self.assertTrue(res.data[1]["port"] == 1000)
 

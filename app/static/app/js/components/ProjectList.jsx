@@ -12,9 +12,15 @@ class ProjectList extends React.Component {
             error: "",
             projects: null
         }
+
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount(){
+        this.refresh();
+    }
+
+    refresh(){
         // Load projects from API
         this.serverRequest = 
             $.getJSON(this.props.source, json => {
@@ -36,10 +42,16 @@ class ProjectList extends React.Component {
                     loading: false
                 });
             });
+
     }
 
     componentWillUnmount(){
         this.serverRequest.abort();
+    }
+
+    handleDelete(projectId){
+        let projects = this.state.projects.filter(p => p.id !== projectId);
+        this.setState({projects: projects});
     }
 
     render() {
@@ -49,7 +61,7 @@ class ProjectList extends React.Component {
         else if (this.state.projects){
             return (<ul className="list-group">
                     {this.state.projects.map(p => (
-                        <ProjectListItem key={p.id} data={p} /> 
+                        <ProjectListItem key={p.id} data={p} onDelete={this.handleDelete} /> 
                     ))}
                 </ul>);
         }else if (this.state.error){

@@ -1,6 +1,5 @@
 {% extends "app/logged_in_base.html" %}
 {% load i18n tz %}
-{% load render_bundle from webpack_loader %}
 
 {% block content %}
 <h3>Processing Node</h3>
@@ -36,7 +35,5 @@
 	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><i class="glyphicon glyphicon-trash"></i> {% trans "Delete" %}</button>
 </div>
 {% endif %}
-
-{% render_bundle 'main' %}
 
 {% endblock %}

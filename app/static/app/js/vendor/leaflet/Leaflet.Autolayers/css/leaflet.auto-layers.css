@@ -1,0 +1,182 @@
+.leaflet-control-autolayers-title {
+    cursor: pointer;
+}
+
+.leaflet-control-autolayers-close {
+    display: inline-block;
+    background-image: url(../images/close.png);
+    height: 18px;
+    width: 18px;
+    margin-right: 0;
+    float: right;
+    vertical-align: middle;
+    text-align: right;
+    margin-top: 1px;
+}
+
+.leaflet-control-autolayers-title {
+    display: inline-block !important;
+    width: 90%;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.leaflet-control-layers-base {
+    padding-bottom: 1px;
+    width: 340px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 220px;
+    display: none;
+}
+
+.leaflet-control-layers-base label {
+    height: 24px;
+    margin: 0;
+    min-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.leaflet-control-layers-base label:hover {
+    background-color: #CCC;
+}
+
+.leaflet-control-layers-overlays {
+    padding-bottom: 1px;
+    padding-top: 6px;
+    margin: 0;
+    width: 340px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 220px;
+    display: block;
+}
+
+.leaflet-control-layers-overlays label {
+    height: 24px;
+    min-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.leaflet-control-layers-overlays label:hover {
+    background-color: #CCC;
+}
+
+.leaflet-control-layers-selected {
+    padding-bottom: 1px;
+    width: 340px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 150px;
+    display: none;
+}
+
+.selected-label {
+    height: 21px;
+    width: 330px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: left;
+}
+
+.selected-label:hover {
+    background-color: #CCC;
+}
+
+.selected-name {
+    display: inline-block;
+    width: 270px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.selected-remove {
+    display: inline-block;
+    background-image: url(../images/remove.png);
+    height: 14px;
+    width: 14px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.selected-none {
+    display: inline-block;
+    height: 11px;
+    width: 16px;
+}
+
+.selected-up {
+    display: inline-block;
+    background-image: url(../images/arrow-up.png);
+    background-repeat: no-repeat;
+    background-position: top;
+    height: 12px;
+    width: 16px;
+    cursor: pointer;
+}
+
+.selected-down {
+    display: inline-block;
+    background-image: url(../images/arrow-down.png);
+    background-repeat: no-repeat;
+    background-position: top;
+    height: 12px;
+    width: 16px;
+    cursor: pointer;
+}
+
+.leaflet-control-attribution {
+    height: 16px;
+    overflow: hidden;
+    text-align: left;
+    transition: height 0.5s;
+    /* Animation time */
+    -webkit-transition: height 0.5s;
+    /* For Safari */
+}
+
+.leaflet-control-attribution:hover {
+    height: 150px;
+}
+
+.map-filter {
+    display: none;
+    margin-top: 6px;
+}
+
+.map-filter-box-base {
+    width: 75%;
+    margin-bottom: 3px;
+    height: 20px;
+    padding: 0;
+    text-align: left;
+}
+
+.map-filter-box-overlays {
+    width: 75%;
+    margin-bottom: 3px;
+    height: 20px;
+    padding: 0;
+    text-align: left;
+    display: none;
+}
+
+.leaflet-control-layers-item-container{
+    padding-top: 2px;
+    padding-bottom: 4px;
+}
+
+.leaflet-control-layers-item-container:hover{
+    background: #eee;
+    cursor: pointer;
+}

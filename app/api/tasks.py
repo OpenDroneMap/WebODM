@@ -1,15 +1,19 @@
 import mimetypes
 import os
 
+from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models.functions import Envelope
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.functions import Cast
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
+from .common import get_and_check_project, get_tile_json
 
-from app import models, scheduler
+from app import models, scheduler, pending_actions
 from nodeodm.models import ProcessingNode
 
 
@@ -31,22 +35,9 @@ class TaskSerializer(serializers.ModelSerializer):
         exclude = ('processing_lock', 'console_output', 'orthophoto', )
 
 
-def get_and_check_project(request, project_pk, perms=('view_project',)):
-    '''
-    Retrieves a project and raises an exeption if the current user
-    has no access to it.
-    '''
-    try:
-        project = models.Project.objects.get(pk=project_pk)
-        for perm in perms:
-            if not request.user.has_perm(perm, project): raise ObjectDoesNotExist()
-    except ObjectDoesNotExist:
-        raise exceptions.NotFound()
-    return project
-
-
 class TaskViewSet(viewsets.ViewSet):
     """
+    Task get/add/delete/update
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
@@ -76,15 +67,15 @@ class TaskViewSet(viewsets.ViewSet):
 
     @detail_route(methods=['post'])
     def cancel(self, *args, **kwargs):
-        return self.set_pending_action(models.Task.PendingActions.CANCEL, *args, **kwargs)
+        return self.set_pending_action(pending_actions.CANCEL, *args, **kwargs)
 
     @detail_route(methods=['post'])
     def restart(self, *args, **kwargs):
-        return self.set_pending_action(models.Task.PendingActions.RESTART, *args, **kwargs)
+        return self.set_pending_action(pending_actions.RESTART, *args, **kwargs)
 
     @detail_route(methods=['post'])
     def remove(self, *args, **kwargs):
-        return self.set_pending_action(models.Task.PendingActions.REMOVE, *args, perms=('delete_project', ), **kwargs)
+        return self.set_pending_action(pending_actions.REMOVE, *args, perms=('delete_project', ), **kwargs)
 
     @detail_route(methods=['get'])
     def output(self, request, pk=None, project_pk=None):
@@ -158,12 +149,12 @@ class TaskViewSet(viewsets.ViewSet):
 
 
 class TaskNestedView(APIView):
-    queryset = models.Task.objects.all()
+    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
 
-    def get_and_check_task(self, request, pk, project_pk, defer=(None, )):
+    def get_and_check_task(self, request, pk, project_pk, annotate={}):
         get_and_check_project(request, project_pk)
         try:
-            task = self.queryset.defer(*defer).get(pk=pk, project=project_pk)
+            task = self.queryset.annotate(**annotate).get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
         return task
@@ -172,9 +163,9 @@ class TaskNestedView(APIView):
 class TaskTiles(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, z="", x="", y=""):
         """
-        Returns a prerendered orthophoto tile for a task
+        Get an orthophoto tile
         """
-        task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
+        task = self.get_and_check_task(request, pk, project_pk)
         tile_path = task.get_tile_path(z, x, y)
         if os.path.isfile(tile_path):
             tile = open(tile_path, "rb")
@@ -186,21 +177,14 @@ class TaskTiles(TaskNestedView):
 class TaskTilesJson(TaskNestedView):
     def get(self, request, pk=None, project_pk=None):
         """
-        Returns a tiles.json file for consumption by a client
+        Get tile.json for this tasks's orthophoto
         """
-        task = self.get_and_check_task(request, pk, project_pk)
-        json = {
-            'tilejson': '2.1.0',
-            'name': task.name,
-            'version': '1.0.0',
-            'scheme': 'tms',
-            'tiles': [
+        task = self.get_and_check_task(request, pk, project_pk, annotate={
+                'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))
+            })
+        json = get_tile_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
-            ],
-            'minzoom': 0,
-            'maxzoom': 22,
-            'bounds': task.orthophoto.extent
-        }
+            ], task.orthophoto_area.extent)
         return Response(json)
 
 
@@ -209,7 +193,7 @@ class TaskAssets(TaskNestedView):
             """
             Downloads a task asset (if available)
             """
-            task = self.get_and_check_task(request, pk, project_pk, ('orthophoto', 'console_output'))
+            task = self.get_and_check_task(request, pk, project_pk)
 
             allowed_assets = {
                 'all': 'all.zip',

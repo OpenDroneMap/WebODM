@@ -57,6 +57,7 @@ class TaskList extends React.Component {
     this.setState({
       tasks: this.state.tasks.filter(t => t.id !== id)
     });
+    if (this.props.onDelete) this.props.onDelete(id);
   }
 
   render() {
