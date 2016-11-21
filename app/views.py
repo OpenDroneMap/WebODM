@@ -40,10 +40,10 @@ def map(request, project_pk=None, task_pk=None):
         if task_pk is not None:
             task = get_object_or_404(Task.objects.defer('orthophoto'), pk=task_pk, project=project)
             title = task.name
-            tiles = [task.get_tiles_json_data()]
+            tiles = [task.get_tile_json_data()]
         else:
             title = project.name
-            tiles = project.get_tiles_json_data()
+            tiles = project.get_tile_json_data()
 
     return render(request, 'app/map.html', {
             'title': title,

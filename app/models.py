@@ -64,8 +64,8 @@ class Project(models.Model):
     def tasks(self):
         return self.task_set.only('id')
 
-    def get_tiles_json_data(self):
-        return [task.get_tiles_json_data() for task in self.task_set.filter(
+    def get_tile_json_data(self):
+        return [task.get_tile_json_data() for task in self.task_set.filter(
                     status=status_codes.COMPLETED
                 ).only('id', 'project_id')]
 
@@ -331,12 +331,12 @@ class Task(models.Model):
     def get_tile_path(self, z, x, y):
         return self.assets_path("orthophoto_tiles", z, x, "{}.png".format(y))
 
-    def get_tiles_json_url(self):
+    def get_tile_json_url(self):
         return "/api/projects/{}/tasks/{}/tiles.json".format(self.project.id, self.id)
 
-    def get_tiles_json_data(self):
+    def get_tile_json_data(self):
         return {
-            'url': self.get_tiles_json_url(),
+            'url': self.get_tile_json_url(),
             'meta': {
                 'task': self.id,
                 'project': self.project.id

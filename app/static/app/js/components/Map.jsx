@@ -2,6 +2,7 @@ import React from 'react';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
+import async from 'async/dist/async';
 import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet-measure/dist/leaflet-measure';
 import '../vendor/leaflet/L.Control.MousePosition.css';
@@ -83,76 +84,78 @@ class Map extends React.Component {
 
     this.tileJsonRequests = [];
 
-    let tilesLoaded = 0;
-
-    tiles.forEach(tile => {
+    async.each(tiles, (tile, done) => {
       const { url, meta } = tile;
 
       this.tileJsonRequests.push($.getJSON(url)
-          .done(info => {
-            const bounds = Leaflet.latLngBounds(
-                [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()]
-              );
-            const layer = Leaflet.tileLayer(info.tiles[0], {
-                  bounds,
-                  minZoom: info.minzoom,
-                  maxZoom: info.maxzoom,
-                  tms: info.scheme === 'tms'
-                }).addTo(this.map);
-
-            // For some reason, getLatLng is not defined for tileLayer?
-            layer.getLatLng = function(){
-              return this.options.bounds.getCenter();
-            };
-            layer.bindPopup(`<div class="title">${info.name}</div>
-              <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-              <ul class="asset-links">
-                ${assets.map(asset => {
-                    return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
-                }).join("")}
-              </ul>
-            `);
-
-            // Associate metadata with this layer
-            meta.name = info.name;
-            layer[Symbol.for("meta")] = meta;
-
-            this.imageryLayers.push(layer);
-
-            let mapBounds = this.mapBounds || Leaflet.latLngBounds();
-            mapBounds.extend(bounds);
-            this.mapBounds = mapBounds;
-
-            // Done loading all tiles?
-            if (++tilesLoaded === tiles.length){
-              this.map.fitBounds(mapBounds);
-
-              // Add basemaps / layers control
-              let overlays = {};
-              this.imageryLayers.forEach(layer => {
-                  const meta = layer[Symbol.for("meta")];
-                  overlays[meta.name] = layer;
-                });
-
-              Leaflet.control.autolayers({
-                overlays: overlays,
-                selectedOverlays: [],
-                baseLayers: this.basemaps
+        .done(info => {
+          const bounds = Leaflet.latLngBounds(
+              [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()]
+            );
+          const layer = Leaflet.tileLayer(info.tiles[0], {
+                bounds,
+                minZoom: info.minzoom,
+                maxZoom: info.maxzoom,
+                tms: info.scheme === 'tms'
               }).addTo(this.map);
 
-              this.map.on('click', e => {
-                // Find first tile layer at the selected coordinates 
-                for (let layer of this.imageryLayers){
-                  if (layer._map && layer.options.bounds.contains(e.latlng)){
-                    layer.openPopup();
-                    break;
-                  }
-                }
-              });
+          // For some reason, getLatLng is not defined for tileLayer?
+          // We need this function if other code calls layer.openPopup()
+          layer.getLatLng = function(){
+            return this.options.bounds.getCenter();
+          };
+          layer.bindPopup(`<div class="title">${info.name}</div>
+            <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
+            <ul class="asset-links">
+              ${assets.map(asset => {
+                  return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
+              }).join("")}
+            </ul>
+          `);
+
+          // Associate metadata with this layer
+          meta.name = info.name;
+          layer[Symbol.for("meta")] = meta;
+
+          this.imageryLayers.push(layer);
+
+          let mapBounds = this.mapBounds || Leaflet.latLngBounds();
+          mapBounds.extend(bounds);
+          this.mapBounds = mapBounds;
+
+          done();
+        })
+        .fail((_, __, err) => done(err))
+      );
+
+    }, err => {
+      if (err) this.setState({error: err.message});
+      else{
+        this.map.fitBounds(this.mapBounds);
+
+        // Add basemaps / layers control
+        let overlays = {};
+        this.imageryLayers.forEach(layer => {
+            const meta = layer[Symbol.for("meta")];
+            overlays[meta.name] = layer;
+          });
+
+        Leaflet.control.autolayers({
+          overlays: overlays,
+          selectedOverlays: [],
+          baseLayers: this.basemaps
+        }).addTo(this.map);
+
+        this.map.on('click', e => {
+          // Find first tile layer at the selected coordinates 
+          for (let layer of this.imageryLayers){
+            if (layer._map && layer.options.bounds.contains(e.latlng)){
+              layer.openPopup();
+              break;
             }
-          })
-          .fail((_, __, err) => this.setState({error: err.message}))
-        );
+          }
+        });
+      }
     });
   }
 
