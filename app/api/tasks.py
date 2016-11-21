@@ -11,7 +11,7 @@ from rest_framework import status, serializers, viewsets, filters, exceptions, p
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
-from .common import get_and_check_project, get_tiles_json
+from .common import get_and_check_project, get_tile_json
 
 from app import models, scheduler, pending_actions
 from nodeodm.models import ProcessingNode
@@ -177,12 +177,12 @@ class TaskTiles(TaskNestedView):
 class TaskTilesJson(TaskNestedView):
     def get(self, request, pk=None, project_pk=None):
         """
-        Get tiles.json for this tasks's orthophoto
+        Get tile.json for this tasks's orthophoto
         """
         task = self.get_and_check_task(request, pk, project_pk, annotate={
                 'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))
             })
-        json = get_tiles_json(task.name, [
+        json = get_tile_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
             ], task.orthophoto_area.extent)
         return Response(json)

@@ -30,7 +30,6 @@ class AssetDownloadButtons extends React.Component {
 
     render(){
         const assetDownloads = AssetDownloads.all();
-        let i = 0;
 
         return (<div className={"asset-download-buttons btn-group " + (this.props.direction === "up" ? "dropup" : "")}>
           <button type="button" className="btn btn-sm btn-primary" disabled={this.props.disabled} data-toggle="dropdown">
@@ -40,13 +39,13 @@ class AssetDownloadButtons extends React.Component {
                 <span className="caret"></span>
           </button>
           <ul className="dropdown-menu">
-            {assetDownloads.map(asset => {
+            {assetDownloads.map((asset, i) => {
                 if (!asset.separator){
-                    return (<li key={i++}>
+                    return (<li key={i}>
                             <a href="javascript:void(0);" onClick={this.downloadAsset(asset)}><i className={asset.icon}></i> {asset.label}</a>
                         </li>);
                 }else{
-                    return (<li key={i++} className="divider"></li>);
+                    return (<li key={i} className="divider"></li>);
                 }
             })}
           </ul>
