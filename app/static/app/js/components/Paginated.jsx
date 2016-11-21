@@ -5,7 +5,6 @@ import React from 'react';
     super();
   }
 
-  // Should be called after parent state is set
   setupPagination(itemsPerPage, totalItems){
     let currentPage = 1;
     if (this.state.pagination && this.state.pagination.currentPage !== undefined){
