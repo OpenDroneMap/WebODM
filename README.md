@@ -8,7 +8,7 @@ A free, user-friendly, extendable application and API for drone image processing
 
 ![Alt text](/screenshots/dashboard.png?raw=true "Dashboard")
 
-If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork, contribute something that interests you, and make a pull request! All ideas are considered and people of all skill levels are welcome.
+If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork, contribute something that interests you, and make a pull request! All ideas are considered and people of all skill levels are welcome. See the [Contributing](/CONTRIBUTING.md) document for more information.
 
 ## Getting Started
 
