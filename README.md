@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM)
 
-A free, user-friendly, extendable application and API for drone image processing.
+A free, user-friendly, extendable application and API for drone image processing. Generate georeferenced maps, point clouds and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
