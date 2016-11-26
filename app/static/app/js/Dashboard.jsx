@@ -48,7 +48,7 @@ class Dashboard extends React.Component {
             ref={(domNode) => { this.projectDialog = domNode; }}
             />
           <ProjectList 
-            source="/api/projects/?ordering=-created_at&page=1"
+            source="/api/projects/?ordering=-created_at&page=#{PAGE}"
             ref={(domNode) => { this.projectList = domNode; }} />
         </div>
     );

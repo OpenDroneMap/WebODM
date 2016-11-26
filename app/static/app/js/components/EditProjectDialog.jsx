@@ -60,7 +60,8 @@ class EditProjectDialog extends React.Component {
     }
 
     componentWillUnmount(){
-        $(this.modal).off('hidden.bs.modal hidden.bs.modal');
+        $(this.modal).off('hidden.bs.modal hidden.bs.modal')
+                     .modal('hide');
     }
 
     componentDidUpdate(){

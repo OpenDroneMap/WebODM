@@ -14,7 +14,7 @@ class Paginator extends React.Component {
                 <div className={this.props.className}>
                     <ul className="pagination pagination-sm">
                         <li className={currentPage === 1 ? "disabled" : ""}>
-                          <a href="#">
+                          <a href="javascript:void(0);" onClick={this.props.handlePageChange(1)}>
                             <span>&laquo;</span>
                           </a>
                         </li>
@@ -22,10 +22,10 @@ class Paginator extends React.Component {
                             return (<li     
                                 key={page + 1}
                                 className={currentPage === (page + 1) ? "active" : ""}
-                            ><a href="#">{page + 1}</a></li>);
+                            ><a href="javascript:void(0);" onClick={this.props.handlePageChange(page + 1)}>{page + 1}</a></li>);
                         })}
                         <li className={currentPage === numPages ? "disabled" : ""}>
-                          <a href="#">
+                          <a href="javascript:void(0);" onClick={this.props.handlePageChange(numPages)}>
                             <span>&raquo;</span>
                           </a>
                         </li>
