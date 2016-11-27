@@ -33,6 +33,15 @@ Linux users can connect to 127.0.0.1.
 * Open a Web Browser to `http://<yourDockerMachineIp>:8000`
 * Log in with the default credentials: "admin:admin"
 
+### Need a processing node for testing?
+
+At startup, WebODM needs to be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/pierotofy/node-OpenDroneMap). It's recommended that you setup your own processing nodes, but if you just want to do some quick tests, use the following:
+
+```
+Hostname: nodeodm.masseranolabs.com
+Port: 80
+```
+
 ## Run it natively
 
 If you want to run WebODM natively, you will need to install:
