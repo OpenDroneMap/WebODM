@@ -94,6 +94,40 @@ ul#side-menu.nav{
     z-index: 999999;
 }
 
+.pagination{
+    margin: 0;
+
+    li>a{
+        color: black;
+        border: 1px solid #ecf0f1;
+        background-color: #fff;
+        &:hover, &:focus{
+            background-color: #798d8f;
+        }
+    }
+    .disabled > a{
+        background-color: #fff;
+        border: 1px solid #f4f9f5;
+        &:hover, &:focus{
+            background-color: #fff;
+            border: 1px solid #f4f9f5;
+        }
+    }
+    .active > a{
+        background-color: #798d8f;
+        &:hover, &:focus{
+            background-color: #798d8f;
+        }
+    }  
+
+    &.pagination-sm{
+        a{
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+    }
+}
+
 table.table-first-col-bold{
     td:first-child{
         font-weight: bold;

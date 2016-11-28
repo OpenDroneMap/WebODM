@@ -1,17 +1,24 @@
 import React from 'react';
 import $ from 'jquery';
+import '../css/ProjectList.scss';
 
 import ProjectListItem from './ProjectListItem';
+import Paginated from './Paginated';
+import Paginator from './Paginator';
+import ErrorMessage from './ErrorMessage';
 
-class ProjectList extends React.Component {
+class ProjectList extends Paginated {
     constructor(){
         super();
 
         this.state = {
             loading: true,
+            refreshing: false,
             error: "",
-            projects: null
+            projects: []
         }
+
+        this.PROJECTS_PER_PAGE = 10;
 
         this.handleDelete = this.handleDelete.bind(this);
     }
@@ -21,14 +28,17 @@ class ProjectList extends React.Component {
     }
 
     refresh(){
+        this.setState({refreshing: true});
+
         // Load projects from API
         this.serverRequest = 
-            $.getJSON(this.props.source, json => {
+            $.getJSON(this.getPaginatedUrl(this.props.source), json => {
                 if (json.results){
                     this.setState({
                         projects: json.results,
                         loading: false
                     });
+                    this.updatePagination(this.PROJECTS_PER_PAGE, json.count);
                 }else{
                     this.setState({ 
                         error: `Invalid JSON response: ${JSON.stringify(json)}`,
@@ -41,8 +51,14 @@ class ProjectList extends React.Component {
                     error: `Could not load projects list: ${textStatus}`,
                     loading: false
                 });
+            })
+            .always(() => {
+                this.setState({refreshing: false});
             });
+    }
 
+    onPageChanged(pageNum){
+        this.refresh();
     }
 
     componentWillUnmount(){
@@ -52,22 +68,25 @@ class ProjectList extends React.Component {
     handleDelete(projectId){
         let projects = this.state.projects.filter(p => p.id !== projectId);
         this.setState({projects: projects});
+        this.handlePageItemsNumChange(-1, () => {
+            this.refresh();
+        });
     }
 
     render() {
         if (this.state.loading){
-            return (<div>Loading projects... <i className="fa fa-refresh fa-spin fa-fw"></i></div>);
-        }
-        else if (this.state.projects){
-            return (<ul className="list-group">
-                    {this.state.projects.map(p => (
-                        <ProjectListItem key={p.id} data={p} onDelete={this.handleDelete} /> 
-                    ))}
-                </ul>);
-        }else if (this.state.error){
-            return (<div>An error occurred: {this.state.error}</div>);
+            return (<div className="project-list">Loading projects... <i className="fa fa-refresh fa-spin fa-fw"></i></div>);
         }else{
-            return (<div></div>); // should never happen
+            return (<div className="project-list">
+                  <ErrorMessage bind={[this, 'error']} />
+                  <Paginator className="text-right" {...this.state.pagination} handlePageChange={this.handlePageChange.bind(this)}>
+                    <ul className={"list-group project-list " + (this.state.refreshing ? "refreshing" : "")}>
+                        {this.state.projects.map(p => (
+                            <ProjectListItem key={p.id} data={p} onDelete={this.handleDelete} /> 
+                        ))}
+                    </ul>
+                </Paginator>
+            </div>);
         }
     }
 }

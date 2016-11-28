@@ -2,7 +2,7 @@ import React from 'react';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
-import async from 'async/dist/async';
+import async from 'async';
 import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet-measure/dist/leaflet-measure';
 import '../vendor/leaflet/L.Control.MousePosition.css';
