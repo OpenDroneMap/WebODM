@@ -1,6 +1,6 @@
 import '../css/ProjectListItem.scss';
 import React from 'react';
-import update from 'react-addons-update';
+import update from 'immutability-helper';
 import TaskList from './TaskList';
 import EditTaskPanel from './EditTaskPanel';
 import UploadProgressBar from './UploadProgressBar';

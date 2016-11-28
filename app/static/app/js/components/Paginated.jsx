@@ -1,9 +1,10 @@
 import React from 'react';
-import update from 'react-addons-update';
+import update from 'immutability-helper';
 
-/*abstract*/ class Paginated extends React.Component{
+class Paginated extends React.Component{
   constructor(){
     super();
+    this.handlePageChange = this.handlePageChange.bind(this);
   }
 
   updatePagination(itemsPerPage, totalItems){
@@ -23,8 +24,6 @@ import update from 'react-addons-update';
         currentPage: currentPage
       }
     });
-
-    this.handlePageChange = this.handlePageChange.bind(this);
   }
 
   totalPages(itemsPerPage, totalItems){

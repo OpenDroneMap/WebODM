@@ -2,7 +2,7 @@ import React from 'react';
 import './css/Console.scss';
 import './vendor/google-code-prettify/prettify';
 import './vendor/google-code-prettify/prettify.css';
-import update from 'react-addons-update';
+import update from 'immutability-helper';
 import Utils from './classes/Utils';
 
 class Console extends React.Component {
