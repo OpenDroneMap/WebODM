@@ -2,6 +2,7 @@
 # a default processing node instance. This is best for users
 # who are just getting started with WebODM.
 
+version: '2'
 services:
   webapp:
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh --create-default-pnode"
