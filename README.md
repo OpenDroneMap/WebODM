@@ -12,7 +12,7 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
 
 ## Getting Started
 
-Install the following applications (if they are not installed already):
+* Install the following applications (if they are not installed already):
  - [Docker](https://www.docker.com/)
  - [Python](https://www.python.org/downloads/)
  - [Git](https://git-scm.com/downloads)
