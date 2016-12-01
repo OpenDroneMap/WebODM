@@ -27,7 +27,7 @@ def api(func):
     return wrapper
 
 class ProcessingNode(models.Model):
-    hostname = models.CharField(max_length=255, help_text="Hostname where the node is located (can be an internal hostname as well)")
+    hostname = models.CharField(max_length=255, help_text="Hostname or IP address where the node is located (can be an internal hostname as well). If you are using Docker, this is never 127.0.0.1 or localhost. Find the IP address of your host machine by running ifconfig on Linux or by checking your network settings.")
     port = models.PositiveIntegerField(help_text="Port that connects to the node's API")
     api_version = models.CharField(max_length=32, null=True, help_text="API version used by the node")
     last_refreshed = models.DateTimeField(null=True, help_text="When was the information about this node last retrieved?")
