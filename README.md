@@ -12,14 +12,17 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
 
 ## Getting Started
 
-The quickest way to get started is by using Docker.
+Install the following applications (if they are not installed already):
+ - [Docker](https://www.docker.com/)
+ - [Python](https://www.python.org/downloads/)
+ - [Git](https://git-scm.com/downloads)
 
-* From the Docker Quickstart Terminal (Windows / OSX) or from the command line (Linux) type:
+* From the Docker Quickstart Terminal (Windows) or from the command line (OSX/Linux) type:
 ```
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
 pip install docker-compose
-docker-compose up
+docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml up
 ```
 
 * If you're on Windows/OSX, find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
@@ -33,14 +36,9 @@ Linux users can connect to 127.0.0.1.
 * Open a Web Browser to `http://<yourDockerMachineIp>:8000`
 * Log in with the default credentials: "admin:admin"
 
-### Need a processing node for testing?
+### Add More Processing Nodes
 
-At startup, WebODM needs to be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/pierotofy/node-OpenDroneMap). It's recommended that you setup your own processing nodes, but if you just want to do some quick tests, use the following:
-
-```
-Hostname: nodeodm.masseranolabs.com
-Port: 80
-```
+WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/pierotofy/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install the processing node on a separate machine.
 
 ## Run it natively
 
@@ -55,7 +53,11 @@ On Linux, make sure you have:
 apt-get install binutils libproj-dev gdal-bin
 ```
 
-On Windows use the [OSGeo4W](https://trac.osgeo.org/osgeo4w/) installer to install GDAL.
+On Windows use the [OSGeo4W](https://trac.osgeo.org/osgeo4w/) installer to install GDAL. MacOS users can use:
+
+```
+brew install postgres postgis
+```
 
 Then these steps should be sufficient to get you up and running:
 
