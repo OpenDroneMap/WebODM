@@ -1,0 +1,12 @@
+# Chaining this file to the main docker-compose file adds
+# a default processing node instance. This is best for users
+# who are just getting started with WebODM.
+
+services:
+  webapp:
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh --create-default-pnode"
+  node-odm-1:
+    image: pierotofy/nodeodm
+    container_name: node-odm-1
+    ports:
+      - "3000"
