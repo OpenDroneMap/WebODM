@@ -2,7 +2,7 @@ FROM postgres:9.6
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV POSTGIS_MAJOR 2.3
-ENV POSTGIS_VERSION 2.3.0+dfsg-2.pgdg80+1
+ENV POSTGIS_VERSION 2.3.1+dfsg-1.pgdg16.04+1
 
 RUN apt-get update \
       && apt-get install -y --no-install-recommends \
