@@ -1,4 +1,4 @@
-FROM postgres:9.5
+FROM postgres:9.6
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV POSTGIS_MAJOR 2.3
