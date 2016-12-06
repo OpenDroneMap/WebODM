@@ -88,7 +88,7 @@ Then:
 
 ```
 pip install -r requirements.txt
-npm install -g webpack
+sudo npm install -g webpack
 npm install
 webpack
 chmod +x start.sh && ./start.sh
