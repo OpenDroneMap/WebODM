@@ -18,6 +18,7 @@
         animation: pulsate 0.5s ease-out;
         animation-iteration-count: infinite; 
         opacity: 0.5;
+        pointer-events:none;
     }
 
     @-webkit-keyframes pulsate {

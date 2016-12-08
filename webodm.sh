@@ -7,10 +7,9 @@ if [[ $uname == "Darwin" ]]; then
 elif [[ $uname == MINGW* ]]; then
 	platform = "Windows"
 fi
-echo "Using platform: $platform" 
 
 usage(){
-  echo "Usage: $0 <command>"
+  echo "Usage: $0 <command> [options]"
   echo
   echo "This program helps to manage the setup/teardown of the docker containers for running WebODM. We recommend that you read the full documentation of docker at https://docs.docker.com if you want to customize your setup."
   echo 
@@ -47,11 +46,6 @@ environment_check(){
 run(){
 	echo $1
 	$1
-	if [[ ! $? -eq 0 ]]; then
-		echo 
-		echo "Doh! The last command returned an error. This might be an issue. Would you be so kind as to report it here? https://github.com/OpenDroneMap/WebODM/issues"
-		exit
-	fi	
 }
 
 start(){
@@ -60,10 +54,10 @@ start(){
 
 rebuild(){
 	run "docker-compose down"
-	run "rm -r node_modules/"
-	run "rm -r nodeodm/external/node-OpenDroneMap"
+	run "rm -fr node_modules/"
+	run "rm -fr nodeodm/external/node-OpenDroneMap"
 	run "docker-compose build --no-cache"
-	echo "\e[1mDone!\e[0m You can now start WebODM by running ./$0 start"
+	echo -e "\e[1mDone!\e[0m You can now start WebODM by running ./$0 start"
 }
 
 if [[ $1 = "start" ]]; then

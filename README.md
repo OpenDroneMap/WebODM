@@ -22,21 +22,33 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
 pip install docker-compose
-docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml up
+./webodm.sh start
 ```
 
-* If you're on Windows / OSX, find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
+* If you're on Windows find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
 
 ```
 docker-machine ip
 ```
 
-Linux users can connect to 127.0.0.1.
+Linux / OSX, users can connect to 127.0.0.1.
 
 * Open a Web Browser to `http://<yourDockerMachineIp>:8000`
 * Log in with the default credentials: "admin:admin"
 
-We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown.
+To stop WebODM press CTRL+C or run:
+
+```
+./webodm.sh stop
+```
+
+To update WebODM to the latest version use:
+
+```
+./webodm.sh update
+```
+
+We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
 
 If you are getting a **MemoryError** while processing the images, make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
 
