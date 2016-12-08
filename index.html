@@ -1,0 +1,298 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>WebODM Documentation</title>
+
+    <style>
+      .highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight, .highlight .w {
+  color: #f8f8f2;
+  background-color: #272822;
+}
+.highlight .err {
+  color: #272822;
+  background-color: #f92672;
+}
+.highlight .c, .highlight .cd, .highlight .cm, .highlight .c1, .highlight .cs {
+  color: #75715e;
+}
+.highlight .cp {
+  color: #f4bf75;
+}
+.highlight .nt {
+  color: #f4bf75;
+}
+.highlight .o, .highlight .ow {
+  color: #f8f8f2;
+}
+.highlight .p, .highlight .pi {
+  color: #f8f8f2;
+}
+.highlight .gi {
+  color: #a6e22e;
+}
+.highlight .gd {
+  color: #f92672;
+}
+.highlight .gh {
+  color: #66d9ef;
+  background-color: #272822;
+  font-weight: bold;
+}
+.highlight .k, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kv {
+  color: #ae81ff;
+}
+.highlight .kc {
+  color: #fd971f;
+}
+.highlight .kt {
+  color: #fd971f;
+}
+.highlight .kd {
+  color: #fd971f;
+}
+.highlight .s, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
+  color: #a6e22e;
+}
+.highlight .sr {
+  color: #a1efe4;
+}
+.highlight .si {
+  color: #cc6633;
+}
+.highlight .se {
+  color: #cc6633;
+}
+.highlight .nn {
+  color: #f4bf75;
+}
+.highlight .nc {
+  color: #f4bf75;
+}
+.highlight .no {
+  color: #f4bf75;
+}
+.highlight .na {
+  color: #66d9ef;
+}
+.highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mb, .highlight .mx {
+  color: #a6e22e;
+}
+.highlight .ss {
+  color: #a6e22e;
+}
+    </style>
+    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
+      <script src="javascripts/all.js"></script>
+  </head>
+
+  <body class="index" data-languages="[&quot;json&quot;]">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" alt="Navbar" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+      <img src="images/logo.png" alt="Logo" />
+        <div class="lang-selector">
+              <a href="#" data-language-name="json">json</a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <div id="toc">
+      </div>
+        <ul class="toc-footer">
+            <li><a href='https://github.com/OpenDroneMap/WebODM'>WebODM on GitHub</a></li>
+            <li><a href='https://github.com/OpenDroneMap/OpenDroneMap'>OpenDroneMap on GitHub</a></li>
+        </ul>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="introduction">Introduction</h1>
+
+<p><a href="https://github.com/OpenDroneMap/WebODM">WebODM</a> is a free, user-friendly, extendable application and API for drone image processing. It generates georeferenced maps, point clouds and textured 3D models from aerial images.</p>
+
+<p>Developers can leverage this API to extend the functionality of <a href="https://github.com/OpenDroneMap/WebODM">WebODM</a> or integrate it with existing software like <a href="http://www.qgis.org/">QGIS</a> or <a href="http://www.autodesk.com/products/autocad/overview">AutoCAD</a>.</p>
+
+<h1 id="authentication">Authentication</h1>
+
+<p>To access the API, you need to provide a valid username and password. You can create users from WebODM&rsquo;s Administration page.</p>
+
+<p>If authentication is successful, you will be issued a token. For all API calls, always include the following parameter (TODO: how?):</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>token</td>
+<td>*</td>
+<td>&ldquo;&rdquo;</td>
+<td>Authentication Token</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>Get authentication token:</p>
+</blockquote>
+<pre class="highlight python"><code><span class="c"># TODO</span>
+</code></pre>
+<h1 id="processing-images">Processing Images</h1>
+
+<p>Images are processed by creating a <a href="#task">Task</a>. A <a href="#project">Project</a> is a way to group together related <a href="#task">Task</a> items. A <a href="#project">Project</a> always needs to exist before a <a href="#task">Task</a> can be created.</p>
+
+<h1 id="project">Project</h1>
+
+<h2 id="definition">Definition</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="mi">7</span><span class="p">,</span><span class="w">
+        </span><span class="mi">6</span><span class="p">,</span><span class="w">
+        </span><span class="mi">5</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>A <a href="#project">Project</a> is a collection of <a href="#task">Task</a> items.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td>tasks</td>
+<td>int[]</td>
+<td>List of task IDs associated with this project</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>string</td>
+<td>Creation date and time</td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>Name of the project</td>
+</tr>
+<tr>
+<td>description</td>
+<td>string</td>
+<td>A more in-depth description</td>
+</tr>
+</tbody></table>
+
+<h2 id="create-a-project">Create a project</h2>
+
+<p><code class="prettyprint">POST /api/projects/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>name</td>
+<td>*</td>
+<td>&ldquo;&rdquo;</td>
+<td>Name of the project</td>
+</tr>
+<tr>
+<td>description</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>A more in-depth description</td>
+</tr>
+</tbody></table>
+
+<h2 id="get-list-of-projects">Get list of projects</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"next"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"previous"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"results"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                </span><span class="mi">7</span><span class="p">,</span><span class="w">
+                </span><span class="mi">6</span><span class="p">,</span><span class="w">
+                </span><span class="mi">5</span><span class="w">
+            </span><span class="p">],</span><span class="w">
+            </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p><code class="prettyprint">GET /api/projects/?page=N</code></p>
+
+<p>If <code class="prettyprint">N</code> is omitted, defaults to 1.</p>
+
+<h3 id="filtering-the-list">Filtering the list</h3>
+
+<p><code class="prettyprint">GET /api/projects/?&lt;field&gt;=&lt;value&gt;</code></p>
+
+<p>Where field is one of: <code class="prettyprint">id</code>, <code class="prettyprint">name</code>, <code class="prettyprint">description</code>, <code class="prettyprint">created_at</code>. Only equality can be used, e.g. <code class="prettyprint">id=3</code>.</p>
+
+<h3 id="sorting-the-list">Sorting the list</h3>
+
+<p><code class="prettyprint">GET /api/projects/?ordering=&lt;field&gt;</code></p>
+
+<p>Where field is one of: <code class="prettyprint">id</code>, <code class="prettyprint">name</code>, <code class="prettyprint">description</code>, <code class="prettyprint">created_at</code>. Results are sorted in ascending order. Placing a minus <code class="prettyprint">-</code> sign, e.g. <code class="prettyprint">-created_at</code> sorts in descending order.</p>
+
+<h3 id="pagination">Pagination</h3>
+
+<p>The project list is paginated. Items are stored in <code class="prettyprint">results</code>. <code class="prettyprint">count</code> is the total number of items. <code class="prettyprint">next</code> and <code class="prettyprint">previous</code> are links to retrieve the next and previous page of results, or null. Each page contains 10 items.</p>
+
+<aside class="notice">Only the projects visible to the current user will be displayed.</aside>
+
+<h1 id="task">Task</h1>
+
+<h2 id="definition">Definition</h2>
+
+<p>TODO</p>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="json">json</a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
