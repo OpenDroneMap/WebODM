@@ -182,6 +182,7 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'propagate': True,
+            'level': 'WARNING',
         },
         'app.logger': {
             'handlers': ['console'],
@@ -189,7 +190,7 @@ LOGGING = {
         },
         'apscheduler.executors.default': {
             'handlers': ['console'],
-            'level': 'WARN',
+            'level': 'WARNING',
         }
     }
 }

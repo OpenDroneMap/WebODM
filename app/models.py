@@ -187,146 +187,159 @@ class Task(models.Model):
         with a processing node or executing a pending action.
         """
 
-        if self.processing_node:
-            # Need to process some images (UUID not yet set)?
-            if not self.uuid:
-                logger.info("Processing... {}".format(self))
+        try:
+            if self.processing_node:
+                # Need to process some images (UUID not yet set)?
+                if not self.uuid:
+                    logger.info("Processing... {}".format(self))
 
-                images = [image.path() for image in self.imageupload_set.all()]
+                    images = [image.path() for image in self.imageupload_set.all()]
 
+                    try:
+                        # This takes a while
+                        uuid = self.processing_node.process_new_task(images, self.name, self.options)
+
+                        # Refresh task object before committing change
+                        self.refresh_from_db()
+                        self.uuid = uuid
+                        self.save()
+
+                        # TODO: log process has started processing
+
+                    except ProcessingException as e:
+                        self.set_failure(str(e))
+
+            if self.pending_action is not None:
                 try:
-                    # This takes a while
-                    uuid = self.processing_node.process_new_task(images, self.name, self.options)
+                    if self.pending_action == pending_actions.CANCEL:
+                        # Do we need to cancel the task on the processing node?
+                        logger.info("Canceling task {}".format(self))
+                        if self.processing_node and self.uuid:
+                            self.processing_node.cancel_task(self.uuid)
+                            self.pending_action = None
+                            self.save()
+                        else:
+                            raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
 
-                    # Refresh task object before committing change
-                    self.refresh_from_db()
-                    self.uuid = uuid
+                    elif self.pending_action == pending_actions.RESTART:
+                        logger.info("Restarting task {}".format(self))
+                        if self.processing_node and self.uuid:
+
+                            # Check if the UUID is still valid, as processing nodes purge
+                            # results after a set amount of time, the UUID might have eliminated.
+                            try:
+                                info = self.processing_node.get_task_info(self.uuid)
+                                uuid_still_exists = info['uuid'] == self.uuid
+                            except ProcessingException:
+                                uuid_still_exists = False
+
+                            if uuid_still_exists:
+                                # Good to go
+                                self.processing_node.restart_task(self.uuid)
+                            else:
+                                # Task has been purged (or processing node is offline)
+                                # TODO: what if processing node went offline?
+
+                                # Process this as a new task
+                                # Removing its UUID will cause the scheduler
+                                # to process this the next tick
+                                self.uuid = None
+
+                            self.console_output = ""
+                            self.processing_time = -1
+                            self.status = None
+                            self.last_error = None
+                            self.pending_action = None
+                            self.save()
+                        else:
+                            raise ProcessingException("Cannot restart a task that has no processing node or UUID")
+
+                    elif self.pending_action == pending_actions.REMOVE:
+                        logger.info("Removing task {}".format(self))
+                        if self.processing_node and self.uuid:
+                            # Attempt to delete the resources on the processing node
+                            # We don't care if this fails, as resources on processing nodes
+                            # Are expected to be purged on their own after a set amount of time anyway
+                            try:
+                                self.processing_node.remove_task(self.uuid)
+                            except ProcessingException:
+                                pass
+
+                        # What's more important is that we delete our task properly here
+                        self.delete()
+
+                        # Stop right here!
+                        return
+
+                except ProcessingException as e:
+                    self.last_error = str(e)
                     self.save()
 
-                    # TODO: log process has started processing
+            if self.processing_node:
+                # Need to update status (first time, queued or running?)
+                if self.uuid and self.status in [None, status_codes.QUEUED, status_codes.RUNNING]:
+                    # Update task info from processing node
+                    try:
+                        info = self.processing_node.get_task_info(self.uuid)
 
-                except ProcessingException as e:
-                    self.set_failure(str(e))
+                        self.processing_time = info["processingTime"]
+                        self.status = info["status"]["code"]
 
-        if self.pending_action is not None:
-            try:
-                if self.pending_action == pending_actions.CANCEL:
-                    # Do we need to cancel the task on the processing node?
-                    logger.info("Canceling task {}".format(self))
-                    if self.processing_node and self.uuid:
-                        self.processing_node.cancel_task(self.uuid)
-                        self.pending_action = None
-                        self.save()
-                    else:
-                        raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
+                        current_lines_count = len(self.console_output.split("\n")) - 1
+                        self.console_output += self.processing_node.get_task_console_output(self.uuid, current_lines_count)
 
-                elif self.pending_action == pending_actions.RESTART:
-                    logger.info("Restarting task {}".format(self))
-                    if self.processing_node and self.uuid:
+                        if "errorMessage" in info["status"]:
+                            self.last_error = info["status"]["errorMessage"]
 
-                        # Check if the UUID is still valid, as processing nodes purge
-                        # results after a set amount of time, the UUID might have eliminated.
-                        try:
-                            info = self.processing_node.get_task_info(self.uuid)
-                            uuid_still_exists = info['uuid'] == self.uuid
-                        except ProcessingException:
-                            uuid_still_exists = False
+                        # Has the task just been canceled, failed, or completed?
+                        if self.status in [status_codes.FAILED, status_codes.COMPLETED, status_codes.CANCELED]:
+                            logger.info("Processing status: {} for {}".format(self.status, self))
 
-                        if uuid_still_exists:
-                            # Good to go
-                            self.processing_node.restart_task(self.uuid)
-                        else:
-                            # Task has been purged (or processing node is offline)
-                            # TODO: what if processing node went offline?
+                            if self.status == status_codes.COMPLETED:
+                                try:
+                                    assets_dir = self.assets_path("")
+                                    if not os.path.exists(assets_dir):
+                                        os.makedirs(assets_dir)
 
-                            # Process this as a new task
-                            # Removing its UUID will cause the scheduler
-                            # to process this the next tick
-                            self.uuid = None
+                                    logger.info("Downloading all.zip for {}".format(self))
 
-                        self.console_output = ""
-                        self.processing_time = -1
-                        self.status = None
-                        self.last_error = None
-                        self.pending_action = None
-                        self.save()
-                    else:
-                        raise ProcessingException("Cannot restart a task that has no processing node or UUID")
+                                    # Download all assets
+                                    #zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
+                                    zip_path = os.path.join(assets_dir, "all.zip")
+                                    #with open(zip_path, 'wb') as fd:
+                                    #    for chunk in zip_stream.iter_content(4096):
+                                    #        fd.write(chunk)
 
-                elif self.pending_action == pending_actions.REMOVE:
-                    logger.info("Removing task {}".format(self))
-                    if self.processing_node and self.uuid:
-                        # Attempt to delete the resources on the processing node
-                        # We don't care if this fails, as resources on processing nodes
-                        # Are expected to be purged on their own after a set amount of time anyway
-                        try:
-                            self.processing_node.remove_task(self.uuid)
-                        except ProcessingException:
-                            pass
+                                    logger.info("Done downloading all.zip for {}".format(self))
 
-                    # What's more important is that we delete our task properly here
-                    self.delete()
+                                    # Extract from zip
+                                    with zipfile.ZipFile(zip_path, "r") as zip_h:
+                                        zip_h.extractall(assets_dir)
 
-                    # Stop right here!
-                    return
+                                    logger.info("Extracted all.zip for {}".format(self))
 
-            except ProcessingException as e:
-                self.last_error = str(e)
-                self.save()
+                                    # Add to database orthophoto
+                                    orthophoto_path = self.assets_path("odm_orthophoto", "odm_orthophoto.tif")
+                                    if os.path.exists(orthophoto_path):
+                                        self.orthophoto = GDALRaster(orthophoto_path, write=True)
 
-        if self.processing_node:
-            # Need to update status (first time, queued or running?)
-            if self.uuid and self.status in [None, status_codes.QUEUED, status_codes.RUNNING]:
-                # Update task info from processing node
-                try:
-                    info = self.processing_node.get_task_info(self.uuid)
-
-                    self.processing_time = info["processingTime"]
-                    self.status = info["status"]["code"]
-
-                    current_lines_count = len(self.console_output.split("\n")) - 1
-                    self.console_output += self.processing_node.get_task_console_output(self.uuid, current_lines_count)
-
-                    if "errorMessage" in info["status"]:
-                        self.last_error = info["status"]["errorMessage"]
-
-                    # Has the task just been canceled, failed, or completed?
-                    if self.status in [status_codes.FAILED, status_codes.COMPLETED, status_codes.CANCELED]:
-                        logger.info("Processing status: {} for {}".format(self.status, self))
-
-                        if self.status == status_codes.COMPLETED:
-                            try:
-                                assets_dir = self.assets_path("")
-                                if not os.path.exists(assets_dir):
-                                    os.makedirs(assets_dir)
-
-                                # Download all assets
-                                zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
-                                zip_path = os.path.join(assets_dir, "all.zip")
-                                with open(zip_path, 'wb') as fd:
-                                    for chunk in zip_stream.iter_content(4096):
-                                        fd.write(chunk)
-
-                                # Extract from zip
-                                with zipfile.ZipFile(zip_path, "r") as zip_h:
-                                    zip_h.extractall(assets_dir)
-
-                                # Add to database orthophoto
-                                orthophoto_path = self.assets_path("odm_orthophoto", "odm_orthophoto.tif")
-                                if os.path.exists(orthophoto_path):
-                                    self.orthophoto = GDALRaster(orthophoto_path, write=True)
-
+                                    self.save()
+                                except ProcessingException as e:
+                                    self.set_failure(str(e))
+                            else:
+                                # FAILED, CANCELED
                                 self.save()
-                            except ProcessingException as e:
-                                self.set_failure(str(e))
                         else:
-                            # FAILED, CANCELED
+                            # Still waiting...
                             self.save()
-                    else:
-                        # Still waiting...
-                        self.save()
-                except ProcessingException as e:
-                    self.set_failure(str(e))
+                    except ProcessingException as e:
+                        self.set_failure(str(e))
+        except ConnectionRefusedError as e:
+            logger.warning("Task {} cannot communicate with processing node: {}".format(self, str(e)))
+
+            # In the future we might want to retry instead of just failing
+            #self.set_failure(str(e))
+
 
     def get_tile_path(self, z, x, y):
         return self.assets_path("orthophoto_tiles", z, x, "{}.png".format(y))
