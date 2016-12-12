@@ -243,7 +243,7 @@ class Task(models.Model):
                                 # Process this as a new task
                                 # Removing its UUID will cause the scheduler
                                 # to process this the next tick
-                                self.uuid = None
+                                self.uuid = ''
 
                             self.console_output = ""
                             self.processing_time = -1
@@ -304,11 +304,11 @@ class Task(models.Model):
                                     logger.info("Downloading all.zip for {}".format(self))
 
                                     # Download all assets
-                                    #zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
+                                    zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
                                     zip_path = os.path.join(assets_dir, "all.zip")
-                                    #with open(zip_path, 'wb') as fd:
-                                    #    for chunk in zip_stream.iter_content(4096):
-                                    #        fd.write(chunk)
+                                    with open(zip_path, 'wb') as fd:
+                                        for chunk in zip_stream.iter_content(4096):
+                                            fd.write(chunk)
 
                                     logger.info("Done downloading all.zip for {}".format(self))
 
@@ -319,9 +319,16 @@ class Task(models.Model):
                                     logger.info("Extracted all.zip for {}".format(self))
 
                                     # Add to database orthophoto
-                                    orthophoto_path = self.assets_path("odm_orthophoto", "odm_orthophoto.tif")
+                                    orthophoto_path = os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif"))
                                     if os.path.exists(orthophoto_path):
-                                        self.orthophoto = GDALRaster(orthophoto_path, write=True)
+                                        orthophoto = GDALRaster(orthophoto_path, write=True)
+
+                                        # We need to transform to 4326 before we can store it
+                                        # as an offdb raster field
+                                        orthophoto_4326_path = os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto_4326.tif"))
+                                        self.orthophoto = orthophoto.transform(4326, 'GTiff', orthophoto_4326_path)
+
+                                        logger.info("Imported orthophoto {} for {}".format(orthophoto_4326_path, self))
 
                                     self.save()
                                 except ProcessingException as e:
