@@ -4,7 +4,6 @@ import shutil
 import zipfile
 
 from django.contrib.auth.models import User
-from django.contrib.gis.db import models as gismodels
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.postgres import fields
 from django.core.exceptions import ValidationError
@@ -18,6 +17,7 @@ from guardian.models import UserObjectPermissionBase
 from guardian.shortcuts import get_perms_for_model, assign_perm
 
 from app import pending_actions
+from app.postgis import OffDbRasterField
 from nodeodm import status_codes
 from nodeodm.exceptions import ProcessingException
 from nodeodm.models import ProcessingNode
@@ -139,7 +139,7 @@ class Task(models.Model):
     ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
     # georeferenced_model
-    orthophoto = gismodels.RasterField(null=True, blank=True, srid=4326, help_text="Orthophoto created by OpenDroneMap")
+    orthophoto = OffDbRasterField(null=True, blank=True, srid=4326, help_text="Orthophoto created by OpenDroneMap")
     # textured_model
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")

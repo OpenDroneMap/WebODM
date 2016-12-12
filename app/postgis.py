@@ -7,11 +7,14 @@ from django.contrib.gis.db.backends.postgis.pgraster import (
     STRUCT_SIZE,
     pack)
 from django.contrib.gis.db.backends.postgis.pgraster import chunk, unpack
-from django.contrib.gis.db.models.fields import RasterField
+from django.contrib.gis.db.models.fields import RasterField, BaseSpatialField
+from django.contrib.gis.gdal import GDALException
+from django.contrib.gis.gdal import GDALRaster
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-class OutOfDbRasterField(RasterField):
+
+class OffDbRasterField(RasterField):
     """
     Out-of-db Raster field for GeoDjango -- evaluates into GDALRaster objects.
     """
@@ -19,14 +22,42 @@ class OutOfDbRasterField(RasterField):
     description = _("Out-of-db Raster Field")
 
     def from_db_value(self, value, expression, connection, context):
-        return connection.ops.parse_raster(value)
+        return from_pgraster(value, True)
+
+    def get_db_prep_save(self, value, connection):
+        """
+        Prepare the value for saving in the database.
+        """
+        if not value:
+            return None
+        else:
+            return to_pgraster(value, True)
 
     def get_db_prep_value(self, value, connection, prepared=False):
         self._check_connection(connection)
         # Prepare raster for writing to database.
         if not prepared:
-            value = connection.ops.deconstruct_raster(value)
-        return super(OutOfDbRasterField, self).get_db_prep_value(value, connection, prepared)
+            value = to_pgraster(value, True)
+
+        # Call RasterField's base class get_db_prep_value
+        return BaseSpatialField.get_db_prep_value(self, value, connection, prepared)
+
+    def get_raster_prep_value(self, value, is_candidate):
+        """
+        Return a GDALRaster if conversion is successful, otherwise return None.
+        """
+        if isinstance(value, GDALRaster):
+            return value
+        elif is_candidate:
+            try:
+                return GDALRaster(value)
+            except GDALException:
+                pass
+        elif isinstance(value, (dict, str)):
+            try:
+                return GDALRaster(value)
+            except GDALException:
+                raise ValueError("Couldn't create spatial object from lookup value '%s'." % value)
 
 
 class POSTGIS_BANDTYPES(object):
@@ -35,7 +66,7 @@ class POSTGIS_BANDTYPES(object):
     BANDTYPE_FLAG_ISNODATA = 1 << 5
 
 
-def from_pgraster(data):
+def from_pgraster(data, offdb = False):
     """
     Convert a PostGIS HEX String into a dictionary.
     """
@@ -111,16 +142,18 @@ def from_pgraster(data):
     if len(set(pixeltypes)) != 1:
         raise ValidationError("Band pixeltypes are not all equal.")
 
-
-    return {
-        'srid': int(header[9]),
-        'width': header[10], 'height': header[11],
-        'datatype': pixeltypes[0],
-        'origin': (header[5], header[6]),
-        'scale': (header[3], header[4]),
-        'skew': (header[7], header[8]),
-        'bands': bands,
-    }
+    if offdb and len(bands) > 0:
+        return bands[0]['path']
+    else:
+        return {
+            'srid': int(header[9]),
+            'width': header[10], 'height': header[11],
+            'datatype': pixeltypes[0],
+            'origin': (header[5], header[6]),
+            'scale': (header[3], header[4]),
+            'skew': (header[7], header[8]),
+            'bands': bands,
+        }
 
 
 def to_pgraster(rast, offdb = False):
