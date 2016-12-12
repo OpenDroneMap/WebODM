@@ -18,7 +18,7 @@ RUN git submodule init
 RUN git submodule update
 
 # Install Node.js + other packages
-RUN add-apt-repository ppa:ubuntugis/ubuntugis-unstable && apt-get update
+RUN apt-get install software-properties-common && add-apt-repository ppa:ubuntugis/ubuntugis-unstable && apt-get update
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs binutils libproj-dev gdal-bin
 
