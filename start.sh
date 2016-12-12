@@ -24,7 +24,6 @@ echo Building asssets...
 webpack
 
 echo Running migrations
-python manage.py makemigrations
 python manage.py migrate
 
 if [[ $1 = "--create-default-pnode" ]]; then
