@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import requests
 from django.db import models
 from django.contrib.postgres import fields
 from django.utils import timezone
@@ -84,7 +85,11 @@ class ProcessingNode(models.Model):
         if len(images) < 2: raise ProcessingException("Need at least 2 images")
 
         api_client = self.api_client()
-        result = api_client.new_task(images, name, options)
+        try:
+            result = api_client.new_task(images, name, options)
+        except requests.exceptions.ConnectionError as e:
+            raise ProcessingException(e)
+
         if result['uuid']:
             return result['uuid']
         elif result['error']:
