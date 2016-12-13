@@ -62,6 +62,7 @@ If you want to run WebODM natively, you will need to install:
  * PostgreSQL (>= 9.5)
  * PostGIS 2.3
  * Python 3.5
+ * GDAL (>= 2.1)
 
 On Linux, make sure you have:
 
