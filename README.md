@@ -17,26 +17,38 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
  - [Python](https://www.python.org/downloads/)
  - [Git](https://git-scm.com/downloads)
 
-* From the Docker Quickstart Terminal (Windows) or from the command line (OSX / Linux) type:
+* From the Docker Quickstart Terminal (Windows) or from the command line (Mac / Linux) type:
 ```
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
 pip install docker-compose
-docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml up
+./webodm.sh start
 ```
 
-* If you're on Windows / OSX, find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
+* If you're on Windows find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
 
 ```
 docker-machine ip
 ```
 
-Linux users can connect to 127.0.0.1.
+Linux / Mac, users can connect to 127.0.0.1.
 
 * Open a Web Browser to `http://<yourDockerMachineIp>:8000`
 * Log in with the default credentials: "admin:admin"
 
-We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown.
+To stop WebODM press CTRL+C or run:
+
+```
+./webodm.sh stop
+```
+
+To update WebODM to the latest version use:
+
+```
+./webodm.sh update
+```
+
+We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
 
 If you are getting a **MemoryError** while processing the images, make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
 
@@ -50,6 +62,7 @@ If you want to run WebODM natively, you will need to install:
  * PostgreSQL (>= 9.5)
  * PostGIS 2.3
  * Python 3.5
+ * GDAL (>= 2.1)
 
 On Linux, make sure you have:
 
@@ -69,7 +82,7 @@ Then these steps should be sufficient to get you up and running:
 git clone https://github.com/OpenDroneMap/WebODM
 ```
 
-Create a `WebODM\webodm\local_settings.py` file containing:
+Create a `WebODM\webodm\local_settings.py` file containing your database settings:
 
 ```
 DATABASES = {
@@ -82,6 +95,13 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+```
+
+From psql or [pgadmin](https://www.pgadmin.org), connect to the database and set the [postgis.enable_outdb_rasters](http://postgis.net/docs/manual-2.2/postgis_enable_outdb_rasters.html) and [postgis.gdal_enabled_drivers](http://postgis.net/docs/postgis_gdal_enabled_drivers.html) settings:
+
+```sql
+ALTER SYSTEM SET postgis.enable_outdb_rasters TO True;
+ALTER SYSTEM SET postgis.gdal_enabled_drivers TO 'GTiff';
 ```
 
 Then:

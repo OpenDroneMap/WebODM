@@ -113,7 +113,7 @@ def setup():
         scheduler.add_job(process_pending_tasks, 'interval', seconds=5)
         scheduler.add_job(cleanup_projects, 'interval', seconds=15)
     except SchedulerAlreadyRunningError:
-        logger.warn("Scheduler already running (this is OK while testing)")
+        logger.warning("Scheduler already running (this is OK while testing)")
 
 def teardown():
     logger.info("Stopping scheduler...")
@@ -121,4 +121,4 @@ def teardown():
         scheduler.shutdown()
         logger.info("Scheduler stopped")
     except SchedulerNotRunningError:
-        logger.warn("Scheduler not running")
+        logger.warning("Scheduler not running")

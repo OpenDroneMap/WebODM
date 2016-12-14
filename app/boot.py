@@ -40,4 +40,4 @@ def boot():
             scheduler.update_nodes_info(background=True)
 
     except ProgrammingError:
-        logger.warn("Could not touch the database. If running a migration, this is expected.")
+        logger.warning("Could not touch the database. If running a migration, this is expected.")
