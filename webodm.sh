@@ -1,12 +1,16 @@
 #!/bin/bash
+set -eo pipefail
 
 platform="Linux" # Assumed
-uname=`uname`
-if [[ $uname == "Darwin" ]]; then
-	platform = "MacOS / OSX"
-elif [[ $uname == MINGW* ]]; then
-	platform = "Windows"
-fi
+uname=$(uname)
+case $uname in
+	"Darwin")
+	platform="MacOS / OSX"
+	;;
+	MINGW*)
+	platform="Windows"
+	;;
+esac
 
 usage(){
   echo "Usage: $0 <command> [options]"
@@ -30,9 +34,7 @@ check_command(){
 
 	echo -e "Checking for $1... $check_msg"
 	
-	if [[ $not_found ]]; then
-		exit 1
-	fi
+	return 1
 }
 
 environment_check(){
