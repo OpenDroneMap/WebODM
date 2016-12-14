@@ -17,7 +17,7 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
  - [Python](https://www.python.org/downloads/)
  - [Git](https://git-scm.com/downloads)
 
-* From the Docker Quickstart Terminal (Windows) or from the command line (OSX / Linux) type:
+* From the Docker Quickstart Terminal (Windows) or from the command line (Mac / Linux) type:
 ```
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
@@ -31,7 +31,7 @@ pip install docker-compose
 docker-machine ip
 ```
 
-Linux / OSX, users can connect to 127.0.0.1.
+Linux / Mac, users can connect to 127.0.0.1.
 
 * Open a Web Browser to `http://<yourDockerMachineIp>:8000`
 * Log in with the default credentials: "admin:admin"
@@ -82,7 +82,7 @@ Then these steps should be sufficient to get you up and running:
 git clone https://github.com/OpenDroneMap/WebODM
 ```
 
-Create a `WebODM\webodm\local_settings.py` file containing:
+Create a `WebODM\webodm\local_settings.py` file containing your database settings:
 
 ```
 DATABASES = {
@@ -95,6 +95,13 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+```
+
+From psql or [pgadmin](https://www.pgadmin.org), connect to the database and set the [postgis.enable_outdb_rasters](http://postgis.net/docs/manual-2.2/postgis_enable_outdb_rasters.html) and [postgis.gdal_enabled_drivers](http://postgis.net/docs/postgis_gdal_enabled_drivers.html) settings:
+
+```sql
+ALTER SYSTEM SET postgis.enable_outdb_rasters TO True;
+ALTER SYSTEM SET postgis.gdal_enabled_drivers TO 'GTiff';
 ```
 
 Then:
