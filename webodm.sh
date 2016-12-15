@@ -33,8 +33,9 @@ check_command(){
 	fi
 
 	echo -e "Checking for $1... $check_msg"
-	
-	return 1
+	if [[ $not_found ]]; then
+		return 1
+	fi
 }
 
 environment_check(){
