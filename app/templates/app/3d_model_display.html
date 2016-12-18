@@ -1,0 +1,13 @@
+{% extends "app/logged_in_base.html" %}
+{% load i18n %}
+
+{% block content %}
+	<h3>{{title}}</h3>
+	
+	<div data-modelview
+		{% for key, value in params %}
+			data-{{key}}="{{value}}"
+		{% endfor %}
+	></div>
+
+{% endblock %}
