@@ -1,0 +1,52 @@
+'use strict';
+var MACROUTILS = require( 'osg/Utils' );
+var Animation = require( 'osgAnimation/animation' );
+var SkinningAttribute = require( 'osgAnimation/SkinningAttribute' );
+var AnimationUpdateCallback = require( 'osgAnimation/AnimationUpdateCallback' );
+var BasicAnimationManager = require( 'osgAnimation/BasicAnimationManager' );
+var Bone = require( 'osgAnimation/Bone' );
+var Channel = require( 'osgAnimation/channel' );
+var CollectAnimationUpdateCallbackVisitor = require( 'osgAnimation/CollectAnimationUpdateCallbackVisitor' );
+var Easing = require( 'osgAnimation/easing' );
+var Interpolator = require( 'osgAnimation/interpolator' );
+var MorphAttribute = require( 'osgAnimation/MorphAttribute' );
+var MorphGeometry = require( 'osgAnimation/MorphGeometry' );
+var RigGeometry = require( 'osgAnimation/RigGeometry' );
+var Skeleton = require( 'osgAnimation/Skeleton' );
+var StackedMatrix = require( 'osgAnimation/StackedMatrix' );
+var StackedQuaternion = require( 'osgAnimation/StackedQuaternion' );
+var StackedRotateAxis = require( 'osgAnimation/StackedRotateAxis' );
+var StackedScale = require( 'osgAnimation/StackedScale' );
+var StackedTranslate = require( 'osgAnimation/StackedTranslate' );
+var UpdateBone = require( 'osgAnimation/UpdateBone' );
+var UpdateMatrixTransform = require( 'osgAnimation/UpdateMatrixTransform' );
+var UpdateMorph = require( 'osgAnimation/UpdateMorph' );
+var UpdateSkeleton = require( 'osgAnimation/UpdateSkeleton' );
+
+
+var osgAnimation = {};
+
+MACROUTILS.objectMix( osgAnimation, Easing );
+MACROUTILS.objectMix( osgAnimation, Interpolator );
+osgAnimation.Animation = Animation;
+osgAnimation.SkinningAttribute = SkinningAttribute;
+osgAnimation.AnimationUpdateCallback = AnimationUpdateCallback;
+osgAnimation.BasicAnimationManager = BasicAnimationManager;
+osgAnimation.Bone = Bone;
+osgAnimation.Channel = Channel;
+osgAnimation.CollectAnimationUpdateCallbackVisitor = CollectAnimationUpdateCallbackVisitor;
+osgAnimation.MorphAttribute = MorphAttribute;
+osgAnimation.MorphGeometry = MorphGeometry;
+osgAnimation.RigGeometry = RigGeometry;
+osgAnimation.Skeleton = Skeleton;
+osgAnimation.StackedMatrix = StackedMatrix;
+osgAnimation.StackedQuaternion = StackedQuaternion;
+osgAnimation.StackedRotateAxis = StackedRotateAxis;
+osgAnimation.StackedScale = StackedScale;
+osgAnimation.StackedTranslate = StackedTranslate;
+osgAnimation.UpdateBone = UpdateBone;
+osgAnimation.UpdateMatrixTransform = UpdateMatrixTransform;
+osgAnimation.UpdateMorph = UpdateMorph;
+osgAnimation.UpdateSkeleton = UpdateSkeleton;
+
+module.exports = osgAnimation;

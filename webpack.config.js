@@ -4,6 +4,8 @@ let BundleTracker = require('webpack-bundle-tracker');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 
+let osgPath = path.resolve('app/static/app/js/vendor/osgjs');
+
 module.exports = {
   context: __dirname,
 
@@ -51,18 +53,42 @@ module.exports = {
       {
         test: /\.(png|jpg|jpeg|svg)/,
         loader: "url-loader?limit=100000"
+      },
+      {
+        // shaders
+        test: /\.(frag|vert|glsl)$/,
+        loader: 'raw-loader'
       }
     ]
   },
 
   resolve: {
     modulesDirectories: ['node_modules', 'bower_components'],
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
+
+    alias: {
+      osg: path.join(osgPath, 'osg'),
+      osgNameSpace: path.join(osgPath, 'osgNameSpace.js'),
+      osgAnimation: path.join(osgPath, 'osgAnimation'),
+      osgDB: path.join(osgPath, 'osgDB'),
+      osgGA: path.join(osgPath, 'osgGA'),
+      osgPlugins: path.join(osgPath, 'osgPlugins'),
+      osgShader: path.join(osgPath, 'osgShader'),
+      osgShadow: path.join(osgPath, 'osgShadow'),
+      osgText: path.join(osgPath, 'osgText'),
+      osgUtil: path.join(osgPath, 'osgUtil'),
+      osgViewer: path.join(osgPath, 'osgViewer'),
+      osgWrappers: path.join(osgPath, 'osgWrappers')      
+    }
   },
 
   externals: {
-        // require("jquery") is external and available
-        //  on the global let jQuery
-    "jquery": "jQuery"
+    // require("jquery") is external and available
+    //  on the global let jQuery
+    "jquery": "jQuery",
+    "zlib" : "Zlib",
+    "bluebird": "P",
+    "rstats": "rStats",
+    "hammer": "Hammer"
   }
 }

@@ -25,6 +25,17 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/bundles/css/main.css' %}" />
     <script src="{% static 'app/js/vendor/modernizr-2.8.3.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
+
+    <!-- Not sure if these are needed by OSGJS 
+    <script src="{% static 'app/js/vendor/core.js' %}"></script>
+    <script src="{% static 'app/js/vendor/rStats.js' %}"></script>
+    <script src="{% static 'app/js/vendor/rStats.extras.js' %}"></script>
+    <script src="{% static 'app/js/vendor/dat.gui.js' %}"></script>-->
+
+    <script src="{% static 'app/js/vendor/hammer.js' %}"></script>
+    <script src="{% static 'app/js/vendor/bluebird.js' %}"></script>
+
+
     {% load render_bundle from webpack_loader %}
     {% render_bundle 'main' %}
     <title>{{title|default:"Login"}} - WebODM</title>
