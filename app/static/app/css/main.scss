@@ -6,7 +6,7 @@ html{
     height: 50px;
     min-height: 50px;
     background-color: #18bc9c;
-    z-index: 999999;
+    z-index: 99999;
 
     .navbar-header{
         width: 100%;
@@ -91,7 +91,7 @@ ul#side-menu.nav{
     margin-bottom: 10px;
 }
 
-.modal-dialog{
+.modal-dialog, .modal{
     z-index: 999999;
 }
 
