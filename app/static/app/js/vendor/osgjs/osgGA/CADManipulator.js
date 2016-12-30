@@ -204,7 +204,7 @@ CADManipulator.prototype = MACROUTILS.objectInherit( Manipulator.prototype, {
 
             var bs = this.getHomeBound( boundStrategy );
             if ( !bs ) return;
-            debugger;
+
             this.setDistance( this.getHomeDistance( bs ) );
             this.setTarget( bs.center() );
             this.setPivotPoint( bs.center() );

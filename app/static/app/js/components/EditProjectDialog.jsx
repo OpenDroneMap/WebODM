@@ -1,5 +1,4 @@
 import React from 'react';
-import '../vendor/bootstrap.min';
 import ErrorMessage from './ErrorMessage';
 import '../css/EditProjectDialog.scss';
 import $ from 'jquery';

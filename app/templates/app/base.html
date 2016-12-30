@@ -35,9 +35,9 @@
     <script src="{% static 'app/js/vendor/hammer.js' %}"></script>
     <script src="{% static 'app/js/vendor/bluebird.js' %}"></script>
 
-
     {% load render_bundle from webpack_loader %}
     {% render_bundle 'main' %}
+
     <title>{{title|default:"Login"}} - WebODM</title>
 </head>
 <body data-admin-utc-offset="{% now "Z" %}">
