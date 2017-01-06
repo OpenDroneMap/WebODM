@@ -9,4 +9,19 @@
     background: -ms-radial-gradient(center, ellipse cover, rgba(79,79,79,1) 0%,rgba(22,22,22,1) 100%);
     background: radial-gradient(ellipse at center, rgba(79,79,79,1) 0%,rgba(22,22,22,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4f4f4f', endColorstr='#161616',GradientType=1 );
+    .container{
+    	position: relative;
+    	padding: 0;
+    }
+    .dg{
+	    &.main{
+		    position: absolute;
+		    right: 0px;
+	    }
+	    .c{
+	    	select{
+	    		color: black;
+	    	}
+	    }
+    }
 }

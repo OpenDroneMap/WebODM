@@ -86,7 +86,7 @@ class ModelView extends React.Component {
   // }
 
   componentDidMount() {
-    var canvas = this.canvas;
+    var container = this.container;
 
     var sceneProperties = {
       path:     "/static/app/test/conv/cloud.js",
@@ -137,7 +137,7 @@ class ModelView extends React.Component {
     var earthControls;
     var controls;
 
-    var progressBar = new ProgressBar();
+    var progressBar = new ProgressBar(container);
 
     var pointcloudPath = sceneProperties.path;
 
@@ -215,9 +215,8 @@ class ModelView extends React.Component {
       setMaterial(sceneProperties.material);
 
       // dat.gui
-      gui = new dat.GUI({
-        //height : 5 * 32 - 1
-      });
+      gui = new dat.GUI({autoPlace:false});
+      $(gui.domElement).prependTo(container);
       
       var params = {
         "points(m)": pointCountTarget,
@@ -377,17 +376,18 @@ class ModelView extends React.Component {
       });
 
       // stats
-      var stats = new Stats();
+      stats = new Stats();
       stats.domElement.style.position = 'absolute';
       stats.domElement.style.top = '0px';
       stats.domElement.style.margin = '5px';
-      document.body.appendChild( stats.domElement );
+      container.appendChild( stats.domElement );
+
     }
 
     const initThree = () => {
 
-      var width = canvas.clientWidth;
-      var height = canvas.clientHeight;
+      var width = container.clientWidth;
+      var height = container.clientHeight;
       var aspect = width / height;
       var near = 0.1;
       var far = 1000*1000;
@@ -406,7 +406,7 @@ class ModelView extends React.Component {
       renderer = new THREE.WebGLRenderer();
       renderer.setSize(width, height);
       renderer.autoClear = false;
-      canvas.appendChild(renderer.domElement);
+      container.appendChild(renderer.domElement);
       
       skybox = Potree.utils.loadSkybox("/static/app/test/resources/textures/skybox/");
 
@@ -697,20 +697,10 @@ class ModelView extends React.Component {
       }
       
       if(stats && showStats){
-        document.getElementById("lblNumVisibleNodes").style.display = "";
-          document.getElementById("lblNumVisiblePoints").style.display = "";
-          stats.domElement.style.display = "";
-      
+        stats.domElement.style.display = 'block';
         stats.update();
-      
-        if(pointcloud){
-          document.getElementById("lblNumVisibleNodes").innerHTML = "visible nodes: " + pointcloud.numVisibleNodes;
-          document.getElementById("lblNumVisiblePoints").innerHTML = "visible points: " + Potree.utils.addCommas(pointcloud.numVisiblePoints);
-        }
-      }else if(stats){
-        document.getElementById("lblNumVisibleNodes").style.display = "none";
-          document.getElementById("lblNumVisiblePoints").style.display = "none";
-          stats.domElement.style.display = "none";
+      }else if (stats){
+        stats.domElement.style.display = 'none';
       }
       
       camera.fov = fov;
@@ -863,8 +853,8 @@ class ModelView extends React.Component {
 
       this.render = function(){
         {// resize
-          var width = canvas.clientWidth;
-          var height = canvas.clientHeight;
+          var width = container.clientWidth;
+          var height = container.clientHeight;
           var aspect = width / height;
           
           camera.aspect = aspect;
@@ -988,8 +978,8 @@ class ModelView extends React.Component {
       // render with splats
       this.render = function(renderer){
       
-        var width = canvas.clientWidth;
-        var height = canvas.clientHeight;
+        var width = container.clientWidth;
+        var height = container.clientHeight;
       
         initHQSPlats();
         
@@ -1136,8 +1126,8 @@ class ModelView extends React.Component {
       };
       
       var resize = function(){
-        var width = canvas.clientWidth;
-        var height = canvas.clientHeight;
+        var width = container.clientWidth;
+        var height = container.clientHeight;
         var aspect = width / height;
         
         var needsResize = (rtColor.width != width || rtColor.height != height);
@@ -1193,8 +1183,8 @@ class ModelView extends React.Component {
         renderer.render(scene, camera);
         
         if(pointcloud){
-          var width = canvas.clientWidth;
-          var height = canvas.clientHeight;
+          var width = container.clientWidth;
+          var height = container.clientHeight;
         
           var octreeSize = pointcloud.pcoGeometry.boundingBox.size().x;
         
@@ -1293,7 +1283,8 @@ class ModelView extends React.Component {
   render(){
     return (<div className="model-view">
           <div 
-            ref={(domNode) => { this.canvas = domNode; }}
+            className="container"
+            ref={(domNode) => { this.container = domNode; }}
             style={{height: "100%", width: "100%"}} 
             onContextMenu={(e) => {e.preventDefault();}}></div>
       </div>);

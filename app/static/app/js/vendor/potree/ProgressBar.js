@@ -1,6 +1,6 @@
 
 
-function ProgressBar(){
+function ProgressBar(container){
 	this._progress = 0;
 	this._message = "";
 	
@@ -14,7 +14,7 @@ function ProgressBar(){
 	//this.elProgress.innerHTML = "progress";
 	
 	this.element.innerHTML = "";
-	this.element.style.position = "fixed";
+	this.element.style.position = "absolute";
 	this.element.style.bottom = "40px";
 	this.element.style.width = "200px";
 	this.element.style.marginLeft = "-100px";
@@ -39,11 +39,13 @@ function ProgressBar(){
 	
 	this.elProgressMessage.style.position = "absolute";
 	this.elProgressMessage.style.width = "100%";
+	this.elProgressMessage.style.fontSize = "10px";
+
 	this.elProgressMessage.innerHTML = "loading 1 / 10";
 	
 	
 	
-	document.body.appendChild(this.element);
+	container.appendChild(this.element);
 	this.element.appendChild(this.elProgress);
 	this.element.appendChild(this.elProgressMessage);
 	

@@ -1,4 +1,6 @@
 .dg {
+  color: white;
+
   /** Clear list styles */
   /* Auto-place container */
   /* Auto-placed GUI's */
@@ -18,7 +20,7 @@
     width: 100%;
     clear: both; }
   .dg.ac {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
