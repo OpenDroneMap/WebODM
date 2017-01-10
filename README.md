@@ -23,8 +23,8 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
 ```bash
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
-sudo easy_install pip
-sudo pip install docker-compose
+easy_install pip || sudo easy_install pip
+pip install docker-compose || sudo pip install docker-compose
 ./webodm.sh start
 ```
 
