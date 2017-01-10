@@ -28,7 +28,7 @@ sudo pip install docker-compose
 
 * If you're on Windows find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
 
-```
+```bash
 docker-machine ip
 ```
 
@@ -45,7 +45,7 @@ To stop WebODM press CTRL+C or run:
 
 To update WebODM to the latest version use:
 
-```
+```bash
 ./webodm.sh update
 ```
 
@@ -80,7 +80,7 @@ If you want to run WebODM natively, you will need to install:
 
 On Linux, make sure you have:
 
-```
+```bash
 apt-get install binutils libproj-dev gdal-bin
 ```
 
@@ -92,13 +92,13 @@ brew install postgres postgis
 
 Then these steps should be sufficient to get you up and running:
 
-```
+```bash
 git clone https://github.com/OpenDroneMap/WebODM
 ```
 
 Create a `WebODM\webodm\local_settings.py` file containing your database settings:
 
-```
+```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -120,7 +120,7 @@ ALTER SYSTEM SET postgis.gdal_enabled_drivers TO 'GTiff';
 
 Then:
 
-```
+```bash
 pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
@@ -130,7 +130,7 @@ chmod +x start.sh && ./start.sh
 
 If you are getting a `rt_raster_gdal_warp: Could not create GDAL transformation object for output dataset creation`, make sure that your PostGIS installation has PROJ support:
 
-```
+```sql
 SELECT PostGIS_Full_Version();
 ```
 
@@ -142,6 +142,7 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
 - [X] Task Processing
 - [X] 2D Map Display 
 - [ ] 3D model display
+- [ ] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner
 - [X] API
@@ -150,6 +151,7 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
 - [ ] iOS Mobile App
 - [ ] Processing Nodes Volunteer Network
 - [X] Unit Testing
+- [ ] Any Feature You Want!
 
 ## Terminology
 
@@ -159,6 +161,4 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
  - `ImageUpload`: aerial images.
  - `Mission`: A flight path and other information (overlap %, angle, ...) associated with a particular `Task`.
  
-![image](https://cloud.githubusercontent.com/assets/1951843/17680196/9bfe878e-6304-11e6-852e-c09f1e02f3c0.png)
-
-![er diagram - webodm 2](https://cloud.githubusercontent.com/assets/1951843/17717379/4a227e28-63d3-11e6-9518-6a63cc1bcd3b.png)
+[![WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier](https://img.youtube.com/vi/UnN-NzL96T8/0.jpg)](https://www.youtube.com/watch?v=UnN-NzL96T8 "WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier")
