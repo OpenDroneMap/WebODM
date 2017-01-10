@@ -18,10 +18,11 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
  - [Git](https://git-scm.com/downloads)
 
 * From the Docker Quickstart Terminal (Windows) or from the command line (Mac / Linux) type:
-```
+```bash
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
-pip install docker-compose
+sudo easy_install pip
+sudo pip install docker-compose
 ./webodm.sh start
 ```
 
@@ -49,6 +50,19 @@ To update WebODM to the latest version use:
 ```
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
+
+### Common Troubleshooting
+
+if you get the following error while starting WebODM:
+```bash
+from six.moves import _thread as thread
+ImportError: cannot import name _thread
+```
+
+Try running:
+```bash
+sudo pip install --ignore-installed six
+```
 
 If you are getting a **MemoryError** while processing the images, make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
 
