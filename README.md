@@ -155,7 +155,8 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
 - [ ] iOS Mobile App
 - [ ] Processing Nodes Volunteer Network
 - [X] Unit Testing
-- [ ] Any Feature You Want!
+
+Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md). 
 
 ## Terminology
 
