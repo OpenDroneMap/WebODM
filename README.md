@@ -8,6 +8,8 @@ A free, user-friendly, extendable application and API for drone image processing
 
 ![Alt text](/screenshots/dashboard.png?raw=true "Dashboard")
 
+[![WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier](https://img.youtube.com/vi/UnN-NzL96T8/0.jpg)](https://www.youtube.com/watch?v=UnN-NzL96T8 "WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier")
+
 If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork, contribute something that interests you, and make a pull request! All ideas are considered and people of all skill levels are welcome. See the [Contributing](/CONTRIBUTING.md) document for more information.
 
 ## Getting Started
@@ -65,6 +67,8 @@ sudo pip install --ignore-installed six
 ```
 
 If you are getting a **MemoryError** while processing the images, make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
+
+Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
 ### Add More Processing Nodes
 
@@ -160,5 +164,4 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
  - `ProcessingNode`: An instance usually running on a separate VM, or on a separate machine which accepts aerial images, runs OpenDroneMap and returns the processed results (orthophoto, georeferenced model, etc.). Each node communicates with WebODM via a lightweight API such as [node-OpenDroneMap](https://www.github.com/pierotofy/node-OpenDroneMap). WebODM manages the distribution of `Task` to different `ProcessingNode` instances.
  - `ImageUpload`: aerial images.
  - `Mission`: A flight path and other information (overlap %, angle, ...) associated with a particular `Task`.
- 
-[![WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier](https://img.youtube.com/vi/UnN-NzL96T8/0.jpg)](https://www.youtube.com/watch?v=UnN-NzL96T8 "WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier")
+
