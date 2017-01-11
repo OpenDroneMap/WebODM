@@ -1,6 +1,9 @@
-.map-view{
-    height: 500px;
+[data-mapview]{
+    height: 100%;
+}
 
+.map-view{
+    height: 80%;
     input[type="range"]{
         margin-left: 4px;
         display: inline-block;

@@ -491,6 +491,7 @@
     position: relative;
     margin-right: -300px; }
   .admin-area #footer {
+    display: none;
     clear: both;
     padding: 10px; }
   .admin-area .colMS {

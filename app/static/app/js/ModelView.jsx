@@ -32,7 +32,9 @@ class ModelView extends React.Component {
     var container = this.container;
 
     var sceneProperties = {
-      path:     "/static/app/test/conv/cloud.js",
+      // path:     "/static/app/test/lion_takanawa/cloud.js",
+      // path:     "/static/app/test/conv/cloud.js",
+      path:     "/static/app/test/brighton/cloud.js",
       cameraPosition: null,
       cameraTarget: null,
       sizeType:     "Adaptive",     // options: "Fixed", "Attenuated", "Adaptive"
@@ -41,17 +43,8 @@ class ModelView extends React.Component {
       material:     "RGB",        // options: "RGB", "Height", "Intensity", "Classification"
       pointLimit:   1,          // max number of points in millions
       navigation:   "Orbit",      // options: "Earth", "Orbit", "Flight"
-      pointSize:    1.2,  
-      useEDL:     false,        // eye-dome-lighting, especially usefull for point clouds without normals
+      pointSize:    1.2
     };
-
-    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-      sceneProperties.navigation = "Orbit";
-    }
-
-    if(sceneProperties.useEDL && !Potree.Features.SHADER_EDL.isSupported()){
-      sceneProperties.useEDL = false;
-    }
 
     if(sceneProperties.quality === null){
       sceneProperties.quality = "Squares";
@@ -112,8 +105,6 @@ class ModelView extends React.Component {
     };
 
     function setQuality(value){
-      
-
       if(value == "Interpolation" && !Potree.Features.SHADER_INTERPOLATION.isSupported()){
         quality = "Squares";
       }else if(value == "Splats" && !Potree.Features.SHADER_SPLATS.isSupported()){
@@ -162,32 +153,36 @@ class ModelView extends React.Component {
       $(gui.domElement).prependTo(container);
       
       var params = {
-        "points(m)": pointCountTarget,
-        PointSize: pointSize,
+        "Textured Model": false,
+        "Points": pointCountTarget,
+        "Point Size": pointSize,
         "FOV": sceneProperties.fov,
-        "opacity": opacity,
-        "SizeType" : sceneProperties.sizeType,
-        "show octree" : false,
+        "Opacity": opacity,
+        "Size Type" : sceneProperties.sizeType,
+        "Show Octree" : false,
         "Materials" : sceneProperties.material,
         "Clip Mode": "Highlight Inside",
-        "quality": sceneProperties.quality,
-        "EDL": sceneProperties.useEDL,
-        "skybox": false,
-        "stats": showStats,
-        "BoundingBox": showBoundingBox,
+        "Quality": sceneProperties.quality,
+        "Skybox": false,
+        "WebGL Stats": showStats,
+        "Show Origin": false,
+        "Bounding Box": showBoundingBox,
         "DEM Collisions": useDEMCollisions,
-        "MinNodeSize": minNodeSize,
-        "freeze": freeze
+        "Minimum Node Size": minNodeSize,
+        "Freeze": freeze
       };
+
+      var pToggleTexturedModel = gui.add(params, 'Textured Model');
+      pToggleTexturedModel.onChange(toggleTexturedModel);
       
-      var pPoints = gui.add(params, 'points(m)', 0, 4);
+      var pPoints = gui.add(params, 'Points', 0, 4);
       pPoints.onChange(function(value){
         pointCountTarget = value ;
       });
       
       var fAppearance = gui.addFolder('Appearance');
       
-      var pPointSize = fAppearance.add(params, 'PointSize', 0, 3);
+      var pPointSize = fAppearance.add(params, 'Point Size', 0, 3);
       pPointSize.onChange(function(value){
         pointSize = value;
       });
@@ -197,12 +192,12 @@ class ModelView extends React.Component {
         fov = value;
       });
       
-      var pOpacity = fAppearance.add(params, 'opacity', 0, 1);
+      var pOpacity = fAppearance.add(params, 'Opacity', 0, 1);
       pOpacity.onChange(function(value){
         opacity = value;
       });
       
-      var pSizeType = fAppearance.add(params, 'SizeType', [ "Fixed", "Attenuated", "Adaptive"]);
+      var pSizeType = fAppearance.add(params, 'Size Type', [ "Fixed", "Attenuated", "Adaptive"]);
       pSizeType.onChange(function(value){
         setPointSizeType(value);
       });
@@ -257,19 +252,12 @@ class ModelView extends React.Component {
       if(Potree.Features.SHADER_SPLATS.isSupported()){
         qualityOptions.push("Splats");
       }
-      var pQuality = fAppearance.add(params, 'quality', qualityOptions);
+      var pQuality = fAppearance.add(params, 'Quality', qualityOptions);
       pQuality.onChange(function(value){
         quality = value;
       });
       
-      if(Potree.Features.SHADER_EDL.isSupported()){
-        var pEDL = fAppearance.add(params, 'EDL');
-        pEDL.onChange(function(value){
-          sceneProperties.useEDL = value;
-        });
-      }
-      
-      var pSykbox = fAppearance.add(params, 'skybox');
+      var pSykbox = fAppearance.add(params, 'Skybox');
       pSykbox.onChange(function(value){
         showSkybox = value;
       });
@@ -292,28 +280,28 @@ class ModelView extends React.Component {
         useDEMCollisions = value;
       });
       
-      var pMinNodeSize = fSettings.add(params, 'MinNodeSize', 0, 1500);
+      var pMinNodeSize = fSettings.add(params, 'Minimum Node Size', 0, 1500);
       pMinNodeSize.onChange(function(value){
         minNodeSize = value;
       });
       
-      
-      
-      
       var fDebug = gui.addFolder('Debug');
 
       
-      var pStats = fDebug.add(params, 'stats');
+      var pStats = fDebug.add(params, 'WebGL Stats');
       pStats.onChange(function(value){
         showStats = value;
       });
       
-      var pBoundingBox = fDebug.add(params, 'BoundingBox');
+      var pShowOrigin = fDebug.add(params, 'Show Origin');
+      pShowOrigin.onChange(toggleOrigin);
+
+      var pBoundingBox = fDebug.add(params, 'Bounding Box');
       pBoundingBox.onChange(function(value){
         showBoundingBox = value;
       });
       
-      var pFreeze = fDebug.add(params, 'freeze');
+      var pFreeze = fDebug.add(params, 'Freeze');
       pFreeze.onChange(function(value){
         freeze = value;
       });
@@ -324,13 +312,12 @@ class ModelView extends React.Component {
       stats.domElement.style.top = '0px';
       stats.domElement.style.margin = '5px';
       container.appendChild( stats.domElement );
-
     }
 
-    const initThree = () => {
+    var width = container.clientWidth;
+    var height = container.clientHeight;
 
-      var width = container.clientWidth;
-      var height = container.clientHeight;
+    const initThree = () => {
       var aspect = width / height;
       var near = 0.1;
       var far = 1000*1000;
@@ -374,9 +361,6 @@ class ModelView extends React.Component {
       
       // enable frag_depth extension for the interpolation shader, if available
       renderer.context.getExtension("EXT_frag_depth");
-      
-      var axisHelper = new THREE.AxisHelper( 35 );
-      scene.add( axisHelper );
 
       // load pointcloud
       if(pointcloudPath.indexOf("cloud.js") > 0){
@@ -410,7 +394,6 @@ class ModelView extends React.Component {
           
           flipYZ();
           camera.zoomTo(pointcloud, 1);
-          
           initGUI();  
         
           earthControls.pointclouds.push(pointcloud); 
@@ -438,22 +421,16 @@ class ModelView extends React.Component {
             if(sceneProperties.navigation === "Orbit"){
               controls.target.copy(ct);
             }
-          }
-
-          addObjModel();          
+          }         
         });
       }else{
         throw new Error("pointcloudPath does not contain a reference to cloud.js");
       }
       
-      var grid = Potree.utils.createGrid(5, 5, 2);
-      scene.add(grid);
-      
       measuringTool = new Potree.MeasuringTool(scenePointCloud, camera, renderer);
       profileTool = new Potree.ProfileTool(scenePointCloud, camera, renderer);
       volumeTool = new Potree.VolumeTool(scenePointCloud, camera, renderer);
       transformationTool = new Potree.TransformationTool(scenePointCloud, camera, renderer);
-      
       
       // background
       var texture = Potree.utils.createBackgroundTexture(512, 512);
@@ -467,7 +444,6 @@ class ModelView extends React.Component {
           map: texture
         })
       );
-      //bg.position.z = -1;
       bg.material.depthTest = false;
       bg.material.depthWrite = false;
       sceneBG.add(bg);      
@@ -481,39 +457,83 @@ class ModelView extends React.Component {
       
       var light = new THREE.AmbientLight( 0x555555 ); // soft white light
       scenePointCloud.add( light );
-
-
-      function addObjModel(){
-        var cube = new THREE.Mesh( new THREE.CubeGeometry( 10, 10, 10 ), new THREE.MeshNormalMaterial() );
-        cube.position.copy(referenceFrame.position);
-        console.log(referenceFrame.position);
-        scenePointCloud.add(cube);
-
-        var mtlLoader = new THREE.MTLLoader();
-        mtlLoader.setTexturePath('/static/app/test/');
-        mtlLoader.setPath('/static/app/test/');
-
-        mtlLoader.load('odm_textured_model.mtl', function (materials) {
-            materials.preload();
-
-            const objLoader = new THREE.OBJLoader();
-            objLoader.setMaterials(materials);
-            objLoader.load('/static/app/test/odm_textured_model.obj', function (object) {
-                
-                // object.position.copy(referenceFrame.position);
-                // object.updateMatrixWorld(true);
-
-                // pointcloud.rotateY(THREE.Math.degToRad(-30));
-                // pointcloud.rotateZ(THREE.Math.degToRad(60));
-
-
-                referenceFrame.add(object);
-            });
-        });
-      }
-
-      
     }
+
+    const toggleTexturedModel = (function(){
+      let modelReference = null,
+          initializingModel = false;
+
+      return function(flag){
+        if (flag){
+          // Need to load model for the first time?
+          if (modelReference === null && !initializingModel){
+
+            initializingModel = true;
+            const mtlLoader = new THREE.MTLLoader();
+            mtlLoader.setTexturePath('/static/app/test/brighton/');
+            mtlLoader.setPath('/static/app/test/brighton/');
+
+            mtlLoader.load('odm_textured_model.mtl', function (materials) {
+                materials.preload();
+
+                const objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.load('/static/app/test/brighton/odm_textured_model_geo.obj', function (object) {
+                    
+                    // ODM models are Y-up
+                    object.rotateX(THREE.Math.degToRad(-90));
+
+                    // Bring the model close to center
+                    if (object.children.length > 0){
+                      const geom = object.children[0].geometry;
+
+                      // Compute center
+                      geom.computeBoundingBox();
+
+                      const center = geom.boundingBox.getCenter();
+
+                      object.translateX(-center.x);
+                      object.translateY(-center.y);
+                      object.translateZ(-center.z);
+                    } 
+
+                    scenePointCloud.add(object);
+                    pointcloud.visible = false;
+
+                    modelReference = object;
+                    initializingModel = false;
+                });
+            });
+          }else{
+            // Already initialized
+            modelReference.visible = true;
+            pointcloud.visible = false;
+          }
+        }else{
+          modelReference.visible = false;
+          pointcloud.visible = true;
+        }
+      }
+    })();
+
+    const toggleOrigin = (function(){
+      let grid = null,
+          axisHelper = null;
+      return function(flag){
+        if (flag){
+          if (grid === null){
+            grid = Potree.utils.createGrid(5, 5, 2);
+            axisHelper = new THREE.AxisHelper( 10 );
+            scene.add( grid );
+            scene.add( axisHelper );
+          }else{
+            grid.visible = axisHelper.visible = true;
+          }
+        }else{
+          grid.visible = axisHelper.visible = false;
+        }
+      };
+    })();
 
     function flipYZ(){
       isFlipYZ = !isFlipYZ;
@@ -685,22 +705,6 @@ class ModelView extends React.Component {
       if(pointcloud){
         pointcloud.material.setClipBoxes(clipBoxes);
       }
-      
-      //if(pointcloud){
-      //
-      //  var levels = new Uint32Array(20);
-      //
-      //  var vn = pointcloud.visibleNodes;
-      //  for(var i = 0; i < vn.length; i++){
-      //    var node = vn[i].node;
-      //    var level = node.level;
-      //    
-      //    levels[level]++;
-      //  }
-      //  
-      //  var a;
-      //}
-      
     }
 
     function useEarthControls(){
@@ -772,19 +776,19 @@ class ModelView extends React.Component {
       }
     }
 
-    var PotreeRenderer = function(){
+    window.addEventListener("resize", function(){
+      width = container.clientWidth;
+      height = container.clientHeight;
+    });
 
+    var PotreeRenderer = function(){
       this.render = function(){
-        {// resize
-          var width = container.clientWidth;
-          var height = container.clientHeight;
-          var aspect = width / height;
-          
-          camera.aspect = aspect;
-          camera.updateProjectionMatrix();
-          
-          renderer.setSize(width, height);
-        }
+        var aspect = width / height;
+        
+        camera.aspect = aspect;
+        camera.updateProjectionMatrix();
+        
+        renderer.setSize(width, height);
         
 
         // render skybox
@@ -829,7 +833,6 @@ class ModelView extends React.Component {
     // high quality rendering using splats
     var highQualityRenderer = null;
     var HighQualityRenderer = function(){
-
       var depthMaterial = null;
       var attributeMaterial = null;
       var normalizationMaterial = null;
@@ -900,10 +903,6 @@ class ModelView extends React.Component {
 
       // render with splats
       this.render = function(renderer){
-      
-        var width = container.clientWidth;
-        var height = container.clientHeight;
-      
         initHQSPlats();
         
         resize(width, height);
@@ -997,197 +996,11 @@ class ModelView extends React.Component {
       }
     };
 
-
-
-    var edlRenderer = null;
-    var EDLRenderer = function(){
-
-      var edlMaterial = null;
-      var attributeMaterial = null;
-      
-      //var depthTexture = null;
-      
-      var rtColor = null;
-      var gl = renderer.context;
-      
-      var initEDL = function(){
-        if(edlMaterial != null){
-          return;
-        }
-        
-        //var depthTextureExt = gl.getExtension("WEBGL_depth_texture"); 
-        
-        edlMaterial = new Potree.EyeDomeLightingMaterial();
-        attributeMaterial = new Potree.PointCloudMaterial();
-              
-        attributeMaterial.pointShape = Potree.PointShape.CIRCLE;
-        attributeMaterial.interpolate = false;
-        attributeMaterial.weighted = false;
-        attributeMaterial.minSize = 2;
-        attributeMaterial.useLogarithmicDepthBuffer = false;
-        attributeMaterial.useEDL = true;
-
-        rtColor = new THREE.WebGLRenderTarget( 1024, 1024, { 
-          minFilter: THREE.LinearFilter, 
-          magFilter: THREE.NearestFilter, 
-          format: THREE.RGBAFormat, 
-          type: THREE.FloatType,
-          //type: THREE.UnsignedByteType,
-          //depthBuffer: false,
-          //stencilBuffer: false
-        } );
-        
-        //depthTexture = new THREE.Texture();
-        //depthTexture.__webglInit = true;
-        //depthTexture.__webglTexture = gl.createTexture();;
-        //gl.bindTexture(gl.TEXTURE_2D, depthTexture.__webglTexture);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        //gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, 1024, 1024, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
-      };
-      
-      var resize = function(){
-        var width = container.clientWidth;
-        var height = container.clientHeight;
-        var aspect = width / height;
-        
-        var needsResize = (rtColor.width != width || rtColor.height != height);
-      
-        // disposal will be unnecessary once this fix made it into three.js master: 
-        // https://github.com/mrdoob/three.js/pull/6355
-        if(needsResize){
-          rtColor.dispose();
-        }
-        
-        camera.aspect = aspect;
-        camera.updateProjectionMatrix();
-        
-        renderer.setSize(width, height);
-        rtColor.setSize(width, height);
-        
-        //if(needsResize){
-        //  renderer.setRenderTarget(rtColor);
-        //  var framebuffer = rtColor.__webglFramebuffer;
-        //  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-        //  
-        //  
-        //  gl.bindRenderbuffer( gl.RENDERBUFFER, rtColor.__webglRenderbuffer );
-        //  gl.renderbufferStorage( gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rtColor.width, rtColor.height );
-        //  gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, null );
-        //  
-        //  gl.bindTexture(gl.TEXTURE_2D, depthTexture.__webglTexture);
-        //  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        //  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        //  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        //  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        //  gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
-        //  
-        //  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture.__webglTexture, 0);
-        //  
-        //  renderer.setRenderTarget(null);
-        //}
-      }
-
-      this.render = function(){
-      
-        initEDL();
-        
-        resize();
-        
-        renderer.clear();
-        if(showSkybox){
-          skybox.camera.rotation.copy(camera.rotation);
-          renderer.render(skybox.scene, skybox.camera);
-        }else{
-          renderer.render(sceneBG, cameraBG);
-        }
-        renderer.render(scene, camera);
-        
-        if(pointcloud){
-          var width = container.clientWidth;
-          var height = container.clientHeight;
-        
-          var octreeSize = pointcloud.pcoGeometry.boundingBox.size().x;
-        
-          pointcloud.visiblePointsTarget = pointCountTarget * 1000 * 1000;
-          var originalMaterial = pointcloud.material;
-          
-          {// COLOR & DEPTH PASS
-            attributeMaterial.size = pointSize;
-            attributeMaterial.pointSizeType = pointSizeType;
-            attributeMaterial.screenWidth = width;
-            attributeMaterial.screenHeight = height;
-            attributeMaterial.pointColorType = pointColorType;
-            attributeMaterial.uniforms.visibleNodes.value = pointcloud.material.visibleNodesTexture;
-            attributeMaterial.uniforms.octreeSize.value = octreeSize;
-            attributeMaterial.fov = camera.fov * (Math.PI / 180);
-            attributeMaterial.spacing = pointcloud.pcoGeometry.spacing;
-            attributeMaterial.near = camera.near;
-            attributeMaterial.far = camera.far;
-            attributeMaterial.heightMin = heightMin;
-            attributeMaterial.heightMax = heightMax;
-            attributeMaterial.intensityMin = pointcloud.material.intensityMin;
-            attributeMaterial.intensityMax = pointcloud.material.intensityMax;
-            attributeMaterial.setClipBoxes(pointcloud.material.clipBoxes);
-            attributeMaterial.clipMode = pointcloud.material.clipMode;
-            attributeMaterial.bbSize = pointcloud.material.bbSize;
-            attributeMaterial.treeType = pointcloud.material.treeType;
-            
-            scenePointCloud.overrideMaterial = attributeMaterial;
-            renderer.clearTarget( rtColor, true, true, true );
-            renderer.render(scenePointCloud, camera, rtColor);
-            scenePointCloud.overrideMaterial = null;
-          }
-          
-          { // EDL OCCLUSION PASS
-            edlMaterial.uniforms.screenWidth.value = width;
-            edlMaterial.uniforms.screenHeight.value = height;
-            edlMaterial.uniforms.near.value = camera.near;
-            edlMaterial.uniforms.far.value = camera.far;
-            edlMaterial.uniforms.colorMap.value = rtColor;
-            edlMaterial.uniforms.expScale.value = camera.far;
-            
-            //edlMaterial.uniforms.depthMap.value = depthTexture;
-          
-            Potree.utils.screenPass.render(renderer, edlMaterial);
-          } 
-          
-          renderer.render(scene, camera);
-          
-          profileTool.render();
-          volumeTool.render();
-          renderer.clearDepth();
-          measuringTool.render();
-          transformationTool.render();
-        }
-
-
-      }
-    };
-
-    //var toggleMessage = 0;
-
     function loop() {
       requestAnimationFrame(loop);
-      
-      //var start = new Date().getTime();
       update();
-      //var end = new Date().getTime();
-      //var duration = end - start;
-      //toggleMessage++;
-      //if(toggleMessage > 30){
-      //  document.getElementById("lblMessage").innerHTML = "update: " + duration + "ms";
-      //  toggleMessage = 0;
-      //}
       
-      if(sceneProperties.useEDL){
-        if(!edlRenderer){
-          edlRenderer = new EDLRenderer();
-        }
-        edlRenderer.render(renderer);
-      }else if(quality === "Splats"){
+      if(quality === "Splats"){
         if(!highQualityRenderer){
           highQualityRenderer = new HighQualityRenderer();
         }
@@ -1202,6 +1015,7 @@ class ModelView extends React.Component {
     initThree();
     loop();
   }
+
   // React render
   render(){
     return (<div className="model-view">
