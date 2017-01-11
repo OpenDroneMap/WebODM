@@ -43,7 +43,7 @@
     "react-hot-loader": "^3.0.0-beta.5",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
-    "three": "^0.71.0",
+    "three": "^0.83.0",
     "three-orbit-controls": "^82.1.0",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.2",

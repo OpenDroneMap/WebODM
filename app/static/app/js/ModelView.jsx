@@ -28,63 +28,6 @@ class ModelView extends React.Component {
     };
   }
 
-  // componentDidMount() {
-  //   let camera, controls, scene, renderer;
-
-  //   const init = () => {
-  //     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-  //     camera.up = new THREE.Vector3( 0, 0, -1 );
-  //     camera.position.set(0, 0, -20);
-
-  //     scene = new THREE.Scene();
-  //     const ambient = new THREE.AmbientLight(0xFFFFFF, 1.0);
-  //     scene.add(ambient);
-
-  //     var mtlLoader = new THREE.MTLLoader();
-  //     mtlLoader.setTexturePath('/static/app/test/');
-  //     mtlLoader.setPath('/static/app/test/');
-  //     mtlLoader.load('odm_textured_model.mtl', function (materials) {
-  //         materials.preload();
-
-
-  //         const objLoader = new THREE.OBJLoader();
-  //         objLoader.setMaterials(materials);
-  //         objLoader.load('/static/app/test/odm_textured_model.obj', function (object) {
-  //             scene.add(object);
-
-  //             // Focus on object
-  //             var bb = new THREE.Box3()
-  //             bb.setFromObject(object);
-  //             bb.getCenter(controls.target);
-
-  //             controls.zoom = 5;
-  //         });
-  //     });
-
-  //     renderer = new THREE.WebGLRenderer();
-  //     renderer.setPixelRatio(window.devicePixelRatio);
-  //     renderer.setSize($(canvas).width(), $(canvas).height());
-
-  //     controls = new THREE.OrbitControls(camera, renderer.domElement);
-  //     controls.enableDamping = true;
-  //     controls.dampingFactor = 0.25;
-  //     controls.enableZoom = true;
-  //     controls.rotateSpeed = 0.5;
-  //     controls.zoomSpeed = 1.5;
-
-  //     canvas.appendChild(renderer.domElement);
-  //   };
-
-  //   function render() {
-  //     requestAnimationFrame(render);
-  //     controls.update();
-  //     renderer.render(scene, camera);
-  //   }
-
-  //   init();
-  //   render();
-  // }
-
   componentDidMount() {
     var container = this.container;
 
@@ -414,6 +357,7 @@ class ModelView extends React.Component {
       camera.position.set(-304, 372, 318);
       camera.rotation.y = -Math.PI / 4;
       camera.rotation.x = -Math.PI / 6;
+      
       //useOrbitControls();
       earthControls = new THREE.EarthControls(camera, renderer, scenePointCloud);
       earthControls.addEventListener("proposeTransform", function(event){
@@ -431,10 +375,11 @@ class ModelView extends React.Component {
       // enable frag_depth extension for the interpolation shader, if available
       renderer.context.getExtension("EXT_frag_depth");
       
+      var axisHelper = new THREE.AxisHelper( 35 );
+      scene.add( axisHelper );
+
       // load pointcloud
-      if(!pointcloudPath){
-        
-      }else if(pointcloudPath.indexOf("cloud.js") > 0){
+      if(pointcloudPath.indexOf("cloud.js") > 0){
         Potree.POCLoader.load(pointcloudPath, function(geometry){
           pointcloud = new Potree.PointCloudOctree(geometry);
           
@@ -449,7 +394,7 @@ class ModelView extends React.Component {
           
           referenceFrame.position.copy(sg.center).multiplyScalar(-1);
           referenceFrame.updateMatrixWorld(true);
-          
+
           if(sg.radius > 50*1000){
             camera.near = 10;
           }else if(sg.radius > 10*1000){
@@ -469,8 +414,6 @@ class ModelView extends React.Component {
           initGUI();  
         
           earthControls.pointclouds.push(pointcloud); 
-          
-          
           
           if(sceneProperties.navigation === "Earth"){
             useEarthControls();
@@ -496,61 +439,11 @@ class ModelView extends React.Component {
               controls.target.copy(ct);
             }
           }
-          
+
+          addObjModel();          
         });
-      }else if(pointcloudPath.indexOf(".vpc") > 0){
-        Potree.PointCloudArena4DGeometry.load(pointcloudPath, function(geometry){
-          pointcloud = new Potree.PointCloudArena4D(geometry);
-          pointcloud.visiblePointsTarget = 500*1000;
-          
-          //pointcloud.applyMatrix(new THREE.Matrix4().set(
-          //  1,0,0,0,
-          //  0,0,1,0,
-          //  0,-1,0,0,
-          //  0,0,0,1
-          //));
-          
-          referenceFrame.add(pointcloud);
-          
-          flipYZ();
-          
-          referenceFrame.updateMatrixWorld(true);
-          var sg = pointcloud.boundingSphere.clone().applyMatrix4(pointcloud.matrixWorld);
-          
-          referenceFrame.position.sub(sg.center);
-          referenceFrame.position.y += sg.radius / 2;
-          referenceFrame.updateMatrixWorld(true);
-          
-          camera.zoomTo(pointcloud, 1);
-          
-          initGUI();
-          pointcloud.material.interpolation = false;
-          pointcloud.material.pointSizeType = Potree.PointSizeType.ATTENUATED;
-          earthControls.pointclouds.push(pointcloud); 
-          
-          
-          if(sceneProperties.navigation === "Earth"){
-            useEarthControls();
-          }else if(sceneProperties.navigation === "Orbit"){
-            useOrbitControls();
-          }else if(sceneProperties.navigation === "Flight"){
-            useFPSControls();
-          }else{
-            console.warning("No navigation mode specivied. Using OrbitControls");
-            useOrbitControls();
-          }
-          
-          if(sceneProperties.cameraPosition != null){
-            var cp = new THREE.Vector3(sceneProperties.cameraPosition[0], sceneProperties.cameraPosition[1], sceneProperties.cameraPosition[2]);
-            camera.position.copy(cp);
-          }
-          
-          if(sceneProperties.cameraTarget != null){
-            var ct = new THREE.Vector3(sceneProperties.cameraTarget[0], sceneProperties.cameraTarget[1], sceneProperties.cameraTarget[2]);
-            camera.lookAt(ct);
-          }
-          
-        });
+      }else{
+        throw new Error("pointcloudPath does not contain a reference to cloud.js");
       }
       
       var grid = Potree.utils.createGrid(5, 5, 2);
@@ -563,7 +456,6 @@ class ModelView extends React.Component {
       
       
       // background
-      // var texture = THREE.ImageUtils.loadTexture( '/static/app/test/resources/textures/background.gif' );
       var texture = Potree.utils.createBackgroundTexture(512, 512);
       
       texture.minFilter = texture.magFilter = THREE.NearestFilter;
@@ -589,6 +481,37 @@ class ModelView extends React.Component {
       
       var light = new THREE.AmbientLight( 0x555555 ); // soft white light
       scenePointCloud.add( light );
+
+
+      function addObjModel(){
+        var cube = new THREE.Mesh( new THREE.CubeGeometry( 10, 10, 10 ), new THREE.MeshNormalMaterial() );
+        cube.position.copy(referenceFrame.position);
+        console.log(referenceFrame.position);
+        scenePointCloud.add(cube);
+
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.setTexturePath('/static/app/test/');
+        mtlLoader.setPath('/static/app/test/');
+
+        mtlLoader.load('odm_textured_model.mtl', function (materials) {
+            materials.preload();
+
+            const objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.load('/static/app/test/odm_textured_model.obj', function (object) {
+                
+                // object.position.copy(referenceFrame.position);
+                // object.updateMatrixWorld(true);
+
+                // pointcloud.rotateY(THREE.Math.degToRad(-30));
+                // pointcloud.rotateZ(THREE.Math.degToRad(60));
+
+
+                referenceFrame.add(object);
+            });
+        });
+      }
+
       
     }
 

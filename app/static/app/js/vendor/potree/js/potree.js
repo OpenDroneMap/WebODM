@@ -1843,6 +1843,65 @@ Potree.PointCloudMaterial = function(parameters){
 		hemisphereLightSkyColor: 	{ type: "fv", value: null },
 		hemisphereLightGroundColor: { type: "fv", value: null },
 		hemisphereLightDirection: 	{ type: "fv", value: null },
+
+		directionalLights: { value: [], properties: {
+			direction: {},
+			color: {},
+
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+
+		directionalShadowMap: { value: [] },
+		directionalShadowMatrix: { value: [] },
+
+		spotLights: { value: [], properties: {
+			color: {},
+			position: {},
+			direction: {},
+			distance: {},
+			coneCos: {},
+			penumbraCos: {},
+			decay: {},
+
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+
+		spotShadowMap: { value: [] },
+		spotShadowMatrix: { value: [] },
+
+		pointLights: { value: [], properties: {
+			color: {},
+			position: {},
+			decay: {},
+			distance: {},
+
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+
+		pointShadowMap: { value: [] },
+		pointShadowMatrix: { value: [] },
+
+		hemisphereLights: { value: [], properties: {
+			direction: {},
+			skyColor: {},
+			groundColor: {}
+		} },
+		
+		rectAreaLights: { value: [], properties: {
+			color: {},
+			position: {},
+			width: {},
+			height: {}
+		} }
 	};
 	
 	this.defaultAttributeValues.normal = [0,0,0];
@@ -4177,7 +4236,7 @@ Potree.PointCloudOctree.prototype.updateVisibility = function(camera, renderer){
 			
 			if((typeof parent === "undefined" || parent instanceof Potree.PointCloudOctreeNode) && geometryNode.loaded){
 				var pcoNode = new Potree.PointCloudOctreeNode();
-				var sceneNode = new THREE.PointCloud(geometry, this.material);
+				var sceneNode = new THREE.Points(geometry, this.material);
 				sceneNode.visible = false;
 				
 				pcoNode.name = geometryNode.name;
@@ -4330,7 +4389,7 @@ Potree.PointCloudOctree.prototype.updateMaterial = function(material, visibleNod
 	material.spacing = this.pcoGeometry.spacing;
 	material.near = camera.near;
 	material.far = camera.far;
-	material.uniforms.octreeSize.value = this.pcoGeometry.boundingBox.size().x;
+	material.uniforms.octreeSize.value = this.pcoGeometry.boundingBox.getSize().x;
 	
 	// update visibility texture
 	if(material.pointSizeType){
@@ -4671,7 +4730,7 @@ Potree.PointCloudOctree.prototype.getProfile = function(start, end, width, depth
 			
 			var pointsFound = 0;
 			
-			if(object instanceof THREE.PointCloud){
+			if(object instanceof THREE.Points){
 				var geometry = object.geometry;
 				var positions = geometry.attributes.position;
 				var p = positions.array;
@@ -4734,7 +4793,7 @@ Potree.PointCloudOctree.prototype.getProfile = function(start, end, width, depth
 			if(object == this || object.level < depth){
 				for(var i = 0; i < object.children.length; i++){
 					var child = object.children[i];
-					if(child instanceof THREE.PointCloud){
+					if(child instanceof THREE.Points){
 						var sphere = child.boundingSphere.clone().applyMatrix4(child.matrixWorld);
 						if(cutPlane.distanceToSphere(sphere) < sphere.radius){
 							stack.push(child);	
@@ -4995,7 +5054,7 @@ Potree.PointCloudOctree.prototype.createDEM = function(node){
 	var world = sceneNode.matrixWorld;
 
 	var boundingBox = sceneNode.boundingBox.clone().applyMatrix4(world);
-	var bbSize = boundingBox.size();
+	var bbSize = boundingBox.getSize();
 	var positions = sceneNode.geometry.attributes.position.array;
 	var demSize = 64;
 	var demMArray = new Array(demSize*demSize);
@@ -5174,7 +5233,7 @@ Potree.PointCloudOctree.prototype.getDEMHeight = function(position){
 		var box = dem.boundingBox2D;
 		var insideBox = box.containsPoint(pos2);
 		if(box.containsPoint(pos2)){
-			var uv = pos2.clone().sub(box.min).divide(box.size());
+			var uv = pos2.clone().sub(box.min).divide(box.getSize());
 			var xy = uv.clone().multiplyScalar(demSize);
 			
 			var demHeight = 0;
@@ -5299,9 +5358,9 @@ Potree.PointCloudOctree.prototype.generateTerain = function(){
 	}
 	
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	var material = new THREE.PointCloudMaterial({size: 20, color: 0x00ff00});
+	var material = new THREE.PointsMaterial({size: 20, color: 0x00ff00});
 	
-	var pc = new THREE.PointCloud(geometry, material);
+	var pc = new THREE.Points(geometry, material);
 	scene.add(pc);
 	
 };
@@ -5643,7 +5702,7 @@ Potree.utils.createGrid = function createGrid(width, length, spacing, color){
 		 geometry.vertices.push(new THREE.Vector3(i*spacing-(spacing*width)/2, 0, +(spacing*length)/2));
 	}
 	
-	var line = new THREE.Line(geometry, material, THREE.LinePieces);
+	var line = new THREE.Line(geometry, material, THREE.LineSegments);
 	line.receiveShadow = true;
 	return line;
 }
@@ -8236,7 +8295,7 @@ Potree.Volume = function(args){
 	this.add(this.box);
 	
 	this.frame = new THREE.Line( boxFrameGeometry, new THREE.LineBasicMaterial({color: 0x000000}));
-	this.frame.mode = THREE.LinePieces;
+	this.frame.mode = THREE.LineSegments;
 	this.add(this.frame);
 	
 	this.label = new Potree.TextSprite("0");
@@ -8634,7 +8693,7 @@ Potree.PointCloudArena4D.prototype.updateMaterial = function(camera, renderer){
 	this.material.far = camera.far;
 	this.material.minSize = 3;
 	
-	var bbSize = this.boundingBox.size();
+	var bbSize = this.boundingBox.getSize();
 	this.material.bbSize = [bbSize.x, bbSize.y, bbSize.z];
 };
 
@@ -8785,7 +8844,7 @@ Potree.PointCloudArena4D.prototype.update = function(camera, renderer){
 			}else{
 				this.loadQueue.push(element);
 			}
-		}else if(node instanceof THREE.PointCloud){
+		}else if(node instanceof THREE.Points){
 			if(this.numVisiblePoints + node.pcoGeometry.numPoints > pointcloud.visiblePointsTarget){
 				break;
 			}
@@ -8811,7 +8870,7 @@ Potree.PointCloudArena4D.prototype.update = function(camera, renderer){
 				var sphere = child.boundingSphere;
 				var distance = sphere.center.distanceTo(camObjPos);
 				
-				var radius = box.size().length() / 2;
+				var radius = box.getSize().length() / 2;
 				var fov = camera.fov / 2 * Math.PI / 180.0;
 				var pr = 1 / Math.tan(fov) * radius / Math.sqrt(distance * distance - radius * radius);
 				
@@ -8912,7 +8971,7 @@ Potree.PointCloudArena4D.prototype.replaceProxy = function(proxy){
 	var geometryNode = proxy.geometryNode;
 	if(geometryNode.loaded === true){
 		var geometry = geometryNode.geometry;
-		var node = new THREE.PointCloud(geometry, this.material);
+		var node = new THREE.Points(geometry, this.material);
 		node.number = proxy.number;
 		node.numPoints = proxy.numPoints;
 		node.boundingBox = geometryNode.boundingBox;
@@ -9493,7 +9552,7 @@ Potree.PointCloudArena4DGeometry.load = function(url, callback){
 				geometry.offset = offset;
 				
 				var center = geometry.boundingBox.center();
-				var radius = geometry.boundingBox.size().length() / 2;
+				var radius = geometry.boundingBox.getSize().length() / 2;
 				geometry.boundingSphere = new THREE.Sphere(center, radius);
 				
 				geometry.loadHierarchy();
@@ -9569,7 +9628,7 @@ Potree.PointCloudArena4DGeometry.prototype.loadHierarchy = function(){
 			if(stack.length > 0){
 				var parent = stack[stack.length-1];
 				node.boundingBox = parent.boundingBox.clone();
-				var parentBBSize = parent.boundingBox.size();
+				var parentBBSize = parent.boundingBox.getSize();
 				
 				if(parent.hasLeft && !parent.left){
 					parent.left = node;
@@ -9583,7 +9642,7 @@ Potree.PointCloudArena4DGeometry.prototype.loadHierarchy = function(){
 					}
 					
 					var center = node.boundingBox.center();
-					var radius = node.boundingBox.size().length() / 2;
+					var radius = node.boundingBox.getSize().length() / 2;
 					node.boundingSphere = new THREE.Sphere(center, radius);
 					
 				}else{
@@ -9598,18 +9657,18 @@ Potree.PointCloudArena4DGeometry.prototype.loadHierarchy = function(){
 					}
 					
 					var center = node.boundingBox.center();
-					var radius = node.boundingBox.size().length() / 2;
+					var radius = node.boundingBox.getSize().length() / 2;
 					node.boundingSphere = new THREE.Sphere(center, radius);
 				}
 			}else{
 				root = node;
 				root.boundingBox = scope.boundingBox.clone();
 				var center = root.boundingBox.center();
-				var radius = root.boundingBox.size().length() / 2;
+				var radius = root.boundingBox.getSize().length() / 2;
 				root.boundingSphere = new THREE.Sphere(center, radius);
 			}
 			
-			var bbSize = node.boundingBox.size();
+			var bbSize = node.boundingBox.getSize();
 			node.spacing = ((bbSize.x + bbSize.y + bbSize.z) / 3) / 75;
 			
 			stack.push(node);
