@@ -8,6 +8,8 @@ A free, user-friendly, extendable application and API for drone image processing
 
 ![Alt text](/screenshots/dashboard.png?raw=true "Dashboard")
 
+[![WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier](https://img.youtube.com/vi/UnN-NzL96T8/0.jpg)](https://www.youtube.com/watch?v=UnN-NzL96T8 "WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier")
+
 If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork, contribute something that interests you, and make a pull request! All ideas are considered and people of all skill levels are welcome. See the [Contributing](/CONTRIBUTING.md) document for more information.
 
 ## Getting Started
@@ -18,16 +20,17 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
  - [Git](https://git-scm.com/downloads)
 
 * From the Docker Quickstart Terminal (Windows) or from the command line (Mac / Linux) type:
-```
+```bash
 git clone https://github.com/OpenDroneMap/WebODM
 cd WebODM
-pip install docker-compose
+easy_install pip || sudo easy_install pip
+pip install docker-compose || sudo pip install docker-compose
 ./webodm.sh start
 ```
 
 * If you're on Windows find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
 
-```
+```bash
 docker-machine ip
 ```
 
@@ -44,13 +47,28 @@ To stop WebODM press CTRL+C or run:
 
 To update WebODM to the latest version use:
 
-```
+```bash
 ./webodm.sh update
 ```
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
 
+### Common Troubleshooting
+
+if you get the following error while starting WebODM:
+```bash
+from six.moves import _thread as thread
+ImportError: cannot import name _thread
+```
+
+Try running:
+```bash
+sudo pip install --ignore-installed six
+```
+
 If you are getting a **MemoryError** while processing the images, make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
+
+Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
 ### Add More Processing Nodes
 
@@ -66,7 +84,7 @@ If you want to run WebODM natively, you will need to install:
 
 On Linux, make sure you have:
 
-```
+```bash
 apt-get install binutils libproj-dev gdal-bin
 ```
 
@@ -78,13 +96,13 @@ brew install postgres postgis
 
 Then these steps should be sufficient to get you up and running:
 
-```
+```bash
 git clone https://github.com/OpenDroneMap/WebODM
 ```
 
 Create a `WebODM\webodm\local_settings.py` file containing your database settings:
 
-```
+```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -106,7 +124,7 @@ ALTER SYSTEM SET postgis.gdal_enabled_drivers TO 'GTiff';
 
 Then:
 
-```
+```bash
 pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
@@ -116,7 +134,7 @@ chmod +x start.sh && ./start.sh
 
 If you are getting a `rt_raster_gdal_warp: Could not create GDAL transformation object for output dataset creation`, make sure that your PostGIS installation has PROJ support:
 
-```
+```sql
 SELECT PostGIS_Full_Version();
 ```
 
@@ -128,6 +146,7 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
 - [X] Task Processing
 - [X] 2D Map Display 
 - [ ] 3D model display
+- [ ] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner
 - [X] API
@@ -137,6 +156,8 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
 - [ ] Processing Nodes Volunteer Network
 - [X] Unit Testing
 
+Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md). 
+
 ## Terminology
 
  - `Project`: A collection of tasks (successfully processed, failed, waiting to be executed, etc.)
@@ -144,7 +165,4 @@ You may also need to set the environment variable PROJSO to the .so or .dll proj
  - `ProcessingNode`: An instance usually running on a separate VM, or on a separate machine which accepts aerial images, runs OpenDroneMap and returns the processed results (orthophoto, georeferenced model, etc.). Each node communicates with WebODM via a lightweight API such as [node-OpenDroneMap](https://www.github.com/pierotofy/node-OpenDroneMap). WebODM manages the distribution of `Task` to different `ProcessingNode` instances.
  - `ImageUpload`: aerial images.
  - `Mission`: A flight path and other information (overlap %, angle, ...) associated with a particular `Task`.
- 
-![image](https://cloud.githubusercontent.com/assets/1951843/17680196/9bfe878e-6304-11e6-852e-c09f1e02f3c0.png)
 
-![er diagram - webodm 2](https://cloud.githubusercontent.com/assets/1951843/17717379/4a227e28-63d3-11e6-9518-6a63cc1bcd3b.png)
