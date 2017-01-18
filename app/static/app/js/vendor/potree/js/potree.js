@@ -1099,6 +1099,8 @@ Potree.POCLoader.load = function load(url, callback) {
 				pco.nodes = nodes;
 				
 				callback(pco);
+			}else if (xhr.status === 404){
+				callback(null, new Error("File not found"));
 			}
 		}
 		

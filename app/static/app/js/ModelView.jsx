@@ -1,5 +1,6 @@
 import React from 'react';
 import './css/ModelView.scss';
+import ErrorMessage from './components/ErrorMessage';
 import $ from 'jquery';
 
 const THREE = require('three'); // import does not work :/
@@ -14,25 +15,46 @@ import ProgressBar from './vendor/potree/ProgressBar';
 
 class ModelView extends React.Component {
   static defaultProps = {
-    test: 1
+    task: null
   };
 
   static propTypes = {
-      test: React.PropTypes.number
+      task: React.PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
   };
 
   constructor(props){
     super(props);
 
     this.state = {
-    };
+      error: ""
+    }
+  }
+
+  assetsPath(){
+    return `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/assets`
+  }
+
+  potreeFilePath(){
+    return this.assetsPath() + '/potree_pointcloud/cloud.js';
+  }
+
+  texturedModelDirectoryPath(){
+    return this.assetsPath() + '/odm_texturing/';
+  }
+
+  objFilePath(){
+    return this.texturedModelDirectoryPath() + 'odm_textured_model.obj'; 
+  }
+
+  mtlFilename(){
+    return 'odm_textured_model.mtl';
   }
 
   componentDidMount() {
     var container = this.container;
 
     var sceneProperties = {
-      path:     "/static/app/test/brighton/cloud.js",
+      path: this.potreeFilePath(),
       cameraPosition: null,
       cameraTarget: null,
       sizeType:     "Adaptive",     // options: "Fixed", "Attenuated", "Adaptive"
@@ -336,7 +358,7 @@ class ModelView extends React.Component {
       renderer.autoClear = false;
       container.appendChild(renderer.domElement);
       
-      skybox = Potree.utils.loadSkybox("/static/app/test/resources/textures/skybox/");
+      skybox = Potree.utils.loadSkybox("/static/app/potree/textures/skybox/");
 
       // camera and controls
       camera.position.set(-304, 372, 318);
@@ -362,7 +384,13 @@ class ModelView extends React.Component {
 
       // load pointcloud
       if(pointcloudPath.indexOf("cloud.js") > 0){
-        Potree.POCLoader.load(pointcloudPath, function(geometry){
+        Potree.POCLoader.load(pointcloudPath, (geometry, error) => {
+          if (error){
+            console.log(error);
+            this.setState({error: "Could not load point cloud. This task doesn't seem to have one. Try processing the task again."});
+            return;
+          }
+
           pointcloud = new Potree.PointCloudOctree(geometry);
           
           pointcloud.material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
@@ -457,26 +485,26 @@ class ModelView extends React.Component {
       scenePointCloud.add( light );
     }
 
-    const toggleTexturedModel = (function(){
+    const toggleTexturedModel = (() => {
       let modelReference = null,
           initializingModel = false;
 
-      return function(flag){
+      return (flag) => {
         if (flag){
           // Need to load model for the first time?
           if (modelReference === null && !initializingModel){
 
             initializingModel = true;
             const mtlLoader = new THREE.MTLLoader();
-            mtlLoader.setTexturePath('/static/app/test/brighton/');
-            mtlLoader.setPath('/static/app/test/brighton/');
+            mtlLoader.setTexturePath(this.texturedModelDirectoryPath());
+            mtlLoader.setPath(this.texturedModelDirectoryPath());
 
-            mtlLoader.load('odm_textured_model.mtl', function (materials) {
+            mtlLoader.load(this.mtlFilename(), (materials) => {
                 materials.preload();
 
                 const objLoader = new THREE.OBJLoader();
                 objLoader.setMaterials(materials);
-                objLoader.load('/static/app/test/brighton/odm_textured_model_geo.obj', function (object) {
+                objLoader.load(this.objFilePath(), (object) => {
                     
                     // ODM models are Y-up
                     object.rotateX(THREE.Math.degToRad(-90));
@@ -1020,6 +1048,7 @@ class ModelView extends React.Component {
   // React render
   render(){
     return (<div className="model-view">
+          <ErrorMessage bind={[this, "error"]} />
           <div 
             className="container"
             ref={(domNode) => { this.container = domNode; }}

@@ -71,7 +71,10 @@ def model_display(request, project_pk=None, task_pk=None):
     return render(request, 'app/3d_model_display.html', {
         'title': title,
         'params': {
-            'test': 123
+            'task': json.dumps({
+                'id': task.id,
+                'project': project.id
+            })
         }.items()
     })
 
