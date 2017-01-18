@@ -32,8 +32,6 @@ class ModelView extends React.Component {
     var container = this.container;
 
     var sceneProperties = {
-      // path:     "/static/app/test/lion_takanawa/cloud.js",
-      // path:     "/static/app/test/conv/cloud.js",
       path:     "/static/app/test/brighton/cloud.js",
       cameraPosition: null,
       cameraTarget: null,
@@ -446,9 +444,9 @@ class ModelView extends React.Component {
       );
       bg.material.depthTest = false;
       bg.material.depthWrite = false;
-      sceneBG.add(bg);      
+      sceneBG.add(bg);
       
-      window.addEventListener( 'keydown', onKeyDown, false );
+      window.addEventListener( 'keydown', this.onKeyDown, false );
       
       directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
       directionalLight.position.set( 10, 10, 10 );
@@ -566,9 +564,7 @@ class ModelView extends React.Component {
       referenceFrame.updateMatrixWorld(true);
     }
 
-    function onKeyDown(event){
-      //console.log(event.keyCode);
-      
+    this.onKeyDown = function(event){
       if(event.keyCode === 69){
         // e pressed
         
@@ -776,10 +772,12 @@ class ModelView extends React.Component {
       }
     }
 
-    window.addEventListener("resize", function(){
+    this.onResize = function(){
       width = container.clientWidth;
       height = container.clientHeight;
-    });
+    };
+
+    window.addEventListener("resize", this.onResize);
 
     var PotreeRenderer = function(){
       this.render = function(){
@@ -1010,10 +1008,13 @@ class ModelView extends React.Component {
       }
     };
 
-
-
     initThree();
     loop();
+  }
+
+  componentWillUnmount(){
+    window.removeEventListener("resize", this.onResize);
+    window.removeEventListener("keydown", this.onKeyDown);
   }
 
   // React render

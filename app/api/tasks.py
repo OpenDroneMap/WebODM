@@ -3,7 +3,7 @@ import os
 
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.models.functions import Envelope
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation
 from django.db.models.functions import Cast
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
@@ -11,7 +11,7 @@ from rest_framework import status, serializers, viewsets, filters, exceptions, p
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
-from .common import get_and_check_project, get_tile_json
+from .common import get_and_check_project, get_tile_json, path_traversal_check
 
 from app import models, scheduler, pending_actions
 from nodeodm.models import ProcessingNode
@@ -188,7 +188,11 @@ class TaskTilesJson(TaskNestedView):
         return Response(json)
 
 
-class TaskAssets(TaskNestedView):
+"""
+Task downloads are simply aliases to download the task's assets
+(but require a shorter path and look nicer the API user)
+"""
+class TaskDownloads(TaskNestedView):
         def get(self, request, pk=None, project_pk=None, asset=""):
             """
             Downloads a task asset (if available)
@@ -218,3 +222,31 @@ class TaskAssets(TaskNestedView):
                 return response
             else:
                 raise exceptions.NotFound()
+
+"""
+Raw access to the task's asset folder resources
+Useful when accessing a textured 3d model, or the Potree point cloud data
+"""
+class TaskAssets(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None, unsafe_asset_path=""):
+        """
+        Downloads a task asset (if available)
+        """
+        task = self.get_and_check_task(request, pk, project_pk)
+
+        # Check for directory traversal attacks
+        try:
+            asset_path = path_traversal_check(task.assets_path(unsafe_asset_path), task.assets_path(""))
+        except SuspiciousFileOperation:
+            raise exceptions.NotFound("Asset does not exist")
+
+        if (not os.path.exists(asset_path)) or os.path.isdir(asset_path):
+            raise exceptions.NotFound("Asset does not exist")
+
+        asset_filename = os.path.basename(asset_path)
+
+        file = open(asset_path, "rb")
+        response = HttpResponse(FileWrapper(file),
+                                content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
+        response['Content-Disposition'] = "inline; filename={}".format(asset_filename)
+        return response
