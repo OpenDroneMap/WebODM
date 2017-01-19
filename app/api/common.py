@@ -40,7 +40,7 @@ def get_tile_json(name, tiles, bounds):
         'scheme': 'tms',
         'tiles': tiles,
         'minzoom': 0,
-        'maxzoom': 22,
+        'maxzoom': 21,
         'bounds': bounds
     }
 

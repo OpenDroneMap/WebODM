@@ -56,19 +56,19 @@ class Map extends React.Component {
         "Google Maps Hybrid": L.tileLayer('//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
             attribution: 'Map data: &copy; Google Maps',
             subdomains: ['mt0','mt1','mt2','mt3'],
-            maxZoom: 22,
+            maxZoom: 21,
             minZoom: 0,
             label: 'Google Maps Hybrid'
         }).addTo(this.map),
         "ESRI Satellite": L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-            maxZoom: 22,
+            maxZoom: 21,
             minZoom: 0,
             label: 'ESRI Satellite'  // optional label used for tooltip
         }),
         "OSM Mapnik": L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 22,
+            maxZoom: 21,
             minZoom: 0,
             label: 'OSM Mapnik'  // optional label used for tooltip
         })

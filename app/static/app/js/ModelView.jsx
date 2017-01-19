@@ -1,6 +1,7 @@
 import React from 'react';
 import './css/ModelView.scss';
 import ErrorMessage from './components/ErrorMessage';
+import Standby from './components/Standby';
 import $ from 'jquery';
 
 const THREE = require('three'); // import does not work :/
@@ -495,6 +496,8 @@ class ModelView extends React.Component {
           if (modelReference === null && !initializingModel){
 
             initializingModel = true;
+            this.texturedModelStandby.show();
+
             const mtlLoader = new THREE.MTLLoader();
             mtlLoader.setTexturePath(this.texturedModelDirectoryPath());
             mtlLoader.setPath(this.texturedModelDirectoryPath());
@@ -528,6 +531,7 @@ class ModelView extends React.Component {
 
                     modelReference = object;
                     initializingModel = false;
+                    this.texturedModelStandby.hide();
                 });
             });
           }else{
@@ -1052,8 +1056,13 @@ class ModelView extends React.Component {
           <div 
             className="container"
             ref={(domNode) => { this.container = domNode; }}
-            style={{height: "100%", width: "100%"}} 
-            onContextMenu={(e) => {e.preventDefault();}}></div>
+            style={{height: "100%", width: "100%", position: "relative"}} 
+            onContextMenu={(e) => {e.preventDefault();}}>
+              <Standby 
+                message="Loading textured model..."
+                ref={(domNode) => { this.texturedModelStandby = domNode; }}
+                />
+            </div>
       </div>);
   }
 }
