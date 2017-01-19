@@ -83,7 +83,6 @@ class ModelView extends React.Component {
     var isFlipYZ = false;
     var useDEMCollisions = false;
     var minNodeSize = 100;
-    var directionalLight;
 
     var showStats = false;
     var showBoundingBox = false;
@@ -477,12 +476,7 @@ class ModelView extends React.Component {
       
       window.addEventListener( 'keydown', this.onKeyDown, false );
       
-      directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-      directionalLight.position.set( 10, 10, 10 );
-      directionalLight.lookAt( new THREE.Vector3(0, 0, 0));
-      scenePointCloud.add( directionalLight );
-      
-      var light = new THREE.AmbientLight( 0x555555 ); // soft white light
+      var light = new THREE.AmbientLight( 0xffffff ); // soft white light
       scenePointCloud.add( light );
     }
 
@@ -618,9 +612,6 @@ class ModelView extends React.Component {
 
     function update(){
       Potree.pointLoadLimit = pointCountTarget * 2 * 1000 * 1000;
-      
-      directionalLight.position.copy(camera.position);
-      directionalLight.lookAt(new THREE.Vector3().addVectors(camera.position, camera.getWorldDirection()));
       
       if(pointcloud){
       
