@@ -192,7 +192,7 @@ class TaskListItem extends React.Component {
         addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
           location.href = `/map/project/${task.project}/task/${task.id}/`;
         });
-        addActionButton(" View 3D Assets", "btn-primary", "fa fa-cube", () => {
+        addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
           location.href = `/3d/project/${task.project}/task/${task.id}/`;
         });
       }

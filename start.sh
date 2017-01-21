@@ -49,7 +49,7 @@ echo -e "\033[92m"
 echo "Congratulations! └@(･◡･)@┐"
 echo ==========================
 echo -e "\033[39m"
-echo "WebODM should be up and running!"
+echo "If there are no errors, WebODM should be up and running!"
 echo -e "\033[93m"
 echo Open a web browser and navigate to http://localhost:8000
 echo -e "\033[39m"

@@ -13,7 +13,7 @@ import json
 from django.db.models import signals
 from requests.exceptions import ConnectionError
 from .exceptions import ProcessingException
-
+import simplejson
 def api(func):
     """
     Catches JSON decoding errors that might happen when the server
@@ -22,8 +22,9 @@ def api(func):
     def wrapper(*args,**kwargs):
         try:
             return func(*args, **kwargs)
-        except json.decoder.JSONDecodeError as e:
+        except (json.decoder.JSONDecodeError, simplejson.JSONDecodeError) as e:
             raise ProcessingException(str(e))
+
 
     return wrapper
 
@@ -57,7 +58,7 @@ class ProcessingNode(models.Model):
             self.last_refreshed = timezone.now()
             self.save()
             return True
-        except ConnectionError:
+        except:
             return False
 
     def api_client(self):
@@ -187,8 +188,10 @@ class ProcessingNode(models.Model):
 @receiver(signals.post_save, sender=ProcessingNode, dispatch_uid="update_processing_node_info")
 def auto_update_node_info(sender, instance, created, **kwargs):
     if created:
-        instance.update_node_info()
-
+        try:
+            instance.update_node_info()
+        except ProcessingException:
+            pass
 
 class ProcessingNodeUserObjectPermission(UserObjectPermissionBase):
     content_object = models.ForeignKey(ProcessingNode)
