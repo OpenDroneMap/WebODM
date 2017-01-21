@@ -44,4 +44,18 @@ if [[ $1 = "--create-default-pnode" ]]; then
    echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-odm-1', defaults={'hostname': 'node-odm-1', 'port': 3000})" | python manage.py shell
 fi
 
+(sleep 5; echo
+echo -e "\033[92m"      
+echo "Congratulations! └@(･◡･)@┐"
+echo ==========================
+echo -e "\033[39m"
+echo "WebODM should be up and running!"
+echo -e "\033[93m"
+echo Open a web browser and navigate to http://localhost:8000
+echo -e "\033[39m"
+echo -e "\033[91mNOTE:\033[39m Windows users using docker should replace localhost with the IP of their docker machine's IP. To find what that is, run: docker-machine ip") &
+
 python manage.py runserver 0.0.0.0:8000
+
+# If this is executed, it means the previous command failed, don't display the congratulations message
+kill %1
