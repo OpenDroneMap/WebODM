@@ -81,6 +81,7 @@ If you want to run WebODM natively, you will need to install:
  * PostGIS 2.3
  * Python 3.5
  * GDAL (>= 2.1)
+ * Node.js (>= 6.0)
 
 On Linux, make sure you have:
 
@@ -139,6 +140,23 @@ SELECT PostGIS_Full_Version();
 ```
 
 You may also need to set the environment variable PROJSO to the .so or .dll projection library your PostGIS is using. This just needs to have the name of the file. So for example on Windows, you would in Control Panel -> System -> Environment Variables add a system variable called PROJSO and set it to libproj.dll (if you are using proj 4.6.1). You'll have to restart your PostgreSQL service/daemon after this change. [http://postgis.net/docs/manual-2.0/RT_ST_Transform.html](http://postgis.net/docs/manual-2.0/RT_ST_Transform.html)
+
+If you are using Windows and are unable to go past the `pip install -r requirements.txt` command because of an error regarding zlib and Pillow, manually edit the `requirements.txt` file, remove the Pillow requirement and run:
+
+```bash
+easy_install pillow
+pip install -r requirements.txt
+```
+
+On Windows make sure that all of your PATH environment variables are set properly. These commands:
+
+```bash
+python --version
+pip --version
+npm --version
+gdalinfo --version
+```
+Should all work without errors.
 
 ## Roadmap
 - [X] User Registration / Authentication
