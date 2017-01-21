@@ -6,6 +6,8 @@ A free, user-friendly, extendable application and API for drone image processing
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
+![Alt text](/screenshots/pointcloud.png?raw=true "3D Display")
+
 ![Alt text](/screenshots/dashboard.png?raw=true "Dashboard")
 
 [![WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier](https://img.youtube.com/vi/UnN-NzL96T8/0.jpg)](https://www.youtube.com/watch?v=UnN-NzL96T8 "WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier")
@@ -163,7 +165,7 @@ Should all work without errors.
 - [X] UI mockup
 - [X] Task Processing
 - [X] 2D Map Display 
-- [ ] 3D model display
+- [X] 3D Model Display
 - [ ] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner
