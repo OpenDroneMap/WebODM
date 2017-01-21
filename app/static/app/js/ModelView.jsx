@@ -1,6 +1,8 @@
 import React from 'react';
 import './css/ModelView.scss';
 import ErrorMessage from './components/ErrorMessage';
+import SwitchModeButton from './components/SwitchModeButton';
+import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
 import $ from 'jquery';
 
@@ -1053,7 +1055,11 @@ class ModelView extends React.Component {
                 message="Loading textured model..."
                 ref={(domNode) => { this.texturedModelStandby = domNode; }}
                 />
+              <SwitchModeButton 
+                task={this.props.task}
+                type="modelToMap" />
             </div>
+            <AssetDownloadButtons task={this.props.task} direction="up" />
       </div>);
   }
 }

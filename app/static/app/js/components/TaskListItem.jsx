@@ -192,6 +192,9 @@ class TaskListItem extends React.Component {
         addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
           location.href = `/map/project/${task.project}/task/${task.id}/`;
         });
+        addActionButton(" View 3D Assets", "btn-primary", "fa fa-cube", () => {
+          location.href = `/3d/project/${task.project}/task/${task.id}/`;
+        });
       }
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&

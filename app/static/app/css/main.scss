@@ -156,8 +156,18 @@ button i.glyphicon{
     background-color: #dddddd;
 }
 
+.btn.btn-white{
+    background-color: #fff;
+    color: #111;
+
+    &:hover{
+        background-color: #f4f4f4;
+    }
+}
+
 .dropdown-menu>li>a{
     padding-left: 10px;
+    color: #222;
     .fa, .glyphicon{
         margin-right: 4px;
     }

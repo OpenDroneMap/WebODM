@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import ReactDOM from 'react-dom';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
@@ -11,6 +13,7 @@ import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
+import SwitchModeButton from './SwitchModeButton';
 import AssetDownloads from '../classes/AssetDownloads';
 
 class Map extends React.Component {
@@ -33,7 +36,8 @@ class Map extends React.Component {
     super(props);
     
     this.state = {
-      error: ""
+      error: "",
+      switchButtonTask: null // When this is set to a task, show a switch mode button to view the 3d model
     };
 
     this.imageryLayers = [];
@@ -99,11 +103,26 @@ class Map extends React.Component {
                 tms: info.scheme === 'tms'
               }).addTo(this.map);
 
+          // Associate metadata with this layer
+          meta.name = info.name;
+          layer[Symbol.for("meta")] = meta;
+
+          // Show 3D switch button only if we have a single orthophoto
+          const task = {
+            id: meta.task,
+            project: meta.project
+          };
+
+          if (tiles.length === 1){
+            this.setState({switchButtonTask: task});
+          }
+
           // For some reason, getLatLng is not defined for tileLayer?
           // We need this function if other code calls layer.openPopup()
           layer.getLatLng = function(){
             return this.options.bounds.getCenter();
           };
+
           layer.bindPopup(`<div class="title">${info.name}</div>
             <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
             <ul class="asset-links">
@@ -111,11 +130,15 @@ class Map extends React.Component {
                   return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
               }).join("")}
             </ul>
-          `);
 
-          // Associate metadata with this layer
-          meta.name = info.name;
-          layer[Symbol.for("meta")] = meta;
+            <button 
+              onclick="location.href='/3d/project/${task.project}/task/${task.id}/';"
+              type="button"
+              class="switchModeButton btn btn-sm btn-default btn-white">
+              <i class="fa fa-cube"></i> 3D
+            </button>
+          `);
+          
 
           this.imageryLayers.push(layer);
 
@@ -180,8 +203,11 @@ class Map extends React.Component {
         <ErrorMessage bind={[this, 'error']} />
         <div 
           style={{height: "100%"}}
-          ref={(domNode) => (this.container = domNode)}
-        />
+          ref={(domNode) => (this.container = domNode)}>
+          <SwitchModeButton 
+            task={this.state.switchButtonTask}
+            type="mapToModel" />
+        </div>
       </div>
     );
   }
