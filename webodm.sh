@@ -57,8 +57,8 @@ start(){
 
 rebuild(){
 	run "docker-compose down"
-	run "rm -fr node_modules/"
-	run "rm -fr nodeodm/external/node-OpenDroneMap"
+	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
+	run "rm -fr nodeodm/external/node-OpenDroneMap || sudo rm -fr nodeodm/external/node-OpenDroneMap"
 	run "docker-compose build --no-cache"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running ./$0 start"
 }
