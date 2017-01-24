@@ -68,6 +68,8 @@ sudo pip install --ignore-installed six
 
 If you are getting a **MemoryError** while processing the images, make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
 
+If you are getting a `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` after an update, try to remove your WebODM folder and start from a fresh git clone.
+
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
 ### Add More Processing Nodes
