@@ -851,10 +851,8 @@ class ModelView extends React.Component {
         transformationTool.render();
       };
     };
-    var potreeRenderer = new PotreeRenderer();
 
     // high quality rendering using splats
-    var highQualityRenderer = null;
     var HighQualityRenderer = function(){
       var depthMaterial = null;
       var attributeMaterial = null;
@@ -1019,6 +1017,9 @@ class ModelView extends React.Component {
       }
     };
 
+    var potreeRenderer = new PotreeRenderer();
+    var highQualityRenderer = null;
+    
     function loop() {
       requestAnimationFrame(loop);
       update();
