@@ -22,17 +22,31 @@ usage(){
   echo "	stop		Stop WebODM"
   echo "	update		Update WebODM to the latest release"
   echo "	rebuild		Rebuild all docker containers and perform cleanups"
+  echo "	checkenv	Do an environment check and install missing components"
   exit
 }
 
+# $1 = command | $2 = help_text | $3 = install_command (optional)
 check_command(){
-	check_msg="\033[92m\033[1m OK\033[0m\033[39m"
+	check_msg_prefix="Checking for $1... "
+	check_msg_result="\033[92m\033[1m OK\033[0m\033[39m"
+
 	hash $1 2>/dev/null || not_found=true 
 	if [[ $not_found ]]; then
-		check_msg="\033[91m can't find $1! Check that the program is installed before launching WebODM. $2\033[39m"
+		
+		# Can we attempt to install it?
+		if [[ ! -z "$3" ]]; then
+			echo -e "$check_msg_prefix \033[93mnot found, we'll attempt to install\033[39m"
+			run "$3 || sudo $3"
+
+			# Recurse, but don't pass the install command
+			check_command "$1" "$2"	
+		else
+			check_msg_result="\033[91m can't find $1! Check that the program is installed before launching WebODM. $2\033[39m"
+		fi
 	fi
 
-	echo -e "Checking for $1... $check_msg"
+	echo -e "$check_msg_prefix $check_msg_result"
 	if [[ $not_found ]]; then
 		return 1
 	fi
@@ -42,13 +56,13 @@ environment_check(){
 	check_command "docker" "https://www.docker.com/"
 	check_command "git" "https://git-scm.com/downloads"
 	check_command "python" "https://www.python.org/downloads/"
-	check_command "pip" "Run \033[1msudo easy_install pip\033[0m"
-	check_command "docker-compose" "Run \033[1mpip install docker-compose\033[0m"	
+	check_command "pip" "Run \033[1msudo easy_install pip\033[0m" "easy_install pip"
+	check_command "docker-compose" "Run \033[1mpip install docker-compose\033[0m" "pip install docker-compose"
 }
 
 run(){
 	echo $1
-	$1
+	eval $1
 }
 
 start(){
@@ -80,6 +94,8 @@ elif [[ $1 = "update" ]]; then
 	git pull origin master
 	run "docker pull pierotofy/nodeodm"
 	rebuild
+elif [[ $1 = "checkenv" ]]; then
+	environment_check
 else
 	usage
 fi
