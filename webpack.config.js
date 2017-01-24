@@ -51,6 +51,11 @@ module.exports = {
       {
         test: /\.(png|jpg|jpeg|svg)/,
         loader: "url-loader?limit=100000"
+      },
+      {
+        // shaders
+        test: /\.(frag|vert|glsl)$/,
+        loader: 'raw-loader'
       }
     ]
   },
@@ -61,8 +66,8 @@ module.exports = {
   },
 
   externals: {
-        // require("jquery") is external and available
-        //  on the global let jQuery
+    // require("jquery") is external and available
+    //  on the global let jQuery
     "jquery": "jQuery"
   }
 }

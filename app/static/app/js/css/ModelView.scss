@@ -1,0 +1,59 @@
+[data-modelview]{
+    height: 100%;
+}
+.model-view{
+    height: 80%;
+
+    .container{
+        background: rgb(79,79,79);
+        background: -moz-radial-gradient(center, ellipse cover, rgba(79,79,79,1) 0%, rgba(22,22,22,1) 100%);
+        background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(79,79,79,1)), color-stop(100%,rgba(22,22,22,1)));
+        background: -webkit-radial-gradient(center, ellipse cover, rgba(79,79,79,1) 0%,rgba(22,22,22,1) 100%);
+        background: -o-radial-gradient(center, ellipse cover, rgba(79,79,79,1) 0%,rgba(22,22,22,1) 100%);
+        background: -ms-radial-gradient(center, ellipse cover, rgba(79,79,79,1) 0%,rgba(22,22,22,1) 100%);
+        background: radial-gradient(ellipse at center, rgba(79,79,79,1) 0%,rgba(22,22,22,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4f4f4f', endColorstr='#161616',GradientType=1 );
+    	position: relative;
+    	padding: 0;
+    }
+    .dg{
+	    &.main{
+		    position: absolute;
+		    right: 0px;
+	    }
+	    .c{
+	    	select{
+	    		color: black;
+	    	}
+	    }
+    }
+
+    .switchModeButton{
+        bottom: 12px;
+    }
+    .asset-download-buttons{
+        position: relative;
+        top: -48px;
+        left: 12px;
+
+        &.open{
+            .dropdown-toggle{
+                background-color: #f4f4f4;
+                color: #111;
+            }
+            button{
+                outline: none;
+            }
+        }
+
+        button{
+            background-color: #fff;
+            color: #111;
+            border-width: 1px;
+
+            &:hover{
+                background-color: #f4f4f4;
+            }
+        }        
+    }
+}

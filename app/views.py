@@ -54,6 +54,32 @@ def map(request, project_pk=None, task_pk=None):
 
 
 @login_required
+def model_display(request, project_pk=None, task_pk=None):
+    title = _("3D Model Display")
+
+    if project_pk is not None:
+        project = get_object_or_404(Project, pk=project_pk)
+        if not request.user.has_perm('projects.view_project', project):
+            raise Http404()
+
+        if task_pk is not None:
+            task = get_object_or_404(Task.objects.defer('orthophoto'), pk=task_pk, project=project)
+            title = task.name
+        else:
+            raise Http404()
+
+    return render(request, 'app/3d_model_display.html', {
+        'title': title,
+        'params': {
+            'task': json.dumps({
+                'id': task.id,
+                'project': project.id
+            })
+        }.items()
+    })
+
+
+@login_required
 def processing_node(request, processing_node_id):
     pn = get_object_or_404(ProcessingNode, pk=processing_node_id)
     if not pn.update_node_info():

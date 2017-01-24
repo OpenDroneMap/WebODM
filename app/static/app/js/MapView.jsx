@@ -1,7 +1,6 @@
 import React from 'react';
 import './css/MapView.scss';
 import Map from './components/Map';
-import AssetDownloadButtons from './components/AssetDownloadButtons';
 
 class MapView extends React.Component {
   static defaultProps = {

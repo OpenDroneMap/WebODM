@@ -302,12 +302,6 @@ class ProjectListItem extends React.Component {
             <button type="button" className="btn btn-default btn-sm" onClick={this.viewMap}>
               <i className="fa fa-globe"></i> View Map
             </button>
-            <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
-              <span className="caret"></span>
-            </button>
-            <ul className="dropdown-menu">
-              <li><a href="javascript:alert('TODO!');"><i className="fa fa-cube"></i> 3D View</a></li>
-            </ul>
           </div>
 
           <span className="project-name">

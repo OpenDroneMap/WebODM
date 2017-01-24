@@ -1,11 +1,16 @@
-html{
+html, body, #wrapper, #page-wrapper, section.main, .content{
     height: 100%;
 }
 
 #navbar-top{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
     height: 50px;
     min-height: 50px;
     background-color: #18bc9c;
+    z-index: 99999;
 
     .navbar-header{
         width: 100%;
@@ -72,6 +77,8 @@ ul#side-menu.nav{
 
 .content{
     clear: both;
+    padding-top: 56px;
+
     h1,h2,h3,h4,h5{
         padding-top: 4px;
         margin-top: 0;
@@ -90,7 +97,7 @@ ul#side-menu.nav{
     margin-bottom: 10px;
 }
 
-.modal-dialog{
+.modal-dialog, .modal{
     z-index: 999999;
 }
 
@@ -134,6 +141,13 @@ table.table-first-col-bold{
     }
 }
 
+table.processing-node-info{
+    table-layout: fixed;
+    tr:first-child td:first-child{
+        width: 30%;
+    }
+}
+
 button i.glyphicon{
     margin-right: 4px;
 }
@@ -142,8 +156,18 @@ button i.glyphicon{
     background-color: #dddddd;
 }
 
+.btn.btn-white{
+    background-color: #fff;
+    color: #111;
+
+    &:hover{
+        background-color: #f4f4f4;
+    }
+}
+
 .dropdown-menu>li>a{
     padding-left: 10px;
+    color: #222;
     .fa, .glyphicon{
         margin-right: 4px;
     }
