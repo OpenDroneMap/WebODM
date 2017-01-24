@@ -78,6 +78,7 @@ elif [[ $1 = "rebuild" ]]; then
 elif [[ $1 = "update" ]]; then
 	echo "Updating WebODM..."
 	git pull origin master
+	run "docker pull pierotofy/nodeodm"
 	rebuild
 else
 	usage
