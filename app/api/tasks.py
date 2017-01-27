@@ -121,6 +121,9 @@ class TaskViewSet(viewsets.ViewSet):
                         [keys for keys in request.FILES])
                     for file in filesList]
 
+        if len(files) <= 1:
+            raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
+
         task = models.Task.create_from_images(files, project)
         if task is not None:
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)

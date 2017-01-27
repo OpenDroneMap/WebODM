@@ -6,9 +6,10 @@ from rest_framework.test import APIClient
 from rest_framework import status
 import datetime
 
-from app.models import Project, Task
+from app.models import Project, Task, ImageUpload
 from nodeodm.models import ProcessingNode
 from django.contrib.auth.models import User
+
 
 class TestApi(BootTestCase):
     def setUp(self):
@@ -191,15 +192,85 @@ class TestApi(BootTestCase):
         self.assertTrue(task.last_error is None)
         self.assertTrue(task.pending_action == pending_actions.REMOVE)
 
-
         # TODO test:
-        # - tiles.json requests
-        # - task creation via file upload
         # - scheduler processing steps
         # - tiles API urls (permissions, 404s)
         # - assets download (aliases)
         # - assets raw downloads
         # - project deletion
+
+    def test_task(self):
+        client = APIClient()
+
+        user = User.objects.get(username="testuser")
+        other_user = User.objects.get(username="testuser2")
+        project = Project.objects.create(
+                owner=user,
+                name="test project"
+            )
+        other_project = Project.objects.create(
+                owner=User.objects.get(username="testuser2"),
+                name="another test project"
+            )
+
+        # task creation via file upload
+        image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
+        image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
+
+        # Not authenticated?
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'images': [image1, image2]
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN);
+
+        client.login(username="testuser", password="test1234")
+
+        # Cannot create a task for a project that does not exist
+        res = client.post("/api/projects/0/tasks/", {
+            'images': [image1, image2]
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Cannot create a task for a project for which we have no access to
+        res = client.post("/api/projects/{}/tasks/".format(other_project.id), {
+            'images': [image1, image2]
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Cannot create a task without images
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'images': []
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+
+        # Cannot create a task with just 1 image
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'images': image1
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+
+        # Normal case with just images[] parameter
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'images': [image1, image2]
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+
+        # Should have returned the id of the newly created task
+        task = Task.objects.latest('created_at')
+        self.assertTrue('id' in res.data)
+        self.assertTrue(task.id == res.data['id'])
+
+        # Two images should have been uploaded
+        self.assertTrue(ImageUpload.objects.filter(task=task).count() == 2)
+
+        # No processing node is set
+        self.assertTrue(task.processing_node is None)
+
+        image1.close()
+        image2.close()
+
+        # TODO: test tiles.json
+        # - tiles.json requests
 
     def test_processingnodes(self):
         client = APIClient()
