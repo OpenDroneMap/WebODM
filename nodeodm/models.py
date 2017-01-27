@@ -58,7 +58,7 @@ class ProcessingNode(models.Model):
             self.last_refreshed = timezone.now()
             self.save()
             return True
-        except:
+        except (ConnectionError, json.decoder.JSONDecodeError, simplejson.JSONDecodeError):
             return False
 
     def api_client(self):

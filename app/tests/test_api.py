@@ -1,10 +1,13 @@
+import datetime
+import subprocess
+
 from guardian.shortcuts import assign_perm
 
 from app import pending_actions
 from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
-import datetime
+import time, os
 
 from app.models import Project, Task, ImageUpload
 from nodeodm.models import ProcessingNode
@@ -212,6 +215,7 @@ class TestApi(BootTestCase):
                 owner=User.objects.get(username="testuser2"),
                 name="another test project"
             )
+        other_task = Task.objects.create(project=other_project)
 
         # task creation via file upload
         image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
@@ -269,8 +273,53 @@ class TestApi(BootTestCase):
         image1.close()
         image2.close()
 
-        # TODO: test tiles.json
-        # - tiles.json requests
+        # tiles.json should not be accessible at this point
+        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+
+        # Neither should an individual tile
+        # Z/X/Y coords are choosen based on node-odm test dataset for orthophoto_tiles/
+        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Cannot access a tiles.json we have no access to
+        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(other_project.id, other_task.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Cannot access an individual tile we have no access to
+        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(other_project.id, other_task.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Start processing node
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False,
+                                    cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
+        time.sleep(5)  # Wait for the server to launch
+
+        # Create processing node
+        pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+
+        # Verify that it's working
+        self.assertTrue(pnode.api_version is not None)
+
+        # Cannot assign processing node to a task we have no access to
+        res = client.patch("/api/projects/{}/tasks/{}/".format(other_project.id, other_task.id), {
+            'processing_node': pnode.id
+        })
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Assign processing node to task via API
+        res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+            'processing_node': pnode.id
+        })
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        # After a processing node has been assigned, the task processing should start
+        # TODO: check
+        # TODO: what happens when nodes go offline, or an offline node is assigned to a task
+
+        # Teardown processing node
+        node_odm.terminate()
 
     def test_processingnodes(self):
         client = APIClient()

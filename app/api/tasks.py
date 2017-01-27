@@ -185,6 +185,10 @@ class TaskTilesJson(TaskNestedView):
         task = self.get_and_check_task(request, pk, project_pk, annotate={
                 'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))
             })
+
+        if task.orthophoto_area is None:
+            raise exceptions.ValidationError("An orthophoto has not been processed for this task. Tiles are not available yet.")
+
         json = get_tile_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
             ], task.orthophoto_area.extent)
