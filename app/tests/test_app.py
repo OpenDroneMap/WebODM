@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User, Group
 from django.test import Client
+from rest_framework import status
 
 from app.models import Project, Task
 from .classes import BootTestCase
@@ -57,6 +58,12 @@ class TestApp(BootTestCase):
         res = c.get('/processingnode/1/', follow=True)
         self.assertRedirects(res, '/login/?next=/processingnode/1/')
 
+        res = c.get('/map/project/1/', follow=True)
+        self.assertRedirects(res, '/login/?next=/map/project/1/')
+
+        res = c.get('/3d/project/1/task/1/', follow=True)
+        self.assertRedirects(res, '/login/?next=/3d/project/1/task/1/')
+
         # Login
         c.post('/login/', data=self.credentials, follow=True)
 
@@ -84,8 +91,35 @@ class TestApp(BootTestCase):
         res = c.get('/processingnode/abc/')
         self.assertTrue(res.status_code == 404)
 
-        # TODO:
-        # - test /map/ urls
+        # /map/ and /3d/ views
+        user = User.objects.get(username="testuser")
+        other_user = User.objects.get(username="testuser2")
+
+        project = Project.objects.create(owner=user)
+        task = Task.objects.create(project=project)
+        other_project = Project.objects.create(owner=other_user)
+        other_task = Task.objects.create(project=other_project)
+
+        # Cannot access a project that we have no access to, or that does not exist
+        for project_id in [other_project.id, 99999]:
+            res = c.get('/map/project/{}/'.format(project_id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # We can access a project that we have access to
+        res = c.get('/map/project/{}/'.format(project.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        # 3D views need project and task parameters
+        res = c.get('/3d/project/{}/'.format(project.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Cannot access a 3d view for a task we have no access to
+        res = c.get('/3d/project/{}/task/{}/'.format(other_project.id, other_task.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Can access 3d view for task we have access to
+        res = c.get('/3d/project/{}/task/{}/'.format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
 
     def test_default_group(self):
         # It exists

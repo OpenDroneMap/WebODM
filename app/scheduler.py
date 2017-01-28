@@ -10,7 +10,6 @@ from app.models import Task, Project
 from django.db.models import Q, Count
 from django import db
 from nodeodm import status_codes
-import random
 
 logger = logging.getLogger('app.logger')
 scheduler = BackgroundScheduler({
@@ -53,7 +52,6 @@ def update_nodes_info():
     processing_nodes = ProcessingNode.objects.all()
     for processing_node in processing_nodes:
         processing_node.update_node_info()
-
 
 tasks_mutex = Lock()
 

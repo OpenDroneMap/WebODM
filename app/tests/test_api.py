@@ -4,6 +4,7 @@ import subprocess
 from guardian.shortcuts import assign_perm
 
 from app import pending_actions
+from nodeodm import status_codes
 from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -27,12 +28,14 @@ class TestApi(BootTestCase):
         user = User.objects.get(username="testuser")
         self.assertFalse(user.is_superuser)
 
+        other_user = User.objects.get(username="testuser2")
+
         project = Project.objects.create(
                 owner=user,
                 name="test project"
             )
         other_project = Project.objects.create(
-                owner=User.objects.get(username="testuser2"),
+                owner=other_user,
                 name="another test project"
             )
 
@@ -195,14 +198,32 @@ class TestApi(BootTestCase):
         self.assertTrue(task.last_error is None)
         self.assertTrue(task.pending_action == pending_actions.REMOVE)
 
+        # Can delete project that we we own
+        temp_project = Project.objects.create(owner=user)
+        res = client.delete('/api/projects/{}/'.format(temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
+        self.assertTrue(Project.objects.filter(id=temp_project.id).count() == 0) # Really deleted
+
+        # Cannot delete a project we don't own
+        other_temp_project = Project.objects.create(owner=other_user)
+        res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Can't delete a project for which we just have view permissions
+        assign_perm('view_project', user, other_temp_project)
+        res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
+
+        # Can delete a project for which we have delete permissions
+        assign_perm('delete_project', user, other_temp_project)
+        res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
+
         # TODO test:
         # - scheduler processing steps
-        # - tiles API urls (permissions, 404s)
-        # - assets download (aliases)
-        # - assets raw downloads
-        # - project deletion
 
     def test_task(self):
+        DELAY = 1 # time to sleep for during process launch, background processing, etc.
         client = APIClient()
 
         user = User.objects.get(username="testuser")
@@ -290,11 +311,22 @@ class TestApi(BootTestCase):
         res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(other_project.id, other_task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
+        # Cannot download assets (they don't exist yet)
+        assets = ["all", "geotiff", "las", "csv", "ply"]
+
+        for asset in assets:
+            res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Cannot access raw assets (they don't exist yet)
+        res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
         # Start processing node
         current_dir = os.path.dirname(os.path.realpath(__file__))
         node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False,
                                     cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
-        time.sleep(5)  # Wait for the server to launch
+        time.sleep(DELAY)  # Wait for the server to launch
 
         # Create processing node
         pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
@@ -315,8 +347,23 @@ class TestApi(BootTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # After a processing node has been assigned, the task processing should start
+        #time.sleep(DELAY)
+
+        # Processing should have completed
+        #task.refresh_from_db()
+        #self.assertTrue(task.status == status_codes.COMPLETED)
+
+        # TODO: background tasks do not properly talk to the database
+        # Task table is always empty when read from a separate Thread. Why?
+        # from app import scheduler
+        # scheduler.process_pending_tasks(background=True)
+
+        #time.sleep(3)
+
         # TODO: check
         # TODO: what happens when nodes go offline, or an offline node is assigned to a task
+        # TODO: check raw/non-raw assets once task is finished processing
+        # TODO: recheck tiles, tiles.json urls, etc.
 
         # Teardown processing node
         node_odm.terminate()
