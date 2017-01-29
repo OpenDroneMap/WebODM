@@ -12,6 +12,10 @@ case $uname in
 	;;
 esac
 
+if [[ $platform = "Windows" ]]; then
+	export COMPOSE_CONVERT_WINDOWS_PATHS=1
+fi
+
 usage(){
   echo "Usage: $0 <command> [options]"
   echo
@@ -42,7 +46,7 @@ check_command(){
 			# Recurse, but don't pass the install command
 			check_command "$1" "$2"	
 		else
-			check_msg_result="\033[91m can't find $1! Check that the program is installed before launching WebODM. $2\033[39m"
+			check_msg_result="\033[91m can't find $1! Check that the program is installed and that you have added the proper path to the program to your PATH environment variable before launching WebODM. If you change your PATH environment variable, remember to close and reopen your terminal. $2\033[39m"
 		fi
 	fi
 
