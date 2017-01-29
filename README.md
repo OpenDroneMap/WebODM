@@ -23,7 +23,7 @@ If you know Python, web technologies (JS, HTML, CSS, etc.) or both, make a fork,
 
 * From the Docker Quickstart Terminal (Windows) or from the command line (Mac / Linux) type:
 ```bash
-git clone https://github.com/OpenDroneMap/WebODM
+git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input
 cd WebODM
 ./webodm.sh start
 ```

@@ -12,6 +12,10 @@ case $uname in
 	;;
 esac
 
+if [[ $platform = "Windows" ]]; then
+	export COMPOSE_CONVERT_WINDOWS_PATHS=1
+fi
+
 usage(){
   echo "Usage: $0 <command> [options]"
   echo
