@@ -223,7 +223,7 @@ class TestApi(BootTestCase):
         # - scheduler processing steps
 
     def test_task(self):
-        DELAY = 1 # time to sleep for during process launch, background processing, etc.
+        DELAY = 5 # time to sleep for during process launch, background processing, etc.
         client = APIClient()
 
         user = User.objects.get(username="testuser")
