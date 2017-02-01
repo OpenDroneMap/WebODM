@@ -91,10 +91,12 @@ class ProcessingNode(models.Model):
         except requests.exceptions.ConnectionError as e:
             raise ProcessingException(e)
 
-        if result['uuid']:
+        if 'uuid' in result:
             return result['uuid']
-        elif result['error']:
+        elif 'error' in result:
             raise ProcessingException(result['error'])
+        else:
+            raise ProcessingException("Unexpected answer from server: {}".format(result))
 
     @api
     def get_task_info(self, uuid):

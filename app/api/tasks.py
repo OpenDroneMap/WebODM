@@ -126,6 +126,12 @@ class TaskViewSet(viewsets.ViewSet):
 
         task = models.Task.create_from_images(files, project)
         if task is not None:
+
+            # Update other parameters such as processing node, task name, etc.
+            serializer = TaskSerializer(task, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)
         else:
             raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
