@@ -43,7 +43,7 @@ class ApiClient:
         return requests.post(self.url('/task/restart'), data={'uuid': uuid}, timeout=TIMEOUT).json()
 
     def task_download(self, uuid, asset):
-        res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset), stream=True, timeout=TIMEOUT)
+        res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset), stream=True)
         if "Content-Type" in res.headers and "application/json" in res.headers['Content-Type']:
             return res.json()
         else:
@@ -62,5 +62,4 @@ class ApiClient:
                  ) for image in images]
         return requests.post(self.url("/task/new"),
                              files=files,
-                             data={'name': name, 'options': json.dumps(options)},
-                             timeout=TIMEOUT).json()
+                             data={'name': name, 'options': json.dumps(options)}).json()

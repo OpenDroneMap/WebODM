@@ -1,51 +1,23 @@
 import logging
 import traceback
+from multiprocessing.dummy import Pool as ThreadPool
+from threading import Lock
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import SchedulerAlreadyRunningError, SchedulerNotRunningError
-from threading import Thread, Lock
-from multiprocessing.dummy import Pool as ThreadPool 
-from nodeodm.models import ProcessingNode
-from app.models import Task, Project
-from django.db.models import Q, Count
+from apscheduler.schedulers.background import BackgroundScheduler
 from django import db
+from django.db.models import Q, Count
+
+from app.models import Task, Project
 from nodeodm import status_codes
+from nodeodm.models import ProcessingNode
+from app.background import background
 
 logger = logging.getLogger('app.logger')
 scheduler = BackgroundScheduler({
     'apscheduler.job_defaults.coalesce': 'false',
     'apscheduler.job_defaults.max_instances': '3',
 })
-
-def background(func):
-    """
-    Adds background={True|False} param to any function
-    so that we can call update_nodes_info(background=True) from the outside
-    """
-    def wrapper(*args,**kwargs):
-        background = kwargs.get('background', False)
-        if 'background' in kwargs: del kwargs['background']
-
-        if background:
-            # Create a function that closes all 
-            # db connections at the end of the thread
-            # This is necessary to make sure we don't leave
-            # open connections lying around. 
-            def execute_and_close_db():
-                ret = None
-                try:
-                    ret = func(*args, **kwargs)
-                finally:
-                    db.connections.close_all()
-                return ret
-
-            t = Thread(target=execute_and_close_db)
-            t.start()
-            return t
-        else:
-            return func(*args, **kwargs)
-    return wrapper
-
 
 @background
 def update_nodes_info():
@@ -86,6 +58,8 @@ def process_pending_tasks():
                 task.save()
         except Exception as e:
             logger.error("Uncaught error: {} {}".format(e, traceback.format_exc()))
+        finally:
+            db.connections.close_all()
 
     if tasks.count() > 0:
         pool = ThreadPool(tasks.count())

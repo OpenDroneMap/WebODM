@@ -15,8 +15,10 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 
 # We need to test the task API in a TransactionTestCase because
-# processing happens on a separate thread. This is required by Django.
-class TestApi(BootTransactionTestCase):
+# task processing happens on a separate thread, and normal TestCases
+# do not commit changes to the DB, so spawning a new thread will show no
+# data in it.
+class TestApiTask(BootTransactionTestCase):
     def test_task(self):
         DELAY = 1  # time to sleep for during process launch, background processing, etc.
         client = APIClient()
@@ -167,6 +169,10 @@ class TestApi(BootTransactionTestCase):
         # On update scheduler.processing_pending_tasks should have been called in the background
         time.sleep(DELAY)
 
+        print("HERE")
+        from app.background import testWatch
+        print(testWatch.stats)
+
         # Processing should have completed
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.RUNNING)
@@ -190,4 +196,4 @@ class TestApi(BootTransactionTestCase):
 
         # Teardown processing node
         node_odm.terminate()
-        time.sleep(20)
+        #time.sleep(20)

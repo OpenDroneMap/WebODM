@@ -56,6 +56,7 @@ class BootTestCase(TestCase):
     def tearDownClass(cls):
         super(BootTestCase, cls).tearDownClass()
 
+
 class BootTransactionTestCase(TransactionTestCase):
     '''
     Same as above, but inherits from TransactionTestCase
