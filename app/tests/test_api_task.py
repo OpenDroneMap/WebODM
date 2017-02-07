@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from app import pending_actions
 from app import scheduler
 from app.models import Project, Task, ImageUpload, task_directory_path
 from app.tests.classes import BootTransactionTestCase
@@ -23,6 +24,15 @@ from app.testwatch import testWatch
 from webodm import settings
 logger = logging.getLogger('app.logger')
 
+DELAY = 1  # time to sleep for during process launch, background processing, etc.
+
+def start_processing_node():
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False,
+                                cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
+    time.sleep(DELAY)  # Wait for the server to launch
+    return node_odm
+
 class TestApiTask(BootTransactionTestCase):
     def setUp(self):
         # We need to clear previous media_root content
@@ -36,8 +46,9 @@ class TestApiTask(BootTransactionTestCase):
             logger.warning("We did not remove MEDIA_ROOT because we couldn't find a _test suffix in its path.")
 
     def test_task(self):
-        DELAY = 1  # time to sleep for during process launch, background processing, etc.
         client = APIClient()
+
+        node_odm = start_processing_node()
 
         user = User.objects.get(username="testuser")
         self.assertFalse(user.is_superuser)
@@ -55,10 +66,6 @@ class TestApiTask(BootTransactionTestCase):
         other_task = Task.objects.create(project=other_project)
 
         # Start processing node
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False,
-                                    cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
-        time.sleep(DELAY)  # Wait for the server to launch
 
         # Create processing node
         pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
@@ -138,9 +145,6 @@ class TestApiTask(BootTransactionTestCase):
         # No processing node is set
         self.assertTrue(task.processing_node is None)
 
-        image1.close()
-        image2.close()
-
         # tiles.json should not be accessible at this point
         res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
@@ -193,6 +197,8 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.RUNNING)
         self.assertTrue(len(task.uuid) > 0)
+
+        time.sleep(DELAY)
 
         # Calling process pending tasks should finish the process
         scheduler.process_pending_tasks()
@@ -249,10 +255,58 @@ class TestApiTask(BootTransactionTestCase):
         testWatch.clear()
         testWatch.intercept("app.scheduler.process_pending_tasks")
 
+        # Create a task, then kill the processing node
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'images': [image1, image2],
+            'name': 'test_task_offline',
+            'processing_node': pnode.id
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+        task = Task.objects.get(pk=res.data['id'])
+
+        # Stop processing node
+        node_odm.terminate()
+
+        task.refresh_from_db()
+        self.assertTrue(task.last_error is None)
+        scheduler.process_pending_tasks()
+
+        # Processing should fail and set an error
+        task.refresh_from_db()
+        self.assertTrue(task.last_error is not None)
+        self.assertTrue(task.status == status_codes.FAILED)
+
+        # Now bring it back online
+        node_odm = start_processing_node()
+
+        # Restart
+        res = client.post("/api/projects/{}/tasks/{}/restart/".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        task.refresh_from_db()
+        self.assertTrue(task.pending_action == pending_actions.RESTART)
+
+        # After processing, the task should have restarted, and have no UUID or status
+        scheduler.process_pending_tasks()
+        task.refresh_from_db()
+        self.assertTrue(task.status is None)
+        self.assertTrue(len(task.uuid) == 0)
+
+        # Another step and it should have acquired a UUID
+        scheduler.process_pending_tasks()
+        task.refresh_from_db()
+        self.assertTrue(task.status is status_codes.RUNNING)
+        self.assertTrue(len(task.uuid) > 0)
+
+        # Another step and it should be completed
+        time.sleep(DELAY)
+        scheduler.process_pending_tasks()
+        task.refresh_from_db()
+        self.assertTrue(task.status == status_codes.COMPLETED)
 
 
-        # TODO: what happens when nodes go offline, or an offline node is assigned to a task
         # TODO: timeout issues
 
-        # Teardown processing node
-        node_odm.terminate()
+        image1.close()
+        image2.close()
+
+

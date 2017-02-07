@@ -189,8 +189,8 @@ class Task(models.Model):
 
         try:
             if self.processing_node:
-                # Need to process some images (UUID not yet set and task not marked for deletion)?
-                if not self.uuid and self.pending_action != pending_actions.REMOVE:
+                # Need to process some images (UUID not yet set and task doesn't have pending actions)?
+                if not self.uuid and self.pending_action is None:
                     logger.info("Processing... {}".format(self))
 
                     images = [image.path() for image in self.imageupload_set.all()]
@@ -223,24 +223,25 @@ class Task(models.Model):
                             raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
 
                     elif self.pending_action == pending_actions.RESTART:
-                        logger.info("Restarting task {}".format(self))
-                        if self.processing_node and self.uuid:
+                        logger.info("Restarting {}".format(self))
+                        if self.processing_node:
 
                             # Check if the UUID is still valid, as processing nodes purge
                             # results after a set amount of time, the UUID might have eliminated.
-                            try:
-                                info = self.processing_node.get_task_info(self.uuid)
-                                uuid_still_exists = info['uuid'] == self.uuid
-                            except ProcessingException:
-                                uuid_still_exists = False
+                            uuid_still_exists = False
+
+                            if self.uuid:
+                                try:
+                                    info = self.processing_node.get_task_info(self.uuid)
+                                    uuid_still_exists = info['uuid'] == self.uuid
+                                except ProcessingException:
+                                    pass
 
                             if uuid_still_exists:
                                 # Good to go
                                 self.processing_node.restart_task(self.uuid)
                             else:
                                 # Task has been purged (or processing node is offline)
-                                # TODO: what if processing node went offline?
-
                                 # Process this as a new task
                                 # Removing its UUID will cause the scheduler
                                 # to process this the next tick
