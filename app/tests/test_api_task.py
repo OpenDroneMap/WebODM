@@ -29,8 +29,9 @@ class TestApiTask(BootTransactionTestCase):
         # This points to the test directory, but just in case
         # we double check that the directory is indeed a test directory
         if "_test" in settings.MEDIA_ROOT:
-            logger.info("Cleaning up {}".format(settings.MEDIA_ROOT))
-            shutil.rmtree(settings.MEDIA_ROOT)
+            if os.path.exists(settings.MEDIA_ROOT):
+                logger.info("Cleaning up {}".format(settings.MEDIA_ROOT))
+                shutil.rmtree(settings.MEDIA_ROOT)
         else:
             logger.warning("We did not remove MEDIA_ROOT because we couldn't find a _test suffix in its path.")
 
@@ -242,8 +243,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertFalse(Task.objects.filter(pk=task.id).exists())
         self.assertFalse(ImageUpload.objects.filter(task=task).exists())
 
-        task_assets_path = os.path.join(settings.MEDIA_ROOT,
-                               task_directory_path(task.id, task.project.id))
+        task_assets_path = os.path.join(settings.MEDIA_ROOT, task_directory_path(task.id, task.project.id))
         self.assertFalse(os.path.exists(task_assets_path))
 
         testWatch.clear()
