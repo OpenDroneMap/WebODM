@@ -1,18 +1,16 @@
 import os
 import subprocess
-
 import time
 
-from django import db
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from app import scheduler
 from app.models import Project, Task, ImageUpload
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
+from app.testwatch import testWatch
 
 # We need to test the task API in a TransactionTestCase because
 # task processing happens on a separate thread, and normal TestCases
@@ -133,6 +131,7 @@ class TestApiTask(BootTransactionTestCase):
         # Neither should an individual tile
         # Z/X/Y coords are choosen based on node-odm test dataset for orthophoto_tiles/
         res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
+        print(res.status_code)
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot access a tiles.json we have no access to
@@ -160,6 +159,8 @@ class TestApiTask(BootTransactionTestCase):
         })
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
+        testWatch.clear()
+
         # Assign processing node to task via API
         res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
             'processing_node': pnode.id
@@ -167,27 +168,11 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # On update scheduler.processing_pending_tasks should have been called in the background
-        time.sleep(DELAY)
-
-        print("HERE")
-        from app.background import testWatch
-        print(testWatch.stats)
+        testWatch.wait_until_call("app.scheduler.process_pending_tasks", timeout=5)
 
         # Processing should have completed
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.RUNNING)
-
-
-        # TODO: need a way to prevent multithreaded code from executing
-        # and a way to notify our test case that multithreaded code should have
-        # executed
-
-        # TODO: at this point we might not even need a TransactionTestCase?
-
-        #from app import scheduler
-        #scheduler.process_pending_tasks(background=True)
-
-        # time.sleep(3)
 
         # TODO: check
         # TODO: what happens when nodes go offline, or an offline node is assigned to a task
@@ -196,4 +181,3 @@ class TestApiTask(BootTransactionTestCase):
 
         # Teardown processing node
         node_odm.terminate()
-        #time.sleep(20)

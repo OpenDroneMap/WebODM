@@ -1,24 +1,11 @@
 from threading import Thread
+
+import logging
 from django import db
 from webodm import settings
+from app.testwatch import testWatch
 
-
-# TODO: design class such that:
-# 1. test cases can choose which functions to intercept (prevent from executing)
-# 2. test cases can see how many times a function has been called (and with which parameters)
-# 3. test cases can pause until a function has been called
-class TestWatch:
-    stats = {}
-
-    def called(self, func, *args, **kwargs):
-        list = TestWatch.stats[func] if func in TestWatch.stats else []
-        list.append({'f': func, 'args': args, 'kwargs': kwargs})
-        print(list)
-
-    def clear(self):
-        TestWatch.stats = {}
-
-testWatch = TestWatch()
+logger = logging.getLogger('app.logger')
 
 def background(func):
     """
@@ -30,9 +17,7 @@ def background(func):
         if 'background' in kwargs: del kwargs['background']
 
         if background:
-            if settings.TESTING:
-                # During testing, intercept all background requests and execute them on the same thread
-                testWatch.called(func.__name__, *args, **kwargs)
+            if testWatch.hook_pre(func, *args, **kwargs): return
 
             # Create a function that closes all
             # db connections at the end of the thread
@@ -44,6 +29,7 @@ def background(func):
                     ret = func(*args, **kwargs)
                 finally:
                     db.connections.close_all()
+                    testWatch.hook_post(func, *args, **kwargs)
                 return ret
 
             t = Thread(target=execute_and_close_db)
