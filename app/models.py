@@ -217,6 +217,7 @@ class Task(models.Model):
                         if self.processing_node and self.uuid:
                             self.processing_node.cancel_task(self.uuid)
                             self.pending_action = None
+                            self.status = None
                             self.save()
                         else:
                             raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
@@ -373,7 +374,7 @@ class Task(models.Model):
         try:
             shutil.rmtree(directory_to_delete)
         except FileNotFoundError as e:
-            logger.warn(e)
+            logger.warning(e)
 
 
     def set_failure(self, error_message):
