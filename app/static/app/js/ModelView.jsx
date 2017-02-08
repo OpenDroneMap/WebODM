@@ -509,7 +509,7 @@ class ModelView extends React.Component {
                     // ODM models are Y-up
                     object.rotateX(THREE.Math.degToRad(-90));
 
-                    // // Bring the model close to center
+                    // Bring the model close to center
                     if (object.children.length > 0){
                       const geom = object.children[0].geometry;
 

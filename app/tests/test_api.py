@@ -219,9 +219,6 @@ class TestApi(BootTestCase):
         res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
         self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
 
-        # TODO test:
-        # - scheduler processing steps
-
 
     def test_processingnodes(self):
         client = APIClient()
