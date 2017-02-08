@@ -20,7 +20,7 @@ from guardian.shortcuts import get_perms_for_model, assign_perm
 from app import pending_actions
 from app.postgis import OffDbRasterField
 from nodeodm import status_codes
-from nodeodm.exceptions import ProcessingException
+from nodeodm.exceptions import ProcessingError, ProcessingTimeout, ProcessingException
 from nodeodm.models import ProcessingNode
 from webodm import settings
 
@@ -149,7 +149,7 @@ class Task(models.Model):
     def __str__(self):
         name = self.name if self.name is not None else "unnamed"
 
-        return 'Task {} ({})'.format(name, self.id)
+        return 'Task [{}] ({})'.format(name, self.id)
 
     def save(self, *args, **kwargs):
         # Autovalidate on save
@@ -209,21 +209,21 @@ class Task(models.Model):
 
                         # TODO: log process has started processing
 
-                    except ProcessingException as e:
+                    except ProcessingError as e:
                         self.set_failure(str(e))
 
             if self.pending_action is not None:
                 try:
                     if self.pending_action == pending_actions.CANCEL:
                         # Do we need to cancel the task on the processing node?
-                        logger.info("Canceling task {}".format(self))
+                        logger.info("Canceling {}".format(self))
                         if self.processing_node and self.uuid:
                             self.processing_node.cancel_task(self.uuid)
                             self.pending_action = None
                             self.status = None
                             self.save()
                         else:
-                            raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
+                            raise ProcessingError("Cannot cancel a task that has no processing node or UUID")
 
                     elif self.pending_action == pending_actions.RESTART:
                         logger.info("Restarting {}".format(self))
@@ -237,7 +237,7 @@ class Task(models.Model):
                                 try:
                                     info = self.processing_node.get_task_info(self.uuid)
                                     uuid_still_exists = info['uuid'] == self.uuid
-                                except ProcessingException:
+                                except ProcessingError:
                                     pass
 
                             if uuid_still_exists:
@@ -257,10 +257,10 @@ class Task(models.Model):
                             self.pending_action = None
                             self.save()
                         else:
-                            raise ProcessingException("Cannot restart a task that has no processing node or UUID")
+                            raise ProcessingError("Cannot restart a task that has no processing node or UUID")
 
                     elif self.pending_action == pending_actions.REMOVE:
-                        logger.info("Removing task {}".format(self))
+                        logger.info("Removing {}".format(self))
                         if self.processing_node and self.uuid:
                             # Attempt to delete the resources on the processing node
                             # We don't care if this fails, as resources on processing nodes
@@ -276,7 +276,7 @@ class Task(models.Model):
                         # Stop right here!
                         return
 
-                except ProcessingException as e:
+                except ProcessingError as e:
                     self.last_error = str(e)
                     self.save()
 
@@ -336,7 +336,7 @@ class Task(models.Model):
                                         logger.info("Imported orthophoto {} for {}".format(orthophoto_4326_path, self))
 
                                     self.save()
-                                except ProcessingException as e:
+                                except ProcessingError as e:
                                     self.set_failure(str(e))
                             else:
                                 # FAILED, CANCELED
@@ -344,11 +344,11 @@ class Task(models.Model):
                         else:
                             # Still waiting...
                             self.save()
-                    except ProcessingException as e:
+                    except ProcessingError as e:
                         self.set_failure(str(e))
         except (ConnectionRefusedError, ConnectionError) as e:
             logger.warning("{} cannot communicate with processing node: {}".format(self, str(e)))
-        except requests.exceptions.ConnectTimeout as e:
+        except ProcessingTimeout as e:
             logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
 
 

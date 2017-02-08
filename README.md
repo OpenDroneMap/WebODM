@@ -76,6 +76,10 @@ Have you had other issues? Please [report them](https://github.com/OpenDroneMap/
 
 WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/pierotofy/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
 
+### Security
+
+If you want to run WebODM in production, make sure to change the `SECRET_KEY` variable in `webodm/settings.py`, as well as any other relevant setting as indicated in the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
+
 ## Run it natively
 
 If you want to run WebODM natively, you will need to install:

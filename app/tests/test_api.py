@@ -1,18 +1,15 @@
 import datetime
-import subprocess
 
+from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from rest_framework import status
+from rest_framework.test import APIClient
+from rest_framework_jwt.settings import api_settings
 
 from app import pending_actions
-from nodeodm import status_codes
-from .classes import BootTestCase
-from rest_framework.test import APIClient
-from rest_framework import status
-import time, os
-
-from app.models import Project, Task, ImageUpload
+from app.models import Project, Task
 from nodeodm.models import ProcessingNode
-from django.contrib.auth.models import User
+from .classes import BootTestCase
 
 
 class TestApi(BootTestCase):
@@ -309,4 +306,38 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 2)
         self.assertTrue(res.data[1]["port"] == 1000)
+
+    def test_token_auth(self):
+        client = APIClient()
+
+        pnode = ProcessingNode.objects.create(
+            hostname="localhost",
+            port=999
+        )
+
+        # Cannot access resources
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Cannot generate token with invalid credentials
+        res = client.post('/api/token-auth/', {
+            'username': 'testuser',
+            'password': 'wrongpwd'
+        })
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Can generate token with valid credentials
+        res = client.post('/api/token-auth/', {
+            'username': 'testuser',
+            'password': 'test1234'
+        })
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        token = res.data['token']
+        self.assertTrue(len(token) > 0)
+
+        # Can access resources by passing token
+        client = APIClient(HTTP_AUTHORIZATION="{0} {1}".format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 

@@ -9,6 +9,7 @@ django-guardian==1.4.6
 django-rest-swagger==2.1.0
 django-webpack-loader==0.3.3
 djangorestframework==3.5.1
+djangorestframework-jwt==1.9.0
 drf-nested-routers==0.11.1
 funcsigs==1.0.2
 futures==3.0.5
@@ -19,6 +20,7 @@ packaging==16.8
 Pillow==3.3.1
 pip-autoremove==0.9.0
 psycopg2==2.6.2
+PyJWT==1.4.2
 pyparsing==2.1.10
 pytz==2016.6.1
 requests==2.11.1

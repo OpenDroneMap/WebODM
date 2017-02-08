@@ -6,7 +6,7 @@ from os import path
 from .models import ProcessingNode
 from .api_client import ApiClient
 from requests.exceptions import ConnectionError
-from .exceptions import ProcessingException
+from .exceptions import ProcessingError
 from . import status_codes
 
 current_dir = path.dirname(path.realpath(__file__))
@@ -80,7 +80,7 @@ class TestClientApi(TestCase):
                     task_info = api.task_info(uuid)
                     if task_info['status']['code'] == status:
                         return True
-                except ProcessingException:
+                except ProcessingError:
                     pass
 
                 time.sleep(0.5)
@@ -120,25 +120,25 @@ class TestClientApi(TestCase):
         self.assertTrue(isinstance(api.task_output(uuid, 0), list))
         self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), str))
 
-        self.assertRaises(ProcessingException, online_node.get_task_console_output, "wrong-uuid", 0)
+        self.assertRaises(ProcessingError, online_node.get_task_console_output, "wrong-uuid", 0)
 
         # Can restart task
         self.assertTrue(online_node.restart_task(uuid))
-        self.assertRaises(ProcessingException, online_node.restart_task, "wrong-uuid")
+        self.assertRaises(ProcessingError, online_node.restart_task, "wrong-uuid")
 
         wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not restart task")
 
         # Can cancel task (should work even if we completed the task)
         self.assertTrue(online_node.cancel_task(uuid))
-        self.assertRaises(ProcessingException, online_node.cancel_task, "wrong-uuid")
+        self.assertRaises(ProcessingError, online_node.cancel_task, "wrong-uuid")
 
         # Wait for task to be canceled
         wait_for_status(api, uuid, status_codes.CANCELED, 5, "Could not remove task")
         self.assertTrue(online_node.remove_task(uuid))
-        self.assertRaises(ProcessingException, online_node.remove_task, "wrong-uuid")
+        self.assertRaises(ProcessingError, online_node.remove_task, "wrong-uuid")
 
         # Cannot delete task again
-        self.assertRaises(ProcessingException, online_node.remove_task, uuid)
+        self.assertRaises(ProcessingError, online_node.remove_task, uuid)
 
         # Task has been deleted
-        self.assertRaises(ProcessingException, online_node.get_task_info, uuid)
+        self.assertRaises(ProcessingError, online_node.get_task_info, uuid)
