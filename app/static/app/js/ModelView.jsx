@@ -46,10 +46,11 @@ class ModelView extends React.Component {
   }
 
   objFilePath(){
-    return this.texturedModelDirectoryPath() + 'odm_textured_model.obj'; 
+    return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.obj'; 
   }
 
   mtlFilename(){
+    // For some reason, loading odm_textured_model_geo.mtl does not load textures properly
     return 'odm_textured_model.mtl';
   }
 
@@ -508,7 +509,7 @@ class ModelView extends React.Component {
                     // ODM models are Y-up
                     object.rotateX(THREE.Math.degToRad(-90));
 
-                    // Bring the model close to center
+                    // // Bring the model close to center
                     if (object.children.length > 0){
                       const geom = object.children[0].geometry;
 
