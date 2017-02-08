@@ -9,7 +9,7 @@ import os
 from urllib.parse import urlunparse
 from app.testwatch import TestWatch
 
-TIMEOUT = 10
+TIMEOUT = 30
 
 class ApiClient:
     def __init__(self, host, port):
