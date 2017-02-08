@@ -7,6 +7,7 @@ from apscheduler.schedulers import SchedulerAlreadyRunningError, SchedulerNotRun
 from apscheduler.schedulers.background import BackgroundScheduler
 from django import db
 from django.db.models import Q, Count
+from webodm import settings
 
 from app.models import Task, Project
 from nodeodm import status_codes
@@ -51,14 +52,15 @@ def process_pending_tasks():
     def process(task):
         try:
             task.process()
-
+        except Exception as e:
+            logger.error("Uncaught error! This is potentially bad. Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(e, traceback.format_exc()))
+            if settings.TESTING: raise e
+        finally:
             # Might have been deleted
             if task.pk is not None:
                 task.processing_lock = False
                 task.save()
-        except Exception as e:
-            logger.error("Uncaught error: {} {}".format(e, traceback.format_exc()))
-        finally:
+
             db.connections.close_all()
 
     if tasks.count() > 0:

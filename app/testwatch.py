@@ -17,8 +17,12 @@ class TestWatch:
     def func_to_name(f):
         return "{}.{}".format(f.__module__, f.__name__)
 
-    def intercept(self, fname):
-        self._intercept_list[fname] = True
+    def intercept(self, fname, f = None):
+        self._intercept_list[fname] = f if f is not None else True
+
+    def execute_intercept_function_replacement(self, fname, *args, **kwargs):
+        if fname in self._intercept_list and callable(self._intercept_list[fname]):
+            (self._intercept_list[fname])(*args, **kwargs)
 
     def should_prevent_execution(self, func):
         return TestWatch.func_to_name(func) in self._intercept_list
@@ -51,7 +55,9 @@ class TestWatch:
 
     def hook_pre(self, func, *args, **kwargs):
         if settings.TESTING and self.should_prevent_execution(func):
-            logger.info(func.__name__ + " intercepted")
+            fname = TestWatch.func_to_name(func)
+            logger.info(fname + " intercepted")
+            self.execute_intercept_function_replacement(fname, *args, **kwargs)
             self.log_call(func, *args, **kwargs)
             return True # Intercept
         return False # Do not intercept

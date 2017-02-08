@@ -36,5 +36,22 @@ class TestTestWatch(TestCase):
         test2(d)
         self.assertTrue(d['flag'])
 
+        # Test function replacement intercept
+        d = {
+            'a': False,
+            'b': False
+        }
+        @TestWatch.watch(testWatch=tw)
+        def test3(d):
+            d['a'] = True
+
+        def replacement(d):
+            d['b'] = True
+
+        tw.intercept("app.tests.test_testwatch.test3", replacement)
+        test3(d)
+        self.assertFalse(d['a'])
+        self.assertTrue(d['b'])
+
 
 

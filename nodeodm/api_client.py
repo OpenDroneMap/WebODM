@@ -7,6 +7,7 @@ import mimetypes
 import json
 import os
 from urllib.parse import urlunparse
+from app.testwatch import TestWatch
 
 TIMEOUT = 10
 
@@ -30,6 +31,7 @@ class ApiClient:
     def task_info(self, uuid):
         return requests.get(self.url('/task/{}/info').format(uuid), timeout=TIMEOUT).json()
 
+    @TestWatch.watch()
     def task_output(self, uuid, line = 0):
         return requests.get(self.url('/task/{}/output?line={}').format(uuid, line), timeout=TIMEOUT).json()
 

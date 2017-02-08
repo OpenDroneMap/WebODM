@@ -5,6 +5,8 @@ import time
 import shutil
 
 import logging
+
+import requests
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -304,9 +306,21 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.status == status_codes.COMPLETED)
 
 
-        # TODO: timeout issues
+        # Test connection, timeout errors
+        res = client.post("/api/projects/{}/tasks/{}/restart/".format(project.id, task.id))
+        def connTimeout(*args, **kwargs):
+            raise requests.exceptions.ConnectTimeout("Simulated timeout")
+
+        testWatch.intercept("nodeodm.api_client.task_output", connTimeout)
+        scheduler.process_pending_tasks()
+
+        # Timeout errors should be handled by retrying again at a later time
+        # and not fail
+        task.refresh_from_db()
+        self.assertTrue(task.last_error is None)
 
         image1.close()
         image2.close()
+        node_odm.terminate()
 
 
