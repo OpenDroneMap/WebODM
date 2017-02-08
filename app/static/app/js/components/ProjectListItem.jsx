@@ -266,7 +266,8 @@ class ProjectListItem extends React.Component {
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
          href="javascript:void(0);"
-         ref={this.setRef("dropzone")}>
+         ref={this.setRef("dropzone")}
+         >
 
         <EditProjectDialog 
           ref={(domNode) => { this.editProjectDialog = domNode; }}

@@ -213,10 +213,10 @@ class TaskListItem extends React.Component {
           ));
       }
 
-      // TODO: ability to change options
-      // addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
-      //   console.log("edit call");
-      // });
+      // Ability to change options
+      addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
+        
+      });
 
       addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
         confirm: "All information related to this task, including images, maps and models will be deleted. Continue?"

@@ -2,6 +2,7 @@ import '../css/EditTaskPanel.scss';
 import React from 'react';
 import ProcessingNodeOption from './ProcessingNodeOption';
 import values from 'object.values';
+import Utils from '../classes/Utils';
 
 if (!Object.values) {
     values.shim();
@@ -32,82 +33,96 @@ class EditTaskPanel extends React.Component {
     this.setOptionRef = this.setOptionRef.bind(this);
     this.save = this.save.bind(this);
     this.edit = this.edit.bind(this);
+    this.loadProcessingNodes = this.loadProcessingNodes.bind(this);
+    this.retryLoadProcessingNodes = this.retryLoadProcessingNodes.bind(this);
+  }
+
+  loadProcessingNodes(){
+    function failed(){
+      // Try again
+      setTimeout(loadProcessingNodes, 1000);
+    }
+
+    this.nodesRequest = 
+      $.getJSON("/api/processingnodes/?has_available_options=True", json => {
+        if (Array.isArray(json)){
+          // No nodes with options?
+          const noProcessingNodesError = (nodes) => {
+            var extra = nodes ? "We tried to reach:<ul>" + nodes.map(n => Utils.html`<li><a href="${n.url}">${n.label}</a></li>`).join("") + "</ul>" : "";
+            this.setState({error: `There are no usable processing nodes. ${extra}Make sure that at least one processing node is reachable and
+             that you have granted the current user sufficient permissions to view 
+             the processing node (by going to Administration -- Processing Nodes -- Select Node -- Object Permissions -- Add User/Group and check CAN VIEW PROCESSING NODE).
+             If you are bringing a node back online, it will take about 30 seconds for WebODM to recognize it.`});
+          }
+          if (json.length === 0){
+            noProcessingNodesError();
+            return;
+          }
+
+          let now = new Date();
+
+          let nodes = json.map(node => {
+            let last_refreshed = new Date(node.last_refreshed);
+            let enabled = (now - last_refreshed) < 1000 * 60 * 5; // 5 minutes
+
+            return {
+              id: node.id,
+              key: node.id,
+              label: `${node.hostname}:${node.port} (queue: ${node.queue_count})`,
+              options: node.available_options,
+              queue_count: node.queue_count,
+              enabled: enabled,
+              url: `http://${node.hostname}:${node.port}`
+            };
+          });
+
+          // Find a node with lowest queue count
+          let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
+          let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
+
+          if (minQueueCountNodes.length === 0){
+            noProcessingNodesError(nodes);
+            return;
+          }
+
+          // Choose at random
+          let autoNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
+
+          nodes.unshift({
+            id: autoNode.id,
+            key: "auto",
+            label: "Auto",
+            options: autoNode.options,
+            enabled: true
+          });
+
+          this.setState({
+              selectedNode: nodes[0],
+              processingNodes: nodes,
+              loadedProcessingNodes: true
+          });
+        }else{
+          console.error("Got invalid json response for processing nodes", json);
+          failed();
+        }
+      })
+      .fail((jqXHR, textStatus, errorThrown) => {
+        // I don't expect this to fail, unless it's a development error or connection error.
+        // in which case we don't need to notify the user directly. 
+        console.error("Error retrieving processing nodes", jqXHR, textStatus);
+        failed();
+      });
+  }
+
+  retryLoadProcessingNodes(){
+    this.setState({
+      error: ""
+    });
+    this.loadProcessingNodes();
   }
 
   componentDidMount(){
-    // Load projects from API
-    const loadProcessingNodes = () => {
-      function failed(){
-        // Try again
-        setTimeout(loadProcessingNodes, 1000);
-      }
-
-      this.nodesRequest = 
-        $.getJSON("/api/processingnodes/?has_available_options=True", json => {
-          if (Array.isArray(json)){
-            // No nodes with options?
-            const noProcessingNodesError = () => {
-              this.setState({error: "There are no processing nodes available. Make sure at least one of them is reachable."});
-            }
-            if (json.length === 0){
-              noProcessingNodesError();
-              return;
-            }
-
-            let now = new Date();
-
-            let nodes = json.map(node => {
-              let last_refreshed = new Date(node.last_refreshed);
-              let enabled = (now - last_refreshed) < 1000 * 60 * 5; // 5 minutes
-
-              return {
-                id: node.id,
-                key: node.id,
-                label: `${node.hostname}:${node.port} (queue: ${node.queue_count})`,
-                options: node.available_options,
-                queue_count: node.queue_count,
-                enabled: enabled
-              };
-            });
-
-            // Find a node with lowest queue count
-            let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
-            let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
-
-            if (minQueueCountNodes.length === 0){
-              noProcessingNodesError();
-              return;
-            }
-
-            // Choose at random
-            let autoNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
-
-            nodes.unshift({
-              id: autoNode.id,
-              key: "auto",
-              label: "Auto",
-              options: autoNode.options,
-              enabled: true
-            });
-
-            this.setState({
-                selectedNode: nodes[0],
-                processingNodes: nodes,
-                loadedProcessingNodes: true
-            });
-          }else{
-            console.error("Got invalid json response for processing nodes", json);
-            failed();
-          }
-        })
-        .fail((jqXHR, textStatus, errorThrown) => {
-          // I don't expect this to fail, unless it's a development error or connection error.
-          // in which case we don't need to notify the user directly. 
-          console.error("Error retrieving processing nodes", jqXHR, textStatus);
-          failed();
-        });
-    }
-    loadProcessingNodes();
+    this.loadProcessingNodes();
   }
 
   componentWillUnmount(){
@@ -167,8 +182,13 @@ class EditTaskPanel extends React.Component {
 
   render() {
     if (this.state.error){
-      return (<div className="alert alert-warning alert-dismissible">
-            {this.state.error}
+      return (<div className="edit-task-panel">
+          <div className="alert alert-warning">
+              <div dangerouslySetInnerHTML={{__html:this.state.error}}></div>
+              <button className="btn btn-sm btn-primary" onClick={this.retryLoadProcessingNodes}>
+                <i className="fa fa-rotate-left"></i> Retry
+              </button>
+          </div>
         </div>);
     }
 
@@ -226,11 +246,13 @@ class EditTaskPanel extends React.Component {
               </div>
             </div>
             {processingNodesOptions}
-            <div className="form-group">
-              <div className="col-sm-offset-2 col-sm-10 text-right">
-                <button type="submit" className="btn btn-primary" onClick={this.save}><i className="glyphicon glyphicon-saved"></i> {this.props.uploading ? "Save" : "Start Processing"}</button>
+            {this.state.loadedProcessingNodes ? 
+              <div className="form-group">
+                <div className="col-sm-offset-2 col-sm-10 text-right">
+                  <button type="submit" className="btn btn-primary" onClick={this.save}><i className="glyphicon glyphicon-saved"></i> {this.props.uploading ? "Save" : "Start Processing"}</button>
+                </div>
               </div>
-            </div>
+              : ""}
           </form>
         </div>
       );
