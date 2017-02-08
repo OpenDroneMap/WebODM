@@ -326,7 +326,7 @@ class TestApi(BootTestCase):
         })
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
-        # Can generate token with invalid credentials
+        # Can generate token with valid credentials
         res = client.post('/api/token-auth/', {
             'username': 'testuser',
             'password': 'test1234'
