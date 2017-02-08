@@ -4,12 +4,7 @@
 
 {% block content %}
 	{% if no_processingnodes %}
-		<h3>{% trans 'Welcome!' %}</h3>
-	{% else %}
-		<h3>{% trans 'Dashboard' %}</h3>
-	{% endif %}
-	
-	{% if no_processingnodes %}
+		<h3>{% trans 'Welcome! ☺' %}</h3>
 		{% trans 'Add a Processing Node' as add_processing_node %}
 		{% with nodeodm_link='<a href="https://github.com/pierotofy/node-OpenDroneMap" target="_blank">node-OpenDroneMap</a>' api_link='<a href="https://github.com/pierotofy/node-OpenDroneMap/blob/master/docs/index.adoc" target="_blank">API</a>' %}
 			<p>

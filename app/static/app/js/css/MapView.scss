@@ -4,6 +4,8 @@
 
 .map-view{
     height: 80%;
+    position: relative;
+
     input[type="range"]{
         margin-left: 4px;
         display: inline-block;
@@ -12,7 +14,15 @@
         top: 6px;
     }
 
-    .controls{
-        margin-top: 8px;
+    .opacity-slider{
+        text-align: center;
+        width: 220px;
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        margin-left: -100px;
+        z-index: 400;
+        padding-bottom: 6px;
+        background-color: white;
     }
 }

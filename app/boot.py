@@ -1,11 +1,16 @@
-from django.contrib.contenttypes.models import ContentType
+import logging
+
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User, Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import ProgrammingError
-from . import signals, scheduler
-import logging, os
-from .models import Task
+from guardian.shortcuts import assign_perm
+
+from nodeodm.models import ProcessingNode
 from webodm import settings
+from . import scheduler
+from .models import Task
+
 
 def boot():
     logger = logging.getLogger('app.logger')
@@ -15,6 +20,15 @@ def boot():
         default_group, created = Group.objects.get_or_create(name='Default')
         if created:
             logger.info("Created default group")
+
+            # Assign viewprocessing node object permission to default processing node (if present)
+            # Otherwise non-root users will not be able to process
+            try:
+                pnode = ProcessingNode.objects.get(hostname="node-odm-1")
+                assign_perm('view_processingnode', default_group, pnode)
+                logger.info("Added view_processingnode permissions to default group")
+            except ObjectDoesNotExist:
+                pass
 
         # Add default permissions (view_project, change_project, delete_project, etc.)
         for permission in ('_project', '_task'):
@@ -32,7 +46,8 @@ def boot():
 
         # Unlock any Task that might have been locked
         Task.objects.filter(processing_lock=True).update(processing_lock=False)
-        
+
+
         if not settings.TESTING:
             # Setup and start scheduler
             scheduler.setup()
