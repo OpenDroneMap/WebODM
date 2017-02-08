@@ -46,10 +46,11 @@ class ModelView extends React.Component {
   }
 
   objFilePath(){
-    return this.texturedModelDirectoryPath() + 'odm_textured_model.obj'; 
+    return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.obj'; 
   }
 
   mtlFilename(){
+    // For some reason, loading odm_textured_model_geo.mtl does not load textures properly
     return 'odm_textured_model.mtl';
   }
 

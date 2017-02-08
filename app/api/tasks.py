@@ -121,8 +121,17 @@ class TaskViewSet(viewsets.ViewSet):
                         [keys for keys in request.FILES])
                     for file in filesList]
 
+        if len(files) <= 1:
+            raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
+
         task = models.Task.create_from_images(files, project)
         if task is not None:
+
+            # Update other parameters such as processing node, task name, etc.
+            serializer = TaskSerializer(task, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)
         else:
             raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
@@ -182,6 +191,10 @@ class TaskTilesJson(TaskNestedView):
         task = self.get_and_check_task(request, pk, project_pk, annotate={
                 'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))
             })
+
+        if task.orthophoto_area is None:
+            raise exceptions.ValidationError("An orthophoto has not been processed for this task. Tiles are not available yet.")
+
         json = get_tile_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
             ], task.orthophoto_area.extent)

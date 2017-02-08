@@ -4,6 +4,11 @@
 .model-view{
     height: 80%;
 
+    canvas{
+        width: 100% !important;
+        height: 100% !important;
+    }
+
     .container{
         background: rgb(79,79,79);
         background: -moz-radial-gradient(center, ellipse cover, rgba(79,79,79,1) 0%, rgba(22,22,22,1) 100%);

@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import zipfile
+import requests
 
 from django.contrib.auth.models import User
 from django.contrib.gis.gdal import GDALRaster
@@ -146,7 +147,9 @@ class Task(models.Model):
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
 
     def __str__(self):
-        return 'Task ID: {}'.format(self.id)
+        name = self.name if self.name is not None else "unnamed"
+
+        return 'Task {} ({})'.format(name, self.id)
 
     def save(self, *args, **kwargs):
         # Autovalidate on save
@@ -189,8 +192,8 @@ class Task(models.Model):
 
         try:
             if self.processing_node:
-                # Need to process some images (UUID not yet set and task not marked for deletion)?
-                if not self.uuid and self.pending_action != pending_actions.REMOVE:
+                # Need to process some images (UUID not yet set and task doesn't have pending actions)?
+                if not self.uuid and self.pending_action is None:
                     logger.info("Processing... {}".format(self))
 
                     images = [image.path() for image in self.imageupload_set.all()]
@@ -217,29 +220,31 @@ class Task(models.Model):
                         if self.processing_node and self.uuid:
                             self.processing_node.cancel_task(self.uuid)
                             self.pending_action = None
+                            self.status = None
                             self.save()
                         else:
                             raise ProcessingException("Cannot cancel a task that has no processing node or UUID")
 
                     elif self.pending_action == pending_actions.RESTART:
-                        logger.info("Restarting task {}".format(self))
-                        if self.processing_node and self.uuid:
+                        logger.info("Restarting {}".format(self))
+                        if self.processing_node:
 
                             # Check if the UUID is still valid, as processing nodes purge
                             # results after a set amount of time, the UUID might have eliminated.
-                            try:
-                                info = self.processing_node.get_task_info(self.uuid)
-                                uuid_still_exists = info['uuid'] == self.uuid
-                            except ProcessingException:
-                                uuid_still_exists = False
+                            uuid_still_exists = False
+
+                            if self.uuid:
+                                try:
+                                    info = self.processing_node.get_task_info(self.uuid)
+                                    uuid_still_exists = info['uuid'] == self.uuid
+                                except ProcessingException:
+                                    pass
 
                             if uuid_still_exists:
                                 # Good to go
                                 self.processing_node.restart_task(self.uuid)
                             else:
                                 # Task has been purged (or processing node is offline)
-                                # TODO: what if processing node went offline?
-
                                 # Process this as a new task
                                 # Removing its UUID will cause the scheduler
                                 # to process this the next tick
@@ -341,11 +346,10 @@ class Task(models.Model):
                             self.save()
                     except ProcessingException as e:
                         self.set_failure(str(e))
-        except ConnectionRefusedError as e:
-            logger.warning("Task {} cannot communicate with processing node: {}".format(self, str(e)))
-
-            # In the future we might want to retry instead of just failing
-            #self.set_failure(str(e))
+        except (ConnectionRefusedError, ConnectionError) as e:
+            logger.warning("{} cannot communicate with processing node: {}".format(self, str(e)))
+        except requests.exceptions.ConnectTimeout as e:
+            logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
 
 
     def get_tile_path(self, z, x, y):
@@ -373,11 +377,11 @@ class Task(models.Model):
         try:
             shutil.rmtree(directory_to_delete)
         except FileNotFoundError as e:
-            logger.warn(e)
+            logger.warning(e)
 
 
     def set_failure(self, error_message):
-        logger.error("{} ERROR: {}".format(self, error_message))
+        logger.error("FAILURE FOR {}: {}".format(self, error_message))
         self.last_error = error_message
         self.status = status_codes.FAILED
         self.save()

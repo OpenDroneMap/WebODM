@@ -224,6 +224,8 @@ REST_FRAMEWORK = {
 }
 
 TESTING = sys.argv[1:2] == ['test']
+if TESTING:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 
 try:
     from .local_settings import *

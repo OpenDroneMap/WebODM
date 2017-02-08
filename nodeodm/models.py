@@ -58,7 +58,7 @@ class ProcessingNode(models.Model):
             self.last_refreshed = timezone.now()
             self.save()
             return True
-        except:
+        except (ConnectionError, json.decoder.JSONDecodeError, simplejson.JSONDecodeError):
             return False
 
     def api_client(self):
@@ -91,10 +91,12 @@ class ProcessingNode(models.Model):
         except requests.exceptions.ConnectionError as e:
             raise ProcessingException(e)
 
-        if result['uuid']:
+        if isinstance(result, dict) and 'uuid' in result:
             return result['uuid']
-        elif result['error']:
+        elif isinstance(result, dict) and 'error' in result:
             raise ProcessingException(result['error'])
+        else:
+            raise ProcessingException("Unexpected answer from server: {}".format(result))
 
     @api
     def get_task_info(self, uuid):
@@ -196,5 +198,6 @@ def auto_update_node_info(sender, instance, created, **kwargs):
 class ProcessingNodeUserObjectPermission(UserObjectPermissionBase):
     content_object = models.ForeignKey(ProcessingNode)
 
+
 class ProcessingNodeGroupObjectPermission(GroupObjectPermissionBase):
-        content_object = models.ForeignKey(ProcessingNode)
+    content_object = models.ForeignKey(ProcessingNode)

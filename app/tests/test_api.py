@@ -1,14 +1,19 @@
+import datetime
+import subprocess
+
 from guardian.shortcuts import assign_perm
 
 from app import pending_actions
+from nodeodm import status_codes
 from .classes import BootTestCase
 from rest_framework.test import APIClient
 from rest_framework import status
-import datetime
+import time, os
 
-from app.models import Project, Task
+from app.models import Project, Task, ImageUpload
 from nodeodm.models import ProcessingNode
 from django.contrib.auth.models import User
+
 
 class TestApi(BootTestCase):
     def setUp(self):
@@ -23,12 +28,14 @@ class TestApi(BootTestCase):
         user = User.objects.get(username="testuser")
         self.assertFalse(user.is_superuser)
 
+        other_user = User.objects.get(username="testuser2")
+
         project = Project.objects.create(
                 owner=user,
                 name="test project"
             )
         other_project = Project.objects.create(
-                owner=User.objects.get(username="testuser2"),
+                owner=other_user,
                 name="another test project"
             )
 
@@ -191,15 +198,27 @@ class TestApi(BootTestCase):
         self.assertTrue(task.last_error is None)
         self.assertTrue(task.pending_action == pending_actions.REMOVE)
 
+        # Can delete project that we we own
+        temp_project = Project.objects.create(owner=user)
+        res = client.delete('/api/projects/{}/'.format(temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
+        self.assertTrue(Project.objects.filter(id=temp_project.id).count() == 0) # Really deleted
 
-        # TODO test:
-        # - tiles.json requests
-        # - task creation via file upload
-        # - scheduler processing steps
-        # - tiles API urls (permissions, 404s)
-        # - assets download (aliases)
-        # - assets raw downloads
-        # - project deletion
+        # Cannot delete a project we don't own
+        other_temp_project = Project.objects.create(owner=other_user)
+        res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+        # Can't delete a project for which we just have view permissions
+        assign_perm('view_project', user, other_temp_project)
+        res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
+
+        # Can delete a project for which we have delete permissions
+        assign_perm('delete_project', user, other_temp_project)
+        res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
+
 
     def test_processingnodes(self):
         client = APIClient()

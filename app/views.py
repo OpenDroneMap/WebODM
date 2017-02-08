@@ -34,7 +34,7 @@ def map(request, project_pk=None, task_pk=None):
 
     if project_pk is not None:
         project = get_object_or_404(Project, pk=project_pk)
-        if not request.user.has_perm('projects.view_project', project):
+        if not request.user.has_perm('app.view_project', project):
             raise Http404()
         
         if task_pk is not None:
@@ -59,7 +59,7 @@ def model_display(request, project_pk=None, task_pk=None):
 
     if project_pk is not None:
         project = get_object_or_404(Project, pk=project_pk)
-        if not request.user.has_perm('projects.view_project', project):
+        if not request.user.has_perm('app.view_project', project):
             raise Http404()
 
         if task_pk is not None:

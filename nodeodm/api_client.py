@@ -7,7 +7,9 @@ import mimetypes
 import json
 import os
 from urllib.parse import urlunparse
+from app.testwatch import TestWatch
 
+TIMEOUT = 30
 
 class ApiClient:
     def __init__(self, host, port):
@@ -21,25 +23,26 @@ class ApiClient:
         return urlunparse(('http', netloc, url, '', '', ''))
 
     def info(self):
-        return requests.get(self.url('/info')).json()
+        return requests.get(self.url('/info'), timeout=TIMEOUT).json()
 
     def options(self):
-        return requests.get(self.url('/options')).json()
+        return requests.get(self.url('/options'), timeout=TIMEOUT).json()
 
     def task_info(self, uuid):
-        return requests.get(self.url('/task/{}/info').format(uuid)).json()
+        return requests.get(self.url('/task/{}/info').format(uuid), timeout=TIMEOUT).json()
 
+    @TestWatch.watch()
     def task_output(self, uuid, line = 0):
-        return requests.get(self.url('/task/{}/output?line={}').format(uuid, line)).json()
+        return requests.get(self.url('/task/{}/output?line={}').format(uuid, line), timeout=TIMEOUT).json()
 
     def task_cancel(self, uuid):
-        return requests.post(self.url('/task/cancel'), data={'uuid': uuid}).json()
+        return requests.post(self.url('/task/cancel'), data={'uuid': uuid}, timeout=TIMEOUT).json()
 
     def task_remove(self, uuid):
-        return requests.post(self.url('/task/remove'), data={'uuid': uuid}).json()
+        return requests.post(self.url('/task/remove'), data={'uuid': uuid}, timeout=TIMEOUT).json()
 
     def task_restart(self, uuid):
-        return requests.post(self.url('/task/restart'), data={'uuid': uuid}).json()
+        return requests.post(self.url('/task/restart'), data={'uuid': uuid}, timeout=TIMEOUT).json()
 
     def task_download(self, uuid, asset):
         res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset), stream=True)

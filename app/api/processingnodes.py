@@ -1,8 +1,6 @@
 import django_filters
 from django_filters.rest_framework import FilterSet
 from rest_framework import serializers, viewsets
-from rest_framework.filters import DjangoFilterBackend
-from rest_framework.permissions import DjangoModelPermissions
 
 from nodeodm.models import ProcessingNode
 
