@@ -5,11 +5,11 @@ import $ from 'jquery';
 
 class EditProjectDialog extends React.Component {
     static defaultProps = {
-        title: "New Project",
-        saveLabel: "Create Project",
-        savingLabel: "Creating project...",
+        title: "Title",
+        saveLabel: "Save",
+        savingLabel: "Saving...",
         saveIcon: "glyphicon glyphicon-plus",
-        deleteWarning: "All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?",
+        deleteWarning: "Are you sure?",
         show: false
     };
 
@@ -17,6 +17,7 @@ class EditProjectDialog extends React.Component {
         getFormData: React.PropTypes.func.isRequired,
         reset: React.PropTypes.func.isRequired,
         saveAction: React.PropTypes.func.isRequired,
+        onShow: React.PropTypes.func,
         deleteAction: React.PropTypes.func,
         title: React.PropTypes.string,
         saveLabel: React.PropTypes.string,
@@ -25,8 +26,6 @@ class EditProjectDialog extends React.Component {
         deleteWarning: React.PropTypes.string,
         show: React.PropTypes.bool
     };
-
-    static inheritMethods = ['show', 'hide'];
 
     constructor(props){
         super(props);
@@ -59,7 +58,7 @@ class EditProjectDialog extends React.Component {
 
             // Autofocus
             .on('shown.bs.modal', (e) => {
-                this.nameInput.focus();
+                if (this.props.onShow) this.props.onShow();
             });
 
         this.componentDidUpdate();
@@ -73,15 +72,13 @@ class EditProjectDialog extends React.Component {
     componentDidUpdate(){
         if (this.state.showModal){
             $(this.modal).modal('show');
-
-            // Reset to original values
-            this.props.reset();
         }else{
             $(this.modal).modal('hide');
         }
     }
 
     show(){
+        this.props.reset();
         this.setState({showModal: true, saving: false, error: ""});
     }
 
@@ -94,7 +91,10 @@ class EditProjectDialog extends React.Component {
 
         this.setState({saving: true});
 
-        this.props.saveAction(this.props.getFormData()).fail(e => {
+        let formData = {};
+        if (this.props.getFormData) formData = this.props.getFormData();
+
+        this.props.saveAction(formData).fail(e => {
             this.setState({error: e.message || e.responseText || "Could not apply changes"});
         }).always(() => {
             this.setState({saving: false});
