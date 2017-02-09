@@ -126,7 +126,7 @@ class ProjectListItem extends React.Component {
         if (success){
           this.setUploadState({uploading: false});
 
-          try{
+          // try{
             let response = JSON.parse(files[0].xhr.response);
             if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
             
@@ -139,9 +139,9 @@ class ProjectListItem extends React.Component {
             }else{
               // Need to wait for user to confirm task options
             }
-          }catch(e){
-            this.setUploadState({error: `Invalid response from server: ${e.message}`})
-          }
+          // }catch(e){
+          //   this.setUploadState({error: `Invalid response from server: ${e.message}`})
+          // }
 
         }else{
           this.setUploadState({

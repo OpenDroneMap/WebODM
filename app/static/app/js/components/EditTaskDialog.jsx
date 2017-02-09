@@ -1,0 +1,93 @@
+import React from 'react';
+import ErrorMessage from './ErrorMessage';
+import FormDialog from './FormDialog';
+import EditTaskForm from './EditTaskForm';
+import $ from 'jquery';
+
+class EditTaskDialog extends React.Component {
+    static defaultProps = {
+        show: false
+    };
+
+    static propTypes = {
+        show: React.PropTypes.bool,
+        task: React.PropTypes.object.isRequired,
+        onHide: React.PropTypes.func
+    };
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+          name: props.task.name,
+          editTaskFormLoaded: false
+        };
+
+        this.reset = this.reset.bind(this);
+        this.getFormData = this.getFormData.bind(this);
+        this.onShow = this.onShow.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.save = this.save.bind(this);
+        this.handleFormTaskLoaded = this.handleFormTaskLoaded.bind(this);
+    }
+
+    reset(){
+      this.setState({});
+    }
+
+    getFormData(){
+      return this.taskForm.getTaskInfo();
+    }
+
+    onShow(){
+      // this.nameInput.focus();
+    }
+
+    show(){
+      this.dialog.show();
+    }
+
+    hide(){
+      this.dialog.hide();
+    }
+
+    handleChange(field){
+      return (e) => {
+        let state = {};
+        state[field] = e.target.value;
+        this.setState(state);
+      }
+    }
+
+    handleFormTaskLoaded(){
+      this.setState({editTaskFormLoaded: true});
+    }
+
+    save(taskInfo){
+      if (this.state.editTaskFormLoaded){
+        console.log(taskInfo);
+      }
+    }
+
+    render(){
+        return (
+            <FormDialog {...this.props} 
+                getFormData={this.getFormData}
+                reset={this.reset}
+                onShow={this.onShow}
+                onHide={this.onHide}
+                title={this.state.name}
+                ref={(domNode) => { this.dialog = domNode; }}
+                saveAction={this.save}
+                >
+              <EditTaskForm 
+                ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
+                onFormLoaded={this.handleFormTaskLoaded}
+                name={this.state.name}
+              />
+            </FormDialog>
+        );
+    }
+}
+
+export default EditTaskDialog;

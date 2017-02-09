@@ -4,6 +4,7 @@ import Console from '../Console';
 import statusCodes from '../classes/StatusCodes';
 import pendingActions from '../classes/PendingActions';
 import ErrorMessage from './ErrorMessage';
+import EditTaskDialog from './EditTaskDialog';
 import AssetDownloadButtons from './AssetDownloadButtons';
 
 class TaskListItem extends React.Component {
@@ -15,7 +16,8 @@ class TaskListItem extends React.Component {
       task: {},
       time: props.data.processing_time,
       actionError: "",
-      actionButtonsDisabled: false
+      actionButtonsDisabled: false,
+      editing: false
     }
 
     for (let k in props.data){
@@ -24,6 +26,7 @@ class TaskListItem extends React.Component {
 
     this.toggleExpanded = this.toggleExpanded.bind(this);
     this.consoleOutputUrl = this.consoleOutputUrl.bind(this);
+    this.stopEditing = this.stopEditing.bind(this);
   }
 
   shouldRefresh(){
@@ -170,6 +173,10 @@ class TaskListItem extends React.Component {
     }
   }
 
+  stopEditing(){
+    this.setState({editing: false});
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : `Task #${task.id}`;
@@ -214,9 +221,11 @@ class TaskListItem extends React.Component {
       }
 
       // Ability to change options
-      addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
-        
-      });
+      if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED, null].indexOf(task.status) !== -1){
+        addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
+          this.setState({editing: !this.state.editing});
+        });
+      }
 
       addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
         confirm: "All information related to this task, including images, maps and models will be deleted. Continue?"
@@ -311,6 +320,14 @@ class TaskListItem extends React.Component {
           </div>
         </div>
         {expanded}
+
+        {this.state.editing ? 
+          <EditTaskDialog 
+            task={this.state.task}
+            show={true}
+            onHide={this.stopEditing}
+          /> : 
+          ""}
       </div>
     );
   }

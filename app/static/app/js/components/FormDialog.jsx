@@ -3,7 +3,7 @@ import ErrorMessage from './ErrorMessage';
 import '../css/FormDialog.scss';
 import $ from 'jquery';
 
-class EditProjectDialog extends React.Component {
+class FormDialog extends React.Component {
     static defaultProps = {
         title: "Title",
         saveLabel: "Save",
@@ -18,6 +18,7 @@ class EditProjectDialog extends React.Component {
         reset: React.PropTypes.func.isRequired,
         saveAction: React.PropTypes.func.isRequired,
         onShow: React.PropTypes.func,
+        onHide: React.PropTypes.func,
         deleteAction: React.PropTypes.func,
         title: React.PropTypes.string,
         saveLabel: React.PropTypes.string,
@@ -53,7 +54,7 @@ class EditProjectDialog extends React.Component {
             // Ensure state is kept up to date when
             // the user presses the escape key
             .on('hidden.bs.modal', (e) => {
-                this.setState({showModal: false});
+                this.hide();
             })
 
             // Autofocus
@@ -84,6 +85,7 @@ class EditProjectDialog extends React.Component {
 
     hide(){
         this.setState({showModal: false});
+        if (this.props.onHide) this.props.onHide();
     }
 
     handleSave(e){
@@ -170,4 +172,4 @@ class EditProjectDialog extends React.Component {
     }
 }
 
-export default EditProjectDialog;
+export default FormDialog;
