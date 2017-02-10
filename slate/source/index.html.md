@@ -2,7 +2,7 @@
 title: WebODM Documentation
 
 language_tabs:
-  - json
+  - code
 
 toc_footers:
   - <a href='https://github.com/OpenDroneMap/WebODM'>WebODM on GitHub</a>
@@ -17,31 +17,58 @@ search: true
 
 Developers can leverage this API to extend the functionality of [WebODM](https://github.com/OpenDroneMap/WebODM) or integrate it with existing software like [QGIS](http://www.qgis.org/) or [AutoCAD](http://www.autodesk.com/products/autocad/overview).
 
-# Authentication
+# Quickstart
 
-To access the API, you need to provide a valid username and password. You can create users from WebODM's Administration page.
+## How To Process Images
 
-If authentication is successful, you will be issued a token. For all API calls, always include the following parameter (TODO: how?):
+We'll explore how to process some aerial images and retrieve the results. To do that we'll need to:
 
-Parameter | Required | Default | Description
---------- | -------- | ------- | -----------
-token | * | "" | Authentication Token 
+ - Authenticate
+ - Create a [Project](#project). Projects are a way to group together related [Task](#task) items
+ - Upload some images to create a [Task](#task)
+ - Check for [Task](#task) progress. Photogrammetry can take a long time, so results could take a few minutes to a few hours to be processed.
+ - Download an orthophoto from a successful [Task](#task)
+
+# Reference
+
+## Authentication
 
 > Get authentication token:
 
-```python
-# TODO
+```bash
+curl -X POST -d "username=testuser&password=testpass" http://localhost:8000/api/token-auth/
+
+{"token":"eyJ0eXAiO..."}
 ```
 
-# Processing Images
+> Use authentication token:
 
-Images are processed by creating a [Task](#task). A [Project](#project) is a way to group together related [Task](#task) items. A [Project](#project) always needs to exist before a [Task](#task) can be created.
+```bash
+curl -H "Authorization: JWT <your_token>" http://localhost:8000/api/projects/
 
-# Project
+{"count":13, ...}
+```
 
-## Definition
+`POST /api/token-auth/`
 
-> Example:
+Field | Type | Description
+----- | ---- | -----------
+username | string | Username
+password | string | Password
+
+To access the API, you need to provide a valid username and password. You can create users from WebODM's Administration page.
+
+If authentication is successful, you will be issued a token. All API calls should include the following header:
+
+Header |
+------ |
+Authorization: JWT `your_token` |
+
+The token expires after a set amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
+
+## Project
+
+> Example project:
 
 ```json
 {
@@ -68,7 +95,7 @@ name | string | Name of the project
 description | string | A more in-depth description
 
 
-## Create a project
+### Create a project
 
 `POST /api/projects/`
 
@@ -77,9 +104,9 @@ Parameter | Required | Default | Description
 name | * | "" | Name of the project 
 description | |  "" | A more in-depth description
 
-## Get list of projects
+### Get list of projects
 
-> Example:
+> Project list:
 
 ```json
 {
@@ -106,26 +133,24 @@ description | |  "" | A more in-depth description
 
 If `N` is omitted, defaults to 1.
 
-### Filtering the list
+#### Filtering
 
 `GET /api/projects/?<field>=<value>`
 
-Where field is one of: `id`, `name`, `description`, `created_at`. Only equality can be used, e.g. `id=3`.
+Where field is one of: `id`, `name`, `description`, `created_at`.
 
-### Sorting the list
+#### Sorting
 
 `GET /api/projects/?ordering=<field>`
 
 Where field is one of: `id`, `name`, `description`, `created_at`. Results are sorted in ascending order. Placing a minus `-` sign, e.g. `-created_at` sorts in descending order.
 
-### Pagination
+#### Pagination
 
-The project list is paginated. Items are stored in `results`. `count` is the total number of items. `next` and `previous` are links to retrieve the next and previous page of results, or null. Each page contains 10 items.
+The project list is paginated. Items are stored in `results`. `count` is the total number of items. `next` and `previous` are links to retrieve the next and previous page of results, or null.
 
 <aside class="notice">Only the projects visible to the current user will be displayed.</aside>
 
-# Task
-
-## Definition
+## Task
 
 TODO
