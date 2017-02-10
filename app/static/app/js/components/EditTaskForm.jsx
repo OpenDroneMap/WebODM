@@ -10,18 +10,17 @@ if (!Object.values) {
 
 class EditTaskForm extends React.Component {
   static defaultProps = {
-    name: "",
-    advancedOptions: false,
-    selectedNode: null
+    selectedNode: null,
+    task: null
   };
 
   static propTypes = {
-      advancedOptions: React.PropTypes.bool,
       selectedNode: React.PropTypes.oneOfType([
         React.PropTypes.string,
         React.PropTypes.number
       ]),
-      onFormLoaded: React.PropTypes.func
+      onFormLoaded: React.PropTypes.func,
+      task: React.PropTypes.object
   };
 
   constructor(props){
@@ -31,8 +30,8 @@ class EditTaskForm extends React.Component {
 
     this.state = {
       error: "",
-      name: props.name,
-      advancedOptions: props.advancedOptions,
+      name: props.task !== null ? props.task.name : "",
+      advancedOptions: props.task !== null ? props.task.options.length > 0 : false,
       loadedProcessingNodes: false,
       selectedNode: null,
       processingNodes: []
@@ -116,8 +115,8 @@ class EditTaskForm extends React.Component {
           });
 
           // Have we specified a node?
-          if (this.props.selectedNode){
-            this.selectNodeByKey(props.selectedNode);
+          if (this.props.task && this.props.task.processing_node){
+            this.selectNodeByKey(this.props.task.processing_node);
           }else{
             this.selectNodeByKey(nodes[0].key);
           }
@@ -194,6 +193,30 @@ class EditTaskForm extends React.Component {
     };
   }
 
+  // Takes a list of options, a task which could have options specified,
+  // and changes the value options to use those of the task and set
+  // a defaultValue key for all options.
+  populateOptionsWithDefaultValues(options, task){
+    options.forEach(opt => {
+      if (!opt.defaultValue){
+        let taskOpt;
+        if (task){
+          taskOpt = task.options.find(to => to.name == opt.name);
+        }
+        
+        if (taskOpt){
+          opt.defaultValue = opt.value;
+          opt.value = taskOpt.value;
+        }else{
+          opt.defaultValue = opt.value !== undefined ? opt.value : "";
+          delete(opt.value);
+        }
+      }
+    });
+
+    return options;
+  }
+
   render() {
     if (this.state.error){
       return (<div className="edit-task-panel">
@@ -208,6 +231,8 @@ class EditTaskForm extends React.Component {
 
     let processingNodesOptions = "";
     if (this.state.loadedProcessingNodes && this.state.selectedNode){
+      let options = this.populateOptionsWithDefaultValues(this.state.selectedNode.options, this.props.task);
+
       processingNodesOptions = (
         <div>
           <div className="form-group">
@@ -231,9 +256,9 @@ class EditTaskForm extends React.Component {
           </div>
           <div className={"form-group " + (!this.state.advancedOptions ? "hide" : "")}>
             <div className="col-sm-offset-2 col-sm-10">
-              {this.state.selectedNode.options.map(option =>
-                <ProcessingNodeOption {...option} 
-                  key={option.name} 
+              {options.map(option =>
+                <ProcessingNodeOption {...option}
+                  key={option.name}
                   ref={this.setOptionRef(option.name)} /> 
               )}
             </div>
@@ -251,7 +276,12 @@ class EditTaskForm extends React.Component {
         <div className="form-group">
           <label className="col-sm-2 control-label">Name</label>
           <div className="col-sm-10">
-            <input type="text" onChange={this.handleNameChange} className="form-control" placeholder={this.namePlaceholder} />
+            <input type="text" 
+              onChange={this.handleNameChange} 
+              className="form-control" 
+              placeholder={this.namePlaceholder} 
+              value={this.state.name} 
+            />
           </div>
         </div>
         {processingNodesOptions}

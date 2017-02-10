@@ -120,7 +120,7 @@ class FormDialog extends React.Component {
     render(){
         return (
             <div ref={this.setModal}
-                className="modal fade form-dialog" tabIndex="-1"
+                className="modal form-dialog" tabIndex="-1"
                 data-backdrop="static"
             >
               <div className="modal-dialog">

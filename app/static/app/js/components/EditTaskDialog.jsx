@@ -6,13 +6,14 @@ import $ from 'jquery';
 
 class EditTaskDialog extends React.Component {
     static defaultProps = {
-        show: false
+      show: false
     };
 
     static propTypes = {
         show: React.PropTypes.bool,
         task: React.PropTypes.object.isRequired,
-        onHide: React.PropTypes.func
+        onHide: React.PropTypes.func,
+        onShow: React.PropTypes.func
     };
 
     constructor(props){
@@ -25,7 +26,6 @@ class EditTaskDialog extends React.Component {
 
         this.reset = this.reset.bind(this);
         this.getFormData = this.getFormData.bind(this);
-        this.onShow = this.onShow.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.save = this.save.bind(this);
         this.handleFormTaskLoaded = this.handleFormTaskLoaded.bind(this);
@@ -37,10 +37,6 @@ class EditTaskDialog extends React.Component {
 
     getFormData(){
       return this.taskForm.getTaskInfo();
-    }
-
-    onShow(){
-      // this.nameInput.focus();
     }
 
     show(){
@@ -74,16 +70,17 @@ class EditTaskDialog extends React.Component {
             <FormDialog {...this.props} 
                 getFormData={this.getFormData}
                 reset={this.reset}
-                onShow={this.onShow}
-                onHide={this.onHide}
-                title={this.state.name}
+                onShow={this.props.onShow}
+                onHide={this.props.onHide}
+                title={"Edit Task"}
+                saveIcon={"fa fa-edit"}
                 ref={(domNode) => { this.dialog = domNode; }}
                 saveAction={this.save}
                 >
               <EditTaskForm 
                 ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
                 onFormLoaded={this.handleFormTaskLoaded}
-                name={this.state.name}
+                task={this.props.task}
               />
             </FormDialog>
         );
