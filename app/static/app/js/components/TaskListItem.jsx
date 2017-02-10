@@ -27,6 +27,8 @@ class TaskListItem extends React.Component {
     this.toggleExpanded = this.toggleExpanded.bind(this);
     this.consoleOutputUrl = this.consoleOutputUrl.bind(this);
     this.stopEditing = this.stopEditing.bind(this);
+    this.startEditing = this.startEditing.bind(this);
+    this.updateTask = this.updateTask.bind(this);
   }
 
   shouldRefresh(){
@@ -173,8 +175,36 @@ class TaskListItem extends React.Component {
     }
   }
 
+  startEditing(){
+    this.setState({editing: true});
+  }
+
   stopEditing(){
     this.setState({editing: false});
+  }
+
+  updateTask(taskInfo){
+    let d = $.Deferred();
+
+    taskInfo.uuid = ""; // TODO: we could reuse the UUID so that images don't need to be re-uploaded! This needs changes on node-odm as well.
+
+    taskInfo.processing_node = taskInfo.selectedNode.id;
+    delete(taskInfo.selectedNode);
+
+    $.ajax({
+        url: `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/`,
+        contentType: 'application/json',
+        data: JSON.stringify(taskInfo),
+        dataType: 'json',
+        type: 'PATCH'
+      }).done((json) => {
+        this.setState({task: json});
+        d.resolve();
+      }).fail(() => {
+        d.reject(new Error("Could not update task information. Plese try again."));
+      });
+
+    return d;
   }
 
   render() {
@@ -204,6 +234,14 @@ class TaskListItem extends React.Component {
         });
       }
 
+      // Ability to change options
+      if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 ||
+          (!task.processing_node)){
+        addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
+          this.startEditing();
+        });
+      }
+
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
           task.processing_node){
         addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel"));
@@ -218,13 +256,6 @@ class TaskListItem extends React.Component {
               }
             }
           ));
-      }
-
-      // Ability to change options
-      if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED, null].indexOf(task.status) !== -1){
-        addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
-          this.setState({editing: !this.state.editing});
-        });
       }
 
       addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
@@ -288,12 +319,14 @@ class TaskListItem extends React.Component {
 
     let statusLabel = "";
     let statusIcon = statusCodes.icon(task.status);
+    let showEditLink = false;
 
     if (task.last_error){
       statusLabel = getStatusLabel(task.last_error, "error");
     }else if (!task.processing_node){
-      statusLabel = getStatusLabel("Processing node not set");
+      statusLabel = getStatusLabel("Set a processing node");
       statusIcon = "fa fa-hourglass-3";
+      showEditLink = true;
     }else{
       statusLabel = getStatusLabel(status, task.status == 40 ? "done" : "");
     }
@@ -311,7 +344,9 @@ class TaskListItem extends React.Component {
             <i className="fa fa-clock-o"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
           <div className="col-md-3">
-            {statusLabel}
+            {showEditLink ? 
+              <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
+              : statusLabel}
           </div>
           <div className="col-md-1 text-right">
             <div className="status-icon">
@@ -326,6 +361,7 @@ class TaskListItem extends React.Component {
             task={this.state.task}
             show={true}
             onHide={this.stopEditing}
+            saveAction={this.updateTask}
           /> : 
           ""}
       </div>

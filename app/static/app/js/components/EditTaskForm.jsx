@@ -30,7 +30,7 @@ class EditTaskForm extends React.Component {
 
     this.state = {
       error: "",
-      name: props.task !== null ? props.task.name : "",
+      name: props.task !== null ? (props.task.name || "") : "",
       advancedOptions: props.task !== null ? props.task.options.length > 0 : false,
       loadedProcessingNodes: false,
       selectedNode: null,
@@ -175,7 +175,8 @@ class EditTaskForm extends React.Component {
   }
 
   getOptions(){
-    return Object.values(this.options)
+    if (!this.state.advancedOptions) return [];
+    else return Object.values(this.options)
       .map(option => {
         return {
           name: option.props.name,
@@ -200,10 +201,10 @@ class EditTaskForm extends React.Component {
     options.forEach(opt => {
       if (!opt.defaultValue){
         let taskOpt;
-        if (task){
+        if (task && Array.isArray(task.options)){
           taskOpt = task.options.find(to => to.name == opt.name);
         }
-        
+
         if (taskOpt){
           opt.defaultValue = opt.value;
           opt.value = taskOpt.value;

@@ -13,7 +13,8 @@ class EditTaskDialog extends React.Component {
         show: React.PropTypes.bool,
         task: React.PropTypes.object.isRequired,
         onHide: React.PropTypes.func,
-        onShow: React.PropTypes.func
+        onShow: React.PropTypes.func,
+        saveAction: React.PropTypes.func.isRequired
     };
 
     constructor(props){
@@ -61,7 +62,9 @@ class EditTaskDialog extends React.Component {
 
     save(taskInfo){
       if (this.state.editTaskFormLoaded){
-        console.log(taskInfo);
+        return this.props.saveAction(taskInfo);
+      }else{
+        return $.Deferred().reject(new Error("The form has not loaded, please wait."));
       }
     }
 
