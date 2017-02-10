@@ -10,7 +10,6 @@ class EditTaskPanel extends React.Component {
 
   static propTypes = {
       onSave: React.PropTypes.func.isRequired,
-      show: React.PropTypes.bool,
       name: React.PropTypes.string,
       uploading: React.PropTypes.bool
   };
