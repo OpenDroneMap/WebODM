@@ -29,7 +29,7 @@ SECRET_KEY = 'gmarsutd!fee6_58=6k)2je#o2^&&)ovu1svjg8k^(a!7qa7r&'
 DEBUG = True
 INTERNAL_IPS = ['127.0.0.1']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
