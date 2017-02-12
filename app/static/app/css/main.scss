@@ -95,6 +95,12 @@ ul#side-menu.nav{
 
 .alert{
     margin-bottom: 10px;
+    background-color: #fff;
+    border-width: 2px;
+    color: #000;
+    .close:hover, .close:focus{
+        color: #000;
+    }
 }
 
 .modal-dialog, .modal{

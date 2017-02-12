@@ -32,10 +32,8 @@ class MapView extends React.Component {
 
     return (<div className="map-view">
         <Map tiles={this.props.tiles} showBackground={true} opacity={opacity}/>
-        <div className="row controls">
-          <div className="col-md-12 text-right">
-            Orthophotos opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
-          </div>
+        <div className="opacity-slider">
+          Opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
         </div>
       </div>);
   }

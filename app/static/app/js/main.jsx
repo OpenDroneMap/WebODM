@@ -32,4 +32,22 @@ $(function(){
                 autoscroll={typeof $(this).attr("autoscroll") !== 'undefined' && $(this).attr("autoscroll") !== false}
             >{$(this).text()}</Console>, $(this).get(0));
     });
+
+    // Warn users if there's any sort of work in progress before
+    // they press the back button on the browser
+    // Yes it's a hack. No we're not going to track state in React just
+    // for this.
+    window.onbeforeunload = function() {
+        let found = false; 
+        $(".progress-bar:visible").each(function(){ 
+            try{
+                let value = parseFloat($(this).text());
+                if (!isNaN(value) && value > 0 && value < 100) found = true;
+            }catch(e){
+                // Do nothing
+            }
+        });
+        return found ? "Your changes will be lost. Are you sure you want to leave?" : undefined; 
+    };
+    
 });

@@ -3,11 +3,28 @@ import '../css/ProcessingNodeOption.scss';
 import $ from 'jquery';
 
 class ProcessingNodeOption extends React.Component {
+  static defaultProps = {};
+
+  static propTypes = {
+    name: React.PropTypes.string.isRequired,
+    defaultValue: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.bool
+    ]).isRequired,
+    value: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.bool
+    ]),
+    type: React.PropTypes.string,
+    domain: React.PropTypes.string,
+    help: React.PropTypes.string,
+  };
+
   constructor(props){
     super();
 
     this.state = {
-      value: ""
+      value: props.value !== undefined ? props.value : ""
     };
 
     this.resetToDefault = this.resetToDefault.bind(this);
@@ -42,7 +59,7 @@ class ProcessingNodeOption extends React.Component {
       inputControl = (
           <input type="text" 
             className="form-control"
-            placeholder={this.props.value}
+            placeholder={this.props.defaultValue}
             value={this.state.value}
             onChange={this.handleInputChange} />
         );

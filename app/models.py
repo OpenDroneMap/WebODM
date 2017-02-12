@@ -237,7 +237,7 @@ class Task(models.Model):
                                 try:
                                     info = self.processing_node.get_task_info(self.uuid)
                                     uuid_still_exists = info['uuid'] == self.uuid
-                                except ProcessingError:
+                                except ProcessingException:
                                     pass
 
                             if uuid_still_exists:
@@ -257,7 +257,7 @@ class Task(models.Model):
                             self.pending_action = None
                             self.save()
                         else:
-                            raise ProcessingError("Cannot restart a task that has no processing node or UUID")
+                            raise ProcessingError("Cannot restart a task that has no processing node")
 
                     elif self.pending_action == pending_actions.REMOVE:
                         logger.info("Removing {}".format(self))
