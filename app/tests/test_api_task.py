@@ -134,9 +134,10 @@ class TestApiTask(BootTransactionTestCase):
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
 
-        # Normal case with just images[] parameter
+        # Normal case with images[] parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
-            'images': [image1, image2]
+            'images': [image1, image2],
+            'auto_processing_node': 'false'
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_201_CREATED)
 
@@ -265,7 +266,8 @@ class TestApiTask(BootTransactionTestCase):
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
             'images': [image1, image2],
             'name': 'test_task_offline',
-            'processing_node': pnode.id
+            'processing_node': pnode.id,
+            'auto_processing_node': 'false'
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_201_CREATED)
         task = Task.objects.get(pk=res.data['id'])
