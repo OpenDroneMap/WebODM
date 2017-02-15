@@ -155,6 +155,9 @@ class ProjectListItem extends React.Component {
       })
       .on("dragenter", () => {
         this.resetUploadState();
+      })
+      .on("sending", (file, xhr, formData) => {
+        formData.append('auto_processing_node', "false");
       });
   }
 
@@ -172,7 +175,8 @@ class ProjectListItem extends React.Component {
         data: JSON.stringify({
           name: taskInfo.name,
           options: taskInfo.options,
-          processing_node: taskInfo.selectedNode.id
+          processing_node: taskInfo.selectedNode.id,
+          auto_processing_node: taskInfo.selectedNode.key == "auto"
         }),
         dataType: 'json',
         type: 'PATCH'

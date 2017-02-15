@@ -2,9 +2,9 @@ import logging
 import os
 import shutil
 import zipfile
-import requests
 
 from django.contrib.auth.models import User
+from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.postgres import fields
 from django.core.exceptions import ValidationError
@@ -133,6 +133,7 @@ class Task(models.Model):
     processing_lock = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently locked for processing. When this flag is turned on, the task is in the middle of a processing step.")
     processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
     processing_node = models.ForeignKey(ProcessingNode, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
+    auto_processing_node = models.BooleanField(default=True, help_text="A flag indicating whether this task should be automatically assigned a processing node")
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
     options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
@@ -153,7 +154,12 @@ class Task(models.Model):
 
     def save(self, *args, **kwargs):
         # Autovalidate on save
-        self.full_clean()
+        try:
+            self.full_clean()
+        except GDALException as e:
+            logger.warning("Problem while handling GDAL raster: {}. We're going to attempt to remove the reference to it...".format(e))
+            self.orthophoto = None
+
         super(Task, self).save(*args, **kwargs)
 
 
@@ -166,22 +172,6 @@ class Task(models.Model):
                             "assets",
                             *args)
 
-    @staticmethod
-    def create_from_images(images, project):
-        '''
-        Create a new task from a set of input images (such as the ones coming from request.FILES). 
-        This will happen inside a transaction so if one of the images 
-        fails to load, the task will not be created.
-        '''
-        with transaction.atomic():
-            task = Task.objects.create(project=project)
-
-            for image in images:
-                ImageUpload.objects.create(task=task, image=image)
-
-            return task
-
-
     def process(self):
         """
         This method contains the logic for processing tasks asynchronously
@@ -191,6 +181,26 @@ class Task(models.Model):
         """
 
         try:
+            if self.auto_processing_node and self.last_error is None:
+                # No processing node assigned and need to auto assign
+                if self.processing_node is None:
+                    # Assign first online node with lowest queue count
+                    self.processing_node = ProcessingNode.find_best_available_node()
+                    if self.processing_node:
+                        self.processing_node.queue_count += 1 # Doesn't have to be accurate, it will get overriden later
+                        self.processing_node.save()
+
+                        logger.info("Automatically assigned processing node {} to {}".format(self.processing_node, self))
+                        self.save()
+
+                # Processing node assigned, but is offline and no errors
+                if self.processing_node and not self.processing_node.is_online():
+                    # Detach processing node, will be processed at the next tick
+                    logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
+                    self.uuid = ''
+                    self.processing_node = None
+                    self.save()
+
             if self.processing_node:
                 # Need to process some images (UUID not yet set and task doesn't have pending actions)?
                 if not self.uuid and self.pending_action is None:

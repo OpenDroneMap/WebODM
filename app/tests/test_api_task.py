@@ -5,6 +5,7 @@ import time
 import shutil
 
 import logging
+from datetime import timedelta
 
 import requests
 from django.contrib.auth.models import User
@@ -13,10 +14,11 @@ from rest_framework.test import APIClient
 
 from app import pending_actions
 from app import scheduler
+from django.utils import timezone
 from app.models import Project, Task, ImageUpload, task_directory_path
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
-from nodeodm.models import ProcessingNode
+from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from app.testwatch import testWatch
 
 # We need to test the task API in a TransactionTestCase because
@@ -37,6 +39,8 @@ def start_processing_node():
 
 class TestApiTask(BootTransactionTestCase):
     def setUp(self):
+        super().setUp()
+
         # We need to clear previous media_root content
         # This points to the test directory, but just in case
         # we double check that the directory is indeed a test directory
@@ -322,5 +326,92 @@ class TestApiTask(BootTransactionTestCase):
         image1.close()
         image2.close()
         node_odm.terminate()
+
+    def test_task_auto_processing_node(self):
+        project = Project.objects.get(name="User Test Project")
+        task = Task.objects.create(project=project, name="Test")
+        pnode = ProcessingNode.objects.create(hostname="invalid-host", port=11223)
+        another_pnode = ProcessingNode.objects.create(hostname="invalid-host-2", port=11223)
+
+        # By default
+        self.assertTrue(task.auto_processing_node)
+        self.assertTrue(task.processing_node is None)
+
+        # Simulate an error
+        task.last_error = "Test error"
+        task.save()
+
+        scheduler.process_pending_tasks()
+
+        # A processing node should not have been assigned
+        task.refresh_from_db()
+        self.assertTrue(task.processing_node is None)
+
+        # Remove error
+        task.last_error = None
+        task.save()
+
+        scheduler.process_pending_tasks()
+
+        # A processing node should not have been assigned because no processing nodes are online
+        task.refresh_from_db()
+        self.assertTrue(task.processing_node is None)
+
+        # Bring a proessing node online
+        pnode.last_refreshed = timezone.now()
+        pnode.save()
+        self.assertTrue(pnode.is_online())
+
+        # A processing node has been assigned
+        scheduler.process_pending_tasks()
+        task.refresh_from_db()
+        self.assertTrue(task.processing_node.id == pnode.id)
+
+        # Task should have failed (no images provided, invalid host...)
+        self.assertTrue(task.last_error is not None)
+
+        # Bring another processing node online, and bring the old one offline
+        pnode.last_refreshed = timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
+        pnode.save()
+
+        another_pnode.last_refreshed = timezone.now()
+        another_pnode.save()
+
+        # Remove error
+        task.last_error = None
+        task.save()
+
+        scheduler.process_pending_tasks()
+
+        # Processing node is now cleared and a new one will be assigned on the next tick
+        task.refresh_from_db()
+        self.assertTrue(task.processing_node is None)
+
+        scheduler.process_pending_tasks()
+
+        task.refresh_from_db()
+        self.assertTrue(task.processing_node.id == another_pnode.id)
+
+    def test_task_manual_processing_node(self):
+        user = User.objects.get(username="testuser")
+        project = Project.objects.create(name="User Test Project", owner=user)
+        task = Task.objects.create(project=project, name="Test", auto_processing_node=False)
+
+        # Bring a processing node online
+        pnode = ProcessingNode.objects.create(hostname="invalid-host", port=11223)
+        pnode.last_refreshed = timezone.now()
+        pnode.save()
+        self.assertTrue(pnode.is_online())
+
+        scheduler.process_pending_tasks()
+
+        # A processing node should not have been assigned because we asked
+        # not to via auto_processing_node = false
+        task.refresh_from_db()
+        self.assertTrue(task.processing_node is None)
+
+
+
+
 
 

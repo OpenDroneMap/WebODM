@@ -66,7 +66,8 @@ class EditTaskForm extends React.Component {
              that you have granted the current user sufficient permissions to view 
              the processing node (by going to Administration -- Processing Nodes -- Select Node -- Object Permissions -- Add User/Group and check CAN VIEW PROCESSING NODE).
              If you are bringing a node back online, it will take about 30 seconds for WebODM to recognize it.`});
-          }
+          };
+
           if (json.length === 0){
             noProcessingNodesError();
             return;
@@ -89,17 +90,27 @@ class EditTaskForm extends React.Component {
             };
           });
 
-          // Find a node with lowest queue count
-          let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
-          let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
+          let autoNode = null;
 
-          if (minQueueCountNodes.length === 0){
-            noProcessingNodesError(nodes);
-            return;
+          // If the user has selected auto, and the a processing node has been assigned
+          // we need attempt to find the "auto" node to be the one that has been assigned
+          if (this.props.task && this.props.task.processing_node && this.props.task.auto_processing_node){
+            autoNode = nodes.find(node => node.id === this.props.task.processing_node);
           }
 
-          // Choose at random
-          let autoNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
+          if (!autoNode){
+            // Find a node with lowest queue count
+            let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
+            let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
+
+            if (minQueueCountNodes.length === 0){
+              noProcessingNodesError(nodes);
+              return;
+            }
+
+            // Choose at random
+            autoNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
+          }
 
           nodes.unshift({
             id: autoNode.id,
@@ -116,9 +127,13 @@ class EditTaskForm extends React.Component {
 
           // Have we specified a node?
           if (this.props.task && this.props.task.processing_node){
-            this.selectNodeByKey(this.props.task.processing_node);
+            if (this.props.task.auto_processing_node){
+              this.selectNodeByKey("auto");
+            }else{
+              this.selectNodeByKey(this.props.task.processing_node);
+            }
           }else{
-            this.selectNodeByKey(nodes[0].key);
+            this.selectNodeByKey("auto");
           }
 
           if (this.props.onFormLoaded) this.props.onFormLoaded();

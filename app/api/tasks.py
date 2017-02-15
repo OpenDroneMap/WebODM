@@ -4,6 +4,7 @@ import os
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.models.functions import Envelope
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation
+from django.db import transaction
 from django.db.models.functions import Cast
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
@@ -124,17 +125,24 @@ class TaskViewSet(viewsets.ViewSet):
         if len(files) <= 1:
             raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
 
-        task = models.Task.create_from_images(files, project)
-        if task is not None:
+        with transaction.atomic():
+            task = models.Task.objects.create(project=project)
+
+            for image in files:
+                models.ImageUpload.objects.create(task=task, image=image)
 
             # Update other parameters such as processing node, task name, etc.
             serializer = TaskSerializer(task, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
+            # Call the scheduler (speed things up)
+            scheduler.process_pending_tasks(background=True)
+
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)
-        else:
-            raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
+
+        # on transaction fail
+        raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
 
     def update(self, request, pk=None, project_pk=None, partial=False):
         get_and_check_project(request, project_pk, ('change_project', ))
