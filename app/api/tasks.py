@@ -136,9 +136,6 @@ class TaskViewSet(viewsets.ViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            # Call the scheduler (speed things up)
-            scheduler.process_pending_tasks(background=True)
-
             return Response({"id": task.id}, status=status.HTTP_201_CREATED)
 
         # on transaction fail
