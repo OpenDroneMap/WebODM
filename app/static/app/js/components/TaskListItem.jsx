@@ -189,6 +189,7 @@ class TaskListItem extends React.Component {
     taskInfo.uuid = ""; // TODO: we could reuse the UUID so that images don't need to be re-uploaded! This needs changes on node-odm as well.
 
     taskInfo.processing_node = taskInfo.selectedNode.id;
+    taskInfo.auto_processing_node = taskInfo.selectedNode.key == "auto";
     delete(taskInfo.selectedNode);
 
     $.ajax({

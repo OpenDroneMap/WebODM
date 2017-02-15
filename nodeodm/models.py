@@ -11,9 +11,12 @@ from guardian.models import UserObjectPermissionBase
 from .api_client import ApiClient
 import json
 from django.db.models import signals
-from requests.exceptions import ConnectionError
+from datetime import datetime, timedelta
 from .exceptions import ProcessingError, ProcessingTimeout
 import simplejson
+import django.utils.timezone
+
+
 def api(func):
     """
     Catches JSON decoding errors that might happen when the server
@@ -24,11 +27,13 @@ def api(func):
             return func(*args, **kwargs)
         except (json.decoder.JSONDecodeError, simplejson.JSONDecodeError) as e:
             raise ProcessingError(str(e))
-        except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError) as e:
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
             raise ProcessingTimeout(str(e))
 
 
     return wrapper
+
+OFFLINE_MINUTES = 5 # Number of minutes a node hasn't been seen before it should be considered offline
 
 class ProcessingNode(models.Model):
     hostname = models.CharField(max_length=255, help_text="Hostname or IP address where the node is located (can be an internal hostname as well). If you are using Docker, this is never 127.0.0.1 or localhost. Find the IP address of your host machine by running ifconfig on Linux or by checking your network settings.")
@@ -40,6 +45,19 @@ class ProcessingNode(models.Model):
     
     def __str__(self):
         return '{}:{}'.format(self.hostname, self.port)
+
+    @staticmethod
+    def find_best_available_node():
+        """
+        Attempts to find an available node (seen in the last 5 minutes, and with lowest queue count)
+        :return: ProcessingNode | None
+        """
+        return ProcessingNode.objects.filter(last_refreshed__gte=timezone.now() - timedelta(minutes=OFFLINE_MINUTES)) \
+                                     .order_by('queue_count').first()
+
+    def is_online(self):
+        return self.last_refreshed is not None and \
+               self.last_refreshed >= timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
 
     @api
     def update_node_info(self):
@@ -60,7 +78,7 @@ class ProcessingNode(models.Model):
             self.last_refreshed = timezone.now()
             self.save()
             return True
-        except (ConnectionError, json.decoder.JSONDecodeError, simplejson.JSONDecodeError):
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, json.decoder.JSONDecodeError, simplejson.JSONDecodeError):
             return False
 
     def api_client(self):

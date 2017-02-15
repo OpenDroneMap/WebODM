@@ -61,9 +61,8 @@ class BootTransactionTestCase(TransactionTestCase):
     '''
     Same as above, but inherits from TransactionTestCase
     '''
-    @classmethod
-    def setUpClass(cls):
-        super(BootTransactionTestCase, cls).setUpClass()
+    def setUp(self):
+        super().setUp()
         boot()
         setupUsers()
         setupProjects()
