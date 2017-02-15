@@ -92,7 +92,7 @@ class EditTaskForm extends React.Component {
 
           let autoNode = null;
 
-          // If the user has selected auto, and the a processing node has been assigned
+          // If the user has selected auto, and a processing node has been assigned
           // we need attempt to find the "auto" node to be the one that has been assigned
           if (this.props.task && this.props.task.processing_node && this.props.task.auto_processing_node){
             autoNode = nodes.find(node => node.id === this.props.task.processing_node);
