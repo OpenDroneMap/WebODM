@@ -66,7 +66,11 @@ Try running:
 sudo pip install --ignore-installed six
 ```
 
-If you are getting a **MemoryError** while processing the images, make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
+If while processing the images you get an error message that contains any of the following words:
+ - `MemoryError`
+ - `Killed`
+ 
+Make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
 
 If you are getting a `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` after an update, try to remove your WebODM folder and start from a fresh git clone.
 
