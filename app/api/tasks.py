@@ -136,10 +136,8 @@ class TaskViewSet(viewsets.ViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            return Response({"id": task.id}, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        # on transaction fail
-        raise exceptions.ValidationError(detail="Cannot create task, input provided is not valid.")
 
     def update(self, request, pk=None, project_pk=None, partial=False):
         get_and_check_project(request, project_pk, ('change_project', ))

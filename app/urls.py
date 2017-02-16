@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^processingnode/([\d]+)/$', views.processing_node, name='processing_node'),
 
     url(r'^api/', include("app.api.urls")),
-    url(r'^apiviewer/', get_swagger_view(title='WebODM API'))
+    url(r'^apiviewer/', get_swagger_view(title='WebODM API')),
 ]
 
 # Test cases call boot() independently
