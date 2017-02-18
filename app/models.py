@@ -181,7 +181,7 @@ class Task(models.Model):
         """
 
         try:
-            if self.auto_processing_node and self.last_error is None:
+            if self.auto_processing_node and not self.status in [status_codes.FAILED, status_codes.CANCELED]:
                 # No processing node assigned and need to auto assign
                 if self.processing_node is None:
                     # Assign first online node with lowest queue count
