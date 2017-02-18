@@ -203,7 +203,7 @@ class Task(models.Model):
 
             if self.processing_node:
                 # Need to process some images (UUID not yet set and task doesn't have pending actions)?
-                if not self.uuid and self.pending_action is None:
+                if not self.uuid and self.pending_action is None and self.status is None:
                     logger.info("Processing... {}".format(self))
 
                     images = [image.path() for image in self.imageupload_set.all()]
