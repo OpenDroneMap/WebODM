@@ -2,7 +2,6 @@ from threading import Thread
 
 import logging
 from django import db
-from webodm import settings
 from app.testwatch import testWatch
 
 logger = logging.getLogger('app.logger')

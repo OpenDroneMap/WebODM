@@ -1,9 +1,12 @@
+from datetime import timedelta
+
 import requests
 from django.test import TestCase
 from django.utils import six
 import subprocess, time
+from django.utils import timezone
 from os import path
-from .models import ProcessingNode
+from .models import ProcessingNode, OFFLINE_MINUTES
 from .api_client import ApiClient
 from requests.exceptions import ConnectionError
 from .exceptions import ProcessingError
@@ -142,3 +145,34 @@ class TestClientApi(TestCase):
 
         # Task has been deleted
         self.assertRaises(ProcessingError, online_node.get_task_info, uuid)
+
+    def test_find_best_available_node_and_is_online(self):
+        # Fixtures are all offline
+        self.assertTrue(ProcessingNode.find_best_available_node() is None)
+
+        # Bring one online
+        pnode = ProcessingNode.objects.get(pk=1)
+        self.assertFalse(pnode.is_online())
+
+        pnode.last_refreshed = timezone.now()
+        pnode.queue_count = 2
+        pnode.save()
+
+        self.assertTrue(pnode.is_online())
+        self.assertTrue(ProcessingNode.find_best_available_node().id == pnode.id)
+
+        # Bring another online with lower queue count
+        another_pnode = ProcessingNode.objects.get(pk=2)
+        another_pnode.last_refreshed = pnode.last_refreshed
+        another_pnode.queue_count = 1
+        another_pnode.save()
+
+        self.assertTrue(ProcessingNode.find_best_available_node().id == another_pnode.id)
+
+        # Bring it offline
+        another_pnode.last_refreshed -= timedelta(minutes=OFFLINE_MINUTES)
+        another_pnode.save()
+        self.assertFalse(another_pnode.is_online())
+
+        # Best choice now is original processing node
+        self.assertTrue(ProcessingNode.find_best_available_node().id == pnode.id)

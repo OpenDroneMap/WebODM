@@ -35,10 +35,12 @@ def process_pending_tasks():
         tasks_mutex.acquire()
 
         # All tasks that have a processing node assigned
+        # Or that need one assigned (via auto)
         # but don't have a UUID
         # or tasks that have a pending action
         # and that are not locked (being processed by another thread)
-        tasks = Task.objects.filter(Q(uuid='', last_error__isnull=True, processing_node__isnull=False) |
+        tasks = Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
+                                    Q(uuid='', last_error__isnull=True, processing_node__isnull=False) |
                                     Q(status__in=[status_codes.QUEUED, status_codes.RUNNING], processing_node__isnull=False) |
                                     Q(status=None, processing_node__isnull=False) |
                                     Q(pending_action__isnull=False)).exclude(Q(processing_lock=True))
