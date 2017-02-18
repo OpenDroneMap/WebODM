@@ -34,7 +34,7 @@ class EditProjectDialog extends React.Component {
 
         this.state = {
           name: props.projectName,
-          descr: props.projectDescr
+          descr: props.projectDescr !== null ? props.projectDescr : ""
         };
 
         this.reset = this.reset.bind(this);
