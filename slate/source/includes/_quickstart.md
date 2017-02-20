@@ -2,13 +2,13 @@
 
 ## How To Process Images
 
-We'll explore how to process some aerial images and retrieve the results. To do that we'll need to:
+In this tutorial we'll explore how to process an orthophoto from a set of aerial images. To do that we'll need to:
 
  - Authenticate
  - Create a [Project](#project). Projects are a way to group together related [Task](#task) items
  - Upload some images to create a [Task](#task)
  - Check for [Task](#task) progress. Photogrammetry can take a long time, so results could take a few minutes to a few hours to be processed.
- - Download an orthophoto from a successful [Task](#task)
+ - Download the resulting orthophoto.
 
 <aside class="notice">Most of the examples in this document use <a href="http://docs.python-requests.org/en/latest/index.html" target="_blank">requests</a>. Make sure it's installed before running any code:<br/><br/>
 
@@ -39,7 +39,7 @@ res = requests.post('http://localhost:8000/api/projects/',
 project_id = res['id']
 ```
 
-Then we need to create a <a href="#project">Project</a>. We pass our `token` via the `Authorization` header. If we forget to pass this header, the system will not authenticate us and will refuse to process the request. We assign a `name` to the project.
+Then we need to create a [Project](#project). We pass our `token` via the `Authorization` header. If we forget to pass this header, the system will not authenticate us and will refuse to process the request. We also assign a `name` to our project.
 <div class="clear"></div>
 
 ```python
@@ -63,8 +63,8 @@ res = requests.post('http://localhost:8000/api/projects/{}/tasks/'.format(projec
 task_id = res['id']
 ```
 
-We can then create a <a href="#task">Task</a>. The only required parameter is a list of multiple, multipart-encoded `images`. Processing will start automatically
-as soon as a <a href="#processingnode">Processing Node</a> is available. It is possible to specify additional options by passing an `options` value, which is a JSON-encoded list of name/value pairs. Several other options are available. See the <a href="#task">Task</a> reference for more information.
+We can then create a [Task](#task). The only required parameter is a list of multiple, multipart-encoded `images`. Processing will start automatically
+as soon as a [Processing Node](#processingnode) is available. It is possible to specify additional options by passing an `options` value, which is a JSON-encoded list of name/value pairs. Several other options are available. See the [Task](#task) reference for more information.
 <div class="clear"></div>
 
 ```python
@@ -83,19 +83,22 @@ while True:
 		time.sleep(3)
 ```
 
-We periodically check for the <a href="#task">Task</a> status using a loop.
+We periodically check for the [Task](#task) status using a loop.
 <div class="clear"></div>
 
 ```python
 res = requests.get("http://localhost:8000/api/projects/{}/tasks/{}/download/geotiff/".format(project_id, task_id), 
 						headers={'Authorization': 'JWT {}'.format(token)},
 						stream=True)
-	    with open("orthophoto.tif", 'wb') as f:
-	        for chunk in res.iter_content(chunk_size=1024): 
-	            if chunk:
-	                f.write(chunk)
+with open("orthophoto.tif", 'wb') as f:
+    for chunk in res.iter_content(chunk_size=1024): 
+        if chunk:
+            f.write(chunk)
+print("Saved ./orthophoto.tif")
 ```
 
-Our orthophoto is ready to be downloaded. A variety of other assets, including a dense 3D point cloud and a textured model <a href="#download">is also available</a>.
+Our orthophoto is ready to be downloaded. A variety of other assets, including a dense 3D point cloud and a textured model [are also available](#download).
 
-A <a href="" target="_blank">TMS</a> layer is also made available at `http://localhost:8000/api/projects/{project_id}/tasks/{task_id}/tiles.json` for inclusion in programs such as <a href="http://leafletjs.com/" target="_blank">Leaflet</a> or <a href="http://cesiumjs.org" target="_blank">Cesium</a>.
+Congratulations! You just processed some images.
+
+![Success](https://i.imgflip.com/2/ipzhf.jpg)

@@ -33,8 +33,26 @@ description | string | A more in-depth description
 
 Parameter | Required | Default | Description
 --------- | -------- | ------- | -----------
-name | * | "" | Name of the project 
+name | * | "" | Name of the project
 description | |  "" | A more in-depth description
+
+
+### Update a project
+
+`PATCH /api/projects/{id}/`
+
+Parameter | Required | Default | Description
+--------- | -------- | ------- | -----------
+name | | "" | Name of the project
+description | |  "" | A more in-depth description
+
+
+### Delete a project
+
+`DELETE /api/projects/{id}/`
+
+Upon deletion, all [Task](#task) items associated with the [Project](#project) are deleted also. The operation is irreversible.
+
 
 ### Get list of projects
 
@@ -61,24 +79,29 @@ description | |  "" | A more in-depth description
 }
 ```
 
-`GET /api/projects/?page=N`
+`GET /api/projects/`
 
-If `N` is omitted, defaults to 1.
+Parameter | Required | Default | Description
+--------- | -------- | ------- | -----------
+page | | 1 | Page number
+id | | "" | Filter by id
+name | | "" | Filter by name
+description | | "" | Filter by description
+created_at | | "" | Filter by created_at
+ordering | | "" | Ordering field to sort results by
 
-#### Filtering
 
-`GET /api/projects/?<field>=<value>`
+#### Example: Filtering by name
 
-Where field is one of: `id`, `name`, `description`, `created_at`.
+`GET /api/projects/?name=hello`
 
-#### Sorting
+Retrieves projects that have a name of "hello".
 
-`GET /api/projects/?ordering=<field>`
 
-Where field is one of: `id`, `name`, `description`, `created_at`. Results are sorted in ascending order. Placing a minus `-` sign, e.g. `-created_at` sorts in descending order.
+#### Example: Sorting
 
-#### Pagination
+`GET /api/projects/?ordering=-id`
 
-The project list is paginated. Items are stored in `results`. `count` is the total number of items. `next` and `previous` are links to retrieve the next and previous page of results, or null.
+Sort by project ID, descending order.
 
-<aside class="notice">Only the projects visible to the current user will be displayed.</aside>
+<aside class="notice">Only projects visible to the current user are returned.</aside>

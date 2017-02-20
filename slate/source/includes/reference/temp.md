@@ -1,0 +1,1 @@
+At this point a TMS layer is also made available at `http://localhost:8000/api/projects/{project_id}/tasks/{task_id}/tiles.json` for inclusion in programs such as [Leaflet](http://leafletjs.com/) or [Cesium](http://cesiumjs.org).
