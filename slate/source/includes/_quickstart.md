@@ -65,4 +65,37 @@ task_id = res['id']
 
 We can then create a <a href="#task">Task</a>. The only required parameter is a list of multiple, multipart-encoded `images`. Processing will start automatically
 as soon as a <a href="#processingnode">Processing Node</a> is available. It is possible to specify additional options by passing an `options` value, which is a JSON-encoded list of name/value pairs. Several other options are available. See the <a href="#task">Task</a> reference for more information.
+<div class="clear"></div>
 
+```python
+while True:
+	res = requests.get('http://localhost:8000/api/projects/{}/tasks/{}/'.format(project_id, task_id), 
+				headers={'Authorization': 'JWT {}'.format(token)}).json()
+	
+	if res['status'] == status_codes.COMPLETED:
+		print("Task has completed!")
+		break
+	elif res['status'] == status_codes.FAILED:
+		print("Task failed: {}".format(res))
+		sys.exit(1)
+	else:
+		print("Processing, hold on...")
+		time.sleep(3)
+```
+
+We periodically check for the <a href="#task">Task</a> status using a loop.
+<div class="clear"></div>
+
+```python
+res = requests.get("http://localhost:8000/api/projects/{}/tasks/{}/download/geotiff/".format(project_id, task_id), 
+						headers={'Authorization': 'JWT {}'.format(token)},
+						stream=True)
+	    with open("orthophoto.tif", 'wb') as f:
+	        for chunk in res.iter_content(chunk_size=1024): 
+	            if chunk:
+	                f.write(chunk)
+```
+
+Our orthophoto is ready to be downloaded. A variety of other assets, including a dense 3D point cloud and a textured model <a href="#download">is also available</a>.
+
+A <a href="" target="_blank">TMS</a> layer is also made available at `http://localhost:8000/api/projects/{project_id}/tasks/{task_id}/tiles.json` for inclusion in programs such as <a href="http://leafletjs.com/" target="_blank">Leaflet</a> or <a href="http://cesiumjs.org" target="_blank">Cesium</a>.
