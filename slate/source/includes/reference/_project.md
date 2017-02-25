@@ -41,10 +41,7 @@ description | |  "" | A more in-depth description
 
 `PATCH /api/projects/{id}/`
 
-Parameter | Required | Default | Description
---------- | -------- | ------- | -----------
-name | | "" | Name of the project
-description | |  "" | A more in-depth description
+Parameters are the same as above.
 
 
 ### Delete a project

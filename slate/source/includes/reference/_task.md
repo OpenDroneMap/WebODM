@@ -45,32 +45,35 @@ ground_control_points | string | Currently unused. See [#37](https://github.com/
 created_at | string | Creation date and time
 pending_action | int | One of [Pending Actions](#pending-actions), or `null` if no pending action is set.
 
+<aside class="notice">Tasks inherit the permission settings from the <a href="#project">Project</a> they belong to.</aside>
 
 ### Create a task
 
-`POST /api/projects/`
+`POST /api/projects/{project_id}/tasks/`
 
 Parameter | Required | Default | Description
 --------- | -------- | ------- | -----------
-name | * | "" | Name of the project
-description | |  "" | A more in-depth description
+images[] | * | "" | List of multipart-encoded images (2 minimum)
+processing_node | | null | The ID of the [Processing Node](#processingnode) this [Task](#task) should be assigned to. If not specified, and auto_processing_node is `true`, a [Processing Node](#processingnode) will be automatically assigned. 
+name | | "" | User defined name for the task
+auto_processing_node | | true | Whether WebODM should automatically assign the next available [Processing Node](#processingnode) to process this [Task](#task).
+options | | "[]" | JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a [Processing Node](#processingnode).
+
+You assign a [Task](#task) to a [Project](#project) by passing the proper `project_id` path in the URL.
 
 
 ### Update a task
 
-`PATCH /api/projects/{id}/`
+`PATCH /api/projects/{project_id}/tasks/{task_id}/`
 
-Parameter | Required | Default | Description
---------- | -------- | ------- | -----------
-name | | "" | Name of the project
-description | |  "" | A more in-depth description
+Parameters are the same as above.
 
 
 ### Delete a task
 
-`DELETE /api/projects/{id}/`
+`DELETE /api/projects/{project_id}/tasks/{task_id}/`
 
-Upon deletion, all <a href="#task">Task</a> items associated with the <a href="#project">Project</a> are deleted also. The operation is irreversible.
+Upon deletion, all images and assets associated with the [Task](#task) are deleted also. The operation is irreversible.
 
 
 ### Get list of tasks
@@ -78,25 +81,61 @@ Upon deletion, all <a href="#task">Task</a> items associated with the <a href="#
 > Task list:
 
 ```json
-{
-}
+[
+    {
+        "id": 6,
+        "project": 2,
+        "processing_node": 2,
+        "images_count": 89,
+        "uuid": "2e8b687d-c269-4e2f-91b3-5a2cd51b5321",
+        "name": "Test name",
+        "processing_time": 8402184,
+        "auto_processing_node": true,
+        "status": 40,
+        "last_error": null,
+        "options": [],
+        "ground_control_points": null,
+        "created_at": "2016-12-08T13:32:28.139474Z",
+        "pending_action": null
+    }
+]
 ```
 
-`GET /api/projects/`
+`GET /api/projects/{project_id}/tasks/`
 
-Parameter | Required | Default | Description
---------- | -------- | ------- | -----------
-page | | 1 | Page number
-id | | "" | Filter by id
-name | | "" | Filter by name
-description | | "" | Filter by description
-created_at | | "" | Filter by created_at
-ordering | | "" | Ordering field to sort results by
+Retrieves all [Task](#task) items associated with `project_id`.
 
+### Download assets
+
+TODO
+
+### Download assets (raw)
+
+TODO
+
+### Retrieve console output
+
+TODO
+
+### Cancel task
+
+TODO
+
+### Remove task
+
+TODO
+
+### Restart task
+
+TODO
+
+### Orthophoto TMS layer
+
+TODO
 
 ### Pending Actions
 
-In some circumstances, a [Task](#task) can have a pending action that requires some amount of time.
+In some circumstances, a [Task](#task) can have a pending action that requires some amount of time to be performed.
 
 Pending Action | Code | Description
 ----- | ---- | -----------

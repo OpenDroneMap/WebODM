@@ -34,7 +34,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
         exclude = ('processing_lock', 'console_output', 'orthophoto', )
-
+        #read_only_fields = ('project', 'images_count', 'processing_time', 'status', 'last_error', 'created_at', 'pending_action', ) #TODO: add uuid
 
 class TaskViewSet(viewsets.ViewSet):
     """
