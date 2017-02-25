@@ -94,12 +94,22 @@ created_at | | "" | Filter by created_at
 ordering | | "" | Ordering field to sort results by
 
 
-## Pending Actions
+### Pending Actions
 
-In some circumstances, a [Task](#task) can have a pending action. When this happens, an action is soon to be performed on it.
+In some circumstances, a [Task](#task) can have a pending action that requires some amount of time.
 
 Pending Action | Code | Description
 ----- | ---- | -----------
-CANCEL | 1 | About to be canceled
-REMOVE | 2 | About to be removed
-RESTART | 3 | About to be restarted
+CANCEL | 1 | [Task](#task) is being canceled
+REMOVE | 2 | [Task](#task) is being removed
+RESTART | 3 | [Task](#task) is being restarted
+
+### Status Codes
+
+Status | Code | Description
+----- | ---- | -----------
+QUEUED | 10 | [Task](#task)'s files have been uploaded to a [ProcessingNode](#processingnode) and are waiting to be processed.
+RUNNING | 20 | [Task](#task) is currently being processed.
+FAILED | 30 | [Task](#task) has failed for some reason (not enough images, out of memory, Piero forgot to close a parenthesis, etc.)
+COMPLETED | 40 | [Task](#task) has completed. Assets are be ready to be downloaded.
+CANCELED | 50 | [Task](#task) was manually canceled by the user.

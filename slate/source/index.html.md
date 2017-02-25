@@ -16,5 +16,4 @@ includes:
  - reference/authentication
  - reference/project
  - reference/task
- - reference/status_codes
 ---

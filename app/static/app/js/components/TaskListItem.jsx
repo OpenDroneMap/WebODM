@@ -82,16 +82,20 @@ class TaskListItem extends React.Component {
         console.warn("Cannot refresh task: " + json);
       }
       
-      if (this.shouldRefresh()) this.refreshTimeout = setTimeout(() => this.refresh(), this.props.refreshInterval || 3000);
+      this.setAutoRefresh();
     })
     .fail(( _, __, errorThrown) => {
       if (errorThrown === "Not Found"){ // Don't translate this one
         // Assume this has been deleted
         if (this.props.onDelete) this.props.onDelete(this.state.task.id);
       }else{
-        if (this.shouldRefresh()) this.refreshTimeout = setTimeout(() => this.refresh(), this.props.refreshInterval || 3000);
+        this.setAutoRefresh();
       }
     });
+  }
+
+  setAutoRefresh(){
+    if (this.shouldRefresh()) this.refreshTimeout = setTimeout(() => this.refresh(), this.props.refreshInterval || 3000);
   }
 
   componentWillUnmount(){
@@ -202,6 +206,7 @@ class TaskListItem extends React.Component {
         type: 'PATCH'
       }).done((json) => {
         this.setState({task: json});
+        this.setAutoRefresh();
         d.resolve();
       }).fail(() => {
         d.reject(new Error("Could not update task information. Plese try again."));
