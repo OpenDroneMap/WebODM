@@ -9,7 +9,7 @@ services:
     depends_on:
       - node-odm-1
   node-odm-1:
-    image: pierotofy/nodeodm
+    image: opendronemap/node-opendronemap
     container_name: node-odm-1
     ports:
       - "3000"
