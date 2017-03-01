@@ -2,7 +2,7 @@
 
 ## How To Process Images
 
-In this tutorial we'll explore how to process an orthophoto from a set of aerial images. To do that we'll need to:
+In this tutorial we'll explore how to process an orthophoto from a set of aerial images using Python. To do that we'll need to:
 
  - Authenticate
  - Create a [Project](#project). Projects are a way to group together related [Task](#task) items
@@ -49,8 +49,7 @@ images = [
 	# ...
 ]
 options = json.dumps([
-	{'name': "use-opensfm-pointcloud", 'value': True},
-	{'name': "orthophoto-resolution", 'value': 24},
+	{'name': "orthophoto-resolution", 'value': 24}
 ])
 
 res = requests.post('http://localhost:8000/api/projects/{}/tasks/'.format(project_id), 
@@ -64,7 +63,7 @@ task_id = res['id']
 ```
 
 We can then create a [Task](#task). The only required parameter is a list of multiple, multipart-encoded `images`. Processing will start automatically
-as soon as a [Processing Node](#processingnode) is available. It is possible to specify additional options by passing an `options` value, which is a JSON-encoded list of name/value pairs. Several other options are available. See the [Task](#task) reference for more information.
+as soon as a [Processing Node](#processing-node) is available. It is possible to specify additional options by passing an `options` value, which is a JSON-encoded list of name/value pairs. Several other options are available. See the [Task - Processing Options](#processing-options) reference for more information.
 <div class="clear"></div>
 
 ```python
@@ -97,7 +96,7 @@ with open("orthophoto.tif", 'wb') as f:
 print("Saved ./orthophoto.tif")
 ```
 
-Our orthophoto is ready to be downloaded. A variety of other assets, including a dense 3D point cloud and a textured model [are also available](#download).
+Our orthophoto is ready to be downloaded. A variety of other assets, including a dense 3D point cloud and a textured model [are also available](#download-assets).
 
 Congratulations! You just processed some images.
 

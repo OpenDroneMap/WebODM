@@ -32,15 +32,15 @@ Field | Type | Description
 ----- | ---- | -----------
 id | int | Unique identifier
 project | int | [Project](#project) ID the task belongs to
-processing_node | int | The ID of the [Processing Node](#processingnode) this task has been assigned to, or `null` if no [Processing Node](#processingnode) has been assigned.
+processing_node | int | The ID of the [Processing Node](#processing-node) this task has been assigned to, or `null` if no [Processing Node](#processing-node) has been assigned.
 images_count | int | Number of images
-uuid | string | Unique identifier assigned by a [Processing Node](#processingnode) once processing has started.
+uuid | string | Unique identifier assigned by a [Processing Node](#processing-node) once processing has started.
 name | string | User defined name for the task
 processing_time | int | Milliseconds that have elapsed since the start of processing, or `-1` if no information is available. Useful for displaying a time status report to the user.
-auto_processing_node | boolean | Whether WebODM should automatically assign the next available [Processing Node](#processingnode) to process this [Task](#task). A user can set this to `false` to manually choose a [Processing Node](#processingnode).
+auto_processing_node | boolean | Whether WebODM should automatically assign the next available [Processing Node](#processing-node) to process this [Task](#task). A user can set this to `false` to manually choose a [Processing Node](#processing-node).
 status | int | One of [Status Codes](#status-codes), or `null` if no status is available.
-last_error | string | The last error message reported by a [Processing Node](#processingnode) in case of processing failure.
-options | JSON[] | JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a [Processing Node](#processingnode).
+last_error | string | The last error message reported by a [Processing Node](#processing-node) in case of processing failure.
+options | JSON[] | JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a [Processing Node](#processing-node).
 ground_control_points | string | Currently unused. See [#37](https://github.com/OpenDroneMap/WebODM/issues/37)
 created_at | string | Creation date and time
 pending_action | int | One of [Pending Actions](#pending-actions), or `null` if no pending action is set.
@@ -54,10 +54,10 @@ pending_action | int | One of [Pending Actions](#pending-actions), or `null` if 
 Parameter | Required | Default | Description
 --------- | -------- | ------- | -----------
 images[] | * | "" | List of multipart-encoded images (2 minimum)
-processing_node | | null | The ID of the [Processing Node](#processingnode) this [Task](#task) should be assigned to. If not specified, and auto_processing_node is `true`, a [Processing Node](#processingnode) will be automatically assigned. 
+processing_node | | null | The ID of the [Processing Node](#processing-node) this [Task](#task) should be assigned to. If not specified, and auto_processing_node is `true`, a [Processing Node](#processing-node) will be automatically assigned. 
 name | | "" | User defined name for the task
-auto_processing_node | | true | Whether WebODM should automatically assign the next available [Processing Node](#processingnode) to process this [Task](#task).
-options | | "[]" | JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a [Processing Node](#processingnode).
+auto_processing_node | | true | Whether WebODM should automatically assign the next available [Processing Node](#processing-node) to process this [Task](#task).
+options | | "[]" | JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a [Processing Node](#processing-node).
 
 You assign a [Task](#task) to a [Project](#project) by passing the proper `project_id` path in the URL.
 
@@ -107,31 +107,72 @@ Retrieves all [Task](#task) items associated with `project_id`.
 
 ### Download assets
 
-TODO
+`GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/`
 
-### Download assets (raw)
+After a task has been successfully processed, the user can download several assets from this URL.
 
-TODO
+Asset | Description
+----- | -----------
+all   | Archive (.zip) containing all assets, including an orthophoto, TMS tiles, a textured 3D model and point cloud in various formats.
+geotiff | GeoTIFF orthophoto.
+las | Point cloud in .LAS format.
+ply | Point cloud in .PLY format.
+csv | Point cloud in .CSV format.
+
+### Download assets (raw path)
+
+`GET /api/projects/{project_id}/tasks/{task_id}/assets/{path}/`
+
+After a task has been successfully processed, its assets are stored in a directory on the file system. This API call allows direct access to the files in that directory (by default: `WebODM/app/media/project/{project_id}/task/{task_id}/assets`). This can be useful to those applications that want to stream a `Potree` dataset, or render a textured 3D model on the fly. 
+
+<aside class="notice">
+These paths could change in future versions of WebODM. If the asset you need can be reached via <b>/api/projects/{project_id}/tasks/download/{asset}/</b>, use that instead.
+</aside>
 
 ### Retrieve console output
 
-TODO
+> Console output example:
+
+```bash
+curl -H "Authorization: JWT <your_token>" http://localhost:8000/api/projects/2/tasks/1/output/?line=5
+
+[DEBUG]   /var/www/data/e453747f-5fd4-4654-9622-b02727b29fc5/images\n[DEBUG]   Loaded DJI_0219.JPG | camera: dji fc300s ...
+```
+
+
+`GET /api/projects/{project_id}/tasks/{task_id}/output/`
+
+As a [Task](#task) is being processed, processing nodes will return an output string that can be used for debugging and informative purposes. Output is only available after processing has started.
+
+Parameter | Required | Default | Description
+--------- | -------- | ------- | -----------
+line | | 0 | Only display the output starting from a certain line number. This can be useful to display output in realtime to the user by keeping track of the number of lines that have been displayed to the user so far and thus avoiding to download all output at every request.
 
 ### Cancel task
 
-TODO
+`POST /api/projects/{project_id}/tasks/{task_id}/cancel/`
+
+Stop processing a [Task](#task). Canceled tasks can be restarted.
 
 ### Remove task
 
-TODO
+`POST /api/projects/{project_id}/tasks/{task_id}/remove/`
+
+All assets associated with it will be destroyed also. If the [Task](#task) is currently being processed, processing will stop.
 
 ### Restart task
 
-TODO
+`POST /api/projects/{project_id}/tasks/{task_id}/restart/`
+
+If a [Task](#task) has been canceled or has failed processing, or has completed but the user decided to change processing options, it can be restarted. If the [Processing Node](#processing-node) assigned to the [Task](#task) has not changed, processing will happen more quickly compared to creating a new [Task](#task), since the [Processing Node](#processing-node) remembers the `uuid` of the [Task](#task) and will attempt to reuse previous results from the computation pipeline.
 
 ### Orthophoto TMS layer
 
-TODO
+`GET /api/projects/{project_id}/tasks/{task_id}/tiles.json`
+
+`GET /api/projects/{project_id}/tasks/{task_id}/tiles/{Z}/{X}/{Y}.png`
+
+After a task has been successfully processed, a TMS layer is made available for inclusion in programs such as [Leaflet](http://leafletjs.com/) or [Cesium](http://cesiumjs.org).
 
 ### Pending Actions
 
@@ -147,7 +188,7 @@ RESTART | 3 | [Task](#task) is being restarted
 
 Status | Code | Description
 ----- | ---- | -----------
-QUEUED | 10 | [Task](#task)'s files have been uploaded to a [ProcessingNode](#processingnode) and are waiting to be processed.
+QUEUED | 10 | [Task](#task)'s files have been uploaded to a [#processing-node](#processing-node) and are waiting to be processed.
 RUNNING | 20 | [Task](#task) is currently being processed.
 FAILED | 30 | [Task](#task) has failed for some reason (not enough images, out of memory, Piero forgot to close a parenthesis, etc.)
 COMPLETED | 40 | [Task](#task) has completed. Assets are be ready to be downloaded.

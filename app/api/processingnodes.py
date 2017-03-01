@@ -44,10 +44,7 @@ class ProcessingNodeViewSet(viewsets.ModelViewSet):
 
 class ProcessingNodeOptionsView(APIView):
     """
-    Display the intersection of all ProcessingNode's available_options fields.
-    Each ProcessingNode has its own set of available_options. When a user relies on the
-    automatic node selection feature, it's better to have a list of available_options that
-    is common among all ProcessingNode.
+    Display the common options available among all online processing nodes. This is calculated by intersecting the available_options field of all online processing nodes visible to the current user.
     """
 
     queryset = ProcessingNode.objects.all()
@@ -55,7 +52,6 @@ class ProcessingNodeOptionsView(APIView):
     def get(self, request):
 
         nodes = get_objects_for_user(request.user, 'view_processingnode', ProcessingNode, accept_global_perms=False)
-
         common_options = []
 
         for node in nodes:
