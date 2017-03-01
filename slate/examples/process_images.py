@@ -41,8 +41,7 @@ if 'token' in res:
 
         images = [('images', (os.path.basename(file), open(file, 'rb'), 'image/jpg')) for file in images_list]
         options = json.dumps([
-            {'name': "use-opensfm-pointcloud", 'value': True},
-            {'name': "orthophoto-resolution", 'value': 24},
+            {'name': "orthophoto-resolution", 'value': 24}
         ])
         res = requests.post('http://localhost:8000/api/projects/{}/tasks/'.format(project_id), 
                     headers={'Authorization': 'JWT {}'.format(token)},
