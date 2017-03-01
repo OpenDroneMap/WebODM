@@ -1,36 +1,11 @@
-# Reference
+## Permissions
 
-## Authentication
+WebODM comes with a standard `model level` permission system. You can
+check whether users are logged-in and have privileges to act on things
+model-wise (can a user add a project? can a user view projects?).
 
-> Get authentication token:
+On top of that, WebODM features a powerful `row level` permission system. You can specify exactly which things a user has or has not access to, delete, change, etc.
 
-```bash
-curl -X POST -d "username=testuser&password=testpass" http://localhost:8000/api/token-auth/
+Changes to the permissions of objects can be handled via the `Administration` page of WebODM. 
 
-{"token":"eyJ0eXAiO..."}
-```
-
-> Use authentication token:
-
-```bash
-curl -H "Authorization: JWT <your_token>" http://localhost:8000/api/projects/
-
-{"count":13, ...}
-```
-
-`POST /api/token-auth/`
-
-Field | Type | Description
------ | ---- | -----------
-username | string | Username
-password | string | Password
-
-To access the API, you need to provide a valid username and password. You can create users from WebODM's Administration page.
-
-If authentication is successful, you will be issued a token. All API calls should include the following header:
-
-Header |
------- |
-Authorization: JWT `your_token` |
-
-The token expires after a set amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
+We are planning to make it easier for users and developers to handle permissions via an API. This is a work in progress.

@@ -18,5 +18,6 @@ includes:
  - reference/project
  - reference/task
  - reference/processingnode
+ - reference/permissions
 
 ---
