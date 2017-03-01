@@ -91,7 +91,7 @@
       <script src="javascripts/all.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;json&quot;]">
+  <body class="index" data-languages="[&quot;code&quot;]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -101,7 +101,7 @@
     <div class="tocify-wrapper">
       <img src="images/logo.png" alt="Logo" />
         <div class="lang-selector">
-              <a href="#" data-language-name="json">json</a>
+              <a href="#" data-language-name="code">code</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -112,65 +112,182 @@
         <ul class="toc-footer">
             <li><a href='https://github.com/OpenDroneMap/WebODM'>WebODM on GitHub</a></li>
             <li><a href='https://github.com/OpenDroneMap/OpenDroneMap'>OpenDroneMap on GitHub</a></li>
+            <li><a href='https://github.com/OpenDroneMap/node-OpenDroneMap'>node-OpenDroneMap on GitHub</a></li>
         </ul>
     </div>
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <h1 id="introduction">Introduction</h1>
+        
+          <h1 id="introduction">Introduction</h1>
 
 <p><a href="https://github.com/OpenDroneMap/WebODM">WebODM</a> is a free, user-friendly, extendable application and API for drone image processing. It generates georeferenced maps, point clouds and textured 3D models from aerial images.</p>
 
 <p>Developers can leverage this API to extend the functionality of <a href="https://github.com/OpenDroneMap/WebODM">WebODM</a> or integrate it with existing software like <a href="http://www.qgis.org/">QGIS</a> or <a href="http://www.autodesk.com/products/autocad/overview">AutoCAD</a>.</p>
 
-<h1 id="authentication">Authentication</h1>
+<p><img src="https://raw.githubusercontent.com/OpenDroneMap/WebODM/master/screenshots/pointcloud.png" alt="Point Cloud" /></p>
 
-<p>To access the API, you need to provide a valid username and password. You can create users from WebODM&rsquo;s Administration page.</p>
+          <h1 id="quickstart">Quickstart</h1>
 
-<p>If authentication is successful, you will be issued a token. For all API calls, always include the following parameter (TODO: how?):</p>
+<h2 id="how-to-process-images">How To Process Images</h2>
 
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Required</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>token</td>
-<td>*</td>
-<td>&ldquo;&rdquo;</td>
-<td>Authentication Token</td>
-</tr>
-</tbody></table>
+<p>In this tutorial we&rsquo;ll explore how to process an orthophoto from a set of aerial images using Python. To do that we&rsquo;ll need to:</p>
+
+<ul>
+<li>Authenticate</li>
+<li>Create a <a href="#project">Project</a>. Projects are a way to group together related <a href="#task">Task</a> items</li>
+<li>Upload some images to create a <a href="#task">Task</a></li>
+<li>Check for <a href="#task">Task</a> progress. Photogrammetry can take a long time, so results could take a few minutes to a few hours to be processed.</li>
+<li>Download the resulting orthophoto.</li>
+</ul>
+
+<aside class="notice">Most of the examples in this document use <a href="http://docs.python-requests.org/en/latest/index.html" target="_blank">requests</a>. Make sure it&rsquo;s installed before running any code:<br/><br/>
+
+<pre class="higlight shell">
+$ pip install requests
+</pre>
+</aside>
+
+<aside class="notice">
+The <a href="https://github.com/OpenDroneMap/WebODM/tree/master/slate/examples/process_images.py" target="_blank">source code</a> for this example is available on GitHub</a>.
+</aside>
+<pre class="highlight python"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/token-auth/'</span><span class="p">,</span> 
+                    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'username'</span><span class="p">:</span> <span class="s">'admin'</span><span class="p">,</span>
+                          <span class="s">'password'</span><span class="p">:</span> <span class="s">'admin'</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'token'</span><span class="p">]</span>
+</code></pre>
+<p>First, we <a href="#authenticate">authenticate</a> with WebODM. A <code class="prettyprint">token</code> is returned when authentication is successful.
+<div class="clear"></div></p>
+<pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/'</span><span class="p">,</span> 
+                    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'Hello WebODM!'</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="n">project_id</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'id'</span><span class="p">]</span>
+</code></pre>
+<p>Then we need to create a <a href="#project">Project</a>. We pass our <code class="prettyprint">token</code> via the <code class="prettyprint">Authorization</code> header. If we forget to pass this header, the system will not authenticate us and will refuse to process the request. We also assign a <code class="prettyprint">name</code> to our project.
+<div class="clear"></div></p>
+<pre class="highlight python"><code><span class="n">images</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s">'images'</span><span class="p">,</span> <span class="p">(</span><span class="s">'image1.jpg'</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s">'image1.jpg'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">),</span> <span class="s">'image/jpg'</span><span class="p">)),</span> 
+    <span class="p">(</span><span class="s">'images'</span><span class="p">,</span> <span class="p">(</span><span class="s">'image2.jpg'</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s">'image2.jpg'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">),</span> <span class="s">'image/jpg'</span><span class="p">)),</span>
+    <span class="c"># ...</span>
+<span class="p">]</span>
+<span class="n">options</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span>
+    <span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">"orthophoto-resolution"</span><span class="p">,</span> <span class="s">'value'</span><span class="p">:</span> <span class="mi">24</span><span class="p">}</span>
+<span class="p">])</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/{}/tasks/'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> 
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
+            <span class="n">files</span><span class="o">=</span><span class="n">images</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                <span class="s">'options'</span><span class="p">:</span> <span class="n">options</span>
+            <span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="n">task_id</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'id'</span><span class="p">]</span>
+</code></pre>
+<p>We can then create a <a href="#task">Task</a>. The only required parameter is a list of multiple, multipart-encoded <code class="prettyprint">images</code>. Processing will start automatically
+as soon as a <a href="#processing-node">Processing Node</a> is available. It is possible to specify additional options by passing an <code class="prettyprint">options</code> value, which is a JSON-encoded list of name/value pairs. Several other options are available. See the <a href="#processing-options">Task - Processing Options</a> reference for more information.
+<div class="clear"></div></p>
+<pre class="highlight python"><code><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/{}/tasks/{}/'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="s">'status'</span><span class="p">]</span> <span class="o">==</span> <span class="n">status_codes</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Task has completed!"</span><span class="p">)</span>
+        <span class="k">break</span>
+    <span class="k">elif</span> <span class="n">res</span><span class="p">[</span><span class="s">'status'</span><span class="p">]</span> <span class="o">==</span> <span class="n">status_codes</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Task failed: {}"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Processing, hold on..."</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</code></pre>
+<p>We periodically check for the <a href="#task">Task</a> status using a loop.
+<div class="clear"></div></p>
+<pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"http://localhost:8000/api/projects/{}/tasks/{}/download/geotiff/"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
+                        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
+                        <span class="n">stream</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"orthophoto.tif"</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span> 
+        <span class="k">if</span> <span class="n">chunk</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Saved ./orthophoto.tif"</span><span class="p">)</span>
+</code></pre>
+<p>Our orthophoto is ready to be downloaded. A variety of other assets, including a dense 3D point cloud and a textured model <a href="#download-assets">are also available</a>.</p>
+
+<p>Congratulations! You just processed some images.</p>
+
+<p><img src="https://i.imgflip.com/2/ipzhf.jpg" alt="Success" /></p>
+
+          <h1 id="reference">Reference</h1>
+
+<h2 id="authentication">Authentication</h2>
 
 <blockquote>
 <p>Get authentication token:</p>
 </blockquote>
-<pre class="highlight python"><code><span class="c"># TODO</span>
+<pre class="highlight shell"><code>curl -X POST -d <span class="s2">"username=testuser&amp;password=testpass"</span> http://localhost:8000/api/token-auth/
+
+<span class="o">{</span><span class="s2">"token"</span>:<span class="s2">"eyJ0eXAiO..."</span><span class="o">}</span>
 </code></pre>
-<h1 id="processing-images">Processing Images</h1>
+<blockquote>
+<p>Use authentication token:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -H <span class="s2">"Authorization: JWT &lt;your_token&gt;"</span> http://localhost:8000/api/projects/
 
-<p>Images are processed by creating a <a href="#task">Task</a>. A <a href="#project">Project</a> is a way to group together related <a href="#task">Task</a> items. A <a href="#project">Project</a> always needs to exist before a <a href="#task">Task</a> can be created.</p>
+<span class="o">{</span><span class="s2">"count"</span>:13, ...<span class="o">}</span>
+</code></pre>
+<p><code class="prettyprint">POST /api/token-auth/</code></p>
 
-<h1 id="project">Project</h1>
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>username</td>
+<td>string</td>
+<td>Username</td>
+</tr>
+<tr>
+<td>password</td>
+<td>string</td>
+<td>Password</td>
+</tr>
+</tbody></table>
 
-<h2 id="definition">Definition</h2>
+<p>To access the API, you need to provide a valid username and password. You can create users from WebODM&rsquo;s Administration page.</p>
+
+<p>If authentication is successful, you will be issued a token. All API calls should include the following header:</p>
+
+<table><thead>
+<tr>
+<th>Header</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Authorization: JWT <code class="prettyprint">your_token</code></td>
+</tr>
+</tbody></table>
+
+<p>The token expires after a set amount of time. The expiration time is dependent on WebODM&rsquo;s settings. You will need to request another token when a token expires.</p>
+
+          <h2 id="project">Project</h2>
 
 <blockquote>
-<p>Example:</p>
+<p>Example project:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
-    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">7</span><span class="p">,</span><span class="w">
         </span><span class="mi">6</span><span class="p">,</span><span class="w">
         </span><span class="mi">5</span><span class="w">
     </span><span class="p">],</span><span class="w">
-    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+    </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>A <a href="#project">Project</a> is a collection of <a href="#task">Task</a> items.</p>
@@ -209,7 +326,7 @@
 </tr>
 </tbody></table>
 
-<h2 id="create-a-project">Create a project</h2>
+<h3 id="create-a-project">Create a project</h3>
 
 <p><code class="prettyprint">POST /api/projects/</code></p>
 
@@ -235,62 +352,674 @@
 </tr>
 </tbody></table>
 
-<h2 id="get-list-of-projects">Get list of projects</h2>
+<h3 id="update-a-project">Update a project</h3>
+
+<p><code class="prettyprint">PATCH /api/projects/{id}/</code></p>
+
+<p>Parameters are the same as above.</p>
+
+<h3 id="delete-a-project">Delete a project</h3>
+
+<p><code class="prettyprint">DELETE /api/projects/{id}/</code></p>
+
+<p>Upon deletion, all <a href="#task">Task</a> items associated with the <a href="#project">Project</a> are deleted also. The operation is irreversible.</p>
+
+<h3 id="get-list-of-projects">Get list of projects</h3>
 
 <blockquote>
-<p>Example:</p>
+<p>Project list:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
-    </span><span class="nt">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"next"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"previous"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"results"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"next"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"previous"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"results"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="mi">7</span><span class="p">,</span><span class="w">
                 </span><span class="mi">6</span><span class="p">,</span><span class="w">
                 </span><span class="mi">5</span><span class="w">
             </span><span class="p">],</span><span class="w">
-            </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
         </span><span class="p">}</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p><code class="prettyprint">GET /api/projects/?page=N</code></p>
+<p><code class="prettyprint">GET /api/projects/</code></p>
 
-<p>If <code class="prettyprint">N</code> is omitted, defaults to 1.</p>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>page</td>
+<td></td>
+<td>1</td>
+<td>Page number</td>
+</tr>
+<tr>
+<td>id</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by id</td>
+</tr>
+<tr>
+<td>name</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by name</td>
+</tr>
+<tr>
+<td>description</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by description</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by created_at</td>
+</tr>
+<tr>
+<td>ordering</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Ordering field to sort results by</td>
+</tr>
+</tbody></table>
 
-<h3 id="filtering-the-list">Filtering the list</h3>
+<h4 id="example-filtering-by-name">Example: Filtering by name</h4>
 
-<p><code class="prettyprint">GET /api/projects/?&lt;field&gt;=&lt;value&gt;</code></p>
+<p><code class="prettyprint">GET /api/projects/?name=hello</code></p>
 
-<p>Where field is one of: <code class="prettyprint">id</code>, <code class="prettyprint">name</code>, <code class="prettyprint">description</code>, <code class="prettyprint">created_at</code>. Only equality can be used, e.g. <code class="prettyprint">id=3</code>.</p>
+<p>Retrieves projects that have a name of &ldquo;hello&rdquo;.</p>
 
-<h3 id="sorting-the-list">Sorting the list</h3>
+<h4 id="example-sorting">Example: Sorting</h4>
 
-<p><code class="prettyprint">GET /api/projects/?ordering=&lt;field&gt;</code></p>
+<p><code class="prettyprint">GET /api/projects/?ordering=-id</code></p>
 
-<p>Where field is one of: <code class="prettyprint">id</code>, <code class="prettyprint">name</code>, <code class="prettyprint">description</code>, <code class="prettyprint">created_at</code>. Results are sorted in ascending order. Placing a minus <code class="prettyprint">-</code> sign, e.g. <code class="prettyprint">-created_at</code> sorts in descending order.</p>
+<p>Sort by project ID, descending order.</p>
 
-<h3 id="pagination">Pagination</h3>
+<aside class="notice">Only projects visible to the current user are returned.</aside>
 
-<p>The project list is paginated. Items are stored in <code class="prettyprint">results</code>. <code class="prettyprint">count</code> is the total number of items. <code class="prettyprint">next</code> and <code class="prettyprint">previous</code> are links to retrieve the next and previous page of results, or null. Each page contains 10 items.</p>
+          <h2 id="task">Task</h2>
 
-<aside class="notice">Only the projects visible to the current user will be displayed.</aside>
+<blockquote>
+<p>Example task:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">134</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4338d684-91b4-49a2-b907-8ba171894393"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Task Name"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"processing_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">2197417</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"auto_processing_node"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"last_error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"use-opensfm-pointcloud"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"ground_control_points"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-02-18T18:01:55.402551Z"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>A <a href="#task">Task</a> is the basic processing unit of WebODM. To compute an orthophoto, point cloud and textured model from a set of images, you need to create a <a href="#task">Task</a>.</p>
 
-<h1 id="task">Task</h1>
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td>project</td>
+<td>int</td>
+<td><a href="#project">Project</a> ID the task belongs to</td>
+</tr>
+<tr>
+<td>processing_node</td>
+<td>int</td>
+<td>The ID of the <a href="#processing-node">Processing Node</a> this task has been assigned to, or <code class="prettyprint">null</code> if no <a href="#processing-node">Processing Node</a> has been assigned.</td>
+</tr>
+<tr>
+<td>images_count</td>
+<td>int</td>
+<td>Number of images</td>
+</tr>
+<tr>
+<td>uuid</td>
+<td>string</td>
+<td>Unique identifier assigned by a <a href="#processing-node">Processing Node</a> once processing has started.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>User defined name for the task</td>
+</tr>
+<tr>
+<td>processing_time</td>
+<td>int</td>
+<td>Milliseconds that have elapsed since the start of processing, or <code class="prettyprint">-1</code> if no information is available. Useful for displaying a time status report to the user.</td>
+</tr>
+<tr>
+<td>auto_processing_node</td>
+<td>boolean</td>
+<td>Whether WebODM should automatically assign the next available <a href="#processing-node">Processing Node</a> to process this <a href="#task">Task</a>. A user can set this to <code class="prettyprint">false</code> to manually choose a <a href="#processing-node">Processing Node</a>.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>int</td>
+<td>One of <a href="#status-codes">Status Codes</a>, or <code class="prettyprint">null</code> if no status is available.</td>
+</tr>
+<tr>
+<td>last_error</td>
+<td>string</td>
+<td>The last error message reported by a <a href="#processing-node">Processing Node</a> in case of processing failure.</td>
+</tr>
+<tr>
+<td>options</td>
+<td>JSON[]</td>
+<td>JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a <a href="#processing-node">Processing Node</a>.</td>
+</tr>
+<tr>
+<td>ground_control_points</td>
+<td>string</td>
+<td>Currently unused. See <a href="https://github.com/OpenDroneMap/WebODM/issues/37">#37</a></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>string</td>
+<td>Creation date and time</td>
+</tr>
+<tr>
+<td>pending_action</td>
+<td>int</td>
+<td>One of <a href="#pending-actions">Pending Actions</a>, or <code class="prettyprint">null</code> if no pending action is set.</td>
+</tr>
+</tbody></table>
 
-<h2 id="definition">Definition</h2>
+<aside class="notice">Tasks inherit the permission settings from the <a href="#project">Project</a> they belong to.</aside>
 
-<p>TODO</p>
+<h3 id="create-a-task">Create a task</h3>
+
+<p><code class="prettyprint">POST /api/projects/{project_id}/tasks/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>images[]</td>
+<td>*</td>
+<td>&ldquo;&rdquo;</td>
+<td>List of multipart-encoded images (2 minimum)</td>
+</tr>
+<tr>
+<td>processing_node</td>
+<td></td>
+<td>null</td>
+<td>The ID of the <a href="#processing-node">Processing Node</a> this <a href="#task">Task</a> should be assigned to. If not specified, and auto_processing_node is <code class="prettyprint">true</code>, a <a href="#processing-node">Processing Node</a> will be automatically assigned.</td>
+</tr>
+<tr>
+<td>name</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>User defined name for the task</td>
+</tr>
+<tr>
+<td>auto_processing_node</td>
+<td></td>
+<td>true</td>
+<td>Whether WebODM should automatically assign the next available <a href="#processing-node">Processing Node</a> to process this <a href="#task">Task</a>.</td>
+</tr>
+<tr>
+<td>options</td>
+<td></td>
+<td>&ldquo;[]&rdquo;</td>
+<td>JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a <a href="#processing-node">Processing Node</a>.</td>
+</tr>
+</tbody></table>
+
+<p>You assign a <a href="#task">Task</a> to a <a href="#project">Project</a> by passing the proper <code class="prettyprint">project_id</code> path in the URL.</p>
+
+<h3 id="update-a-task">Update a task</h3>
+
+<p><code class="prettyprint">PATCH /api/projects/{project_id}/tasks/{task_id}/</code></p>
+
+<p>Parameters are the same as above.</p>
+
+<h3 id="delete-a-task">Delete a task</h3>
+
+<p><code class="prettyprint">DELETE /api/projects/{project_id}/tasks/{task_id}/</code></p>
+
+<p>Upon deletion, all images and assets associated with the <a href="#task">Task</a> are deleted also. The operation is irreversible.</p>
+
+<h3 id="get-list-of-tasks">Get list of tasks</h3>
+
+<blockquote>
+<p>Task list:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">89</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2e8b687d-c269-4e2f-91b3-5a2cd51b5321"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test name"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"processing_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">8402184</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"auto_processing_node"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"last_error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="s2">"ground_control_points"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-08T13:32:28.139474Z"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre>
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/</code></p>
+
+<p>Retrieves all <a href="#task">Task</a> items associated with <code class="prettyprint">project_id</code>.</p>
+
+<h3 id="download-assets">Download assets</h3>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/</code></p>
+
+<p>After a task has been successfully processed, the user can download several assets from this URL.</p>
+
+<table><thead>
+<tr>
+<th>Asset</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>all</td>
+<td>Archive (.zip) containing all assets, including an orthophoto, TMS tiles, a textured 3D model and point cloud in various formats.</td>
+</tr>
+<tr>
+<td>geotiff</td>
+<td>GeoTIFF orthophoto.</td>
+</tr>
+<tr>
+<td>las</td>
+<td>Point cloud in .LAS format.</td>
+</tr>
+<tr>
+<td>ply</td>
+<td>Point cloud in .PLY format.</td>
+</tr>
+<tr>
+<td>csv</td>
+<td>Point cloud in .CSV format.</td>
+</tr>
+</tbody></table>
+
+<h3 id="download-assets-raw-path">Download assets (raw path)</h3>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/assets/{path}/</code></p>
+
+<p>After a task has been successfully processed, its assets are stored in a directory on the file system. This API call allows direct access to the files in that directory (by default: <code class="prettyprint">WebODM/app/media/project/{project_id}/task/{task_id}/assets</code>). This can be useful to those applications that want to stream a <code class="prettyprint">Potree</code> dataset, or render a textured 3D model on the fly. </p>
+
+<aside class="notice">
+These paths could change in future versions of WebODM. If the asset you need can be reached via <b>/api/projects/{project_id}/tasks/download/{asset}/</b>, use that instead.
+</aside>
+
+<h3 id="retrieve-console-output">Retrieve console output</h3>
+
+<blockquote>
+<p>Console output example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -H <span class="s2">"Authorization: JWT &lt;your_token&gt;"</span> http://localhost:8000/api/projects/2/tasks/1/output/?line<span class="o">=</span>5
+
+<span class="o">[</span>DEBUG]   /var/www/data/e453747f-5fd4-4654-9622-b02727b29fc5/images<span class="se">\n</span><span class="o">[</span>DEBUG]   Loaded DJI_0219.JPG | camera: dji fc300s ...
+</code></pre>
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/output/</code></p>
+
+<p>As a <a href="#task">Task</a> is being processed, processing nodes will return an output string that can be used for debugging and informative purposes. Output is only available after processing has started.</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>line</td>
+<td></td>
+<td>0</td>
+<td>Only display the output starting from a certain line number. This can be useful to display output in realtime to the user by keeping track of the number of lines that have been displayed to the user so far and thus avoiding to download all output at every request.</td>
+</tr>
+</tbody></table>
+
+<h3 id="cancel-task">Cancel task</h3>
+
+<p><code class="prettyprint">POST /api/projects/{project_id}/tasks/{task_id}/cancel/</code></p>
+
+<p>Stop processing a <a href="#task">Task</a>. Canceled tasks can be restarted.</p>
+
+<h3 id="remove-task">Remove task</h3>
+
+<p><code class="prettyprint">POST /api/projects/{project_id}/tasks/{task_id}/remove/</code></p>
+
+<p>All assets associated with it will be destroyed also. If the <a href="#task">Task</a> is currently being processed, processing will stop.</p>
+
+<h3 id="restart-task">Restart task</h3>
+
+<p><code class="prettyprint">POST /api/projects/{project_id}/tasks/{task_id}/restart/</code></p>
+
+<p>If a <a href="#task">Task</a> has been canceled or has failed processing, or has completed but the user decided to change processing options, it can be restarted. If the <a href="#processing-node">Processing Node</a> assigned to the <a href="#task">Task</a> has not changed, processing will happen more quickly compared to creating a new <a href="#task">Task</a>, since the <a href="#processing-node">Processing Node</a> remembers the <code class="prettyprint">uuid</code> of the <a href="#task">Task</a> and will attempt to reuse previous results from the computation pipeline.</p>
+
+<h3 id="orthophoto-tms-layer">Orthophoto TMS layer</h3>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/tiles.json</code></p>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/tiles/{Z}/{X}/{Y}.png</code></p>
+
+<p>After a task has been successfully processed, a TMS layer is made available for inclusion in programs such as <a href="http://leafletjs.com/">Leaflet</a> or <a href="http://cesiumjs.org">Cesium</a>.</p>
+
+<h3 id="pending-actions">Pending Actions</h3>
+
+<p>In some circumstances, a <a href="#task">Task</a> can have a pending action that requires some amount of time to be performed.</p>
+
+<table><thead>
+<tr>
+<th>Pending Action</th>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>CANCEL</td>
+<td>1</td>
+<td><a href="#task">Task</a> is being canceled</td>
+</tr>
+<tr>
+<td>REMOVE</td>
+<td>2</td>
+<td><a href="#task">Task</a> is being removed</td>
+</tr>
+<tr>
+<td>RESTART</td>
+<td>3</td>
+<td><a href="#task">Task</a> is being restarted</td>
+</tr>
+</tbody></table>
+
+<h3 id="status-codes">Status Codes</h3>
+
+<table><thead>
+<tr>
+<th>Status</th>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>QUEUED</td>
+<td>10</td>
+<td><a href="#task">Task</a>&rsquo;s files have been uploaded to a <a href="#processing-node">#processing-node</a> and are waiting to be processed.</td>
+</tr>
+<tr>
+<td>RUNNING</td>
+<td>20</td>
+<td><a href="#task">Task</a> is currently being processed.</td>
+</tr>
+<tr>
+<td>FAILED</td>
+<td>30</td>
+<td><a href="#task">Task</a> has failed for some reason (not enough images, out of memory, Piero forgot to close a parenthesis, etc.)</td>
+</tr>
+<tr>
+<td>COMPLETED</td>
+<td>40</td>
+<td><a href="#task">Task</a> has completed. Assets are be ready to be downloaded.</td>
+</tr>
+<tr>
+<td>CANCELED</td>
+<td>50</td>
+<td><a href="#task">Task</a> was manually canceled by the user.</td>
+</tr>
+</tbody></table>
+
+          <h2 id="processing-node">Processing Node</h2>
+
+<blockquote>
+<p>Example processing node:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"hostname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"api_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"last_refreshed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-03-01T21:14:49.918276Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"queue_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"available_options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mesh-solver-divide"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"int"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"positive integer"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+</span></code></pre>
+<p>Processing nodes are associated with zero or more tasks and
+take care of processing input images. Processing nodes are computers or virtual machines running <a href="https://github.com/OpenDroneMap/node-OpenDroneMap/">node-OpenDroneMap</a> or any other API compatible with it.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>Unique Identifier</td>
+</tr>
+<tr>
+<td>hostname</td>
+<td>string</td>
+<td>Hostname/IP address</td>
+</tr>
+<tr>
+<td>port</td>
+<td>int</td>
+<td>Port</td>
+</tr>
+<tr>
+<td>api_version</td>
+<td>string</td>
+<td>Version of node-OpenDroneMap currently running</td>
+</tr>
+<tr>
+<td>last_refreshed</td>
+<td>string</td>
+<td>Date and time this node was last seen online. This value is typically refreshed every 15-30 seconds and is used to decide whether a node is offline or not</td>
+</tr>
+<tr>
+<td>queue_count</td>
+<td>int</td>
+<td>Number of <a href="#task">Task</a> items currently being processed/queued on this node.</td>
+</tr>
+<tr>
+<td>available_options</td>
+<td>JSON[]</td>
+<td>JSON-encoded list of name/value pairs that represent the list of options that this node is capable of handling.</td>
+</tr>
+</tbody></table>
+
+<h3 id="add-a-processing-node">Add a processing node</h3>
+
+<p><code class="prettyprint">POST /api/processingnodes/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>hostname</td>
+<td>*</td>
+<td>&ldquo;&rdquo;</td>
+<td>Hostname/IP address</td>
+</tr>
+<tr>
+<td>port</td>
+<td>*</td>
+<td></td>
+<td>Port</td>
+</tr>
+</tbody></table>
+
+<p>All other fields are automatically populated, and shouldn&rsquo;t generally be specified.</p>
+
+<h3 id="update-a-processing-node">Update a processing node</h3>
+
+<p><code class="prettyprint">PATCH /api/processingnodes/</code></p>
+
+<p>Parameters are the same as above.</p>
+
+<h3 id="delete-a-processing-node">Delete a processing node</h3>
+
+<p><code class="prettyprint">DELETE /api/processingnodes/</code></p>
+
+<p>Upon deletion, all <a href="#task">Task</a> items associated with the node will continue to exist. You might get errors (duh!) if you delete a processing node in the middle of processing a <a href="#task">Task</a>.</p>
+
+<h3 id="get-list-of-processing-nodes">Get list of processing nodes</h3>
+
+<p><code class="prettyprint">GET /api/processingnodes/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by id</td>
+</tr>
+<tr>
+<td>hostname</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by hostname</td>
+</tr>
+<tr>
+<td>port</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by port</td>
+</tr>
+<tr>
+<td>api_version</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by API version</td>
+</tr>
+<tr>
+<td>queue_count</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by queue count</td>
+</tr>
+<tr>
+<td>ordering</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Ordering field to sort results by</td>
+</tr>
+<tr>
+<td>has_available_options</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Return only processing nodes that have a valid set of processing options (check that the <code class="prettyprint">available_options</code> field is populated). Either <code class="prettyprint">true</code> or <code class="prettyprint">false</code>.</td>
+</tr>
+</tbody></table>
+
+<h4 id="example-show-only-nodes-that-have-a-valid-set-of-options">Example: Show only nodes that have a valid set of options</h4>
+
+<p><code class="prettyprint">GET /api/processingnodes/?has_available_options=true</code></p>
+
+<h4 id="example-sorting">Example: Sorting</h4>
+
+<p><code class="prettyprint">GET /api/processingnodes/?ordering=-hostname</code></p>
+
+<p>Sort by hostname, descending order.</p>
+
+<aside class="notice">Only processing nodes visible to the current user are returned. If you added a processing node, but your non-admin users can&rsquo;t see it, make sure that they have been assigned the proper permissions. Administration &ndash; Processing Nodes &ndash; Select Node &ndash; Object Permissions &ndash; Add User/Group and check CAN VIEW PROCESSING NODE.</aside>
+
+<h3 id="processing-options">Processing Options</h3>
+
+<blockquote>
+<p>Processing options example:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mesh-solver-divide"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"int"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"positive integer"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ignore matched keypoints if the two images share less than &lt;float&gt; percent of keypoints. Default: 2"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"matcher-threshold"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"float"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"percent"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+</span></code></pre>
+<p><code class="prettyprint">GET /api/processingnodes/options/</code></p>
+
+<p>Display the common options available among all online processing nodes. This is calculated by intersecting the <code class="prettyprint">available_options</code> field of all online processing nodes visible to the current user.</p>
+
+<p>Use this list of options to check whether a particular option is supported by all online processing nodes. If you use the automatic processing node assignment feature for processing tasks, this is the list you want to display to the user for choosing the options to use during processing.</p>
+
+<aside class="notice">While WebODM is capable of handling processing nodes running different versions of node-OpenDroneMap, we don&rsquo;t recommend doing so. When all processing nodes use the same node-OpenDroneMap version, the output of this API call will be identical to the <b>available_options</b> field of any node.</aside>
 
       </div>
       <div class="dark-box">
           <div class="lang-selector">
-                <a href="#" data-language-name="json">json</a>
+                <a href="#" data-language-name="code">code</a>
           </div>
       </div>
     </div>
