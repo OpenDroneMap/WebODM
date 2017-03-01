@@ -1,14 +1,15 @@
 import datetime
 
 from django.contrib.auth.models import User
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, get_objects_for_user
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_jwt.settings import api_settings
 
 from app import pending_actions
 from app.models import Project, Task
-from nodeodm.models import ProcessingNode
+from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from .classes import BootTestCase
 
 
@@ -237,6 +238,10 @@ class TestApi(BootTestCase):
         res = client.get('/api/processingnodes/{}/'.format(pnode.id))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
+        # Cannot get options as guest
+        res = client.get('/api/processingnodes/options/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
         client.login(username="testuser", password="test1234")
 
         # Cannot list processing nodes, unless permissions have been granted
@@ -306,6 +311,39 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) == 2)
         self.assertTrue(res.data[1]["port"] == 1000)
+
+        # Test available_options intersection
+        # (with normal user)
+        client.login(username="testuser", password="test1234")
+        user = User.objects.get(username="testuser")
+        self.assertFalse(user.is_superuser)
+
+        p1 = ProcessingNode.objects.create(hostname="invalid-host", port=11223,
+                                           last_refreshed=timezone.now(),
+                                           available_options=[{'name': 'a'}, {'name': 'b'}])
+        p2 = ProcessingNode.objects.create(hostname="invalid-host-2", port=11223,
+                                           last_refreshed=timezone.now(),
+                                           available_options=[{'name': 'a'}, {'name': 'c'}])
+        p3 = ProcessingNode.objects.create(hostname="invalid-host-3", port=11223,
+                                           last_refreshed=timezone.now(),
+                                           available_options=[{'name': 'd'}])
+        p4 = ProcessingNode.objects.create(hostname="invalid-host-4", port=11223,
+                                           last_refreshed=timezone.now() - datetime.timedelta(minutes=OFFLINE_MINUTES * 2),
+                                           available_options=[{'name': 'd'}]) # offline
+
+        assign_perm('view_processingnode', user, p1)
+        assign_perm('view_processingnode', user, p2)
+        assign_perm('view_processingnode', user, p4)
+        self.assertFalse(user.has_perm('view_processingnode', p3))
+
+        nodes_available = get_objects_for_user(user, 'view_processingnode', ProcessingNode, accept_global_perms=False).exclude(available_options=dict())
+        self.assertTrue(len(nodes_available) == 3)
+
+        res = client.get('/api/processingnodes/options/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) == 1)
+        self.assertTrue(res.data[0]['name'] == 'a')
+
 
     def test_token_auth(self):
         client = APIClient()
