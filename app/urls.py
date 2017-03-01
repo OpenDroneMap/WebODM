@@ -1,5 +1,4 @@
 from django.conf.urls import url, include
-from rest_framework_swagger.views import get_swagger_view
 
 from . import views
 from app.boot import boot
@@ -15,7 +14,6 @@ urlpatterns = [
     url(r'^processingnode/([\d]+)/$', views.processing_node, name='processing_node'),
 
     url(r'^api/', include("app.api.urls")),
-    url(r'^apiviewer/', get_swagger_view(title='WebODM API')),
 ]
 
 # Test cases call boot() independently
