@@ -476,6 +476,11 @@ html, body {
     background: $aside-notice-bg;
     line-height: 1.6;
 
+    pre{
+      float: none;
+      padding: 6px 10px;
+    }
+
     &.warning {
       background-color: $aside-warning-bg;
       text-shadow: 0 1px 0 lighten($aside-warning-bg, 15%);
@@ -558,6 +563,16 @@ html, body {
       color: #ccc;
       border-top: 1px solid #000;
       border-bottom: 1px solid #404040;
+    }
+  }
+}
+
+.tocify-subheader {
+  .tocify-subheader {
+    .tocify-item>a {
+      // Styling here for a level 2 nesting. For example -> 
+      padding-left: $nav-padding + $nav-indent * 2;
+      font-size: 12px;
     }
   }
 }

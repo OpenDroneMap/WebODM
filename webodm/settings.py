@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'guardian',
     'rest_framework',
     'rest_framework_nested',
-    'rest_framework_swagger',
     'webpack_loader',
 #    'debug_toolbar',
     'app',

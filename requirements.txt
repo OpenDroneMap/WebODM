@@ -6,7 +6,6 @@ Django==1.10.5
 django-debug-toolbar==1.6
 django-filter==0.15.3
 django-guardian==1.4.6
-django-rest-swagger==2.1.0
 django-webpack-loader==0.3.3
 djangorestframework==3.5.1
 djangorestframework-jwt==1.9.0

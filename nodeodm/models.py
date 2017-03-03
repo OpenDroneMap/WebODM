@@ -14,7 +14,6 @@ from django.db.models import signals
 from datetime import datetime, timedelta
 from .exceptions import ProcessingError, ProcessingTimeout
 import simplejson
-import django.utils.timezone
 
 
 def api(func):

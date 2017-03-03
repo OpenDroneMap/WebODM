@@ -381,6 +381,7 @@ class TestApiTask(BootTransactionTestCase):
 
         # Remove error
         task.last_error = None
+        task.status = None
         task.save()
 
         scheduler.process_pending_tasks()

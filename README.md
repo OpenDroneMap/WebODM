@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM)
 
-A free, user-friendly, extendable application and API for drone image processing. Generate georeferenced maps, point clouds and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
+A free, user-friendly, extendable application and [API](https://opendronemap.github.io/WebODM/) for drone image processing. Generate georeferenced maps, point clouds and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
@@ -83,6 +83,10 @@ WebODM can be linked to one or more processing nodes running [node-OpenDroneMap]
 ### Security
 
 If you want to run WebODM in production, make sure to change the `SECRET_KEY` variable in `webodm/settings.py`, as well as any other relevant setting as indicated in the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
+
+## API Docs
+
+See the [API documentation page](https://opendronemap.github.io/WebODM/).
 
 ## Run it natively
 
@@ -178,7 +182,7 @@ Should all work without errors.
 - [X] Cluster management and setup.
 - [ ] Mission Planner
 - [X] API
-- [ ] Documentation
+- [X] Documentation
 - [ ] Android Mobile App
 - [ ] iOS Mobile App
 - [ ] Processing Nodes Volunteer Network
