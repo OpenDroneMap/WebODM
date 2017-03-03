@@ -34,7 +34,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
         exclude = ('processing_lock', 'console_output', 'orthophoto', )
-        #read_only_fields = ('project', 'images_count', 'processing_time', 'status', 'last_error', 'created_at', 'pending_action', ) #TODO: add uuid
+        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -145,6 +145,13 @@ class TaskViewSet(viewsets.ViewSet):
             task = self.queryset.get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
+
+        # Check that a user has access to reassign a project
+        if 'project' in request.data:
+            try:
+                get_and_check_project(request, request.data['project'], ('change_project', ))
+            except exceptions.NotFound:
+                raise exceptions.PermissionDenied()
 
         serializer = TaskSerializer(task, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)

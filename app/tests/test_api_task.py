@@ -15,7 +15,7 @@ from rest_framework.test import APIClient
 from app import pending_actions
 from app import scheduler
 from django.utils import timezone
-from app.models import Project, Task, ImageUpload, task_directory_path
+from app.models import Project, Task, ImageUpload, task_directory_path, full_task_directory_path
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
@@ -324,6 +324,21 @@ class TestApiTask(BootTransactionTestCase):
         # and not fail
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
+
+
+        # Reassigning the task to another project should move its assets
+        self.assertTrue(os.path.exists(full_task_directory_path(task.id, project.id)))
+
+        self.assertTrue(len(task.imageupload_set) == 2)
+
+        task.project = other_project
+        task.save()
+        self.assertFalse(os.path.exists(full_task_directory_path(task.id, project.id)))
+        self.assertTrue(os.path.exists(full_task_directory_path(task.id, other_project.id)))
+
+        # TODO: more testing
+        # - orthophoto path updated?
+        # - imageset paths updated?
 
         image1.close()
         image2.close()

@@ -29,18 +29,18 @@ class TestApi(BootTestCase):
         other_user = User.objects.get(username="testuser2")
 
         project = Project.objects.create(
-                owner=user,
-                name="test project"
-            )
+            owner=user,
+            name="test project"
+        )
         other_project = Project.objects.create(
-                owner=other_user,
-                name="another test project"
-            )
+            owner=other_user,
+            name="another test project"
+        )
 
         # Forbidden without credentials
         res = client.get('/api/projects/')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-        
+
         client.login(username="testuser", password="test1234")
         res = client.get('/api/projects/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -115,7 +115,7 @@ class TestApi(BootTestCase):
         # Cannot list project tasks for a project that doesn't exist
         res = client.get('/api/projects/999/tasks/')
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
-        
+
         # Can list task details for a task belonging to a project we have access to
         res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -217,6 +217,40 @@ class TestApi(BootTestCase):
         res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
         self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
 
+        # A user cannot reassign a task to a
+        # project for which he/she has no permissions
+        res = client.patch('/api/projects/{}/tasks/{}/'.format(project.id, task.id), {'project': other_project.id},
+                           format='json')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # A user cannot reassign a task to a
+        # project for which he/she has no permissions (using uppercase)
+        res = client.patch('/api/projects/{}/tasks/{}/'.format(project.id, task.id), {'PROJECT': other_project.id},
+                           format='json')
+
+        # Request went through, but no changes were applied
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        task.refresh_from_db()
+        self.assertTrue(task.project.id == project.id)
+
+        # A user cannot update a task's read only fields
+        self.assertTrue(task.pending_action != 0)
+        res = client.patch('/api/projects/{}/tasks/{}/'.format(project.id, task.id), {
+                'processing_time': 1234,
+                'status': -99,
+                'last_error': 'yo!',
+                'created_at': 0,
+                'pending_action': 0
+            }, format='json')
+
+        # Operation should fail without errors, but nothing has changed in the DB
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        task.refresh_from_db()
+        self.assertTrue(task.processing_time != 1234)
+        self.assertTrue(task.status != -99)
+        self.assertTrue(task.last_error != 'yo!')
+        self.assertTrue(task.created_at != 0)
+        self.assertTrue(task.pending_action != 0)
 
     def test_processingnodes(self):
         client = APIClient()

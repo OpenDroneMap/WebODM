@@ -31,6 +31,10 @@ def task_directory_path(taskId, projectId):
     return 'project/{0}/task/{1}/'.format(projectId, taskId)
 
 
+def full_task_directory_path(taskId, projectId, *args):
+    return os.path.join(settings.MEDIA_ROOT, task_directory_path(taskId, projectId), *args)
+
+
 def assets_directory_path(taskId, projectId, filename):
     # files will be uploaded to MEDIA_ROOT/project/<id>/task/<id>/<filename>
     return '{0}{1}'.format(task_directory_path(taskId, projectId), filename)
@@ -147,21 +151,69 @@ class Task(models.Model):
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
 
+    def __init__(self, *args, **kwargs):
+        super(Task, self).__init__(*args, **kwargs)
+
+        # To help keep track of changes to the project id
+        self.__original_project_id = self.project.id
+
     def __str__(self):
         name = self.name if self.name is not None else "unnamed"
 
         return 'Task [{}] ({})'.format(name, self.id)
 
+    def move_assets(self, old_project_id, new_project_id):
+        """
+        Moves the task's folder, update ImageFields and orthophoto files to a new project
+        """
+        old_task_folder = full_task_directory_path(self.id, old_project_id)
+        new_task_folder = full_task_directory_path(self.id, new_project_id)
+        new_task_folder_parent = os.path.abspath(os.path.join(new_task_folder, os.pardir))
+
+        try:
+            if os.path.exists(old_task_folder) and not os.path.exists(new_task_folder):
+                # Use parent, otherwise we get a duplicate directory in there
+                shutil.move(old_task_folder, new_task_folder_parent)
+
+                logger.info("Moved task folder from {} to {}".format(old_task_folder, new_task_folder))
+
+                with transaction.atomic():
+                    for img in self.imageupload_set.all():
+                        prev_name = img.image.name
+                        img.image.name = assets_directory_path(self.id, new_project_id,
+                                                               os.path.basename(img.image.name))
+                        logger.info("Changing {} to {}".format(prev_name, img))
+                        img.save()
+
+                if self.orthophoto is not None:
+                    new_orthophoto_path = os.path.realpath(full_task_directory_path(self.id, new_project_id, "assets", "odm_orthophoto", "odm_orthophoto_4326.tif"))
+                    logger.info("Changing orthophoto path to {}".format(new_orthophoto_path))
+                    self.orthophoto = GDALRaster(new_orthophoto_path, write=True)
+            else:
+                logger.warning(
+                    "Project changed for task {}, but either {} doesn't exist, or {} already exists. This doesn't look right, so we will not move any files.".format(self,
+                                                                                                             old_task_folder,
+                                                                                                             new_task_folder))
+        except shutil.Error as e:
+            logger.warning(
+                "Could not move assets folder for task {}. We're going to proceed anyway, but you might experience issues: {}".format(
+                    self, e))
+
     def save(self, *args, **kwargs):
+        if self.project.id != self.__original_project_id:
+            self.move_assets(self.__original_project_id, self.project.id)
+            self.__original_project_id = self.project.id
+
         # Autovalidate on save
         try:
             self.full_clean()
         except GDALException as e:
-            logger.warning("Problem while handling GDAL raster: {}. We're going to attempt to remove the reference to it...".format(e))
+            logger.warning(
+                "Problem while handling GDAL raster: {}. We're going to attempt to remove the reference to it...".format(
+                    e))
             self.orthophoto = None
 
         super(Task, self).save(*args, **kwargs)
-
 
     def assets_path(self, *args):
         """
