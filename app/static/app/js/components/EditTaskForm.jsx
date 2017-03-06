@@ -76,16 +76,13 @@ class EditTaskForm extends React.Component {
           let now = new Date();
 
           let nodes = json.map(node => {
-            let last_refreshed = new Date(node.last_refreshed);
-            let enabled = (now - last_refreshed) < 1000 * 60 * 5; // 5 minutes
-
             return {
               id: node.id,
               key: node.id,
               label: `${node.hostname}:${node.port} (queue: ${node.queue_count})`,
               options: node.available_options,
               queue_count: node.queue_count,
-              enabled: enabled,
+              enabled: node.online,
               url: `http://${node.hostname}:${node.port}`
             };
           });

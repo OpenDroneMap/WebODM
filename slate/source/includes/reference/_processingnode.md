@@ -5,6 +5,7 @@
 ```json
 {
     "id": 2,
+    "online": true,
     "hostname": "nodeodm.masseranolabs.com",
     "port": 80,
     "api_version": "1.0.1",
@@ -27,6 +28,7 @@ take care of processing input images. Processing nodes are computers or virtual 
 Field | Type | Description
 ----- | ---- | -----------
 id | int | Unique Identifier
+online | bool | Whether the processing node could be reached in the last 5 minutes
 hostname | string | Hostname/IP address
 port | int | Port
 api_version | string | Version of node-OpenDroneMap currently running

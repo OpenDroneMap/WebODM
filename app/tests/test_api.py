@@ -321,6 +321,11 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data["hostname"] == "localhost")
 
+        # Verify online field exists
+        self.assertTrue("online" in res.data)
+
+        # Should be set to false
+        self.assertFalse(res.data['online'])
 
         # Cannot delete a processing node as normal user
         res = client.delete('/api/processingnodes/{}/'.format(pnode.id))

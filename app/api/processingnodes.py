@@ -10,6 +10,11 @@ from nodeodm.models import ProcessingNode
 
 
 class ProcessingNodeSerializer(serializers.ModelSerializer):
+    online = serializers.SerializerMethodField()
+
+    def get_online(self, obj):
+        return obj.is_online()
+
     class Meta:
         model = ProcessingNode
         fields = '__all__'
