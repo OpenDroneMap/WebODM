@@ -78,7 +78,7 @@ rebuild(){
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
 	run "rm -fr nodeodm/external/node-OpenDroneMap || sudo rm -fr nodeodm/external/node-OpenDroneMap"
 	run "docker-compose build --no-cache"
-	echo -e "\033[1mDone!\033[0m You can now start WebODM by running ./$0 start"
+	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 }
 
 if [[ $1 = "start" ]]; then
@@ -88,7 +88,7 @@ if [[ $1 = "start" ]]; then
 elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
-	docker-compose down
+	run "docker-compose down"
 elif [[ $1 = "rebuild" ]]; then
 	environment_check
 	echo  "Rebuilding WebODM..."
