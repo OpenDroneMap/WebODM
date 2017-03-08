@@ -45,8 +45,7 @@ class Project(models.Model):
     name = models.CharField(max_length=255, help_text="A label used to describe the project")
     description = models.TextField(null=True, blank=True, help_text="More in-depth description of the project")
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
-    deleting = models.BooleanField(db_index=True, default=False,
-                                         help_text="Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted.")
+    deleting = models.BooleanField(db_index=True, default=False, help_text="Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted.")
 
     def delete(self, *args):
         # No tasks?
@@ -173,6 +172,9 @@ class Task(models.Model):
         try:
             if os.path.exists(old_task_folder) and not os.path.exists(new_task_folder):
                 # Use parent, otherwise we get a duplicate directory in there
+                if not os.path.exists(new_task_folder_parent):
+                    os.makedirs(new_task_folder_parent)
+
                 shutil.move(old_task_folder, new_task_folder_parent)
 
                 logger.info("Moved task folder from {} to {}".format(old_task_folder, new_task_folder))
@@ -190,14 +192,11 @@ class Task(models.Model):
                     logger.info("Changing orthophoto path to {}".format(new_orthophoto_path))
                     self.orthophoto = GDALRaster(new_orthophoto_path, write=True)
             else:
-                logger.warning(
-                    "Project changed for task {}, but either {} doesn't exist, or {} already exists. This doesn't look right, so we will not move any files.".format(self,
+                logger.warning("Project changed for task {}, but either {} doesn't exist, or {} already exists. This doesn't look right, so we will not move any files.".format(self,
                                                                                                              old_task_folder,
                                                                                                              new_task_folder))
-        except shutil.Error as e:
-            logger.warning(
-                "Could not move assets folder for task {}. We're going to proceed anyway, but you might experience issues: {}".format(
-                    self, e))
+        except (shutil.Error, GDALException) as e:
+            logger.warning("Could not move assets folder for task {}. We're going to proceed anyway, but you might experience issues: {}".format(self, e))
 
     def save(self, *args, **kwargs):
         if self.project.id != self.__original_project_id:
@@ -208,9 +207,7 @@ class Task(models.Model):
         try:
             self.full_clean()
         except GDALException as e:
-            logger.warning(
-                "Problem while handling GDAL raster: {}. We're going to attempt to remove the reference to it...".format(
-                    e))
+            logger.warning("Problem while handling GDAL raster: {}. We're going to attempt to remove the reference to it...".format(e))
             self.orthophoto = None
 
         super(Task, self).save(*args, **kwargs)

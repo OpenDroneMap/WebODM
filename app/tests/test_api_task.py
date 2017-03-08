@@ -328,17 +328,22 @@ class TestApiTask(BootTransactionTestCase):
 
         # Reassigning the task to another project should move its assets
         self.assertTrue(os.path.exists(full_task_directory_path(task.id, project.id)))
-
-        self.assertTrue(len(task.imageupload_set) == 2)
+        self.assertTrue(task.orthophoto is not None)
+        self.assertTrue('project/{}/'.format(project.id) in task.orthophoto.name)
+        self.assertTrue(len(task.imageupload_set.all()) == 2)
+        for image in task.imageupload_set.all():
+            self.assertTrue('project/{}/'.format(project.id) in image.image.path)
 
         task.project = other_project
         task.save()
+        task.refresh_from_db()
         self.assertFalse(os.path.exists(full_task_directory_path(task.id, project.id)))
         self.assertTrue(os.path.exists(full_task_directory_path(task.id, other_project.id)))
 
-        # TODO: more testing
-        # - orthophoto path updated?
-        # - imageset paths updated?
+        self.assertTrue('project/{}/'.format(other_project.id) in task.orthophoto.name)
+
+        for image in task.imageupload_set.all():
+            self.assertTrue('project/{}/'.format(other_project.id) in image.image.path)
 
         image1.close()
         image2.close()
