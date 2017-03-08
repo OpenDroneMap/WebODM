@@ -427,9 +427,9 @@ class Task(models.Model):
             raise FileNotFoundError("{} does not exist".format(textured_mesh_directory))
 
         if not os.path.exists(archive_path):
-            shutil.make_archive(archive_path, 'zip', textured_mesh_directory)
-        else:
-            return archive_path
+            shutil.make_archive(os.path.splitext(archive_path)[0], 'zip', textured_mesh_directory)
+
+        return archive_path
 
     def delete(self, using=None, keep_parents=False):
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
