@@ -388,6 +388,11 @@ class Task(models.Model):
 
                                 logger.info("Imported orthophoto {} for {}".format(orthophoto_4326_path, self))
 
+                            # Remove old odm_texturing.zip archive (if any)
+                            textured_model_archive = self.assets_path(self.get_textured_model_filename())
+                            if os.path.exists(textured_model_archive):
+                                os.remove(textured_model_archive)
+
                             self.save()
                         else:
                             # FAILED, CANCELED
@@ -419,8 +424,11 @@ class Task(models.Model):
             }
         }
 
+    def get_textured_model_filename(self):
+        return "odm_texturing.zip"
+
     def get_textured_model_archive(self):
-        archive_path = self.assets_path("odm_texturing.zip")
+        archive_path = self.assets_path(self.get_textured_model_filename())
         textured_model_directory = self.assets_path("odm_texturing")
 
         if not os.path.exists(textured_model_directory):

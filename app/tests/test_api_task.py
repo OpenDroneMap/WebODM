@@ -218,7 +218,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # A textured mesh archive file should exist
-        self.assertTrue(os.path.exists(task.assets_path("odm_texturing.zip")))
+        self.assertTrue(os.path.exists(task.assets_path(task.get_textured_model_filename())))
 
         # Can download raw assets
         res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
