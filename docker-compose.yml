@@ -1,20 +1,25 @@
 # This configuration does not include a processing node
 # Which makes for faster setup times
 version: '2'
+volumes:
+  dbdata:
+    driver: local
+  appmedia:
+    driver: local
 services:
   db:
     build: ./db
     container_name: db
     ports:
-        - "5432"
+      - "5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
   webapp:
     build: .
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh"
     volumes:
-      - .:/webodm
-      - /webodm/nodeodm/external/node-OpenDroneMap/node_modules
-      - /webodm/node_modules
+      - appmedia:/webodm/app/media
     ports:
       - "8000:8000"
     depends_on:

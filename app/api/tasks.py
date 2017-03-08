@@ -34,7 +34,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
         exclude = ('processing_lock', 'console_output', 'orthophoto', )
-        #read_only_fields = ('project', 'images_count', 'processing_time', 'status', 'last_error', 'created_at', 'pending_action', ) #TODO: add uuid
+        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -146,6 +146,13 @@ class TaskViewSet(viewsets.ViewSet):
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
 
+        # Check that a user has access to reassign a project
+        if 'project' in request.data:
+            try:
+                get_and_check_project(request, request.data['project'], ('change_project', ))
+            except exceptions.NotFound:
+                raise exceptions.PermissionDenied()
+
         serializer = TaskSerializer(task, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -218,11 +225,20 @@ class TaskDownloads(TaskNestedView):
             allowed_assets = {
                 'all': 'all.zip',
                 'geotiff': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+                'texturedmodel': '_SEE_PATH_BELOW_',
                 'las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply.las'),
                 'ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
                 'csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv')
             }
 
+            # Generate textured mesh if requested
+            try:
+                if asset == 'texturedmodel':
+                    allowed_assets[asset] = os.path.basename(task.get_textured_model_archive())
+            except FileNotFoundError:
+                raise exceptions.NotFound("Asset does not exist")
+
+            # Check and download
             if asset in allowed_assets:
                 asset_path = task.assets_path(allowed_assets[asset])
 

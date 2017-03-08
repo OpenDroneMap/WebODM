@@ -15,7 +15,7 @@ from rest_framework.test import APIClient
 from app import pending_actions
 from app import scheduler
 from django.utils import timezone
-from app.models import Project, Task, ImageUpload, task_directory_path
+from app.models import Project, Task, ImageUpload, task_directory_path, full_task_directory_path
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
@@ -170,7 +170,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot download assets (they don't exist yet)
-        assets = ["all", "geotiff", "las", "csv", "ply"]
+        assets = ["all", "geotiff", "texturedmodel", "las", "csv", "ply"]
 
         for asset in assets:
             res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
@@ -216,6 +216,9 @@ class TestApiTask(BootTransactionTestCase):
         for asset in assets:
             res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        # A textured mesh archive file should exist
+        self.assertTrue(os.path.exists(task.assets_path(task.get_textured_model_filename())))
 
         # Can download raw assets
         res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
@@ -324,6 +327,26 @@ class TestApiTask(BootTransactionTestCase):
         # and not fail
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
+
+
+        # Reassigning the task to another project should move its assets
+        self.assertTrue(os.path.exists(full_task_directory_path(task.id, project.id)))
+        self.assertTrue(task.orthophoto is not None)
+        self.assertTrue('project/{}/'.format(project.id) in task.orthophoto.name)
+        self.assertTrue(len(task.imageupload_set.all()) == 2)
+        for image in task.imageupload_set.all():
+            self.assertTrue('project/{}/'.format(project.id) in image.image.path)
+
+        task.project = other_project
+        task.save()
+        task.refresh_from_db()
+        self.assertFalse(os.path.exists(full_task_directory_path(task.id, project.id)))
+        self.assertTrue(os.path.exists(full_task_directory_path(task.id, other_project.id)))
+
+        self.assertTrue('project/{}/'.format(other_project.id) in task.orthophoto.name)
+
+        for image in task.imageupload_set.all():
+            self.assertTrue('project/{}/'.format(other_project.id) in image.image.path)
 
         image1.close()
         image2.close()
