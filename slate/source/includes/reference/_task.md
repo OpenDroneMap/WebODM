@@ -115,7 +115,7 @@ Asset | Description
 ----- | -----------
 all   | Archive (.zip) containing all assets, including an orthophoto, TMS tiles, a textured 3D model and point cloud in various formats.
 geotiff | GeoTIFF orthophoto.
-texturedmesh | Archive (.zip) containing the textured 3D model
+texturedmodel | Archive (.zip) containing the textured 3D model
 las | Point cloud in .LAS format.
 ply | Point cloud in .PLY format.
 csv | Point cloud in .CSV format.

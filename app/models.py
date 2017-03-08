@@ -419,15 +419,15 @@ class Task(models.Model):
             }
         }
 
-    def get_textured_mesh_archive(self):
+    def get_textured_model_archive(self):
         archive_path = self.assets_path("odm_texturing.zip")
-        textured_mesh_directory = self.assets_path("odm_texturing")
+        textured_model_directory = self.assets_path("odm_texturing")
 
-        if not os.path.exists(textured_mesh_directory):
-            raise FileNotFoundError("{} does not exist".format(textured_mesh_directory))
+        if not os.path.exists(textured_model_directory):
+            raise FileNotFoundError("{} does not exist".format(textured_model_directory))
 
         if not os.path.exists(archive_path):
-            shutil.make_archive(os.path.splitext(archive_path)[0], 'zip', textured_mesh_directory)
+            shutil.make_archive(os.path.splitext(archive_path)[0], 'zip', textured_model_directory)
 
         return archive_path
 

@@ -225,7 +225,7 @@ class TaskDownloads(TaskNestedView):
             allowed_assets = {
                 'all': 'all.zip',
                 'geotiff': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
-                'texturedmesh': '_SEE_PATH_BELOW_',
+                'texturedmodel': '_SEE_PATH_BELOW_',
                 'las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply.las'),
                 'ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
                 'csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv')
@@ -233,8 +233,8 @@ class TaskDownloads(TaskNestedView):
 
             # Generate textured mesh if requested
             try:
-                if asset == 'texturedmesh':
-                    allowed_assets[asset] = os.path.basename(task.get_textured_mesh_archive())
+                if asset == 'texturedmodel':
+                    allowed_assets[asset] = os.path.basename(task.get_textured_model_archive())
             except FileNotFoundError:
                 raise exceptions.NotFound("Asset does not exist")
 

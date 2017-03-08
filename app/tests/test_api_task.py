@@ -170,7 +170,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot download assets (they don't exist yet)
-        assets = ["all", "geotiff", "texturedmesh", "las", "csv", "ply"]
+        assets = ["all", "geotiff", "texturedmodel", "las", "csv", "ply"]
 
         for asset in assets:
             res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))

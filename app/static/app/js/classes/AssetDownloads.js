@@ -32,7 +32,7 @@ const api = {
   all: function() {
     return [
       new AssetDownload("GeoTIFF","geotiff","fa fa-map-o"),
-      new AssetDownload("Textured Mesh","texturedmesh","fa fa-connectdevelop"),
+      new AssetDownload("Textured Model","texturedmodel","fa fa-connectdevelop"),
       new AssetDownload("LAS","las","fa fa-cube"),
       new AssetDownload("PLY","ply","fa fa-cube"),
       new AssetDownload("CSV","csv","fa fa-cube"),
