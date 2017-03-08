@@ -13,14 +13,13 @@ services:
     ports:
       - "5432"
     volumes:
-      - dbdata:/var/lib/postgresql
+      - dbdata:/var/lib/postgresql/data
   webapp:
     build: .
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh"
     volumes:
       - appmedia:/webodm/app/media
-      - /webodm/app/static/app/bundles
     ports:
       - "8000:8000"
     depends_on:

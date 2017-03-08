@@ -36,3 +36,5 @@ RUN npm install
 WORKDIR /webodm
 RUN npm install -g webpack
 RUN npm install
+
+VOLUME /webodm/app/media
