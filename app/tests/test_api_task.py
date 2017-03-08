@@ -170,7 +170,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot download assets (they don't exist yet)
-        assets = ["all", "geotiff", "las", "csv", "ply"]
+        assets = ["all", "geotiff", "texturedmesh", "las", "csv", "ply"]
 
         for asset in assets:
             res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
@@ -216,6 +216,9 @@ class TestApiTask(BootTransactionTestCase):
         for asset in assets:
             res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        # A textured mesh archive file should exist
+        self.assertTrue(os.path.exists(task.assets_path("odm_texturing.zip")))
 
         # Can download raw assets
         res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))

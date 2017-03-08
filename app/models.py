@@ -419,6 +419,18 @@ class Task(models.Model):
             }
         }
 
+    def get_textured_mesh_archive(self):
+        archive_path = self.assets_path("odm_texturing.zip")
+        textured_mesh_directory = self.assets_path("odm_texturing")
+
+        if not os.path.exists(textured_mesh_directory):
+            raise FileNotFoundError("{} does not exist".format(textured_mesh_directory))
+
+        if not os.path.exists(archive_path):
+            shutil.make_archive(archive_path, 'zip', textured_mesh_directory)
+        else:
+            return archive_path
+
     def delete(self, using=None, keep_parents=False):
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
                                            task_directory_path(self.id, self.project.id))

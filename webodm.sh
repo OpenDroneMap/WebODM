@@ -95,7 +95,7 @@ elif [[ $1 = "rebuild" ]]; then
 	rebuild
 elif [[ $1 = "update" ]]; then
 	echo "Updating WebODM..."
-	git pull origin master
+	run "git pull origin master"
 	run "docker pull opendronemap/node-opendronemap"
 	rebuild
 elif [[ $1 = "checkenv" ]]; then
