@@ -55,24 +55,12 @@ We recommend that you read the [Docker Documentation](https://docs.docker.com/) 
 
 ### Common Troubleshooting
 
-if you get the following error while starting WebODM:
-```bash
-from six.moves import _thread as thread
-ImportError: cannot import name _thread
-```
-
-Try running:
-```bash
-sudo pip install --ignore-installed six
-```
-
-If while processing the images you get an error message that contains any of the following words:
- - `MemoryError`
- - `Killed`
- 
-Make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
-
-If you are getting a `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` after an update, try to remove your WebODM folder and start from a fresh git clone.
+Sympthoms | Possible Solutions
+--------- | ------------------
+While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
+Task output shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
+After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` | Try to remove your WebODM folder and start from a fresh git clone
+Task fails with `Process exited with code null`, no task console output | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
