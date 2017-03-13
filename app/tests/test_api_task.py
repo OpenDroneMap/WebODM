@@ -28,7 +28,7 @@ from app.testwatch import testWatch
 from webodm import settings
 logger = logging.getLogger('app.logger')
 
-DELAY = 1  # time to sleep for during process launch, background processing, etc.
+DELAY = 2  # time to sleep for during process launch, background processing, etc.
 
 def start_processing_node():
     current_dir = os.path.dirname(os.path.realpath(__file__))
