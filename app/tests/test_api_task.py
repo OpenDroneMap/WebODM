@@ -371,10 +371,10 @@ class TestApiTask(BootTransactionTestCase):
         self.assertFalse(os.path.exists(task.assets_path("orthophoto_tiles")))
 
         # Available assets should be missing the geotiff type
-        # but other types are available
+        # but others such as texturedmodel should be available
         res = client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
         self.assertFalse('geotiff' in res.data['available_assets'])
-        self.assertTrue('las' in res.data['available_assets'])
+        self.assertTrue('texturedmodel' in res.data['available_assets'])
 
         image1.close()
         image2.close()
