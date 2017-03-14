@@ -12,6 +12,8 @@ from rest_framework import status, serializers, viewsets, filters, exceptions, p
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
+
+from nodeodm import status_codes
 from .common import get_and_check_project, get_tile_json, path_traversal_check
 
 from app import models, scheduler, pending_actions
@@ -27,9 +29,13 @@ class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
     images_count = serializers.SerializerMethodField()
+    available_assets = serializers.SerializerMethodField()
 
     def get_images_count(self, obj):
         return obj.imageupload_set.count()
+
+    def get_available_assets(self, obj):
+        return obj.get_available_assets()
 
     class Meta:
         model = models.Task
@@ -203,7 +209,7 @@ class TaskTilesJson(TaskNestedView):
             })
 
         if task.orthophoto_area is None:
-            raise exceptions.ValidationError("An orthophoto has not been processed for this task. Tiles are not available yet.")
+            raise exceptions.ValidationError("An orthophoto has not been processed for this task. Tiles are not available.")
 
         json = get_tile_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
@@ -222,38 +228,22 @@ class TaskDownloads(TaskNestedView):
             """
             task = self.get_and_check_task(request, pk, project_pk)
 
-            allowed_assets = {
-                'all': 'all.zip',
-                'geotiff': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
-                'texturedmodel': '_SEE_PATH_BELOW_',
-                'las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply.las'),
-                'ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
-                'csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv')
-            }
-
-            # Generate textured mesh if requested
+            # Check and download
             try:
-                if asset == 'texturedmodel':
-                    allowed_assets[asset] = os.path.basename(task.get_textured_model_archive())
+                asset_path = task.get_asset_download_path(asset)
             except FileNotFoundError:
                 raise exceptions.NotFound("Asset does not exist")
 
-            # Check and download
-            if asset in allowed_assets:
-                asset_path = task.assets_path(allowed_assets[asset])
+            if not os.path.exists(asset_path):
+                raise exceptions.NotFound("Asset does not exist")
 
-                if not os.path.exists(asset_path):
-                    raise exceptions.NotFound("Asset does not exist")
+            asset_filename = os.path.basename(asset_path)
 
-                asset_filename = os.path.basename(asset_path)
-
-                file = open(asset_path, "rb")
-                response = HttpResponse(FileWrapper(file),
-                                        content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
-                response['Content-Disposition'] = "attachment; filename={}".format(asset_filename)
-                return response
-            else:
-                raise exceptions.NotFound()
+            file = open(asset_path, "rb")
+            response = HttpResponse(FileWrapper(file),
+                                    content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
+            response['Content-Disposition'] = "attachment; filename={}".format(asset_filename)
+            return response
 
 """
 Raw access to the task's asset folder resources

@@ -59,6 +59,16 @@
         padding-bottom: 16px;
         padding-left: 16px;
 
+        .geotiff-warning{
+            margin-top: 16px;
+            i.fa{
+                color: #ff8000;
+            }
+            span{
+                font-size: 13px;
+            }
+        }
+
         .action-buttons{
             button{
                 margin-right: 4px;

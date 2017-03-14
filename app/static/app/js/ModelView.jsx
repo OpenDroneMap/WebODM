@@ -1046,6 +1046,8 @@ class ModelView extends React.Component {
 
   // React render
   render(){
+    const showSwitchModeButton = this.props.task.available_assets.indexOf('geotiff') !== -1;
+
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
           <div 
@@ -1057,9 +1059,10 @@ class ModelView extends React.Component {
                 message="Loading textured model..."
                 ref={(domNode) => { this.texturedModelStandby = domNode; }}
                 />
-              <SwitchModeButton 
-                task={this.props.task}
-                type="modelToMap" />
+              {showSwitchModeButton ? 
+                <SwitchModeButton 
+                  task={this.props.task}
+                  type="modelToMap" /> : ""}
             </div>
             <AssetDownloadButtons task={this.props.task} direction="up" />
       </div>);

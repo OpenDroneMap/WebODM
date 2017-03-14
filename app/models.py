@@ -70,7 +70,8 @@ class Project(models.Model):
 
     def get_tile_json_data(self):
         return [task.get_tile_json_data() for task in self.task_set.filter(
-                    status=status_codes.COMPLETED
+                    status=status_codes.COMPLETED,
+                    orthophoto__isnull=False
                 ).only('id', 'project_id')]
 
     class Meta:
@@ -116,6 +117,8 @@ def validate_task_options(value):
 
 
 class Task(models.Model):
+    ASSET_DOWNLOADS = ("all", "geotiff", "texturedmodel", "las", "csv", "ply",)
+
     STATUS_CODES = (
         (status_codes.QUEUED, 'QUEUED'),
         (status_codes.RUNNING, 'RUNNING'),
@@ -220,6 +223,28 @@ class Task(models.Model):
                             assets_directory_path(self.id, self.project.id, ""),
                             "assets",
                             *args)
+
+    def get_asset_download_path(self, asset):
+        """
+        Get the path to an asset download
+        :param asset: one of ASSET_DOWNLOADS
+        :return: path
+        """
+        if asset == 'texturedmodel':
+            return self.assets_path(os.path.basename(self.get_textured_model_archive()))
+        else:
+            map = {
+                'all': 'all.zip',
+                'geotiff': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+                'las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply.las'),
+                'ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
+                'csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv')
+            }
+
+            if asset in map:
+                return self.assets_path(map[asset])
+            else:
+                raise FileNotFoundError("{} is not a valid asset".format(asset))
 
     def process(self):
         """
@@ -438,6 +463,19 @@ class Task(models.Model):
             shutil.make_archive(os.path.splitext(archive_path)[0], 'zip', textured_model_directory)
 
         return archive_path
+
+    def get_available_assets(self):
+        # We make some assumptions for the sake of speed
+        # as checking the filesystem would be slow
+        if self.status == status_codes.COMPLETED:
+            assets = list(self.ASSET_DOWNLOADS)
+
+            if self.orthophoto is None:
+                assets.remove('geotiff')
+
+            return assets
+        else:
+            return []
 
     def delete(self, using=None, keep_parents=False):
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,

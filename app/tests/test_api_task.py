@@ -30,9 +30,9 @@ logger = logging.getLogger('app.logger')
 
 DELAY = 2  # time to sleep for during process launch, background processing, etc.
 
-def start_processing_node():
+def start_processing_node(*args):
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False,
+    node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'] + list(args), shell=False,
                                 cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
     time.sleep(DELAY)  # Wait for the server to launch
     return node_odm
@@ -170,9 +170,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot download assets (they don't exist yet)
-        assets = ["all", "geotiff", "texturedmodel", "las", "csv", "ply"]
-
-        for asset in assets:
+        for asset in task.ASSET_DOWNLOADS:
             res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
@@ -213,7 +211,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.status == status_codes.COMPLETED)
 
         # Can download assets
-        for asset in assets:
+        for asset in task.ASSET_DOWNLOADS:
             res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
@@ -347,6 +345,36 @@ class TestApiTask(BootTransactionTestCase):
 
         for image in task.imageupload_set.all():
             self.assertTrue('project/{}/'.format(other_project.id) in image.image.path)
+
+        node_odm.terminate()
+
+        # Restart node-odm as to not generate orthophotos
+        testWatch.clear()
+        node_odm = start_processing_node("--test_skip_orthophotos")
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'images': [image1, image2],
+            'name': 'test_task_no_orthophoto',
+            'processing_node': pnode.id,
+            'auto_processing_node': 'false'
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+
+        scheduler.process_pending_tasks()
+        time.sleep(DELAY)
+        scheduler.process_pending_tasks()
+
+        task = Task.objects.get(pk=res.data['id'])
+        self.assertTrue(task.status == status_codes.COMPLETED)
+
+        # Orthophoto files/directories should be missing
+        self.assertFalse(os.path.exists(task.assets_path("odm_orthophoto", "odm_orthophoto.tif")))
+        self.assertFalse(os.path.exists(task.assets_path("orthophoto_tiles")))
+
+        # Available assets should be missing the geotiff type
+        # but other types are available
+        res = client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
+        self.assertFalse('geotiff' in res.data['available_assets'])
+        self.assertTrue('las' in res.data['available_assets'])
 
         image1.close()
         image2.close()

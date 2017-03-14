@@ -29,7 +29,7 @@ class AssetDownloadButtons extends React.Component {
     }
 
     render(){
-        const assetDownloads = AssetDownloads.all();
+        const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
 
         return (<div className={"asset-download-buttons btn-group " + (this.props.direction === "up" ? "dropup" : "")}>
           <button type="button" className="btn btn-sm btn-primary" disabled={this.props.disabled} data-toggle="dropdown">
