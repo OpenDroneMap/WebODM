@@ -200,7 +200,7 @@ class TestApiTask(BootTransactionTestCase):
 
         # Processing should have started and a UUID is assigned
         task.refresh_from_db()
-        self.assertTrue(task.status == status_codes.RUNNING)
+        self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED]) # Sometimes the task finishes and we can't test for RUNNING state
         self.assertTrue(len(task.uuid) > 0)
 
         time.sleep(DELAY)
