@@ -309,7 +309,7 @@ class TaskListItem extends React.Component {
               {/* TODO: List of images? */}
 
               {showAssetsMissingWarning ? 
-              <div className="assets-warning"><i className="fa fa-warning"></i> <span>An orthophoto and point cloud could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
+              <div className="assets-warning"><i className="fa fa-warning"></i> <span>An orthophoto and point cloud could not be generated. To generate them, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
             </div>
             <div className="col-md-8">
               <Console 
