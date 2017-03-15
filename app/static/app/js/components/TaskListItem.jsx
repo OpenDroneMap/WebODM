@@ -224,7 +224,7 @@ class TaskListItem extends React.Component {
     if (!task.processing_node) status = "";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
-    let showAssetsMissingWarning = false;
+    let showGeotiffMissingWarning = false;
     let expanded = "";
     if (this.state.expanded){
       let actionButtons = [];
@@ -239,12 +239,13 @@ class TaskListItem extends React.Component {
           addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
-          addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
-            location.href = `/3d/project/${task.project}/task/${task.id}/`;
-          });
         }else{
-          showAssetsMissingWarning = true;
+          showGeotiffMissingWarning = true;
         }
+        
+        addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
+          location.href = `/3d/project/${task.project}/task/${task.id}/`;
+        });
       }
 
       // Ability to change options
@@ -308,8 +309,8 @@ class TaskListItem extends React.Component {
               : ""}
               {/* TODO: List of images? */}
 
-              {showAssetsMissingWarning ? 
-              <div className="assets-warning"><i className="fa fa-warning"></i> <span>An orthophoto and point cloud could not be generated. To generate them, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
+              {showGeotiffMissingWarning ? 
+              <div className="geotiff-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
             </div>
             <div className="col-md-8">
               <Console 
