@@ -9,11 +9,11 @@ usage(){
   echo "This program helps to setup a development environment for WebODM using docker."
   echo 
   echo "Command list:"
-  echo "	start		Start the development environment"
-  echo "	stop		Stop the development environment"
+  echo "	start			Start the development environment"
+  echo "	stop			Stop the development environment"
+  echo "	runtests [tests]	Run unit tests. You can specify an optional extra parameter such as app.tests.test_db to limit the scope of the tests. Defaults to running all tests."
   exit
 }
-
 
 run(){
 	echo $1
@@ -25,12 +25,22 @@ start(){
 }
 
 stop(){
-	./webodm.sh stop
+	run "./webodm.sh stop"
+}
+
+runtests(){
+	run "docker-compose exec webapp python manage.py test $1"
 }
 
 if [[ $1 = "start" ]]; then
 	echo "Starting development environment..."
 	start
+elif [[ $1 = "stop" ]]; then
+	echo "Stopping development environment..."
+	stop
+elif [[ $1 = "runtests" ]]; then
+	echo "Starting tests..."
+	runtests "$2"
 else
 	usage
 fi
