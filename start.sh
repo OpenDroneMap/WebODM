@@ -34,8 +34,25 @@ if [ $? -ne 0 ]; then
     exit
 fi
 
-echo Building asssets...
-webpack
+if [ $1 = "--setup-devenv" ] || [ $2 = "--setup-devenv" ]; then
+    echo Setup git modules...
+
+    git submodule init 
+    git submodule update
+    
+    echo Setup npm dependencies...
+    npm install
+    cd nodeodm/external/node-OpenDroneMap
+    npm install
+    cd /webodm
+
+    echo Setup webpack watch...
+    webpack --watch &
+else
+    # Normal startup
+    echo Building asssets...
+    webpack
+fi
 
 echo Running migrations
 python manage.py migrate
