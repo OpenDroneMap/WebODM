@@ -460,6 +460,14 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
   </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="w">
   </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
   </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"available_assets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"all"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"geotiff"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"texturedmodel"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"las"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"csv"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"ply"</span><span class="w">
+  </span><span class="p">],</span><span class="w">
   </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4338d684-91b4-49a2-b907-8ba171894393"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Task Name"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"processing_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">2197417</span><span class="p">,</span><span class="w">
@@ -505,6 +513,11 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <td>images_count</td>
 <td>int</td>
 <td>Number of images</td>
+</tr>
+<tr>
+<td>available_assets</td>
+<td>string[]</td>
+<td>List of <a href="#download-assets">assets</a> available for download</td>
 </tr>
 <tr>
 <td>uuid</td>
@@ -650,7 +663,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 
 <p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/</code></p>
 
-<p>After a task has been successfully processed, the user can download several assets from this URL.</p>
+<p>After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the <code class="prettyprint">geotiff</code> asset will be missing. You can check the <code class="prettyprint">available_assets</code> property of a <a href="#task">Task</a> to see which assets are available for download.</p>
 
 <table><thead>
 <tr>
@@ -665,6 +678,10 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <tr>
 <td>geotiff</td>
 <td>GeoTIFF orthophoto.</td>
+</tr>
+<tr>
+<td>texturedmodel</td>
+<td>Archive (.zip) containing the textured 3D model</td>
 </tr>
 <tr>
 <td>las</td>
@@ -785,7 +802,7 @@ These paths could change in future versions of WebODM. If the asset you need can
 <tr>
 <td>QUEUED</td>
 <td>10</td>
-<td><a href="#task">Task</a>&rsquo;s files have been uploaded to a <a href="#processing-node">#processing-node</a> and are waiting to be processed.</td>
+<td><a href="#task">Task</a>&rsquo;s files have been uploaded to a <a href="#processing-node">Processing Node</a> and are waiting to be processed.</td>
 </tr>
 <tr>
 <td>RUNNING</td>
@@ -816,6 +833,7 @@ These paths could change in future versions of WebODM. If the asset you need can
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"online"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
     </span><span class="s2">"hostname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w">
     </span><span class="s2">"api_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.1"</span><span class="p">,</span><span class="w">
@@ -845,6 +863,11 @@ take care of processing input images. Processing nodes are computers or virtual 
 <td>id</td>
 <td>int</td>
 <td>Unique Identifier</td>
+</tr>
+<tr>
+<td>online</td>
+<td>bool</td>
+<td>Whether the processing node could be reached in the last 5 minutes</td>
 </tr>
 <tr>
 <td>hostname</td>
@@ -1057,6 +1080,116 @@ model-wise (can a user add a project? can a user view projects?).</p>
 <p>Changes to the permissions of objects can be handled via the <code class="prettyprint">Administration</code> page of WebODM. </p>
 
 <p>We are planning to make it easier for users and developers to handle permissions via an API. This is a work in progress.</p>
+
+          <h1 id="for-developers">For Developers</h1>
+
+<h2 id="development-quickstart">Development Quickstart</h2>
+
+<ol>
+<li>Make a fork of the <a href="https://github.com/OpenDroneMap/WebODM/">WebODM repository</a></li>
+<li>Clone your repository in a directory</li>
+<li>Create a new branch: <code class="prettyprint">git checkout -b branchname</code>.</li>
+<li><a href="#setup-a-development-environment">Setup a development environment</a> either with <a href="#docker-setup">docker</a> or <a href="#native-setup">natively</a>.</li>
+<li>Commit the changes: <code class="prettyprint">git commit -a -m &quot;describe your changes&quot;</code></li>
+<li>Push the changes to your repository: <code class="prettyprint">git push origin branchname</code></li>
+<li>Create a <a href="https://github.com/OpenDroneMap/WebODM/compare">pull request</a> </li>
+</ol>
+
+<p>We don&rsquo;t have many rules. Follow the guidelines indicated in the <a href="https://github.com/OpenDroneMap/WebODM/blob/master/CONTRIBUTING.md">Contributing</a> document, be nice and you&rsquo;ll do great.</p>
+
+<h2 id="setup-a-development-environment">Setup a Development Environment</h2>
+
+<p>There are two ways to setup a development environment. The easiest one is to use <a href="#docker-setup">docker</a>.</p>
+
+<p>Once you have a development environment, read about the <a href="#project-overview">project overview</a> and get hacking!</p>
+
+<h3 id="docker-setup">Docker Setup</h3>
+
+<p>Follow the <a href="https://github.com/OpenDroneMap/WebODM#getting-started">Getting Started</a> instructions, then run:</p>
+
+<p><code class="prettyprint">./devenv.sh start</code></p>
+
+<p>That&rsquo;s it! You can modify any of the files, including SASS and React.js files. Changes will be reflected in the running WebODM instance automatically. </p>
+
+<h3 id="native-setup">Native Setup</h3>
+
+<p>If you can follow the instructions to <a href="https://github.com/OpenDroneMap/WebODM#run-it-natively">run WebODM natively</a>, you should be able to make changes to the code directly.</p>
+
+<h2 id="run-unit-tests">Run Unit Tests</h2>
+
+<p>We think testing is a necessary part of delivering robust software. We try to achieve complete test coverage for backend code, while we are more relaxed about front end testing. See <a href="https://github.com/OpenDroneMap/WebODM/issues/119">#119</a>.</p>
+
+<p>To run the unit tests, simply type:</p>
+
+<p><code class="prettyprint">./devenv.sh runtests</code></p>
+
+<h2 id="project-overview">Project Overview</h2>
+
+<h3 id="backend">Backend</h3>
+
+<p>The backend is based mainly on <a href="https://www.djangoproject.com/">Django</a> and <a href="http://www.django-rest-framework.org/">Django REST Framework</a>.</p>
+
+<p>We don&rsquo;t use much of Django&rsquo;s templating system, except for the <code class="prettyprint">Administration</code> and <code class="prettyprint">Processing Nodes</code> sections, since we found it too inflexible. Instead we use Django to expose an <a href="#reference">API</a>, which we then tie to a <a href="https://facebook.github.io/react/">React.js</a> app.</p>
+
+<p>Directories of interest are listed as follow:</p>
+
+<table><thead>
+<tr>
+<th>Directory</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code class="prettyprint">/app</code></td>
+<td>Main application, includes the UI components, API, tests and backend logic.</td>
+</tr>
+<tr>
+<td><code class="prettyprint">/nodeodm</code></td>
+<td>Application that bridges the communication between WebODM and <a href="https://github.com/OpenDroneMap/node-OpenDroneMap">node-OpenDroneMap</a>. Includes its own unit tests and models.</td>
+</tr>
+<tr>
+<td><code class="prettyprint">/webodm</code></td>
+<td>Django&rsquo;s main project directory. Setting files are here.</td>
+</tr>
+</tbody></table>
+
+<h3 id="frontend">Frontend</h3>
+
+<p>We use a <a href="https://facebook.github.io/react/">React.js</a> app (<a href="https://leanpub.com/understandinges6/read/">ES6</a> syntax) and <a href="http://sass-lang.com/">SCSS</a> for various UI components such as the dashboard. We use <a href="https://webpack.github.io/">webpack</a> to build intermediate components into a static bundle.</p>
+
+<p>Directories of interest are listed as follow:</p>
+
+<table><thead>
+<tr>
+<th>Directory</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code class="prettyprint">/app/templates/app</code></td>
+<td>Location of Django templates. While we don&rsquo;t use them a lot, we use them for a few pages and as a glue to bootstrap the React code.</td>
+</tr>
+<tr>
+<td><code class="prettyprint">/app/static/app/js</code></td>
+<td>Location of Javascript files for all UI components.</td>
+</tr>
+<tr>
+<td><code class="prettyprint">/app/static/app/js/components</code></td>
+<td>We try to separate components for reusability into various React components. Each component is stored here.</td>
+</tr>
+<tr>
+<td><code class="prettyprint">/app/static/app/js/css</code></td>
+<td>Each component should have its own SCSS file. Those files are stored here.</td>
+</tr>
+</tbody></table>
+
+<p><code class="prettyprint">/app/static/app/js/main.jsx</code> is the entry point for the UI. If you wonder how we tie Django and React.js together, this is the file to look at to begin your search.</p>
+
+<h3 id="documentation">Documentation</h3>
+
+<p>We use <a href="https://github.com/lord/slate">Slate</a> to generate our documentation. See their project&rsquo;s <a href="https://github.com/lord/slate/wiki">wiki</a> for information about making changes to the documentation.</p>
+
+<p>Documentation can be changed by modifying the files in <code class="prettyprint">/slate/source/includes</code>.</p>
 
       </div>
       <div class="dark-box">
