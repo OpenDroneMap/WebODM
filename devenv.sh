@@ -1,7 +1,8 @@
 #!/bin/bash
 set -eo pipefail
+__dirname=$(cd $(dirname "$0"); pwd -P)
 
-./webodm.sh checkenv
+${__dirname}/webodm.sh checkenv
 
 usage(){
   echo "Usage: $0 <command> [options]"
@@ -25,7 +26,7 @@ start(){
 }
 
 stop(){
-	run "./webodm.sh stop"
+	run "${__dirname}/webodm.sh stop"
 }
 
 runtests(){

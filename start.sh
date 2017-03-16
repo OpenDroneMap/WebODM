@@ -1,4 +1,6 @@
 #!/bin/bash
+__dirname=$(cd $(dirname "$0"); pwd -P)
+cd ${__dirname}
 
 echo -e "\033[92m"      
 echo " _       __     __    ____  ____  __  ___"
@@ -36,9 +38,8 @@ fi
 
 if [ $1 = "--setup-devenv" ] || [ $2 = "--setup-devenv" ]; then
     echo Setup git modules...
-
-    git submodule init 
-    git submodule update
+    
+    git submodule update --init
     
     echo Setup npm dependencies...
     npm install

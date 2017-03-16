@@ -32,7 +32,7 @@ If you can follow the instructions to [run WebODM natively](https://github.com/O
 
 ## Run Unit Tests
 
-We believe testing is a necessary part of deliverying software of a certain quality. We try to achieve complete test coverage for backend code, while we are more relaxed about front end testing. See [#119](https://github.com/OpenDroneMap/WebODM/issues/119).
+We think testing is a necessary part of delivering robust software. We try to achieve complete test coverage for backend code, while we are more relaxed about front end testing. See [#119](https://github.com/OpenDroneMap/WebODM/issues/119).
 
 To run the unit tests, simply type:
 
