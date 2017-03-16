@@ -1,4 +1,6 @@
 #!/bin/bash
+__dirname=$(cd $(dirname "$0"); pwd -P)
+cd ${__dirname}
 
 echo -e "\033[92m"      
 echo " _       __     __    ____  ____  __  ___"
@@ -34,8 +36,24 @@ if [ $? -ne 0 ]; then
     exit
 fi
 
-echo Building asssets...
-webpack
+if [ $1 = "--setup-devenv" ] || [ $2 = "--setup-devenv" ]; then
+    echo Setup git modules...
+    
+    git submodule update --init
+    
+    echo Setup npm dependencies...
+    npm install
+    cd nodeodm/external/node-OpenDroneMap
+    npm install
+    cd /webodm
+
+    echo Setup webpack watch...
+    webpack --watch &
+else
+    # Normal startup
+    echo Building asssets...
+    webpack
+fi
 
 echo Running migrations
 python manage.py migrate

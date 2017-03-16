@@ -14,8 +14,7 @@ RUN pip install -r requirements.txt
 
 ADD . /webodm/
 
-RUN git submodule init 
-RUN git submodule update
+RUN git submodule update --init
 
 # Install Node.js
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
