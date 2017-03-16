@@ -224,6 +224,7 @@ class TaskListItem extends React.Component {
     if (!task.processing_node) status = "";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
+    let showGeotiffMissingWarning = false;
     let expanded = "";
     if (this.state.expanded){
       let actionButtons = [];
@@ -234,9 +235,14 @@ class TaskListItem extends React.Component {
       };
       
       if (task.status === statusCodes.COMPLETED){
-        addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
-          location.href = `/map/project/${task.project}/task/${task.id}/`;
-        });
+        if (task.available_assets.indexOf("geotiff") !== -1){
+          addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
+            location.href = `/map/project/${task.project}/task/${task.id}/`;
+          });
+        }else{
+          showGeotiffMissingWarning = true;
+        }
+        
         addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
           location.href = `/3d/project/${task.project}/task/${task.id}/`;
         });
@@ -302,6 +308,9 @@ class TaskListItem extends React.Component {
                 </div>
               : ""}
               {/* TODO: List of images? */}
+
+              {showGeotiffMissingWarning ? 
+              <div className="geotiff-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
             </div>
             <div className="col-md-8">
               <Console 

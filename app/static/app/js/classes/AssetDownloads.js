@@ -43,6 +43,11 @@ const api = {
 
   excludeSeparators: function(){
     return api.all().filter(asset => !asset.separator);
+  },
+
+  // @param assets {String[]} list of assets (example: ['geotiff', 'las']))
+  only: function(assets){
+    return api.all().filter(asset => assets.indexOf(asset.asset) !== -1);
   }
 }
 

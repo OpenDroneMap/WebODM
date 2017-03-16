@@ -150,9 +150,8 @@ class Map extends React.Component {
         })
         .fail((_, __, err) => done(err))
       );
-
     }, err => {
-      if (err) this.setState({error: err.message});
+      if (err) this.setState({error: err.message || JSON.stringify(err)});
       else{
         this.map.fitBounds(this.mapBounds);
 

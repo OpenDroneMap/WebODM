@@ -45,8 +45,16 @@ class ModelView extends React.Component {
     return this.assetsPath() + '/odm_texturing/';
   }
 
+  hasGeoreferencedAssets(){
+    return this.props.task.available_assets.indexOf('geotiff') !== -1;
+  }
+
   objFilePath(){
-    return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.obj'; 
+    let file =  this.hasGeoreferencedAssets() ?
+                'odm_textured_model_geo.obj' : 
+                'odm_textured_model.obj';
+
+    return this.texturedModelDirectoryPath() + file; 
   }
 
   mtlFilename(){
@@ -64,7 +72,7 @@ class ModelView extends React.Component {
       sizeType:     "Adaptive",     // options: "Fixed", "Attenuated", "Adaptive"
       quality:    "Interpolation",  // options: "Squares", "Circles", "Interpolation", "Splats"
       fov:      75,         // field of view in degree
-      material:     "RGB",        // options: "RGB", "Height", "Intensity", "Classification"
+      material:     this.hasGeoreferencedAssets() ? "RGB" : "Elevation",        // options: "RGB", "Height", "Intensity", "Classification"
       pointLimit:   1,          // max number of points in millions
       navigation:   "Orbit",      // options: "Earth", "Orbit", "Flight"
       pointSize:    1.2
@@ -1046,6 +1054,8 @@ class ModelView extends React.Component {
 
   // React render
   render(){
+    const showSwitchModeButton = this.props.task.available_assets.indexOf('geotiff') !== -1;
+
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
           <div 
@@ -1057,9 +1067,10 @@ class ModelView extends React.Component {
                 message="Loading textured model..."
                 ref={(domNode) => { this.texturedModelStandby = domNode; }}
                 />
-              <SwitchModeButton 
-                task={this.props.task}
-                type="modelToMap" />
+              {showSwitchModeButton ? 
+                <SwitchModeButton 
+                  task={this.props.task}
+                  type="modelToMap" /> : ""}
             </div>
             <AssetDownloadButtons task={this.props.task} direction="up" />
       </div>);

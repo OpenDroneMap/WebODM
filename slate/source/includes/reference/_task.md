@@ -8,6 +8,14 @@
   "project": 27,
   "processing_node": 10,
   "images_count": 48,
+  "available_assets": [
+      "all",
+      "geotiff",
+      "texturedmodel",
+      "las",
+      "csv",
+      "ply"
+  ],
   "uuid": "4338d684-91b4-49a2-b907-8ba171894393",
   "name": "Task Name",
   "processing_time": 2197417,
@@ -34,6 +42,7 @@ id | int | Unique identifier
 project | int | [Project](#project) ID the task belongs to
 processing_node | int | The ID of the [Processing Node](#processing-node) this task has been assigned to, or `null` if no [Processing Node](#processing-node) has been assigned.
 images_count | int | Number of images
+available_assets | string[] | List of [assets](#download-assets) available for download 
 uuid | string | Unique identifier assigned by a [Processing Node](#processing-node) once processing has started.
 name | string | User defined name for the task
 processing_time | int | Milliseconds that have elapsed since the start of processing, or `-1` if no information is available. Useful for displaying a time status report to the user.
@@ -109,7 +118,7 @@ Retrieves all [Task](#task) items associated with `project_id`.
 
 `GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/`
 
-After a task has been successfully processed, the user can download several assets from this URL.
+After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the `geotiff` asset will be missing. You can check the `available_assets` property of a [Task](#task) to see which assets are available for download.
 
 Asset | Description
 ----- | -----------
@@ -189,7 +198,7 @@ RESTART | 3 | [Task](#task) is being restarted
 
 Status | Code | Description
 ----- | ---- | -----------
-QUEUED | 10 | [Task](#task)'s files have been uploaded to a [#processing-node](#processing-node) and are waiting to be processed.
+QUEUED | 10 | [Task](#task)'s files have been uploaded to a [Processing Node](#processing-node) and are waiting to be processed.
 RUNNING | 20 | [Task](#task) is currently being processed.
 FAILED | 30 | [Task](#task) has failed for some reason (not enough images, out of memory, Piero forgot to close a parenthesis, etc.)
 COMPLETED | 40 | [Task](#task) has completed. Assets are be ready to be downloaded.
