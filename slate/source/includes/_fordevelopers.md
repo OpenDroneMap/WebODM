@@ -10,7 +10,7 @@
 6. Push the changes to your repository: `git push origin branchname`
 7. Create a [pull request](https://github.com/OpenDroneMap/WebODM/compare) 
 
-We don't have many rules. Follow the guidelines indicated in the [Contributing](https://github.com/OpenDroneMap/WebODM/blob/master/CONTRIBUTING.md) document, be nice and you'll do great.
+We don't have many rules. Follow the guidelines indicated in the [Contributing](https://github.com/OpenDroneMap/WebODM/blob/master/CONTRIBUTING.md) document, be nice to others and you'll do great! :)
 
 ## Setup a Development Environment
 
@@ -32,7 +32,7 @@ If you can follow the instructions to [run WebODM natively](https://github.com/O
 
 ## Run Unit Tests
 
-We think testing is a necessary part of delivering robust software. We try to achieve complete test coverage for backend code, while we are more relaxed about front end testing. See [#119](https://github.com/OpenDroneMap/WebODM/issues/119).
+We think testing is a necessary part of delivering robust software. We try to achieve complete test coverage for backend code, while we are more relaxed about frontend testing. See [#119](https://github.com/OpenDroneMap/WebODM/issues/119).
 
 To run the unit tests, simply type:
 
