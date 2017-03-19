@@ -72,7 +72,7 @@ class ModelView extends React.Component {
       sizeType:     "Adaptive",     // options: "Fixed", "Attenuated", "Adaptive"
       quality:    "Interpolation",  // options: "Squares", "Circles", "Interpolation", "Splats"
       fov:      75,         // field of view in degree
-      material:     this.hasGeoreferencedAssets() ? "RGB" : "Elevation",        // options: "RGB", "Height", "Intensity", "Classification"
+      material:     "RGB",        // options: "RGB", "Height", "Intensity", "Classification"
       pointLimit:   1,          // max number of points in millions
       navigation:   "Orbit",      // options: "Earth", "Orbit", "Flight"
       pointSize:    1.2
