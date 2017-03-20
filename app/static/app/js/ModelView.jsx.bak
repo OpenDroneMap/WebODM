@@ -11,8 +11,10 @@ require('./vendor/OBJLoader');
 THREE.MTLLoader = require('./vendor/MTLLoader');
 THREE.OrbitControls = require('three-orbit-controls')(THREE);
 
+import Stats from './vendor/Stats';
 import dat from './vendor/dat.gui';
 import Potree from './vendor/potree';
+import ProgressBar from './vendor/potree/ProgressBar';
 
 class ModelView extends React.Component {
   static defaultProps = {
@@ -62,39 +64,6 @@ class ModelView extends React.Component {
 
   componentDidMount() {
     var container = this.container;
-
-    window.viewer = new Potree.Viewer(container);
-    viewer.setEDLEnabled(true);
-    viewer.setPointSize(1);
-    viewer.setMaterial("RGB"); // ["RGB", "Elevation", "Classification", "Intensity"]
-    viewer.setFOV(60);
-    viewer.setPointSizing("Adaptive"); // ["Fixed", "Attenuated", "Adaptive"]
-    viewer.setQuality("Squares"); // ["Squares", "Circles", "Interpolation"]
-    viewer.setPointBudget(1*1000*1000);
-    viewer.setIntensityRange(0, 300);
-    viewer.setWeightClassification(1);
-    viewer.setBackground("gradient"); // ["skybox", "gradient", "black", "white"];
-    viewer.loadSettingsFromURL();
-    
-    viewer.setDescription("Point cloud courtesy of <a target='_blank' href='https://www.sigeom.ch/'>sigeom sa</a>");
-    
-    viewer.loadGUI(() => {
-      viewer.setLanguage('en');
-      $("#menu_tools").next().show();
-      // viewer.toggleSidebar();
-    });
-    
-    // Sigeom
-    Potree.loadPointCloud(this.potreeFilePath(), "TODO.sa", e => {
-      let scene = viewer.scene;
-      scene.addPointCloud(e.pointcloud);
-      
-      //scene.view.position.set(589974.341, 231698.397, 986.146);
-      //scene.view.lookAt(new THREE.Vector3(589851.587, 231428.213, 715.634));
-       viewer.fitToScreen();
-    });
-
-    return;
 
     var sceneProperties = {
       path: this.potreeFilePath(),
@@ -1091,23 +1060,9 @@ class ModelView extends React.Component {
           <ErrorMessage bind={[this, "error"]} />
           <div 
             className="container"
+            ref={(domNode) => { this.container = domNode; }}
             style={{height: "100%", width: "100%", position: "relative"}} 
             onContextMenu={(e) => {e.preventDefault();}}>
-
-              <div 
-                id="potree_render_area" 
-                ref={(domNode) => { this.container = domNode; }}>
-                  <div id="potree_map" className="mapBox">
-                    <div id="potree_map_header">
-                    </div>
-                    <div id="potree_map_content" className="map"></div>
-                  </div>
-
-                <div id="potree_description" className="potree_info_text"></div>
-              </div>
-
-              <div id="potree_sidebar_container"> </div>
-
               <Standby 
                 message="Loading textured model..."
                 ref={(domNode) => { this.texturedModelStandby = domNode; }}
@@ -1123,4 +1078,3 @@ class ModelView extends React.Component {
 }
 
 export default ModelView;
-    
