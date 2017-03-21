@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_nested',
     'webpack_loader',
+    'corsheaders',
 #    'debug_toolbar',
     'app',
     'nodeodm',
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -200,6 +202,9 @@ LOGGING = {
 # Auth
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
+
+# CORS (very relaxed settings, users might want to change this in production)
+CORS_ORIGIN_ALLOW_ALL = True
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
