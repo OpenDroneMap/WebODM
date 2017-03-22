@@ -1,7 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  */
-var THREE = require('three');
+var THREE = require('./potree/js/three');
 
 THREE.OBJLoader = function ( manager ) {
 

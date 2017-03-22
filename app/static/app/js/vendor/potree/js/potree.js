@@ -1,16 +1,24 @@
-const THREE = require('three'); // import does not work :/
+const THREE = require('./three.js'); // import does not work :/
 import './ImageUtils';
 import './jquery-ui';
-import './jquery-ui.css';
 import BinaryHeap from './BinaryHeap';
 import proj4 from 'proj4';
-import Stats from './Stats';
 import TWEEN from 'tween.js';
-import ol from 'openlayers';
 import $ from 'jquery';
-import i18n from 'i18next';
+import i18n from './i18next';
+import jqueryi18n from 'jquery-i18next';
+import d3 from 'd3';
 
-console.log(i18n);
+jqueryi18n.init(i18n, $, {
+  tName: 't', // --> appends $.t = i18next.t
+  i18nName: 'i18n', // --> appends $.i18n = i18next
+  handleName: 'i18n', // --> appends $(selector).localize(opts);
+  selectorAttr: 'data-i18n', // selector for translating elements
+  targetAttr: 'i18n-target', // data-() attribute to grab target element to translate (if diffrent then itself)
+  optionsAttr: 'i18n-options', // data-() attribute that contains options, will load/set if useOptionsAttr = true
+  useOptionsAttr: false, // see optionsAttr
+  parseDefaultValueFromContent: false // parses default values from content ele.val or ele.text
+});
 
 function Potree(){
 
@@ -12754,11 +12762,6 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 
 		this.progressBar = new ProgressBar();
 
-		this.stats = new Stats();
-		this.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-		document.body.appendChild( this.stats.dom );
-		this.stats.dom.style.left = "100px";
-		
 		this.potreeRenderer = null;
 		this.highQualityRenderer = null;
 		this.edlRenderer = null;
@@ -12809,11 +12812,10 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 				}
 				
 				
-				//if(e.pointcloud.projection){
-				//	this.mapView = new Potree.MapView(this);
-				//	this.mapView.init();
-				//}
-				
+				// if(e.pointcloud.projection){
+				// 	this.mapView = new Potree.MapView(this);
+				// 	this.mapView.init();
+				// }
 			};
 			
 			this.addEventListener("scene_changed", (e) => {
@@ -13800,7 +13802,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 
 	loadGUI(callback){
 		var sidebarContainer = $('#potree_sidebar_container');
-		sidebarContainer.load(new URL(Potree.scriptPath + "/sidebar.html").href, () => {
+		// sidebarContainer.load(new URL(Potree.scriptPath + "/sidebar_webodm.html").href, () => {
 			
 			sidebarContainer.css("width", "300px");
 			sidebarContainer.css("height", "100%");
@@ -13819,9 +13821,9 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 			viewer.renderArea.insertBefore(imgMapToggle, viewer.renderArea.children[0]);
 			viewer.renderArea.insertBefore(imgMenuToggle, viewer.renderArea.children[0]);
 			
-			this.mapView = new Potree.MapView(this);
-			this.mapView.init();
-			
+			// this.mapView = new Potree.MapView(this);
+			// this.mapView.init();
+
 			i18n.init({ 
 				lng: 'en',
 				resGetPath: Potree.resourcePath + '/lang/__lng__/__ns__.json',
@@ -13830,7 +13832,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 				debug: false
 				}, function(t) { 
 				// Start translation once everything is loaded
-				// $("body").i18n();
+				$("body").i18n();
 			});
 			
 			$(function() {
@@ -13846,15 +13848,12 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 				}
 			});
 			
-		});
-		
-		
-		
+		// });
 	}
     
     setLanguage(lang){
-        // i18n.setLng(lang);
-        // $("body").i18n();
+        i18n.setLng(lang);
+        $("body").i18n();
     }	
 	
 	initThree(){
@@ -14224,8 +14223,6 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		
 		requestAnimationFrame(this.loop.bind(this));
 		
-		this.stats.begin();
-		
 		//var start = new Date().getTime();
 		this.update(this.clock.getDelta(), timestamp);
 		//var end = new Date().getTime();
@@ -14268,9 +14265,6 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		//	var w = this.open();
 		//	w.document.write('<img src="'+screenshot+'"/>');
 		//}	
-		
-		this.stats.end();
-
 		
 		Potree.framenumber++;
 	};
@@ -15845,7 +15839,7 @@ Potree.MapView = class{
 	init(){
 		$( "#potree_map" ).draggable({ handle: $('#potree_map_header') });
 		$( "#potree_map" ).resizable();
-		//$( "#potree_map_toggle" ).css("display", "block");
+		$( "#potree_map_toggle" ).css("display", "block");
 	
 		let extentsLayer = this.getExtentsLayer();
 		let cameraLayer = this.getCameraLayer();
@@ -17592,7 +17586,7 @@ function initMeasurementDetails(){
 					scene.removeEventListener("marker_added", updateDisplay);
 					scene.removeEventListener("marker_removed", updateDisplay);
 					scene.removeEventListener("marker_moved", updateDisplay);
-					$(elLi).remove();
+					$(element).remove();
 				}
 			};
 		
@@ -17804,8 +17798,7 @@ let initSidebar = function(){
 	initSceneList();
 	initSettings()
 	
-	$('#potree_version_number').html(Potree.version.major + "." + Potree.version.minor + Potree.version.suffix);
-	// $('.perfect_scrollbar').perfectScrollbar();
+	$('#potree_version_number').html("Potree " + Potree.version.major + "." + Potree.version.minor + Potree.version.suffix);
 }
 class HoverMenuItem{
 

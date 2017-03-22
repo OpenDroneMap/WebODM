@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author Daosheng Mu / https://github.com/DaoshengMu/
  */
-const THREE = require('three'); // import does not work :/
+const THREE = require('./three'); // import does not work :/
 THREE.ImageUtils = {
 
 	crossOrigin: undefined,
