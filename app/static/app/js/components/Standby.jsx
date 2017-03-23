@@ -3,20 +3,23 @@ import '../css/Standby.scss';
 
 class Standby extends React.Component {
   static defaultProps = {
-      message: ""
+      message: "",
+      show: false
   };
 
   static propTypes = {
-    message: React.PropTypes.string
+    message: React.PropTypes.string,
+    show: React.PropTypes.bool
   };
 
   constructor(props){
     super(props);
 
-    this.state = {
-      message: props.message,
-      show: false
-    }
+    this.state = props;
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.setState(nextProps);
   }
 
   show(message = null){

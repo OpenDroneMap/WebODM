@@ -303,7 +303,7 @@ class TestApiTask(BootTransactionTestCase):
         # Another step and it should have acquired a UUID
         scheduler.process_pending_tasks()
         task.refresh_from_db()
-        self.assertTrue(task.status is status_codes.RUNNING)
+        self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])
         self.assertTrue(len(task.uuid) > 0)
 
         # Another step and it should be completed
