@@ -89,22 +89,17 @@ class ModelView extends React.Component {
 
     // Sigeom
     Potree.loadPointCloud(this.potreeFilePath(), "", e => {
+      if (e.type == "loading_failed"){
+        this.setState({error: "Could not load point cloud. This task doesn't seem to have one. Try processing the task again."});
+        return;
+      }
+
       let scene = viewer.scene;
       scene.addPointCloud(e.pointcloud);
       this.pointCloud = e.pointcloud;
       
-      //scene.view.position.set(589974.341, 231698.397, 986.146);
-      //scene.view.lookAt(new THREE.Vector3(589851.587, 231428.213, 715.634));
-       viewer.fitToScreen();
-    });
-
-    
-          // if (error){
-          //   console.log(error);
-          //   this.setState({error: "Could not load point cloud. This task doesn't seem to have one. Try processing the task again."});
-          //   return;
-          // }
-      
+      viewer.fitToScreen();
+    });     
   }
 
   toggleTexturedModel(e){
@@ -149,7 +144,9 @@ class ModelView extends React.Component {
                 viewer.scene.scene.add(object);
 
                 this.modelReference = object;
-                this.pointCloud.visible = false;
+
+                this.viewerOpacity = viewer.getOpacity();
+                viewer.setOpacity(0);
 
                 this.setState({
                   initializingModel: false,
@@ -159,11 +156,14 @@ class ModelView extends React.Component {
       }else{
         // Already initialized
         this.modelReference.visible = true;
-        this.pointCloud.visible = false;
+
+        this.viewerOpacity = viewer.getOpacity();
+        viewer.setOpacity(0);
       }
     }else{
       this.modelReference.visible = false;
-      this.pointCloud.visible = true;
+
+      viewer.setOpacity(this.viewerOpacity);
     }
   }
 

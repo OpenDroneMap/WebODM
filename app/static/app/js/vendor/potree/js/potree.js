@@ -1849,6 +1849,10 @@ Potree.POCLoader.load = function load(url, callback) {
 				callback(pco);
 			}
 		};
+
+		xhr.onloadend = function() {
+		    if(xhr.status == 404) callback();
+		};
 		
 		xhr.send(null);
 	}catch(e){
@@ -12641,8 +12645,8 @@ Potree.Scene = class extends THREE.EventDispatcher{
 		var light = new THREE.AmbientLight( 0x555555 ); // soft white light
 		this.scenePointCloud.add( light );
 		
-		let grid = Potree.utils.createGrid(5, 5, 2);
-		this.scene.add(grid);
+		// let grid = Potree.utils.createGrid(5, 5, 2);
+		// this.scene.add(grid);
 		
 		{// background
 		// var texture = THREE.ImageUtils.loadTexture( Potree.resourcePath + '/textures/background.gif' );
