@@ -170,6 +170,7 @@ class ModelView extends React.Component {
   // React render
   render(){
     const showSwitchModeButton = this.props.task.available_assets.indexOf('geotiff') !== -1;
+    const hideWithTexturedModel = {display: this.state.showTexturedModel ? "none" : "block"};
 
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
@@ -211,10 +212,10 @@ class ModelView extends React.Component {
                         type="modelToMap" /> : ""}
                   </div>
 
-                  <div className="accordion" style={{display: this.state.showTexturedModel ? "none" : "block"}}>
+                  <div className="accordion">
                   
-                    <h3 id="menu_appearance"><span data-i18n="tb.rendering_opt"></span></h3>
-                    <div>
+                    <h3 id="menu_appearance" style={hideWithTexturedModel}><span data-i18n="tb.rendering_opt"></span></h3>
+                    <div style={hideWithTexturedModel}>
                       <ul className="pv-menu-list">
                       <li><span data-i18n="appearance.nb_max_pts"></span>:<span id="lblPointBudget"></span> <div id="sldPointBudget"></div> </li>
                       <li><span data-i18n="appearance.point_size"></span>:<span id="lblPointSize"></span> <div id="sldPointSize"></div>   </li>
@@ -269,9 +270,9 @@ class ModelView extends React.Component {
                       <ul className="pv-menu-list">
                         <div>
                         
-                          <li id="tools"></li>
+                          <li id="tools" style={hideWithTexturedModel}></li>
                           
-                          <div className="divider">
+                          <div className="divider" style={hideWithTexturedModel}>
                             <span>Navigation</span>
                           </div>
                           <li id="navigation"></li>
@@ -281,18 +282,18 @@ class ModelView extends React.Component {
                       </ul>
                     </div>
 
-                    <h3 id="menu_measurements"><span data-i18n="tb.measurments_opt"></span></h3>
-                    <div>
+                    <h3 id="menu_measurements" style={hideWithTexturedModel}><span data-i18n="tb.measurments_opt"></span></h3>
+                    <div style={hideWithTexturedModel}>
                       <ul className="pv-menu-list selectable" id="measurement_details"></ul>
                     </div>
                     
-                    <h3 id="menu_annotations"><span data-i18n="tb.annotations_opt"></span></h3>
-                    <div>
+                    <h3 id="menu_annotations" style={hideWithTexturedModel}><span data-i18n="tb.annotations_opt"></span></h3>
+                    <div style={hideWithTexturedModel}>
                       <ul className="pv-menu-list selectable" id="annotation_details"></ul>
                     </div>
                     
-                    <h3 id="menu_materials"><span data-i18n="tb.materials_opt"></span></h3>
-                    <div>
+                    <h3 id="menu_materials" style={hideWithTexturedModel}><span data-i18n="tb.materials_opt"></span></h3>
+                    <div style={hideWithTexturedModel}>
                       <ul className="pv-menu-list">
                       <li>
                          <label htmlFor="optMaterial" className="pv-select-label">Attributes:</label><br/>
@@ -354,8 +355,8 @@ class ModelView extends React.Component {
                       
                       </ul>
                     </div>
-                    <h3 id="menu_scene"><span data-i18n="tb.scene_opt"></span></h3>
-                    <div>
+                    <h3 id="menu_scene" style={hideWithTexturedModel}><span data-i18n="tb.scene_opt"></span></h3>
+                    <div style={hideWithTexturedModel}>
                       <ul className="pv-menu-list selectable">
                         <div>
                           <li><span data-i18n="scene.camera_position"></span>:<span id="lblCameraPosition"></span></li>
@@ -365,13 +366,13 @@ class ModelView extends React.Component {
                       </ul>
                     </div>
                   
-                    <h3 id="menu_classification"><span data-i18n="tb.classification_filter_opt"></span></h3>
-                    <div>
+                    <h3 id="menu_classification" style={hideWithTexturedModel}><span data-i18n="tb.classification_filter_opt"></span></h3>
+                    <div style={hideWithTexturedModel}>
                       <ul id="classificationList" className="pv-menu-list"></ul>
                     </div>
                   
-                    <h3 id="menu_other_settings"><span data-i18n="tb.parameters_opt"></span></h3>
-                    <div>
+                    <h3 id="menu_other_settings" style={hideWithTexturedModel}><span data-i18n="tb.parameters_opt"></span></h3>
+                    <div style={hideWithTexturedModel}>
                       <ul className="pv-menu-list">
                         <li><span data-i18n="appearance.min_node_size"></span><span id="lblMinNodeSize"></span><div id="sldMinNodeSize"></div>  </li>
                         <li>
@@ -387,51 +388,51 @@ class ModelView extends React.Component {
                       </ul>
                       </div>
                       
-                      <h3 id="menu_about"><span data-i18n="tb.about_opt"></span></h3>
-                      <div>
-                      <ul className="pv-menu-list">
-                        <li><a href="http://potree.org" target="_blank">Potree</a> is a viewer for large point cloud / LIDAR data sets, developed at the Vienna University of Technology. 
-                        <a href="https://github.com/potree/potree" target="_blank">(github)</a>
-                        </li>
-                        <li>Author: <a href="mailto:mschuetz@potree.org">Markus Sch&uuml;tz</a></li>
-                        <li>License: <a target="_blank" href="http://potree.org/wp/potree_license/">FreeBSD (2-clause BSD)</a></li>
-                        <li>Libraries:
-                          <ul>
-                            <li><a target="_blank" href="http://threejs.org/">three.js</a></li>
-                            <li><a target="_blank" href="https://jquery.com/">Jquery</a></li>
-                            <li><a target="_blank" href="http://www.laszip.org/">laszip</a></li>
-                            <li><a target="_blank" href="https://github.com/verma/plasio">Plas.io (laslaz) </a></li>
-                            <li><a target="_blank" href="http://openlayers.org/">OpenLayers3</a></li>
-                            <li><a target="_blank" href="http://proj4js.org/">proj4js</a></li>
-                            <li><a target="_blank" href="https://github.com/tweenjs/tween.js/">tween</a></li>
-                            <li><a target="_blank" href="https://github.com/i18next/i18next/">i18next</a></li>
-                          </ul>
-                        </li>
-                        <li>Donators:
-                          <ul>
-                            <li><a target="_blank" href="http://rapidlasso.com/">rapidlasso</a></li>
-                            <li><a target="_blank" href="https://georepublic.info/en/">georepublic</a></li>
-                            <li><a target="_blank" href="http://sitn.ne.ch/">sitn</a></li>
-                            <li><a target="_blank" href="http://www.veesus.com/veesus/index.php">Veesus</a></li>
-                            <li><a target="_blank" href="http://sigeom.ch/">sigeom sa</a></li>
-                            <li><a target="_blank" href="http://archpro.lbg.ac.at/">LBI ArchPro</a></li>
-                          </ul>
-                        </li>
-                        <li>Credits:
-                          <ul>
-                            <li><a target="_blank" href="https://www.cg.tuwien.ac.at/staff/MichaelWimmer.html">Michael Wimmer</a> &amp; 
-                              <a target="_blank" href="https://www.cg.tuwien.ac.at/staff/ClausScheiblauer.html">Claus Scheiblauer</a></li>
-                            <li><a target="_blank" href="https://www.cg.tuwien.ac.at/">TU Wien, Insitute of Computer Graphics and Algorithms</a></li>
-                            <li><a target="_blank" href="https://harvest4d.org/">Harvest4D</a></li>
-                            <li><a target="_blank" href="http://rapidlasso.com/">rapidlasso</a></li>
-                            <li><a target="_blank" href="https://georepublic.info/en/">georepublic</a></li>
-                            <li><a target="_blank" href="http://hobu.co/">Howard Butler, Uday Verma, Connor Manning</a></li>
-                            <li><a target="_blank" href="http://www.danielgm.net/cc/">Cloud Compare</a></li>
-                            <li><a target="_blank" href="http://sitn.ne.ch/">sitn</a></li>
-                          </ul>
-                        </li>
-                      </ul>
-                      </div>
+                    <h3 id="menu_about"><span data-i18n="tb.about_opt"></span></h3>
+                    <div>
+                    <ul className="pv-menu-list">
+                      <li><a href="http://potree.org" target="_blank">Potree</a> is a viewer for large point cloud / LIDAR data sets, developed at the Vienna University of Technology. 
+                      <a href="https://github.com/potree/potree" target="_blank">(github)</a>
+                      </li>
+                      <li>Author: <a href="mailto:mschuetz@potree.org">Markus Sch&uuml;tz</a></li>
+                      <li>License: <a target="_blank" href="http://potree.org/wp/potree_license/">FreeBSD (2-clause BSD)</a></li>
+                      <li>Libraries:
+                        <ul>
+                          <li><a target="_blank" href="http://threejs.org/">three.js</a></li>
+                          <li><a target="_blank" href="https://jquery.com/">Jquery</a></li>
+                          <li><a target="_blank" href="http://www.laszip.org/">laszip</a></li>
+                          <li><a target="_blank" href="https://github.com/verma/plasio">Plas.io (laslaz) </a></li>
+                          <li><a target="_blank" href="http://openlayers.org/">OpenLayers3</a></li>
+                          <li><a target="_blank" href="http://proj4js.org/">proj4js</a></li>
+                          <li><a target="_blank" href="https://github.com/tweenjs/tween.js/">tween</a></li>
+                          <li><a target="_blank" href="https://github.com/i18next/i18next/">i18next</a></li>
+                        </ul>
+                      </li>
+                      <li>Donators:
+                        <ul>
+                          <li><a target="_blank" href="http://rapidlasso.com/">rapidlasso</a></li>
+                          <li><a target="_blank" href="https://georepublic.info/en/">georepublic</a></li>
+                          <li><a target="_blank" href="http://sitn.ne.ch/">sitn</a></li>
+                          <li><a target="_blank" href="http://www.veesus.com/veesus/index.php">Veesus</a></li>
+                          <li><a target="_blank" href="http://sigeom.ch/">sigeom sa</a></li>
+                          <li><a target="_blank" href="http://archpro.lbg.ac.at/">LBI ArchPro</a></li>
+                        </ul>
+                      </li>
+                      <li>Credits:
+                        <ul>
+                          <li><a target="_blank" href="https://www.cg.tuwien.ac.at/staff/MichaelWimmer.html">Michael Wimmer</a> &amp; 
+                            <a target="_blank" href="https://www.cg.tuwien.ac.at/staff/ClausScheiblauer.html">Claus Scheiblauer</a></li>
+                          <li><a target="_blank" href="https://www.cg.tuwien.ac.at/">TU Wien, Insitute of Computer Graphics and Algorithms</a></li>
+                          <li><a target="_blank" href="https://harvest4d.org/">Harvest4D</a></li>
+                          <li><a target="_blank" href="http://rapidlasso.com/">rapidlasso</a></li>
+                          <li><a target="_blank" href="https://georepublic.info/en/">georepublic</a></li>
+                          <li><a target="_blank" href="http://hobu.co/">Howard Butler, Uday Verma, Connor Manning</a></li>
+                          <li><a target="_blank" href="http://www.danielgm.net/cc/">Cloud Compare</a></li>
+                          <li><a target="_blank" href="http://sitn.ne.ch/">sitn</a></li>
+                        </ul>
+                      </li>
+                    </ul>
+                    </div>
                   </div>
                 </div>
               </div>

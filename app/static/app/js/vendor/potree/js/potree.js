@@ -16442,7 +16442,7 @@ function initToolbar(){
 	// POINT
 	elToolbar.appendChild(createToolIcon(
 		Potree.resourcePath + "/icons/point.svg",
-		"[title]tt.angle_measurement",
+		"[title]tt.coord_measurement",
 		function(){
 			$("#menu_measurements").next().slideDown();
 			viewer.measuringTool.startInsertion({

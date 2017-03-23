@@ -78,7 +78,7 @@
                 &:hover{
                     background-color: #f4f4f4;
                 }
-            }        
+            }      
         }
     }
     
@@ -115,12 +115,12 @@
     }
 
     #potree_sidebar_container{
-        a{
-            color: #111;
-        }
-
         overflow-y: auto;
         background-color: #19282c;
+
+        a{
+            color: #111;
+        }  
 
         #sidebar_root{
             width: 300px;
@@ -131,6 +131,10 @@
                 .divider{
                     padding: 10px 0px 15px 0px;
                 }
+
+                a{
+                    color: #8Aa1c4;
+                } 
             }
 
             .measurement-panel-remove:hover{
