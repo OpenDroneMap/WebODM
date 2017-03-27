@@ -17,7 +17,8 @@ class TaskListItem extends React.Component {
       time: props.data.processing_time,
       actionError: "",
       actionButtonsDisabled: false,
-      editing: false
+      editing: false,
+      memoryError: false
     }
 
     for (let k in props.data){
@@ -29,6 +30,7 @@ class TaskListItem extends React.Component {
     this.stopEditing = this.stopEditing.bind(this);
     this.startEditing = this.startEditing.bind(this);
     this.updateTask = this.updateTask.bind(this);
+    this.checkForMemoryError = this.checkForMemoryError.bind(this);
   }
 
   shouldRefresh(){
@@ -76,6 +78,10 @@ class TaskListItem extends React.Component {
           }else{
             this.setState({time: this.state.task.processing_time});
             this.unloadTimer();
+          }
+
+          if (this.state.task.status !== statusCodes.FAILED){
+            this.setState({memoryError: false});
           }
         }
       }else{
@@ -215,6 +221,14 @@ class TaskListItem extends React.Component {
     return d;
   }
 
+  checkForMemoryError(lines){
+    for (let line of lines){
+      if (line.indexOf("Killed") !== -1 || line.indexOf("MemoryError") !== -1){
+        this.setState({memoryError: true});
+      }
+    }
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : `Task #${task.id}`;
@@ -224,9 +238,11 @@ class TaskListItem extends React.Component {
     if (!task.processing_node) status = "";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
-    let showGeotiffMissingWarning = false;
     let expanded = "";
     if (this.state.expanded){
+      let showGeotiffMissingWarning = false,
+          showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED;
+
       let actionButtons = [];
       const addActionButton = (label, className, icon, onClick) => {
         actionButtons.push({
@@ -291,6 +307,7 @@ class TaskListItem extends React.Component {
                 )
             })}
           </div>);
+
       expanded = (
         <div className="expanded-panel">
           <div className="row">
@@ -310,8 +327,8 @@ class TaskListItem extends React.Component {
               {/* TODO: List of images? */}
 
               {showGeotiffMissingWarning ? 
-              <div className="geotiff-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
-            </div>
+              <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
+              </div>
             <div className="col-md-8">
               <Console 
                 source={this.consoleOutputUrl} 
@@ -319,7 +336,11 @@ class TaskListItem extends React.Component {
                 autoscroll={true}
                 height={200} 
                 ref={domNode => this.console = domNode}
+                onAddLines={this.checkForMemoryError}
                 />
+
+              {showMemoryErrorWarning ? 
+              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href="http://stackoverflow.com/a/39720010" target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>Advanced Options</a>.</span></div> : ""}
             </div>
           </div>
           <div className="row">
