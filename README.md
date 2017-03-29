@@ -66,7 +66,7 @@ Have you had other issues? Please [report them](https://github.com/OpenDroneMap/
 
 ### Add More Processing Nodes
 
-WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/pierotofy/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
+WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
 
 ### Security
 
@@ -169,6 +169,7 @@ Should all work without errors.
 - [ ] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner
+- [ ] Plugins/Webhooks System
 - [X] API
 - [X] Documentation
 - [ ] Android Mobile App
