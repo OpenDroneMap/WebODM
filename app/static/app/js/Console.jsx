@@ -15,6 +15,7 @@ class Console extends React.Component {
 
     if (typeof props.children === "string"){
       this.state.lines = props.children.split('\n');
+      if (this.props.onAddLines) this.props.onAddLines(this.state.lines);
     }
 
     this.autoscroll = props.autoscroll === true;
@@ -96,6 +97,7 @@ class Console extends React.Component {
       lines: {$push: lines}
     }));
     this.checkAutoscroll();
+    if (this.props.onAddLines) this.props.onAddLines(lines);
   }
 
   render() {
