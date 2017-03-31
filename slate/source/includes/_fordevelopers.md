@@ -44,7 +44,7 @@ To run the unit tests, simply type:
 
 The backend is based mainly on [Django](https://www.djangoproject.com/) and [Django REST Framework](http://www.django-rest-framework.org/).
 
-We don't use much of Django's templating system, except for the `Administration` and `Processing Nodes` sections, since we found it too inflexible. Instead we use Django to expose an [API](#reference), which we then tie to a [React.js](https://facebook.github.io/react/) app.
+We don't use much of Django's templating system, except for the `Administration` and `Processing Nodes` sections. Instead we use Django to expose an [API](#reference), which we then tie to a [React.js](https://facebook.github.io/react/) app.
 
 Directories of interest are listed as follow:
 
