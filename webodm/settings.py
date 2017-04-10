@@ -230,6 +230,7 @@ REST_FRAMEWORK = {
     'rest_framework.authentication.SessionAuthentication',
     'rest_framework.authentication.BasicAuthentication',
     'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    'app.api.authentication.JSONWebTokenAuthenticationQS',
   ),
   'PAGE_SIZE': 10,
 }

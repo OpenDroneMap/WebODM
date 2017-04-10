@@ -413,8 +413,13 @@ class TestApi(BootTestCase):
         token = res.data['token']
         self.assertTrue(len(token) > 0)
 
-        # Can access resources by passing token
+        # Can access resources by passing token via querystring
+        res = client.get('/api/processingnodes/?jwt={}'.format(token))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Can access resources by passing token via header
         client = APIClient(HTTP_AUTHORIZATION="{0} {1}".format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         res = client.get('/api/processingnodes/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
 
