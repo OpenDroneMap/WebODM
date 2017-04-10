@@ -18,6 +18,15 @@ curl -H "Authorization: JWT <your_token>" http://localhost:8000/api/projects/
 {"count":13, ...}
 ```
 
+> Use authentication token via querystring (less secure):
+
+```bash
+curl http://localhost:8000/api/projects/?jwt=<your_token>
+
+{"count":13, ...}
+```
+
+
 `POST /api/token-auth/`
 
 Field | Type | Description
@@ -34,3 +43,5 @@ Header |
 Authorization: JWT `your_token` |
 
 The token expires after a set amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
+
+Since applications sometimes do not allow headers to be modified, you can also authenticate by appending the `jwt` querystring parameter to a protected URL. This is less secure, so pass the token via header if possible.
