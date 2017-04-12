@@ -15,7 +15,7 @@ class Console extends React.Component {
 
     if (typeof props.children === "string"){
       this.state.lines = props.children.split('\n');
-      if (this.props.onAddLines) this.props.onAddLines(this.state.lines);
+      if (props.onAddLines) props.onAddLines(this.state.lines);
     }
 
     this.autoscroll = props.autoscroll === true;
