@@ -2,6 +2,11 @@ import React from 'react';
 import './css/Dashboard.scss';
 import ProjectList from './components/ProjectList';
 import EditProjectDialog from './components/EditProjectDialog';
+import Utils from './classes/Utils';
+import {
+  BrowserRouter as Router,
+  Route
+} from 'react-router-dom';
 import $ from 'jquery';
 
 class Dashboard extends React.Component {
@@ -32,7 +37,20 @@ class Dashboard extends React.Component {
   }
 
   render() {
+    const projectList = ({ location, history }) => {
+      let q = Utils.queryParams(location),
+          page = parseInt(q.page);
+
+      return <ProjectList
+                source={`/api/projects/?ordering=-created_at&page=${page}`}
+                ref={(domNode) => { this.projectList = domNode; }} 
+                currentPage={page}
+                history={history}
+                />;
+    };
+
     return (
+      <Router basename="/dashboard">
         <div>
           <div className="text-right add-button">
             <button type="button" 
@@ -47,10 +65,9 @@ class Dashboard extends React.Component {
             saveAction={this.addNewProject}
             ref={(domNode) => { this.projectDialog = domNode; }}
             />
-          <ProjectList 
-            source="/api/projects/?ordering=-created_at&page=#{PAGE}"
-            ref={(domNode) => { this.projectList = domNode; }} />
+          <Route path="/" component={projectList} />
         </div>
+      </Router>
     );
   }
 }

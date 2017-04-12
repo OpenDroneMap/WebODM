@@ -25,5 +25,30 @@ export default {
 
         return result;
     },
+
+    queryParams: function(location){
+      let params = {};
+      let paramsRaw = (location.search.replace("?", "").match(/([^&=]+)=?([^&]*)/g) || []);
+      for (let i in paramsRaw){
+        let parts = paramsRaw[i].split("=");
+        params[parts[0]] = parts[1];
+      }
+      return params;
+    },
+
+    toSearchQuery: function(params){
+      let parts = [];
+      for (let k in params){
+        parts.push(encodeURIComponent(k) + "=" + encodeURIComponent(params[k]));
+      }
+      if (parts.length > 0) return "?" + parts.join("&");
+      else return "";
+    },
+
+    replaceSearchQueryParam: function(location, param, value){
+      let q = this.queryParams(location);
+      q[param] = value;
+      return this.toSearchQuery(q);
+    }
 };
 

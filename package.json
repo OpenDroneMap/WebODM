@@ -44,6 +44,8 @@
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-hot-loader": "^3.0.0-beta.5",
+    "react-router": "^4.1.0",
+    "react-router-dom": "^4.1.0",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "tween.js": "^16.6.0",
