@@ -51,7 +51,7 @@ class Paginated extends React.Component{
 
     if (currentPage > pagesAfter) currentPage = pagesAfter;
 
-    this.historyNav.changeQueryString('page', currentPage);
+    this.historyNav.changeQS('page', currentPage);
 
     this.setPaginationState({
       totalItems: this.state.pagination.totalItems + delta

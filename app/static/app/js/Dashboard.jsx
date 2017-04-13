@@ -39,7 +39,7 @@ class Dashboard extends React.Component {
   render() {
     const projectList = ({ location, history }) => {
       let q = Utils.queryParams(location),
-          page = parseInt(q.page);
+          page = parseInt(q.page !== undefined ? q.page : 1);
 
       return <ProjectList
                 source={`/api/projects/?ordering=-created_at&page=${page}`}

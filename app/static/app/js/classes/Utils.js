@@ -39,7 +39,7 @@ export default {
     toSearchQuery: function(params){
       let parts = [];
       for (let k in params){
-        parts.push(encodeURIComponent(k) + "=" + encodeURIComponent(params[k]));
+        parts.push(k + "=" + params[k]);
       }
       if (parts.length > 0) return "?" + parts.join("&");
       else return "";

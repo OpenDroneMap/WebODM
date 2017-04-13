@@ -6,13 +6,16 @@ import pendingActions from '../classes/PendingActions';
 import ErrorMessage from './ErrorMessage';
 import EditTaskDialog from './EditTaskDialog';
 import AssetDownloadButtons from './AssetDownloadButtons';
+import HistoryNav from '../classes/HistoryNav';
 
 class TaskListItem extends React.Component {
   constructor(props){
     super();
 
+    this.historyNav = new HistoryNav(props.history);
+
     this.state = {
-      expanded: false,
+      expanded: this.historyNav.isValueInQSList("project_task_expanded", props.data.id),
       task: {},
       time: props.data.processing_time,
       actionError: "",
@@ -111,8 +114,12 @@ class TaskListItem extends React.Component {
   }
 
   toggleExpanded(){
+    const expanded = !this.state.expanded;
+
+    this.historyNav.toggleQSListItem("project_task_expanded", this.props.data.id, expanded);
+    
     this.setState({
-      expanded: !this.state.expanded
+      expanded: expanded
     });
   }
 

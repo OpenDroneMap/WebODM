@@ -3,8 +3,8 @@ import '../css/TaskList.scss';
 import TaskListItem from './TaskListItem';
 
 class TaskList extends React.Component {
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
 
     this.state = {
       tasks: [],
@@ -75,7 +75,12 @@ class TaskList extends React.Component {
         {message}
 
         {this.state.tasks.map(task => (
-          <TaskListItem data={task} key={task.id} refreshInterval={3000} onDelete={this.deleteTask} />
+          <TaskListItem 
+            data={task} 
+            key={task.id} 
+            refreshInterval={3000} 
+            onDelete={this.deleteTask} 
+            history={this.props.history} />
         ))}
       </div>
     );
