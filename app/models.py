@@ -297,9 +297,16 @@ class Task(models.Model):
                     # Do we need to cancel the task on the processing node?
                     logger.info("Canceling {}".format(self))
                     if self.processing_node and self.uuid:
-                        self.processing_node.cancel_task(self.uuid)
+                        # Attempt to cancel the task on the processing node
+                        # We don't care if this fails (we tried)
+                        try:
+                            self.processing_node.cancel_task(self.uuid)
+                            self.status = None
+                        except ProcessingException:
+                            logger.warning("Could not cancel {} on processing node. We'll proceed anyway...".format(self))
+                            self.status = status_codes.CANCELED
+
                         self.pending_action = None
-                        self.status = None
                         self.save()
                     else:
                         raise ProcessingError("Cannot cancel a task that has no processing node or UUID")
