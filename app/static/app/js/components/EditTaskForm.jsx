@@ -262,8 +262,8 @@ class EditTaskForm extends React.Component {
             <label className="col-sm-2 control-label">Options</label>
             <div className="col-sm-10">
               <div className="btn-group" role="group">
-                <button type="button" className={"btn " + (!this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(false)}>Default</button>
-                <button type="button" className={"btn " + (this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(true)}>Advanced</button>
+                <button type="button" className={"btn " + (!this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(false)}>Use Defaults</button>
+                <button type="button" className={"btn " + (this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(true)}>Set Options</button>
               </div>
             </div>
           </div>
