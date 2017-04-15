@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import $ from 'jquery';
 
 class Paginator extends React.Component {
@@ -14,20 +15,20 @@ class Paginator extends React.Component {
                 <div className={this.props.className}>
                     <ul className="pagination pagination-sm">
                         <li className={currentPage === 1 ? "disabled" : ""}>
-                          <a href="javascript:void(0);" onClick={this.props.handlePageChange(1)}>
+                          <Link to={{search: "?page=1"}}>
                             <span>&laquo;</span>
-                          </a>
+                          </Link>
                         </li>
                         {pages.map(page => {
                             return (<li     
                                 key={page + 1}
                                 className={currentPage === (page + 1) ? "active" : ""}
-                            ><a href="javascript:void(0);" onClick={this.props.handlePageChange(page + 1)}>{page + 1}</a></li>);
+                            ><Link to={{search: "?page=" + (page + 1)}}>{page + 1}</Link></li>);
                         })}
                         <li className={currentPage === numPages ? "disabled" : ""}>
-                          <a href="javascript:void(0);" onClick={this.props.handlePageChange(numPages)}>
+                          <Link to={{search: "?page=" + numPages}}>
                             <span>&raquo;</span>
-                          </a>
+                          </Link>
                         </li>
                     </ul>
                 </div>
