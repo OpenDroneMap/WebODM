@@ -78,6 +78,50 @@ If you want to run WebODM in production, make sure to change the `SECRET_KEY` va
 
 See the [API documentation page](https://opendronemap.github.io/WebODM/).
 
+## Run the docker version as a Linux Service
+
+If you wish to run the docker version with auto start/monitoring/stop, etc, as a systemd style Linux Service, a systemd unit file is included in the service folder of the repo.
+
+This should work on any Linux OS capable of running WebODM, and using a SystemD based service daemon (such as Ubuntu 16.04 server for example).
+
+This has only been tested on Ubuntu 16.04 server.
+
+The following pre-requisites are required:
+ * Requires odm user
+ * Requires docker installed via system (ubuntu: `sudo apt-get install docker.io`)
+ * Requires screen to be installed
+ * Requires odm user member of docker group
+ * Required WebODM directory checked out to /opt/WebODM
+ * Requires that /opt/WebODM is recursively owned by odm:odm
+
+If all pre-requisites have been met, and repository is checked out to /opt/WebODM folder, then you can use the following steps to enable and manage the service:
+
+First, to install the service, and enable the service to run at startup from now on:
+```bash
+sudo systemctl enable /opt/WebODM/service/webodm.service
+```
+
+To manually stop the service:
+```bash
+sudo systemctl stop webodm
+```
+
+To manually start the service:
+```bash
+sudo systemctl start webodm
+```
+
+To manually check service status:
+```bash
+sudo systemctl status webodm
+```
+
+The service runs within a screen session, so as the odm user you can easily jump into the screen session by using:
+```bash
+screen -r webodm
+```
+(if you wish to exit the screen session, don't use ctrl+c, that will kill webodm, use `CTRL+A` then hit the `D` key)
+
 ## Run it natively
 
 If you want to run WebODM natively, you will need to install:
