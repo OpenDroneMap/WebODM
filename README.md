@@ -211,8 +211,8 @@ Should all work without errors.
 The [OpenDroneMap project](https://github.com/OpenDroneMap/) is composed of several components.
 
 - [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) is a command line toolkit that processes aerial images. Users comfortable with the command line are probably OK using this component alone.
-- [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap) is a lightweight interface and API (Application Program Interface) built directly on top of [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap). Users not comfortable with the command line can use this interface to process aerial images and developers can use the API to build applications. No other features such as user authentication, map displays, etc. are provided.
-- [WebODM](https://github.com/OpenDroneMap/WebODM) adds more features such as user authentication, map displays, 3D display, a higher level API and the ability to orchestrate multiple processing nodes (run jobs in parallel). Processing nodes are simply servers running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap).
+- [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap) is a lightweight interface and API (Application Program Interface) built directly on top of [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap). Users not comfortable with the command line can use this interface to process aerial images and developers can use the API to build applications. Features such as user authentication, map displays, etc. are not provided.
+- [WebODM](https://github.com/OpenDroneMap/WebODM) adds more features such as user authentication, map displays, 3D displays, a higher level API and the ability to orchestrate multiple processing nodes (run jobs in parallel). Processing nodes are simply servers running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap).
 
 ![webodm](https://cloud.githubusercontent.com/assets/1951843/25567386/5aeec7aa-2dba-11e7-9169-aca97b70db79.png)
 
@@ -223,6 +223,7 @@ I am a... | Best choice
 End user, I'm not really comfortable with the command line | [WebODM](https://github.com/OpenDroneMap/WebODM)
 End user, I like shell commands, I need to process images for myself. I use other software to display processing results |  [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap)
 End user, I can work with the command line, but I'd rather not. I use other software to display processing results  |  [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap)
+End user, I need a drone mapping application for my organization that everyone can use. | [WebODM](https://github.com/OpenDroneMap/WebODM)
 Developer, I'm looking to build an app that displays map results and takes care of things like permissions | [WebODM](https://github.com/OpenDroneMap/WebODM)
 Developer, I'm looking to build an app that will stay behind a firewall and just needs raw results | [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap)
 
