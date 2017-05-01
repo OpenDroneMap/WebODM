@@ -107,6 +107,11 @@ ul#side-menu.nav{
     z-index: 999999;
 }
 
+.modal-body {
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+}
+
 .pagination{
     margin: 0;
 
