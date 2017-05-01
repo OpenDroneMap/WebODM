@@ -88,7 +88,7 @@ if [[ $1 = "start" ]]; then
 elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
-	run "docker-compose down"
+	run "docker-compose down --remove-orphans"
 elif [[ $1 = "rebuild" ]]; then
 	environment_check
 	echo  "Rebuilding WebODM..."

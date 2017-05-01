@@ -6,10 +6,11 @@ import ProjectListItem from './ProjectListItem';
 import Paginated from './Paginated';
 import Paginator from './Paginator';
 import ErrorMessage from './ErrorMessage';
+import { Route } from 'react-router-dom';
 
 class ProjectList extends Paginated {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
 
         this.state = {
             loading: true,
@@ -27,12 +28,18 @@ class ProjectList extends Paginated {
         this.refresh();
     }
 
+    componentDidUpdate(prevProps){
+        if (prevProps.source !== this.props.source){
+            this.refresh();
+        }
+    }
+
     refresh(){
         this.setState({refreshing: true});
 
         // Load projects from API
         this.serverRequest = 
-            $.getJSON(this.getPaginatedUrl(this.props.source), json => {
+            $.getJSON(this.props.source, json => {
                 if (json.results){
                     this.setState({
                         projects: json.results,
@@ -78,11 +85,15 @@ class ProjectList extends Paginated {
             return (<div className="project-list">Loading projects... <i className="fa fa-refresh fa-spin fa-fw"></i></div>);
         }else{
             return (<div className="project-list">
-                  <ErrorMessage bind={[this, 'error']} />
-                  <Paginator className="text-right" {...this.state.pagination} handlePageChange={this.handlePageChange.bind(this)}>
+                <ErrorMessage bind={[this, 'error']} />
+                <Paginator className="text-right" {...this.state.pagination} {...this.props}>
                     <ul className={"list-group project-list " + (this.state.refreshing ? "refreshing" : "")}>
                         {this.state.projects.map(p => (
-                            <ProjectListItem key={p.id} data={p} onDelete={this.handleDelete} /> 
+                            <ProjectListItem 
+                                key={p.id} 
+                                data={p} 
+                                onDelete={this.handleDelete} 
+                                history={this.props.history} /> 
                         ))}
                     </ul>
                 </Paginator>

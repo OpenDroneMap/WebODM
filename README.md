@@ -4,6 +4,17 @@
 
 A free, user-friendly, extendable application and [API](https://opendronemap.github.io/WebODM/) for drone image processing. Generate georeferenced maps, point clouds and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
 
+* [Getting Started](#getting-started)
+    * [Common Troubleshooting](#common-troubleshooting)
+    * [Add More Processing Nodes](#add-more-processing-nodes)
+    * [Security](#security)
+ * [API Docs](#api-docs)
+ * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
+ * [Run it natively](#run-it-natively)
+ * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
+ * [Roadmap](#roadmap)
+ * [Terminology](#terminology)
+
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
 ![Alt text](/screenshots/pointcloud.png?raw=true "3D Display")
@@ -58,7 +69,7 @@ We recommend that you read the [Docker Documentation](https://docs.docker.com/) 
 Sympthoms | Possible Solutions
 --------- | ------------------
 While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
-Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated. http://stackoverflow.com/a/39720010
+Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
 After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` | Try to remove your WebODM folder and start from a fresh git clone
 Task fails with `Process exited with code null`, no task console output | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
 On Windows, docker-compose fails with `Failed to execute the script docker-compose` | Make sure you have enabled VT-x virtualization in the BIOS
@@ -77,6 +88,50 @@ If you want to run WebODM in production, make sure to change the `SECRET_KEY` va
 ## API Docs
 
 See the [API documentation page](https://opendronemap.github.io/WebODM/).
+
+## Run the docker version as a Linux Service
+
+If you wish to run the docker version with auto start/monitoring/stop, etc, as a systemd style Linux Service, a systemd unit file is included in the service folder of the repo.
+
+This should work on any Linux OS capable of running WebODM, and using a SystemD based service daemon (such as Ubuntu 16.04 server for example).
+
+This has only been tested on Ubuntu 16.04 server.
+
+The following pre-requisites are required:
+ * Requires odm user
+ * Requires docker installed via system (ubuntu: `sudo apt-get install docker.io`)
+ * Requires screen to be installed
+ * Requires odm user member of docker group
+ * Required WebODM directory checked out to /opt/WebODM
+ * Requires that /opt/WebODM is recursively owned by odm:odm
+
+If all pre-requisites have been met, and repository is checked out to /opt/WebODM folder, then you can use the following steps to enable and manage the service:
+
+First, to install the service, and enable the service to run at startup from now on:
+```bash
+sudo systemctl enable /opt/WebODM/service/webodm.service
+```
+
+To manually stop the service:
+```bash
+sudo systemctl stop webodm
+```
+
+To manually start the service:
+```bash
+sudo systemctl start webodm
+```
+
+To manually check service status:
+```bash
+sudo systemctl status webodm
+```
+
+The service runs within a screen session, so as the odm user you can easily jump into the screen session by using:
+```bash
+screen -r webodm
+```
+(if you wish to exit the screen session, don't use ctrl+c, that will kill webodm, use `CTRL+A` then hit the `D` key)
 
 ## Run it natively
 
@@ -120,7 +175,7 @@ DATABASES = {
 }
 ```
 
-From psql or [pgadmin](https://www.pgadmin.org), connect to the database and set the [postgis.enable_outdb_rasters](http://postgis.net/docs/manual-2.2/postgis_enable_outdb_rasters.html) and [postgis.gdal_enabled_drivers](http://postgis.net/docs/postgis_gdal_enabled_drivers.html) settings:
+From psql or [pgadmin](https://www.pgadmin.org), connect to PostgreSQL, create a new database (name it `webodm_dev`), connect to it and set the [postgis.enable_outdb_rasters](http://postgis.net/docs/manual-2.2/postgis_enable_outdb_rasters.html) and [postgis.gdal_enabled_drivers](http://postgis.net/docs/postgis_gdal_enabled_drivers.html) settings:
 
 ```sql
 ALTER SYSTEM SET postgis.enable_outdb_rasters TO True;
@@ -161,6 +216,27 @@ npm --version
 gdalinfo --version
 ```
 Should all work without errors.
+
+## OpenDroneMap, node-OpenDroneMap, WebODM... what?
+
+The [OpenDroneMap project](https://github.com/OpenDroneMap/) is composed of several components.
+
+- [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) is a command line toolkit that processes aerial images. Users comfortable with the command line are probably OK using this component alone.
+- [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap) is a lightweight interface and API (Application Program Interface) built directly on top of [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap). Users not comfortable with the command line can use this interface to process aerial images and developers can use the API to build applications. Features such as user authentication, map displays, etc. are not provided.
+- [WebODM](https://github.com/OpenDroneMap/WebODM) adds more features such as user authentication, map displays, 3D displays, a higher level API and the ability to orchestrate multiple processing nodes (run jobs in parallel). Processing nodes are simply servers running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap).
+
+![webodm](https://cloud.githubusercontent.com/assets/1951843/25567386/5aeec7aa-2dba-11e7-9169-aca97b70db79.png)
+
+In general, follow these guidelines to find out what you should use:
+
+I am a... | Best choice
+--------- | -----------
+End user, I'm not really comfortable with the command line | [WebODM](https://github.com/OpenDroneMap/WebODM)
+End user, I like shell commands, I need to process images for myself. I use other software to display processing results |  [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap)
+End user, I can work with the command line, but I'd rather not. I use other software to display processing results  |  [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap)
+End user, I need a drone mapping application for my organization that everyone can use. | [WebODM](https://github.com/OpenDroneMap/WebODM)
+Developer, I'm looking to build an app that displays map results and takes care of things like permissions | [WebODM](https://github.com/OpenDroneMap/WebODM)
+Developer, I'm looking to build an app that will stay behind a firewall and just needs raw results | [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap)
 
 ## Roadmap
 - [X] User Registration / Authentication

@@ -8,14 +8,17 @@ import ErrorMessage from './ErrorMessage';
 import EditProjectDialog from './EditProjectDialog';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
+import HistoryNav from '../classes/HistoryNav';
 import $ from 'jquery';
 
 class ProjectListItem extends React.Component {
   constructor(props){
     super(props);
 
+    this.historyNav = new HistoryNav(props.history);
+
     this.state = {
-      showTaskList: false,
+      showTaskList: this.historyNav.isValueInQSList("project_task_open", props.data.id),
       updatingTask: false,
       upload: this.getDefaultUploadState(),
       error: "",
@@ -201,8 +204,12 @@ class ProjectListItem extends React.Component {
   }
 
   toggleTaskList(){
+    const showTaskList = !this.state.showTaskList;
+
+    this.historyNav.toggleQSListItem("project_task_open", this.state.data.id, showTaskList);
+    
     this.setState({
-      showTaskList: !this.state.showTaskList
+      showTaskList: showTaskList
     });
   }
 
@@ -358,6 +365,7 @@ class ProjectListItem extends React.Component {
                 ref={this.setRef("taskList")} 
                 source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
                 onDelete={this.taskDeleted}
+                history={this.props.history}
             /> : ""}
 
         </div>

@@ -1,41 +1,39 @@
 import React from 'react';
 import update from 'immutability-helper';
+import HistoryNav from '../classes/HistoryNav';
 
 class Paginated extends React.Component{
-  constructor(){
-    super();
-    this.handlePageChange = this.handlePageChange.bind(this);
+  static defaultProps = {
+    currentPage: 1
+  };
+
+  static propTypes = {
+      history: React.PropTypes.object.isRequired, // reference to the history object coming from the route this component is bound to
+      currentPage: React.PropTypes.number
+  };
+
+  constructor(props){
+    super(props);
+
+    this.historyNav = new HistoryNav(props.history);
   }
 
   updatePagination(itemsPerPage, totalItems){
-    let currentPage = 1;
+    let currentPage = this.props.currentPage;
     const totalPages = this.totalPages(itemsPerPage, totalItems);
-
-    if (this.state.pagination && this.state.pagination.currentPage !== undefined){
-      currentPage = this.state.pagination.currentPage;
-    }
 
     if (currentPage > totalPages) currentPage = totalPages;
 
     this.setState({pagination: {
-        switchingPages: false,  
+        switchingPages: false,
         itemsPerPage: itemsPerPage,
-        totalItems: totalItems,
-        currentPage: currentPage
+        totalItems: totalItems
       }
     });
   }
 
   totalPages(itemsPerPage, totalItems){
     return Math.ceil(totalItems / itemsPerPage);
-  }
-
-  getPaginatedUrl(base){
-    const page = this.state.pagination && this.state.pagination.currentPage !== undefined
-                 ? this.state.pagination.currentPage 
-                 : 1;
-
-    return base.replace(/#\{PAGE\}/g, page);
   }
 
   setPaginationState(props, done){
@@ -46,29 +44,17 @@ class Paginated extends React.Component{
     }), done);
   }
 
-  handlePageChange(pageNum){
-    return (e) => {
-      // Update current page, once rendering is completed, raise 
-      // on page changed event
-      this.setPaginationState({
-          currentPage: pageNum,
-          switchingPages: true
-        }, () => {
-          if (this.onPageChanged) this.onPageChanged(pageNum);
-        });
-    }
-  }
-
   handlePageItemsNumChange(delta, needsRefreshCallback){
+    let currentPage = this.props.currentPage;
     const pagesBefore = this.totalPages(this.state.pagination.itemsPerPage, this.state.pagination.totalItems),
           pagesAfter = this.totalPages(this.state.pagination.itemsPerPage, this.state.pagination.totalItems + delta);
-    let currentPage = this.state.pagination.currentPage;
 
     if (currentPage > pagesAfter) currentPage = pagesAfter;
 
+    this.historyNav.changeQS('page', currentPage);
+
     this.setPaginationState({
-      totalItems: this.state.pagination.totalItems + delta,
-      currentPage: currentPage
+      totalItems: this.state.pagination.totalItems + delta
     }, () => {
       if (pagesBefore !== pagesAfter) needsRefreshCallback(pagesAfter);
     });
