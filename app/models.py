@@ -487,7 +487,7 @@ class Task(models.Model):
 
             if self.orthophoto is None:
                 assets.remove('geotiff')
-                assets.remove('ply')
+                assets.remove('las')
                 assets.remove('csv')
 
             return assets
