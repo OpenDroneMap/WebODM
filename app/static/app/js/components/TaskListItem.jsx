@@ -34,6 +34,7 @@ class TaskListItem extends React.Component {
     this.startEditing = this.startEditing.bind(this);
     this.updateTask = this.updateTask.bind(this);
     this.checkForMemoryError = this.checkForMemoryError.bind(this);
+    this.downloadTaskOutput = this.downloadTaskOutput.bind(this);
   }
 
   shouldRefresh(){
@@ -186,6 +187,10 @@ class TaskListItem extends React.Component {
     };
   }
 
+  downloadTaskOutput(){
+    this.console.downloadTxt("task_output.txt");
+  }
+
   optionsToList(options){
     if (!Array.isArray(options)) return "";
     else if (options.length === 0) return "Default";
@@ -236,20 +241,27 @@ class TaskListItem extends React.Component {
     }
   }
 
+  isMacOS(){
+    return window.navigator.platform === "MacIntel";
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : `Task #${task.id}`;
     
     let status = statusCodes.description(task.status);
     if (status === "") status = "Uploading images";
+
     if (!task.processing_node) status = "";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
     let expanded = "";
     if (this.state.expanded){
       let showGeotiffMissingWarning = false,
-          showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED;
-
+          showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
+          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && !showMemoryErrorWarning && task.status == statusCodes.FAILED,
+          memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
+      
       let actionButtons = [];
       const addActionButton = (label, className, icon, onClick) => {
         actionButtons.push({
@@ -335,7 +347,8 @@ class TaskListItem extends React.Component {
 
               {showGeotiffMissingWarning ? 
               <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
-              </div>
+
+            </div>
             <div className="col-md-8">
               <Console 
                 source={this.consoleOutputUrl} 
@@ -347,7 +360,20 @@ class TaskListItem extends React.Component {
                 />
 
               {showMemoryErrorWarning ? 
-              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href="http://stackoverflow.com/a/39720010" target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>Advanced Options</a>.</span></div> : ""}
+              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>Advanced Options</a>.</span></div> : ""}
+            
+              {showExitedWithCodeOneHints ?
+              <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
+                  "Process exited with code 1" means that part of the processing failed. Try tweaking the <a href="javascript:void(0);" onClick={this.startEditing}>Task Options</a> as follows:
+                  <ul>
+                    <li>Increase the <b>min-num-features</b> option, especially if your images have lots of vegetation</li>
+                    <li>Enable the <b>use-pmvs</b> option.</li>
+                  </ul>
+                  Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="https://github.com/OpenDroneMap/WebODM/issues" target="_blank">open an issue</a> on GitHub, making 
+                  sure include a <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>copy of your task's output</a> (the one you see above <i className="fa fa-arrow-up"></i>, click to <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>download</a> it). Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>
+                </div>
+              </div>
+              : ""}
             </div>
           </div>
           <div className="row">

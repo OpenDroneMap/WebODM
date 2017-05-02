@@ -64,8 +64,14 @@
             i.fa.fa-warning{
                 color: #ff8000;
             }
-            span{
+            span, div{
                 font-size: 13px;
+            }
+            div.inline{
+                display: inline;
+            }
+            ul{
+                margin: 8px 0;
             }
         }
 

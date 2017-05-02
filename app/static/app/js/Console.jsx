@@ -62,6 +62,29 @@ class Console extends React.Component {
     this.setupDynamicSource();
   }
 
+  downloadTxt(filename="console.txt"){
+    function saveAs(uri, filename) {
+      let link = document.createElement('a');
+      if (typeof link.download === 'string') {
+        link.href = uri;
+        link.download = filename;
+
+        //Firefox requires the link to be in the body
+        document.body.appendChild(link);
+        
+        //simulate click
+        link.click();
+
+        //remove the link when done
+        document.body.removeChild(link);
+      } else {
+        window.open(uri);
+      }
+    }
+
+    saveAs("data:application/octet-stream," + encodeURIComponent(this.state.lines.join("\r\n")), filename);
+  }
+
   tearDownDynamicSource(){
     if (this.sourceTimeout) clearTimeout(this.sourceTimeout);
     if (this.sourceRequest) this.sourceRequest.abort();
