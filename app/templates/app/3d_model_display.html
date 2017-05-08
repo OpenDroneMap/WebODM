@@ -2,6 +2,9 @@
 {% load i18n %}
 
 {% block content %}
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'ModelView' attrs='async' %}
+
 	<h3><i class="fa fa-cube"></i> {{title}}</h3>
 	
 	<div data-modelview

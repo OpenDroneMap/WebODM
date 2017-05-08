@@ -1,6 +1,7 @@
 import React from 'react';
 import './css/MapView.scss';
 import Map from './components/Map';
+import $ from 'jquery';
 
 class MapView extends React.Component {
   static defaultProps = {
@@ -38,5 +39,13 @@ class MapView extends React.Component {
       </div>);
   }
 }
+
+$(function(){
+    $("[data-mapview]").each(function(){
+        let props = $(this).data();
+        delete(props.mapview);
+        window.ReactDOM.render(<MapView {...props}/>, $(this).get(0));
+    });
+});
 
 export default MapView;

@@ -1,8 +1,10 @@
 {% extends "app/logged_in_base.html" %}
 {% load i18n %}
-{% load render_bundle from webpack_loader %}
 
 {% block content %}
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'Dashboard' attrs='async' %}
+
 	{% if no_processingnodes %}
 		<h3>{% trans 'Welcome! ☺' %}</h3>
 		{% trans 'Add a Processing Node' as add_processing_node %}

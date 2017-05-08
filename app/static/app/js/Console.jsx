@@ -148,4 +148,14 @@ class Console extends React.Component {
   }
 }
 
+$(function(){
+    $("[data-console]").each(function(){
+        window.ReactDOM.render(<Console 
+                lang={$(this).data("console-lang")}
+                height={$(this).data("console-height")}
+                autoscroll={typeof $(this).attr("autoscroll") !== 'undefined' && $(this).attr("autoscroll") !== false}
+            >{$(this).text()}</Console>, $(this).get(0));
+    });
+});
+
 export default Console;

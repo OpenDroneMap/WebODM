@@ -7,11 +7,15 @@ let LiveReloadPlugin = require('webpack-livereload-plugin');
 module.exports = {
   context: __dirname,
 
-  entry: [
+  entry: {
     // 'webpack-dev-server/client?http://localhost:3000',
     // 'webpack/hot/only-dev-server',
-    './app/static/app/js/main.jsx',
-  ],
+    main: ['./app/static/app/js/main.jsx'],
+    Console: ['./app/static/app/js/Console.jsx'],
+    Dashboard: ['./app/static/app/js/Dashboard.jsx'],
+    MapView: ['./app/static/app/js/MapView.jsx'],
+    ModelView: ['./app/static/app/js/ModelView.jsx']
+  },
 
   output: {
       path: path.join(__dirname, './app/static/app/bundles/'),
@@ -24,7 +28,7 @@ module.exports = {
     // new webpack.NoErrorsPlugin(), // don't reload if there is an error
     new LiveReloadPlugin(),
     new BundleTracker({filename: './webpack-stats.json'}),
-    new ExtractTextPlugin('css/main.css', {
+    new ExtractTextPlugin('css/[name]-[hash].css', {
         allChunks: true
     })
   ],
