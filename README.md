@@ -217,6 +217,8 @@ gdalinfo --version
 ```
 Should all work without errors.
 
+Ubuntu 16.04 LTS users can refer to this [script](https://gist.githubusercontent.com/lkpanganiban/5226cc8dd59cb39cdc1946259c3fea6e/raw/f9f41ad0c1dfdd2d26a452d3b2732dbaf3fd3608/webodm_install.sh) to install WebODM natively on a new machine.
+
 ## OpenDroneMap, node-OpenDroneMap, WebODM... what?
 
 The [OpenDroneMap project](https://github.com/OpenDroneMap/) is composed of several components.
