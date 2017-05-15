@@ -95,7 +95,7 @@ class ProjectListItem extends React.Component {
         url : `/api/projects/${this.state.data.id}/tasks/`,
         parallelUploads: 9999999,
         uploadMultiple: true,
-        acceptedFiles: "image/*,gcp_list.txt",
+        acceptedFiles: "image/*",
         autoProcessQueue: true,
         createImageThumbnails: false,
         clickable: this.uploadButton,
