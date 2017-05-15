@@ -300,7 +300,7 @@ class ProjectListItem extends React.Component {
                     onClick={this.handleUpload} 
                     ref={this.setRef("uploadButton")}>
               <i className="glyphicon glyphicon-upload"></i>
-              Upload Images and GCP List
+              Upload Images and GCP
             </button>
               
             <button disabled={this.state.upload.error !== ""} 
