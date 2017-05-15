@@ -95,7 +95,7 @@ class ProjectListItem extends React.Component {
         url : `/api/projects/${this.state.data.id}/tasks/`,
         parallelUploads: 9999999,
         uploadMultiple: true,
-        acceptedFiles: "image/*",
+        acceptedFiles: "image/*, .txt",
         autoProcessQueue: true,
         createImageThumbnails: false,
         clickable: this.uploadButton,
@@ -300,7 +300,7 @@ class ProjectListItem extends React.Component {
                     onClick={this.handleUpload} 
                     ref={this.setRef("uploadButton")}>
               <i className="glyphicon glyphicon-upload"></i>
-              Upload Images
+              Upload Images and GCP List
             </button>
               
             <button disabled={this.state.upload.error !== ""} 
