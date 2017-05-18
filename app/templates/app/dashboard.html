@@ -20,7 +20,8 @@
 	{% else %}
 		
 		{% if no_tasks %}
-			{% trans 'Upload Images' as upload_images %}
+			<h3>{% trans 'Welcome! ☺' %}</h3>
+			{% trans 'Upload Images and GCP' as upload_images %}
 			<p>
 				{% blocktrans %} To create a map, press the "{{ upload_images }}" button, or drag and drop some images into a project. {% endblocktrans %}
 			</p>
@@ -28,6 +29,7 @@
 				<ul>
 					<li>{% trans 'You need at least 5 images' %}</li>
 					<li>{% trans 'Images must overlap by 60% or more' %}</li>
+					<li>{% trans 'A <a href="https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-OpenDroneMap#running-odm-with-ground-control" target="_blank">GCP file</a> is optional, but can increase georeferencing accuracy' %}</li>
 				</ul>
 			</p>
 		{% endif %}

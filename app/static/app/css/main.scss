@@ -77,7 +77,7 @@ ul#side-menu.nav{
 
 .content{
     clear: both;
-    padding-top: 56px;
+    padding-top: 60px;
 
     h1,h2,h3,h4,h5{
         padding-top: 4px;
@@ -183,3 +183,44 @@ button i.glyphicon{
         margin-right: 4px;
     }
 }
+
+/* This is to make the Header and navigation more mobile friendly */
+
+.navbar-toggle {
+    position: relative;
+    float: right;
+    margin-right: 15px;
+    padding: 9px 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.navbar-header {
+	height: 50px;
+}
+
+.navbar-right {
+	clear: none !important;
+	height: 50px;
+}
+
+.dropdown {
+	float: right;
+}
+
+.navbar-brand {
+	position: absolute;
+	top: 0px;
+}
+
+.navbar-text {
+	position: absolute;
+	top: 0px;
+	left: 50px;
+}
+
+.navbar-link {
+	position: absolute;
+	top: 0px;
+}
+
