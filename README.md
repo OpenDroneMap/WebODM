@@ -135,17 +135,22 @@ screen -r webodm
 
 ## Run it natively
 
-If you want to run WebODM natively, you will need to install:
+WebODM can run natively on Windows, MacOS and Linux.
+
+Ubuntu 16.04 LTS users can refer to this [script](/contrib/ubuntu_1604_install.sh) to install WebODM natively on a new machine.
+
+To run WebODM, you will need to install:
  * PostgreSQL (>= 9.5)
  * PostGIS 2.3
  * Python 3.5
  * GDAL (>= 2.1)
  * Node.js (>= 6.0)
+ * Nginx (Linux/MacOS) - OR - Apache + mod_wsgi (Windows)
 
 On Linux, make sure you have:
 
 ```bash
-apt-get install binutils libproj-dev gdal-bin
+apt-get install binutils libproj-dev gdal-bin nginx
 ```
 
 On Windows use the [OSGeo4W](https://trac.osgeo.org/osgeo4w/) installer to install GDAL. MacOS users can use:
@@ -189,7 +194,17 @@ pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
 webpack
-chmod +x start.sh && ./start.sh
+chmod +x start.sh && ./start.sh --no-gunicorn
+```
+
+The `start.sh` script will use Django's built-in server if you pass the `--no-gunicorn` parameter. This is good for testing, but bad for production. 
+
+In production, if you have nginx installed, modify the configuration file in `nginx/nginx.conf` to match your system's configuration and just run `start.sh` without parameters. 
+
+Windows users should refer to [this guide](https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/modwsgi/) to install Apache + mod_wsgi and run gunicorn:
+
+```bash
+gunicorn webodm.wsgi --bind 0.0.0.0:8000 --preload
 ```
 
 If you are getting a `rt_raster_gdal_warp: Could not create GDAL transformation object for output dataset creation`, make sure that your PostGIS installation has PROJ support:
@@ -216,8 +231,6 @@ npm --version
 gdalinfo --version
 ```
 Should all work without errors.
-
-Ubuntu 16.04 LTS users can refer to this [script](https://gist.githubusercontent.com/lkpanganiban/5226cc8dd59cb39cdc1946259c3fea6e/raw/f9f41ad0c1dfdd2d26a452d3b2732dbaf3fd3608/webodm_install.sh) to install WebODM natively on a new machine.
 
 ## OpenDroneMap, node-OpenDroneMap, WebODM... what?
 

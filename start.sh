@@ -76,7 +76,7 @@ echo Open a web browser and navigate to http://localhost:8000
 echo -e "\033[39m"
 echo -e "\033[91mNOTE:\033[39m Windows users using docker should replace localhost with the IP of their docker machine's IP. To find what that is, run: docker-machine ip") &
 
-if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
+if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ] || [ "$1" = "--no-gunicorn" ]; then
     python manage.py runserver 0.0.0.0:8000
 else
     nginx -c /webodm/nginx/nginx.conf
