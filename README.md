@@ -137,7 +137,7 @@ screen -r webodm
 
 WebODM can run natively on Windows, MacOS and Linux.
 
-Ubuntu 16.04 LTS users can refer to this [script](/contrib/ubuntu_1604_install.sh) to install WebODM natively on a new machine.
+Ubuntu 16.04 LTS users can refer to [this script](/contrib/ubuntu_1604_install.sh) to install WebODM natively on a new machine.
 
 To run WebODM, you will need to install:
  * PostgreSQL (>= 9.5)
