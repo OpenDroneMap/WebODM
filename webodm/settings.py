@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os, sys
 
 import datetime
+
+import tzlocal
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'django_filters',
     'guardian',
     'rest_framework',
     'rest_framework_nested',
@@ -133,7 +136,7 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = None # Use local server time
+TIME_ZONE = tzlocal.get_localzone().zone
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True

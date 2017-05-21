@@ -2,7 +2,7 @@ anyjson==0.3.3
 appdirs==1.4.0
 APScheduler==3.2.0
 coreapi==2.0.9
-Django==1.10.5
+Django==1.11.1
 django-cors-headers==2.0.2
 django-debug-toolbar==1.6
 django-filter==0.15.3

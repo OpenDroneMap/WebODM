@@ -1,4 +1,3 @@
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
@@ -6,7 +5,8 @@ from django.db.utils import ProgrammingError
 from guardian.shortcuts import assign_perm
 
 from nodeodm.models import ProcessingNode
-from . import scheduler
+# noinspection PyUnresolvedReferences
+from . import scheduler, signals
 import logging
 from .models import Task
 from webodm import settings
@@ -16,14 +16,14 @@ from webodm.wsgi import booted
 def boot():
     # booted is a shared memory variable to keep track of boot status
     # as multiple workers could trigger the boot sequence twice
-    if booted.value: return
+    if not settings.DEBUG and booted.value: return
 
     booted.value = True
     logger = logging.getLogger('app.logger')
     logger.info("Booting...")
 
     if settings.DEBUG:
-        logger.warning("Debug mode is ON (for development this is OK)")
+       logger.warning("Debug mode is ON (for development this is OK)")
 
     # Check default group
     try:
