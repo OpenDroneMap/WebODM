@@ -26,8 +26,8 @@ RUN printf "Package: *\nPin: release a=testing\nPin-Priority: 750\n" > /etc/apt/
 RUN printf "deb     http://mirror.steadfast.net/debian/    stable main contrib non-free\ndeb-src http://mirror.steadfast.net/debian/    stable main contrib non-free" > /etc/apt/sources.list.d/stable.list
 RUN printf "deb     http://mirror.steadfast.net/debian/    testing main contrib non-free\ndeb-src http://mirror.steadfast.net/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
 
-# Install GDAL
-RUN apt-get update && apt-get install -t testing -y binutils libproj-dev gdal-bin
+# Install GDAL, nginx
+RUN apt-get update && apt-get install -t testing -y binutils libproj-dev gdal-bin nginx
 
 WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install
