@@ -14,6 +14,8 @@ A free, user-friendly, extendable application and [API](https://opendronemap.git
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
  * [Roadmap](#roadmap)
  * [Terminology](#terminology)
+ * [Getting Help](#getting-help)
+ 
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
@@ -281,3 +283,11 @@ Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md).
  - `ImageUpload`: aerial images.
  - `Mission`: A flight path and other information (overlap %, angle, ...) associated with a particular `Task`.
 
+## Getting Help
+
+We have several channels of communication for people to ask questions and to get involved with the community:
+
+ - [Gitter](https://gitter.im/OpenDroneMap/web-development)
+ - [GitHub Issues](https://github.com/OpenDroneMap/WebODM/issues)
+ - [OpenDroneMap Users Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-users)
+ - [OpenDroneMap Developers Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-dev)
