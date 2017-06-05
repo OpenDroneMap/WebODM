@@ -79,7 +79,7 @@ echo -e "\033[91mNOTE:\033[39m Windows users using docker should replace localho
 if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ] || [ "$1" = "--no-gunicorn" ]; then
     python manage.py runserver 0.0.0.0:8000
 else
-    nginx -c /webodm/nginx/nginx.conf
+    nginx -c $(pwd)/nginx/nginx.conf
     gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --preload
 fi
 
