@@ -79,6 +79,9 @@ echo -e "\033[91mNOTE:\033[39m Windows users using docker should replace localho
 if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ] || [ "$1" = "--no-gunicorn" ]; then
     python manage.py runserver 0.0.0.0:8000
 else
+    if [ ! -e /webodm/build/static ]; then
+       echo -e "\033[91mWARN:\033[39m /webodm/build/static does not exist, CSS, JS and other files might not be available."
+    fi 
     nginx -c $(pwd)/nginx/nginx.conf
     gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --preload
 fi
