@@ -14,6 +14,8 @@ A free, user-friendly, extendable application and [API](https://opendronemap.git
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
  * [Roadmap](#roadmap)
  * [Terminology](#terminology)
+ * [Getting Help](#getting-help)
+ 
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
@@ -74,6 +76,7 @@ After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission m
 Task fails with `Process exited with code null`, no task console output | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
 On Windows, docker-compose fails with `Failed to execute the script docker-compose` | Make sure you have enabled VT-x virtualization in the BIOS
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
+Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
@@ -135,17 +138,22 @@ screen -r webodm
 
 ## Run it natively
 
-If you want to run WebODM natively, you will need to install:
+WebODM can run natively on Windows, MacOS and Linux.
+
+Ubuntu 16.04 LTS users can refer to [this script](/contrib/ubuntu_1604_install.sh) to install WebODM natively on a new machine.
+
+To run WebODM, you will need to install:
  * PostgreSQL (>= 9.5)
  * PostGIS 2.3
  * Python 3.5
  * GDAL (>= 2.1)
  * Node.js (>= 6.0)
+ * Nginx (Linux/MacOS) - OR - Apache + mod_wsgi (Windows)
 
 On Linux, make sure you have:
 
 ```bash
-apt-get install binutils libproj-dev gdal-bin
+apt-get install binutils libproj-dev gdal-bin nginx
 ```
 
 On Windows use the [OSGeo4W](https://trac.osgeo.org/osgeo4w/) installer to install GDAL. MacOS users can use:
@@ -189,7 +197,17 @@ pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
 webpack
-chmod +x start.sh && ./start.sh
+chmod +x start.sh && ./start.sh --no-gunicorn
+```
+
+The `start.sh` script will use Django's built-in server if you pass the `--no-gunicorn` parameter. This is good for testing, but bad for production. 
+
+In production, if you have nginx installed, modify the configuration file in `nginx/nginx.conf` to match your system's configuration and just run `start.sh` without parameters. 
+
+Windows users should refer to [this guide](https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/modwsgi/) to install Apache + mod_wsgi and run gunicorn:
+
+```bash
+gunicorn webodm.wsgi --bind 0.0.0.0:8000 --preload
 ```
 
 If you are getting a `rt_raster_gdal_warp: Could not create GDAL transformation object for output dataset creation`, make sure that your PostGIS installation has PROJ support:
@@ -216,8 +234,6 @@ npm --version
 gdalinfo --version
 ```
 Should all work without errors.
-
-Ubuntu 16.04 LTS users can refer to this [script](https://gist.githubusercontent.com/lkpanganiban/5226cc8dd59cb39cdc1946259c3fea6e/raw/f9f41ad0c1dfdd2d26a452d3b2732dbaf3fd3608/webodm_install.sh) to install WebODM natively on a new machine.
 
 ## OpenDroneMap, node-OpenDroneMap, WebODM... what?
 
@@ -267,3 +283,11 @@ Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md).
  - `ImageUpload`: aerial images.
  - `Mission`: A flight path and other information (overlap %, angle, ...) associated with a particular `Task`.
 
+## Getting Help
+
+We have several channels of communication for people to ask questions and to get involved with the community:
+
+ - [Gitter](https://gitter.im/OpenDroneMap/web-development)
+ - [GitHub Issues](https://github.com/OpenDroneMap/WebODM/issues)
+ - [OpenDroneMap Users Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-users)
+ - [OpenDroneMap Developers Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-dev)

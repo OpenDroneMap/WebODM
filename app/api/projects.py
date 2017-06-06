@@ -26,5 +26,5 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     filter_fields = ('id', 'name', 'description', 'created_at')
     serializer_class = ProjectSerializer
-    queryset = models.Project.objects.filter(deleting=False)
+    queryset = models.Project.objects.filter(deleting=False).order_by('-created_at')
     ordering_fields = '__all__'

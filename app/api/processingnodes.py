@@ -20,10 +20,10 @@ class ProcessingNodeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProcessingNodeFilter(FilterSet):
-    has_available_options = django_filters.MethodFilter()
+    has_available_options = django_filters.CharFilter(method='filter_has_available_options')
 
     # noinspection PyMethodMayBeStatic
-    def filter_has_available_options(self, queryset, value):
+    def filter_has_available_options(self, queryset, name, value):
         if value.lower() in ['true', '1']:
             return queryset.exclude(available_options=dict())
         else:
