@@ -3,6 +3,8 @@ import json
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from guardian.shortcuts import get_objects_for_user
+
 from nodeodm.models import ProcessingNode
 from .models import Project, Task
 from django.contrib import messages
@@ -22,9 +24,11 @@ def dashboard(request):
     if Project.objects.filter(owner=request.user).count() == 0:
         Project.objects.create(owner=request.user, name=_("First Project"))
 
-    return render(request, 'app/dashboard.html', {'title': 'Dashboard', 
+    return render(request, 'app/dashboard.html', {'title': 'Dashboard',
         'no_processingnodes': no_processingnodes,
-        'no_tasks': no_tasks})
+        'no_tasks': no_tasks,
+        **get_view_params(request),
+    })
 
 
 @login_required
@@ -49,7 +53,8 @@ def map(request, project_pk=None, task_pk=None):
             'title': title,
             'params': {
                 'tiles': json.dumps(tiles)
-            }.items()
+            }.items(),
+            **get_view_params(request),
         })
 
 
@@ -76,7 +81,8 @@ def model_display(request, project_pk=None, task_pk=None):
                 'project': project.id,
                 'available_assets': task.get_available_assets()
             })
-        }.items()
+        }.items(),
+        **get_view_params(request),
     })
 
 
@@ -90,5 +96,19 @@ def processing_node(request, processing_node_id):
             {
                 'title': 'Processing Node', 
                 'processing_node': pn,
-                'available_options_json': pn.get_available_options_json(pretty=True)
+                'available_options_json': pn.get_available_options_json(pretty=True),
+                **get_view_params(request),
             })
+
+
+def get_view_params(request):
+    """
+    Returns common parameters to pass to a view
+    """
+    processingnodes = get_objects_for_user(request.user, "nodeodm.view_processingnode", ProcessingNode)
+
+    return {
+        'can_view_processingnode': request.user.has_perm("nodeodm.view_processingnode"),
+        'can_add_processingnode': request.user.has_perm("nodeodm.add_processingnode"),
+        'processingnodes': processingnodes,
+    }
