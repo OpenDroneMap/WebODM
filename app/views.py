@@ -9,7 +9,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 
+from django.contrib.auth import login
+from django.contrib.auth.models import User
+
 def index(request):
+    # Auto login
+    if not request.user.is_authenticated():
+        login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
+        return redirect('dashboard')
+
     return redirect('dashboard' if request.user.is_authenticated() 
                     else 'login')
 
