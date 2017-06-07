@@ -241,24 +241,27 @@
                 <!--<li>
                     <a href="#"><i class="fa fa-plane fa-fw"></i> Mission Planner</a>
                 </li> -->
-                {% if user.is_staff %}   
+                {% if can_view_processingnode %}
                 <li>
                     <a href="#"><i class="fa fa-wrench fa-fw"></i> Processing Nodes<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
-                        {% load processingnode_extras %}
-                        {% all_processing_nodes as nodes %}
-
-                        {% for node in nodes %}
+                        {% for node in processingnodes %}
                         <li>
                             <a href="{% url 'processing_node' node.id %}"><span class="fa fa-laptop"></span> {{node}}</a>
                         </li>
                         {% endfor %}
+
+                        {% if can_add_processingnode %}
                         <li>
                             <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> Add New</a>
                         </li>
+                        {% endif %}
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
+                {% endif %}
+
+                {% if user.is_staff %}
                 <li>
                     <a href="/admin/"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}</a>
                 </li>
@@ -267,7 +270,7 @@
                     <a href="/api/"><i class="fa fa-book fa-fw"></i> {% trans 'API' %}</a>
                 </li>
                 <li>
-                    <a href="https://opendronemap.github.io/WebODM/" target="_blank"><i class="fa fa-life-saver fa-fw"></i> {% trans 'Documentation' %}</a>
+                    <a href="http://docs.webodm.org" target="_blank"><i class="fa fa-life-saver fa-fw"></i> {% trans 'Documentation' %}</a>
                 </li>
             </ul>
         </div>

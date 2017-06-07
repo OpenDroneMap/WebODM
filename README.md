@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM)
 
-A free, user-friendly, extendable application and [API](https://opendronemap.github.io/WebODM/) for drone image processing. Generate georeferenced maps, point clouds and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
+A free, user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
 
 * [Getting Started](#getting-started)
     * [Common Troubleshooting](#common-troubleshooting)
@@ -14,6 +14,8 @@ A free, user-friendly, extendable application and [API](https://opendronemap.git
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
  * [Roadmap](#roadmap)
  * [Terminology](#terminology)
+ * [Getting Help](#getting-help)
+ 
 
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
@@ -23,7 +25,7 @@ A free, user-friendly, extendable application and [API](https://opendronemap.git
 
 [![WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier](https://img.youtube.com/vi/UnN-NzL96T8/0.jpg)](https://www.youtube.com/watch?v=UnN-NzL96T8 "WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier")
 
-If you know Python, web technologies (JS, HTML, CSS, etc.) or both, it's easy to make a change to WebODM! Make a fork, clone the repository and run `./devenv.sh start`. That's it! See the [Development Quickstart](https://opendronemap.github.io/WebODM/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information. All ideas are considered and people of all skill levels are welcome to contribute.
+If you know Python, web technologies (JS, HTML, CSS, etc.) or both, it's easy to make a change to WebODM! Make a fork, clone the repository and run `./devenv.sh start`. That's it! See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information. All ideas are considered and people of all skill levels are welcome to contribute.
 
 ## Getting Started
 
@@ -88,7 +90,7 @@ If you want to run WebODM in production, make sure to change the `SECRET_KEY` va
 
 ## API Docs
 
-See the [API documentation page](https://opendronemap.github.io/WebODM/).
+See the [API documentation page](http://docs.webodm.org).
 
 ## Run the docker version as a Linux Service
 
@@ -281,3 +283,11 @@ Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md).
  - `ImageUpload`: aerial images.
  - `Mission`: A flight path and other information (overlap %, angle, ...) associated with a particular `Task`.
 
+## Getting Help
+
+We have several channels of communication for people to ask questions and to get involved with the community:
+
+ - [Gitter](https://gitter.im/OpenDroneMap/web-development)
+ - [GitHub Issues](https://github.com/OpenDroneMap/WebODM/issues)
+ - [OpenDroneMap Users Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-users)
+ - [OpenDroneMap Developers Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-dev)
