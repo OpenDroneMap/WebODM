@@ -83,7 +83,7 @@ else
        echo -e "\033[91mWARN:\033[39m /webodm/build/static does not exist, CSS, JS and other files might not be available."
     fi 
     nginx -c $(pwd)/nginx/nginx.conf
-    gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --preload
+    gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --preload
 fi
 
 # If this is executed, it means the previous command failed, don't display the congratulations message
