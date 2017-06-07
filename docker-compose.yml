@@ -17,7 +17,7 @@ services:
   webapp:
     build: .
     container_name: webapp
-    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh"
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-it.sh db:5432 -- /webodm/start.sh\""
     volumes:
       - appmedia:/webodm/app/media
     ports:
