@@ -1,6 +1,8 @@
 import json
 
+from django.contrib.auth.models import User
 from django.http import Http404
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from guardian.shortcuts import get_objects_for_user
@@ -12,7 +14,12 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 
 def index(request):
-    return redirect('dashboard' if request.user.is_authenticated() 
+    # Check first access where the user is expected to
+    # create an admin account
+    if User.objects.filter(is_superuser=True).count() == 0:
+        return redirect('welcome')
+
+    return redirect('dashboard' if request.user.is_authenticated()
                     else 'login')
 
 @login_required
@@ -99,6 +106,20 @@ def processing_node(request, processing_node_id):
                 'available_options_json': pn.get_available_options_json(pretty=True),
                 **get_view_params(request),
             })
+
+def welcome(request):
+    if User.objects.filter(is_superuser=True).count() > 0:
+        return redirect('index')
+
+    if request.method == 'GET':
+        return render(request, 'app/registration/registration_base.html',
+              {
+                  'title': 'Welcome'
+              })
+    elif request.method == 'POST':
+        pass
+    else:
+        raise Http404()
 
 
 def get_view_params(request):
