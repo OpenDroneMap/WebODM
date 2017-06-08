@@ -1,10 +1,9 @@
 import json
 
+from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from guardian.shortcuts import get_objects_for_user
 
 from nodeodm.models import ProcessingNode
@@ -12,6 +11,7 @@ from .models import Project, Task
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
+from django import forms
 
 def index(request):
     # Check first access where the user is expected to
@@ -107,19 +107,37 @@ def processing_node(request, processing_node_id):
                 **get_view_params(request),
             })
 
+class FirstUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'password', )
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+
+
 def welcome(request):
     if User.objects.filter(is_superuser=True).count() > 0:
         return redirect('index')
 
-    if request.method == 'GET':
-        return render(request, 'app/registration/registration_base.html',
-              {
-                  'title': 'Welcome'
-              })
-    elif request.method == 'POST':
-        pass
-    else:
-        raise Http404()
+    fuf = FirstUserForm(prefix='user')
+
+    if request.method == 'POST':
+        fuf = FirstUserForm(request.POST, prefix='user')
+        if fuf.is_valid():
+            admin_user = fuf.save(commit=False)
+            admin_user.is_superuser = admin_user.is_staff = True
+            admin_user.save()
+
+            # Log-in automatically
+            login(request, admin_user, 'django.contrib.auth.backends.ModelBackend')
+            return redirect('dashboard')
+
+    return render(request, 'app/welcome.html',
+                  {
+                      'title': 'Welcome',
+                      'firstuserform': fuf
+                  })
 
 
 def get_view_params(request):
