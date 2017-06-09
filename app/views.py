@@ -120,10 +120,10 @@ def welcome(request):
     if User.objects.filter(is_superuser=True).count() > 0:
         return redirect('index')
 
-    fuf = FirstUserForm(prefix='user')
+    fuf = FirstUserForm()
 
     if request.method == 'POST':
-        fuf = FirstUserForm(request.POST, prefix='user')
+        fuf = FirstUserForm(request.POST)
         if fuf.is_valid():
             admin_user = fuf.save(commit=False)
             admin_user.is_superuser = admin_user.is_staff = True
