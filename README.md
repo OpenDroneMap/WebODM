@@ -50,7 +50,6 @@ docker-machine ip
 Linux / Mac, users can connect to 127.0.0.1.
 
 * Open a Web Browser to `http://<yourDockerMachineIp>:8000`
-* Log in with the default credentials: "admin:admin"
 
 To stop WebODM press CTRL+C or run:
 
