@@ -36,6 +36,7 @@ class ProjectListItem extends React.Component {
     this.handleEditProject = this.handleEditProject.bind(this);
     this.updateProject = this.updateProject.bind(this);
     this.taskDeleted = this.taskDeleted.bind(this);
+    this.hasPermission = this.hasPermission.bind(this);
   }
 
   refresh(){
@@ -87,81 +88,87 @@ class ProjectListItem extends React.Component {
     }));
   }
 
+  hasPermission(perm){
+    return this.state.data.permissions.indexOf(perm) !== -1;
+  }
+
   componentDidMount(){
     Dropzone.autoDiscover = false;
 
-    this.dz = new Dropzone(this.dropzone, {
-        paramName: "images",
-        url : `/api/projects/${this.state.data.id}/tasks/`,
-        parallelUploads: 9999999,
-        uploadMultiple: true,
-        acceptedFiles: "image/*, .txt",
-        autoProcessQueue: true,
-        createImageThumbnails: false,
-        clickable: this.uploadButton,
-        
-        headers: {
-          [csrf.header]: csrf.token
-        }
-    });
-
-    this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
-        this.setUploadState({
-          progress, totalBytes, totalBytesSent
-        });
-      })
-      .on("addedfile", () => {
-        this.setUploadState({
-          totalCount: this.state.upload.totalCount + 1
-        });
-      })
-      .on("processingmultiple", () => {
-        this.setUploadState({
-          uploading: true,
-          showEditTask: true
-        })
-      })
-      .on("completemultiple", (files) => {
-        // Check
-        let success = files.length > 0 && files.filter(file => file.status !== "success").length === 0;
-
-        // All files have uploaded!
-        if (success){
-          this.setUploadState({uploading: false});
-
-          try{
-            let response = JSON.parse(files[0].xhr.response);
-            if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
-            
-            let taskId = response.id;
-            this.setUploadState({taskId});
-
-            // Update task information (if the user has completed this step)
-            if (this.state.upload.savedTaskInfo){
-              this.updateTaskInfo(taskId, this.editTaskPanel.getTaskInfo());
-            }else{
-              // Need to wait for user to confirm task options
-            }
-          }catch(e){
-            this.setUploadState({error: `Invalid response from server: ${e.message}`})
+    if (this.hasPermission("add")){
+      this.dz = new Dropzone(this.dropzone, {
+          paramName: "images",
+          url : `/api/projects/${this.state.data.id}/tasks/`,
+          parallelUploads: 9999999,
+          uploadMultiple: true,
+          acceptedFiles: "image/*, .txt",
+          autoProcessQueue: true,
+          createImageThumbnails: false,
+          clickable: this.uploadButton,
+          
+          headers: {
+            [csrf.header]: csrf.token
           }
-
-        }else{
-          this.setUploadState({
-            uploading: false,
-            error: "Could not upload all files. An error occured. Please try again."
-          });
-        }
-      })
-      .on("reset", () => {
-        this.resetUploadState();
-      })
-      .on("dragenter", () => {
-        this.resetUploadState();
-      })
-      .on("sending", (file, xhr, formData) => {
-        formData.append('auto_processing_node', "false");
       });
+
+      this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
+          this.setUploadState({
+            progress, totalBytes, totalBytesSent
+          });
+        })
+        .on("addedfile", () => {
+          this.setUploadState({
+            totalCount: this.state.upload.totalCount + 1
+          });
+        })
+        .on("processingmultiple", () => {
+          this.setUploadState({
+            uploading: true,
+            showEditTask: true
+          })
+        })
+        .on("completemultiple", (files) => {
+          // Check
+          let success = files.length > 0 && files.filter(file => file.status !== "success").length === 0;
+
+          // All files have uploaded!
+          if (success){
+            this.setUploadState({uploading: false});
+
+            try{
+              let response = JSON.parse(files[0].xhr.response);
+              if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
+              
+              let taskId = response.id;
+              this.setUploadState({taskId});
+
+              // Update task information (if the user has completed this step)
+              if (this.state.upload.savedTaskInfo){
+                this.updateTaskInfo(taskId, this.editTaskPanel.getTaskInfo());
+              }else{
+                // Need to wait for user to confirm task options
+              }
+            }catch(e){
+              this.setUploadState({error: `Invalid response from server: ${e.message}`})
+            }
+
+          }else{
+            this.setUploadState({
+              uploading: false,
+              error: "Could not upload all files. An error occured. Please try again."
+            });
+          }
+        })
+        .on("reset", () => {
+          this.resetUploadState();
+        })
+        .on("dragenter", () => {
+          this.resetUploadState();
+        })
+        .on("sending", (file, xhr, formData) => {
+          formData.append('auto_processing_node', "false");
+        });
+    }
   }
 
   updateTaskInfo(taskId, taskInfo){
@@ -289,19 +296,21 @@ class ProjectListItem extends React.Component {
           projectName={data.name}
           projectDescr={data.description}
           saveAction={this.updateProject}
-          deleteAction={this.handleDelete}
+          deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
         />
 
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
           <div className="btn-group pull-right">
-            <button type="button" 
-                    className={"btn btn-primary btn-sm " + (this.state.upload.uploading ? "hide" : "")} 
-                    onClick={this.handleUpload} 
-                    ref={this.setRef("uploadButton")}>
-              <i className="glyphicon glyphicon-upload"></i>
-              Upload Images and GCP
-            </button>
+            {this.hasPermission("add") ? 
+              <button type="button" 
+                      className={"btn btn-primary btn-sm " + (this.state.upload.uploading ? "hide" : "")} 
+                      onClick={this.handleUpload} 
+                      ref={this.setRef("uploadButton")}>
+                <i className="glyphicon glyphicon-upload"></i>
+                Upload Images and GCP
+              </button>
+            : ""}
               
             <button disabled={this.state.upload.error !== ""} 
                     type="button" 

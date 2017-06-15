@@ -1,8 +1,9 @@
 import json
 
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from guardian.shortcuts import get_objects_for_user
 
 from nodeodm.models import ProcessingNode
@@ -10,11 +11,18 @@ from .models import Project, Task
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
+from django import forms
 
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 
 def index(request):
+    # Check first access where the user is expected to
+    # create an admin account
+    if User.objects.filter(is_superuser=True).count() == 0:
+        return redirect('welcome')
+
+
     # Auto login
     if not request.user.is_authenticated():
         login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
@@ -34,8 +42,7 @@ def dashboard(request):
 
     return render(request, 'app/dashboard.html', {'title': 'Dashboard',
         'no_processingnodes': no_processingnodes,
-        'no_tasks': no_tasks,
-        **get_view_params(request),
+        'no_tasks': no_tasks
     })
 
 
@@ -61,8 +68,7 @@ def map(request, project_pk=None, task_pk=None):
             'title': title,
             'params': {
                 'tiles': json.dumps(tiles)
-            }.items(),
-            **get_view_params(request),
+            }.items()
         })
 
 
@@ -89,8 +95,7 @@ def model_display(request, project_pk=None, task_pk=None):
                 'project': project.id,
                 'available_assets': task.get_available_assets()
             })
-        }.items(),
-        **get_view_params(request),
+        }.items()
     })
 
 
@@ -104,19 +109,37 @@ def processing_node(request, processing_node_id):
             {
                 'title': 'Processing Node', 
                 'processing_node': pn,
-                'available_options_json': pn.get_available_options_json(pretty=True),
-                **get_view_params(request),
+                'available_options_json': pn.get_available_options_json(pretty=True)
             })
 
+class FirstUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'password', )
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
 
-def get_view_params(request):
-    """
-    Returns common parameters to pass to a view
-    """
-    processingnodes = get_objects_for_user(request.user, "nodeodm.view_processingnode", ProcessingNode)
 
-    return {
-        'can_view_processingnode': request.user.has_perm("nodeodm.view_processingnode"),
-        'can_add_processingnode': request.user.has_perm("nodeodm.add_processingnode"),
-        'processingnodes': processingnodes,
-    }
+def welcome(request):
+    if User.objects.filter(is_superuser=True).count() > 0:
+        return redirect('index')
+
+    fuf = FirstUserForm()
+
+    if request.method == 'POST':
+        fuf = FirstUserForm(request.POST)
+        if fuf.is_valid():
+            admin_user = fuf.save(commit=False)
+            admin_user.is_superuser = admin_user.is_staff = True
+            admin_user.save()
+
+            # Log-in automatically
+            login(request, admin_user, 'django.contrib.auth.backends.ModelBackend')
+            return redirect('dashboard')
+
+    return render(request, 'app/welcome.html',
+                  {
+                      'title': 'Welcome',
+                      'firstuserform': fuf
+                  })

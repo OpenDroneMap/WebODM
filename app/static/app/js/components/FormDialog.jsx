@@ -97,7 +97,7 @@ class FormDialog extends React.Component {
         if (this.props.getFormData) formData = this.props.getFormData();
 
         this.props.saveAction(formData).fail(e => {
-            this.setState({error: e.message || e.responseText || "Could not apply changes"});
+            this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || "Could not apply changes"});
         }).always(() => {
             this.setState({saving: false});
         }).done(() => {
@@ -111,7 +111,7 @@ class FormDialog extends React.Component {
                 this.setState({deleting: true});
                 this.props.deleteAction()
                     .fail(e => {
-                        this.setState({error: e.message || e.responseText || "Could not delete item", deleting: false});
+                        this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || "Could not delete item", deleting: false});
                     });
             }
         }

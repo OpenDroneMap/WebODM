@@ -50,11 +50,6 @@ def boot():
         # Add permission to view processing nodes
         default_group.permissions.add(Permission.objects.get(codename="view_processingnode"))
 
-        # Check super user
-        if User.objects.filter(is_superuser=True).count() == 0:
-            User.objects.create_superuser('admin', 'admin@example.com', 'admin')
-            logger.info("Created superuser")
-
         # Unlock any Task that might have been locked
         Task.objects.filter(processing_lock=True).update(processing_lock=False)
 
