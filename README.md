@@ -196,6 +196,7 @@ pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
 webpack
+python manage.py collectstatic --noinput
 chmod +x start.sh && ./start.sh --no-gunicorn
 ```
 
