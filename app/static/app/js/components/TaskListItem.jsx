@@ -304,7 +304,7 @@ class TaskListItem extends React.Component {
                   this.setState({time: -1});
               },
               defaultError: "Cannot restart task."
-            },
+            }
           ));
       }
 

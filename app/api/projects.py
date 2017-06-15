@@ -3,6 +3,10 @@ from rest_framework import serializers, viewsets
 from app import models
 from .tasks import TaskIDsSerializer
 
+#class PermissionsSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = models.Project
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     tasks = TaskIDsSerializer(many=True, read_only=True)
@@ -26,5 +30,5 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     filter_fields = ('id', 'name', 'description', 'created_at')
     serializer_class = ProjectSerializer
-    queryset = models.Project.objects.filter(deleting=False).order_by('-created_at')
+    queryset = models.Project.objects.prefetch_related('task_set').filter(deleting=False).order_by('-created_at')
     ordering_fields = '__all__'
