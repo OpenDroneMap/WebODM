@@ -196,8 +196,14 @@ class TestApi(BootTestCase):
         self.assertTrue(task.last_error is None)
         self.assertTrue(task.pending_action == pending_actions.REMOVE)
 
-        # Can delete project that we we own
         temp_project = Project.objects.create(owner=user)
+
+        # We have permissions to do anything on a project that we own
+        res = client.get('/api/projects/{}/'.format(project.id))
+        for perm in ['delete', 'change', 'view', 'add']:
+            self.assertTrue(perm in res.data['permissions'])
+
+        # Can delete project that we we own
         res = client.delete('/api/projects/{}/'.format(temp_project.id))
         self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
         self.assertTrue(Project.objects.filter(id=temp_project.id).count() == 0) # Really deleted
@@ -207,8 +213,15 @@ class TestApi(BootTestCase):
         res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
-        # Can't delete a project for which we just have view permissions
         assign_perm('view_project', user, other_temp_project)
+
+        # We have view permissions only
+        res = client.get('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue('view' in res.data['permissions'])
+        for perm in ['delete', 'change', 'add']:
+            self.assertFalse(perm in res.data['permissions'])
+
+        # Can't delete a project for which we just have view permissions
         res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
         self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
 

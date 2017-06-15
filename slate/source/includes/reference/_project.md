@@ -12,7 +12,13 @@
     ],
     "created_at": "2016-12-07T02:09:28.515319Z",
     "name": "Test",
-    "description": ""
+    "description": "",
+    "permissions": [
+        "delete",
+        "change",
+        "add",
+        "view"
+    ]
 }
 ```
 
@@ -25,6 +31,7 @@ tasks | int[] | List of task IDs associated with this project
 created_at | string | Creation date and time
 name | string | Name of the project
 description | string | A more in-depth description
+permissions | string[] | List of actions that the current user is allowed to perform. See [Permissions Values](#permission-values)
 
 
 ### Create a project

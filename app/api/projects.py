@@ -1,11 +1,8 @@
+from guardian.shortcuts import get_perms
 from rest_framework import serializers, viewsets
 
 from app import models
 from .tasks import TaskIDsSerializer
-
-#class PermissionsSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = models.Project
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -14,6 +11,11 @@ class ProjectSerializer(serializers.ModelSerializer):
             default=serializers.CurrentUserDefault()
         )
     created_at = serializers.ReadOnlyField()
+    permissions = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        return list(map(lambda p: p.replace("_project", ""), get_perms(self.context['request'].user, obj)))
+
 
     class Meta:
         model = models.Project
