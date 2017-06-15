@@ -111,7 +111,6 @@ class FormDialog extends React.Component {
                 this.setState({deleting: true});
                 this.props.deleteAction()
                     .fail(e => {
-                        console.log(e);
                         this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || "Could not delete item", deleting: false});
                     });
             }
