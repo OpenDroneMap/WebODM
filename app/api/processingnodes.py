@@ -1,8 +1,7 @@
 import django_filters
-from django.core.exceptions import ObjectDoesNotExist
 from django_filters.rest_framework import FilterSet
 from guardian.shortcuts import get_objects_for_user
-from rest_framework import serializers, viewsets, exceptions
+from rest_framework import serializers, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 

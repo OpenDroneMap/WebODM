@@ -164,14 +164,14 @@ class TaskListItem extends React.Component {
               if (options.success !== undefined) options.success();
             }else{
               this.setState({
-                actionError: json.error,
+                actionError: json.error || options.defaultError || "Cannot complete operation.",
                 actionButtonsDisabled: false
               });
             }
         })
         .fail(() => {
             this.setState({
-              error: url + " is unreachable.",
+              actionError: options.defaultError || "Cannot complete operation.",
               actionButtonsDisabled: false
             });
         });
@@ -293,22 +293,24 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
           task.processing_node){
-        addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel"));
+        addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: "Cannot cancel task."}));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node){
           addActionButton("Restart", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("restart", {
-            success: () => {
-                if (this.console) this.console.clear();
-                this.setState({time: -1});
-              }
+              success: () => {
+                  if (this.console) this.console.clear();
+                  this.setState({time: -1});
+              },
+              defaultError: "Cannot restart task."
             }
           ));
       }
 
       addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
-        confirm: "All information related to this task, including images, maps and models will be deleted. Continue?"
+        confirm: "All information related to this task, including images, maps and models will be deleted. Continue?",
+        defaultError: "Cannot delete task."
       }));
 
       const disabled = this.state.actionButtonsDisabled || !!task.pending_action;

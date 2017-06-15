@@ -33,8 +33,7 @@ def dashboard(request):
 
     return render(request, 'app/dashboard.html', {'title': 'Dashboard',
         'no_processingnodes': no_processingnodes,
-        'no_tasks': no_tasks,
-        **get_view_params(request),
+        'no_tasks': no_tasks
     })
 
 
@@ -60,8 +59,7 @@ def map(request, project_pk=None, task_pk=None):
             'title': title,
             'params': {
                 'tiles': json.dumps(tiles)
-            }.items(),
-            **get_view_params(request),
+            }.items()
         })
 
 
@@ -88,8 +86,7 @@ def model_display(request, project_pk=None, task_pk=None):
                 'project': project.id,
                 'available_assets': task.get_available_assets()
             })
-        }.items(),
-        **get_view_params(request),
+        }.items()
     })
 
 
@@ -103,8 +100,7 @@ def processing_node(request, processing_node_id):
             {
                 'title': 'Processing Node', 
                 'processing_node': pn,
-                'available_options_json': pn.get_available_options_json(pretty=True),
-                **get_view_params(request),
+                'available_options_json': pn.get_available_options_json(pretty=True)
             })
 
 class FirstUserForm(forms.ModelForm):
@@ -138,16 +134,3 @@ def welcome(request):
                       'title': 'Welcome',
                       'firstuserform': fuf
                   })
-
-
-def get_view_params(request):
-    """
-    Returns common parameters to pass to a view
-    """
-    processingnodes = get_objects_for_user(request.user, "nodeodm.view_processingnode", ProcessingNode)
-
-    return {
-        'can_view_processingnode': request.user.has_perm("nodeodm.view_processingnode"),
-        'can_add_processingnode': request.user.has_perm("nodeodm.add_processingnode"),
-        'processingnodes': processingnodes,
-    }
