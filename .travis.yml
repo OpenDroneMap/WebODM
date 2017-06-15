@@ -17,7 +17,7 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 
 install:
-  - docker-compose up --build -d
+  - docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d
   - sleep 50
 
 script: docker-compose exec webapp python manage.py test
