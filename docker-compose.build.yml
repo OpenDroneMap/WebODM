@@ -1,0 +1,8 @@
+# This configuration does not include a processing node
+# Which makes for faster setup times
+version: '2'
+services:
+  db:
+    build: ./db
+  webapp:
+    build: .

@@ -70,14 +70,15 @@ run(){
 }
 
 start(){
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml up"
+	command="docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml"
+	run "$command up || $command start"
 }
 
 rebuild(){
-	run "docker-compose down"
+	run "docker-compose down --remove-orphans"
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
 	run "rm -fr nodeodm/external/node-OpenDroneMap || sudo rm -fr nodeodm/external/node-OpenDroneMap"
-	run "docker-compose build --no-cache"
+	run "docker-compose -f docker-compose.yml -f docker-compose.build.yml build --no-cache"
 	#run "docker images --no-trunc -aqf \"dangling=true\" | xargs docker rmi"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 }
@@ -89,7 +90,7 @@ if [[ $1 = "start" ]]; then
 elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
-	run "docker-compose down --remove-orphans"
+	run "docker-compose stop"
 elif [[ $1 = "rebuild" ]]; then
 	environment_check
 	echo  "Rebuilding WebODM..."
@@ -98,7 +99,10 @@ elif [[ $1 = "update" ]]; then
 	echo "Updating WebODM..."
 	run "git pull origin master"
 	run "docker pull opendronemap/node-opendronemap"
-	rebuild
+	run "docker pull opendronemap/webodm_db"
+	run "docker pull opendronemap/webodm_webapp"
+	run "docker-compose down --remove-orphans"
+	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 elif [[ $1 = "checkenv" ]]; then
 	environment_check
 else
