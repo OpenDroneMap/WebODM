@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import login
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -122,6 +123,7 @@ def welcome(request):
         fuf = FirstUserForm(request.POST)
         if fuf.is_valid():
             admin_user = fuf.save(commit=False)
+            admin_user.password = make_password(fuf.cleaned_data['password'])
             admin_user.is_superuser = admin_user.is_staff = True
             admin_user.save()
 
