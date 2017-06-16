@@ -34,7 +34,7 @@ def index(request):
 @login_required
 def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
-    no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
+    no_tasks = False #Task.objects.filter(project__owner=request.user).count() == 0
 
     # Create first project automatically
     #if Project.objects.filter(owner=request.user).count() == 0:
