@@ -71,7 +71,7 @@ run(){
 
 start(){
 	command="docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml"
-	run "$command up || $command start"
+	run "$command start || $command up"
 }
 
 rebuild(){
