@@ -49,17 +49,10 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
 
     echo Setup webpack watch...
     webpack --watch &
-else
-    # Normal startup
-    echo Building asssets...
-    webpack
 fi
 
 echo Running migrations
 python manage.py migrate
-
-echo Collecting static assets
-python manage.py collectstatic --noinput
 
 if [[ "$1" = "--create-default-pnode" ]]; then
    echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-odm-1', defaults={'hostname': 'node-odm-1', 'port': 3000})" | python manage.py shell

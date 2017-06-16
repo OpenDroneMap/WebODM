@@ -1,0 +1,8 @@
+# This configuration builds from Dockerfiles 
+# instead of pulling from opendronemap hub
+version: '2'
+services:
+  db:
+    build: ./db
+  webapp:
+    build: .

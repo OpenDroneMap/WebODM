@@ -8,14 +8,14 @@ volumes:
     driver: local
 services:
   db:
-    build: ./db
+    image: opendronemap/webodm_db
     container_name: db
     ports:
       - "5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
   webapp:
-    build: .
+    image: opendronemap/webodm_webapp
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-it.sh db:5432 -- /webodm/start.sh\""
     volumes:
