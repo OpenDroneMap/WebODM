@@ -1,5 +1,5 @@
-# This configuration does not include a processing node
-# Which makes for faster setup times
+# This configuration builds from Dockerfiles 
+# instead of pulling from opendronemap hub
 version: '2'
 services:
   db:
