@@ -169,7 +169,7 @@ Then these steps should be sufficient to get you up and running:
 git clone https://github.com/OpenDroneMap/WebODM
 ```
 
-Create a `WebODM\webodm\local_settings.py` file containing your database settings:
+Create a `WebODM/webodm/local_settings.py` file containing your database settings:
 
 ```python
 DATABASES = {
