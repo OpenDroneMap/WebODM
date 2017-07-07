@@ -446,5 +446,13 @@ class ModelView extends React.Component {
   }
 }
 
+$(function(){
+    $("[data-modelview]").each(function(){
+        let props = $(this).data();
+        delete(props.modelview);
+        window.ReactDOM.render(<ModelView {...props}/>, $(this).get(0));
+    });
+});
+
 export default ModelView;
     

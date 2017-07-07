@@ -3,6 +3,9 @@
 
 {% block content %}
 
+{% load render_bundle from webpack_loader %}
+{% render_bundle 'Console' attrs='async' %}
+
 <table class="table table-bordered table-striped table-first-col-bold processing-node-info">
 	<tr>
 		<td>{% trans "Hostname" %}</td>
