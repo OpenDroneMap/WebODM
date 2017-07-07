@@ -257,7 +257,7 @@ class TaskListItem extends React.Component {
 
     let expanded = "";
     if (this.state.expanded){
-      let showGeotiffMissingWarning = false,
+      let showOrthophotoMissingWarning = false,
           showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
           showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && !showMemoryErrorWarning && task.status == statusCodes.FAILED,
           memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
@@ -270,12 +270,12 @@ class TaskListItem extends React.Component {
       };
       
       if (task.status === statusCodes.COMPLETED){
-        if (task.available_assets.indexOf("geotiff") !== -1){
+        if (task.available_assets.indexOf("orthophoto.tif") !== -1){
           addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         }else{
-          showGeotiffMissingWarning = true;
+          showOrthophotoMissingWarning = true;
         }
         
         addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
@@ -347,8 +347,8 @@ class TaskListItem extends React.Component {
               : ""}
               {/* TODO: List of images? */}
 
-              {showGeotiffMissingWarning ? 
-              <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images.</span></div> : ""}
+              {showOrthophotoMissingWarning ? 
+              <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.</span></div> : ""}
 
             </div>
             <div className="col-md-8">

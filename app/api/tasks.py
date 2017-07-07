@@ -29,18 +29,14 @@ class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
     images_count = serializers.SerializerMethodField()
-    available_assets = serializers.SerializerMethodField()
 
     def get_images_count(self, obj):
         return obj.imageupload_set.count()
 
-    def get_available_assets(self, obj):
-        return obj.get_available_assets()
-
     class Meta:
         model = models.Task
         exclude = ('processing_lock', 'console_output', 'orthophoto_extent', )
-        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', )
+        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -240,7 +236,7 @@ class TaskDownloads(TaskNestedView):
             file = open(asset_path, "rb")
             response = HttpResponse(FileWrapper(file),
                                     content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
-            response['Content-Disposition'] = "attachment; filename={}".format(asset_filename)
+            response['Content-Disposition'] = "attachment; filename={}".format(asset)
             return response
 
 """
