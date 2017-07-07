@@ -39,7 +39,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Task
-        exclude = ('processing_lock', 'console_output', 'orthophoto', )
+        exclude = ('processing_lock', 'console_output', 'orthophoto_extent', )
         read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', )
 
 class TaskViewSet(viewsets.ViewSet):
@@ -48,7 +48,7 @@ class TaskViewSet(viewsets.ViewSet):
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
+    queryset = models.Task.objects.all().defer('orthophoto_extent', 'console_output')
     
     # We don't use object level permissions on tasks, relying on
     # project's object permissions instead (but standard model permissions still apply)
@@ -174,7 +174,7 @@ class TaskViewSet(viewsets.ViewSet):
 
 
 class TaskNestedView(APIView):
-    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
+    queryset = models.Task.objects.all().defer('orthophoto_extent', 'console_output')
 
     def get_and_check_task(self, request, pk, project_pk, annotate={}):
         get_and_check_project(request, project_pk)
@@ -204,16 +204,14 @@ class TaskTilesJson(TaskNestedView):
         """
         Get tile.json for this tasks's orthophoto
         """
-        task = self.get_and_check_task(request, pk, project_pk, annotate={
-                'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))
-            })
+        task = self.get_and_check_task(request, pk, project_pk)
 
-        if task.orthophoto_area is None:
+        if task.orthophoto_extent is None:
             raise exceptions.ValidationError("An orthophoto has not been processed for this task. Tiles are not available.")
 
         json = get_tile_json(task.name, [
                 '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
-            ], task.orthophoto_area.extent)
+            ], task.orthophoto_extent.extent)
         return Response(json)
 
 

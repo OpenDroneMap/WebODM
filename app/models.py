@@ -6,6 +6,8 @@ import zipfile
 from django.contrib.auth.models import User
 from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.gdal import OGRGeometry
+from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -72,7 +74,7 @@ class Project(models.Model):
     def get_tile_json_data(self):
         return [task.get_tile_json_data() for task in self.task_set.filter(
                     status=status_codes.COMPLETED,
-                    orthophoto__isnull=False
+                    orthophoto_extent__isnull=False
                 ).only('id', 'project_id')]
 
     class Meta:
@@ -190,10 +192,6 @@ class Task(models.Model):
                         logger.info("Changing {} to {}".format(prev_name, img))
                         img.save()
 
-                if self.orthophoto is not None:
-                    new_orthophoto_path = os.path.realpath(full_task_directory_path(self.id, new_project_id, "assets", "odm_orthophoto", "odm_orthophoto_4326.tif"))
-                    logger.info("Changing orthophoto path to {}".format(new_orthophoto_path))
-                    self.orthophoto = GDALRaster(new_orthophoto_path, write=True)
             else:
                 logger.warning("Project changed for task {}, but either {} doesn't exist, or {} already exists. This doesn't look right, so we will not move any files.".format(self,
                                                                                                              old_task_folder,
@@ -207,11 +205,7 @@ class Task(models.Model):
             self.__original_project_id = self.project.id
 
         # Autovalidate on save
-        try:
-            self.full_clean()
-        except GDALException as e:
-            logger.warning("Problem while handling GDAL raster: {}. We're going to attempt to remove the reference to it...".format(e))
-            self.orthophoto = None
+        self.full_clean()
 
         super(Task, self).save(*args, **kwargs)
 
@@ -416,17 +410,17 @@ class Task(models.Model):
 
                             logger.info("Extracted all.zip for {}".format(self))
 
-                            # Add to database orthophoto
+                            # Populate orthophoto_extent field
                             orthophoto_path = os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif"))
                             if os.path.exists(orthophoto_path):
-                                orthophoto = GDALRaster(orthophoto_path, write=True)
+                                # Read extent and SRID
+                                orthophoto = GDALRaster(orthophoto_path)
+                                extent = OGRGeometry.from_bbox(orthophoto.extent)
 
-                                # We need to transform to 4326 before we can store it
-                                # as an offdb raster field
-                                orthophoto_4326_path = os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto_4326.tif"))
-                                self.orthophoto = orthophoto.transform(4326, 'GTiff', orthophoto_4326_path)
+                                # It will be implicitly transformed into the SRID of the model’s field
+                                self.orthophoto_extent = GEOSGeometry(extent.wkt, srid=orthophoto.srid)
 
-                                logger.info("Imported orthophoto {} for {}".format(orthophoto_4326_path, self))
+                                logger.info("Populated orthophoto_extent for {}".format(self))
 
                             # Remove old odm_texturing.zip archive (if any)
                             textured_model_archive = self.assets_path(self.get_textured_model_filename())
@@ -485,7 +479,7 @@ class Task(models.Model):
         if self.status == status_codes.COMPLETED:
             assets = list(self.ASSET_DOWNLOADS)
 
-            if self.orthophoto is None:
+            if self.orthophoto_extent is None:
                 assets.remove('geotiff')
                 assets.remove('las')
                 assets.remove('csv')

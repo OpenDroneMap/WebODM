@@ -9,6 +9,8 @@ from datetime import timedelta
 
 import requests
 from django.contrib.auth.models import User
+from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.gdal import OGRGeometry
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -329,8 +331,6 @@ class TestApiTask(BootTransactionTestCase):
 
         # Reassigning the task to another project should move its assets
         self.assertTrue(os.path.exists(full_task_directory_path(task.id, project.id)))
-        self.assertTrue(task.orthophoto is not None)
-        self.assertTrue('project/{}/'.format(project.id) in task.orthophoto.name)
         self.assertTrue(len(task.imageupload_set.all()) == 2)
         for image in task.imageupload_set.all():
             self.assertTrue('project/{}/'.format(project.id) in image.image.path)
@@ -340,8 +340,6 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertFalse(os.path.exists(full_task_directory_path(task.id, project.id)))
         self.assertTrue(os.path.exists(full_task_directory_path(task.id, other_project.id)))
-
-        self.assertTrue('project/{}/'.format(other_project.id) in task.orthophoto.name)
 
         for image in task.imageupload_set.all():
             self.assertTrue('project/{}/'.format(other_project.id) in image.image.path)
@@ -369,6 +367,9 @@ class TestApiTask(BootTransactionTestCase):
         # Orthophoto files/directories should be missing
         self.assertFalse(os.path.exists(task.assets_path("odm_orthophoto", "odm_orthophoto.tif")))
         self.assertFalse(os.path.exists(task.assets_path("orthophoto_tiles")))
+
+        # orthophoto_extent should be none
+        self.assertTrue(task.orthophoto_extent is None)
 
         # Available assets should be missing the geotiff type
         # but others such as texturedmodel should be available
