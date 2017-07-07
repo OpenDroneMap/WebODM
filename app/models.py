@@ -18,7 +18,8 @@ from guardian.models import UserObjectPermissionBase
 from guardian.shortcuts import get_perms_for_model, assign_perm
 
 from app import pending_actions
-from app.postgis import OffDbRasterField
+from django.contrib.gis.db.models.fields import GeometryField
+
 from nodeodm import status_codes
 from nodeodm.exceptions import ProcessingError, ProcessingTimeout, ProcessingException
 from nodeodm.models import ProcessingNode
@@ -146,9 +147,8 @@ class Task(models.Model):
     console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
     ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
-    # georeferenced_model
-    orthophoto = OffDbRasterField(null=True, blank=True, srid=4326, help_text="Orthophoto created by OpenDroneMap")
-    # textured_model
+    orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
+
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
