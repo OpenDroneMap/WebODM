@@ -172,6 +172,11 @@ STATICFILES_DIRS = [
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4718592 # 4.5 MB
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'app.uploadhandler.TemporaryFileUploadHandler', # Ours doesn't keep file descriptors open by default
+]
+
 # Webpack
 WEBPACK_LOADER = {
     'DEFAULT': {
