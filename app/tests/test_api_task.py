@@ -7,6 +7,7 @@ import shutil
 import logging
 from datetime import timedelta
 
+import json
 import requests
 from django.contrib.auth.models import User
 from django.contrib.gis.gdal import GDALRaster
@@ -172,8 +173,8 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot download assets (they don't exist yet)
-        for asset in task.ASSET_DOWNLOADS:
-            res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
+        for asset in list(task.ASSETS_MAP.keys()):
+            res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot access raw assets (they don't exist yet)
@@ -213,21 +214,28 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.status == status_codes.COMPLETED)
 
         # Can download assets
-        for asset in task.ASSET_DOWNLOADS:
-            res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
+        for asset in list(task.ASSETS_MAP.keys()):
+            res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # A textured mesh archive file should exist
-        self.assertTrue(os.path.exists(task.assets_path(task.get_textured_model_filename())))
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
 
         # Can download raw assets
         res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
-        # Can access tiles.json and individual tiles
+        # Can access tiles.json
         res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
+        # Bounds are what we expect them to be
+        # (4 coords in lat/lon)
+        tiles = json.loads(res.content)
+        self.assertTrue(len(tiles['bounds']) == 4)
+        self.assertTrue(tiles['bounds'][0] == -91.99451323800884)
+
+        # Can access individual tiles
         res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
@@ -371,11 +379,11 @@ class TestApiTask(BootTransactionTestCase):
         # orthophoto_extent should be none
         self.assertTrue(task.orthophoto_extent is None)
 
-        # Available assets should be missing the geotiff type
-        # but others such as texturedmodel should be available
+        # Available assets should be missing orthophoto.tif type
+        # but others such as textured_model.zip should be available
         res = client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
-        self.assertFalse('geotiff' in res.data['available_assets'])
-        self.assertTrue('texturedmodel' in res.data['available_assets'])
+        self.assertFalse('orthophoto.tif' in res.data['available_assets'])
+        self.assertTrue('textured_model.zip' in res.data['available_assets'])
 
         image1.close()
         image2.close()

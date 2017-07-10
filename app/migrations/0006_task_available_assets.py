@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 
 import django.contrib.postgres.fields
 from django.db import migrations, models
-from app.models import Task
 
 
 def detect_available_assets(apps, schema_editor):
+    Task = apps.get_model('app', 'Task')
+
     for t in Task.objects.all():
         print("Updating {}".format(t))
         t.update_available_assets_field(True)

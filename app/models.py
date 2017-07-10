@@ -450,6 +450,7 @@ class Task(models.Model):
 
                                 logger.info("Populated orthophoto_extent for {}".format(self))
 
+                            self.update_available_assets_field()
                             self.save()
                         else:
                             # FAILED, CANCELED

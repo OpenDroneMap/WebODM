@@ -5,10 +5,10 @@ from __future__ import unicode_literals
 from django.contrib.gis.gdal import GDALRaster, OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import migrations
-from app.models import Task
 import os
 
 def transfer_existing_orthophoto_extent_values(apps, schema_editor):
+    Task = apps.get_model('app', 'Task')
 
     for t in Task.objects.all():
         print("Checking {}".format(t))

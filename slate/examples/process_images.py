@@ -76,7 +76,7 @@ if 'token' in res:
                 sys.stdout.write("\rProcessing... [%02d:%02d:%02d]" % (h, m, s))
                 sys.stdout.flush()
 
-        res = requests.get("http://localhost:8000/api/projects/{}/tasks/{}/download/geotiff/".format(project_id, task_id), 
+        res = requests.get("http://localhost:8000/api/projects/{}/tasks/{}/download/orthophoto.tif".format(project_id, task_id), 
                         headers={'Authorization': 'JWT {}'.format(token)},
                         stream=True)
         with open("orthophoto.tif", 'wb') as f:
