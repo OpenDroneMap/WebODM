@@ -151,6 +151,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app', 'static'),
 ]
 
+# File Uploads
+FILE_UPLOAD_MAX_MEMORY_SIZE = 4718592 # 4.5 MB
+
 
 # Webpack
 WEBPACK_LOADER = {
