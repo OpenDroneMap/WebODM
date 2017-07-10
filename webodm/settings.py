@@ -40,9 +40,13 @@ except ImportError:
     print("Generated secret key")
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 TESTING = sys.argv[1:2] == ['test']
-DEBUG = sys.argv[1:2] == ['runserver'] or TESTING
+
+# SECURITY WARNING: don't run with debug turned on a public facing server!
+# We are leaving DEBUG turned on for the sake of making error reporting easier
+# since we haven't reached a stable release yet.
+DEBUG = True #sys.argv[1:2] == ['runserver'] or TESTING
 INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
