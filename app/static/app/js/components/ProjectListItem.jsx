@@ -166,7 +166,9 @@ class ProjectListItem extends React.Component {
           this.resetUploadState();
         })
         .on("sending", (file, xhr, formData) => {
-          formData.append('auto_processing_node', "false");
+          if (!formData.has("auto_processing_node")){
+            formData.append('auto_processing_node', "false");
+          }
         });
     }
   }
