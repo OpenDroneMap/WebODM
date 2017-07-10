@@ -24,8 +24,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gmarsutd!fee6_58=6k)2je#o2^&&)ovu1svjg8k^(a!7qa7r&'
+try:
+    from .secret_key import SECRET_KEY
+except ImportError:
+    # This will be executed the first time Django runs
+    # It generates a secret_key.py file that contains the SECRET_KEY
+    from django.utils.crypto import get_random_string
+
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    with open(os.path.join(current_dir, 'secret_key.py'), 'w') as f:
+        f.write("SECRET_KEY='{}'".format(get_random_string(50, chars)))
+
+    from .secret_key import SECRET_KEY
+    print("Generated secret key")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 TESTING = sys.argv[1:2] == ['test']
