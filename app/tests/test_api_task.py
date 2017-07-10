@@ -231,7 +231,7 @@ class TestApiTask(BootTransactionTestCase):
 
         # Bounds are what we expect them to be
         # (4 coords in lat/lon)
-        tiles = json.loads(res.content)
+        tiles = json.loads(res.content.decode("utf-8"))
         self.assertTrue(len(tiles['bounds']) == 4)
         self.assertTrue(tiles['bounds'][0] == -91.99451323800884)
 
