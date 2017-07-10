@@ -233,7 +233,7 @@ class TestApiTask(BootTransactionTestCase):
         # (4 coords in lat/lon)
         tiles = json.loads(res.content.decode("utf-8"))
         self.assertTrue(len(tiles['bounds']) == 4)
-        self.assertTrue(tiles['bounds'][0] == -91.99451323800884)
+        self.assertTrue(round(tiles['bounds'][0], 7) == -91.9945132)
 
         # Can access individual tiles
         res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
