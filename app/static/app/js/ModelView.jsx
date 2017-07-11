@@ -49,7 +49,7 @@ class ModelView extends React.Component {
   }
 
   hasGeoreferencedAssets(){
-    return this.props.task.available_assets.indexOf('geotiff') !== -1;
+    return this.props.task.available_assets.indexOf('orthophoto.tif') !== -1;
   }
 
   objFilePath(){
@@ -169,7 +169,7 @@ class ModelView extends React.Component {
 
   // React render
   render(){
-    const showSwitchModeButton = this.props.task.available_assets.indexOf('geotiff') !== -1;
+    const showSwitchModeButton = this.hasGeoreferencedAssets();
     const hideWithTexturedModel = {display: this.state.showTexturedModel ? "none" : "block"};
 
     return (<div className="model-view">

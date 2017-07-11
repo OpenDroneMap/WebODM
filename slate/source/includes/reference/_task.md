@@ -9,12 +9,13 @@
   "processing_node": 10,
   "images_count": 48,
   "available_assets": [
-      "all",
-      "geotiff",
-      "texturedmodel",
-      "las",
-      "csv",
-      "ply"
+    "all.zip",
+    "orthophoto.tif",
+    "orthophoto.png",
+    "georeferenced_model.las",
+    "georeferenced_model.ply",
+    "georeferenced_model.csv",
+    "textured_model.zip"
   ],
   "uuid": "4338d684-91b4-49a2-b907-8ba171894393",
   "name": "Task Name",
@@ -118,16 +119,17 @@ Retrieves all [Task](#task) items associated with `project_id`.
 
 `GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/`
 
-After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the `geotiff` asset will be missing. You can check the `available_assets` property of a [Task](#task) to see which assets are available for download.
+After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the `orthophoto.tif` asset will be missing. You can check the `available_assets` property of a [Task](#task) to see which assets are available for download.
 
 Asset | Description
 ----- | -----------
-all   | Archive (.zip) containing all assets, including an orthophoto, TMS tiles, a textured 3D model and point cloud in various formats.
-geotiff | GeoTIFF orthophoto.
-texturedmodel | Archive (.zip) containing the textured 3D model
-las | Point cloud in .LAS format.
-ply | Point cloud in .PLY format.
-csv | Point cloud in .CSV format.
+all.zip   | Archive (.zip) containing all assets, including an orthophoto, TMS tiles, a textured 3D model and point cloud in various formats.
+orthophoto.tif | GeoTIFF orthophoto.
+orthophoto.png | PNG orthophoto.
+textured_model.zip | Archive containing the textured 3D model
+georeferenced_model.las | Point cloud in .LAS format.
+georeferenced_model.ply | Point cloud in .PLY format.
+georeferenced_model.csv | Point cloud in .CSV format.
 
 ### Download assets (raw path)
 

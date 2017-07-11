@@ -3,7 +3,11 @@ from guardian.admin import GuardedModelAdmin
 from .models import Project, Task, ImageUpload
 
 admin.site.register(Project, GuardedModelAdmin)
-admin.site.register(Task, admin.ModelAdmin)
+
+class TaskAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return False
+admin.site.register(Task, TaskAdmin)
 
 class ImageUploadAdmin(admin.ModelAdmin):
     readonly_fields = ('image',)
