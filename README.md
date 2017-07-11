@@ -87,7 +87,7 @@ WebODM can be linked to one or more processing nodes running [node-OpenDroneMap]
 
 ### Security
 
-If you want to run WebODM in production, make sure to change the `SECRET_KEY` variable in `webodm/settings.py`, as well as any other relevant setting as indicated in the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
+If you want to run WebODM in production, make sure to disable the `DEBUG` flag from `webodm/settings.py` and go through the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
 
 ## API Docs
 
