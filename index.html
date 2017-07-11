@@ -203,7 +203,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 </code></pre>
 <p>We periodically check for the <a href="#task">Task</a> status using a loop.
 <div class="clear"></div></p>
-<pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"http://localhost:8000/api/projects/{}/tasks/{}/download/geotiff/"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
+<pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"http://localhost:8000/api/projects/{}/tasks/{}/download/orthophoto.tif"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
                         <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
                         <span class="n">stream</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"orthophoto.tif"</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -296,7 +296,13 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
     </span><span class="p">],</span><span class="w">
     </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+    </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"delete"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"change"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"add"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"view"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>A <a href="#project">Project</a> is a collection of <a href="#task">Task</a> items.</p>
@@ -332,6 +338,11 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <td>description</td>
 <td>string</td>
 <td>A more in-depth description</td>
+</tr>
+<tr>
+<td>permissions</td>
+<td>string[]</td>
+<td>List of actions that the current user is allowed to perform. See <a href="#permission-values">Permissions Values</a></td>
 </tr>
 </tbody></table>
 
@@ -470,12 +481,13 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
   </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
   </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">
   </span><span class="s2">"available_assets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-      </span><span class="s2">"all"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"geotiff"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"texturedmodel"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"las"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"csv"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"ply"</span><span class="w">
+    </span><span class="s2">"all.zip"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"orthophoto.tif"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"orthophoto.png"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"georeferenced_model.las"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"georeferenced_model.ply"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"georeferenced_model.csv"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"textured_model.zip"</span><span class="w">
   </span><span class="p">],</span><span class="w">
   </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4338d684-91b4-49a2-b907-8ba171894393"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Task Name"</span><span class="p">,</span><span class="w">
@@ -672,7 +684,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 
 <p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/</code></p>
 
-<p>After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the <code class="prettyprint">geotiff</code> asset will be missing. You can check the <code class="prettyprint">available_assets</code> property of a <a href="#task">Task</a> to see which assets are available for download.</p>
+<p>After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the <code class="prettyprint">orthophoto.tif</code> asset will be missing. You can check the <code class="prettyprint">available_assets</code> property of a <a href="#task">Task</a> to see which assets are available for download.</p>
 
 <table><thead>
 <tr>
@@ -681,27 +693,31 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 </tr>
 </thead><tbody>
 <tr>
-<td>all</td>
+<td>all.zip</td>
 <td>Archive (.zip) containing all assets, including an orthophoto, TMS tiles, a textured 3D model and point cloud in various formats.</td>
 </tr>
 <tr>
-<td>geotiff</td>
+<td>orthophoto.tif</td>
 <td>GeoTIFF orthophoto.</td>
 </tr>
 <tr>
-<td>texturedmodel</td>
-<td>Archive (.zip) containing the textured 3D model</td>
+<td>orthophoto.png</td>
+<td>PNG orthophoto.</td>
 </tr>
 <tr>
-<td>las</td>
+<td>textured_model.zip</td>
+<td>Archive containing the textured 3D model</td>
+</tr>
+<tr>
+<td>georeferenced_model.las</td>
 <td>Point cloud in .LAS format.</td>
 </tr>
 <tr>
-<td>ply</td>
+<td>georeferenced_model.ply</td>
 <td>Point cloud in .PLY format.</td>
 </tr>
 <tr>
-<td>csv</td>
+<td>georeferenced_model.csv</td>
 <td>Point cloud in .CSV format.</td>
 </tr>
 </tbody></table>
@@ -1091,6 +1107,32 @@ model-wise (can a user add a project? can a user view projects?).</p>
 <p>Changes to the permissions of objects can be handled via the <code class="prettyprint">Administration</code> page of WebODM. </p>
 
 <p>We are planning to make it easier for users and developers to handle permissions via an API. This is a work in progress.</p>
+
+<h3 id="permission-values">Permission Values</h3>
+
+<table><thead>
+<tr>
+<th>Permission</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>delete</td>
+<td>The object can be deleted</td>
+</tr>
+<tr>
+<td>change</td>
+<td>The object can be edited</td>
+</tr>
+<tr>
+<td>add</td>
+<td>A related object can be added to the object (a task can be added to the project)</td>
+</tr>
+<tr>
+<td>view</td>
+<td>The object can be viewed (read-only)</td>
+</tr>
+</tbody></table>
 
           <h1 id="for-developers">For Developers</h1>
 
