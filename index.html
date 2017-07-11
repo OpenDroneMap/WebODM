@@ -682,7 +682,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 
 <h3 id="download-assets">Download assets</h3>
 
-<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/</code></p>
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}</code></p>
 
 <p>After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the <code class="prettyprint">orthophoto.tif</code> asset will be missing. You can check the <code class="prettyprint">available_assets</code> property of a <a href="#task">Task</a> to see which assets are available for download.</p>
 
@@ -729,7 +729,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <p>After a task has been successfully processed, its assets are stored in a directory on the file system. This API call allows direct access to the files in that directory (by default: <code class="prettyprint">WebODM/app/media/project/{project_id}/task/{task_id}/assets</code>). This can be useful to those applications that want to stream a <code class="prettyprint">Potree</code> dataset, or render a textured 3D model on the fly. </p>
 
 <aside class="notice">
-These paths could change in future versions of WebODM. If the asset you need can be reached via <b>/api/projects/{project_id}/tasks/download/{asset}/</b>, use that instead.
+These paths could change in future versions of WebODM. If the asset you need can be reached via <b>/api/projects/{project_id}/tasks/download/{asset}</b>, use that instead.
 </aside>
 
 <h3 id="retrieve-console-output">Retrieve console output</h3>
