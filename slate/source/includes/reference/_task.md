@@ -117,7 +117,7 @@ Retrieves all [Task](#task) items associated with `project_id`.
 
 ### Download assets
 
-`GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}/`
+`GET /api/projects/{project_id}/tasks/{task_id}/download/{asset}`
 
 After a task has been successfully processed, the user can download several assets from this URL. Not all assets are always available. For example if GPS information is missing from the input images, the `orthophoto.tif` asset will be missing. You can check the `available_assets` property of a [Task](#task) to see which assets are available for download.
 
@@ -138,7 +138,7 @@ georeferenced_model.csv | Point cloud in .CSV format.
 After a task has been successfully processed, its assets are stored in a directory on the file system. This API call allows direct access to the files in that directory (by default: `WebODM/app/media/project/{project_id}/task/{task_id}/assets`). This can be useful to those applications that want to stream a `Potree` dataset, or render a textured 3D model on the fly. 
 
 <aside class="notice">
-These paths could change in future versions of WebODM. If the asset you need can be reached via <b>/api/projects/{project_id}/tasks/download/{asset}/</b>, use that instead.
+These paths could change in future versions of WebODM. If the asset you need can be reached via <b>/api/projects/{project_id}/tasks/download/{asset}</b>, use that instead.
 </aside>
 
 ### Retrieve console output
