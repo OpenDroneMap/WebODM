@@ -72,8 +72,8 @@ class Project(models.Model):
     def tasks(self):
         return self.task_set.only('id')
 
-    def get_tiles_json_data(self):
-        return [task.get_tiles_json_data() for task in self.task_set.filter(
+    def get_map_items(self):
+        return [task.get_map_items() for task in self.task_set.filter(
                     status=status_codes.COMPLETED
                 ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
                 .only('id', 'project_id')]
@@ -446,11 +446,11 @@ class Task(models.Model):
                             # Populate *_extent fields
                             extent_fields = [
                                 (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
-                                 self.orthophoto_extent),
-                                (os.path.realpath(self.assets_path("odm_dsm", "dsm.tif")),
-                                 self.dsm_extent),
-                                (os.path.realpath(self.assets_path("odm_dtm", "dtm.tif")),
-                                 self.dtm_extent),
+                                 'orthophoto_extent'),
+                                (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
+                                 'dsm_extent'),
+                                (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
+                                 'dtm_extent'),
                             ]
 
                             for raster_path, field in extent_fields:
@@ -460,7 +460,8 @@ class Task(models.Model):
                                     extent = OGRGeometry.from_bbox(raster.extent)
 
                                     # It will be implicitly transformed into the SRID of the model’s field
-                                    field = GEOSGeometry(extent.wkt, srid=raster.srid)
+                                    # self.field = GEOSGeometry(...)
+                                    setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
 
                                     logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
@@ -487,7 +488,7 @@ class Task(models.Model):
     def get_tile_json_url(self, tile_type):
         return "/api/projects/{}/tasks/{}/{}/tiles.json".format(self.project.id, self.id, tile_type)
 
-    def get_tiles_json_data(self):
+    def get_map_items(self):
         types = []
         if 'orthophoto.tif' in self.available_assets: types.append('orthophoto')
         if 'dsm.tif' in self.available_assets: types.append('dsm')

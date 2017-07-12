@@ -51,17 +51,15 @@ def map(request, project_pk=None, task_pk=None):
         if task_pk is not None:
             task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
             title = task.name
-            tiles = [task.get_tiles_json_data()]
+            mapItems = [task.get_map_items()]
         else:
             title = project.name
-            tiles = project.get_tiles_json_data()
-
-    print(tiles)
+            mapItems = project.get_map_items()
 
     return render(request, 'app/map.html', {
             'title': title,
             'params': {
-                'tiles': json.dumps(tiles),
+                'map-items': json.dumps(mapItems),
                 'title': title
             }.items()
         })
