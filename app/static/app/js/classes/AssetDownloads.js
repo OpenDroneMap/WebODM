@@ -33,6 +33,9 @@ const api = {
     return [
       new AssetDownload("Orthophoto (GeoTIFF)","orthophoto.tif","fa fa-map-o"),
       new AssetDownload("Orthophoto (PNG)","orthophoto.png","fa fa-picture-o"),
+      new AssetDownload("Terrain Model (GeoTIFF)","dtm.tif","fa fa-area-chart"),
+      new AssetDownload("Surface Model (GeoTIFF)","dsm.tif","fa fa-area-chart"),
+      new AssetDownload("Point Cloud (LAS)","georeferenced_model.las","fa fa-cube"),
       new AssetDownload("Point Cloud (LAS)","georeferenced_model.las","fa fa-cube"),
       new AssetDownload("Point Cloud (PLY)","georeferenced_model.ply","fa fa-cube"),
       new AssetDownload("Point Cloud (CSV)","georeferenced_model.csv","fa fa-cube"),

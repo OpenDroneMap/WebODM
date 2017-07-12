@@ -18,11 +18,15 @@
         text-align: center;
         width: 220px;
         position: absolute;
-        bottom: 12px;
+        bottom: -32px;
         left: 50%;
         margin-left: -100px;
         z-index: 400;
         padding-bottom: 6px;
         background-color: white;
+    }
+
+    .map-type-selector{
+        float: right;
     }
 }

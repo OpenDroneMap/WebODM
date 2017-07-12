@@ -133,7 +133,7 @@ georeferenced_model.csv | Point cloud in .CSV format.
 
 ### Download assets (raw path)
 
-`GET /api/projects/{project_id}/tasks/{task_id}/assets/{path}/`
+`GET /api/projects/{project_id}/tasks/{task_id}/assets/{path}`
 
 After a task has been successfully processed, its assets are stored in a directory on the file system. This API call allows direct access to the files in that directory (by default: `WebODM/app/media/project/{project_id}/task/{task_id}/assets`). This can be useful to those applications that want to stream a `Potree` dataset, or render a textured 3D model on the fly. 
 

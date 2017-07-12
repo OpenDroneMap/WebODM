@@ -271,7 +271,7 @@ class TaskListItem extends React.Component {
       
       if (task.status === statusCodes.COMPLETED){
         if (task.available_assets.indexOf("orthophoto.tif") !== -1){
-          addActionButton(" View Orthophoto", "btn-primary", "fa fa-globe", () => {
+          addActionButton(" View Map", "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         }else{

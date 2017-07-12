@@ -21,7 +21,8 @@ class Map extends React.Component {
     maxzoom: 18,
     minzoom: 0,
     showBackground: false,
-    opacity: 100
+    opacity: 100,
+    mapType: "orthophoto"
   };
 
   static propTypes = {
@@ -29,7 +30,8 @@ class Map extends React.Component {
     minzoom: React.PropTypes.number,
     showBackground: React.PropTypes.bool,
     tiles: React.PropTypes.array.isRequired,
-    opacity: React.PropTypes.number
+    opacity: React.PropTypes.number,
+    mapType: React.PropTypes.oneOf(['orthophoto', 'dsm', 'dtm'])
   };
 
   constructor(props) {

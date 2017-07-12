@@ -167,7 +167,7 @@ L.Control.AutoLayers = L.Control.extend({
 			'leaflet-control-layers-tab', form);
 		this._overlaysLayersTitle = L.DomUtil.create('div', 'leaflet-control-autolayers-title',
 			overlaysLayersDiv);
-		this._overlaysLayersTitle.innerHTML = 'Orthophotos';
+		this._overlaysLayersTitle.innerHTML = 'Tasks';
 		var overlaysLayersBox = this._overlaysLayersBox = L.DomUtil.create('div', 'map-filter',
 			overlaysLayersDiv);
 		var overlaysLayersFilter = this._overlaysLayersFilter = L.DomUtil.create('input',
