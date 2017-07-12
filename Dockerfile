@@ -36,4 +36,6 @@ WORKDIR /webodm
 RUN npm install -g webpack && npm install && webpack
 RUN python manage.py collectstatic --noinput
 
+RUN rm /webodm/webodm/secret_key.py
+
 VOLUME /webodm/app/media
