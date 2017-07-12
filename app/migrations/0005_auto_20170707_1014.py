@@ -7,12 +7,24 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.db import migrations
 import os
 
+from webodm import settings
+
+
+def assets_path(project_id, task_id, *args):
+    return os.path.join(settings.MEDIA_ROOT,
+                        "project",
+                        str(project_id),
+                        "task",
+                        str(task_id),
+                        "assets",
+                        *args)
+
 def transfer_existing_orthophoto_extent_values(apps, schema_editor):
     Task = apps.get_model('app', 'Task')
 
     for t in Task.objects.all():
         print("Checking {}".format(t))
-        orthophoto_path = t.assets_path("odm_orthophoto", "odm_orthophoto_4326.tif")
+        orthophoto_path = assets_path(t.project.id, t.id, "odm_orthophoto", "odm_orthophoto_4326.tif")
         if os.path.exists(orthophoto_path):
             print("Migrating {}".format(orthophoto_path))
 

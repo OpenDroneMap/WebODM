@@ -3,7 +3,43 @@
 from __future__ import unicode_literals
 
 import django.contrib.postgres.fields
+import os
 from django.db import migrations, models
+
+from webodm import settings
+
+ASSETS_MAP = {
+    'all.zip': 'all.zip',
+    'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+    'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
+    'georeferenced_model.las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.las'),
+    'georeferenced_model.ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
+    'georeferenced_model.csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv'),
+    'textured_model.zip': {
+        'deferred_path': 'textured_model.zip',
+        'deferred_compress_dir': 'odm_texturing'
+    }
+}
+
+def assets_path(project_id, task_id, *args):
+    return os.path.join(settings.MEDIA_ROOT,
+                        "project",
+                        str(project_id),
+                        "task",
+                        str(task_id),
+                        "assets",
+                        *args)
+
+def is_asset_available_slow(t, asset):
+    if asset in ASSETS_MAP:
+        value = ASSETS_MAP[asset]
+        if isinstance(value, str):
+            return os.path.exists(assets_path(t.project.id, t.id, value))
+        elif isinstance(value, dict):
+            if 'deferred_compress_dir' in value:
+                return os.path.exists(assets_path(t.project.id, t.id, value['deferred_compress_dir']))
+
+    return False
 
 
 def detect_available_assets(apps, schema_editor):
@@ -11,7 +47,10 @@ def detect_available_assets(apps, schema_editor):
 
     for t in Task.objects.all():
         print("Updating {}".format(t))
-        t.update_available_assets_field(True)
+
+        all_assets = list(ASSETS_MAP.keys())
+        t.available_assets = [asset for asset in all_assets if is_asset_available_slow(t, asset)]
+        t.save()
 
 
 class Migration(migrations.Migration):
