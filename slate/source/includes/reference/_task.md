@@ -180,13 +180,25 @@ If a [Task](#task) has been canceled or has failed processing, or has completed 
 
 ### Orthophoto TMS layer
 
-`GET /api/projects/{project_id}/tasks/{task_id}/tiles.json`
+`GET /api/projects/{project_id}/tasks/{task_id}/orthophoto/tiles.json`
 
-`GET /api/projects/{project_id}/tasks/{task_id}/tiles/{Z}/{X}/{Y}.png`
+`GET /api/projects/{project_id}/tasks/{task_id}/orthophoto/tiles/{Z}/{X}/{Y}.png`
 
 After a task has been successfully processed, a TMS layer is made available for inclusion in programs such as [Leaflet](http://leafletjs.com/) or [Cesium](http://cesiumjs.org).
 
 <aside class="notice">If you use <a href="http://leafletjs.com/" target="_blank">Leaflet</a>, you'll need to pass the authentication token via querystring: /api/projects/{project_id}/tasks/{task_id}/tiles/{Z}/{X}/{Y}.png?jwt=your_token</aside>
+
+### Surface Model TMS layer
+
+`GET /api/projects/{project_id}/tasks/{task_id}/dsm/tiles.json`
+
+`GET /api/projects/{project_id}/tasks/{task_id}/dsm/tiles/{Z}/{X}/{Y}.png`
+
+### Terrain Model TMS layer
+
+`GET /api/projects/{project_id}/tasks/{task_id}/dtm/tiles.json`
+
+`GET /api/projects/{project_id}/tasks/{task_id}/dtm/tiles/{Z}/{X}/{Y}.png`
 
 ### Pending Actions
 

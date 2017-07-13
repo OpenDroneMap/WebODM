@@ -31,8 +31,8 @@ class MapView extends React.Component {
   }
 
   getTilesByMapType(type){
-    // Go through the list of tiles and return 
-    // only those that match a particular type
+    // Go through the list of map items and return 
+    // only those that match a particular type (in tile format)
     const tiles = [];
 
     this.props.mapItems.forEach(mapItem => {
@@ -64,7 +64,7 @@ class MapView extends React.Component {
 
   render(){
     const { opacity } = this.state;
-    const mapTypeButtons = [
+    let mapTypeButtons = [
       {
         label: "Orthophoto",
         type: "orthophoto"
@@ -77,7 +77,10 @@ class MapView extends React.Component {
         label: "Terrain Model",
         type: "dtm"
       }
-    ];
+    ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0 );
+
+    // If we have only one button, hide it...
+    if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
     return (<div className="map-view">
         <div className="map-type-selector btn-group" role="group">

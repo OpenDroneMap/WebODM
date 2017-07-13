@@ -45,18 +45,31 @@ class Map extends React.Component {
     this.imageryLayers = [];
     this.basemaps = {};
     this.mapBounds = null;
+    this.autolayers = null;
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
   }
 
-  loadImageryLayers(){
+  loadImageryLayers(forceAddLayers = false){
     const { tiles } = this.props,
-          assets = AssetDownloads.excludeSeparators();
+          assets = AssetDownloads.excludeSeparators(),
+          layerId = layer => {
+            const meta = layer[Symbol.for("meta")];
+            return meta.project + "_" + meta.task;
+          };
 
     // Remove all previous imagery layers
-    this.imageryLayers.forEach(layer => layer.remove());
+    // and keep track of which ones were selected
+    const prevSelectedLayers = [];
+
+    this.imageryLayers.forEach(layer => {
+      this.autolayers.removeLayer(layer);
+      if (this.map.hasLayer(layer)) prevSelectedLayers.push(layerId(layer));
+      layer.remove();
+    });
     this.imageryLayers = [];
 
+    // Request new tiles
     return new Promise((resolve, reject) => {
       this.tileJsonRequests = [];
 
@@ -74,11 +87,15 @@ class Map extends React.Component {
                   maxZoom: info.maxzoom,
                   tms: info.scheme === 'tms',
                   opacity: this.props.opacity / 100
-                }).addTo(this.map);
-
+                });
+            
             // Associate metadata with this layer
             meta.name = info.name;
             layer[Symbol.for("meta")] = meta;
+
+            if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
+              layer.addTo(this.map);
+            }
 
             // Show 3D switch button only if we have a single orthophoto
             const task = {
@@ -118,6 +135,9 @@ class Map extends React.Component {
             mapBounds.extend(bounds);
             this.mapBounds = mapBounds;
 
+            // Add layer to layers control
+            this.autolayers.addOverlay(layer, info.name);
+
             done();
           })
           .fail((_, __, err) => done(err))
@@ -138,9 +158,16 @@ class Map extends React.Component {
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
-      measureControl: true,
       positionControl: true
     });
+
+    const measureControl = Leaflet.control.measure({
+      primaryLengthUnit: 'meters',
+      secondaryLengthUnit: 'feet',
+      primaryAreaUnit: 'sqmeters',
+      secondaryAreaUnit: 'acres'
+    });
+    measureControl.addTo(this.map);
 
     if (showBackground) {
       this.basemaps = {
@@ -166,6 +193,12 @@ class Map extends React.Component {
       };
     }
 
+    this.autolayers = Leaflet.control.autolayers({
+      overlays: {},
+      selectedOverlays: [],
+      baseLayers: this.basemaps
+    }).addTo(this.map);
+
     this.map.fitWorld();
 
     Leaflet.control.scale({
@@ -173,21 +206,8 @@ class Map extends React.Component {
     }).addTo(this.map);
     this.map.attributionControl.setPrefix("");
 
-    this.loadImageryLayers().then(() => {
+    this.loadImageryLayers(true).then(() => {
         this.map.fitBounds(this.mapBounds);
-
-        // Add basemaps / layers control
-        let overlays = {};
-        this.imageryLayers.forEach(layer => {
-            const meta = layer[Symbol.for("meta")];
-            overlays[meta.name] = layer;
-          });
-
-        Leaflet.control.autolayers({
-          overlays: overlays,
-          selectedOverlays: [],
-          baseLayers: this.basemaps
-        }).addTo(this.map);
 
         this.map.on('click', e => {
           // Find first tile layer at the selected coordinates 
@@ -199,7 +219,6 @@ class Map extends React.Component {
           }
         });
     });
-
   }
 
   componentDidUpdate(prevProps) {
@@ -208,7 +227,9 @@ class Map extends React.Component {
     });
 
     if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers();
+      this.loadImageryLayers().then(() => {
+        // console.log("GOT: ", this.autolayers, this.autolayers.selectedOverlays);
+      });
     }
   }
 
