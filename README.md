@@ -264,6 +264,7 @@ Developer, I'm looking to build an app that will stay behind a firewall and just
 - [X] Task Processing
 - [X] 2D Map Display 
 - [X] 3D Model Display
+- [ ] NDVI display
 - [ ] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner
