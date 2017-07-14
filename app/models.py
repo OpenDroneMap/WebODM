@@ -12,6 +12,7 @@ from django.contrib.postgres import fields
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
+from django.db.models import Q
 from django.db.models import signals
 from django.dispatch import receiver
 from django.utils import timezone
@@ -71,11 +72,11 @@ class Project(models.Model):
     def tasks(self):
         return self.task_set.only('id')
 
-    def get_tile_json_data(self):
-        return [task.get_tile_json_data() for task in self.task_set.filter(
-                    status=status_codes.COMPLETED,
-                    orthophoto_extent__isnull=False
-                ).only('id', 'project_id')]
+    def get_map_items(self):
+        return [task.get_map_items() for task in self.task_set.filter(
+                    status=status_codes.COMPLETED
+                ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
+                .only('id', 'project_id')]
 
     class Meta:
         permissions = (
@@ -130,7 +131,9 @@ class Task(models.Model):
             'textured_model.zip': {
                 'deferred_path': 'textured_model.zip',
                 'deferred_compress_dir': 'odm_texturing'
-            }
+            },
+            'dtm.tif': os.path.join('odm_dem', 'dtm.tif'),
+            'dsm.tif': os.path.join('odm_dem', 'dsm.tif'),
     }
 
     STATUS_CODES = (
@@ -138,7 +141,7 @@ class Task(models.Model):
         (status_codes.RUNNING, 'RUNNING'),
         (status_codes.FAILED, 'FAILED'),
         (status_codes.COMPLETED, 'COMPLETED'),
-        (status_codes.CANCELED, 'CANCELED')
+        (status_codes.CANCELED, 'CANCELED'),
     )
 
     PENDING_ACTIONS = (
@@ -162,6 +165,8 @@ class Task(models.Model):
     ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
     orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
+    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM created by OpenDroneMap")
+    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DTM created by OpenDroneMap")
 
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
@@ -438,17 +443,27 @@ class Task(models.Model):
 
                             logger.info("Extracted all.zip for {}".format(self))
 
-                            # Populate orthophoto_extent field
-                            orthophoto_path = os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif"))
-                            if os.path.exists(orthophoto_path):
-                                # Read extent and SRID
-                                orthophoto = GDALRaster(orthophoto_path)
-                                extent = OGRGeometry.from_bbox(orthophoto.extent)
+                            # Populate *_extent fields
+                            extent_fields = [
+                                (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
+                                 'orthophoto_extent'),
+                                (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
+                                 'dsm_extent'),
+                                (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
+                                 'dtm_extent'),
+                            ]
 
-                                # It will be implicitly transformed into the SRID of the model’s field
-                                self.orthophoto_extent = GEOSGeometry(extent.wkt, srid=orthophoto.srid)
+                            for raster_path, field in extent_fields:
+                                if os.path.exists(raster_path):
+                                    # Read extent and SRID
+                                    raster = GDALRaster(raster_path)
+                                    extent = OGRGeometry.from_bbox(raster.extent)
 
-                                logger.info("Populated orthophoto_extent for {}".format(self))
+                                    # It will be implicitly transformed into the SRID of the model’s field
+                                    # self.field = GEOSGeometry(...)
+                                    setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
+
+                                    logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
                             self.update_available_assets_field()
                             self.save()
@@ -467,15 +482,20 @@ class Task(models.Model):
             logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
 
 
-    def get_tile_path(self, z, x, y):
-        return self.assets_path("orthophoto_tiles", z, x, "{}.png".format(y))
+    def get_tile_path(self, tile_type, z, x, y):
+        return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
 
-    def get_tile_json_url(self):
-        return "/api/projects/{}/tasks/{}/tiles.json".format(self.project.id, self.id)
+    def get_tile_json_url(self, tile_type):
+        return "/api/projects/{}/tasks/{}/{}/tiles.json".format(self.project.id, self.id, tile_type)
 
-    def get_tile_json_data(self):
+    def get_map_items(self):
+        types = []
+        if 'orthophoto.tif' in self.available_assets: types.append('orthophoto')
+        if 'dsm.tif' in self.available_assets: types.append('dsm')
+        if 'dtm.tif' in self.available_assets: types.append('dtm')
+
         return {
-            'url': self.get_tile_json_url(),
+            'tiles': [{'url': self.get_tile_json_url(t), 'type': t} for t in types],
             'meta': {
                 'task': self.id,
                 'project': self.project.id

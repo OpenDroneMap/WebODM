@@ -21,7 +21,8 @@ class Map extends React.Component {
     maxzoom: 18,
     minzoom: 0,
     showBackground: false,
-    opacity: 100
+    opacity: 100,
+    mapType: "orthophoto"
   };
 
   static propTypes = {
@@ -29,7 +30,8 @@ class Map extends React.Component {
     minzoom: React.PropTypes.number,
     showBackground: React.PropTypes.bool,
     tiles: React.PropTypes.array.isRequired,
-    opacity: React.PropTypes.number
+    opacity: React.PropTypes.number,
+    mapType: React.PropTypes.oneOf(['orthophoto', 'dsm', 'dtm'])
   };
 
   constructor(props) {
@@ -43,17 +45,129 @@ class Map extends React.Component {
     this.imageryLayers = [];
     this.basemaps = {};
     this.mapBounds = null;
+    this.autolayers = null;
+
+    this.loadImageryLayers = this.loadImageryLayers.bind(this);
+  }
+
+  loadImageryLayers(forceAddLayers = false){
+    const { tiles } = this.props,
+          assets = AssetDownloads.excludeSeparators(),
+          layerId = layer => {
+            const meta = layer[Symbol.for("meta")];
+            return meta.project + "_" + meta.task;
+          };
+
+    // Remove all previous imagery layers
+    // and keep track of which ones were selected
+    const prevSelectedLayers = [];
+
+    this.imageryLayers.forEach(layer => {
+      this.autolayers.removeLayer(layer);
+      if (this.map.hasLayer(layer)) prevSelectedLayers.push(layerId(layer));
+      layer.remove();
+    });
+    this.imageryLayers = [];
+
+    // Request new tiles
+    return new Promise((resolve, reject) => {
+      this.tileJsonRequests = [];
+
+      async.each(tiles, (tile, done) => {
+        const { url, meta } = tile;
+
+        this.tileJsonRequests.push($.getJSON(url)
+          .done(info => {
+            const bounds = Leaflet.latLngBounds(
+                [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()]
+              );
+            const layer = Leaflet.tileLayer(info.tiles[0], {
+                  bounds,
+                  minZoom: info.minzoom,
+                  maxZoom: info.maxzoom,
+                  tms: info.scheme === 'tms',
+                  opacity: this.props.opacity / 100
+                });
+            
+            // Associate metadata with this layer
+            meta.name = info.name;
+            layer[Symbol.for("meta")] = meta;
+
+            if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
+              layer.addTo(this.map);
+            }
+
+            // Show 3D switch button only if we have a single orthophoto
+            const task = {
+              id: meta.task,
+              project: meta.project
+            };
+
+            if (tiles.length === 1){
+              this.setState({switchButtonTask: task});
+            }
+
+            // For some reason, getLatLng is not defined for tileLayer?
+            // We need this function if other code calls layer.openPopup()
+            layer.getLatLng = function(){
+              return this.options.bounds.getCenter();
+            };
+
+            layer.bindPopup(`<div class="title">${info.name}</div>
+              <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
+              <ul class="asset-links">
+                ${assets.map(asset => {
+                    return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
+                }).join("")}
+              </ul>
+
+              <button 
+                onclick="location.href='/3d/project/${task.project}/task/${task.id}/';"
+                type="button"
+                class="switchModeButton btn btn-sm btn-default btn-white">
+                <i class="fa fa-cube"></i> 3D
+              </button>
+            `);
+            
+            this.imageryLayers.push(layer);
+
+            let mapBounds = this.mapBounds || Leaflet.latLngBounds();
+            mapBounds.extend(bounds);
+            this.mapBounds = mapBounds;
+
+            // Add layer to layers control
+            this.autolayers.addOverlay(layer, info.name);
+
+            done();
+          })
+          .fail((_, __, err) => done(err))
+        );
+      }, err => {
+        if (err){
+          this.setState({error: err.message || JSON.stringify(err)});
+          reject(err);
+        }else{
+          resolve();
+        }
+      });
+    });
   }
 
   componentDidMount() {
-    const { showBackground, tiles } = this.props;
-    const assets = AssetDownloads.excludeSeparators();
+    const { showBackground } = this.props;
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
-      measureControl: true,
       positionControl: true
     });
+
+    const measureControl = Leaflet.control.measure({
+      primaryLengthUnit: 'meters',
+      secondaryLengthUnit: 'feet',
+      primaryAreaUnit: 'sqmeters',
+      secondaryAreaUnit: 'acres'
+    });
+    measureControl.addTo(this.map);
 
     if (showBackground) {
       this.basemaps = {
@@ -79,6 +193,12 @@ class Map extends React.Component {
       };
     }
 
+    this.autolayers = Leaflet.control.autolayers({
+      overlays: {},
+      selectedOverlays: [],
+      baseLayers: this.basemaps
+    }).addTo(this.map);
+
     this.map.fitWorld();
 
     Leaflet.control.scale({
@@ -86,87 +206,8 @@ class Map extends React.Component {
     }).addTo(this.map);
     this.map.attributionControl.setPrefix("");
 
-    this.tileJsonRequests = [];
-
-    async.each(tiles, (tile, done) => {
-      const { url, meta } = tile;
-
-      this.tileJsonRequests.push($.getJSON(url)
-        .done(info => {
-          const bounds = Leaflet.latLngBounds(
-              [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()]
-            );
-          const layer = Leaflet.tileLayer(info.tiles[0], {
-                bounds,
-                minZoom: info.minzoom,
-                maxZoom: info.maxzoom,
-                tms: info.scheme === 'tms'
-              }).addTo(this.map);
-
-          // Associate metadata with this layer
-          meta.name = info.name;
-          layer[Symbol.for("meta")] = meta;
-
-          // Show 3D switch button only if we have a single orthophoto
-          const task = {
-            id: meta.task,
-            project: meta.project
-          };
-
-          if (tiles.length === 1){
-            this.setState({switchButtonTask: task});
-          }
-
-          // For some reason, getLatLng is not defined for tileLayer?
-          // We need this function if other code calls layer.openPopup()
-          layer.getLatLng = function(){
-            return this.options.bounds.getCenter();
-          };
-
-          layer.bindPopup(`<div class="title">${info.name}</div>
-            <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-            <ul class="asset-links">
-              ${assets.map(asset => {
-                  return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
-              }).join("")}
-            </ul>
-
-            <button 
-              onclick="location.href='/3d/project/${task.project}/task/${task.id}/';"
-              type="button"
-              class="switchModeButton btn btn-sm btn-default btn-white">
-              <i class="fa fa-cube"></i> 3D
-            </button>
-          `);
-          
-
-          this.imageryLayers.push(layer);
-
-          let mapBounds = this.mapBounds || Leaflet.latLngBounds();
-          mapBounds.extend(bounds);
-          this.mapBounds = mapBounds;
-
-          done();
-        })
-        .fail((_, __, err) => done(err))
-      );
-    }, err => {
-      if (err) this.setState({error: err.message || JSON.stringify(err)});
-      else{
+    this.loadImageryLayers(true).then(() => {
         this.map.fitBounds(this.mapBounds);
-
-        // Add basemaps / layers control
-        let overlays = {};
-        this.imageryLayers.forEach(layer => {
-            const meta = layer[Symbol.for("meta")];
-            overlays[meta.name] = layer;
-          });
-
-        Leaflet.control.autolayers({
-          overlays: overlays,
-          selectedOverlays: [],
-          baseLayers: this.basemaps
-        }).addTo(this.map);
 
         this.map.on('click', e => {
           // Find first tile layer at the selected coordinates 
@@ -177,14 +218,19 @@ class Map extends React.Component {
             }
           }
         });
-      }
     });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.props.opacity / 100);
     });
+
+    if (prevProps.tiles !== this.props.tiles){
+      this.loadImageryLayers().then(() => {
+        // console.log("GOT: ", this.autolayers, this.autolayers.selectedOverlays);
+      });
+    }
   }
 
   componentWillUnmount() {

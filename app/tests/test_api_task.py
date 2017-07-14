@@ -156,20 +156,22 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.processing_node is None)
 
         # tiles.json should not be accessible at this point
-        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+        tile_types = ['orthophoto', 'dsm', 'dtm']
+        for tile_type in tile_types:
+            res = client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
+            self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
 
         # Neither should an individual tile
         # Z/X/Y coords are choosen based on node-odm test dataset for orthophoto_tiles/
-        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/16020/42443.png".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot access a tiles.json we have no access to
-        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(other_project.id, other_task.id))
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles.json".format(other_project.id, other_task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot access an individual tile we have no access to
-        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(other_project.id, other_task.id))
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/16020/42443.png".format(other_project.id, other_task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot download assets (they don't exist yet)
@@ -226,8 +228,9 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # Can access tiles.json
-        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        for tile_type in tile_types:
+            res = client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # Bounds are what we expect them to be
         # (4 coords in lat/lon)
@@ -236,8 +239,9 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(round(tiles['bounds'][0], 7) == -91.9945132)
 
         # Can access individual tiles
-        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        for tile_type in tile_types:
+            res = client.get("/api/projects/{}/tasks/{}/{}/tiles/16/16020/42443.png".format(project.id, task.id, tile_type))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # Restart a task
         testWatch.clear()
@@ -378,6 +382,20 @@ class TestApiTask(BootTransactionTestCase):
 
         # orthophoto_extent should be none
         self.assertTrue(task.orthophoto_extent is None)
+
+        # but other extents should be populated
+        self.assertTrue(task.dsm_extent is not None)
+        self.assertTrue(task.dtm_extent is not None)
+        self.assertTrue(os.path.exists(task.assets_path("dsm_tiles")))
+        self.assertTrue(os.path.exists(task.assets_path("dtm_tiles")))
+
+        # Can access only tiles of available assets
+        res = client.get("/api/projects/{}/tasks/{}/dsm/tiles.json".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        res = client.get("/api/projects/{}/tasks/{}/dtm/tiles.json".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles.json".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
 
         # Available assets should be missing orthophoto.tif type
         # but others such as textured_model.zip should be available
