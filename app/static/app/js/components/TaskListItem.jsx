@@ -265,7 +265,7 @@ class TaskListItem extends React.Component {
       // Ability to change options
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 ||
           (!task.processing_node)){
-        addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
+        addActionButton("Edit", "btn-primary pull-right", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
         });
       }
