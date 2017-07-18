@@ -34,23 +34,29 @@ module.exports = {
   ],
 
   module: {
-    loaders: [
+    rules: [
       { 
         test: /\.jsx?$/, 
         exclude: /(node_modules|bower_components)/, 
-        loader: 'babel-loader',
-        query: {
-          "plugins": [
-             'syntax-class-properties',
-             'transform-class-properties'
-             // 'react-hot-loader/babel'
-          ],
-          presets: ['es2015', 'react']
-        }
+        use: [
+          {
+            loader: 'babel-loader',
+            query: {
+              "plugins": [
+                 'syntax-class-properties',
+                 'transform-class-properties'
+                 // 'react-hot-loader/babel'
+              ],
+              presets: ['es2015', 'react']
+            }
+          }
+        ],
       },
       {
         test: /\.s?css$/,
-        loader: ExtractTextPlugin.extract('css!sass')
+        use: ExtractTextPlugin.extract({
+          use: 'css-loader!sass-loader'
+        })
       },
       {
         test: /\.(png|jpg|jpeg|svg)/,
@@ -65,8 +71,8 @@ module.exports = {
   },
 
   resolve: {
-    modulesDirectories: ['node_modules', 'bower_components'],
-    extensions: ['', '.js', '.jsx']
+    modules: ['node_modules', 'bower_components'],
+    extensions: ['.js', '.jsx']
   },
 
   externals: {
