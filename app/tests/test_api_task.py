@@ -18,7 +18,8 @@ from rest_framework.test import APIClient
 from app import pending_actions
 from app import scheduler
 from django.utils import timezone
-from app.models import Project, Task, ImageUpload, task_directory_path, full_task_directory_path
+from app.models import Project, Task, ImageUpload
+from app.models.task import task_directory_path, full_task_directory_path
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES

@@ -49,11 +49,10 @@ class EditTaskPanel extends React.Component {
           dataType: 'json',
           type: 'PATCH'
         }).done((json) => {
+          this.setState({saving: false});
           this.props.onSave(json);
         }).fail(() => {
-          this.setState({error: "Could not update task information. Plese try again."});
-        }).always(() => {
-          this.setState({saving: false});
+          this.setState({saving: false, error: "Could not update task information. Plese try again."});
         });     
     }
 
