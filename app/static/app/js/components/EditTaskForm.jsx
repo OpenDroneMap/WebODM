@@ -34,7 +34,9 @@ class EditTaskForm extends React.Component {
       advancedOptions: props.task !== null ? props.task.options.length > 0 : false,
       loadedProcessingNodes: false,
       selectedNode: null,
-      processingNodes: []
+      processingNodes: [],
+      selectedPreset: {key: 1, label: "TODO REMOVE"},
+      presets: []
     };
 
     // Refs to ProcessingNodeOption components
@@ -261,10 +263,11 @@ class EditTaskForm extends React.Component {
           <div className="form-group">
             <label className="col-sm-2 control-label">Options</label>
             <div className="col-sm-10">
-              <div className="btn-group" role="group">
-                <button type="button" className={"btn " + (!this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(false)}>Use Defaults</button>
-                <button type="button" className={"btn " + (this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(true)}>Set Options</button>
-              </div>
+              <select className="form-control" value={this.state.selectedPreset.key} onChange={this.handleSelectPreset}>
+                {this.state.presets.map(preset => 
+                  <option value={preset.key} key={preset.key}>{preset.label}</option>
+                )}
+              </select>
             </div>
           </div>
           <div className={"form-group " + (!this.state.advancedOptions ? "hide" : "")}>
@@ -278,6 +281,10 @@ class EditTaskForm extends React.Component {
           </div>
         </div>
         );
+      /*<div className="btn-group" role="group">
+          <button type="button" className={"btn " + (!this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(false)}>Use Defaults</button>
+          <button type="button" className={"btn " + (this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(true)}>Set Options</button>
+        </div>*/
     }else{
       processingNodesOptions = (<div className="form-group">
           <div className="col-sm-offset-2 col-sm-10">Loading processing nodes... <i className="fa fa-refresh fa-spin fa-fw"></i></div>
