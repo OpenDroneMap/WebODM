@@ -3,17 +3,17 @@ import React from 'react';
 import ErrorMessage from './ErrorMessage';
 import FormDialog from './FormDialog';
 import ProcessingNodeOption from './ProcessingNodeOption';
+import PresetUtils from '../classes/PresetUtils';
 import $ from 'jquery';
 
 class EditPresetDialog extends React.Component {
     static defaultProps = {
-        show: false
     };
 
     static propTypes = {
         preset: React.PropTypes.object.isRequired,
         availableOptions: React.PropTypes.array.isRequired,
-        show: React.PropTypes.bool
+        onHide: React.PropTypes.func
     };
 
     constructor(props){
@@ -23,15 +23,13 @@ class EditPresetDialog extends React.Component {
         this.options = {};
 
         this.state = {
-          name: props.preset.name
+            name: props.preset.name
         };
 
-        this.reset = this.reset.bind(this);
         this.getFormData = this.getFormData.bind(this);
         this.onShow = this.onShow.bind(this);
         this.setOptionRef = this.setOptionRef.bind(this);
         this.getOptions = this.getOptions.bind(this);
-        this.getAvailableOptions = this.getAvailableOptions.bind(this);
         this.handleSave = this.handleSave.bind(this);
     }
 
@@ -52,51 +50,12 @@ class EditPresetDialog extends React.Component {
           .filter(option => option.value !== undefined);
     }
 
-    // @return available options, but populate a "defaultValue" key 
-    // before returning the object.
-    getAvailableOptions(){
-        const { preset, availableOptions } = this.props;
-
-        availableOptions.forEach(opt => {
-            if (!opt.defaultValue){
-                let presetOpt;
-                if (preset && Array.isArray(preset.options)){
-                  presetOpt = preset.options.find(to => to.name == opt.name);
-                }
-
-                if (presetOpt){
-                  opt.defaultValue = opt.value;
-                  opt.value = presetOpt.value;
-                }else{
-                  opt.defaultValue = opt.value !== undefined ? opt.value : "";
-                  delete(opt.value);
-                }
-            }
-        });
-
-        return availableOptions;
-    }
-
-    reset(){
-      this.setState({
-        name: this.props.preset.name
-      });
-    }
-
     getFormData(){
-      return this.state;
+      return this.state; // TODO: necessary?
     }
 
     onShow(){
       this.nameInput.focus();
-    }
-
-    show(){
-      this.dialog.show();
-    }
-
-    hide(){
-      this.dialog.hide();
     }
 
     handleChange(field){
@@ -112,18 +71,18 @@ class EditPresetDialog extends React.Component {
     }
 
     render(){
-        let options = this.getAvailableOptions();
-        
+        let options = PresetUtils.getAvailableOptions(this.props.preset.options, this.props.availableOptions);
+
         return (
             <div className="edit-preset-dialog">
                 <FormDialog {...this.props}
                     getFormData={this.getFormData} 
-                    reset={this.reset}
+                    reset={() => {}}
+                    show={true}
                     onShow={this.onShow}
                     saveIcon="fa fa-edit"
                     title="Edit Options"
-                    saveAction={this.handleSave}
-                    ref={(domNode) => { this.dialog = domNode; }}>
+                    saveAction={this.handleSave}>
                   <div className="row preset-name">
                     <label className="col-sm-2 control-label">Name</label>
                     <div className="col-sm-10">

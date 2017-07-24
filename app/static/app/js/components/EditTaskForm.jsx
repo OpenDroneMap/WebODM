@@ -37,7 +37,9 @@ class EditTaskForm extends React.Component {
       selectedNode: null,
       processingNodes: [],
       selectedPreset: null,
-      presets: []
+      presets: [],
+
+      editingPreset: false
     };
 
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -51,6 +53,7 @@ class EditTaskForm extends React.Component {
     this.handleSelectPreset = this.handleSelectPreset.bind(this);
     this.selectPresetById = this.selectPresetById.bind(this);
     this.handleEditPreset = this.handleEditPreset.bind(this);
+    this.handleCancelEditPreset = this.handleCancelEditPreset.bind(this);
   }
 
   notifyFormLoaded(){
@@ -238,12 +241,17 @@ class EditTaskForm extends React.Component {
     return {
       name: this.state.name !== "" ? this.state.name : this.namePlaceholder,
       selectedNode: this.state.selectedNode,
-      options: {} //this.getOptions() TODO!!!!
+      options: this.state.selectedPreset.options
     };
   }
 
   handleEditPreset(){
-    this.editPresetDialog.show();
+    this.setState({editingPreset: true});
+    // this.editPresetDialog.show();
+  }
+
+  handleCancelEditPreset(){
+    this.setState({editingPreset: false});
   }
 
   render() {
@@ -304,16 +312,21 @@ class EditTaskForm extends React.Component {
                   </li>
                 </ul>
               </div>
-
-              <EditPresetDialog
-                preset={this.state.selectedPreset}
-                availableOptions={this.state.selectedNode.options}
-                show={false}
-                ref={(domNode) => { if (domNode) this.editPresetDialog = domNode; }}
-              />
-
             </div>
           </div>
+          PRESET:
+          {JSON.stringify(this.state.selectedPreset.options)}<br/>
+
+
+          {this.state.editingPreset ? 
+            <EditPresetDialog
+              preset={this.state.selectedPreset}
+              availableOptions={this.state.selectedNode.options}
+              onHide={this.handleCancelEditPreset}
+              ref={(domNode) => { if (domNode) this.editPresetDialog = domNode; }}
+            />
+          : ""}
+
         </div>
         );
     }else{
