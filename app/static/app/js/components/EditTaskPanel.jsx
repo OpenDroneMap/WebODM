@@ -64,7 +64,7 @@ class EditTaskPanel extends React.Component {
         return (
             <div className="edit-task-panel">
               <ErrorMessage bind={[this, "error"]} />
-              <form className="form-horizontal">
+              <div className="form-horizontal">
                 <EditTaskForm 
                   ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
                   onFormLoaded={this.handleFormTaskLoaded}
@@ -82,7 +82,7 @@ class EditTaskPanel extends React.Component {
                             </span>}
                     </button>
                 </div>
-              </form>
+              </div>
             </div>
         );
     }

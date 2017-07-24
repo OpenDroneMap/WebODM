@@ -1,8 +1,8 @@
 import '../css/EditTaskForm.scss';
 import React from 'react';
-import ProcessingNodeOption from './ProcessingNodeOption';
 import values from 'object.values';
 import Utils from '../classes/Utils';
+import EditPresetDialog from './EditPresetDialog';
 
 if (!Object.values) {
     values.shim();
@@ -31,25 +31,32 @@ class EditTaskForm extends React.Component {
     this.state = {
       error: "",
       name: props.task !== null ? (props.task.name || "") : "",
-      advancedOptions: props.task !== null ? props.task.options.length > 0 : false,
       loadedProcessingNodes: false,
+      loadedPresets: false,
+
       selectedNode: null,
       processingNodes: [],
-      selectedPreset: {key: 1, label: "TODO REMOVE"},
+      selectedPreset: null,
       presets: []
     };
 
-    // Refs to ProcessingNodeOption components
-    this.options = {};
-
     this.handleNameChange = this.handleNameChange.bind(this);
-    this.setAdvancedOptions = this.setAdvancedOptions.bind(this);
     this.handleSelectNode = this.handleSelectNode.bind(this);
-    this.setOptionRef = this.setOptionRef.bind(this);
     this.loadProcessingNodes = this.loadProcessingNodes.bind(this);
-    this.retryLoadProcessingNodes = this.retryLoadProcessingNodes.bind(this);
+    this.retryLoad = this.retryLoad.bind(this);
     this.selectNodeByKey = this.selectNodeByKey.bind(this);
     this.getTaskInfo = this.getTaskInfo.bind(this);
+    this.notifyFormLoaded = this.notifyFormLoaded.bind(this);
+    this.loadPresets = this.loadPresets.bind(this);
+    this.handleSelectPreset = this.handleSelectPreset.bind(this);
+    this.selectPresetById = this.selectPresetById.bind(this);
+    this.handleEditPreset = this.handleEditPreset.bind(this);
+  }
+
+  notifyFormLoaded(){
+    if (this.props.onFormLoaded && 
+        this.state.loadedPresets && 
+        this.state.loadedProcessingNodes) this.props.onFormLoaded();
   }
 
   loadProcessingNodes(){
@@ -135,7 +142,7 @@ class EditTaskForm extends React.Component {
             this.selectNodeByKey("auto");
           }
 
-          if (this.props.onFormLoaded) this.props.onFormLoaded();
+          this.notifyFormLoaded();
         }else{
           console.error("Got invalid json response for processing nodes", json);
           failed();
@@ -149,17 +156,69 @@ class EditTaskForm extends React.Component {
       });
   }
 
-  retryLoadProcessingNodes(){
+  retryLoad(){
     this.setState({error: ""});
     this.loadProcessingNodes();
+    this.loadPresets();
+  }
+
+  loadPresets(){
+    function failed(){
+      // Try again
+      setTimeout(loadPresets, 1000);
+    }
+
+    this.presetsRequest = 
+      $.getJSON("/api/presets/", presets => {
+        if (Array.isArray(presets)){
+          // In case somebody decides to remove all presets...
+          if (presets.length === 0){
+            this.setState({error: "There are no presets. Please create a system preset from the Administration -- Presets page, then try again."});
+            return;
+          }
+
+          // Choose preset
+          let selectedPreset = presets[0],
+              defaultPreset = presets.find(p => p.name === "Default"); // Do not translate Default
+          if (defaultPreset) selectedPreset = defaultPreset;
+          // TODO: look at task options
+
+          this.setState({
+            loadedPresets: true, 
+            presets: presets, 
+            selectedPreset: selectedPreset
+          });
+          this.notifyFormLoaded();
+        }else{
+          console.error("Got invalid json response for presets", json);
+          failed();
+        }
+      })
+      .fail((jqXHR, textStatus, errorThrown) => {
+        // I don't expect this to fail, unless it's a development error or connection error.
+        // in which case we don't need to notify the user directly. 
+        console.error("Error retrieving processing nodes", jqXHR, textStatus);
+        failed();
+      });
+  }
+
+  handleSelectPreset(e){
+    this.selectPresetById(e.target.value);
+  }
+
+  selectPresetById(id){
+    let preset = this.state.presets.find(p => p.id === parseInt(id));
+    if (preset) this.setState({selectedPreset: preset});
   }
 
   componentDidMount(){
     this.loadProcessingNodes();
+    this.loadPresets();
   }
 
   componentWillUnmount(){
-      this.nodesRequest.abort();
+      if (this.nodesRequest) this.nodesRequest.abort();
+      if (this.presetsRequest) this.presetsRequest.abort();
   }
 
   handleNameChange(e){
@@ -172,64 +231,19 @@ class EditTaskForm extends React.Component {
   }
 
   handleSelectNode(e){
-    this.options = {};
     this.selectNodeByKey(e.target.value);
-  }
-
-  setAdvancedOptions(flag){
-    return () => {
-      this.setState({advancedOptions: flag});
-    };
-  }
-
-  setOptionRef(optionName){
-    return (component) => {
-      if (component) this.options[optionName] = component;
-    }
-  }
-
-  getOptions(){
-    if (!this.state.advancedOptions) return [];
-    else return Object.values(this.options)
-      .map(option => {
-        return {
-          name: option.props.name,
-          value: option.getValue()
-        };
-      })
-      .filter(option => option.value !== undefined);
   }
 
   getTaskInfo(){
     return {
       name: this.state.name !== "" ? this.state.name : this.namePlaceholder,
       selectedNode: this.state.selectedNode,
-      options: this.getOptions()
+      options: {} //this.getOptions() TODO!!!!
     };
   }
 
-  // Takes a list of options, a task which could have options specified,
-  // and changes the value options to use those of the task and set
-  // a defaultValue key for all options.
-  populateOptionsWithDefaultValues(options, task){
-    options.forEach(opt => {
-      if (!opt.defaultValue){
-        let taskOpt;
-        if (task && Array.isArray(task.options)){
-          taskOpt = task.options.find(to => to.name == opt.name);
-        }
-
-        if (taskOpt){
-          opt.defaultValue = opt.value;
-          opt.value = taskOpt.value;
-        }else{
-          opt.defaultValue = opt.value !== undefined ? opt.value : "";
-          delete(opt.value);
-        }
-      }
-    });
-
-    return options;
+  handleEditPreset(){
+    this.editPresetDialog.show();
   }
 
   render() {
@@ -237,18 +251,20 @@ class EditTaskForm extends React.Component {
       return (<div className="edit-task-panel">
           <div className="alert alert-warning">
               <div dangerouslySetInnerHTML={{__html:this.state.error}}></div>
-              <button className="btn btn-sm btn-primary" onClick={this.retryLoadProcessingNodes}>
+              <button className="btn btn-sm btn-primary" onClick={this.retryLoad}>
                 <i className="fa fa-rotate-left"></i> Retry
               </button>
           </div>
         </div>);
     }
 
-    let processingNodesOptions = "";
-    if (this.state.loadedProcessingNodes && this.state.selectedNode){
-      let options = this.populateOptionsWithDefaultValues(this.state.selectedNode.options, this.props.task);
+    let taskOptions = "";
+    if (this.state.loadedProcessingNodes && 
+      this.state.selectedNode && 
+      this.state.loadedPresets &&
+      this.state.selectedPreset){
 
-      processingNodesOptions = (
+      taskOptions = (
         <div>
           <div className="form-group">
             <label className="col-sm-2 control-label">Processing Node</label>
@@ -260,34 +276,49 @@ class EditTaskForm extends React.Component {
                 </select>
               </div>
           </div>
-          <div className="form-group">
+          <div className="form-group form-inline">
             <label className="col-sm-2 control-label">Options</label>
             <div className="col-sm-10">
-              <select className="form-control" value={this.state.selectedPreset.key} onChange={this.handleSelectPreset}>
+              <select className="form-control" value={this.state.selectedPreset.id} onChange={this.handleSelectPreset}>
                 {this.state.presets.map(preset => 
-                  <option value={preset.key} key={preset.key}>{preset.label}</option>
+                  <option value={preset.id} key={preset.id}>{preset.name}</option>
                 )}
-              </select>
-            </div>
-          </div>
-          <div className={"form-group " + (!this.state.advancedOptions ? "hide" : "")}>
-            <div className="col-sm-offset-2 col-sm-10">
-              {options.map(option =>
-                <ProcessingNodeOption {...option}
-                  key={option.name}
-                  ref={this.setOptionRef(option.name)} /> 
-              )}
+              </select> 
+              <div className="btn-group presets-dropdown">
+                <button type="button" className="btn btn-default" onClick={this.handleEditPreset}>
+                  <i className="fa fa-sliders"></i>
+                </button>
+                <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                      <span className="caret"></span>
+                </button>
+                <ul className="dropdown-menu">
+                  <li>
+                    <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders"></i> Edit</a>
+                  </li>
+                  <li className="divider"></li>
+                  <li>
+                    <a href="javascript:void(0);" onClick={this.handleDuplicatePreset}><i className="fa fa-copy"></i> Duplicate</a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash-o"></i> Delete</a>
+                  </li>
+                </ul>
+              </div>
+
+              <EditPresetDialog
+                preset={this.state.selectedPreset}
+                availableOptions={this.state.selectedNode.options}
+                show={false}
+                ref={(domNode) => { if (domNode) this.editPresetDialog = domNode; }}
+              />
+
             </div>
           </div>
         </div>
         );
-      /*<div className="btn-group" role="group">
-          <button type="button" className={"btn " + (!this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(false)}>Use Defaults</button>
-          <button type="button" className={"btn " + (this.state.advancedOptions ? "btn-default" : "btn-secondary")} onClick={this.setAdvancedOptions(true)}>Set Options</button>
-        </div>*/
     }else{
-      processingNodesOptions = (<div className="form-group">
-          <div className="col-sm-offset-2 col-sm-10">Loading processing nodes... <i className="fa fa-refresh fa-spin fa-fw"></i></div>
+      taskOptions = (<div className="form-group">
+          <div className="col-sm-offset-2 col-sm-10">Loading processing nodes and presets... <i className="fa fa-refresh fa-spin fa-fw"></i></div>
         </div>);
     }
 
@@ -298,13 +329,13 @@ class EditTaskForm extends React.Component {
           <div className="col-sm-10">
             <input type="text" 
               onChange={this.handleNameChange} 
-              className="form-control" 
+              className="form-control"
               placeholder={this.namePlaceholder} 
               value={this.state.name} 
             />
           </div>
         </div>
-        {processingNodesOptions}
+        {taskOptions}
       </div>
     );
   }
