@@ -32,8 +32,10 @@ def index(request):
     return redirect('dashboard' if request.user.is_authenticated() 
                     else 'login')
 
-@login_required
 def dashboard(request):
+    if not request.user.is_authenticated():
+        login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
+     
     no_processingnodes = ProcessingNode.objects.count() == 0
     no_tasks = False #Task.objects.filter(project__owner=request.user).count() == 0
 
