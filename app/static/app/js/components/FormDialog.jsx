@@ -141,9 +141,9 @@ class FormDialog extends React.Component {
                   </div>
                   <div className="modal-body">
                     <ErrorMessage bind={[this, "error"]} />
-                    <form className="form-horizontal" onSubmit={this.handleSave}>
+                    <div className="form-horizontal" onSubmit={this.handleSave}>
                       {this.props.children}
-                    </form>
+                    </div>
                   </div>
                   <div className="modal-footer">
                     <div className="pull-right">

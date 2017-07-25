@@ -5,6 +5,7 @@ import Utils from '../classes/Utils';
 import EditPresetDialog from './EditPresetDialog';
 import ErrorMessage from './ErrorMessage';
 import PropTypes from 'prop-types';
+import Storage from '../classes/Storage';
 import $ from 'jquery';
 
 if (!Object.values) {
@@ -66,7 +67,7 @@ class EditTaskForm extends React.Component {
     this.findFirstPresetMatching = this.findFirstPresetMatching.bind(this);
     this.getAvailableOptionsOnly = this.getAvailableOptionsOnly.bind(this);
     this.getAvailableOptionsOnlyText = this.getAvailableOptionsOnlyText.bind(this);
-  
+    this.saveLastPresetToStorage = this.saveLastPresetToStorage.bind(this);
   }
 
   notifyFormLoaded(){
@@ -238,6 +239,13 @@ class EditTaskForm extends React.Component {
               customPreset.options = Utils.clone(this.props.task.options);
               selectedPreset = customPreset;
             }
+          }else{
+            // Check local storage for last used preset
+            const lastPresetId = Storage.getItem("last_preset_id");
+            if (lastPresetId !== null){
+              const lastPreset = presets.find(p => p.id == lastPresetId);
+              if (lastPreset) selectedPreset = lastPreset;
+            }
           }
 
           this.setState({
@@ -304,6 +312,12 @@ class EditTaskForm extends React.Component {
   getAvailableOptionsOnlyText(options, availableOptions){
     const opts = this.getAvailableOptionsOnly(options, availableOptions);
     return opts.map(opt => `${opt.name}:${opt.value}`).join(", ");
+  }
+
+  saveLastPresetToStorage(){
+    if (this.state.selectedPreset){
+      Storage.setItem('last_preset_id', this.state.selectedPreset.id);
+    }
   }
 
   getTaskInfo(){

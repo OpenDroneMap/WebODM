@@ -59,6 +59,7 @@ def boot():
                                                            {'name': 'skip-resize', 'value': True},
                                                            {'name': 'mesh-octree-depth', 'value': "12"},
                                                            {'name': 'use-25dmesh', 'value': True},
+                                                           {'name': 'min-num-features', 'value': 8000},
                                                            {'name': 'dem-resolution', 'value': "0.04"},
                                                            {'name': 'orthophoto-resolution', 'value': "60"},
                                                         ])

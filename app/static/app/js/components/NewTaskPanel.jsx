@@ -33,6 +33,7 @@ class NewTaskPanel extends React.Component {
   save(e){
     e.preventDefault();
     this.setState({editing: false});
+    this.taskForm.saveLastPresetToStorage();
     if (this.props.onSave) this.props.onSave(this.getTaskInfo());
   }
 
@@ -54,7 +55,7 @@ class NewTaskPanel extends React.Component {
       // Done editing, but still uploading
       return (
         <div className="new-task-panel">
-          <form className={"form-horizontal " + (this.state.editing ? "" : "hide")}>
+          <div className={"form-horizontal " + (this.state.editing ? "" : "hide")}>
             <p>{this.props.uploading ? 
               "Your images are being uploaded. In the meanwhile, check these additional options:"
             : "Please check these additional options:"}</p>
@@ -69,7 +70,7 @@ class NewTaskPanel extends React.Component {
                 </div>
               </div>
               : ""}
-          </form>
+          </div>
 
           <div className={"pull-right " + (!this.state.editing ? "" : "hide")}>
             <button type="submit" className="btn btn-primary btn-sm glyphicon glyphicon-pencil" onClick={this.edit}></button>
