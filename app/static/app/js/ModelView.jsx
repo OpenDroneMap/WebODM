@@ -4,6 +4,7 @@ import ErrorMessage from './components/ErrorMessage';
 import SwitchModeButton from './components/SwitchModeButton';
 import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 const THREE = require('./vendor/potree/js/three'); // import does not work :/
@@ -18,7 +19,7 @@ class ModelView extends React.Component {
   };
 
   static propTypes = {
-      task: React.PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
+      task: PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
   };
 
   constructor(props){

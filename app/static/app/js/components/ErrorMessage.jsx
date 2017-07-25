@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class ErrorMessage extends React.Component {
     static propTypes = {
-        bind: React.PropTypes.array.isRequired // two element array, 
+        bind: PropTypes.array.isRequired // two element array, 
                                                // with first element being the parent element 
                                                // and the second the error property to display
                                                // ex. [this, 'error']

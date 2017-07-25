@@ -2,6 +2,7 @@ import '../css/EditTaskPanel.scss';
 import React from 'react';
 import ErrorMessage from './ErrorMessage';
 import EditTaskForm from './EditTaskForm';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class EditTaskPanel extends React.Component {
@@ -9,9 +10,9 @@ class EditTaskPanel extends React.Component {
     };
 
     static propTypes = {
-        task: React.PropTypes.object.isRequired,
-        onSave: React.PropTypes.func.isRequired,
-        onCancel: React.PropTypes.func.isRequired
+        task: PropTypes.object.isRequired,
+        onSave: PropTypes.func.isRequired,
+        onCancel: PropTypes.func.isRequired
     };
 
     constructor(props){

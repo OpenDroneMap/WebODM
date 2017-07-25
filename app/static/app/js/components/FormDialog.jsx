@@ -1,6 +1,7 @@
 import React from 'react';
 import ErrorMessage from './ErrorMessage';
 import '../css/FormDialog.scss';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class FormDialog extends React.Component {
@@ -14,21 +15,21 @@ class FormDialog extends React.Component {
     };
 
     static propTypes = {
-        getFormData: React.PropTypes.func.isRequired,
-        reset: React.PropTypes.func.isRequired,
-        saveAction: React.PropTypes.func.isRequired,
-        onShow: React.PropTypes.func,
-        onHide: React.PropTypes.func,
-        deleteAction: React.PropTypes.func,
-        title: React.PropTypes.string,
-        saveLabel: React.PropTypes.string,
-        savingLabel: React.PropTypes.string,
-        saveIcon: React.PropTypes.string,
-        deleteWarning: React.PropTypes.oneOfType([
-            React.PropTypes.string,
-            React.PropTypes.bool
+        getFormData: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        saveAction: PropTypes.func.isRequired,
+        onShow: PropTypes.func,
+        onHide: PropTypes.func,
+        deleteAction: PropTypes.func,
+        title: PropTypes.string,
+        saveLabel: PropTypes.string,
+        savingLabel: PropTypes.string,
+        saveIcon: PropTypes.string,
+        deleteWarning: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.bool
         ]),
-        show: React.PropTypes.bool
+        show: PropTypes.bool
     };
 
     constructor(props){

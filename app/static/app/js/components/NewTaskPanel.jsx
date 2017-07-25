@@ -1,6 +1,7 @@
 import '../css/NewTaskPanel.scss';
 import React from 'react';
 import EditTaskForm from './EditTaskForm';
+import PropTypes from 'prop-types';
 
 class NewTaskPanel extends React.Component {
   static defaultProps = {
@@ -9,9 +10,9 @@ class NewTaskPanel extends React.Component {
   };
 
   static propTypes = {
-      onSave: React.PropTypes.func.isRequired,
-      name: React.PropTypes.string,
-      uploading: React.PropTypes.bool
+      onSave: PropTypes.func.isRequired,
+      name: PropTypes.string,
+      uploading: PropTypes.bool
   };
 
   constructor(props){

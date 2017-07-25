@@ -1,5 +1,6 @@
 import React from 'react';
 import '../css/Standby.scss';
+import PropTypes from 'prop-types';
 
 class Standby extends React.Component {
   static defaultProps = {
@@ -8,8 +9,8 @@ class Standby extends React.Component {
   };
 
   static propTypes = {
-    message: React.PropTypes.string,
-    show: React.PropTypes.bool
+    message: PropTypes.string,
+    show: PropTypes.bool
   };
 
   constructor(props){

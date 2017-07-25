@@ -3,6 +3,7 @@ import React from 'react';
 import FormDialog from './FormDialog';
 import ProcessingNodeOption from './ProcessingNodeOption';
 import PresetUtils from '../classes/PresetUtils';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class EditPresetDialog extends React.Component {
@@ -10,11 +11,11 @@ class EditPresetDialog extends React.Component {
     };
 
     static propTypes = {
-        preset: React.PropTypes.object.isRequired,
-        availableOptions: React.PropTypes.array.isRequired,
-        saveAction: React.PropTypes.func.isRequired,
-        deleteAction: React.PropTypes.func.isRequired,
-        onHide: React.PropTypes.func
+        preset: PropTypes.object.isRequired,
+        availableOptions: PropTypes.array.isRequired,
+        saveAction: PropTypes.func.isRequired,
+        deleteAction: PropTypes.func.isRequired,
+        onHide: PropTypes.func
     };
 
     constructor(props){

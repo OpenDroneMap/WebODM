@@ -1,5 +1,6 @@
 import React from 'react';
 import '../css/SwitchModeButton.scss';
+import PropTypes from 'prop-types';
 
 class SwitchModeButton extends React.Component {
   static defaultProps = {
@@ -8,8 +9,8 @@ class SwitchModeButton extends React.Component {
   };
 
   static propTypes = {
-    task: React.PropTypes.object, // The object should contain two keys: {id: <taskId>, project: <projectId>}
-    type: React.PropTypes.string // Either "mapToModel" or "modelToMap"
+    task: PropTypes.object, // The object should contain two keys: {id: <taskId>, project: <projectId>}
+    type: PropTypes.string // Either "mapToModel" or "modelToMap"
   };
 
   constructor(props){

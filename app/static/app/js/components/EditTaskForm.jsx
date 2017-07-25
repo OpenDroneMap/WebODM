@@ -4,6 +4,7 @@ import values from 'object.values';
 import Utils from '../classes/Utils';
 import EditPresetDialog from './EditPresetDialog';
 import ErrorMessage from './ErrorMessage';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 if (!Object.values) {
@@ -17,12 +18,12 @@ class EditTaskForm extends React.Component {
   };
 
   static propTypes = {
-      selectedNode: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.number
+      selectedNode: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
       ]),
-      onFormLoaded: React.PropTypes.func,
-      task: React.PropTypes.object
+      onFormLoaded: PropTypes.func,
+      task: PropTypes.object
   };
 
   constructor(props){

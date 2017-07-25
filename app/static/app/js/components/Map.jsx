@@ -15,6 +15,7 @@ import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 import SwitchModeButton from './SwitchModeButton';
 import AssetDownloads from '../classes/AssetDownloads';
+import PropTypes from 'prop-types';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -26,12 +27,12 @@ class Map extends React.Component {
   };
 
   static propTypes = {
-    maxzoom: React.PropTypes.number,
-    minzoom: React.PropTypes.number,
-    showBackground: React.PropTypes.bool,
-    tiles: React.PropTypes.array.isRequired,
-    opacity: React.PropTypes.number,
-    mapType: React.PropTypes.oneOf(['orthophoto', 'dsm', 'dtm'])
+    maxzoom: PropTypes.number,
+    minzoom: PropTypes.number,
+    showBackground: PropTypes.bool,
+    tiles: PropTypes.array.isRequired,
+    opacity: PropTypes.number,
+    mapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm'])
   };
 
   constructor(props) {

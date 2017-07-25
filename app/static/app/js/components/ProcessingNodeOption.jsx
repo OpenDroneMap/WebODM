@@ -1,26 +1,27 @@
 import React from 'react';
 import '../css/ProcessingNodeOption.scss';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class ProcessingNodeOption extends React.Component {
   static defaultProps = {};
 
   static propTypes = {
-    name: React.PropTypes.string.isRequired,
-    defaultValue: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.bool
+    name: PropTypes.string.isRequired,
+    defaultValue: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.bool
     ]).isRequired,
-    value: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.bool
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.bool
     ]),
-    type: React.PropTypes.string,
-    domain: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.array
+    type: PropTypes.string,
+    domain: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array
     ]),
-    help: React.PropTypes.string,
+    help: PropTypes.string,
   };
 
   constructor(props){
