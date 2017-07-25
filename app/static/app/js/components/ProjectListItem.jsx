@@ -2,7 +2,7 @@ import '../css/ProjectListItem.scss';
 import React from 'react';
 import update from 'immutability-helper';
 import TaskList from './TaskList';
-import EditTaskPanel from './EditTaskPanel';
+import NewTaskPanel from './NewTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import ErrorMessage from './ErrorMessage';
 import EditProjectDialog from './EditProjectDialog';
@@ -65,7 +65,7 @@ class ProjectListItem extends React.Component {
   getDefaultUploadState(){
     return {
       uploading: false,
-      showEditTask: false,
+      editing: false,
       error: "",
       progress: 0,
       totalCount: 0,
@@ -124,7 +124,7 @@ class ProjectListItem extends React.Component {
         .on("processingmultiple", () => {
           this.setUploadState({
             uploading: true,
-            showEditTask: true
+            editing: true
           })
         })
         .on("completemultiple", (files) => {
@@ -144,7 +144,7 @@ class ProjectListItem extends React.Component {
 
               // Update task information (if the user has completed this step)
               if (this.state.upload.savedTaskInfo){
-                this.updateTaskInfo(taskId, this.editTaskPanel.getTaskInfo());
+                this.updateTaskInfo(taskId, this.newTaskPanel.getTaskInfo());
               }else{
                 // Need to wait for user to confirm task options
               }
@@ -177,7 +177,7 @@ class ProjectListItem extends React.Component {
     if (!taskId) throw new Error("taskId is not set");
     if (!taskInfo) throw new Error("taskId is not set");
     
-    this.setUploadState({showEditTask: false});
+    this.setUploadState({editing: false});
     this.setState({updatingTask: true});
 
     this.updateTaskRequest = 
@@ -350,7 +350,7 @@ class ProjectListItem extends React.Component {
         </div>
         <i className="drag-drop-icon fa fa-inbox"></i>
         <div className="row">
-          {this.state.upload.showEditTask ? <UploadProgressBar {...this.state.upload}/> : ""}
+          {this.state.upload.editing ? <UploadProgressBar {...this.state.upload}/> : ""}
           
           {this.state.upload.error !== "" ? 
             <div className="alert alert-warning alert-dismissible">
@@ -359,11 +359,11 @@ class ProjectListItem extends React.Component {
             </div>
             : ""}
 
-          {this.state.upload.showEditTask ? 
-            <EditTaskPanel 
+          {this.state.upload.editing ? 
+            <NewTaskPanel 
               uploading={this.state.upload.uploading} 
               onSave={this.handleTaskSaved}
-              ref={this.setRef("editTaskPanel")}
+              ref={this.setRef("newTaskPanel")}
             />
           : ""}
 

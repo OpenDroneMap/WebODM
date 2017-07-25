@@ -1,6 +1,7 @@
 import React from 'react';
 import ErrorMessage from './ErrorMessage';
 import FormDialog from './FormDialog';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class EditProjectDialog extends React.Component {
@@ -16,17 +17,17 @@ class EditProjectDialog extends React.Component {
     };
 
     static propTypes = {
-        projectName: React.PropTypes.string,
-        projectDescr: React.PropTypes.string,
-        saveAction: React.PropTypes.func.isRequired,
-        onShow: React.PropTypes.func,
-        deleteAction: React.PropTypes.func,
-        title: React.PropTypes.string,
-        saveLabel: React.PropTypes.string,
-        savingLabel: React.PropTypes.string,
-        saveIcon: React.PropTypes.string,
-        deleteWarning: React.PropTypes.string,
-        show: React.PropTypes.bool
+        projectName: PropTypes.string,
+        projectDescr: PropTypes.string,
+        saveAction: PropTypes.func.isRequired,
+        onShow: PropTypes.func,
+        deleteAction: PropTypes.func,
+        title: PropTypes.string,
+        saveLabel: PropTypes.string,
+        savingLabel: PropTypes.string,
+        saveIcon: PropTypes.string,
+        deleteWarning: PropTypes.string,
+        show: PropTypes.bool
     };
 
     constructor(props){

@@ -11,6 +11,10 @@
         .no-padding{
             padding: 0;
         }
+
+        &.no-padding{
+            padding: 0;
+        }
     }
 
     .name{
@@ -78,6 +82,10 @@
         .action-buttons{
             button{
                 margin-right: 4px;
+            }
+
+            .edit-button{
+                margin-right: 15px;
             }
 
             .asset-download-buttons{

@@ -1,4 +1,6 @@
 from django.conf.urls import url, include
+
+from app.api.presets import PresetViewSet
 from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
@@ -8,6 +10,8 @@ from rest_framework_jwt.views import obtain_jwt_token
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet)
 router.register(r'processingnodes', ProcessingNodeViewSet)
+router.register(r'presets', PresetViewSet, base_name='presets')
+
 
 tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
 tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')

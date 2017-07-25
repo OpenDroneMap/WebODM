@@ -2,6 +2,7 @@ import React from 'react';
 import './css/MapView.scss';
 import Map from './components/Map';
 import $ from 'jquery';
+import PropTypes from 'prop-types';
 
 class MapView extends React.Component {
   static defaultProps = {
@@ -11,9 +12,9 @@ class MapView extends React.Component {
   };
 
   static propTypes = {
-      mapItems: React.PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
-      selectedMapType: React.PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
-      title: React.PropTypes.string,
+      mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
+      selectedMapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
+      title: PropTypes.string,
   };
 
   constructor(props){

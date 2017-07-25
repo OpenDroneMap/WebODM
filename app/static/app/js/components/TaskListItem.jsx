@@ -4,7 +4,7 @@ import Console from '../Console';
 import statusCodes from '../classes/StatusCodes';
 import pendingActions from '../classes/PendingActions';
 import ErrorMessage from './ErrorMessage';
-import EditTaskDialog from './EditTaskDialog';
+import EditTaskPanel from './EditTaskPanel';
 import AssetDownloadButtons from './AssetDownloadButtons';
 import HistoryNav from '../classes/HistoryNav';
 
@@ -32,16 +32,19 @@ class TaskListItem extends React.Component {
     this.consoleOutputUrl = this.consoleOutputUrl.bind(this);
     this.stopEditing = this.stopEditing.bind(this);
     this.startEditing = this.startEditing.bind(this);
-    this.updateTask = this.updateTask.bind(this);
     this.checkForMemoryError = this.checkForMemoryError.bind(this);
     this.downloadTaskOutput = this.downloadTaskOutput.bind(this);
+    this.handleEditTaskSave = this.handleEditTaskSave.bind(this);
   }
 
   shouldRefresh(){
+    if (this.state.task.pending_action !== null) return true;
+
     // If a task is completed, or failed, etc. we don't expect it to change
+    if ([statusCodes.COMPLETED, statusCodes.FAILED, statusCodes.CANCELED].indexOf(this.state.task.status) !== -1) return false;
+
     return (([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(this.state.task.status) !== -1 && this.state.task.processing_node) ||
-            (!this.state.task.uuid && this.state.task.processing_node && !this.state.task.last_error) ||
-            this.state.task.pending_action !== null);
+            (!this.state.task.uuid && this.state.task.processing_node && !this.state.task.last_error));
   }
 
   loadTimer(startTime){
@@ -200,37 +203,11 @@ class TaskListItem extends React.Component {
   }
 
   startEditing(){
-    this.setState({editing: true});
+    this.setState({expanded: true, editing: true});
   }
 
   stopEditing(){
     this.setState({editing: false});
-  }
-
-  updateTask(taskInfo){
-    let d = $.Deferred();
-
-    taskInfo.uuid = ""; // TODO: we could reuse the UUID so that images don't need to be re-uploaded! This needs changes on node-odm as well.
-
-    taskInfo.processing_node = taskInfo.selectedNode.id;
-    taskInfo.auto_processing_node = taskInfo.selectedNode.key == "auto";
-    delete(taskInfo.selectedNode);
-
-    $.ajax({
-        url: `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/`,
-        contentType: 'application/json',
-        data: JSON.stringify(taskInfo),
-        dataType: 'json',
-        type: 'PATCH'
-      }).done((json) => {
-        this.setState({task: json});
-        this.setAutoRefresh();
-        d.resolve();
-      }).fail(() => {
-        d.reject(new Error("Could not update task information. Plese try again."));
-      });
-
-    return d;
   }
 
   checkForMemoryError(lines){
@@ -245,10 +222,15 @@ class TaskListItem extends React.Component {
     return window.navigator.platform === "MacIntel";
   }
 
+  handleEditTaskSave(task){
+    this.setState({task, editing: false});
+    this.setAutoRefresh();
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : `Task #${task.id}`;
-    
+
     let status = statusCodes.description(task.status);
     if (status === "") status = "Uploading images";
 
@@ -286,7 +268,7 @@ class TaskListItem extends React.Component {
       // Ability to change options
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 ||
           (!task.processing_node)){
-        addActionButton("Edit", "btn-primary", "glyphicon glyphicon-pencil", () => {
+        addActionButton("Edit", "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
         });
       }
@@ -384,6 +366,19 @@ class TaskListItem extends React.Component {
           </div>
         </div>
       );
+
+      // If we're editing, the expanded view becomes the edit panel
+      if (this.state.editing){
+        expanded = <div className="task-list-item">
+          <div className="row no-padding">
+            <EditTaskPanel
+              task={this.state.task}
+              onSave={this.handleEditTaskSave}
+              onCancel={this.stopEditing}
+            />
+          </div>
+        </div>;
+      }
     }
 
     const getStatusLabel = (text, classes = "") => {
@@ -428,15 +423,6 @@ class TaskListItem extends React.Component {
           </div>
         </div>
         {expanded}
-
-        {this.state.editing ? 
-          <EditTaskDialog 
-            task={this.state.task}
-            show={true}
-            onHide={this.stopEditing}
-            saveAction={this.updateTask}
-          /> : 
-          ""}
       </div>
     );
   }
