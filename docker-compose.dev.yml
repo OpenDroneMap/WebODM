@@ -1,6 +1,6 @@
 version: '2'
 services:
   webapp:
-    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh --create-default-pnode --setup-devenv"
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-it.sh db:5432 -- /webodm/start.sh --create-default-pnode --setup-devenv\""
     volumes:
       - .:/webodm
