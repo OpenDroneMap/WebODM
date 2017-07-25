@@ -16,9 +16,14 @@ class TestApiPreset(BootTestCase):
 
         superuser = User.objects.get(username='testsuperuser')
 
-        Preset.objects.create(owner=superuser, name='Global Preset #1', system=True, options=[{'test': True}])
-        Preset.objects.create(owner=superuser, name='Global Preset #2', system=True, options=[{'test2': True}])
+        Preset.objects.create(name='Global Preset #1', system=True, options=[{'test': True}])
+        Preset.objects.create(name='Global Preset #2', system=True, options=[{'test2': True}])
         Preset.objects.create(owner=superuser, name='Local Preset #1', system=False, options=[{'test3': True}])
+
+    def check_default_presets(self):
+        self.assertTrue(Preset.objects.filter(name="Default", system=True).exists())
+        self.assertTrue(Preset.objects.filter(name="DSM + DTM", system=True).exists())
+        self.assertTrue(Preset.objects.filter(name="High Quality", system=True).exists())
 
     def test_preset(self):
         client = APIClient()
@@ -48,8 +53,9 @@ class TestApiPreset(BootTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # Only ours and global presets are available
-        self.assertTrue(len(res.data) == 3)
+        self.assertTrue(len(res.data) == 6)
         self.assertTrue('My Local Preset' in [preset['name'] for preset in res.data])
+        self.assertTrue('High Quality' in [preset['name'] for preset in res.data])
         self.assertTrue('Global Preset #1' in [preset['name'] for preset in res.data])
         self.assertTrue('Global Preset #2' in [preset['name'] for preset in res.data])
         self.assertFalse('Local Preset #1' in [preset['name'] for preset in res.data])

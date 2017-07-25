@@ -64,6 +64,8 @@ class EditTaskForm extends React.Component {
     this.handleDeletePreset = this.handleDeletePreset.bind(this);
     this.findFirstPresetMatching = this.findFirstPresetMatching.bind(this);
     this.getAvailableOptionsOnly = this.getAvailableOptionsOnly.bind(this);
+    this.getAvailableOptionsOnlyText = this.getAvailableOptionsOnlyText.bind(this);
+  
   }
 
   notifyFormLoaded(){
@@ -209,7 +211,7 @@ class EditTaskForm extends React.Component {
     }
 
     this.presetsRequest = 
-      $.getJSON("/api/presets/?ordering=-created_at", presets => {
+      $.getJSON("/api/presets/?ordering=-system,-created_at", presets => {
         if (Array.isArray(presets)){
           // Add custom preset
           const customPreset = {
@@ -218,7 +220,7 @@ class EditTaskForm extends React.Component {
             options: [],
             system: true
           };
-          presets.push(customPreset);
+          presets.unshift(customPreset);
 
           // Choose preset
           let selectedPreset = presets[0],
@@ -298,6 +300,11 @@ class EditTaskForm extends React.Component {
     return options.filter(opt => optionNames[opt.name]);
   }
 
+  getAvailableOptionsOnlyText(options, availableOptions){
+    const opts = this.getAvailableOptionsOnly(options, availableOptions);
+    return opts.map(opt => `${opt.name}:${opt.value}`).join(", ");
+  }
+
   getTaskInfo(){
     const { name, selectedNode, selectedPreset } = this.state;
 
@@ -323,7 +330,7 @@ class EditTaskForm extends React.Component {
           options: [],
           system: true
         };
-        presets.push(customPreset);
+        presets.unshift(customPreset);
         this.setState({presets});
       }
       customPreset.options = Utils.clone(selectedPreset.options);
@@ -463,9 +470,13 @@ class EditTaskForm extends React.Component {
           <div className="form-group form-inline">
             <label className="col-sm-2 control-label">Options</label>
             <div className="col-sm-10">
-              <select className="form-control" value={this.state.selectedPreset.id} onChange={this.handleSelectPreset}>
+              <select 
+                  title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
+                  className="form-control" 
+                  value={this.state.selectedPreset.id} 
+                  onChange={this.handleSelectPreset}>
                 {this.state.presets.map(preset => 
-                  <option value={preset.id} key={preset.id}>{preset.name}</option>
+                  <option value={preset.id} key={preset.id} className={preset.system ? "system-preset" : ""}>{preset.name}</option>
                 )}
               </select>
 

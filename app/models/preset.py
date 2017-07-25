@@ -10,7 +10,7 @@ logger = logging.getLogger('app.logger')
 
 
 class Preset(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, help_text="The person who owns this preset")
+    owner = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, help_text="The person who owns this preset")
     name = models.CharField(max_length=255, blank=False, null=False, help_text="A label used to describe the preset")
     options = JSONField(default=list(), blank=True, help_text="Options that define this preset (same format as in a Task's options).",
                                validators=[validate_task_options])

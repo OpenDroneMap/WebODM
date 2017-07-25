@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import ProgrammingError
 from guardian.shortcuts import assign_perm
 
+from app.models import Preset
 from nodeodm.models import ProcessingNode
 # noinspection PyUnresolvedReferences
 from . import scheduler, signals
@@ -49,6 +50,19 @@ def boot():
 
         # Add permission to view processing nodes
         default_group.permissions.add(Permission.objects.get(codename="view_processingnode"))
+
+        # Add default presets
+        Preset.objects.get_or_create(name='DSM + DTM', system=True,
+                                     options=[{'name': 'dsm', 'value': True}, {'name': 'dtm', 'value': True}])
+        Preset.objects.get_or_create(name='High Quality', system=True,
+                                                  options=[{'name': 'dsm', 'value': True},
+                                                           {'name': 'skip-resize', 'value': True},
+                                                           {'name': 'mesh-octree-depth', 'value': "12"},
+                                                           {'name': 'use-25dmesh', 'value': True},
+                                                           {'name': 'dem-resolution', 'value': "0.04"},
+                                                           {'name': 'orthophoto-resolution', 'value': "60"},
+                                                        ])
+        Preset.objects.get_or_create(name='Default', system=True, options=[{'name': 'dsm', 'value': True}])
 
         # Unlock any Task that might have been locked
         Task.objects.filter(processing_lock=True).update(processing_lock=False)
