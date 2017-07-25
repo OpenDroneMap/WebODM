@@ -5,7 +5,7 @@
 version: '2'
 services:
   webapp:
-    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /webodm/wait-for-it.sh db:5432 -- /webodm/start.sh --create-default-pnode"
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c "/webodm/wait-for-it.sh db:5432 -- /webodm/start.sh --create-default-pnode\""
     depends_on:
       - node-odm-1
   node-odm-1:
