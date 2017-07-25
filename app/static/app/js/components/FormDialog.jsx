@@ -24,7 +24,10 @@ class FormDialog extends React.Component {
         saveLabel: React.PropTypes.string,
         savingLabel: React.PropTypes.string,
         saveIcon: React.PropTypes.string,
-        deleteWarning: React.PropTypes.string,
+        deleteWarning: React.PropTypes.oneOfType([
+            React.PropTypes.string,
+            React.PropTypes.bool
+        ]),
         show: React.PropTypes.bool
     };
 
@@ -50,6 +53,8 @@ class FormDialog extends React.Component {
     }
 
     componentDidMount(){
+        this._mounted = true;
+
         $(this.modal)
             // Ensure state is kept up to date when
             // the user presses the escape key
@@ -66,6 +71,8 @@ class FormDialog extends React.Component {
     }
 
     componentWillUnmount(){
+        this._mounted = false;
+
         $(this.modal).off('hidden.bs.modal hidden.bs.modal')
                      .modal('hide');
     }
@@ -107,11 +114,13 @@ class FormDialog extends React.Component {
 
     handleDelete(){
         if (this.props.deleteAction){
-            if (window.confirm(this.props.deleteWarning)){
+            if (this.props.deleteWarning === false || window.confirm(this.props.deleteWarning)){
                 this.setState({deleting: true});
                 this.props.deleteAction()
                     .fail(e => {
-                        this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || "Could not delete item", deleting: false});
+                        if (this._mounted) this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || "Could not delete item"});
+                    }).always(() => {
+                        if (this._mounted) this.setState({deleting: false});
                     });
             }
         }

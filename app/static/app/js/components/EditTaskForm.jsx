@@ -3,6 +3,8 @@ import React from 'react';
 import values from 'object.values';
 import Utils from '../classes/Utils';
 import EditPresetDialog from './EditPresetDialog';
+import ErrorMessage from './ErrorMessage';
+import $ from 'jquery';
 
 if (!Object.values) {
     values.shim();
@@ -30,6 +32,9 @@ class EditTaskForm extends React.Component {
 
     this.state = {
       error: "",
+      presetError: "",
+      presetActionPerforming: false,
+
       name: props.task !== null ? (props.task.name || "") : "",
       loadedProcessingNodes: false,
       loadedPresets: false,
@@ -54,6 +59,11 @@ class EditTaskForm extends React.Component {
     this.selectPresetById = this.selectPresetById.bind(this);
     this.handleEditPreset = this.handleEditPreset.bind(this);
     this.handleCancelEditPreset = this.handleCancelEditPreset.bind(this);
+    this.handlePresetSave = this.handlePresetSave.bind(this);
+    this.handleDuplicateSavePreset = this.handleDuplicateSavePreset.bind(this);
+    this.handleDeletePreset = this.handleDeletePreset.bind(this);
+    this.findFirstPresetMatching = this.findFirstPresetMatching.bind(this);
+    this.getAvailableOptionsOnly = this.getAvailableOptionsOnly.bind(this);
   }
 
   notifyFormLoaded(){
@@ -165,6 +175,33 @@ class EditTaskForm extends React.Component {
     this.loadPresets();
   }
 
+  findFirstPresetMatching(presets, options){
+    for (let i = 0; i < presets.length; i++){
+      const preset = presets[i];
+
+      if (options.length === preset.options.length){
+        let dict = {};
+        options.forEach(opt => {
+          dict[opt.name] = opt.value;
+        });
+        
+        let matchingOptions = 0;
+        for (let j = 0; j < preset.options.length; j++){
+          if (dict[preset.options[j].name] !== preset.options[j].value){
+            break;
+          }else{
+            matchingOptions++;
+          }
+        }
+
+        // If we terminated the loop above, all options match
+        if (matchingOptions === options.length) return preset;
+      }
+    }
+
+    return null;
+  }
+
   loadPresets(){
     function failed(){
       // Try again
@@ -172,19 +209,33 @@ class EditTaskForm extends React.Component {
     }
 
     this.presetsRequest = 
-      $.getJSON("/api/presets/", presets => {
+      $.getJSON("/api/presets/?ordering=-created_at", presets => {
         if (Array.isArray(presets)){
-          // In case somebody decides to remove all presets...
-          if (presets.length === 0){
-            this.setState({error: "There are no presets. Please create a system preset from the Administration -- Presets page, then try again."});
-            return;
-          }
+          // Add custom preset
+          const customPreset = {
+            id: -1,
+            name: "(Custom)",
+            options: [],
+            system: true
+          };
+          presets.push(customPreset);
 
           // Choose preset
           let selectedPreset = presets[0],
               defaultPreset = presets.find(p => p.name === "Default"); // Do not translate Default
           if (defaultPreset) selectedPreset = defaultPreset;
-          // TODO: look at task options
+          
+          // If task's options are set attempt
+          // to find a preset that matches the current task options
+          if (this.props.task && Array.isArray(this.props.task.options) && this.props.task.options.length > 0){
+            const taskPreset = this.findFirstPresetMatching(presets, this.props.task.options);
+            if (taskPreset !== null){
+              selectedPreset = taskPreset;
+            }else{
+              customPreset.options = Utils.clone(this.props.task.options);
+              selectedPreset = customPreset;
+            }
+          }
 
           this.setState({
             loadedPresets: true, 
@@ -237,21 +288,146 @@ class EditTaskForm extends React.Component {
     this.selectNodeByKey(e.target.value);
   }
 
+  // Filter a list of options based on the ones that
+  // are available (usually options are from a preset and availableOptions
+  // from a processing node)
+  getAvailableOptionsOnly(options, availableOptions){
+    const optionNames = {};
+
+    availableOptions.forEach(opt => optionNames[opt.name] = true);
+    return options.filter(opt => optionNames[opt.name]);
+  }
+
   getTaskInfo(){
+    const { name, selectedNode, selectedPreset } = this.state;
+
     return {
-      name: this.state.name !== "" ? this.state.name : this.namePlaceholder,
-      selectedNode: this.state.selectedNode,
-      options: this.state.selectedPreset.options
+      name: name !== "" ? name : this.namePlaceholder,
+      selectedNode: selectedNode,
+      options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options)
     };
   }
 
   handleEditPreset(){
+    // If the user tries to edit a system preset
+    // set the "Custom..." options to it
+    const { selectedPreset, presets } = this.state;
+
+    if (selectedPreset.system){
+      let customPreset = presets.find(p => p.id === -1);
+      // Might have been deleted
+      if (!customPreset){
+        customPreset = {
+          id: -1,
+          name: "(Custom)",
+          options: [],
+          system: true
+        };
+        presets.push(customPreset);
+        this.setState({presets});
+      }
+      customPreset.options = Utils.clone(selectedPreset.options);
+      this.setState({selectedPreset: customPreset});
+    }
+
     this.setState({editingPreset: true});
-    // this.editPresetDialog.show();
   }
 
   handleCancelEditPreset(){
     this.setState({editingPreset: false});
+  }
+
+  handlePresetSave(preset){
+    const done = () => {
+      // Update presets and selected preset
+      let p = this.state.presets.find(p => p.id === preset.id);
+      p.name = preset.name;
+      p.options = preset.options;
+
+      this.setState({selectedPreset: p});
+    };
+
+    // If it's a custom preset do not update server-side
+    if (preset.id === -1){
+      done();
+      return $.Deferred().resolve();
+    }else{
+      return $.ajax({
+        url: `/api/presets/${preset.id}/`,
+        contentType: 'application/json',
+        data: JSON.stringify({
+          name: preset.name,
+          options: preset.options
+        }),
+        dataType: 'json',
+        type: 'PATCH'
+      }).done(done);
+    }
+  }
+
+  handleDuplicateSavePreset(){
+    // Create a new preset with the same settings as the
+    // currently selected preset
+    const { selectedPreset, presets } = this.state;
+    this.setState({presetActionPerforming: true});
+
+    const isCustom = selectedPreset.id === -1,
+          name = isCustom ? "My Preset" : "Copy of " + selectedPreset.name;
+
+    $.ajax({
+      url: `/api/presets/`,
+      contentType: 'application/json',
+      data: JSON.stringify({
+        name: name,
+        options: selectedPreset.options
+      }),
+      dataType: 'json',
+      type: 'POST'
+    }).done(preset => {
+      // If the original preset was a custom one, 
+      // we remove it from the list (since we just saved it)
+      if (isCustom){
+        presets.splice(presets.indexOf(selectedPreset), 1);
+      }
+
+      // Add new preset to list, select it, then edit
+      presets.push(preset);
+      this.setState({presets, selectedPreset: preset});
+      this.handleEditPreset();
+    }).fail(() => {
+      this.setState({presetError: "Could not duplicate the preset. Please try to refresh the page."});
+    }).always(() => {
+      this.setState({presetActionPerforming: false});
+    });
+  }
+
+  handleDeletePreset(){
+    const { selectedPreset, presets } = this.state;
+    if (selectedPreset.system){
+      this.setState({presetError: "System presets can only be removed by a staff member from the Administration panel."});
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete "${selectedPreset.name}"?`)){
+      this.setState({presetActionPerforming: true});
+
+      return $.ajax({
+        url: `/api/presets/${selectedPreset.id}/`,
+        contentType: 'application/json',
+        type: 'DELETE'
+      }).done(() => {
+        presets.splice(presets.indexOf(selectedPreset), 1);
+
+        // Select first by default
+        this.setState({presets, selectedPreset: presets[0], editingPreset: false});
+      }).fail(() => {
+        this.setState({presetError: "Could not delete the preset. Please try to refresh the page."});
+      }).always(() => {
+        this.setState({presetActionPerforming: false});
+      });
+    }else{
+      return $.Deferred().resolve();
+    }
   }
 
   render() {
@@ -291,38 +467,48 @@ class EditTaskForm extends React.Component {
                 {this.state.presets.map(preset => 
                   <option value={preset.id} key={preset.id}>{preset.name}</option>
                 )}
-              </select> 
-              <div className="btn-group presets-dropdown">
-                <button type="button" className="btn btn-default" onClick={this.handleEditPreset}>
-                  <i className="fa fa-sliders"></i>
-                </button>
-                <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                      <span className="caret"></span>
-                </button>
-                <ul className="dropdown-menu">
-                  <li>
-                    <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders"></i> Edit</a>
-                  </li>
-                  <li className="divider"></li>
-                  <li>
-                    <a href="javascript:void(0);" onClick={this.handleDuplicatePreset}><i className="fa fa-copy"></i> Duplicate</a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash-o"></i> Delete</a>
-                  </li>
-                </ul>
-              </div>
+              </select>
+
+              {!this.state.presetActionPerforming ?
+                <div className="btn-group presets-dropdown">
+                  <button type="button" className="btn btn-default" onClick={this.handleEditPreset}>
+                    <i className="fa fa-sliders"></i>
+                  </button>
+                  <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span className="caret"></span>
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders"></i> Edit</a>
+                    </li>
+                    <li className="divider"></li>
+
+                    {this.state.selectedPreset.id !== -1 ?
+                      <li>
+                        <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-copy"></i> Duplicate</a>
+                      </li>
+                    :
+                      <li>
+                        <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-save"></i> Save</a>
+                      </li>
+                    }
+                    <li className={this.state.selectedPreset.system ? "disabled" : ""}>
+                      <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash-o"></i> Delete</a>
+                    </li>
+                  </ul>
+                </div>
+              : <i className="preset-performing-action-icon fa fa-cog fa-spin fa-fw"></i>}
+              <ErrorMessage className="preset-error" bind={[this, 'presetError']} />
             </div>
           </div>
-          PRESET:
-          {JSON.stringify(this.state.selectedPreset.options)}<br/>
-
 
           {this.state.editingPreset ? 
             <EditPresetDialog
               preset={this.state.selectedPreset}
               availableOptions={this.state.selectedNode.options}
               onHide={this.handleCancelEditPreset}
+              saveAction={this.handlePresetSave}
+              deleteAction={this.handleDeletePreset}
               ref={(domNode) => { if (domNode) this.editPresetDialog = domNode; }}
             />
           : ""}

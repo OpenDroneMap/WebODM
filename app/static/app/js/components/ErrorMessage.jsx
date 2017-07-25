@@ -23,7 +23,7 @@ class ErrorMessage extends React.Component {
 
         if (parent.state[prop]){
             return (
-                <div className="alert alert-warning alert-dismissible">
+                <div className={"alert alert-warning alert-dismissible " + (this.props.className ? this.props.className : "")}>
                     <button type="button" className="close" aria-label="Close" onClick={this.close}><span aria-hidden="true">&times;</span></button>
                     {parent.state[prop]}
                 </div>
