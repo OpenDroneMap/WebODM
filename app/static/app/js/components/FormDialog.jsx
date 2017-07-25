@@ -1,6 +1,7 @@
 import React from 'react';
 import ErrorMessage from './ErrorMessage';
 import '../css/FormDialog.scss';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class FormDialog extends React.Component {
@@ -14,18 +15,21 @@ class FormDialog extends React.Component {
     };
 
     static propTypes = {
-        getFormData: React.PropTypes.func.isRequired,
-        reset: React.PropTypes.func.isRequired,
-        saveAction: React.PropTypes.func.isRequired,
-        onShow: React.PropTypes.func,
-        onHide: React.PropTypes.func,
-        deleteAction: React.PropTypes.func,
-        title: React.PropTypes.string,
-        saveLabel: React.PropTypes.string,
-        savingLabel: React.PropTypes.string,
-        saveIcon: React.PropTypes.string,
-        deleteWarning: React.PropTypes.string,
-        show: React.PropTypes.bool
+        getFormData: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        saveAction: PropTypes.func.isRequired,
+        onShow: PropTypes.func,
+        onHide: PropTypes.func,
+        deleteAction: PropTypes.func,
+        title: PropTypes.string,
+        saveLabel: PropTypes.string,
+        savingLabel: PropTypes.string,
+        saveIcon: PropTypes.string,
+        deleteWarning: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.bool
+        ]),
+        show: PropTypes.bool
     };
 
     constructor(props){
@@ -50,6 +54,8 @@ class FormDialog extends React.Component {
     }
 
     componentDidMount(){
+        this._mounted = true;
+
         $(this.modal)
             // Ensure state is kept up to date when
             // the user presses the escape key
@@ -66,6 +72,8 @@ class FormDialog extends React.Component {
     }
 
     componentWillUnmount(){
+        this._mounted = false;
+
         $(this.modal).off('hidden.bs.modal hidden.bs.modal')
                      .modal('hide');
     }
@@ -107,11 +115,13 @@ class FormDialog extends React.Component {
 
     handleDelete(){
         if (this.props.deleteAction){
-            if (window.confirm(this.props.deleteWarning)){
+            if (this.props.deleteWarning === false || window.confirm(this.props.deleteWarning)){
                 this.setState({deleting: true});
                 this.props.deleteAction()
                     .fail(e => {
-                        this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || "Could not delete item", deleting: false});
+                        if (this._mounted) this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || "Could not delete item"});
+                    }).always(() => {
+                        if (this._mounted) this.setState({deleting: false});
                     });
             }
         }
@@ -131,9 +141,9 @@ class FormDialog extends React.Component {
                   </div>
                   <div className="modal-body">
                     <ErrorMessage bind={[this, "error"]} />
-                    <form className="form-horizontal" onSubmit={this.handleSave}>
+                    <div className="form-horizontal" onSubmit={this.handleSave}>
                       {this.props.children}
-                    </form>
+                    </div>
                   </div>
                   <div className="modal-footer">
                     <div className="pull-right">

@@ -6,7 +6,7 @@ class AssetDownload{
   }
 
   downloadUrl(project_id, task_id){
-    return `/api/projects/${project_id}/tasks/${task_id}/download/${this.asset}/`;
+    return `/api/projects/${project_id}/tasks/${task_id}/download/${this.asset}`;
   }
 
   get separator(){ 
@@ -31,13 +31,16 @@ class AssetDownloadSeparator extends AssetDownload{
 const api = {
   all: function() {
     return [
-      new AssetDownload("GeoTIFF","geotiff","fa fa-map-o"),
-      new AssetDownload("Textured Model","texturedmodel","fa fa-connectdevelop"),
-      new AssetDownload("LAS","las","fa fa-cube"),
-      new AssetDownload("PLY","ply","fa fa-cube"),
-      new AssetDownload("CSV","csv","fa fa-cube"),
+      new AssetDownload("Orthophoto (GeoTIFF)","orthophoto.tif","fa fa-map-o"),
+      new AssetDownload("Orthophoto (PNG)","orthophoto.png","fa fa-picture-o"),
+      new AssetDownload("Terrain Model (GeoTIFF)","dtm.tif","fa fa-area-chart"),
+      new AssetDownload("Surface Model (GeoTIFF)","dsm.tif","fa fa-area-chart"),
+      new AssetDownload("Point Cloud (LAS)","georeferenced_model.las","fa fa-cube"),
+      new AssetDownload("Point Cloud (PLY)","georeferenced_model.ply","fa fa-cube"),
+      new AssetDownload("Point Cloud (CSV)","georeferenced_model.csv","fa fa-cube"),
+      new AssetDownload("Textured Model","textured_model.zip","fa fa-connectdevelop"),
       new AssetDownloadSeparator(),
-      new AssetDownload("All Assets","all","fa fa-file-archive-o")
+      new AssetDownload("All Assets","all.zip","fa fa-file-archive-o")
     ];
   },
 

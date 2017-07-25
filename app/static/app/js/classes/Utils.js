@@ -49,6 +49,10 @@ export default {
       let q = this.queryParams(location);
       q[param] = value;
       return this.toSearchQuery(q);
+    },
+
+    clone: function(obj){
+      return JSON.parse(JSON.stringify(obj));
     }
 };
 

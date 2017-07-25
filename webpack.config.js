@@ -7,46 +7,50 @@ let LiveReloadPlugin = require('webpack-livereload-plugin');
 module.exports = {
   context: __dirname,
 
-  entry: [
-    // 'webpack-dev-server/client?http://localhost:3000',
-    // 'webpack/hot/only-dev-server',
-    './app/static/app/js/main.jsx',
-  ],
+  entry: {
+    main: ['./app/static/app/js/main.jsx'],
+    Console: ['./app/static/app/js/Console.jsx'],
+    Dashboard: ['./app/static/app/js/Dashboard.jsx'],
+    MapView: ['./app/static/app/js/MapView.jsx'],
+    ModelView: ['./app/static/app/js/ModelView.jsx']
+  },
 
   output: {
       path: path.join(__dirname, './app/static/app/bundles/'),
       filename: "[name]-[hash].js"
-      // publicPath: 'http://localhost:3000/app/static/app/bundles/', // Tell django to use this URL to load packages and not use STATIC_URL + bundle_name
   },
 
   plugins: [
-    // new webpack.HotModuleReplacementPlugin(),
-    // new webpack.NoErrorsPlugin(), // don't reload if there is an error
     new LiveReloadPlugin(),
     new BundleTracker({filename: './webpack-stats.json'}),
-    new ExtractTextPlugin('css/main.css', {
+    new ExtractTextPlugin('css/[name]-[hash].css', {
         allChunks: true
     })
   ],
 
   module: {
-    loaders: [
+    rules: [
       { 
         test: /\.jsx?$/, 
         exclude: /(node_modules|bower_components)/, 
-        loader: 'babel-loader',
-        query: {
-          "plugins": [
-             'syntax-class-properties',
-             'transform-class-properties'
-             // 'react-hot-loader/babel'
-          ],
-          presets: ['es2015', 'react']
-        }
+        use: [
+          {
+            loader: 'babel-loader',
+            query: {
+              "plugins": [
+                 'syntax-class-properties',
+                 'transform-class-properties'
+              ],
+              presets: ['es2015', 'react']
+            }
+          }
+        ],
       },
       {
         test: /\.s?css$/,
-        loader: ExtractTextPlugin.extract('css!sass')
+        use: ExtractTextPlugin.extract({
+          use: 'css-loader!sass-loader'
+        })
       },
       {
         test: /\.(png|jpg|jpeg|svg)/,
@@ -61,8 +65,8 @@ module.exports = {
   },
 
   resolve: {
-    modulesDirectories: ['node_modules', 'bower_components'],
-    extensions: ['', '.js', '.jsx']
+    modules: ['node_modules', 'bower_components'],
+    extensions: ['.js', '.jsx']
   },
 
   externals: {

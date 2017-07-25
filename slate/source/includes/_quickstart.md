@@ -86,7 +86,7 @@ We periodically check for the [Task](#task) status using a loop.
 <div class="clear"></div>
 
 ```python
-res = requests.get("http://localhost:8000/api/projects/{}/tasks/{}/download/geotiff/".format(project_id, task_id), 
+res = requests.get("http://localhost:8000/api/projects/{}/tasks/{}/download/orthophoto.tif".format(project_id, task_id), 
 						headers={'Authorization': 'JWT {}'.format(token)},
 						stream=True)
 with open("orthophoto.tif", 'wb') as f:

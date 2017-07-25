@@ -17,13 +17,13 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
  * [Getting Help](#getting-help)
  
 
+![Alt text](https://user-images.githubusercontent.com/1951843/28586405-af18e8cc-7141-11e7-9853-a7feca7c9c6b.gif)
+
 ![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
 
 ![Alt text](/screenshots/pointcloud.png?raw=true "3D Display")
 
-![Alt text](/screenshots/dashboard.png?raw=true "Dashboard")
-
-[![WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier](https://img.youtube.com/vi/UnN-NzL96T8/0.jpg)](https://www.youtube.com/watch?v=UnN-NzL96T8 "WebODM - An Introduction to a Web Interface for OpenDroneMap to Make Drone Mapping Even Easier")
+![Alt text](https://user-images.githubusercontent.com/1951843/28586977-8588ebfe-7143-11e7-94d6-a66bf02c1517.png)
 
 If you know Python, web technologies (JS, HTML, CSS, etc.) or both, it's easy to make a change to WebODM! Make a fork, clone the repository and run `./devenv.sh start`. That's it! See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information. All ideas are considered and people of all skill levels are welcome to contribute.
 
@@ -65,6 +65,8 @@ To update WebODM to the latest version use:
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
 
+For Windows users an [Installer](https://www.webodm.org/installer) is also available.
+
 ### Common Troubleshooting
 
 Sympthoms | Possible Solutions
@@ -85,7 +87,7 @@ WebODM can be linked to one or more processing nodes running [node-OpenDroneMap]
 
 ### Security
 
-If you want to run WebODM in production, make sure to change the `SECRET_KEY` variable in `webodm/settings.py`, as well as any other relevant setting as indicated in the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
+If you want to run WebODM in production, make sure to disable the `DEBUG` flag from `webodm/settings.py` and go through the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
 
 ## API Docs
 
@@ -167,7 +169,7 @@ Then these steps should be sufficient to get you up and running:
 git clone https://github.com/OpenDroneMap/WebODM
 ```
 
-Create a `WebODM\webodm\local_settings.py` file containing your database settings:
+Create a `WebODM/webodm/local_settings.py` file containing your database settings:
 
 ```python
 DATABASES = {
@@ -196,6 +198,7 @@ pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
 webpack
+python manage.py collectstatic --noinput
 chmod +x start.sh && ./start.sh --no-gunicorn
 ```
 
@@ -261,6 +264,7 @@ Developer, I'm looking to build an app that will stay behind a firewall and just
 - [X] Task Processing
 - [X] 2D Map Display 
 - [X] 3D Model Display
+- [ ] NDVI display
 - [ ] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner

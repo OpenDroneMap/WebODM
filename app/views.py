@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import login
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -57,17 +58,18 @@ def map(request, project_pk=None, task_pk=None):
             raise Http404()
         
         if task_pk is not None:
-            task = get_object_or_404(Task.objects.defer('orthophoto'), pk=task_pk, project=project)
+            task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
             title = task.name
-            tiles = [task.get_tile_json_data()]
+            mapItems = [task.get_map_items()]
         else:
             title = project.name
-            tiles = project.get_tile_json_data()
+            mapItems = project.get_map_items()
 
     return render(request, 'app/map.html', {
             'title': title,
             'params': {
-                'tiles': json.dumps(tiles)
+                'map-items': json.dumps(mapItems),
+                'title': title
             }.items()
         })
 
@@ -82,7 +84,7 @@ def model_display(request, project_pk=None, task_pk=None):
             raise Http404()
 
         if task_pk is not None:
-            task = get_object_or_404(Task.objects.defer('orthophoto'), pk=task_pk, project=project)
+            task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
             title = task.name
         else:
             raise Http404()
@@ -93,7 +95,7 @@ def model_display(request, project_pk=None, task_pk=None):
             'task': json.dumps({
                 'id': task.id,
                 'project': project.id,
-                'available_assets': task.get_available_assets()
+                'available_assets': task.available_assets
             })
         }.items()
     })
@@ -131,6 +133,7 @@ def welcome(request):
         fuf = FirstUserForm(request.POST)
         if fuf.is_valid():
             admin_user = fuf.save(commit=False)
+            admin_user.password = make_password(fuf.cleaned_data['password'])
             admin_user.is_superuser = admin_user.is_staff = True
             admin_user.save()
 

@@ -70,3 +70,13 @@ class TestWelcome(BootTestCase):
         c.logout()
         res = c.get('/welcome/', follow=True)
         self.assertRedirects(res, '/login/')
+
+        # We're not logged-in
+        self.assertFalse(res.context['user'].is_authenticated)
+
+        # We can log-in
+        res = c.post('/login/', data={
+            'username': 'testadminuser',
+            'password': 'testadminpass'}, follow=True)
+        self.assertTrue(res.context['user'].is_authenticated)
+        self.assertRedirects(res, '/dashboard/')

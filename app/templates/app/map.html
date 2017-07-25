@@ -2,8 +2,9 @@
 {% load i18n %}
 
 {% block content %}
-	<h3><i class="fa fa-globe"></i> {{title}}</h3>
-	
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'MapView' attrs='async' %}
+
 	<div data-mapview 
 		{% for key, value in params %}
 			data-{{key}}="{{value}}"

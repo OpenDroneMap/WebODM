@@ -7,15 +7,19 @@ import shutil
 import logging
 from datetime import timedelta
 
+import json
 import requests
 from django.contrib.auth.models import User
+from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.gdal import OGRGeometry
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from app import pending_actions
 from app import scheduler
 from django.utils import timezone
-from app.models import Project, Task, ImageUpload, task_directory_path, full_task_directory_path
+from app.models import Project, Task, ImageUpload
+from app.models.task import task_directory_path, full_task_directory_path
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
@@ -153,25 +157,27 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.processing_node is None)
 
         # tiles.json should not be accessible at this point
-        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+        tile_types = ['orthophoto', 'dsm', 'dtm']
+        for tile_type in tile_types:
+            res = client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
+            self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
 
         # Neither should an individual tile
         # Z/X/Y coords are choosen based on node-odm test dataset for orthophoto_tiles/
-        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/16020/42443.png".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot access a tiles.json we have no access to
-        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(other_project.id, other_task.id))
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles.json".format(other_project.id, other_task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot access an individual tile we have no access to
-        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(other_project.id, other_task.id))
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/16020/42443.png".format(other_project.id, other_task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot download assets (they don't exist yet)
-        for asset in task.ASSET_DOWNLOADS:
-            res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
+        for asset in list(task.ASSETS_MAP.keys()):
+            res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Cannot access raw assets (they don't exist yet)
@@ -211,23 +217,32 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.status == status_codes.COMPLETED)
 
         # Can download assets
-        for asset in task.ASSET_DOWNLOADS:
-            res = client.get("/api/projects/{}/tasks/{}/download/{}/".format(project.id, task.id, asset))
+        for asset in list(task.ASSETS_MAP.keys()):
+            res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # A textured mesh archive file should exist
-        self.assertTrue(os.path.exists(task.assets_path(task.get_textured_model_filename())))
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
 
         # Can download raw assets
         res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
-        # Can access tiles.json and individual tiles
-        res = client.get("/api/projects/{}/tasks/{}/tiles.json".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        # Can access tiles.json
+        for tile_type in tile_types:
+            res = client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
 
-        res = client.get("/api/projects/{}/tasks/{}/tiles/16/16020/42443.png".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        # Bounds are what we expect them to be
+        # (4 coords in lat/lon)
+        tiles = json.loads(res.content.decode("utf-8"))
+        self.assertTrue(len(tiles['bounds']) == 4)
+        self.assertTrue(round(tiles['bounds'][0], 7) == -91.9945132)
+
+        # Can access individual tiles
+        for tile_type in tile_types:
+            res = client.get("/api/projects/{}/tasks/{}/{}/tiles/16/16020/42443.png".format(project.id, task.id, tile_type))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # Restart a task
         testWatch.clear()
@@ -329,8 +344,6 @@ class TestApiTask(BootTransactionTestCase):
 
         # Reassigning the task to another project should move its assets
         self.assertTrue(os.path.exists(full_task_directory_path(task.id, project.id)))
-        self.assertTrue(task.orthophoto is not None)
-        self.assertTrue('project/{}/'.format(project.id) in task.orthophoto.name)
         self.assertTrue(len(task.imageupload_set.all()) == 2)
         for image in task.imageupload_set.all():
             self.assertTrue('project/{}/'.format(project.id) in image.image.path)
@@ -340,8 +353,6 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertFalse(os.path.exists(full_task_directory_path(task.id, project.id)))
         self.assertTrue(os.path.exists(full_task_directory_path(task.id, other_project.id)))
-
-        self.assertTrue('project/{}/'.format(other_project.id) in task.orthophoto.name)
 
         for image in task.imageupload_set.all():
             self.assertTrue('project/{}/'.format(other_project.id) in image.image.path)
@@ -370,11 +381,28 @@ class TestApiTask(BootTransactionTestCase):
         self.assertFalse(os.path.exists(task.assets_path("odm_orthophoto", "odm_orthophoto.tif")))
         self.assertFalse(os.path.exists(task.assets_path("orthophoto_tiles")))
 
-        # Available assets should be missing the geotiff type
-        # but others such as texturedmodel should be available
+        # orthophoto_extent should be none
+        self.assertTrue(task.orthophoto_extent is None)
+
+        # but other extents should be populated
+        self.assertTrue(task.dsm_extent is not None)
+        self.assertTrue(task.dtm_extent is not None)
+        self.assertTrue(os.path.exists(task.assets_path("dsm_tiles")))
+        self.assertTrue(os.path.exists(task.assets_path("dtm_tiles")))
+
+        # Can access only tiles of available assets
+        res = client.get("/api/projects/{}/tasks/{}/dsm/tiles.json".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        res = client.get("/api/projects/{}/tasks/{}/dtm/tiles.json".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles.json".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+
+        # Available assets should be missing orthophoto.tif type
+        # but others such as textured_model.zip should be available
         res = client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
-        self.assertFalse('geotiff' in res.data['available_assets'])
-        self.assertTrue('texturedmodel' in res.data['available_assets'])
+        self.assertFalse('orthophoto.tif' in res.data['available_assets'])
+        self.assertTrue('textured_model.zip' in res.data['available_assets'])
 
         image1.close()
         image2.close()

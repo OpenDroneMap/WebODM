@@ -4,6 +4,7 @@ import ErrorMessage from './components/ErrorMessage';
 import SwitchModeButton from './components/SwitchModeButton';
 import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 const THREE = require('./vendor/potree/js/three'); // import does not work :/
@@ -18,7 +19,7 @@ class ModelView extends React.Component {
   };
 
   static propTypes = {
-      task: React.PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
+      task: PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
   };
 
   constructor(props){
@@ -49,7 +50,7 @@ class ModelView extends React.Component {
   }
 
   hasGeoreferencedAssets(){
-    return this.props.task.available_assets.indexOf('geotiff') !== -1;
+    return this.props.task.available_assets.indexOf('orthophoto.tif') !== -1;
   }
 
   objFilePath(){
@@ -169,7 +170,7 @@ class ModelView extends React.Component {
 
   // React render
   render(){
-    const showSwitchModeButton = this.props.task.available_assets.indexOf('geotiff') !== -1;
+    const showSwitchModeButton = this.hasGeoreferencedAssets();
     const hideWithTexturedModel = {display: this.state.showTexturedModel ? "none" : "block"};
 
     return (<div className="model-view">
@@ -445,6 +446,14 @@ class ModelView extends React.Component {
       </div>);
   }
 }
+
+$(function(){
+    $("[data-modelview]").each(function(){
+        let props = $(this).data();
+        delete(props.modelview);
+        window.ReactDOM.render(<ModelView {...props}/>, $(this).get(0));
+    });
+});
 
 export default ModelView;
     

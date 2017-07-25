@@ -1,26 +1,27 @@
 import React from 'react';
 import '../css/ProcessingNodeOption.scss';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class ProcessingNodeOption extends React.Component {
   static defaultProps = {};
 
   static propTypes = {
-    name: React.PropTypes.string.isRequired,
-    defaultValue: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.bool
+    name: PropTypes.string.isRequired,
+    defaultValue: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.bool
     ]).isRequired,
-    value: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.bool
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.bool
     ]),
-    type: React.PropTypes.string,
-    domain: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.array
+    type: PropTypes.string,
+    domain: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array
     ]),
-    help: React.PropTypes.string,
+    help: PropTypes.string,
   };
 
   constructor(props){
@@ -111,7 +112,7 @@ class ProcessingNodeOption extends React.Component {
       <div className="processing-node-option form-inline form-group form-horizontal" ref={this.setTooltips}>
         <label>{this.props.name} {(!this.isEnumType() && this.props.domain ? `(${this.props.domain})` : "")}</label><br/>
         {inputControl}
-        <button type="submit" className="btn glyphicon glyphicon-info-sign btn-info" data-toggle="tooltip" data-placement="top" title={this.props.help} onClick={e => e.preventDefault()}></button>
+        <button type="submit" className="btn glyphicon glyphicon-info-sign btn-info" data-toggle="tooltip" data-placement="left" title={this.props.help} onClick={e => e.preventDefault()}></button>
         <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title="Reset to default" onClick={this.resetToDefault}></button>
       </div>
     );

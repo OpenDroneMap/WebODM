@@ -59,8 +59,16 @@ class ApiClient:
         :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
         :return: UUID or error
         """
+
+        # Equivalent as passing the open file descriptor, since requests
+        # eventually calls read(), but this way we make sure to close
+        # the file prior to reading the next, so we don't run into open file OS limits
+        def read_file(path):
+            with open(path, 'rb') as f:
+                return f.read()
+
         files = [('images',
-                  (os.path.basename(image), open(image, 'rb'), (mimetypes.guess_type(image)[0] or "image/jpg"))
+                  (os.path.basename(image), read_file(image), (mimetypes.guess_type(image)[0] or "image/jpg"))
                  ) for image in images]
         return requests.post(self.url("/task/new"),
                              files=files,

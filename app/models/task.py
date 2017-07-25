@@ -3,28 +3,26 @@ import os
 import shutil
 import zipfile
 
-from django.contrib.auth.models import User
-from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.gdal import OGRGeometry
+from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
-from django.db.models import signals
-from django.dispatch import receiver
 from django.utils import timezone
-from guardian.models import GroupObjectPermissionBase
-from guardian.models import UserObjectPermissionBase
-from guardian.shortcuts import get_perms_for_model, assign_perm
 
 from app import pending_actions
-from app.postgis import OffDbRasterField
+from django.contrib.gis.db.models.fields import GeometryField
+
 from nodeodm import status_codes
 from nodeodm.exceptions import ProcessingError, ProcessingTimeout, ProcessingException
 from nodeodm.models import ProcessingNode
 from webodm import settings
+from .project import Project
 
 logger = logging.getLogger('app.logger')
+
 
 
 def task_directory_path(taskId, projectId):
@@ -38,64 +36,6 @@ def full_task_directory_path(taskId, projectId, *args):
 def assets_directory_path(taskId, projectId, filename):
     # files will be uploaded to MEDIA_ROOT/project/<id>/task/<id>/<filename>
     return '{0}{1}'.format(task_directory_path(taskId, projectId), filename)
-
-
-class Project(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.PROTECT, help_text="The person who created the project")
-    name = models.CharField(max_length=255, help_text="A label used to describe the project")
-    description = models.TextField(default="", blank=True, help_text="More in-depth description of the project")
-    created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
-    deleting = models.BooleanField(db_index=True, default=False, help_text="Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted.")
-
-    def delete(self, *args):
-        # No tasks?
-        if self.task_set.count() == 0:
-            # Just delete normally
-            logger.info("Deleted project {}".format(self.id))
-            super().delete(*args)
-        else:
-            # Need to remove all tasks before we can remove this project
-            # which will be deleted on the scheduler after pending actions
-            # have been completed
-            self.task_set.update(pending_action=pending_actions.REMOVE)
-            self.deleting = True
-            self.save()
-            logger.info("Tasks pending, set project {} deleting flag".format(self.id))
-
-    def __str__(self):
-        return self.name
-
-    def tasks(self):
-        return self.task_set.only('id')
-
-    def get_tile_json_data(self):
-        return [task.get_tile_json_data() for task in self.task_set.filter(
-                    status=status_codes.COMPLETED,
-                    orthophoto__isnull=False
-                ).only('id', 'project_id')]
-
-    class Meta:
-        permissions = (
-            ('view_project', 'Can view project'),
-        )
-
-
-@receiver(signals.post_save, sender=Project, dispatch_uid="project_post_save")
-def project_post_save(sender, instance, created, **kwargs):
-    """
-    Automatically assigns all permissions to the owner. If the owner changes
-    it's up to the user/developer to remove the previous owner's permissions.
-    """
-    for perm in get_perms_for_model(sender).all():
-        assign_perm(perm.codename, instance.owner, instance)
-
-
-class ProjectUserObjectPermission(UserObjectPermissionBase):
-    content_object = models.ForeignKey(Project)
-
-
-class ProjectGroupObjectPermission(GroupObjectPermissionBase):
-    content_object = models.ForeignKey(Project)
 
 
 def gcp_directory_path(task, filename):
@@ -117,14 +57,27 @@ def validate_task_options(value):
 
 
 class Task(models.Model):
-    ASSET_DOWNLOADS = ("all", "geotiff", "texturedmodel", "las", "csv", "ply",)
+    ASSETS_MAP = {
+            'all.zip': 'all.zip',
+            'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+            'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
+            'georeferenced_model.las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.las'),
+            'georeferenced_model.ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
+            'georeferenced_model.csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv'),
+            'textured_model.zip': {
+                'deferred_path': 'textured_model.zip',
+                'deferred_compress_dir': 'odm_texturing'
+            },
+            'dtm.tif': os.path.join('odm_dem', 'dtm.tif'),
+            'dsm.tif': os.path.join('odm_dem', 'dsm.tif'),
+    }
 
     STATUS_CODES = (
         (status_codes.QUEUED, 'QUEUED'),
         (status_codes.RUNNING, 'RUNNING'),
         (status_codes.FAILED, 'FAILED'),
         (status_codes.COMPLETED, 'COMPLETED'),
-        (status_codes.CANCELED, 'CANCELED')
+        (status_codes.CANCELED, 'CANCELED'),
     )
 
     PENDING_ACTIONS = (
@@ -143,12 +96,14 @@ class Task(models.Model):
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
     options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
+    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list(), blank=True, help_text="List of available assets to download")
     console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
     ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
-    # georeferenced_model
-    orthophoto = OffDbRasterField(null=True, blank=True, srid=4326, help_text="Orthophoto created by OpenDroneMap")
-    # textured_model
+    orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
+    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM created by OpenDroneMap")
+    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DTM created by OpenDroneMap")
+
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
@@ -190,15 +145,11 @@ class Task(models.Model):
                         logger.info("Changing {} to {}".format(prev_name, img))
                         img.save()
 
-                if self.orthophoto is not None:
-                    new_orthophoto_path = os.path.realpath(full_task_directory_path(self.id, new_project_id, "assets", "odm_orthophoto", "odm_orthophoto_4326.tif"))
-                    logger.info("Changing orthophoto path to {}".format(new_orthophoto_path))
-                    self.orthophoto = GDALRaster(new_orthophoto_path, write=True)
             else:
                 logger.warning("Project changed for task {}, but either {} doesn't exist, or {} already exists. This doesn't look right, so we will not move any files.".format(self,
                                                                                                              old_task_folder,
                                                                                                              new_task_folder))
-        except (shutil.Error, GDALException) as e:
+        except shutil.Error as e:
             logger.warning("Could not move assets folder for task {}. We're going to proceed anyway, but you might experience issues: {}".format(self, e))
 
     def save(self, *args, **kwargs):
@@ -207,11 +158,7 @@ class Task(models.Model):
             self.__original_project_id = self.project.id
 
         # Autovalidate on save
-        try:
-            self.full_clean()
-        except GDALException as e:
-            logger.warning("Problem while handling GDAL raster: {}. We're going to attempt to remove the reference to it...".format(e))
-            self.orthophoto = None
+        self.full_clean()
 
         super(Task, self).save(*args, **kwargs)
 
@@ -224,35 +171,46 @@ class Task(models.Model):
                             "assets",
                             *args)
 
+    def is_asset_available_slow(self, asset):
+        """
+        Checks whether a particular asset is available in the file system
+        Generally this should never be used directly, as it's slow. Use the available_assets field
+        in the database instead.
+        :param asset: one of ASSETS_MAP keys
+        :return: boolean
+        """
+        if asset in self.ASSETS_MAP:
+            value = self.ASSETS_MAP[asset]
+            if isinstance(value, str):
+                return os.path.exists(self.assets_path(value))
+            elif isinstance(value, dict):
+                if 'deferred_compress_dir' in value:
+                    return os.path.exists(self.assets_path(value['deferred_compress_dir']))
+
+        return False
+
     def get_asset_download_path(self, asset):
         """
         Get the path to an asset download
-        :param asset: one of ASSET_DOWNLOADS
+        :param asset: one of ASSETS_MAP keys
         :return: path
         """
-        if asset == 'texturedmodel':
-            return self.assets_path(os.path.basename(self.get_textured_model_archive()))
-        else:
-            map = {
-                'all': 'all.zip',
-                'geotiff': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
-                'las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.las'),
-                'ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
-                'csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv')
-            }
 
-            # BEGIN MIGRATION
-            # Temporary check for naming migration from *model.ply.las to *model.las
-            # This can be deleted at some point in the future
-            if asset == 'las' and not os.path.exists(self.assets_path(map['las'])):
-                logger.info("migration: using odm_georeferenced_model.ply.las instead of odm_georeferenced_model.las")
-                map['las'] = os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply.las')
-            # END MIGRATION
+        if asset in self.ASSETS_MAP:
+            value = self.ASSETS_MAP[asset]
+            if isinstance(value, str):
+                return self.assets_path(value)
 
-            if asset in map:
-                return self.assets_path(map[asset])
+            elif isinstance(value, dict):
+                if 'deferred_path' in value and 'deferred_compress_dir' in value:
+                    return self.generate_deferred_asset(value['deferred_path'], value['deferred_compress_dir'])
+                else:
+                    raise FileNotFoundError("{} is not a valid asset (invalid dict values)".format(asset))
+
             else:
-                raise FileNotFoundError("{} is not a valid asset".format(asset))
+                raise FileNotFoundError("{} is not a valid asset (invalid map)".format(asset))
+        else:
+            raise FileNotFoundError("{} is not a valid asset".format(asset))
 
     def process(self):
         """
@@ -396,8 +354,13 @@ class Task(models.Model):
 
                         if self.status == status_codes.COMPLETED:
                             assets_dir = self.assets_path("")
-                            if not os.path.exists(assets_dir):
-                                os.makedirs(assets_dir)
+
+                            # Remove previous assets directory
+                            if os.path.exists(assets_dir):
+                                logger.info("Removing old assets directory: {} for {}".format(assets_dir, self))
+                                shutil.rmtree(assets_dir)
+
+                            os.makedirs(assets_dir)
 
                             logger.info("Downloading all.zip for {}".format(self))
 
@@ -416,23 +379,29 @@ class Task(models.Model):
 
                             logger.info("Extracted all.zip for {}".format(self))
 
-                            # Add to database orthophoto
-                            orthophoto_path = os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif"))
-                            if os.path.exists(orthophoto_path):
-                                orthophoto = GDALRaster(orthophoto_path, write=True)
+                            # Populate *_extent fields
+                            extent_fields = [
+                                (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
+                                 'orthophoto_extent'),
+                                (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
+                                 'dsm_extent'),
+                                (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
+                                 'dtm_extent'),
+                            ]
 
-                                # We need to transform to 4326 before we can store it
-                                # as an offdb raster field
-                                orthophoto_4326_path = os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto_4326.tif"))
-                                self.orthophoto = orthophoto.transform(4326, 'GTiff', orthophoto_4326_path)
+                            for raster_path, field in extent_fields:
+                                if os.path.exists(raster_path):
+                                    # Read extent and SRID
+                                    raster = GDALRaster(raster_path)
+                                    extent = OGRGeometry.from_bbox(raster.extent)
 
-                                logger.info("Imported orthophoto {} for {}".format(orthophoto_4326_path, self))
+                                    # It will be implicitly transformed into the SRID of the model’s field
+                                    # self.field = GEOSGeometry(...)
+                                    setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
 
-                            # Remove old odm_texturing.zip archive (if any)
-                            textured_model_archive = self.assets_path(self.get_textured_model_filename())
-                            if os.path.exists(textured_model_archive):
-                                os.remove(textured_model_archive)
+                                    logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
+                            self.update_available_assets_field()
                             self.save()
                         else:
                             # FAILED, CANCELED
@@ -449,50 +418,52 @@ class Task(models.Model):
             logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
 
 
-    def get_tile_path(self, z, x, y):
-        return self.assets_path("orthophoto_tiles", z, x, "{}.png".format(y))
+    def get_tile_path(self, tile_type, z, x, y):
+        return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
 
-    def get_tile_json_url(self):
-        return "/api/projects/{}/tasks/{}/tiles.json".format(self.project.id, self.id)
+    def get_tile_json_url(self, tile_type):
+        return "/api/projects/{}/tasks/{}/{}/tiles.json".format(self.project.id, self.id, tile_type)
 
-    def get_tile_json_data(self):
+    def get_map_items(self):
+        types = []
+        if 'orthophoto.tif' in self.available_assets: types.append('orthophoto')
+        if 'dsm.tif' in self.available_assets: types.append('dsm')
+        if 'dtm.tif' in self.available_assets: types.append('dtm')
+
         return {
-            'url': self.get_tile_json_url(),
+            'tiles': [{'url': self.get_tile_json_url(t), 'type': t} for t in types],
             'meta': {
                 'task': self.id,
                 'project': self.project.id
             }
         }
 
-    def get_textured_model_filename(self):
-        return "odm_texturing.zip"
+    def generate_deferred_asset(self, archive, directory):
+        """
+        :param archive: path of the destination .zip file (relative to /assets/ directory)
+        :param directory: path of the source directory to compress (relative to /assets/ directory)
+        :return: full path of the generated archive
+        """
+        archive_path = self.assets_path(archive)
+        directory_path = self.assets_path(directory)
 
-    def get_textured_model_archive(self):
-        archive_path = self.assets_path(self.get_textured_model_filename())
-        textured_model_directory = self.assets_path("odm_texturing")
-
-        if not os.path.exists(textured_model_directory):
-            raise FileNotFoundError("{} does not exist".format(textured_model_directory))
+        if not os.path.exists(directory_path):
+            raise FileNotFoundError("{} does not exist".format(directory_path))
 
         if not os.path.exists(archive_path):
-            shutil.make_archive(os.path.splitext(archive_path)[0], 'zip', textured_model_directory)
+            shutil.make_archive(os.path.splitext(archive_path)[0], 'zip', directory_path)
 
         return archive_path
 
-    def get_available_assets(self):
-        # We make some assumptions for the sake of speed
-        # as checking the filesystem would be slow
-        if self.status == status_codes.COMPLETED:
-            assets = list(self.ASSET_DOWNLOADS)
+    def update_available_assets_field(self, commit=False):
+        """
+        Updates the available_assets field with the actual types of assets available
+        :param commit: when True also saves the model, otherwise the user should manually call save()
+        """
+        all_assets = list(self.ASSETS_MAP.keys())
+        self.available_assets = [asset for asset in all_assets if self.is_asset_available_slow(asset)]
+        if commit: self.save()
 
-            if self.orthophoto is None:
-                assets.remove('geotiff')
-                assets.remove('las')
-                assets.remove('csv')
-
-            return assets
-        else:
-            return []
 
     def delete(self, using=None, keep_parents=False):
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
@@ -519,17 +490,3 @@ class Task(models.Model):
             ('view_task', 'Can view task'),
         )
 
-
-def image_directory_path(image_upload, filename):
-    return assets_directory_path(image_upload.task.id, image_upload.task.project.id, filename)
-
-
-class ImageUpload(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, help_text="Task this image belongs to")
-    image = models.ImageField(upload_to=image_directory_path, help_text="File uploaded by a user")
-    
-    def __str__(self):
-        return self.image.name
-
-    def path(self):
-        return self.image.path

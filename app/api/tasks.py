@@ -29,18 +29,14 @@ class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
     images_count = serializers.SerializerMethodField()
-    available_assets = serializers.SerializerMethodField()
 
     def get_images_count(self, obj):
         return obj.imageupload_set.count()
 
-    def get_available_assets(self, obj):
-        return obj.get_available_assets()
-
     class Meta:
         model = models.Task
-        exclude = ('processing_lock', 'console_output', 'orthophoto', )
-        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', )
+        exclude = ('processing_lock', 'console_output', 'orthophoto_extent', 'dsm_extent', 'dtm_extent', )
+        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -48,7 +44,7 @@ class TaskViewSet(viewsets.ViewSet):
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
+    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dsm_extent', 'dtm_extent', 'console_output', )
     
     # We don't use object level permissions on tasks, relying on
     # project's object permissions instead (but standard model permissions still apply)
@@ -174,7 +170,7 @@ class TaskViewSet(viewsets.ViewSet):
 
 
 class TaskNestedView(APIView):
-    queryset = models.Task.objects.all().defer('orthophoto', 'console_output')
+    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'console_output', )
 
     def get_and_check_task(self, request, pk, project_pk, annotate={}):
         get_and_check_project(request, project_pk)
@@ -186,12 +182,12 @@ class TaskNestedView(APIView):
 
 
 class TaskTiles(TaskNestedView):
-    def get(self, request, pk=None, project_pk=None, z="", x="", y=""):
+    def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y=""):
         """
-        Get an orthophoto tile
+        Get a tile image
         """
         task = self.get_and_check_task(request, pk, project_pk)
-        tile_path = task.get_tile_path(z, x, y)
+        tile_path = task.get_tile_path(tile_type, z, x, y)
         if os.path.isfile(tile_path):
             tile = open(tile_path, "rb")
             return HttpResponse(FileWrapper(tile), content_type="image/png")
@@ -200,20 +196,29 @@ class TaskTiles(TaskNestedView):
 
 
 class TaskTilesJson(TaskNestedView):
-    def get(self, request, pk=None, project_pk=None):
+    def get(self, request, pk=None, project_pk=None, tile_type=""):
         """
-        Get tile.json for this tasks's orthophoto
+        Get tile.json for this tasks's asset type
         """
-        task = self.get_and_check_task(request, pk, project_pk, annotate={
-                'orthophoto_area': Envelope(Cast("orthophoto", GeometryField()))
-            })
+        task = self.get_and_check_task(request, pk, project_pk)
 
-        if task.orthophoto_area is None:
-            raise exceptions.ValidationError("An orthophoto has not been processed for this task. Tiles are not available.")
+        extent_map = {
+            'orthophoto': task.orthophoto_extent,
+            'dsm': task.dsm_extent,
+            'dtm': task.dtm_extent,
+        }
+
+        if not tile_type in extent_map:
+            raise exceptions.ValidationError("Type {} is not a valid tile type".format(tile_type))
+
+        extent = extent_map[tile_type]
+
+        if extent is None:
+            raise exceptions.ValidationError("A {} has not been processed for this task. Tiles are not available.".format(tile_type))
 
         json = get_tile_json(task.name, [
-                '/api/projects/{}/tasks/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id)
-            ], task.orthophoto_area.extent)
+                '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
+            ], extent.extent)
         return Response(json)
 
 
@@ -242,7 +247,7 @@ class TaskDownloads(TaskNestedView):
             file = open(asset_path, "rb")
             response = HttpResponse(FileWrapper(file),
                                     content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
-            response['Content-Disposition'] = "attachment; filename={}".format(asset_filename)
+            response['Content-Disposition'] = "attachment; filename={}".format(asset)
             return response
 
 """

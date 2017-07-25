@@ -1,21 +1,10 @@
 .edit-task-panel{
-    background-color: #ecf0f1;
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-
-    .alert{
-    	margin-top: 4px;
-    	ol, ul{
-    		margin-bottom: 10px;
-    		margin-top: 4px;
-    	}
-    	button{
-    		margin-top: 10px;
-    	}
-    }
-
-    p.header{
-        margin: 8px;
+    padding: 12px;
+    
+    .actions{
+        text-align: right;
+        button{
+            margin-left: 5px;
+        }
     }
 }

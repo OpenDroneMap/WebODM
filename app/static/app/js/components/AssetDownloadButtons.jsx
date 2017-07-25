@@ -1,6 +1,7 @@
 import React from 'react';
 import '../css/AssetDownloadButtons.scss';
 import AssetDownloads from '../classes/AssetDownloads';
+import PropTypes from 'prop-types';
 
 class AssetDownloadButtons extends React.Component {
     static defaultProps = {
@@ -10,9 +11,9 @@ class AssetDownloadButtons extends React.Component {
     };
 
     static propTypes = {
-        disabled: React.PropTypes.bool,
-        task: React.PropTypes.object.isRequired,
-        direction: React.PropTypes.string
+        disabled: PropTypes.bool,
+        task: PropTypes.object.isRequired,
+        direction: PropTypes.string
     };
 
     constructor(props){

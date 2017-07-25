@@ -1,85 +1,92 @@
 import '../css/EditTaskPanel.scss';
 import React from 'react';
+import ErrorMessage from './ErrorMessage';
 import EditTaskForm from './EditTaskForm';
+import PropTypes from 'prop-types';
+import $ from 'jquery';
 
 class EditTaskPanel extends React.Component {
-  static defaultProps = {
-    uploading: false,
-    name: ""
-  };
-
-  static propTypes = {
-      onSave: React.PropTypes.func.isRequired,
-      name: React.PropTypes.string,
-      uploading: React.PropTypes.bool
-  };
-
-  constructor(props){
-    super(props);
-
-    this.state = {
-      name: props.name,
-      editing: true,
-      editTaskFormLoaded: false
+    static defaultProps = {
     };
 
-    this.save = this.save.bind(this);
-    this.edit = this.edit.bind(this);
-    this.handleFormTaskLoaded = this.handleFormTaskLoaded.bind(this);
-    this.getTaskInfo = this.getTaskInfo.bind(this);
-  }
+    static propTypes = {
+        task: PropTypes.object.isRequired,
+        onSave: PropTypes.func.isRequired,
+        onCancel: PropTypes.func.isRequired
+    };
 
-  save(e){
-    e.preventDefault();
-    this.setState({editing: false});
-    if (this.props.onSave) this.props.onSave(this.getTaskInfo());
-  }
+    constructor(props){
+        super(props);
 
-  getTaskInfo(){
-    return this.taskForm.getTaskInfo();
-  }
+        this.state = {
+          editTaskFormLoaded: false,
+          saving: false,
+          error: ''
+        };
 
-  edit(e){
-    e.preventDefault();
-    this.setState({editing: true});
-  }
+        this.handleSave = this.handleSave.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleFormTaskLoaded = this.handleFormTaskLoaded.bind(this);
+    }
 
-  handleFormTaskLoaded(){
-    this.setState({editTaskFormLoaded: true});
-  }
+    handleFormTaskLoaded(){
+      this.setState({editTaskFormLoaded: true});
+    }
 
-  render() {
-    if (this.props.uploading || this.state.editing){
-      // Done editing, but still uploading
-      return (
-        <div className="edit-task-panel">
-          <form className={"form-horizontal " + (this.state.editing ? "" : "hide")}>
-            <p>{this.props.uploading ? 
-              "Your images are being uploaded. In the meanwhile, check these additional options:"
-            : "Please check these additional options:"}</p>
-            <EditTaskForm
-              onFormLoaded={this.handleFormTaskLoaded}
-              ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
-            />
-            {this.state.editTaskFormLoaded ? 
-              <div className="form-group">
-                <div className="col-sm-offset-2 col-sm-10 text-right">
-                  <button type="submit" className="btn btn-primary" onClick={this.save}><i className="glyphicon glyphicon-saved"></i> {this.props.uploading ? "Save" : "Start Processing"}</button>
+    handleSave(){
+      this.setState({saving: true});
+
+      let taskInfo = this.taskForm.getTaskInfo();
+      taskInfo.uuid = ""; // TODO: we could reuse the UUID so that images don't need to be re-uploaded! This needs changes on node-odm as well.
+
+      taskInfo.processing_node = taskInfo.selectedNode.id;
+      taskInfo.auto_processing_node = taskInfo.selectedNode.key == "auto";
+      delete(taskInfo.selectedNode);
+
+      $.ajax({
+          url: `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/`,
+          contentType: 'application/json',
+          data: JSON.stringify(taskInfo),
+          dataType: 'json',
+          type: 'PATCH'
+        }).done((json) => {
+          this.setState({saving: false});
+          this.props.onSave(json);
+        }).fail(() => {
+          this.setState({saving: false, error: "Could not update task information. Plese try again."});
+        });     
+    }
+
+    handleCancel(){
+      this.props.onCancel();
+    }
+
+    render(){
+        return (
+            <div className="edit-task-panel">
+              <ErrorMessage bind={[this, "error"]} />
+              <div className="form-horizontal">
+                <EditTaskForm 
+                  ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
+                  onFormLoaded={this.handleFormTaskLoaded}
+                  task={this.props.task}
+                />
+                <div className="actions">
+                    <button type="button" className="btn btn-sm btn-default" onClick={this.handleCancel} disabled={this.state.saving}>Cancel</button>
+                    <button type="button" className="btn btn-sm btn-primary save" onClick={this.handleSave} disabled={this.state.saving || !this.state.editTaskFormLoaded}>
+                        {this.state.saving ? 
+                            <span>
+                                <i className="fa fa-circle-o-notch fa-spin"></i> Saving...
+                            </span>
+                        :   <span>
+                                <i className="fa fa-edit"></i> Save
+                            </span>}
+                    </button>
                 </div>
               </div>
-              : ""}
-          </form>
-
-          <div className={"pull-right " + (!this.state.editing ? "" : "hide")}>
-            <button type="submit" className="btn btn-primary btn-sm glyphicon glyphicon-pencil" onClick={this.edit}></button>
-          </div>
-          <p className={"header " + (!this.state.editing ? "" : "hide")}><strong>Thank you!</strong> Please wait for the upload to complete.</p>
-        </div>
-      );
-    }else{
-      return (<div><i className="fa fa-refresh fa-spin fa-fw"></i></div>);
+            </div>
+        );
     }
-  }
 }
 
 export default EditTaskPanel;

@@ -33,7 +33,9 @@ WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install
 
 WORKDIR /webodm
-RUN npm install -g webpack
-RUN npm install
+RUN npm install -g webpack && npm install && webpack
+RUN python manage.py collectstatic --noinput
+
+RUN rm /webodm/webodm/secret_key.py
 
 VOLUME /webodm/app/media

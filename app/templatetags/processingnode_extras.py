@@ -1,7 +1,7 @@
 from django import template
 from guardian.shortcuts import get_objects_for_user
 
-from app.models import ProcessingNode
+from nodeodm.models import ProcessingNode
 
 register = template.Library()
 
