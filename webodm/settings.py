@@ -33,10 +33,11 @@ except ImportError:
 
     current_dir = os.path.abspath(os.path.dirname(__file__))
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    secret = get_random_string(50, chars)
     with open(os.path.join(current_dir, 'secret_key.py'), 'w') as f:
-        f.write("SECRET_KEY='{}'".format(get_random_string(50, chars)))
+        f.write("SECRET_KEY='{}'".format(secret))
+    SECRET_KEY=secret
 
-    from .secret_key import SECRET_KEY
     print("Generated secret key")
 
 
@@ -252,7 +253,7 @@ REST_FRAMEWORK = {
     'app.permissions.GuardianObjectPermissions',
   ],
   'DEFAULT_FILTER_BACKENDS': [
-    'rest_framework.filters.DjangoObjectPermissionsFilter', 
+    'rest_framework.filters.DjangoObjectPermissionsFilter',
     'rest_framework.filters.DjangoFilterBackend',
     'rest_framework.filters.OrderingFilter',
   ],
