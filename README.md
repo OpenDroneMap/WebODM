@@ -8,6 +8,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
     * [Common Troubleshooting](#common-troubleshooting)
     * [Add More Processing Nodes](#add-more-processing-nodes)
     * [Security](#security)
+    * [Where Are My Files Stored?](#where-are-my-files-stored)
  * [API Docs](#api-docs)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
@@ -92,6 +93,26 @@ You **will not be able to distribute a single job across multiple processing nod
 ### Security
 
 If you want to run WebODM in production, make sure to disable the `DEBUG` flag from `webodm/settings.py` and go through the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
+
+### Where Are My Files Stored?
+
+When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. If you want to store your files on the host filesystem instead of a docker volume, you need to change a line in `docker-compose.yml` as follows:
+
+From:
+```
+    volumes:
+      - appmedia:/webodm/app/media
+```
+
+To:
+```
+    volumes:
+      - /path/where/to/store/files:/webodm/app/media
+```
+
+Then restart WebODM. 
+
+Note that existing task results will not be available after the change. Refer to the [Migrate Data Volumes](https://docs.docker.com/engine/tutorials/dockervolumes/#backup-restore-or-migrate-data-volumes) section of the Docker documentation for information on migrating existing task results.
 
 ## API Docs
 
