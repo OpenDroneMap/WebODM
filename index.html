@@ -724,7 +724,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 
 <h3 id="download-assets-raw-path">Download assets (raw path)</h3>
 
-<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/assets/{path}/</code></p>
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/assets/{path}</code></p>
 
 <p>After a task has been successfully processed, its assets are stored in a directory on the file system. This API call allows direct access to the files in that directory (by default: <code class="prettyprint">WebODM/app/media/project/{project_id}/task/{task_id}/assets</code>). This can be useful to those applications that want to stream a <code class="prettyprint">Potree</code> dataset, or render a textured 3D model on the fly. </p>
 
@@ -781,13 +781,25 @@ These paths could change in future versions of WebODM. If the asset you need can
 
 <h3 id="orthophoto-tms-layer">Orthophoto TMS layer</h3>
 
-<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/tiles.json</code></p>
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/orthophoto/tiles.json</code></p>
 
-<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/tiles/{Z}/{X}/{Y}.png</code></p>
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/orthophoto/tiles/{Z}/{X}/{Y}.png</code></p>
 
 <p>After a task has been successfully processed, a TMS layer is made available for inclusion in programs such as <a href="http://leafletjs.com/">Leaflet</a> or <a href="http://cesiumjs.org">Cesium</a>.</p>
 
 <aside class="notice">If you use <a href="http://leafletjs.com/" target="_blank">Leaflet</a>, you&rsquo;ll need to pass the authentication token via querystring: /api/projects/{project_id}/tasks/{task_id}/tiles/{Z}/{X}/{Y}.png?jwt=your_token</aside>
+
+<h3 id="surface-model-tms-layer">Surface Model TMS layer</h3>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/dsm/tiles.json</code></p>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/dsm/tiles/{Z}/{X}/{Y}.png</code></p>
+
+<h3 id="terrain-model-tms-layer">Terrain Model TMS layer</h3>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/dtm/tiles.json</code></p>
+
+<p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/dtm/tiles/{Z}/{X}/{Y}.png</code></p>
 
 <h3 id="pending-actions">Pending Actions</h3>
 
