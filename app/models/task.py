@@ -227,7 +227,7 @@ class Task(models.Model):
                     # Assign first online node with lowest queue count
                     self.processing_node = ProcessingNode.find_best_available_node()
                     if self.processing_node:
-                        self.processing_node.queue_count += 1 # Doesn't have to be accurate, it will get overriden later
+                        self.processing_node.queue_count += 1 # Doesn't have to be accurate, it will get overridden later
                         self.processing_node.save()
 
                         logger.info("Automatically assigned processing node {} to {}".format(self.processing_node, self))
