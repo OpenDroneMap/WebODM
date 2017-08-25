@@ -114,21 +114,34 @@ class Map extends React.Component {
               return this.options.bounds.getCenter();
             };
 
-            layer.bindPopup(`<div class="title">${info.name}</div>
-              <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-              <ul class="asset-links">
-                ${assets.map(asset => {
-                    return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
-                }).join("")}
-              </ul>
+            var popup = L.DomUtil.create('div', 'infoWindow');
 
-              <button 
-                onclick="location.href='/3d/project/${task.project}/task/${task.id}/';"
-                type="button"
-                class="switchModeButton btn btn-sm btn-default btn-white">
-                <i class="fa fa-cube"></i> 3D
-              </button>
-            `);
+            popup.innerHTML = `<div class="title">
+                                    ${info.name}
+                                    <div className="opacity-slider">
+                                        Opacity: <input id="layerOpacity" type="range" step="1" />
+                                    </div>
+                                </div>
+
+                                <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
+                                    <ul class="asset-links">
+                                    ${assets.map(asset => {
+                                        return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
+                                    }).join("")}
+                                </ul>
+
+                                <button
+                                    onclick="location.href='/3d/project/${task.project}/task/${task.id}/';"
+                                    type="button"
+                                    class="switchModeButton btn btn-sm btn-default btn-white">
+                                    <i class="fa fa-cube"></i> 3D
+                                </button>`;
+
+            layer.bindPopup(popup);
+
+            $('#layerOpacity', popup).on('change', function() {
+                layer.setOpacity($('#layerOpacity').val() / 100);
+            });
             
             this.imageryLayers.push(layer);
 
