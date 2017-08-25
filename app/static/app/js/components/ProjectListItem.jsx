@@ -155,7 +155,7 @@ class ProjectListItem extends React.Component {
           }else{
             this.setUploadState({
               uploading: false,
-              error: "Could not upload all files. An error occured. Please try again."
+              error: "Could not upload all files. An error occurred. Please try again."
             });
           }
         })

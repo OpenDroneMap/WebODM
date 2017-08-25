@@ -1749,7 +1749,7 @@ var widgetsMouse = $.widget( "ui.mouse", {
 		return this.mouseDelayMet;
 	},
 
-	// These are placeholder methods, to be overriden by extending plugin
+	// These are placeholder methods, to be overridden by extending plugin
 	_mouseStart: function( /* event */ ) {},
 	_mouseDrag: function( /* event */ ) {},
 	_mouseStop: function( /* event */ ) {},
@@ -5058,7 +5058,7 @@ var widgetsSelectmenu = $.widget( "ui.selectmenu", [ $.ui.formResetMixin, {
 				focus: function( event, ui ) {
 					var item = ui.item.data( "ui-selectmenu-item" );
 
-					// Prevent inital focus from firing and check if its a newly focused item
+					// Prevent initial focus from firing and check if its a newly focused item
 					if ( that.focusIndex != null && item.index !== that.focusIndex ) {
 						that._trigger( "focus", event, { item: item } );
 						if ( !that.isOpen ) {

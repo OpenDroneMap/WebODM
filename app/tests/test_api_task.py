@@ -163,7 +163,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
 
         # Neither should an individual tile
-        # Z/X/Y coords are choosen based on node-odm test dataset for orthophoto_tiles/
+        # Z/X/Y coords are chosen based on node-odm test dataset for orthophoto_tiles/
         res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/16020/42443.png".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
