@@ -51,6 +51,6 @@ Since applications sometimes do not allow headers to be modified, you can also a
 
 ### Token Expiration
 
-The token expires after a set amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
+The token expires after a predefined amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
 
-You know that a token has expired if any call to an API returns a `403` status code with the JSON body `{'detail': 'Signature has expired.'}`.
+You know that a token has expired if any API call returns a `403` status code with the JSON body `{'detail': 'Signature has expired.'}`.
