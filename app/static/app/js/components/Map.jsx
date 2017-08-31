@@ -49,6 +49,12 @@ class Map extends React.Component {
     this.autolayers = null;
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
+    this.updatePopupFor = this.updatePopupFor.bind(this);
+  }
+
+  updatePopupFor(layer){
+    const popup = layer.getPopup();
+    $('#layerOpacity', popup.getContent()).val(layer.options.opacity);
   }
 
   loadImageryLayers(forceAddLayers = false){
@@ -118,11 +124,8 @@ class Map extends React.Component {
 
             popup.innerHTML = `<div class="title">
                                     ${info.name}
-                                    <div className="opacity-slider">
-                                        Opacity: <input id="layerOpacity" type="range" step="1" />
-                                    </div>
                                 </div>
-
+                                <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
                                     <ul class="asset-links">
                                     ${assets.map(asset => {
@@ -139,8 +142,8 @@ class Map extends React.Component {
 
             layer.bindPopup(popup);
 
-            $('#layerOpacity', popup).on('change', function() {
-                layer.setOpacity($('#layerOpacity').val() / 100);
+            $('#layerOpacity', popup).on('change input', function() {
+                layer.setOpacity($('#layerOpacity', popup).val());
             });
             
             this.imageryLayers.push(layer);
@@ -227,6 +230,7 @@ class Map extends React.Component {
           // Find first tile layer at the selected coordinates 
           for (let layer of this.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
+              this.updatePopupFor(layer);
               layer.openPopup();
               break;
             }
@@ -238,6 +242,7 @@ class Map extends React.Component {
   componentDidUpdate(prevProps) {
     this.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.props.opacity / 100);
+      this.updatePopupFor(imageryLayer);
     });
 
     if (prevProps.tiles !== this.props.tiles){
