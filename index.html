@@ -222,6 +222,8 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 
 <h2 id="authentication">Authentication</h2>
 
+<h3 id="authentication-basics">Authentication Basics</h3>
+
 <blockquote>
 <p>Get authentication token:</p>
 </blockquote>
@@ -278,9 +280,15 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 </tr>
 </tbody></table>
 
-<p>The token expires after a set amount of time. The expiration time is dependent on WebODM&rsquo;s settings. You will need to request another token when a token expires.</p>
+<p>The token expires after a set amount of time. See <a href="#token-expiration">Token Expiration</a> for more information.</p>
 
 <p>Since applications sometimes do not allow headers to be modified, you can also authenticate by appending the <code class="prettyprint">jwt</code> querystring parameter to a protected URL. This is less secure, so pass the token via header if possible.</p>
+
+<h3 id="token-expiration">Token Expiration</h3>
+
+<p>The token expires after a predefined amount of time. The expiration time is dependent on WebODM&rsquo;s settings. You will need to request another token when a token expires.</p>
+
+<p>You know that a token has expired if any API call returns a <code class="prettyprint">403</code> status code with the JSON body <code class="prettyprint">{&#39;detail&#39;: &#39;Signature has expired.&#39;}</code>.</p>
 
           <h2 id="project">Project</h2>
 
@@ -383,6 +391,10 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <p><code class="prettyprint">DELETE /api/projects/{id}/</code></p>
 
 <p>Upon deletion, all <a href="#task">Task</a> items associated with the <a href="#project">Project</a> are deleted also. The operation is irreversible.</p>
+
+<h3 id="get-single-project">Get single project</h3>
+
+<p><code class="prettyprint">GET /api/projects/{id}/</code></p>
 
 <h3 id="get-list-of-projects">Get list of projects</h3>
 
@@ -1145,6 +1157,40 @@ model-wise (can a user add a project? can a user view projects?).</p>
 <td>The object can be viewed (read-only)</td>
 </tr>
 </tbody></table>
+
+          <h2 id="handling-errors">Handling Errors</h2>
+
+<p>All API calls use the status codes as described in the <a href="http://www.django-rest-framework.org/api-guide/status-codes/">Django REST Framework&rsquo;s Status Code Guide</a>, but generally you only need to check for success status codes (<code class="prettyprint">200</code> or <code class="prettyprint">204</code>), handle the special case of <a href="#token-expiration">Token Expiration</a> (<code class="prettyprint">403</code>) and report an error otherwise.</p>
+
+<h3 id="error-status-codes">Error Status Codes</h3>
+
+<p>This is not an exhaustive list, but common error codes are listed below. </p>
+
+<table><thead>
+<tr>
+<th>Status Code</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>401</td>
+<td>Unauthenticated</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Forbidden (token expired?)</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Malformed request</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not found</td>
+</tr>
+</tbody></table>
+
+<p>For security reasons, sometimes an operation which should return <code class="prettyprint">403</code> returns <code class="prettyprint">404</code> to avoid disclosing IDs and other information to attackers.</p>
 
           <h1 id="for-developers">For Developers</h1>
 
