@@ -14,8 +14,11 @@ class ProjectSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()
 
     def get_permissions(self, obj):
-        return list(map(lambda p: p.replace("_project", ""), get_perms(self.context['request'].user, obj)))
-
+        if 'request' in self.context:
+            return list(map(lambda p: p.replace("_project", ""), get_perms(self.context['request'].user, obj)))
+        else:
+            # Cannot list permissions, no user is associated with request (happens when serializing ui test mocks)
+            return []
 
     class Meta:
         model = models.Project
