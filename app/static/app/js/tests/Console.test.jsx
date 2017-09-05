@@ -1,10 +1,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import Dashboard from '../Dashboard';
+import Console from '../Console';
 
-describe('<Dashboard />', () => {
+describe('<Console />', () => {
   it('renders without exploding', () => {
-    const wrapper = shallow(<Dashboard />);
+    const wrapper = shallow(<Console />);
     expect(wrapper.exists()).toBe(true);
   })
 });
