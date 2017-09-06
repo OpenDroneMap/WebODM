@@ -1,16 +1,13 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import EditTaskPanel from '../EditTaskPanel';
+import TaskListItem from '../TaskListItem';
 
 const taskMock = require('../../tests/utils/MockLoader').load("task.json");
 
-describe('<EditTaskPanel />', () => {
+describe('<TaskListItem />', () => {
   it('renders without exploding', () => {
-    const wrapper = shallow(<EditTaskPanel 
-             task={taskMock}
-             onSave={() => {}}
-			 onCancel={() => {}}
-        />);
+	// TODO: load history mock
+  	const wrapper = shallow(<TaskListItem history={{}} data={taskMock} />);
     expect(wrapper.exists()).toBe(true);
   })
 });

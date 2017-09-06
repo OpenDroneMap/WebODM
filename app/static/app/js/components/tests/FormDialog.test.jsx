@@ -4,7 +4,10 @@ import FormDialog from '../FormDialog';
 
 describe('<FormDialog />', () => {
   it('renders without exploding', () => {
-    const wrapper = shallow(<FormDialog bind={[new MockComponent(), 'error']} />);
+    const wrapper = shallow(<FormDialog 
+    	getFormData={() => {}}
+		reset={() => {}}
+		saveAction={() => {}} />);
     expect(wrapper.exists()).toBe(true);
   })
 });
