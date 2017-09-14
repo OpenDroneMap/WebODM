@@ -48,6 +48,7 @@ pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
 webpack
+python manage.py collectstatic --noinput
 
 # Configure other settings
 cp webodm/settings.py webodm/local_settings.py
