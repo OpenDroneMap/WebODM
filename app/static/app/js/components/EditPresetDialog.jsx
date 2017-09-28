@@ -5,6 +5,11 @@ import ProcessingNodeOption from './ProcessingNodeOption';
 import PresetUtils from '../classes/PresetUtils';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import values from 'object.values';
+
+if (!Object.values) {
+    values.shim();
+}
 
 class EditPresetDialog extends React.Component {
     static defaultProps = {
