@@ -1,6 +1,5 @@
 import '../css/EditTaskForm.scss';
 import React from 'react';
-import values from 'object.values';
 import Utils from '../classes/Utils';
 import EditPresetDialog from './EditPresetDialog';
 import ErrorMessage from './ErrorMessage';
@@ -8,9 +7,6 @@ import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
 import $ from 'jquery';
 
-if (!Object.values) {
-    values.shim();
-}
 
 class EditTaskForm extends React.Component {
   static defaultProps = {
