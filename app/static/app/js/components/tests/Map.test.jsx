@@ -1,13 +1,14 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import Map from '../Map';
+import sinon from 'sinon';
+
+sinon.useFakeXMLHttpRequest();
 
 describe('<Map />', () => {
   it('renders without exploding', () => {
-    const wrapper = shallow(<Map 
+    const wrapper = mount(<Map 
     	tiles={['/tiles.json']} />);
-
-    // TODO: componentDidUpdate method is never called
 
     expect(wrapper.exists()).toBe(true);
   })
