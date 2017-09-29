@@ -1,3 +1,0 @@
-// TODO: how?
-
-export default {};
