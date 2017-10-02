@@ -9,9 +9,16 @@ import EditProjectDialog from './EditProjectDialog';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 class ProjectListItem extends React.Component {
+  static propTypes = {
+      history: PropTypes.object.isRequired,
+      data: PropTypes.object.isRequired, // project json
+      onDelete: PropTypes.func
+  }
+
   constructor(props){
     super(props);
 

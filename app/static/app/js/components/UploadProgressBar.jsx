@@ -1,6 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class UploadProgressBar extends React.Component {
+  static propTypes = {
+    progress: PropTypes.number,
+    totalBytesSent: PropTypes.number,
+    totalBytes: PropTypes.number,
+    totalCount: PropTypes.number // number of files
+  }
 
   // http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
   bytesToSize(bytes, decimals = 2){

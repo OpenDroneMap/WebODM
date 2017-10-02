@@ -28,6 +28,7 @@ usage(){
   echo "	update		Update WebODM to the latest release"
   echo "	rebuild		Rebuild all docker containers and perform cleanups"
   echo "	checkenv	Do an environment check and install missing components"
+  echo "	test		Run the unit test suite (developers only)"
   echo "	resetadminpassword <newpassword>	Reset the administrator's password to a new one. WebODM must be running when executing this command."
   exit
 }
@@ -85,6 +86,17 @@ rebuild(){
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 }
 
+run_tests(){
+	echo -e "\033[1mRunning frontend tests\033[0m"
+	run "npm run test"
+
+	echo "\033[1mRunning backend tests\033[0m"
+	run "python manage.py test"
+
+	echo ""
+	echo -e "\033[1mDone!\033[0m Everything looks in order."
+}
+
 resetpassword(){
 	newpass=$1
 
@@ -132,6 +144,8 @@ elif [[ $1 = "update" ]]; then
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 elif [[ $1 = "checkenv" ]]; then
 	environment_check
+elif [[ $1 = "test" ]]; then
+	run_tests
 elif [[ $1 = "resetadminpassword" ]]; then
 	resetpassword $2
 else

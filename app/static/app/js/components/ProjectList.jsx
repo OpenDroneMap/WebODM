@@ -7,8 +7,13 @@ import Paginated from './Paginated';
 import Paginator from './Paginator';
 import ErrorMessage from './ErrorMessage';
 import { Route } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 class ProjectList extends Paginated {
+    static propTypes = {
+        history: PropTypes.object.isRequired,
+    }
+
     constructor(props){
         super(props);
 
