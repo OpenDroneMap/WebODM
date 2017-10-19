@@ -315,7 +315,8 @@ Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md).
 
 We have several channels of communication for people to ask questions and to get involved with the community:
 
- - [Gitter](https://gitter.im/OpenDroneMap/web-development)
- - [GitHub Issues](https://github.com/OpenDroneMap/WebODM/issues)
- - [OpenDroneMap Users Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-users)
- - [OpenDroneMap Developers Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-dev)
+ - [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm)
+ - [Report Issues](https://github.com/OpenDroneMap/WebODM/issues)
+
+We also have a [Gitter Chat](https://gitter.im/OpenDroneMap/web-development), but the preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
+
