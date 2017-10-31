@@ -1,7 +1,7 @@
 let webpack = require('webpack');
 let WebpackDevServer = require('webpack-dev-server');
 let config = require('./webpack.config');
-
+//ajax code
 new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
   hot: true,
