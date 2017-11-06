@@ -1,7 +1,9 @@
 import logging
 
+from codemirror2.widgets import CodeMirrorEditor
 from django.db import models
 from colorfield.fields import ColorField
+
 
 logger = logging.getLogger('app.logger')
 
@@ -25,6 +27,12 @@ class Theme(models.Model):
 
     failed = ColorField(default='#ffcbcb', help_text="The background color of failed notifications.")
     success = ColorField(default='#cbffcd', help_text="The background color of success notifications.")
+
+    css = models.TextField(default='', blank=True)
+    html_before_header = models.TextField(default='', blank=True)
+    html_after_header = models.TextField(default='', blank=True)
+    html_after_body = models.TextField(default='', blank=True)
+    html_footer = models.TextField(default='', blank=True)
 
     def __str__(self):
         return self.name

@@ -4,6 +4,7 @@ APScheduler==3.2.0
 coreapi==2.0.9
 Django==1.11.1
 django-appconf==1.0.2
+django-codemirror2==0.2
 django-colorfield==0.1.14
 django-cors-headers==2.0.2
 django-debug-toolbar==1.6

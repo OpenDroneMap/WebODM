@@ -71,8 +71,8 @@ def boot():
         Preset.objects.get_or_create(name='Default', system=True, options=[{'name': 'dsm', 'value': True}])
 
         # Add settings
-        Setting.objects.all().delete()
-        Theme.objects.all().delete()
+#       Setting.objects.all().delete()
+#       Theme.objects.all().delete()
 
         default_theme, created = Theme.objects.get_or_create(name='Default')
         if created:

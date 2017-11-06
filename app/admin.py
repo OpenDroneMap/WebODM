@@ -3,6 +3,8 @@ from guardian.admin import GuardedModelAdmin
 
 from app.models import Preset
 from .models import Project, Task, ImageUpload, Setting, Theme
+from django import forms
+from codemirror2.widgets import CodeMirrorEditor
 
 admin.site.register(Project, GuardedModelAdmin)
 
@@ -19,10 +21,40 @@ admin.site.register(Preset, admin.ModelAdmin)
 
 
 class SettingAdmin(admin.ModelAdmin):
+
+
     def has_add_permission(self, request):
         # if there's already an entry, do not allow adding
         count = Setting.objects.all().count()
         return count == 0
 
 admin.site.register(Setting, SettingAdmin)
-admin.site.register(Theme, admin.ModelAdmin)
+
+
+class ThemeModelForm(forms.ModelForm):
+    css = forms.CharField(help_text="Enter custom CSS",
+                          required=False,
+                          widget=CodeMirrorEditor(options={'mode': 'css', 'lineNumbers': True}))
+    html_before_header = forms.CharField(help_text="HTML that will be displayed above site header",
+                                         required=False,
+                                         widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
+    html_after_header = forms.CharField(help_text="HTML that will be displayed after site header",
+                                        required=False,
+                                        widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
+    html_after_body = forms.CharField(help_text="HTML that will be displayed after the &lt;/body&gt; tag",
+                                      required=False,
+                                    widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
+    html_footer = forms.CharField(help_text="HTML that will be displayed in the footer",
+                                  required=False,
+                                  widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
+
+    class Meta:
+        model = Theme
+        fields = '__all__'
+
+
+class ThemeAdmin(admin.ModelAdmin):
+    #list_display = ('id', 'description_en', 'description_ua', 'description_ru')
+    form = ThemeModelForm
+
+admin.site.register(Theme, ThemeAdmin)

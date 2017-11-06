@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'colorfield',
     'imagekit',
+    'codemirror2',
 #    'debug_toolbar',
     'app',
     'nodeodm',

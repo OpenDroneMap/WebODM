@@ -19,6 +19,8 @@
   /* HEADER */
   /* SIDEBAR */
   /* POPUP */ }
+  .admin-area .CodeMirror-scroll, .admin-area .CodeMirror {
+    height: 150px !important; }
   .admin-area #changelist-filter {
     display: none; }
   .admin-area a:link, .admin-area a:visited {

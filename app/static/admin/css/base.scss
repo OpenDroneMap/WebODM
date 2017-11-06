@@ -3,6 +3,10 @@
 */
 
 .admin-area{
+    .CodeMirror-scroll, .CodeMirror{
+        height: 150px !important;
+    }
+
     #changelist-filter{
         display: none;
     }
