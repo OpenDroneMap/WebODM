@@ -89,7 +89,7 @@ class MapView extends React.Component {
             <button 
               key={mapType.type}
               onClick={this.handleMapTypeButton(mapType.type)}
-              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-default" : "btn-secondary")}>{mapType.label}</button>
+              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}>{mapType.label}</button>
           )}
         </div>
 

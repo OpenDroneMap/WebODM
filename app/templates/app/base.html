@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load i18n static %}
+    {% load i18n static settings %}
+    {% get_settings as settings %}
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Web OpenDroneMap. Open Source Aerial Imagery Processing Platform">
-    <meta name="author" content="">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/app/apple-touch-icon.png">
-    <link rel="icon" type="image/png" href="/static/app/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="/static/app/favicon-16x16.png" sizes="16x16">
-    <link rel="manifest" href="/static/app/manifest.json">
-    <link rel="mask-icon" href="/static/app/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="shortcut icon" href="/static/app/favicon.ico">
-    <meta name="msapplication-config" content="/static/app/browserconfig.xml">
-    <meta name="theme-color" content="#ffffff">
-    
+    <meta name="author" content="WebODM Contributors">
+    <link rel="icon" type="image/png" href="{% settings_image_url 'app_logo_favicon' %}" sizes="32x32">
+
     <link rel="stylesheet" type="text/css" href="{% static 'app/css/bootstrap.min.css' %}" />
 
     <link href="{% static 'app/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
@@ -29,7 +23,8 @@
     {% load render_bundle from webpack_loader %}
     {% render_bundle 'main' %}
 
-    <title>{{title|default:"Login"}} - WebODM</title>
+    <title>{{title|default:"Login"}} - {{ settings.app_name }}</title>
+
 </head>
 <body data-admin-utc-offset="{% now "Z" %}">
     <!--[if lt IE 8]>
@@ -62,8 +57,8 @@
                     <span class="icon-bar"></span>
                 </button>
                 {% block navbar-top-links %}{% endblock %}
-                <a class="navbar-brand" href="/"><img src="{% static 'app/img/logo36.png' %}" alt="WebODM" /></a>
-                <a class="navbar-link" href="/"><p class="navbar-text">WebODM</a></p>
+                <a class="navbar-brand" href="/"><img src="{% settings_image_url 'app_logo_36' %}" alt="{{ settings.app_name }}" /></a>
+                <a class="navbar-link" href="/"><p class="navbar-text">{{ settings.app_name }}</a></p>
             </div>
 
             {% block navbar-sidebar %}{% endblock %}

@@ -3,10 +3,13 @@ appdirs==1.4.0
 APScheduler==3.2.0
 coreapi==2.0.9
 Django==1.11.1
+django-appconf==1.0.2
+django-colorfield==0.1.14
 django-cors-headers==2.0.2
 django-debug-toolbar==1.6
 django-filter==1.0.4
 django-guardian==1.4.6
+django-imagekit==4.0.1
 django-webpack-loader==0.3.3
 djangorestframework==3.6.3
 djangorestframework-jwt==1.9.0
@@ -18,6 +21,7 @@ itypes==1.1.0
 Markdown==2.6.7
 openapi-codec==1.1.7
 packaging==16.8
+pilkit==2.0
 Pillow==3.3.1
 pip-autoremove==0.9.0
 psycopg2==2.6.2

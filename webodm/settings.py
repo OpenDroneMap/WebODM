@@ -69,6 +69,8 @@ INSTALLED_APPS = [
     'rest_framework_nested',
     'webpack_loader',
     'corsheaders',
+    'colorfield',
+    'imagekit',
 #    'debug_toolbar',
     'app',
     'nodeodm',
