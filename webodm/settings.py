@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'colorfield',
     'imagekit',
     'codemirror2',
+    'compressor',
 #    'debug_toolbar',
     'app',
     'nodeodm',
@@ -171,6 +172,11 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app', 'static'),
+]
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 # File Uploads
@@ -273,6 +279,18 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=6),
 }
+
+# Compressor
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', 'django_libsass.SassCompiler'),
+)
+
+# Sass
+def theme(color):
+    from app.contexts.settings import theme as settings_theme
+    return settings_theme(color)
+
+LIBSASS_CUSTOM_FUNCTIONS = {'theme': theme}
 
 if TESTING:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')

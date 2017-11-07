@@ -56,7 +56,7 @@ class ThemeModelForm(forms.ModelForm):
 
 
 class ThemeAdmin(admin.ModelAdmin):
-    #list_display = ('id', 'description_en', 'description_ua', 'description_ru')
     form = ThemeModelForm
+
 
 admin.site.register(Theme, ThemeAdmin)

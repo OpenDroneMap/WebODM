@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load i18n static settings %}
+    {% load i18n static settings compress %}
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,7 +24,10 @@
 
     <title>{{title|default:"Login"}} - {{ SETTINGS.app_name }}</title>
 
-    {% include "theme.html" %}
+    {% compress css %}
+        <link rel="stylesheet" type="text/x-scss" href="{% static 'app/css/theme.scss' %}" />
+    {% endcompress %}
+
     <style type="text/css">
         {{ SETTINGS.theme.css|safe }}
     </style>

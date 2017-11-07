@@ -1,22 +1,7 @@
 {% extends "app/base.html" %}
 {% load i18n static %}
 
-            <!--{% if request.user.is_authenticated %}
-                {% if user.is_superuser %}          
-                <li>
-                    <a class="page-scroll" href="/admin/">Admin Panel</a>
-                </li>
-                {% endif %}
-                <li>
-                    <a class="page-scroll" href="/logout/">Logout</a>
-                </li>
-            {% else %}
-                 <li>
-                    <a class="page-scroll" href="/login/">Login</a>
-                </li>
-            {% endif %}
-            </ul>
--->
+
 {% block navbar-top-links %}
     <ul class="nav navbar-top-links navbar-right">
         <!--<li class="dropdown">
@@ -271,9 +256,6 @@
                 <li>
                     <a href="/admin/"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}</a>
                 </li>
-                <li>
-                    <a href="{% url 'admin:app_setting_change' SETTINGS.id %}"><i class="fa fa-paint-brush"></i> {% trans 'Customization' %}</a>
-                </li>
                 {% endif %}
                 <li>
                     <a href="/api/"><i class="fa fa-book fa-fw"></i> {% trans 'API' %}</a>
@@ -281,6 +263,20 @@
                 <li>
                     <a href="http://docs.webodm.org" target="_blank"><i class="fa fa-life-saver fa-fw"></i> {% trans 'Documentation' %}</a>
                 </li>
+
+                {% if user.is_staff %}
+                <li>
+                    <a href="#"><i class="fa fa-magic fa-fw"></i> {% trans 'Customize' %}<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="{% url 'admin:app_setting_change' SETTINGS.id %}"><i class="fa fa-hand-o-right"></i> {% trans 'Brand' %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'admin:app_theme_change' SETTINGS.theme.id %}"><i class="fa fa-paint-brush"></i> {% trans 'Theme' %}</a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
             </ul>
         </div>
         <!-- /.sidebar-collapse -->
