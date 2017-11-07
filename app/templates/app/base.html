@@ -66,6 +66,10 @@
         
         {% block page-wrapper %}{% endblock %}
     </div>
+
+    {% autoescape off %}
+    {% get_footer %}
+    {% endautoescape %}
 </body>
 <script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
 <script>

@@ -1,5 +1,5 @@
-html, body, #wrapper, #page-wrapper, section.main, .content{
-    height: 100%;
+html, body, section.main, .content, #wrapper, #page-wrapper{
+    height: auto;
 }
 
 #navbar-top{
@@ -217,4 +217,13 @@ button i.glyphicon{
 	position: absolute;
 	top: 0px;
 	left: 50px;
+}
+
+footer{
+    font-size: 80%;
+    height: 36px;
+    border-top: 1px solid #efefef;
+    text-align: center;
+    padding: 8px;
+    background-color: white;
 }

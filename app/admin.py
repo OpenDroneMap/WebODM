@@ -44,7 +44,9 @@ class ThemeModelForm(forms.ModelForm):
     html_after_body = forms.CharField(help_text="HTML that will be displayed after the &lt;/body&gt; tag",
                                       required=False,
                                     widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
-    html_footer = forms.CharField(help_text="HTML that will be displayed in the footer",
+    html_footer = forms.CharField(help_text="HTML that will be displayed in the footer. You can also use the special tags:"
+                                            "<p class='help'>{ORGANIZATION}: show a link to your organization.</p>"
+                                            "<p class='help'>{YEAR}: show current year</p>",
                                   required=False,
                                   widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
 

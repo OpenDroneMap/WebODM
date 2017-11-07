@@ -1,9 +1,9 @@
 [data-mapview]{
-    height: 100%;
+    height: calc(100vh);
 }
 
 .map-view{
-    height: 80%;
+    height: calc(100% - 54px);
     position: relative;
 
     input[type="range"]{

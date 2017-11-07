@@ -271,6 +271,11 @@
                 <li>
                     <a href="/admin/"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}</a>
                 </li>
+                <li>
+                    {% load settings %}
+                    {% get_settings as settings %}
+                    <a href="{% url 'admin:app_setting_change' settings.id %}"><i class="fa fa-paint-brush"></i> {% trans 'Theme Settings' %}</a>
+                </li>
                 {% endif %}
                 <li>
                     <a href="/api/"><i class="fa fa-book fa-fw"></i> {% trans 'API' %}</a>
