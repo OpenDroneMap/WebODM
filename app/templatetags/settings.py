@@ -2,24 +2,17 @@ import datetime
 
 from django import template
 
-from app.models import Setting
-
 register = template.Library()
 
 
-@register.assignment_tag()
-def get_settings():
-    return Setting.objects.first()
+@register.assignment_tag(takes_context=True)
+def settings_image_url(context, image):
+    return "/media/" + getattr(context['SETTINGS'], image).url
 
 
-@register.assignment_tag()
-def settings_image_url(image):
-    return "/media/" + getattr(get_settings(), image).url
-
-
-@register.simple_tag()
-def get_footer():
-    settings = get_settings()
+@register.simple_tag(takes_context=True)
+def get_footer(context):
+    settings = context['SETTINGS']
     if settings.theme.html_footer == "": return ""
 
     organization = ""

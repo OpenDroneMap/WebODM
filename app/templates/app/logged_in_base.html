@@ -272,9 +272,7 @@
                     <a href="/admin/"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}</a>
                 </li>
                 <li>
-                    {% load settings %}
-                    {% get_settings as settings %}
-                    <a href="{% url 'admin:app_setting_change' settings.id %}"><i class="fa fa-paint-brush"></i> {% trans 'Theme Settings' %}</a>
+                    <a href="{% url 'admin:app_setting_change' SETTINGS.id %}"><i class="fa fa-paint-brush"></i> {% trans 'Customization' %}</a>
                 </li>
                 {% endif %}
                 <li>
@@ -295,6 +293,8 @@
 <div id="page-wrapper">
     <section class="main">
         <div class="content">
+            {{ SETTINGS.theme.html_after_header|safe }}
+
             {% block messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible">
