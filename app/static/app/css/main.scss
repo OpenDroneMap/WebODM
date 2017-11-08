@@ -94,8 +94,12 @@ ul#side-menu.nav{
     background-color: #fff;
     border-width: 2px;
     color: #000;
+    .close{
+        opacity: 0.6;
+    }
     .close:hover, .close:focus{
         color: #000;
+        opacity: 1;
     }
 }
 
@@ -221,5 +225,8 @@ footer{
     border-top: 1px solid #efefef;
     text-align: center;
     padding: 8px;
-    background-color: white;
+}
+
+.list-group-item{
+    background-color: inherit;
 }

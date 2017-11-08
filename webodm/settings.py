@@ -287,10 +287,25 @@ COMPRESS_PRECOMPILERS = (
 
 # Sass
 def theme(color):
-    from app.contexts.settings import theme as settings_theme
-    return settings_theme(color)
+    from app.contexts.settings import theme as f
+    return f(color)
 
-LIBSASS_CUSTOM_FUNCTIONS = {'theme': theme}
+
+def complementary(color):
+    from app.contexts.settings import complementary as f
+    return f(color)
+
+
+def scaleby(color, n):
+    from app.contexts.settings import scaleby as f
+    return f(color, n)
+
+
+LIBSASS_CUSTOM_FUNCTIONS = {
+    'theme': theme,
+    'complementary': complementary,
+    'scaleby': scaleby,
+}
 
 if TESTING:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')

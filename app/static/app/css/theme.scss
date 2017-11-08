@@ -1,3 +1,107 @@
-*{
+/* Primary */
+body,
+ul#side-menu.nav a,
+.console,
+.alert,
+.dropdown-menu > li > a,
+.form-control
+{
     color: theme("primary");
+}
+
+/* Secondary */
+body,
+.navbar-default,
+.console,
+.alert,
+.modal-content,
+.form-control
+{
+	background-color: theme("secondary");
+}
+
+.alert{
+    .close:hover, .close:focus{
+        color: complementary(theme("secondary"));
+    }
+}
+
+/* Button primary */
+#navbar-top .navbar-top-links,{
+	a:hover,a:focus,.open > a{
+		background-color: theme("button_primary");
+		color: theme("secondary");
+	}
+}
+
+#navbar-top ul#side-menu a:hover, #navbar-top ul#side-menu a:focus{
+	background-color: theme("button_primary");
+	color: theme("secondary");
+}
+
+.btn-primary, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary{
+	background-color: theme("button_primary");
+	border-color: theme("button_primary");
+	color: theme("secondary");
+
+	&:hover, &:active, &:focus{
+		background-color: scaleby(theme("button_primary"), 0.90);
+		border-color: scaleby(theme("button_primary"), 0.90);
+		color: theme("secondary");
+	}
+}
+
+/* Button default */
+.btn-default, .btn-default:active, .btn-default.active, .open>.dropdown-toggle.btn-default{
+	background-color: theme("button_default");
+	border-color: theme("button_default");
+	color: theme("secondary");
+
+	&:hover, &:active, &:focus{
+		background-color: scaleby(theme("button_default"), 0.90);
+		border-color: scaleby(theme("button_default"), 0.90);
+		color: theme("secondary");
+	}
+}
+
+/* Header background */
+#navbar-top{
+	background-color: theme("header_background");
+}
+
+/* Header primary */
+.navbar-default .navbar-link,
+#navbar-top .navbar-top-links a.dropdown-toggle{
+	color: theme("header_primary");
+
+	&:hover{
+		color: theme("secondary");
+	}
+}
+
+/* Border */
+.sidebar ul li,
+.project-list-item,
+#page-wrapper,
+table-bordered>thead>tr>th, .table-bordered>thead>tr>th, table-bordered>tbody>tr>th, .table-bordered>tbody>tr>th, table-bordered>tfoot>tr>th, .table-bordered>tfoot>tr>th, table-bordered>thead>tr>td, .table-bordered>thead>tr>td, table-bordered>tbody>tr>td, .table-bordered>tbody>tr>td, table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>td,
+footer,
+.modal-content,
+.modal-header,
+.modal-footer{
+	border-color: theme("border");
+}
+
+/* Highlight */
+.task-list-item:nth-child(odd),
+.table-striped>tbody>tr:nth-of-type(odd){
+	background-color: theme("highlight");
+}
+pre.prettyprint,
+.form-control{
+	border-color: theme('highlight');
+}
+
+/* Dialog warning */
+.alert-warning{
+	border-color: theme("dialog_warning");
 }
