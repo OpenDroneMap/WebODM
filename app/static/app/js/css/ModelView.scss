@@ -62,24 +62,10 @@
         .asset-download-buttons{
             margin-right: 8px;
             &.open{
-                .dropdown-toggle{
-                    background-color: #f4f4f4;
-                    color: #111;
-                }
                 button{
                     outline: none;
                 }
             }
-
-            button{
-                background-color: #fff;
-                color: #111;
-                border-width: 1px;
-
-                &:hover{
-                    background-color: #f4f4f4;
-                }
-            }      
         }
     }
     

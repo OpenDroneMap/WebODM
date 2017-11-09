@@ -59,7 +59,7 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
 
         .email{
             font-size: 90%;
-            color: gray;
+            opacity: 0.9;
         }
     }
 }
@@ -165,15 +165,6 @@ button i.glyphicon{
 
 .btn.btn-secondary{
     background-color: #dddddd;
-}
-
-.btn.btn-white{
-    background-color: #fff;
-    color: #111;
-
-    &:hover{
-        background-color: #f4f4f4;
-    }
 }
 
 .dropdown-menu>li>a{

@@ -304,7 +304,7 @@ def scaleby(color, n):
 LIBSASS_CUSTOM_FUNCTIONS = {
     'theme': theme,
     'complementary': complementary,
-    'scaleby': scaleby,
+    'scaleby': scaleby
 }
 
 if TESTING:

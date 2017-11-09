@@ -4,9 +4,19 @@ ul#side-menu.nav a,
 .console,
 .alert,
 .dropdown-menu > li > a,
-.form-control
+.form-control,
+.theme-color-primary,
 {
     color: theme("primary");
+}
+.tooltip{
+	.tooltip-inner{
+		background-color: theme("primary");
+	}
+	&.left .tooltip-arrow{ border-left-color: theme("primary"); }
+	&.top .tooltip-arrow{ border-top-color: theme("primary"); }
+	&.bottom .tooltip-arrow{ border-bottom-color: theme("primary"); }
+	&.right .tooltip-arrow{ border-right-color: theme("primary"); }
 }
 
 /* Secondary */
@@ -15,15 +25,37 @@ body,
 .console,
 .alert,
 .modal-content,
-.form-control
+.form-control,
+.dropdown-menu,
+.theme-secondary
 {
 	background-color: theme("secondary");
+}
+
+.tooltip > .tooltip-inner{
+	color: theme("secondary");
 }
 
 .alert{
     .close:hover, .close:focus{
         color: complementary(theme("secondary"));
     }
+}
+
+.pagination li > a,
+.pagination .disabled > a,
+.pagination .disabled > a:hover, .pagination .disabled > a:focus{
+	color: scaleby(theme("primary"), 0.7);
+	background-color: theme("secondary");
+	border-color: scaleby(theme("secondary"), 0.7);
+}
+.pagination li > a{
+	color: theme("primary");
+}
+
+/* Tertiary */
+a, a:hover, a:focus{
+	color: theme("tertiary");
 }
 
 /* Button primary */
@@ -64,6 +96,26 @@ body,
 	}
 }
 
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus,
+.pagination .active > a:hover, .pagination .active > a:focus,
+.pagination li > a:hover, .pagination li > a:focus{
+	background-color: theme("button_default");
+	color: theme("secondary");
+}
+
+/* Button danger */
+.btn-danger, .btn-danger:active, .btn-danger.active, .open>.dropdown-toggle.btn-danger{
+	background-color: theme("button_danger");
+	border-color: theme("button_danger");
+	color: theme("secondary");
+
+	&:hover, &:active, &:focus{
+		background-color: scaleby(theme("button_danger"), 0.90);
+		border-color: scaleby(theme("button_danger"), 0.90);
+		color: theme("secondary");
+	}
+}
+
 /* Header background */
 #navbar-top{
 	background-color: theme("header_background");
@@ -87,21 +139,58 @@ table-bordered>thead>tr>th, .table-bordered>thead>tr>th, table-bordered>tbody>tr
 footer,
 .modal-content,
 .modal-header,
-.modal-footer{
+.modal-footer,
+.dropdown-menu
+{
 	border-color: theme("border");
+}
+.dropdown-menu .divider{
+	background-color: theme("border");
 }
 
 /* Highlight */
 .task-list-item:nth-child(odd),
-.table-striped>tbody>tr:nth-of-type(odd){
+.table-striped>tbody>tr:nth-of-type(odd),
+.theme-background-highlight{
 	background-color: theme("highlight");
 }
 pre.prettyprint,
 .form-control{
 	border-color: theme('highlight');
+	&:focus{
+		border-color: scaleby(theme('highlight'), 0.7);
+	}
 }
 
 /* Dialog warning */
 .alert-warning{
 	border-color: theme("dialog_warning");
+}
+
+/* Success */
+.task-list-item .status-label.done{
+	background-color: theme("success");
+}
+
+/* Failed */
+.task-list-item .status-label.error{
+	background-color: theme("failed");
+}
+
+
+/* ModelView.jsx specific */
+.model-view #potree_sidebar_container .dropdown-menu a{
+	color: theme("primary");
+}
+
+/* MapView.jsx specific */
+.leaflet-bar a, .leaflet-control > a{
+	background-color: theme("button_primary") !important;
+	border-color: theme("button_primary") !important;
+	color: theme("secondary") !important;
+
+	&:hover{
+		background-color: scaleby(theme("button_primary"), 0.90) !important;
+		border-color: scaleby(theme("button_primary"), 0.90) !important;
+	}
 }
