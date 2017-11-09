@@ -1,6 +1,10 @@
 html, body, section.main, .content, #wrapper, #page-wrapper{
     height: auto;
 }
+#page-wrapper{
+    margin-top: 1px;
+    padding-bottom: 8px;
+}
 
 #navbar-top{
     height: 50px;
@@ -37,7 +41,6 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
         }
     }
 
-
     ul#side-menu{
         a:hover, a:focus{
             color: white;
@@ -47,6 +50,10 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
 
         li{
             word-break: break-word;
+            &:first-child{
+                border-top-width: 1px;
+                border-top-style: solid;
+            }
         }
     }
 
@@ -85,8 +92,8 @@ ul#side-menu.nav{
     margin-top: 15px; 
 }
 
-.navbar-default{
-    background-color: white;
+.navbar-default.sidebar{
+    margin-top: -1px;
 }
 
 .alert{
@@ -163,10 +170,6 @@ button i.glyphicon{
     margin-right: 4px;
 }
 
-.btn.btn-secondary{
-    background-color: #dddddd;
-}
-
 .dropdown-menu>li>a{
     padding-left: 10px;
     color: #222;
@@ -220,4 +223,9 @@ footer{
 
 .list-group-item{
     background-color: inherit;
+    border-top-width: 0px;
+
+    &:first-child{
+        border-top-width: 1px;
+    }
 }

@@ -3,8 +3,8 @@ body,
 ul#side-menu.nav a,
 .console,
 .alert,
-.dropdown-menu > li > a,
 .form-control,
+.dropdown-menu > li > a,
 .theme-color-primary,
 {
     color: theme("primary");
@@ -53,6 +53,18 @@ body,
 	color: theme("primary");
 }
 
+.btn-secondary, .btn-secondary:active, .btn-secondary.active, .open>.dropdown-toggle.btn-secondary{
+	background-color: theme("secondary");
+	border-color: theme("secondary");
+	color: theme("primary");
+
+	&:hover, &:active, &:focus{
+		background-color: scalebyiv(theme("secondary"), 0.90);
+		border-color: scalebyiv(theme("secondary"), 0.90);
+		color: theme("primary");
+	}
+}
+
 /* Tertiary */
 a, a:hover, a:focus{
 	color: theme("tertiary");
@@ -76,9 +88,9 @@ a, a:hover, a:focus{
 	border-color: theme("button_primary");
 	color: theme("secondary");
 
-	&:hover, &:active, &:focus{
-		background-color: scaleby(theme("button_primary"), 0.90);
-		border-color: scaleby(theme("button_primary"), 0.90);
+	&:hover, &:active, &:focus, &[disabled]:hover, &[disabled]:focus, &[disabled]:active{
+		background-color: scalebyiv(theme("button_primary"), 0.90);
+		border-color: scalebyiv(theme("button_primary"), 0.90);
 		color: theme("secondary");
 	}
 }
@@ -89,9 +101,9 @@ a, a:hover, a:focus{
 	border-color: theme("button_default");
 	color: theme("secondary");
 
-	&:hover, &:active, &:focus{
-		background-color: scaleby(theme("button_default"), 0.90);
-		border-color: scaleby(theme("button_default"), 0.90);
+	&:hover, &:active, &:focus, &[disabled]:hover, &[disabled]:focus, &[disabled]:active{
+		background-color: scalebyiv(theme("button_default"), 0.90);
+		border-color: scalebyiv(theme("button_default"), 0.90);
 		color: theme("secondary");
 	}
 }
@@ -109,9 +121,9 @@ a, a:hover, a:focus{
 	border-color: theme("button_danger");
 	color: theme("secondary");
 
-	&:hover, &:active, &:focus{
-		background-color: scaleby(theme("button_danger"), 0.90);
-		border-color: scaleby(theme("button_danger"), 0.90);
+	&:hover, &:active, &:focus, &[disabled]:hover, &[disabled]:focus, &[disabled]:active {
+		background-color: scalebyiv(theme("button_danger"), 0.90);
+		border-color: scalebyiv(theme("button_danger"), 0.90);
 		color: theme("secondary");
 	}
 }
@@ -154,11 +166,17 @@ footer,
 .theme-background-highlight{
 	background-color: theme("highlight");
 }
+.dropdown-menu > li > a{
+	&:hover, &:focus{
+		background-color: theme("highlight");
+		color: theme("primary");
+	}
+}
 pre.prettyprint,
 .form-control{
 	border-color: theme('highlight');
 	&:focus{
-		border-color: scaleby(theme('highlight'), 0.7);
+		border-color: scalebyiv(theme('highlight'), 0.7);
 	}
 }
 
@@ -179,18 +197,37 @@ pre.prettyprint,
 
 
 /* ModelView.jsx specific */
-.model-view #potree_sidebar_container .dropdown-menu a{
-	color: theme("primary");
+.model-view #potree_sidebar_container {
+	.dropdown-menu > li > a{
+		color: theme("primary");
+	}
 }
 
 /* MapView.jsx specific */
 .leaflet-bar a, .leaflet-control > a{
-	background-color: theme("button_primary") !important;
-	border-color: theme("button_primary") !important;
-	color: theme("secondary") !important;
+	background-color: theme("secondary") !important;
+	border-color: theme("secondary") !important;
+	color: theme("primary") !important;
 
 	&:hover{
-		background-color: scaleby(theme("button_primary"), 0.90) !important;
-		border-color: scaleby(theme("button_primary"), 0.90) !important;
+		background-color: scalebyiv(theme("secondary"), 0.90) !important;
+		border-color: scalebyiv(theme("secondary"), 0.90) !important;
+	}
+}
+
+.leaflet-popup-content-wrapper{
+	background-color: theme("secondary") !important;
+	color: theme("primary") !important;
+	a{
+		color: theme("tertiary") !important;
+	}
+}
+
+.leaflet-container{
+	a.leaflet-popup-close-button{
+		color: theme("primary") !important;
+		&:hover{
+			color: complementary(theme("secondary")) !important;
+		}
 	}
 }

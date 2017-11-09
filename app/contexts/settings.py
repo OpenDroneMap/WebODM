@@ -30,11 +30,17 @@ def complementary(hexcolor):
     return '#' + ''.join(comp)
 
 
-def scaleby(hexcolor, scalefactor):
+def scaleby(hexcolor, scalefactor, ignore_value = False):
+    """
+    Scales a hex string by ``scalefactor``, but is color dependent, unless ignore_value is True
+    scalefactor is now always between 0 and 1. A value of 0.8
+    will cause bright colors to become darker and
+    dark colors to become brigther by 20%
+    """
+
     def calculate(hexcolor, scalefactor):
         """
         Scales a hex string by ``scalefactor``. Returns scaled hex string.
-
         To darken the color, use a float value between 0 and 1.
         To brighten the color, use a float value greater than 1.
 
@@ -66,12 +72,6 @@ def scaleby(hexcolor, scalefactor):
 
         return "#%02x%02x%02x" % (r, g, b)
 
-    """
-    Same as scaleby, but is color dependent.
-    scalefactor is now always between 0 and 1. A value of 0.8
-    will cause bright colors to become darker and
-    dark colors to become brigther by 20%
-    """
 
     hexcolor = hexcolor.strip('#')
     scalefactor = abs(float(scalefactor.value))
@@ -80,4 +80,4 @@ def scaleby(hexcolor, scalefactor):
     r, g, b = int(hexcolor[:2], 16), int(hexcolor[2:4], 16), int(hexcolor[4:], 16)
     value = max(r, g, b)
 
-    return calculate(hexcolor, scalefactor if value >= 127 else 2 - scalefactor)
+    return calculate(hexcolor, scalefactor if ignore_value or value >= 127 else 2 - scalefactor)

@@ -301,10 +301,16 @@ def scaleby(color, n):
     return f(color, n)
 
 
+def scalebyiv(color, n):
+    from app.contexts.settings import scaleby as f
+    return f(color, n, True)
+
+
 LIBSASS_CUSTOM_FUNCTIONS = {
     'theme': theme,
     'complementary': complementary,
-    'scaleby': scaleby
+    'scaleby': scaleby,
+    'scalebyiv': scalebyiv
 }
 
 if TESTING:
