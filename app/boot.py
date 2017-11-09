@@ -71,18 +71,16 @@ def boot():
         Preset.objects.get_or_create(name='Default', system=True, options=[{'name': 'dsm', 'value': True}])
 
         # Add settings
-#        Setting.objects.all().delete()
-#        Theme.objects.all().delete()
-
         default_theme, created = Theme.objects.get_or_create(name='Default')
         if created:
             logger.info("Created default theme")
 
         if Setting.objects.all().count() == 0:
+            default_logo = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
+
             s = Setting.objects.create(
                     app_name='WebODM',
                     theme=default_theme)
-            default_logo = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
             s.app_logo.save(os.path.basename(default_logo), File(open(default_logo, 'rb')))
 
             logger.info("Created settings")

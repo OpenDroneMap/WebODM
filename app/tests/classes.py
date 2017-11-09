@@ -1,10 +1,14 @@
+import os
+
 from django import db
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import TransactionTestCase
+from shutil import rmtree
 
 from app.boot import boot
 from app.models import Project
+from webodm import settings
 
 
 def setupUsers():
@@ -36,6 +40,15 @@ def setupProjects():
         description="This is a test project"
     )
 
+
+def cleanup():
+    if settings.TESTING and \
+            os.path.exists(settings.MEDIA_ROOT) and \
+                    "_test" in settings.MEDIA_ROOT[-6:]:
+        rmtree(settings.MEDIA_ROOT)
+        print("Cleaned " + settings.MEDIA_ROOT)
+
+
 class BootTestCase(TestCase):
     '''
     This class provides optional default mock data as well as 
@@ -48,6 +61,7 @@ class BootTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         super(BootTestCase, cls).setUpTestData()
+        cleanup()
         boot()
         setupUsers()
         setupProjects()
@@ -63,6 +77,7 @@ class BootTransactionTestCase(TransactionTestCase):
     '''
     def setUp(self):
         super().setUp()
+        cleanup()
         boot()
         setupUsers()
         setupProjects()

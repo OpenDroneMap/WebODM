@@ -1,12 +1,17 @@
 import logging
 import os
 
+from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.db import models
 from django.dispatch import receiver
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
 from pathlib import Path
+
+from shutil import rmtree
+
+from webodm import settings
 
 from .theme import Theme
 
@@ -30,8 +35,49 @@ class Setting(models.Model):
     theme = models.ForeignKey(Theme, blank=False, null=False, on_delete=models.DO_NOTHING,
                               help_text="Active theme")
 
+    def __init__(self, *args, **kwargs):
+        super(Setting, self).__init__(*args, **kwargs)
+
+        # To help keep track of changes to the app_logo
+        self.__original_app_logo_name = self.app_logo.name
+
+    def save(self, *args, **kwargs):
+        # Cleanup old logo files if needed
+        if self.__original_app_logo_name != "" and \
+                self.app_logo.name != self.__original_app_logo_name:
+
+            old_logo_path = os.path.join(settings.MEDIA_ROOT, self.__original_app_logo_name)
+            old_logo_path_caches = os.path.join(settings.MEDIA_ROOT,
+                                                "CACHE",
+                                                "images",
+                                                os.path.splitext(self.__original_app_logo_name)[0])
+
+            if os.path.exists(old_logo_path):
+                try:
+                    os.unlink(old_logo_path)
+                    logger.info("Removed {}".format(old_logo_path))
+                except:
+                    logger.warning("Cannot cleanup {}".format(old_logo_path))
+
+            if os.path.exists(old_logo_path_caches):
+                try:
+                    rmtree(old_logo_path_caches)
+                    logger.info("Removed {}".format(old_logo_path_caches))
+                except:
+                    logger.warning("Cannot cleanup {}".format(old_logo_path_caches))
+
+            self.__original_app_logo_name = self.app_logo.name
+
+        super(Setting, self).save(*args, **kwargs)
+
     def __str__(self):
         return "Application"
+
+
+@receiver(signals.pre_save, sender=Setting, dispatch_uid="setting_pre_save")
+def setting_pre_save(sender, instance, **kwargs):
+    if Setting.objects.count() > 0 and instance.id != Setting.objects.get().id:
+        raise ValidationError("Can only create 1 %s instance" % Setting.__name__)
 
 
 @receiver(signals.post_save, sender=Setting, dispatch_uid="setting_post_save")
@@ -40,10 +86,10 @@ def setting_post_save(sender, instance, created, **kwargs):
     Touch theme.scss to invalidate its cache and force
     compressor to regenerate it
     """
+
     theme_file = os.path.join('app', 'static', 'app', 'css', 'theme.scss')
     try:
         Path(theme_file).touch()
         logger.info("Touched {}".format(theme_file))
     except:
         logger.warning("Failed to touch {}".format(theme_file))
-
