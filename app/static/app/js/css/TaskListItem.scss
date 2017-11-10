@@ -1,8 +1,4 @@
 .task-list-item{
-    &:nth-child(odd){
-        background-color: #f7f7f7;
-    }
-
     .row{
         margin: 0;
         padding: 4px;
@@ -45,13 +41,6 @@
         padding: 4px;
         width: 100%;
         font-size: 90%;
-
-        &.done{
-            background-color: #cbffcd;
-        }
-        &.error{
-            background-color: #ffcbcb;
-        }
     }
 
     .clickable:hover{

@@ -57,6 +57,9 @@ Parameters are the same as above.
 
 Upon deletion, all [Task](#task) items associated with the [Project](#project) are deleted also. The operation is irreversible.
 
+### Get single project
+
+`GET /api/projects/{id}/`
 
 ### Get list of projects
 

@@ -3,6 +3,12 @@
 */
 
 .admin-area{
+    background-color: #fff;
+    
+    .CodeMirror-scroll, .CodeMirror{
+        height: 150px !important;
+    }
+
     #changelist-filter{
         display: none;
     }

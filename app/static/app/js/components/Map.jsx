@@ -49,6 +49,12 @@ class Map extends React.Component {
     this.autolayers = null;
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
+    this.updatePopupFor = this.updatePopupFor.bind(this);
+  }
+
+  updatePopupFor(layer){
+    const popup = layer.getPopup();
+    $('#layerOpacity', popup.getContent()).val(layer.options.opacity);
   }
 
   loadImageryLayers(forceAddLayers = false){
@@ -114,21 +120,31 @@ class Map extends React.Component {
               return this.options.bounds.getCenter();
             };
 
-            layer.bindPopup(`<div class="title">${info.name}</div>
-              <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-              <ul class="asset-links">
-                ${assets.map(asset => {
-                    return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
-                }).join("")}
-              </ul>
+            var popup = L.DomUtil.create('div', 'infoWindow');
 
-              <button 
-                onclick="location.href='/3d/project/${task.project}/task/${task.id}/';"
-                type="button"
-                class="switchModeButton btn btn-sm btn-default btn-white">
-                <i class="fa fa-cube"></i> 3D
-              </button>
-            `);
+            popup.innerHTML = `<div class="title">
+                                    ${info.name}
+                                </div>
+                                <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
+                                <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
+                                    <ul class="asset-links">
+                                    ${assets.map(asset => {
+                                        return `<li><a href="${asset.downloadUrl(meta.project, meta.task)}">${asset.label}</a></li>`;
+                                    }).join("")}
+                                </ul>
+
+                                <button
+                                    onclick="location.href='/3d/project/${task.project}/task/${task.id}/';"
+                                    type="button"
+                                    class="switchModeButton btn btn-sm btn-default">
+                                    <i class="fa fa-cube"></i> 3D
+                                </button>`;
+
+            layer.bindPopup(popup);
+
+            $('#layerOpacity', popup).on('change input', function() {
+                layer.setOpacity($('#layerOpacity', popup).val());
+            });
             
             this.imageryLayers.push(layer);
 
@@ -214,6 +230,7 @@ class Map extends React.Component {
           // Find first tile layer at the selected coordinates 
           for (let layer of this.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
+              this.updatePopupFor(layer);
               layer.openPopup();
               break;
             }
@@ -225,6 +242,7 @@ class Map extends React.Component {
   componentDidUpdate(prevProps) {
     this.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.props.opacity / 100);
+      this.updatePopupFor(imageryLayer);
     });
 
     if (prevProps.tiles !== this.props.tiles){

@@ -12,7 +12,7 @@ usage(){
   echo "Command list:"
   echo "	start			Start the development environment"
   echo "	stop			Stop the development environment"
-  echo "	runtests [tests]	Run unit tests. You can specify an optional extra parameter such as app.tests.test_db to limit the scope of the tests. Defaults to running all tests."
+  echo "	runtests		Run unit tests"
   exit
 }
 
@@ -30,7 +30,7 @@ stop(){
 }
 
 runtests(){
-	run "docker-compose exec webapp python manage.py test $1"
+	run "docker-compose exec webapp /bin/bash -c \"/webodm/webodm.sh test\""
 }
 
 if [[ $1 = "start" ]]; then

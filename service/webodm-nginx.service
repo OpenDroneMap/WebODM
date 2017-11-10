@@ -1,0 +1,16 @@
+[Unit]
+Description=Start WebODM Nginx Service Container
+
+[Service]
+Type=forking
+PIDFile=/run/webodm-nginx.pid
+ExecStartPre=/usr/sbin/nginx -t
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=false
+ExecStart=/usr/sbin/nginx -c /webodm/nginx/nginx.conf
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

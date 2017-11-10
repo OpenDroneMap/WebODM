@@ -1,12 +1,12 @@
-html, body, #wrapper, #page-wrapper, section.main, .content{
-    height: 100%;
+html, body, section.main, .content, #wrapper, #page-wrapper{
+    height: auto;
+}
+#page-wrapper{
+    margin-top: 1px;
+    padding-bottom: 8px;
 }
 
 #navbar-top{
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
     height: 50px;
     min-height: 50px;
     background-color: #18bc9c;
@@ -41,7 +41,6 @@ html, body, #wrapper, #page-wrapper, section.main, .content{
         }
     }
 
-
     ul#side-menu{
         a:hover, a:focus{
             color: white;
@@ -51,6 +50,10 @@ html, body, #wrapper, #page-wrapper, section.main, .content{
 
         li{
             word-break: break-word;
+            &:first-child{
+                border-top-width: 1px;
+                border-top-style: solid;
+            }
         }
     }
 
@@ -63,7 +66,7 @@ html, body, #wrapper, #page-wrapper, section.main, .content{
 
         .email{
             font-size: 90%;
-            color: gray;
+            opacity: 0.9;
         }
     }
 }
@@ -77,7 +80,7 @@ ul#side-menu.nav{
 
 .content{
     clear: both;
-    padding-top: 60px;
+    padding-top: 8px;
 
     h1,h2,h3,h4,h5{
         padding-top: 4px;
@@ -89,8 +92,8 @@ ul#side-menu.nav{
     margin-top: 15px; 
 }
 
-.navbar-default{
-    background-color: white;
+.navbar-default.sidebar{
+    margin-top: -1px;
 }
 
 .alert{
@@ -98,8 +101,12 @@ ul#side-menu.nav{
     background-color: #fff;
     border-width: 2px;
     color: #000;
+    .close{
+        opacity: 0.6;
+    }
     .close:hover, .close:focus{
         color: #000;
+        opacity: 1;
     }
 }
 
@@ -163,19 +170,6 @@ button i.glyphicon{
     margin-right: 4px;
 }
 
-.btn.btn-secondary{
-    background-color: #dddddd;
-}
-
-.btn.btn-white{
-    background-color: #fff;
-    color: #111;
-
-    &:hover{
-        background-color: #f4f4f4;
-    }
-}
-
 .dropdown-menu>li>a{
     padding-left: 10px;
     color: #222;
@@ -219,8 +213,19 @@ button i.glyphicon{
 	left: 50px;
 }
 
-.navbar-link {
-	position: absolute;
-	top: 0px;
+footer{
+    font-size: 80%;
+    height: 36px;
+    border-top: 1px solid #efefef;
+    text-align: center;
+    padding: 8px;
 }
 
+.list-group-item{
+    background-color: inherit;
+    border-top-width: 0px;
+
+    &:first-child{
+        border-top-width: 1px;
+    }
+}

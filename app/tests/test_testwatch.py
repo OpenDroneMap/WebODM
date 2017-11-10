@@ -11,7 +11,7 @@ class TestTestWatch(TestCase):
         tw = TestWatch()
 
         self.assertTrue(tw.get_calls_count("app.tests.test_testwatch.test") == 0)
-        self.assertTrue(tw.get_calls_count("app.tests.test_testwatch.nonexistant") == 0)
+        self.assertTrue(tw.get_calls_count("app.tests.test_testwatch.nonexistent") == 0)
 
         # Test watch count
         tw.hook_pre(test, 1, 2)

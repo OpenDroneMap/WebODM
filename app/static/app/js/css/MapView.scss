@@ -1,9 +1,9 @@
 [data-mapview]{
-    height: 100%;
+    height: calc(100vh - 100px);
 }
 
 .map-view{
-    height: 80%;
+    height: calc(100% - 20px);
     position: relative;
 
     input[type="range"]{
@@ -23,7 +23,6 @@
         margin-left: -100px;
         z-index: 400;
         padding-bottom: 6px;
-        background-color: white;
     }
 
     .map-type-selector{

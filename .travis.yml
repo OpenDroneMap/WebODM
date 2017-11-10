@@ -11,4 +11,4 @@ install:
   - docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d
   - sleep 50
 
-script: docker-compose exec webapp python manage.py test
+script: docker-compose exec webapp /bin/bash -c "/webodm/webodm.sh test"

@@ -6,10 +6,10 @@ import proj4 from 'proj4';
 import TWEEN from 'tween.js';
 import $ from 'jquery';
 import i18n from './i18next';
-import jqueryi18n from 'jquery-i18next';
+import jqueryi18n from './jquery-i18next';
 import d3 from 'd3';
 
-jqueryi18n.init(i18n, $, {
+jqueryi18n(i18n, $, {
   tName: 't', // --> appends $.t = i18next.t
   i18nName: 'i18n', // --> appends $.i18n = i18next
   handleName: 'i18n', // --> appends $(selector).localize(opts);

@@ -5,6 +5,12 @@
 	{% load render_bundle from webpack_loader %}
 	{% render_bundle 'Dashboard' attrs='async' %}
 
+	<!--[if lte IE 8]>
+		<div class="alert alert-warning alert-dismissible">
+            WebODM cannot be used with this version of Internet Explorer. Could you please upgrade <a href="https://www.microsoft.com/en-us/download/internet-explorer.aspx">Internet Explorer</a> to the latest version or use <a href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>?
+        </div>
+	<![endif]-->
+
 	{% if no_processingnodes %}
 		<h3>{% trans 'Welcome! ☺' %}</h3>
 		{% trans 'Add a Processing Node' as add_processing_node %}

@@ -8,9 +8,9 @@ sudo apt-get install -y python-dev libpq-dev gdal-bin libgdal-dev libproj-dev py
 ppaexists=$( grep ^ /etc/apt/sources.list /etc/apt/sources.list.d/* | grep postgres )
 if [ ! $ppaexists ]; then
 	echo "Add PostgreSQL PPA..."
-	add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
+	sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
 	sudo wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-	apt-get update
+	sudo apt-get update
 else
 	echo "PostgreSQL PPA already exists..."
 fi
@@ -48,10 +48,7 @@ pip install -r requirements.txt
 sudo npm install -g webpack
 npm install
 webpack
-
-# Configure other settings
-cp webodm/settings.py webodm/local_settings.py
-
+python manage.py collectstatic --noinput
 
 # Configure Docker (Processing Nodes)
 sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D

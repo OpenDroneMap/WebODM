@@ -2,12 +2,13 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM) [![Join Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/OpenDroneMap/web-development) [![GitHub version](https://badge.fury.io/gh/OpenDroneMap%2FWebODM.svg)](https://badge.fury.io/gh/OpenDroneMap%2FWebODM)
 
-A free, user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
+A free, user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
 
 * [Getting Started](#getting-started)
     * [Common Troubleshooting](#common-troubleshooting)
     * [Add More Processing Nodes](#add-more-processing-nodes)
     * [Security](#security)
+    * [Where Are My Files Stored?](#where-are-my-files-stored)
  * [API Docs](#api-docs)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
@@ -85,9 +86,33 @@ Have you had other issues? Please [report them](https://github.com/OpenDroneMap/
 
 WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
 
+Adding more processing nodes will allow you to run multiple jobs in parallel. 
+
+You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
+
 ### Security
 
 If you want to run WebODM in production, make sure to disable the `DEBUG` flag from `webodm/settings.py` and go through the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
+
+### Where Are My Files Stored?
+
+When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. If you want to store your files on the host filesystem instead of a docker volume, you need to change a line in `docker-compose.yml` as follows:
+
+From:
+```
+    volumes:
+      - appmedia:/webodm/app/media
+```
+
+To:
+```
+    volumes:
+      - /path/where/to/store/files:/webodm/app/media
+```
+
+Then restart WebODM. 
+
+Note that existing task results will not be available after the change. Refer to the [Migrate Data Volumes](https://docs.docker.com/engine/tutorials/dockervolumes/#backup-restore-or-migrate-data-volumes) section of the Docker documentation for information on migrating existing task results.
 
 ## API Docs
 
@@ -290,7 +315,8 @@ Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md).
 
 We have several channels of communication for people to ask questions and to get involved with the community:
 
- - [Gitter](https://gitter.im/OpenDroneMap/web-development)
- - [GitHub Issues](https://github.com/OpenDroneMap/WebODM/issues)
- - [OpenDroneMap Users Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-users)
- - [OpenDroneMap Developers Mailing List](https://lists.osgeo.org/mailman/listinfo/opendronemap-dev)
+ - [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm)
+ - [Report Issues](https://github.com/OpenDroneMap/WebODM/issues)
+
+We also have a [Gitter Chat](https://gitter.im/OpenDroneMap/web-development), but the preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
+

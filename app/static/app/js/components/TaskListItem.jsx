@@ -7,8 +7,16 @@ import ErrorMessage from './ErrorMessage';
 import EditTaskPanel from './EditTaskPanel';
 import AssetDownloadButtons from './AssetDownloadButtons';
 import HistoryNav from '../classes/HistoryNav';
+import PropTypes from 'prop-types';
 
 class TaskListItem extends React.Component {
+  static propTypes = {
+      history: PropTypes.object.isRequired,
+      data: PropTypes.object.isRequired, // task json
+      refreshInterval: PropTypes.number, // how often to refresh info
+      onDelete: PropTypes.func
+  }
+
   constructor(props){
     super();
 

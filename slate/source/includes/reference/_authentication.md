@@ -2,6 +2,8 @@
 
 ## Authentication
 
+### Authentication Basics
+
 > Get authentication token:
 
 ```bash
@@ -42,6 +44,13 @@ Header |
 ------ |
 Authorization: JWT `your_token` |
 
-The token expires after a set amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
+The token expires after a set amount of time. See [Token Expiration](#token-expiration) for more information.
 
 Since applications sometimes do not allow headers to be modified, you can also authenticate by appending the `jwt` querystring parameter to a protected URL. This is less secure, so pass the token via header if possible.
+
+
+### Token Expiration
+
+The token expires after a predefined amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
+
+You know that a token has expired if any API call returns a `403` status code with the JSON body `{'detail': 'Signature has expired.'}`.

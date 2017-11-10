@@ -206,7 +206,10 @@ class ModelView extends React.Component {
                                 checked={this.state.showTexturedModel}
                               /> Textured Model</label>
                     </div>
-                    <AssetDownloadButtons task={this.props.task} direction="down" />
+                    <AssetDownloadButtons 
+                      task={this.props.task} 
+                      direction="down" 
+                      buttonClass="btn-secondary" />
                     {showSwitchModeButton ? 
                       <SwitchModeButton 
                         task={this.props.task}

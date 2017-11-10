@@ -1,0 +1,16 @@
+[Unit]
+Description=Start WebODM Gunicorn Service Container
+Requires=webodm-nginx.service
+
+[Service]
+Type=simple
+User=odm
+Group=odm
+PIDFile=/run/webodm-gunicorn.pid
+WorkingDirectory=/webodm
+ExecStart=/webodm/python3-venv/bin/gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --preload
+ExecStop=/bin/kill -s QUIT $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

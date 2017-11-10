@@ -79,13 +79,6 @@ You assign a [Task](#task) to a [Project](#project) by passing the proper `proje
 Parameters are the same as above.
 
 
-### Delete a task
-
-`DELETE /api/projects/{project_id}/tasks/{task_id}/`
-
-Upon deletion, all images and assets associated with the [Task](#task) are deleted also. The operation is irreversible.
-
-
 ### Get list of tasks
 
 > Task list:
