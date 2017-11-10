@@ -47,6 +47,7 @@ class TestSettings(BootTestCase):
         # and check that's been created
         self.assertTrue(settings.app_logo_favicon.url is not None)
         favicon_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_favicon.name)
+        time.sleep(1)
         self.assertTrue(os.path.exists(favicon_path), "Favicon logo exists")
 
         # We can update the logo
@@ -68,6 +69,7 @@ class TestSettings(BootTestCase):
 
         # Resized images have not been created yet
         logo_36_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_36.name)
+        time.sleep(1)
         self.assertFalse(os.path.exists(logo_36_path), "Resized logo does not exist")
 
         # When we access its URL, it gets created (lazy)
