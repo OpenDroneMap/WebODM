@@ -42,7 +42,7 @@ class Setting(models.Model):
         # Cleanup old logo files if needed
         if self.__original_app_logo_name != "" and \
                 self.app_logo.name != self.__original_app_logo_name and \
-                os.path.basename(self.app_logo.name) != os.path.basename(self.__original_app_logo_name):
+                os.path.basename(self.app_logo.name) != os.path.basename(self.__original_app_logo_name): # This last line will leave an old copy in the cache if the filename is the same name as the previous, but we don't care
 
             old_logo_path = os.path.join(settings.MEDIA_ROOT, self.__original_app_logo_name)
             old_logo_path_caches = os.path.join(settings.MEDIA_ROOT,

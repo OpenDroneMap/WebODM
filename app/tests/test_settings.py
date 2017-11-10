@@ -3,6 +3,7 @@ import time
 
 from django.core.exceptions import ValidationError
 from django.core.files import File
+from django.test import Client
 
 from app.contexts.settings import load as load_settings
 from app.models import Setting
@@ -19,6 +20,8 @@ class TestSettings(BootTestCase):
         pass
 
     def test_settings(self):
+        c = Client()
+
         # There should always be a Setting object
         self.assertTrue(Setting.objects.count() == 1, "There's a settings object")
 
@@ -43,11 +46,11 @@ class TestSettings(BootTestCase):
         default_logo_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo.name)
         self.assertTrue(os.path.exists(default_logo_path), "Default logo exists in MEDIA_ROOT/settings")
 
-        # Access smaller logo (should generate a cached copy),
+        # Access smaller logo by requesting a page
         # and check that's been created
-        self.assertTrue(settings.app_logo_favicon.url is not None)
         favicon_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_favicon.name)
-        time.sleep(1)
+        res = c.get('/login/')
+        self.assertTrue(res.status_code == 200)
         self.assertTrue(os.path.exists(favicon_path), "Favicon logo exists")
 
         # We can update the logo
@@ -69,11 +72,11 @@ class TestSettings(BootTestCase):
 
         # Resized images have not been created yet
         logo_36_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_36.name)
-        time.sleep(1)
         self.assertFalse(os.path.exists(logo_36_path), "Resized logo does not exist")
 
         # When we access its URL, it gets created (lazy)
-        self.assertTrue(settings.app_logo_36.url is not None)
+        res = c.get('/login/')
+        self.assertTrue(res.status_code == 200)
         self.assertTrue(os.path.exists(logo_36_path), "Resized logo exists")
 
 
