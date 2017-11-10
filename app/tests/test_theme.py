@@ -31,7 +31,7 @@ class TestSettings(BootTestCase):
         self.assertTrue(matches is not None, "Found theme.css")
 
         # We can find it in the file system
-        css_file = finders.find(matches[1])
+        css_file = finders.find(matches.group(1))
         self.assertTrue(os.path.exists(css_file), "theme.css exists in file system")
 
         css_content = ""
@@ -64,7 +64,7 @@ class TestSettings(BootTestCase):
         matches = re.search(r'/static/(CACHE/css/theme\.[\w\d]+\.css)', body)
         self.assertTrue(matches is not None, "Found theme.css")
 
-        new_css_file = finders.find(matches[1])
+        new_css_file = finders.find(matches.group(1))
         self.assertTrue(os.path.exists(new_css_file), "new theme.css exists in file system")
 
         # It's not the same file
