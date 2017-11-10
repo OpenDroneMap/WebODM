@@ -1,19 +1,16 @@
 import logging
 import os
+from shutil import rmtree
 
 from django.core.exceptions import ValidationError
-from django.db.models import signals
 from django.db import models
+from django.db.models import signals
 from django.dispatch import receiver
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
-from pathlib import Path
-
-from shutil import rmtree
 
 from webodm import settings
-
-from .theme import Theme
+from .theme import Theme, update_theme_css
 
 logger = logging.getLogger('app.logger')
 
@@ -82,14 +79,6 @@ def setting_pre_save(sender, instance, **kwargs):
 
 @receiver(signals.post_save, sender=Setting, dispatch_uid="setting_post_save")
 def setting_post_save(sender, instance, created, **kwargs):
-    """
-    Touch theme.scss to invalidate its cache and force
-    compressor to regenerate it
-    """
+    update_theme_css()
 
-    theme_file = os.path.join('app', 'static', 'app', 'css', 'theme.scss')
-    try:
-        Path(theme_file).touch()
-        logger.info("Touched {}".format(theme_file))
-    except:
-        logger.warning("Failed to touch {}".format(theme_file))
+

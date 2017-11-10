@@ -1,17 +1,14 @@
 import os
+import time
 
-from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 from django.core.files import File
-from django.test import Client
-from shutil import rmtree
-
-from app.models import Setting
-from app.models import Theme
-from .classes import BootTestCase
 
 from app.contexts.settings import load as load_settings
+from app.models import Setting
+from app.models import Theme
 from webodm import settings as webodm_settings
+from .classes import BootTestCase
 
 class TestSettings(BootTestCase):
 
@@ -49,6 +46,7 @@ class TestSettings(BootTestCase):
         # Access smaller logo (should generate a cached copy),
         # and check that's been created
         print("Access: " + settings.app_logo_favicon.url)
+        time.sleep(0.5)
         favicon_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_favicon.name)
         self.assertTrue(os.path.exists(favicon_path), "Favicon logo exists")
 
@@ -70,13 +68,14 @@ class TestSettings(BootTestCase):
         self.assertFalse(os.path.exists(favicon_path), "Favicon logo has been removed")
 
         # Resized images have not been created yet
-        self.assertFalse(os.path.exists(os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_36.name)), "Resized logo does not exist")
+        logo_36_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_36.name)
+        self.assertFalse(os.path.exists(logo_36_path), "Resized logo does not exist")
 
         # When we access its URL, it gets created (lazy)
         print("Access: " + settings.app_logo_36.url)
+        time.sleep(0.5)
+        self.assertTrue(os.path.exists(logo_36_path), "Resized logo exists")
 
-        self.assertTrue(os.path.exists(os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_36.name)), "Resized logo does not exist")
 
-        c = Client()
 
 

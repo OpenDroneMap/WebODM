@@ -1,8 +1,13 @@
 import logging
+import os
+from pathlib import Path
 
+from django.db.models import signals
 from django.db import models
 from colorfield.fields import ColorField
+from django.dispatch import receiver
 
+from webodm import settings
 
 logger = logging.getLogger('app.logger')
 
@@ -37,3 +42,22 @@ class Theme(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@receiver(signals.post_save, sender=Theme, dispatch_uid="theme_post_save")
+def theme_post_save(sender, instance, created, **kwargs):
+    update_theme_css()
+
+
+def update_theme_css():
+    """
+    Touch theme.scss to invalidate its cache and force
+    compressor to regenerate it
+    """
+
+    theme_file = os.path.join('app', 'static', 'app', 'css', 'theme.scss')
+    try:
+        Path(theme_file).touch()
+        logger.info("Regenerate cache for {}".format(theme_file))
+    except:
+        logger.warning("Failed to touch {}".format(theme_file))
