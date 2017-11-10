@@ -45,8 +45,7 @@ class TestSettings(BootTestCase):
 
         # Access smaller logo (should generate a cached copy),
         # and check that's been created
-        print("Access: " + settings.app_logo_favicon.url)
-        time.sleep(0.5)
+        self.assertTrue(settings.app_logo_favicon.url is not None)
         favicon_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_favicon.name)
         self.assertTrue(os.path.exists(favicon_path), "Favicon logo exists")
 
@@ -72,8 +71,7 @@ class TestSettings(BootTestCase):
         self.assertFalse(os.path.exists(logo_36_path), "Resized logo does not exist")
 
         # When we access its URL, it gets created (lazy)
-        print("Access: " + settings.app_logo_36.url)
-        time.sleep(0.5)
+        self.assertTrue(settings.app_logo_36.url is not None)
         self.assertTrue(os.path.exists(logo_36_path), "Resized logo exists")
 
 

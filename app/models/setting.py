@@ -41,7 +41,8 @@ class Setting(models.Model):
     def save(self, *args, **kwargs):
         # Cleanup old logo files if needed
         if self.__original_app_logo_name != "" and \
-                self.app_logo.name != self.__original_app_logo_name:
+                self.app_logo.name != self.__original_app_logo_name and \
+                os.path.basename(self.app_logo.name) != os.path.basename(self.__original_app_logo_name):
 
             old_logo_path = os.path.join(settings.MEDIA_ROOT, self.__original_app_logo_name)
             old_logo_path_caches = os.path.join(settings.MEDIA_ROOT,
