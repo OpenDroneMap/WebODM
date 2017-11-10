@@ -46,13 +46,6 @@ class TestSettings(BootTestCase):
         default_logo_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo.name)
         self.assertTrue(os.path.exists(default_logo_path), "Default logo exists in MEDIA_ROOT/settings")
 
-        # Access smaller logo by requesting a page
-        # and check that's been created
-        favicon_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_favicon.name)
-        res = c.get('/login/')
-        self.assertTrue(res.status_code == 200)
-        self.assertTrue(os.path.exists(favicon_path), "Favicon logo exists")
-
         # We can update the logo
         logo = os.path.join('app', 'static', 'app', 'img', 'favicon.png')
         settings.app_logo.save(os.path.basename(logo), File(open(logo, 'rb')))
@@ -67,17 +60,6 @@ class TestSettings(BootTestCase):
         self.assertFalse(os.path.exists(default_logo_path),
                         "Old logo has been deleted")
 
-        # The old logo caches are gone also
-        self.assertFalse(os.path.exists(favicon_path), "Favicon logo has been removed")
-
-        # Resized images have not been created yet
-        logo_36_path = os.path.join(webodm_settings.MEDIA_ROOT, settings.app_logo_36.name)
-        self.assertFalse(os.path.exists(logo_36_path), "Resized logo does not exist")
-
-        # When we access its URL, it gets created (lazy)
-        res = c.get('/login/')
-        self.assertTrue(res.status_code == 200)
-        self.assertTrue(os.path.exists(logo_36_path), "Resized logo exists")
 
 
 
