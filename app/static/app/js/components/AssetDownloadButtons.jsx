@@ -6,14 +6,16 @@ import PropTypes from 'prop-types';
 class AssetDownloadButtons extends React.Component {
     static defaultProps = {
         disabled: false,
-        direction: "down", // or "up"
+        direction: "down", // or "up",
+        buttonClass: "btn-primary",
         task: null
     };
 
     static propTypes = {
         disabled: PropTypes.bool,
         task: PropTypes.object.isRequired,
-        direction: PropTypes.string
+        direction: PropTypes.string,
+        buttonClass: PropTypes.string
     };
 
     constructor(props){
@@ -33,10 +35,10 @@ class AssetDownloadButtons extends React.Component {
         const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
 
         return (<div className={"asset-download-buttons btn-group " + (this.props.direction === "up" ? "dropup" : "")}>
-          <button type="button" className="btn btn-sm btn-primary" disabled={this.props.disabled} data-toggle="dropdown">
+          <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
             <i className="glyphicon glyphicon-download"></i> Download Assets
           </button>
-          <button type="button" className="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" disabled={this.props.disabled}>
+          <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
                 <span className="caret"></span>
           </button>
           <ul className="dropdown-menu">

@@ -54,7 +54,7 @@ class NewTaskPanel extends React.Component {
     if (this.props.uploading || this.state.editing){
       // Done editing, but still uploading
       return (
-        <div className="new-task-panel">
+        <div className="new-task-panel theme-background-highlight">
           <div className={"form-horizontal " + (this.state.editing ? "" : "hide")}>
             <p>{this.props.uploading ? 
               "Your images are being uploaded. In the meanwhile, check these additional options:"

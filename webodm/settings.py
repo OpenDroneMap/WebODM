@@ -69,6 +69,10 @@ INSTALLED_APPS = [
     'rest_framework_nested',
     'webpack_loader',
     'corsheaders',
+    'colorfield',
+    'imagekit',
+    'codemirror2',
+    'compressor',
 #    'debug_toolbar',
     'app',
     'nodeodm',
@@ -103,6 +107,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.contexts.settings.load',
             ],
         },
     },
@@ -167,6 +172,11 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app', 'static'),
+]
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 # File Uploads
@@ -268,6 +278,39 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=6),
+}
+
+# Compressor
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', 'django_libsass.SassCompiler'),
+)
+
+# Sass
+def theme(color):
+    from app.contexts.settings import theme as f
+    return f(color)
+
+
+def complementary(color):
+    from app.contexts.settings import complementary as f
+    return f(color)
+
+
+def scaleby(color, n):
+    from app.contexts.settings import scaleby as f
+    return f(color, n)
+
+
+def scalebyiv(color, n):
+    from app.contexts.settings import scaleby as f
+    return f(color, n, True)
+
+
+LIBSASS_CUSTOM_FUNCTIONS = {
+    'theme': theme,
+    'complementary': complementary,
+    'scaleby': scaleby,
+    'scalebyiv': scalebyiv
 }
 
 if TESTING:

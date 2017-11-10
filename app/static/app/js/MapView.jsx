@@ -89,7 +89,7 @@ class MapView extends React.Component {
             <button 
               key={mapType.type}
               onClick={this.handleMapTypeButton(mapType.type)}
-              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-default" : "btn-secondary")}>{mapType.label}</button>
+              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}>{mapType.label}</button>
           )}
         </div>
 
@@ -102,7 +102,7 @@ class MapView extends React.Component {
           showBackground={true} 
           opacity={opacity}
           mapType={this.state.selectedMapType} />
-        <div className="opacity-slider">
+        <div className="opacity-slider theme-secondary">
           Opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
         </div>
       </div>);
