@@ -2,7 +2,7 @@ anyjson==0.3.3
 appdirs==1.4.0
 APScheduler==3.2.0
 coreapi==2.0.9
-Django==1.11.1
+Django==1.11.7
 django-appconf==1.0.2
 django-codemirror2==0.2
 django-colorfield==0.1.14
