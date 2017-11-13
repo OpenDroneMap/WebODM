@@ -26,7 +26,7 @@ Markdown==2.6.7
 openapi-codec==1.1.7
 packaging==16.8
 pilkit==2.0
-Pillow==3.3.1
+Pillow==4.3.0
 pip-autoremove==0.9.0
 psycopg2==2.6.2
 PyJWT==1.4.2
