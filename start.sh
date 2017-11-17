@@ -69,18 +69,21 @@ if [ "$WO_SSL" = "YES" ]; then
     proto="https"
 fi
 
-(sleep 5; echo
-echo -e "\033[92m"      
-echo "Congratulations! └@(･◡･)@┐"
-echo ==========================
-echo -e "\033[39m"
-echo "If there are no errors, WebODM should be up and running!"
-echo -e "\033[93m"
-echo Open a web browser and navigate to $proto://$WO_HOST:$WO_PORT
-echo -e "\033[39m"
-echo -e "\033[91mNOTE:\033[39m Windows users using docker should replace localhost with the IP of their docker machine's IP. To find what that is, run: docker-machine ip") &
+congrats(){
+    (sleep 5; echo
+    echo -e "\033[92m"      
+    echo "Congratulations! └@(･◡･)@┐"
+    echo ==========================
+    echo -e "\033[39m"
+    echo "If there are no errors, WebODM should be up and running!"
+    echo -e "\033[93m"
+    echo Open a web browser and navigate to $proto://$WO_HOST:$WO_PORT
+    echo -e "\033[39m"
+    echo -e "\033[91mNOTE:\033[39m Windows users using docker should replace localhost with the IP of their docker machine's IP. To find what that is, run: docker-machine ip") &
+}
 
 if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ] || [ "$1" = "--no-gunicorn" ]; then
+    congrats
     python manage.py runserver 0.0.0.0:8000
 else
     if [ -e /webodm ] && [ ! -e /webodm/build/static ]; then
@@ -106,6 +109,8 @@ else
         echo "Using nginx SSL configuration"
         conf="nginx-ssl.conf"
     fi
+
+    congrats
 
     nginx -c $(pwd)/nginx/$conf
     gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --preload
