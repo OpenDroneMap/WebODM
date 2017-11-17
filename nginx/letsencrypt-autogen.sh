@@ -20,6 +20,14 @@ if [ -z $DOMAIN ]; then
 	exit 1
 fi
 
+# Stop nginx if needed (free the port used by the standalone server)
+nginx_was_running="NO"
+pgrep nginx
+if [ $? -eq 0]; then
+	killall nginx
+	nginx_was_running="YES"
+fi
+
 # Generate/update certificate
 certbot certonly --tls-sni-01-port $WO_PORT --work-dir ./letsencrypt --config-dir ./letsencrypt --logs-dir ./letsencrypt --standalone -d $DOMAIN --register-unsafely-without-email --agree-tos --keep
 
@@ -40,4 +48,10 @@ fi
 if [ -e "letsencrypt/live/$DOMAIN" ]; then
 	ln -vs "../letsencrypt/live/$DOMAIN/privkey.pem" ssl/key.pem
 	ln -vs "../letsencrypt/live/$DOMAIN/fullchain.pem" ssl/cert.pem
+fi
+
+# Restart nginx if necessary
+if [ "$nginx_was_running" = "YES" ]; then
+	echo "Restarting nginx..."
+	nginx -c $(pwd)/nginx-ssl.conf
 fi
