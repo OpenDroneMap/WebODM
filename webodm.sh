@@ -49,7 +49,7 @@ case $key in
     shift # past value
     ;;
     --ssl)
-    WO_SSL=YES
+    export WO_SSL=YES
     shift # past argument
     ;;
 	--ssl-key)

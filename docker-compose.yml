@@ -25,6 +25,6 @@ services:
     depends_on:
       - db
     environment:
-      - PORT
-      - HOST
+      - WO_PORT
+      - WO_HOST
     restart: on-failure:10

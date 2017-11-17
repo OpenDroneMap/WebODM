@@ -27,7 +27,7 @@ RUN pip install -r requirements.txt
 ADD . /webodm/
 
 # Setup cron
-RUN ln -s /webodm/nginx/crontab /etc/cron.d/nginx-cron && chmod 0644 /webodm/nginx/crontab && service cron start
+RUN ln -s /webodm/nginx/crontab /etc/cron.d/nginx-cron && chmod 0644 /webodm/nginx/crontab && service cron start && chmod +x /webodm/nginx/letsencrypt-autogen.sh
 
 RUN git submodule update --init
 
