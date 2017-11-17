@@ -74,7 +74,19 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ] || [ "$1" = "--no-
 else
     if [ -e /webodm ] && [ ! -e /webodm/build/static ]; then
        echo -e "\033[91mWARN:\033[39m /webodm/build/static does not exist, CSS, JS and other files might not be available."
-    fi 
+    fi
+
+    # If this is invoked outside docker, we need to make sure
+    # envsubst returns a valid config file...
+    export HOST="${HOST:=webodm.localhost}"
+
+    echo "Generating nginx configurations from templates..."
+    for templ in nginx/*.template
+    do
+        echo "- $templ"
+        envsubst '\$HOST \$OTHER_VAR' < $templ > ${templ%.*}
+    done
+
     nginx -c $(pwd)/nginx/nginx.conf
     gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --preload
 fi

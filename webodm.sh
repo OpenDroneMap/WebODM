@@ -16,6 +16,11 @@ if [[ $platform = "Windows" ]]; then
 	export COMPOSE_CONVERT_WINDOWS_PATHS=1
 fi
 
+# Set default ENV variables
+export PORT="${WEBODM_PORT:=8000}"
+export HOST="${WEBODM_HOST:=webodm.localhost}"
+export MEDIA_DIR="${WEBODM_MEDIA_DIR:=appmedia}"
+
 usage(){
   echo "Usage: $0 <command> [options]"
   echo
@@ -121,6 +126,12 @@ resetpassword(){
 if [[ $1 = "start" ]]; then
 	environment_check
 	echo "Starting WebODM..."
+
+
+	echo -e "Host: \033[92m\033[1m$PORT\033[0m\033[39m"
+	echo -e "Port: \033[92m\033[1m$HOST\033[0m\033[39m"
+	echo -e "Media dir: \033[92m\033[1m$HOST\033[0m\033[39m"
+
 	start
 elif [[ $1 = "stop" ]]; then
 	environment_check
