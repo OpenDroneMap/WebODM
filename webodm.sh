@@ -161,18 +161,24 @@ start(){
 			command+=" -f docker-compose.ssl-manual.yml"
 		fi
 		
-		echo "SSL will be enabled ($method)"
-
-		# Check port settings
-		# as let's encrypt cannot communicate on ports
-		# different than 80 or 443
 		if [ "$method" = "Lets Encrypt" ]; then
+			# Check port settings
+			# as let's encrypt cannot communicate on ports
+			# different than 80 or 443
 			if [ "$PORT" != "$DEFAULT_PORT" ]; then
 				echo -e "\033[93mLets Encrypt cannot run on port: $PORT, switching to 443.\033[39m"
 				echo "If you need to use a different port, you'll need to generate the SSL certificate files separately and use the --ssl-key and --ssl-certificate options."
 			fi
 			export PORT=443
+
+			# Make sure we have a hostname
+			if [ "$HOST" = "localhost" ]; then
+				echo -e "\033[91mSSL is enabled, but hostname cannot be set to $HOST. Set the --hostname argument to the domain of your WebODM server (for example: www.mywebodm.org).\033[39m"
+				exit 1
+			fi
 		fi
+
+		echo "Will enable SSL ($method)"
 	fi
 
 	run "$command start || $command up"

@@ -96,7 +96,7 @@ else
 
     # Check if SSL key/certs are available
     conf="nginx.conf"
-    if [ -e nginx/ssl ];
+    if [ -e nginx/ssl ]; then
         echo "Using nginx SSL configuration"
         conf="nginx-ssl.conf"
     fi
