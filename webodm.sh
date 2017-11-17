@@ -18,7 +18,7 @@ fi
 
 # Set default ENV variables
 export PORT="${WEBODM_PORT:=8000}"
-export HOST="${WEBODM_HOST:=webodm.localhost}"
+export HOST="${WEBODM_HOST:=localhost}"
 export MEDIA_DIR="${WEBODM_MEDIA_DIR:=appmedia}"
 
 usage(){
@@ -127,10 +127,9 @@ if [[ $1 = "start" ]]; then
 	environment_check
 	echo "Starting WebODM..."
 
-
-	echo -e "Host: \033[92m\033[1m$PORT\033[0m\033[39m"
-	echo -e "Port: \033[92m\033[1m$HOST\033[0m\033[39m"
-	echo -e "Media dir: \033[92m\033[1m$HOST\033[0m\033[39m"
+	echo "Host: $PORT"
+	echo "Port: $HOST"
+	echo "Media dir: $MEDIA_DIR"
 
 	start
 elif [[ $1 = "stop" ]]; then
