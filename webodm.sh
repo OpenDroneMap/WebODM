@@ -126,11 +126,16 @@ resetpassword(){
 if [[ $1 = "start" ]]; then
 	environment_check
 	echo "Starting WebODM..."
-
-	echo "Host: $PORT"
-	echo "Port: $HOST"
-	echo "Media dir: $MEDIA_DIR"
-
+	echo ""
+	echo "Using the following environment:"
+	echo "============"
+	echo "Host: $HOST"
+	echo "Port: $PORT"
+	echo "Media directory: $MEDIA_DIR"
+	echo "============"
+	echo "Make sure to issue a $0 down if you decide to change the environment."
+	echo ""
+	
 	start
 elif [[ $1 = "stop" ]]; then
 	environment_check
