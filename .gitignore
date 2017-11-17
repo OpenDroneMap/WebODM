@@ -94,3 +94,4 @@ webpack-stats.json
 pip-selfcheck.json
 .idea/
 package-lock.json
+.cronenv

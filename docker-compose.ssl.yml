@@ -1,0 +1,14 @@
+# This configuration adds support for SSL
+version: '2'
+volumes:
+  letsencrypt:
+    driver: local
+services:
+  webapp:
+    ports:
+      - "${SSL_INSECURE_PORT_REDIRECT}:8080"
+    volumes:
+      - letsencrypt:/webodm/nginx/letsencrypt
+    environment:
+      - SSL
+      - SSL_KEY

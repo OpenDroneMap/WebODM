@@ -61,6 +61,9 @@ fi
 export HOST="${HOST:=localhost}"
 export PORT="${PORT:=8000}"
 
+# Dump environment to .cronenv
+printenv > .cronenv
+
 (sleep 5; echo
 echo -e "\033[92m"      
 echo "Congratulations! └@(･◡･)@┐"
@@ -86,7 +89,19 @@ else
         envsubst '\$HOST \$OTHER_VAR' < $templ > ${templ%.*}
     done
 
-    nginx -c $(pwd)/nginx/nginx.conf
+    # Check if we need to auto-generate SSL certs via letsencrypt
+    if [ "$SSL" = "YES" ] && [ -z "$SSL_KEY" ]; then
+        bash -c "nginx/letsencrypt-autogen.sh"
+    fi
+
+    # Check if SSL key/certs are available
+    conf="nginx.conf"
+    if [ -e nginx/ssl ];
+        echo "Using nginx SSL configuration"
+        conf="nginx-ssl.conf"
+    fi
+
+    nginx -c $(pwd)/nginx/$conf
     gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --preload
 fi
 
