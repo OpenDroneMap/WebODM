@@ -142,6 +142,7 @@ run(){
 
 start(){
 	command="docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml"
+	
 	if [ "$SSL" = "YES" ]; then
 		if [ ! -z "$SSL_KEY" ] && [ ! -e "$SSL_KEY" ]; then
 			echo -e "\033[91mSSL key file does not exist: $SSL_KEY\033[39m"
@@ -161,7 +162,19 @@ start(){
 		fi
 		
 		echo "SSL will be enabled ($method)"
+
+		# Check port settings
+		# as let's encrypt cannot communicate on ports
+		# different than 80 or 443
+		if [ "$method" = "Lets Encrypt" ]; then
+			if [ "$PORT" != "$DEFAULT_PORT" ]; then
+				echo -e "\033[93mLets Encrypt cannot run on port: $PORT, switching to 443.\033[39m"
+				echo "If you need to use a different port, you'll need to generate the SSL certificate files separately and use the --ssl-key and --ssl-certificate options."
+			fi
+			export PORT=443
+		fi
 	fi
+
 	run "$command start || $command up"
 }
 

@@ -9,6 +9,7 @@ RUN mkdir /webodm
 WORKDIR /webodm
 
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
+RUN apt-get -qq install -y nodejs
 
 # Configure use of testing branch of Debian
 RUN printf "Package: *\nPin: release a=stable\nPin-Priority: 900\n" > /etc/apt/preferences.d/stable.pref
@@ -17,7 +18,7 @@ RUN printf "deb     http://mirror.steadfast.net/debian/    stable main contrib n
 RUN printf "deb     http://mirror.steadfast.net/debian/    testing main contrib non-free\ndeb-src http://mirror.steadfast.net/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
 
 # Install Node.js GDAL, nginx, letsencrypt
-RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx && apt-get -qq install -y nodejs gettext-base cron certbot
+RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx && apt-get -qq install -y gettext-base cron certbot
 
 # Install pip reqs
 ADD requirements.txt /webodm/
