@@ -9,12 +9,12 @@ if [ $not_found ]; then
 	exit 1
 fi
 
-if [ "$SSL" = "NO" ] || [ ! -z "$SSL_KEY" ]; then
+if [ "$WO_SSL" = "NO" ] || [ ! -z "$WO_SSL_KEY" ]; then
 	echo "SSL not enabled, or manual SSL key specified, exiting."
 	exit 1
 fi
 
-DOMAIN="${HOST:=$1}"
+DOMAIN="${WO_HOST:=$1}"
 if [ -z $DOMAIN ]; then
 	echo "Usage: $0 <my.domain.com>"
 	exit 1

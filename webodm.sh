@@ -20,11 +20,11 @@ fi
 
 # Load default values
 source .env
-DEFAULT_PORT="$PORT"
-DEFAULT_HOST="$HOST"
-DEFAULT_MEDIA_DIR="$MEDIA_DIR"
-DEFAULT_SSL="$SSL"
-DEFAULT_SSL_INSECURE_PORT_REDIRECT="$SSL_INSECURE_PORT_REDIRECT"
+DEFAULT_PORT="$WO_PORT"
+DEFAULT_HOST="$WO_HOST"
+DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
+DEFAULT_SSL="$WO_SSL"
+DEFAULT_SSL_INSECURE_PORT_REDIRECT="$WO_SSL_INSECURE_PORT_REDIRECT"
 
 # Parse args for overrides
 POSITIONAL=()
@@ -34,36 +34,36 @@ key="$1"
 
 case $key in
     --port)
-    export PORT="$2"
+    export WO_PORT="$2"
     shift # past argument
     shift # past value
     ;;    
     --hostname)
-    export HOST="$2"
+    export WO_HOST="$2"
     shift # past argument
     shift # past value
     ;;
 	--media-dir)
-    export MEDIA_DIR=$(realpath "$2")
+    export WO_MEDIA_DIR=$(realpath "$2")
     shift # past argument
     shift # past value
     ;;
     --ssl)
-    SSL=YES
+    WO_SSL=YES
     shift # past argument
     ;;
 	--ssl-key)
-    export SSL_KEY=$(realpath "$2")
+    export WO_SSL_KEY=$(realpath "$2")
     shift # past argument
     shift # past value
     ;;
 	--ssl-cert)
-    export SSL_CERT=$(realpath "$2")
+    export WO_SSL_CERT=$(realpath "$2")
     shift # past argument
     shift # past value
     ;;
 	--ssl-insecure-port-redirect)
-    export SSL_INSECURE_PORT_REDIRECT="$2"
+    export WO_SSL_INSECURE_PORT_REDIRECT="$2"
     shift # past argument
     shift # past value
     ;;
@@ -143,20 +143,20 @@ run(){
 start(){
 	command="docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml"
 	
-	if [ "$SSL" = "YES" ]; then
-		if [ ! -z "$SSL_KEY" ] && [ ! -e "$SSL_KEY" ]; then
-			echo -e "\033[91mSSL key file does not exist: $SSL_KEY\033[39m"
+	if [ "$WO_SSL" = "YES" ]; then
+		if [ ! -z "$WO_SSL_KEY" ] && [ ! -e "$WO_SSL_KEY" ]; then
+			echo -e "\033[91mSSL key file does not exist: $WO_SSL_KEY\033[39m"
 			exit 1
 		fi
-		if [ ! -z "$SSL_CERT" ] && [ ! -e "$SSL_CERT" ]; then
-			echo -e "\033[91mSSL certificate file does not exist: $SSL_CERT\033[39m"
+		if [ ! -z "$WO_SSL_CERT" ] && [ ! -e "$WO_SSL_CERT" ]; then
+			echo -e "\033[91mSSL certificate file does not exist: $WO_SSL_CERT\033[39m"
 			exit 1
 		fi
 		
 		command+=" -f docker-compose.ssl.yml"
 		
 		method="Lets Encrypt"
-		if [ ! -z "$SSL_KEY" ] && [ ! -z "$SSL_CERT" ]; then
+		if [ ! -z "$WO_SSL_KEY" ] && [ ! -z "$WO_SSL_CERT" ]; then
 			method="Manual"
 			command+=" -f docker-compose.ssl-manual.yml"
 		fi
@@ -165,15 +165,15 @@ start(){
 			# Check port settings
 			# as let's encrypt cannot communicate on ports
 			# different than 80 or 443
-			if [ "$PORT" != "$DEFAULT_PORT" ]; then
-				echo -e "\033[93mLets Encrypt cannot run on port: $PORT, switching to 443.\033[39m"
+			if [ "$WO_PORT" != "$DEFAULT_PORT" ]; then
+				echo -e "\033[93mLets Encrypt cannot run on port: $WO_PORT, switching to 443.\033[39m"
 				echo "If you need to use a different port, you'll need to generate the SSL certificate files separately and use the --ssl-key and --ssl-certificate options."
 			fi
-			export PORT=443
+			export WO_PORT=443
 
 			# Make sure we have a hostname
-			if [ "$HOST" = "localhost" ]; then
-				echo -e "\033[91mSSL is enabled, but hostname cannot be set to $HOST. Set the --hostname argument to the domain of your WebODM server (for example: www.mywebodm.org).\033[39m"
+			if [ "$WO_HOST" = "localhost" ]; then
+				echo -e "\033[91mSSL is enabled, but hostname cannot be set to $WO_HOST. Set the --hostname argument to the domain of your WebODM server (for example: www.mywebodm.org).\033[39m"
 				exit 1
 			fi
 		fi
@@ -231,13 +231,13 @@ if [[ $1 = "start" ]]; then
 	echo ""
 	echo "Using the following environment:"
 	echo "================================"
-	echo "Host: $HOST"
-	echo "Port: $PORT"
-	echo "Media directory: $MEDIA_DIR"
-	echo "SSL: $SSL"
-	echo "SSL key: $SSL_KEY"
-	echo "SSL certificate: $SSL_CERT"
-	echo "SSL insecure port redirect: $SSL_INSECURE_PORT_REDIRECT"
+	echo "Host: $WO_HOST"
+	echo "Port: $WO_PORT"
+	echo "Media directory: $WO_MEDIA_DIR"
+	echo "SSL: $WO_SSL"
+	echo "SSL key: $WO_SSL_KEY"
+	echo "SSL certificate: $WO_SSL_CERT"
+	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""

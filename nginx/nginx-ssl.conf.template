@@ -29,16 +29,16 @@ http {
 
   # Redirect all non-encrypted to encrypted
   server {
-      server_name $HOST;
+      server_name $WO_HOST;
       listen 8080;
-      return 301 https://$HOST:$PORT$request_uri;
+      return 301 https://$WO_HOST:$WO_PORT$request_uri;
   }
 
   server {
     listen 8000 deferred;
     client_max_body_size 0;
 
-    server_name $HOST;
+    server_name $WO_HOST;
 
     ssl on;
     ssl_certificate /webodm/nginx/ssl/cert.pem

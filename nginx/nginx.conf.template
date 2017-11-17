@@ -31,7 +31,7 @@ http {
     listen 8000 deferred;
     client_max_body_size 0;
 
-    server_name $HOST;
+    server_name $WO_HOST;
 
     keepalive_timeout 5;
 
