@@ -39,5 +39,5 @@ fi
 
 if [ -e "letsencrypt/live/$DOMAIN" ]; then
 	ln -vs "../letsencrypt/live/$DOMAIN/privkey.pem" ssl/key.pem
-	ln -vs "../letsencrypt/live/$DOMAIN/chain.pem" ssl/cert.pem
+	ln -vs "../letsencrypt/live/$DOMAIN/fullchain.pem" ssl/cert.pem
 fi

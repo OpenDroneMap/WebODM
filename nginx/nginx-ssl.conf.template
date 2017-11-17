@@ -41,8 +41,8 @@ http {
     server_name $WO_HOST;
 
     ssl on;
-    ssl_certificate /webodm/nginx/ssl/cert.pem
-    ssl_certificate_key /webodm/nginx/ssl/key.pem
+    ssl_certificate /webodm/nginx/ssl/cert.pem;
+    ssl_certificate_key /webodm/nginx/ssl/key.pem;
 
     keepalive_timeout 5;
 
