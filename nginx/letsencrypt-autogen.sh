@@ -21,7 +21,7 @@ if [ -z $DOMAIN ]; then
 fi
 
 # Generate/update certificate
-certbot certonly --work-dir ./letsencrypt --config-dir ./letsencrypt --logs-dir ./letsencrypt --standalone -d $DOMAIN --register-unsafely-without-email --agree-tos --keep
+certbot certonly --tls-sni-01-port $WO_PORT --work-dir ./letsencrypt --config-dir ./letsencrypt --logs-dir ./letsencrypt --standalone -d $DOMAIN --register-unsafely-without-email --agree-tos --keep
 
 # Create ssl dir if necessary
 if [ ! -e ssl/ ]; then
@@ -38,6 +38,6 @@ if [ -e ssl/cert.pem ]; then
 fi
 
 if [ -e "letsencrypt/live/$DOMAIN" ]; then
-	ln -vs "letsencrypt/live/$DOMAIN/privkey.pem" ssl/key.pem
-	ln -vs "letsencrypt/live/$DOMAIN/chain.pem" ssl/cert.pem
+	ln -vs "../letsencrypt/live/$DOMAIN/privkey.pem" ssl/key.pem
+	ln -vs "../letsencrypt/live/$DOMAIN/chain.pem" ssl/cert.pem
 fi

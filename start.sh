@@ -64,6 +64,11 @@ export WO_PORT="${WO_PORT:=8000}"
 # Dump environment to .cronenv
 printenv > .cronenv
 
+proto="http"
+if [ "$WO_SSL" = "YES" ]; then
+    proto="https"
+fi
+
 (sleep 5; echo
 echo -e "\033[92m"      
 echo "Congratulations! └@(･◡･)@┐"
@@ -71,7 +76,7 @@ echo ==========================
 echo -e "\033[39m"
 echo "If there are no errors, WebODM should be up and running!"
 echo -e "\033[93m"
-echo Open a web browser and navigate to http://$WO_HOST:$WO_PORT
+echo Open a web browser and navigate to $proto://$WO_HOST:$WO_PORT
 echo -e "\033[39m"
 echo -e "\033[91mNOTE:\033[39m Windows users using docker should replace localhost with the IP of their docker machine's IP. To find what that is, run: docker-machine ip") &
 
