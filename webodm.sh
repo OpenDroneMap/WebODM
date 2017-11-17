@@ -16,7 +16,7 @@ if [[ $platform = "Windows" ]]; then
 	export COMPOSE_CONVERT_WINDOWS_PATHS=1
 fi
 
-# Set default ENV variables
+# Set default env variables
 export PORT="${WEBODM_PORT:=8000}"
 export HOST="${WEBODM_HOST:=localhost}"
 export MEDIA_DIR="${WEBODM_MEDIA_DIR:=appmedia}"
@@ -135,7 +135,7 @@ if [[ $1 = "start" ]]; then
 	echo "============"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
-	
+
 	start
 elif [[ $1 = "stop" ]]; then
 	environment_check
