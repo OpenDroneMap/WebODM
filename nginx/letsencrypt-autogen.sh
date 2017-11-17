@@ -22,7 +22,7 @@ fi
 
 # Stop nginx if needed (free the port used by the standalone server)
 nginx_was_running="NO"
-pgrep nginx
+pgrep nginx > /dev/null
 if [ $? -eq 0 ]; then
 	killall nginx
 	nginx_was_running="YES"

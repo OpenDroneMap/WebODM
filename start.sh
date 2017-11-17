@@ -96,7 +96,7 @@ else
 
     # Check if we need to auto-generate SSL certs via letsencrypt
     if [ "$WO_SSL" = "YES" ] && [ -z "$WO_SSL_KEY" ]; then
-        bash -c "nginx/letsencrypt-autogen.sh"
+        source ./nginx/letsencrypt-autogen.sh
     fi
 
     # Check if SSL key/certs are available
