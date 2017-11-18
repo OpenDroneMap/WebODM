@@ -67,6 +67,10 @@ case $key in
     shift # past argument
     shift # past value
     ;;
+    --no-debug)
+    export WO_DEBUG=NO
+    shift # past argument
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -98,6 +102,7 @@ usage(){
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-cert	<path>	Manually specify a path to the certificate file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-insecure-port-redirect	<port>	Insecure port number to redirect from when SSL is enabled (default: $DEFAULT_SSL_INSECURE_PORT_REDIRECT)"
+  echo "	--no-debug	Disable debug for production environments (default: disabled)"
   exit
 }
 

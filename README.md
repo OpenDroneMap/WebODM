@@ -5,10 +5,11 @@
 A free, user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
 
 * [Getting Started](#getting-started)
-    * [Common Troubleshooting](#common-troubleshooting)
     * [Add More Processing Nodes](#add-more-processing-nodes)
     * [Security](#security)
+    * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
+    * [Common Troubleshooting](#common-troubleshooting)
  * [API Docs](#api-docs)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
@@ -16,6 +17,8 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
  * [Roadmap](#roadmap)
  * [Terminology](#terminology)
  * [Getting Help](#getting-help)
+ * [Support the Project](#support-the-project)
+ * [Become a Contributor](#become-a-contributor)
  
 
 ![Alt text](https://user-images.githubusercontent.com/1951843/28586405-af18e8cc-7141-11e7-9853-a7feca7c9c6b.gif)
@@ -26,7 +29,6 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 ![Alt text](https://user-images.githubusercontent.com/1951843/28586977-8588ebfe-7143-11e7-94d6-a66bf02c1517.png)
 
-If you know Python, web technologies (JS, HTML, CSS, etc.) or both, it's easy to make a change to WebODM! Make a fork, clone the repository and run `./devenv.sh start`. That's it! See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information. All ideas are considered and people of all skill levels are welcome to contribute.
 
 ## Getting Started
 
@@ -68,6 +70,50 @@ We recommend that you read the [Docker Documentation](https://docs.docker.com/) 
 
 For Windows users an [Installer](https://www.webodm.org/installer) is also available.
 
+### Add More Processing Nodes
+
+WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
+
+Adding more processing nodes will allow you to run multiple jobs in parallel. 
+
+You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
+
+### Security
+
+If you want to run WebODM in production, make sure to pass the `--no-debug` flag while starting WebODM:
+
+```bash
+./webodm.sh down && ./webodm.sh start --no-debug
+```
+
+This will disable the `DEBUG` flag from `webodm/settings.py` within the docker container.
+
+### Enable SSL
+
+WebODM has the ability to automatically request and install a SSL certificate via [Let’s Encrypt](https://letsencrypt.org/), or you can manually specify your own key/certificate pair.
+
+ - Setup your server DNS so that it resolves to the IP of your machine (webodm.myorg.com --> ip of server)
+ - Make sure port 80 and 443 are open to the outside
+ - Run the following:
+
+```bash
+./webodm.sh down && ./webodm.sh start --ssl --hostname webodm.myorg.com
+```
+
+That's it! The certificate will automatically renew when needed.
+
+If you want to specify your own key/certificate pair, simply pass the `--ssl-key` and `--ssl-cert` option to `./webodm.sh`. See `./webodm.sh --help` for more information.
+
+### Where Are My Files Stored?
+
+When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. If you want to store your files on the host filesystem instead of a docker volume, you need to pass a path via the `--media-dir` option:
+
+```bash
+./webodm.sh down && ./webodm.sh start --media-dir /home/user/webodm_data
+```
+
+Note that existing task results will not be available after the change. Refer to the [Migrate Data Volumes](https://docs.docker.com/engine/tutorials/dockervolumes/#backup-restore-or-migrate-data-volumes) section of the Docker documentation for information on migrating existing task results.
+
 ### Common Troubleshooting
 
 Sympthoms | Possible Solutions
@@ -81,38 +127,6 @@ Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your inte
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
-
-### Add More Processing Nodes
-
-WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
-
-Adding more processing nodes will allow you to run multiple jobs in parallel. 
-
-You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
-
-### Security
-
-If you want to run WebODM in production, make sure to disable the `DEBUG` flag from `webodm/settings.py` and go through the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/).
-
-### Where Are My Files Stored?
-
-When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. If you want to store your files on the host filesystem instead of a docker volume, you need to change a line in `docker-compose.yml` as follows:
-
-From:
-```
-    volumes:
-      - appmedia:/webodm/app/media
-```
-
-To:
-```
-    volumes:
-      - /path/where/to/store/files:/webodm/app/media
-```
-
-Then restart WebODM. 
-
-Note that existing task results will not be available after the change. Refer to the [Migrate Data Volumes](https://docs.docker.com/engine/tutorials/dockervolumes/#backup-restore-or-migrate-data-volumes) section of the Docker documentation for information on migrating existing task results.
 
 ## API Docs
 
@@ -300,6 +314,7 @@ Developer, I'm looking to build an app that will stay behind a firewall and just
 - [ ] iOS Mobile App
 - [ ] Processing Nodes Volunteer Network
 - [X] Unit Testing
+- [X] SSL Support
 
 Don't see a feature that you want? [Help us make it happen](/CONTRIBUTING.md). 
 
@@ -320,3 +335,16 @@ We have several channels of communication for people to ask questions and to get
 
 We also have a [Gitter Chat](https://gitter.im/OpenDroneMap/web-development), but the preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
 
+## Support the Project
+
+There are many ways to contribute back to the project:
+
+ - Help us test new and existing features and report [bugs](https://www.github.com/OpenDroneMap/WebODM/issues) and [feedback](http://community.opendronemap.org/c/webodm).
+ - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
+ - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
+ - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [premium support package](https://webodm.org/services#premium-support).
+ - Become a contributor (see below).
+
+## Become a Contributor
+
+If you know Python, web technologies (JS, HTML, CSS, etc.) or both, it's easy to make a change to WebODM! Make a fork, clone the repository and run `./devenv.sh start`. That's it! See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information. All ideas are considered and people of all skill levels are welcome to contribute.

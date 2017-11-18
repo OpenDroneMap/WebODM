@@ -27,4 +27,5 @@ services:
     environment:
       - WO_PORT
       - WO_HOST
+      - WO_DEBUG
     restart: on-failure:10
