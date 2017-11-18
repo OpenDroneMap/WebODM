@@ -85,7 +85,7 @@ If you want to run WebODM in production, make sure to pass the `--no-debug` flag
 ./webodm.sh down && ./webodm.sh start --no-debug
 ```
 
-This will disable the `DEBUG` flag from `webodm/settings.py` within the docker container.
+This will disable the `DEBUG` flag from `webodm/settings.py` within the docker container. This is [really important](https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG).
 
 ### Enable SSL
 
