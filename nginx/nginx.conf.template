@@ -31,8 +31,7 @@ http {
     listen 8000 deferred;
     client_max_body_size 0;
 
-    # set the correct host(s) for your site
-    server_name webodm.localhost;
+    server_name $WO_HOST;
 
     keepalive_timeout 5;
 
@@ -46,10 +45,11 @@ http {
 
     # path for certain media files that don't need permissions enforced
     location /media/CACHE {
-      root /webodm/app/media/CACHE;
+      root /webodm/app;
     }
     location /media/settings {
-      root /webodm/app/media/settings;
+      autoindex on;
+      root /webodm/app;
     }
 
     location / {

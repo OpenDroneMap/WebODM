@@ -17,9 +17,13 @@ services:
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-it.sh db:5432 -- /webodm/start.sh\""
     volumes:
-      - appmedia:/webodm/app/media
+      - ${WO_MEDIA_DIR}:/webodm/app/media
     ports:
-      - "80:8000"
+      - "${WO_PORT}:8000"
     depends_on:
       - db
+    environment:
+      - WO_PORT
+      - WO_HOST
+      - WO_DEBUG
     restart: on-failure:10

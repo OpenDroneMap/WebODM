@@ -1,0 +1,88 @@
+worker_processes 1;
+
+# Change this if running outside docker!
+user root root;
+pid /tmp/nginx.pid;
+error_log /tmp/nginx.error.log;
+
+events {
+  worker_connections 1024; # increase if you have lots of clients
+  accept_mutex off; # set to 'on' if nginx worker_processes > 1
+  use epoll;
+}
+
+http {
+  include /etc/nginx/mime.types;
+
+  # fallback in case we can't determine a type
+  default_type application/octet-stream;
+  access_log /tmp/nginx.access.log combined;
+  sendfile on;
+
+  upstream app_server {
+    # fail_timeout=0 means we always retry an upstream even if it failed
+    # to return a good HTTP response
+
+    # for UNIX domain socket setups
+    server unix:/tmp/gunicorn.sock fail_timeout=0;
+  }
+
+  # Redirect all non-encrypted to encrypted
+  server {
+      server_name $WO_HOST;
+      listen 8080;
+      return 301 https://$WO_HOST:$WO_PORT$request_uri;
+  }
+
+  server {
+    listen 8000 deferred;
+    client_max_body_size 0;
+
+    server_name $WO_HOST;
+
+    ssl on;
+    ssl_certificate /webodm/nginx/ssl/cert.pem;
+    ssl_certificate_key /webodm/nginx/ssl/key.pem;
+
+    keepalive_timeout 5;
+
+    proxy_connect_timeout 360s;
+    proxy_read_timeout 360s;
+
+    # path for static files
+    location /static {
+      root /webodm/build;
+    }
+
+    # path for certain media files that don't need permissions enforced
+    location /media/CACHE {
+      root /webodm/app;
+    }
+    location /media/settings {
+      autoindex on;
+      root /webodm/app;
+    }
+
+    location / {
+      # CORS settings
+
+      # These settings are VERY permissive, consider tightening them
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+      add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
+      add_header 'Access-Control-Expose-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
+
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+      # enable this if and only if you use HTTPS
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header Host $http_host;
+
+      # we don't want nginx trying to do something clever with
+      # redirects, we set the Host: header above already.
+      proxy_redirect off;
+      proxy_pass http://app_server;
+    }
+  }
+}
