@@ -109,13 +109,16 @@ class ProjectListItem extends React.Component {
           parallelUploads: 9999999,
           uploadMultiple: true,
           acceptedFiles: "image/*, .txt",
-          autoProcessQueue: true,
+          autoProcessQueue: false,
           createImageThumbnails: false,
           clickable: this.uploadButton,
           
           headers: {
             [csrf.header]: csrf.token
-          }
+          },
+
+          resizeWidth: 2048,
+          resizeQuality: 1.0
       });
 
       this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
@@ -123,10 +126,24 @@ class ProjectListItem extends React.Component {
             progress, totalBytes, totalBytesSent
           });
         })
-        .on("addedfile", () => {
+        .on("addedfiles", files => {
           this.setUploadState({
-            totalCount: this.state.upload.totalCount + 1
+            totalCount: files.length
           });
+
+          // TODO: ask for image resize
+
+          this.dz.processQueue();
+        })
+        .on("transformstart", () => {
+          console.log("START");
+        })
+        .on("transformcompleted", (n) => {
+          console.log(n);
+          // TODO: update state
+        })
+        .on("transformend", () => {
+          console.log("END");
         })
         .on("processingmultiple", () => {
           this.setUploadState({
