@@ -16,7 +16,7 @@ from app.background import background
 
 logger = logging.getLogger('app.logger')
 scheduler = BackgroundScheduler({
-    'apscheduler.job_defaults.coalesce': 'false',
+    'apscheduler.job_defaults.coalesce': 'true',
     'apscheduler.job_defaults.max_instances': '3',
 })
 
@@ -43,7 +43,6 @@ def process_pending_tasks():
                                     Q(Q(status=None) | Q(status__in=[status_codes.QUEUED, status_codes.RUNNING]), processing_node__isnull=False) |
                                     Q(pending_action__isnull=False)).exclude(Q(processing_lock=True))
         for task in tasks:
-            logger.info("Acquiring lock: {}".format(task))
             task.processing_lock = True
             task.save()
     finally:
@@ -80,12 +79,11 @@ def cleanup_projects():
         logger.info("Deleted {} projects".format(count_dict['app.Project']))
 
 def setup():
-    logger.info("Starting background scheduler...")
     try:
         scheduler.start()
         scheduler.add_job(update_nodes_info, 'interval', seconds=30)
         scheduler.add_job(process_pending_tasks, 'interval', seconds=5)
-        scheduler.add_job(cleanup_projects, 'interval', seconds=15)
+        scheduler.add_job(cleanup_projects, 'interval', seconds=60)
     except SchedulerAlreadyRunningError:
         logger.warning("Scheduler already running (this is OK while testing)")
 

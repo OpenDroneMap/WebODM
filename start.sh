@@ -113,7 +113,7 @@ else
     congrats
 
     nginx -c $(pwd)/nginx/$conf
-    gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --preload
+    gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --max-requests 250 --preload
 fi
 
 # If this is executed, it means the previous command failed, don't display the congratulations message
