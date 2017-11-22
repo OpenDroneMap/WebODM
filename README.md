@@ -189,6 +189,8 @@ There are many ways to contribute back to the project:
  - Help us test new and existing features and report [bugs](https://www.github.com/OpenDroneMap/WebODM/issues) and [feedback](http://community.opendronemap.org/c/webodm).
  - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
+ - ⭐️ us on GitHub.
+ - Spread the word about WebODM and OpenDroneMap on social media.
  - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [premium support package](https://webodm.org/services#premium-support).
  - Become a contributor (see below).
 
