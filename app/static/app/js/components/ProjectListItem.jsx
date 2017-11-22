@@ -4,6 +4,7 @@ import update from 'immutability-helper';
 import TaskList from './TaskList';
 import NewTaskPanel from './NewTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
+import ProgressBar from './ProgressBar';
 import ErrorMessage from './ErrorMessage';
 import EditProjectDialog from './EditProjectDialog';
 import Dropzone from '../vendor/dropzone';
@@ -26,7 +27,6 @@ class ProjectListItem extends React.Component {
 
     this.state = {
       showTaskList: this.historyNav.isValueInQSList("project_task_open", props.data.id),
-      updatingTask: false,
       upload: this.getDefaultUploadState(),
       error: "",
       data: props.data,
@@ -64,7 +64,6 @@ class ProjectListItem extends React.Component {
   }
 
   componentWillUnmount(){
-    if (this.updateTaskRequest) this.updateTaskRequest.abort();
     if (this.deleteProjectRequest) this.deleteProjectRequest.abort();
     if (this.refreshRequest) this.refreshRequest.abort();
   }
@@ -73,13 +72,13 @@ class ProjectListItem extends React.Component {
     return {
       uploading: false,
       editing: false,
+      resizing: false,
+      resizedImages: 0,
       error: "",
       progress: 0,
       totalCount: 0,
       totalBytes: 0,
-      totalBytesSent: 0,
-      savedTaskInfo: false,
-      taskId: null
+      totalBytesSent: 0
     };
   }
 
@@ -109,7 +108,7 @@ class ProjectListItem extends React.Component {
           parallelUploads: 9999999,
           uploadMultiple: true,
           acceptedFiles: "image/*, .txt",
-          autoProcessQueue: true,
+          autoProcessQueue: false,
           createImageThumbnails: false,
           clickable: this.uploadButton,
           
@@ -123,16 +122,17 @@ class ProjectListItem extends React.Component {
             progress, totalBytes, totalBytesSent
           });
         })
-        .on("addedfile", () => {
+        .on("addedfiles", files => {
           this.setUploadState({
-            totalCount: this.state.upload.totalCount + 1
+            editing: true,
+            totalCount: files.length
           });
         })
-        .on("processingmultiple", () => {
-          this.setUploadState({
-            uploading: true,
-            editing: true
-          })
+        .on("transformcompleted", (total) => {
+          this.setUploadState({resizedImages: total});
+        })
+        .on("transformend", () => {
+          this.setUploadState({resizing: false, uploading: true});
         })
         .on("completemultiple", (files) => {
           // Check
@@ -141,24 +141,20 @@ class ProjectListItem extends React.Component {
           // All files have uploaded!
           if (success){
             this.setUploadState({uploading: false});
-
             try{
               let response = JSON.parse(files[0].xhr.response);
               if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
               
-              let taskId = response.id;
-              this.setUploadState({taskId});
-
-              // Update task information (if the user has completed this step)
-              if (this.state.upload.savedTaskInfo){
-                this.updateTaskInfo(taskId, this.newTaskPanel.getTaskInfo());
+              if (this.state.showTaskList){
+                this.taskList.refresh();
               }else{
-                // Need to wait for user to confirm task options
+                this.setState({showTaskList: true});
               }
+              this.resetUploadState();
+              this.refresh();
             }catch(e){
-              this.setUploadState({error: `Invalid response from server: ${e.message}`})
+              this.setUploadState({error: `Invalid response from server: ${e.message}`, uploading: false})
             }
-
           }else{
             this.setUploadState({
               uploading: false,
@@ -170,47 +166,19 @@ class ProjectListItem extends React.Component {
           this.resetUploadState();
         })
         .on("dragenter", () => {
-          this.resetUploadState();
+          if (!this.state.upload.uploading && !this.state.upload.resizing){
+            this.resetUploadState();
+          }
         })
         .on("sending", (file, xhr, formData) => {
-          if (!formData.has("auto_processing_node")){
-            formData.append('auto_processing_node', "false");
-          }
+          const taskInfo = this.dz._taskInfo;
+
+          if (!formData.has("name")) formData.append("name", taskInfo.name);
+          if (!formData.has("options")) formData.append("options", JSON.stringify(taskInfo.options));
+          if (!formData.has("processing_node")) formData.append("processing_node", taskInfo.selectedNode.id);
+          if (!formData.has("auto_processing_node")) formData.append("auto_processing_node", taskInfo.selectedNode.key == "auto");
         });
     }
-  }
-
-  updateTaskInfo(taskId, taskInfo){
-    if (!taskId) throw new Error("taskId is not set");
-    if (!taskInfo) throw new Error("taskId is not set");
-    
-    this.setUploadState({editing: false});
-    this.setState({updatingTask: true});
-
-    this.updateTaskRequest = 
-      $.ajax({
-        url: `/api/projects/${this.state.data.id}/tasks/${this.state.upload.taskId}/`,
-        contentType: 'application/json',
-        data: JSON.stringify({
-          name: taskInfo.name,
-          options: taskInfo.options,
-          processing_node: taskInfo.selectedNode.id,
-          auto_processing_node: taskInfo.selectedNode.key == "auto"
-        }),
-        dataType: 'json',
-        type: 'PATCH'
-      }).done((json) => {
-        if (this.state.showTaskList){
-          this.taskList.refresh();
-        }else{
-          this.setState({showTaskList: true});
-        }
-        this.refresh();
-      }).fail(() => {
-        this.setUploadState({error: "Could not update task information. Plese try again."});
-      }).always(() => {
-        this.setState({updatingTask: false});
-      });
   }
 
   setRef(prop){
@@ -255,12 +223,19 @@ class ProjectListItem extends React.Component {
   }
 
   handleTaskSaved(taskInfo){
-    this.setUploadState({savedTaskInfo: true});
+    this.dz._taskInfo = taskInfo; // Allow us to access the task info from dz
 
-    // Has the upload finished?
-    if (!this.state.upload.uploading && this.state.upload.taskId !== null){
-      this.updateTaskInfo(this.state.upload.taskId, taskInfo);
+    // Update dropzone settings
+    if (taskInfo.resizeTo !== null){
+      this.dz.options.resizeWidth = taskInfo.resizeTo;
+      this.dz.options.resizeQuality = 1.0;
+
+      this.setUploadState({resizing: true, editing: false});
+    }else{
+      this.setUploadState({uploading: true, editing: false});
     }
+
+    this.dz.processQueue();
   }
 
   handleEditProject(){
@@ -357,7 +332,18 @@ class ProjectListItem extends React.Component {
         </div>
         <i className="drag-drop-icon fa fa-inbox"></i>
         <div className="row">
-          {this.state.upload.editing ? <UploadProgressBar {...this.state.upload}/> : ""}
+          {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload}/> : ""}
+          {this.state.upload.resizing ? 
+            <ProgressBar
+              current={this.state.upload.resizedImages}
+              total={this.state.upload.totalCount}
+              template={(info) => `Resized ${info.current} of ${info.total} images. Your browser might slow down during this process.`}
+            /> 
+          : ""}
+
+          {this.state.upload.uploading || this.state.upload.resizing ? 
+            <i className="fa fa-refresh fa-spin fa-fw" />
+            : ""}
           
           {this.state.upload.error !== "" ? 
             <div className="alert alert-warning alert-dismissible">
@@ -367,15 +353,11 @@ class ProjectListItem extends React.Component {
             : ""}
 
           {this.state.upload.editing ? 
-            <NewTaskPanel 
-              uploading={this.state.upload.uploading} 
+            <NewTaskPanel
               onSave={this.handleTaskSaved}
-              ref={this.setRef("newTaskPanel")}
+              filesCount={this.state.upload.totalCount}
+              showResize={true}
             />
-          : ""}
-
-          {this.state.updatingTask ? 
-            <span>Updating task information... <i className="fa fa-refresh fa-spin fa-fw"></i></span>
           : ""}
 
           {this.state.showTaskList ? 

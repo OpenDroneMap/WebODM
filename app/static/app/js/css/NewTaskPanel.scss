@@ -17,4 +17,23 @@
     p.header{
         margin: 8px;
     }
+
+    .resize-control{
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 8px;
+        width: 11em;
+        
+        input{
+            width: 8em;
+            display: inline-block;
+        }
+
+        span{
+            width: 2em;
+            opacity: 0.6;
+            font-size: 90%;
+            display: inline-block;
+        }
+    }
 }
