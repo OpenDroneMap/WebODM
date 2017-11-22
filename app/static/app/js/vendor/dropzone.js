@@ -2493,21 +2493,29 @@ var Dropzone = function (_Emitter) {
       // Clumsy way of handling asynchronous calls, until I get to add a proper Future library.
       var doneCounter = 0;
 
+      // Modified for WebODM
       _this17.emit("transformstart", files);
 
-      var _loop = function _loop(i) {
-        _this17.options.transformFile.call(_this17, files[i], function (transformedFile) {
-          transformedFiles[i] = transformedFile;
-          _this17.emit("transformcompleted", files.length);
-          if (++doneCounter === files.length) {
-            _this17.emit("transformend", files);
-            done(transformedFiles);
-          }
-        });
-      };
+      // Process in batches based on the available number of cores
+      var stride = Math.max(1, (navigator.hardwareConcurrency || 2) - 1);
 
-      for (var i = 0; i < files.length; i++) {
-        _loop(i);
+      var process = function(i, s){
+        if (files[i + s]){
+            _this17.options.transformFile.call(_this17, files[i + s], function (transformedFile) {
+              transformedFiles[i + s] = transformedFile;
+              _this17.emit("transformcompleted", doneCounter + 1);
+              if (++doneCounter === files.length) {
+                _this17.emit("transformend", files);
+                done(transformedFiles);
+              }else{
+                process(i + stride, s);
+              }
+            });
+        }
+      }
+      
+      for (var s = 0; s < stride; s++){
+        process(0, s);
       }
     }
 
