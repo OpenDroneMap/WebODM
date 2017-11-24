@@ -220,7 +220,7 @@ class TaskListItem extends React.Component {
 
   checkForMemoryError(lines){
     for (let line of lines){
-      if (line.indexOf("Killed") !== -1 || line.indexOf("MemoryError") !== -1){
+      if (line.indexOf("Killed") !== -1 || line.indexOf("MemoryError") !== -1 || line.indexOf("std::bad_alloc") !== -1){
         this.setState({memoryError: true});
       }
     }
