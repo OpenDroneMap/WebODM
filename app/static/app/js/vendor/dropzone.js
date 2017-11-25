@@ -1399,8 +1399,8 @@ var Dropzone = function (_Emitter) {
 
           var file = _ref11;
 
-          totalBytesSent += file.upload.bytesSent;
-          totalBytes += file.upload.total;
+          totalBytesSent = file.upload.bytesSent;
+          totalBytes = file.upload.total;
         }
         totalUploadProgress = 100 * totalBytesSent / totalBytes;
       } else {
