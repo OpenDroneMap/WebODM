@@ -105,12 +105,14 @@ class ProjectListItem extends React.Component {
       this.dz = new Dropzone(this.dropzone, {
           paramName: "images",
           url : `/api/projects/${this.state.data.id}/tasks/`,
-          parallelUploads: 9999999,
+          parallelUploads: 2147483647,
           uploadMultiple: true,
           acceptedFiles: "image/*, .txt",
           autoProcessQueue: false,
           createImageThumbnails: false,
           clickable: this.uploadButton,
+          chunkSize: 2147483647,
+          timeout: 2147483647,
           
           headers: {
             [csrf.header]: csrf.token
