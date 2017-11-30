@@ -11,7 +11,6 @@ tasks = []
 imageuploads = []
 task_ids = {} # map old task IDs --> new task IDs
 
-
 def task_path(project_id, task_id):
     return os.path.join(settings.MEDIA_ROOT,
                         "project",
@@ -87,23 +86,32 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='task',
-            name='public',
-            field=models.BooleanField(default=False, help_text='A flag indicating whether this task is available to the public'),
-        ),
+        migrations.RunPython(create_uuids),
+        migrations.RunPython(rename_task_folders),
 
-        migrations.RunPython(dump),
-
-        migrations.RemoveField(
-            model_name='imageupload',
-            name='task'
-        ),
-        migrations.AddField(
+        migrations.AlterField(
             model_name='task',
             name='new_id',
-            field=models.UUIDField(null=True)
+            field=models.UUIDField(default=uuid.uuid4, unique=True, serialize=False, editable=False)
         ),
+        migrations.RemoveField('task', 'id'),
+        migrations.RenameField(
+            model_name='task',
+            old_name='new_id',
+            new_name='id'
+        ),
+        migrations.AlterField(
+            model_name='task',
+            name='id',
+            field=models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, serialize=False, editable=False)
+        ),
+
+        migrations.AddField(
+            model_name='imageupload',
+            name='task',
+            field=models.ForeignKey(null=True, on_delete=models.CASCADE, help_text="Task this image belongs to", to='app.Task')
+        ),
+        migrations.RunPython(restoreImageUploadFks),
         
 
     ]

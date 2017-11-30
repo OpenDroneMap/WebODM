@@ -87,6 +87,8 @@ class Task(models.Model):
         (pending_actions.RESTART, 'RESTART'),
     )
 
+    id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
+
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
     name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
@@ -110,7 +112,6 @@ class Task(models.Model):
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
 
     public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
-    public_uuid = models.UUIDField(db_index=True, unique=True, default=uuid_module.uuid4, help_text="Unique identifier used to retrieve a publicly shared task. This is better than ID because it's not sequential.")
 
 
     def __init__(self, *args, **kwargs):
