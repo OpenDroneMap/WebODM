@@ -1,0 +1,15 @@
+{% extends "app/base.html" %}
+{% load i18n %}
+
+{% block page-wrapper %}
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'MapView' attrs='async' %}
+
+	<div data-mapview 
+		{% for key, value in params %}
+			data-{{key}}="{{value}}"
+		{% endfor %}
+	></div>
+
+    {{ SETTINGS.theme.html_after_header|safe }}
+{% endblock %}

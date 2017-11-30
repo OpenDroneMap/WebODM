@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import zipfile
+import uuid as uuid_module
 
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
@@ -107,6 +108,10 @@ class Task(models.Model):
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
+
+    public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
+    public_uuid = models.UUIDField(db_index=True, unique=True, default=uuid_module.uuid4, help_text="Unique identifier used to retrieve a publicly shared task. This is better than ID because it's not sequential.")
+
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)

@@ -36,7 +36,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
         exclude = ('processing_lock', 'console_output', 'orthophoto_extent', 'dsm_extent', 'dtm_extent', )
-        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', )
+        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', 'public_uuid', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -173,11 +173,15 @@ class TaskNestedView(APIView):
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'console_output', )
 
     def get_and_check_task(self, request, pk, project_pk, annotate={}):
-        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.annotate(**annotate).get(pk=pk, project=project_pk)
         except ObjectDoesNotExist:
             raise exceptions.NotFound()
+
+        # Check for permissions, unless the task is public
+        if not task.public:
+            get_and_check_project(request, project_pk)
+
         return task
 
 

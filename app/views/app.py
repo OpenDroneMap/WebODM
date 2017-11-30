@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from guardian.shortcuts import get_objects_for_user
 
 from nodeodm.models import ProcessingNode
-from .models import Project, Task
+from app.models import Project, Task
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
@@ -41,7 +41,6 @@ def dashboard(request):
 @login_required
 def map(request, project_pk=None, task_pk=None):
     title = _("Map")
-    tiles = []
 
     if project_pk is not None:
         project = get_object_or_404(Project, pk=project_pk)
