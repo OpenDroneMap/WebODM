@@ -148,7 +148,7 @@ class TestApiTask(BootTransactionTestCase):
         # Should have returned the id of the newly created task
         task = Task.objects.latest('created_at')
         self.assertTrue('id' in res.data)
-        self.assertTrue(task.id == res.data['id'])
+        self.assertTrue(str(task.id) == res.data['id'])
 
         # Two images should have been uploaded
         self.assertTrue(ImageUpload.objects.filter(task=task).count() == 2)

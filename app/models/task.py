@@ -439,7 +439,7 @@ class Task(models.Model):
         return {
             'tiles': [{'url': self.get_tile_json_url(t), 'type': t} for t in types],
             'meta': {
-                'task': self.id,
+                'task': str(self.id),
                 'project': self.project.id
             }
         }

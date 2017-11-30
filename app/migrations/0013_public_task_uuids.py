@@ -40,7 +40,7 @@ def create_uuids(apps, schema_editor):
         t.new_id = task['new_id']
         t.save()
 
-    print("Created UUIDs")
+    if len(tasks) > 0: print("Created UUIDs")
 
 
 def restore(apps, schema_editor):

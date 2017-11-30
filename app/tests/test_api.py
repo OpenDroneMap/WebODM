@@ -101,12 +101,12 @@ class TestApi(BootTestCase):
 
         # Can sort
         res = client.get('/api/projects/{}/tasks/?ordering=created_at'.format(project.id))
-        self.assertTrue(res.data[0]['id'] == task.id)
-        self.assertTrue(res.data[1]['id'] == task2.id)
+        self.assertTrue(res.data[0]['id'] == str(task.id))
+        self.assertTrue(res.data[1]['id'] == str(task2.id))
 
         res = client.get('/api/projects/{}/tasks/?ordering=-created_at'.format(project.id))
-        self.assertTrue(res.data[0]['id'] == task2.id)
-        self.assertTrue(res.data[1]['id'] == task.id)
+        self.assertTrue(res.data[0]['id'] == str(task2.id))
+        self.assertTrue(res.data[1]['id'] == str(task.id))
 
         # Cannot list project tasks for a project we don't have access to
         res = client.get('/api/projects/{}/tasks/'.format(other_project.id))
@@ -119,7 +119,7 @@ class TestApi(BootTestCase):
         # Can list task details for a task belonging to a project we have access to
         res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(res.data["id"] == task.id)
+        self.assertTrue(res.data["id"] == str(task.id))
 
         # images_count field exists
         self.assertTrue(res.data["images_count"] == 0)
@@ -155,7 +155,11 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Cannot access task details for a task that doesn't exist
-        res = client.get('/api/projects/{}/tasks/999/'.format(project.id, other_task.id))
+        res = client.get('/api/projects/{}/tasks/4004d1e9-ed2c-4983-8b93-fc7577ee6d89/'.format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Cannot access task details for a malformed task id
+        res = client.get('/api/projects/{}/tasks/0/'.format(project.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Can update a task

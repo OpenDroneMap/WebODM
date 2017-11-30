@@ -83,7 +83,7 @@ def model_display(request, project_pk=None, task_pk=None):
         'title': title,
         'params': {
             'task': json.dumps({
-                'id': task.id,
+                'id': str(task.id),
                 'project': project.id,
                 'available_assets': task.available_assets
             })
