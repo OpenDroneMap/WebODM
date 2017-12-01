@@ -1,0 +1,24 @@
+.sharePopup{
+	position: relative;
+	top: -56px;
+	display: block;
+
+	&.popover.top > .arrow{
+		left: auto;
+		right: 60px;
+	}
+
+	h3.popover-title{
+		padding-top: 8px;
+	}
+
+	.checkbox{
+		margin-top: 0;
+	}
+
+	.fa-refresh{
+		margin-left: -25px;
+		margin-right: 5px;
+	}
+}
+
