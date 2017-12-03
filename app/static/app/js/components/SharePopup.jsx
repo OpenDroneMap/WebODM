@@ -2,12 +2,16 @@ import React from 'react';
 import '../css/SharePopup.scss';
 import PropTypes from 'prop-types';
 import ErrorMessage from './ErrorMessage';
+import Utils from '../classes/Utils';
+import ClipboardInput from './ClipboardInput';
 
 class SharePopup extends React.Component{
   static propTypes = {
-    task: PropTypes.object.isRequired
+    task: PropTypes.object.isRequired,
+    taskChanged: PropTypes.func
   };
   static defaultProps = {
+    taskChanged: () => {}
   };
 
   constructor(props){
@@ -22,6 +26,12 @@ class SharePopup extends React.Component{
     this.handleEnableSharing = this.handleEnableSharing.bind(this);
   }
 
+  componentDidMount(){
+    if (!this.state.task.public){
+      this.handleEnableSharing();
+    }
+  }
+
   handleEnableSharing(e){
     const { task } = this.state;
 
@@ -31,13 +41,14 @@ class SharePopup extends React.Component{
         url: `/api/projects/${task.project}/tasks/${task.id}/`,
         contentType: 'application/json',
         data: JSON.stringify({
-          public: e.target.checked
+          public: !this.state.task.public
         }),
         dataType: 'json',
         type: 'PATCH'
       })
       .done((task) => {
         this.setState({task});
+        this.props.taskChanged(task);
       })
       .fail(() => this.setState({error: "An error occurred. Check your connection and permissions."}))
       .always(() => {
@@ -46,13 +57,17 @@ class SharePopup extends React.Component{
   }
 
   render(){
+    const shareLink = Utils.absoluteUrl(`/public/task/${this.state.task.id}/map/`);
+    const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/`);
+    const iframeCode = `<iframe>${iframeUrl}</iframe>`;
+
     return (<div className="sharePopup popover top in">
       <div className="arrow"></div>
-      <h3 className="popover-title theme-background-highlight">Share</h3>
+      <h3 className="popover-title theme-background-highlight">Share This Task</h3>
       <div className="popover-content theme-secondary">
         <ErrorMessage bind={[this, 'error']} />
         <div className="checkbox">
-          <label>
+          <label onClick={this.handleEnableSharing}>
             {this.state.togglingShare ? 
               <i className="fa fa-refresh fa-spin fa-fw"></i>
             : ""}
@@ -61,18 +76,38 @@ class SharePopup extends React.Component{
               className={this.state.togglingShare ? "hide" : ""}
               type="checkbox" 
               checked={this.state.task.public}
-              onChange={this.handleEnableSharing}
+              onChange={() => {}}
                />
-            Enable sharing
+            Enabled
           </label>
         </div>
-
-        {this.state.task.public ? 
-          <div>A large<br/>bunch<br/>bunch<br/>bunch<br/>bunch<br/>bunch<br/></div>
-        : ""}
+        <div className={"share-links " + (this.state.task.public ? "show" : "")}>
+          <div className="form-group">
+            <label>
+              Link:
+              <ClipboardInput 
+                type="text" 
+                className="form-control" 
+                value={shareLink} 
+                readOnly={true} 
+                />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              HTML iframe:
+              <ClipboardInput 
+                type="text" 
+                className="form-control" 
+                value={iframeCode} 
+                readOnly={true} 
+                />
+            </label>
+          </div>
+        </div>
       </div>
     </div>);
-  }
+  }       
 }
 
 export default SharePopup;

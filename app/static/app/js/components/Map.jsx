@@ -51,6 +51,7 @@ class Map extends React.Component {
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
+    this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
   }
 
   updatePopupFor(layer){
@@ -257,16 +258,29 @@ class Map extends React.Component {
     }
   }
 
+  handleMapMouseDown(e){
+    // Make sure the share popup closes
+    this.shareButton.hidePopup();
+  }
+
   render() {
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div 
           style={{height: "100%"}}
-          ref={(domNode) => (this.container = domNode)}>
+          ref={(domNode) => (this.container = domNode)}
+          onMouseDown={this.handleMapMouseDown}
+          >
+        </div>
+        
 
+        <div className="actionButtons">
           {this.state.singleTask !== null ? 
-            <ShareButton task={this.state.singleTask} />
+            <ShareButton 
+              ref={(ref) => { this.shareButton = ref; }}
+              task={this.state.singleTask} 
+            />
           : ""}
           <SwitchModeButton 
             task={this.state.singleTask}

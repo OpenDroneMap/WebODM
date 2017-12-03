@@ -15,26 +15,41 @@ class ShareButton extends React.Component {
   constructor(props){
     super(props);
 
-    this.state = { showPopup: false };
+    this.state = { 
+      showPopup: false,
+      task: props.task
+    };
 
     this.handleClick = this.handleClick.bind(this);
+    this.handleTaskChanged = this.handleTaskChanged.bind(this);
   }
 
   handleClick(){
     this.setState({ showPopup: !this.state.showPopup });
   }
 
+  hidePopup(){
+    this.setState({showPopup: false});
+  }
+
+  handleTaskChanged(task){
+    this.setState({task});
+  }
+
   render() {
     return (
-      <div className="shareButton">
+      <div className="shareButton" onClick={e => { e.stopPropagation(); }}>
         {this.state.showPopup ? 
-          <SharePopup task={this.props.task} />
+          <SharePopup 
+            task={this.state.task}
+            taskChanged={this.handleTaskChanged}
+          />
         : ""}
         <button 
           ref={(domNode) => { this.shareButton = domNode; }}
           type="button"
           onClick={this.handleClick}
-          className={"shareButton btn btn-sm " + (this.props.task.public ? "btn-primary" : "btn-secondary")}>
+          className={"shareButton btn btn-sm " + (this.state.task.public ? "btn-primary" : "btn-secondary")}>
           <i className="fa fa-share-alt"></i> Share
         </button>
       </div>

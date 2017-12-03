@@ -189,7 +189,7 @@ pre.prettyprint,
 }
 
 /* Success */
-.task-list-item .status-label.done{
+.task-list-item .status-label.done, .theme-background-success{
 	background-color: theme("success");
 }
 
