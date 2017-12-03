@@ -5,12 +5,16 @@ import PropTypes from 'prop-types';
 class SwitchModeButton extends React.Component {
   static defaultProps = {
     task: null,
-    type: "mapToModel"
+    type: "mapToModel",
+    public: false,
+    style: {}
   };
 
   static propTypes = {
     task: PropTypes.object, // The object should contain two keys: {id: <taskId>, project: <projectId>}
-    type: PropTypes.string // Either "mapToModel" or "modelToMap"
+    type: PropTypes.string, // Either "mapToModel" or "modelToMap"
+    public: PropTypes.bool, // Whether to use public or private URLs
+    style: PropTypes.object
   };
 
   constructor(props){
@@ -24,8 +28,13 @@ class SwitchModeButton extends React.Component {
 
   handleClick(){
     if (this.props.task){
-      const prefix = this.props.type === 'mapToModel' ? '3d' : 'map';
-      location.href = `/${prefix}/project/${this.props.task.project}/task/${this.props.task.id}/`;
+      const target = this.props.type === 'mapToModel' ? '3d' : 'map';
+
+      let url = this.props.public ? 
+                `../${target}/`
+              : `/${target}/project/${this.props.task.project}/task/${this.props.task.id}/`;
+      
+      location.href = url;
     }
   }
 
@@ -40,6 +49,7 @@ class SwitchModeButton extends React.Component {
   render() {
     return (
       <button 
+        style={this.props.style}
         onClick={this.handleClick}
         type="button"
         className={"switchModeButton btn btn-sm btn-secondary " + (!this.props.task ? "hide" : "")}>

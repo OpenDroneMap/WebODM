@@ -8,9 +8,12 @@ import ClipboardInput from './ClipboardInput';
 class SharePopup extends React.Component{
   static propTypes = {
     task: PropTypes.object.isRequired,
+    linksTarget: PropTypes.oneOf(['map', '3d']).isRequired,
+    placement: PropTypes.string,
     taskChanged: PropTypes.func
   };
   static defaultProps = {
+    placement: 'top',
     taskChanged: () => {}
   };
 
@@ -57,11 +60,12 @@ class SharePopup extends React.Component{
   }
 
   render(){
-    const shareLink = Utils.absoluteUrl(`/public/task/${this.state.task.id}/map/`);
-    const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/`);
+    const shareLink = Utils.absoluteUrl(`/public/task/${this.state.task.id}/${this.props.linksTarget}/`);
+    const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/${this.props.linksTarget}/`);
     const iframeCode = `<iframe>${iframeUrl}</iframe>`;
 
-    return (<div className="sharePopup popover top in">
+    return (<div onMouseDown={e => { e.stopPropagation(); }}
+        className={"sharePopup popover in " + this.props.placement}>
       <div className="arrow"></div>
       <h3 className="popover-title theme-background-highlight">Share This Task</h3>
       <div className="popover-content theme-secondary">
@@ -77,8 +81,7 @@ class SharePopup extends React.Component{
               type="checkbox" 
               checked={this.state.task.public}
               onChange={() => {}}
-               />
-            Enabled
+               /> Enabled
           </label>
         </div>
         <div className={"share-links " + (this.state.task.public ? "show" : "")}>

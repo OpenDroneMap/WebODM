@@ -24,7 +24,8 @@ class Map extends React.Component {
     minzoom: 0,
     showBackground: false,
     opacity: 100,
-    mapType: "orthophoto"
+    mapType: "orthophoto",
+    public: false
   };
 
   static propTypes = {
@@ -33,7 +34,8 @@ class Map extends React.Component {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
     opacity: PropTypes.number,
-    mapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm'])
+    mapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
+    public: PropTypes.bool
   };
 
   constructor(props) {
@@ -276,15 +278,17 @@ class Map extends React.Component {
         
 
         <div className="actionButtons">
-          {this.state.singleTask !== null ? 
+          {(!this.props.public && this.state.singleTask !== null) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
               task={this.state.singleTask} 
+              linksTarget="map"
             />
           : ""}
           <SwitchModeButton 
             task={this.state.singleTask}
-            type="mapToModel" />
+            type="mapToModel" 
+            public={this.props.public} />
         </div>
       </div>
     );

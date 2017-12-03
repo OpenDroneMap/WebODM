@@ -7,9 +7,12 @@ import $ from 'jquery';
 class ShareButton extends React.Component {
   static defaultProps = {
     task: null,
+    popupPlacement: 'top'
   };
   static propTypes = {
-    task: PropTypes.object.isRequired
+    task: PropTypes.object.isRequired,
+    linksTarget: PropTypes.oneOf(['map', '3d']).isRequired,
+    popupPlacement: PropTypes.string
   }
 
   constructor(props){
@@ -37,14 +40,17 @@ class ShareButton extends React.Component {
   }
 
   render() {
-    return (
-      <div className="shareButton" onClick={e => { e.stopPropagation(); }}>
-        {this.state.showPopup ? 
-          <SharePopup 
+    const popup = <SharePopup 
             task={this.state.task}
             taskChanged={this.handleTaskChanged}
-          />
-        : ""}
+            placement={this.props.popupPlacement}
+            linksTarget={this.props.linksTarget}
+          />;
+
+    return (
+      <div className="shareButton" onClick={e => { e.stopPropagation(); }}>
+        {this.props.popupPlacement === 'top' && this.state.showPopup ? 
+          popup : ""}
         <button 
           ref={(domNode) => { this.shareButton = domNode; }}
           type="button"
@@ -52,6 +58,8 @@ class ShareButton extends React.Component {
           className={"shareButton btn btn-sm " + (this.state.task.public ? "btn-primary" : "btn-secondary")}>
           <i className="fa fa-share-alt"></i> Share
         </button>
+        {this.props.popupPlacement === 'bottom' && this.state.showPopup ? 
+          popup : ""}
       </div>
     );
   }

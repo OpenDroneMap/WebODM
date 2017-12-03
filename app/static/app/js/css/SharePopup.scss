@@ -1,11 +1,20 @@
 .sharePopup{
 	position: relative;
-	top: -32px;
 	display: block;
+
+	&.top{
+		top: -32px;
+	}
+	&.bottom{
+		top: 32px;
+	}
 
 	&.popover.top > .arrow{
 		left: auto;
 		right: 60px;
+	}
+	&.popover.bottom > .arrow{
+		left: 25px;
 	}
 
 	h3.popover-title{

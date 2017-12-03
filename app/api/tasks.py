@@ -9,6 +9,7 @@ from django.db.models.functions import Cast
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
@@ -36,7 +37,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
         exclude = ('processing_lock', 'console_output', 'orthophoto_extent', 'dsm_extent', 'dtm_extent', )
-        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', 'public_uuid', )
+        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -171,6 +172,7 @@ class TaskViewSet(viewsets.ViewSet):
 
 class TaskNestedView(APIView):
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'console_output', )
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_and_check_task(self, request, pk, project_pk, annotate={}):
         try:

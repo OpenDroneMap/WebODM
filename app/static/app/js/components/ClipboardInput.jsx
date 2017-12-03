@@ -33,7 +33,7 @@ class ClipboardInput extends React.Component{
           onBlur={() => { this.setState({showCopied: false}); }}
          />
         <div style={{position: 'relative', 'width': '100%'}}>
-          <div className={"copied theme-background-success " + (this.state.showCopied ? "show" : "")}>Copied to clipboard!</div>
+          <div className={"copied theme-background-success " + (this.state.showCopied ? "show" : "")}>Copied to clipboard</div>
         </div>
     </div>);
   }       

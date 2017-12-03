@@ -447,6 +447,17 @@ class Task(models.Model):
             }
         }
 
+    def get_model_display_params(self):
+        """
+        Subset of a task fields used in the 3D model display view
+        """
+        return {
+            'id': str(self.id),
+            'project': self.project.id,
+            'available_assets': self.available_assets,
+            'public': self.public
+        }
+
     def generate_deferred_asset(self, archive, directory):
         """
         :param archive: path of the destination .zip file (relative to /assets/ directory)

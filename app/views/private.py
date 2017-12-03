@@ -59,7 +59,8 @@ def map(request, project_pk=None, task_pk=None):
             'title': title,
             'params': {
                 'map-items': json.dumps(mapItems),
-                'title': title
+                'title': title,
+                'public': 'false'
             }.items()
         })
 
@@ -80,15 +81,12 @@ def model_display(request, project_pk=None, task_pk=None):
             raise Http404()
 
     return render(request, 'app/3d_model_display.html', {
-        'title': title,
-        'params': {
-            'task': json.dumps({
-                'id': str(task.id),
-                'project': project.id,
-                'available_assets': task.available_assets
-            })
-        }.items()
-    })
+            'title': title,
+            'params': {
+                'task': json.dumps(task.get_model_display_params()),
+                'public': 'false'
+            }.items()
+        })
 
 
 @login_required
