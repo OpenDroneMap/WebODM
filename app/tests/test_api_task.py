@@ -148,7 +148,7 @@ class TestApiTask(BootTransactionTestCase):
         # Should have returned the id of the newly created task
         task = Task.objects.latest('created_at')
         self.assertTrue('id' in res.data)
-        self.assertTrue(task.id == res.data['id'])
+        self.assertTrue(str(task.id) == res.data['id'])
 
         # Two images should have been uploaded
         self.assertTrue(ImageUpload.objects.filter(task=task).count() == 2)
@@ -243,6 +243,39 @@ class TestApiTask(BootTransactionTestCase):
         for tile_type in tile_types:
             res = client.get("/api/projects/{}/tasks/{}/{}/tiles/16/16020/42443.png".format(project.id, task.id, tile_type))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        # Another user does not have access to the resources
+        other_client = APIClient()
+        other_client.login(username="testuser2", password="test1234")
+
+        def accessResources(expectedStatus):
+            for tile_type in tile_types:
+                res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
+                self.assertTrue(res.status_code == expectedStatus)
+
+            res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles/16/16020/42443.png".format(project.id, task.id, tile_type))
+            self.assertTrue(res.status_code == expectedStatus)
+
+        accessResources(status.HTTP_404_NOT_FOUND)
+
+        # Original owner enables sharing
+        res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+            'public': True
+        })
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        # Now other user can acccess resources
+        accessResources(status.HTTP_200_OK)
+
+        # User logs out
+        other_client.logout()
+
+        # He can still access the resources as anonymous
+        accessResources(status.HTTP_200_OK)
+
+        # Other user still does not have access to certain parts of the API
+        res = other_client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
 
         # Restart a task
         testWatch.clear()

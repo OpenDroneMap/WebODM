@@ -159,6 +159,9 @@ footer,
 .dropdown-menu .divider{
 	background-color: theme("border");
 }
+.popover-title{
+	border-bottom-color: theme("border");
+}
 
 /* Highlight */
 .task-list-item:nth-child(odd),
@@ -186,7 +189,7 @@ pre.prettyprint,
 }
 
 /* Success */
-.task-list-item .status-label.done{
+.task-list-item .status-label.done, .theme-background-success{
 	background-color: theme("success");
 }
 

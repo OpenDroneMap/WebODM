@@ -1,0 +1,14 @@
+{% extends "app/public/base.html" %}
+
+{% block content %}
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'ModelView' attrs='async' %}
+
+	<h3><i class="fa fa-cube"></i> {{title}}</h3>
+
+	<div data-modelview
+		{% for key, value in params %}
+			data-{{key}}="{{value}}"
+		{% endfor %}
+	></div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "app/base.html" %}
+
+{% block page-wrapper %}
+    {{ SETTINGS.theme.html_after_header|safe }}
+
+    <div id="public-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+{% endblock %}

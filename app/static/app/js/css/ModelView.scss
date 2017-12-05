@@ -67,6 +67,15 @@
                 }
             }
         }
+
+        .action-buttons-row{
+            margin-top: 12px;
+
+            & > *{
+                display: inline-block;
+                margin-right: 8px;
+            }
+        }
     }
     
 

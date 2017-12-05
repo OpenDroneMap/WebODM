@@ -1,0 +1,12 @@
+{% extends "app/public/iframe_base.html" %}
+
+{% block content %}
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'ModelView' attrs='async' %}
+
+	<div data-modelview
+		{% for key, value in params %}
+			data-{{key}}="{{value}}"
+		{% endfor %}
+	></div>
+{% endblock %}

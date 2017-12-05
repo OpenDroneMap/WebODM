@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from guardian.shortcuts import get_objects_for_user
 
 from nodeodm.models import ProcessingNode
-from .models import Project, Task
+from app.models import Project, Task
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
@@ -41,7 +41,6 @@ def dashboard(request):
 @login_required
 def map(request, project_pk=None, task_pk=None):
     title = _("Map")
-    tiles = []
 
     if project_pk is not None:
         project = get_object_or_404(Project, pk=project_pk)
@@ -60,7 +59,8 @@ def map(request, project_pk=None, task_pk=None):
             'title': title,
             'params': {
                 'map-items': json.dumps(mapItems),
-                'title': title
+                'title': title,
+                'public': 'false'
             }.items()
         })
 
@@ -81,15 +81,12 @@ def model_display(request, project_pk=None, task_pk=None):
             raise Http404()
 
     return render(request, 'app/3d_model_display.html', {
-        'title': title,
-        'params': {
-            'task': json.dumps({
-                'id': task.id,
-                'project': project.id,
-                'available_assets': task.available_assets
-            })
-        }.items()
-    })
+            'title': title,
+            'params': {
+                'task': json.dumps(task.get_model_display_params()),
+                'public': 'false'
+            }.items()
+        })
 
 
 @login_required
