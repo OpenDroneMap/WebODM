@@ -4,6 +4,10 @@
 
 A free, user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
 
+
+![image](https://user-images.githubusercontent.com/1951843/33631371-5c55cc2c-d9d8-11e7-8609-b9032d4bbbb6.png)
+
+
 * [Getting Started](#getting-started)
     * [Add More Processing Nodes](#add-more-processing-nodes)
     * [Security](#security)
@@ -22,11 +26,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 ![Alt text](https://user-images.githubusercontent.com/1951843/28586405-af18e8cc-7141-11e7-9853-a7feca7c9c6b.gif)
 
-![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
-
 ![Alt text](/screenshots/pointcloud.png?raw=true "3D Display")
-
-![Alt text](https://user-images.githubusercontent.com/1951843/28586977-8588ebfe-7143-11e7-94d6-a66bf02c1517.png)
 
 
 ## Getting Started
