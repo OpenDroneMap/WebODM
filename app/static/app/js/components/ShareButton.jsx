@@ -27,7 +27,7 @@ class ShareButton extends React.Component {
     this.handleTaskChanged = this.handleTaskChanged.bind(this);
   }
 
-  handleClick(){
+  handleClick(e){
     this.setState({ showPopup: !this.state.showPopup });
   }
 
@@ -52,7 +52,6 @@ class ShareButton extends React.Component {
         {this.props.popupPlacement === 'top' && this.state.showPopup ? 
           popup : ""}
         <button 
-          ref={(domNode) => { this.shareButton = domNode; }}
           type="button"
           onClick={this.handleClick}
           className={"shareButton btn btn-sm " + (this.state.task.public ? "btn-primary" : "btn-secondary")}>

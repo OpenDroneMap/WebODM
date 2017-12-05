@@ -38,7 +38,7 @@ class ModelView extends React.Component {
     this.modelReference = null;
 
     this.toggleTexturedModel = this.toggleTexturedModel.bind(this);
-    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseClick = this.handleMouseClick.bind(this);
   }
 
   assetsPath(){
@@ -70,7 +70,7 @@ class ModelView extends React.Component {
     return 'odm_textured_model.mtl';
   }
 
-  handleMouseDown(e){
+  handleMouseClick(e){
     // Make sure the share popup closes
     this.shareButton.hidePopup();
   }
@@ -198,7 +198,7 @@ class ModelView extends React.Component {
                   </div>
               </div>
 
-              <div id="potree_sidebar_container" onMouseDown={this.handleMouseDown}>
+              <div id="potree_sidebar_container" onClick={this.handleMouseClick}>
 
                 <div id="sidebar_root" 
                   className="navmenu navmenu-default navmenu-fixed-left unselectable">

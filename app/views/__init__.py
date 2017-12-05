@@ -1,2 +1,2 @@
-from . import private
+from . import app
 from . import public

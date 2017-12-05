@@ -60,7 +60,7 @@ export default {
       if (path[0] === '/') path = path.slice(1);
 
       let parser = document.createElement('a');
-      parser.href = window.location.href;
+      parser.href = href;
 
       return `${parser.protocol}//${parser.host}/${path}`;
     }
