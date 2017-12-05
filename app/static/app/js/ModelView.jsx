@@ -4,6 +4,7 @@ import ErrorMessage from './components/ErrorMessage';
 import SwitchModeButton from './components/SwitchModeButton';
 import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
+import ShareButton from './components/ShareButton';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
 
@@ -15,11 +16,13 @@ import Potree from './vendor/potree';
 
 class ModelView extends React.Component {
   static defaultProps = {
-    task: null
+    task: null,
+    public: false
   };
 
   static propTypes = {
       task: PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
+      public: PropTypes.bool // Is the view being displayed via a shared link?
   };
 
   constructor(props){
@@ -35,6 +38,7 @@ class ModelView extends React.Component {
     this.modelReference = null;
 
     this.toggleTexturedModel = this.toggleTexturedModel.bind(this);
+    this.handleMouseClick = this.handleMouseClick.bind(this);
   }
 
   assetsPath(){
@@ -64,6 +68,11 @@ class ModelView extends React.Component {
   mtlFilename(){
     // For some reason, loading odm_textured_model_geo.mtl does not load textures properly
     return 'odm_textured_model.mtl';
+  }
+
+  handleMouseClick(e){
+    // Make sure the share popup closes
+    this.shareButton.hidePopup();
   }
 
   componentDidMount() {
@@ -179,7 +188,6 @@ class ModelView extends React.Component {
             className="container"
             style={{height: "100%", width: "100%", position: "relative"}} 
             onContextMenu={(e) => {e.preventDefault();}}>
-
               <div 
                 id="potree_render_area" 
                 ref={(domNode) => { this.container = domNode; }}>
@@ -190,7 +198,7 @@ class ModelView extends React.Component {
                   </div>
               </div>
 
-              <div id="potree_sidebar_container">
+              <div id="potree_sidebar_container" onClick={this.handleMouseClick}>
 
                 <div id="sidebar_root" 
                   className="navmenu navmenu-default navmenu-fixed-left unselectable">
@@ -210,10 +218,23 @@ class ModelView extends React.Component {
                       task={this.props.task} 
                       direction="down" 
                       buttonClass="btn-secondary" />
-                    {showSwitchModeButton ? 
-                      <SwitchModeButton 
-                        task={this.props.task}
-                        type="modelToMap" /> : ""}
+                    
+                    <div className="action-buttons-row">
+                      {(!this.props.public) ? 
+                        <ShareButton 
+                          ref={(ref) => { this.shareButton = ref; }}
+                          task={this.props.task} 
+                          popupPlacement="bottom"
+                          linksTarget="3d"
+                        />
+                      : ""}
+                      {showSwitchModeButton ? 
+                        <SwitchModeButton 
+                          public={this.props.public}
+                          style={{marginLeft: this.props.public ? '0' : '76px'}}
+                          task={this.props.task}
+                          type="modelToMap" /> : ""}
+                    </div>
                   </div>
 
                   <div className="accordion">

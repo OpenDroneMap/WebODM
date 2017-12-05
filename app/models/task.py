@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import zipfile
+import uuid as uuid_module
 
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
@@ -86,6 +87,8 @@ class Task(models.Model):
         (pending_actions.RESTART, 'RESTART'),
     )
 
+    id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
+
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
     name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
@@ -107,6 +110,9 @@ class Task(models.Model):
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
+
+    public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
+
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -433,9 +439,23 @@ class Task(models.Model):
         return {
             'tiles': [{'url': self.get_tile_json_url(t), 'type': t} for t in types],
             'meta': {
-                'task': self.id,
-                'project': self.project.id
+                'task': {
+                    'id': str(self.id),
+                    'project': self.project.id,
+                    'public': self.public
+                }
             }
+        }
+
+    def get_model_display_params(self):
+        """
+        Subset of a task fields used in the 3D model display view
+        """
+        return {
+            'id': str(self.id),
+            'project': self.project.id,
+            'available_assets': self.available_assets,
+            'public': self.public
         }
 
     def generate_deferred_asset(self, archive, directory):

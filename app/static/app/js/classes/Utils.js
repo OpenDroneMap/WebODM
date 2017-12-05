@@ -53,6 +53,16 @@ export default {
 
     clone: function(obj){
       return JSON.parse(JSON.stringify(obj));
+    },
+
+    // "/a/b" --> http://localhost/a/b
+    absoluteUrl: function(path, href = window.location.href){
+      if (path[0] === '/') path = path.slice(1);
+
+      let parser = document.createElement('a');
+      parser.href = href;
+
+      return `${parser.protocol}//${parser.host}/${path}`;
     }
 };
 

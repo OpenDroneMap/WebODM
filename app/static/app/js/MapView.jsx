@@ -8,13 +8,15 @@ class MapView extends React.Component {
   static defaultProps = {
     mapItems: [],
     selectedMapType: 'orthophoto',
-    title: ""
+    title: "",
+    public: false
   };
 
   static propTypes = {
       mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
       selectedMapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
       title: PropTypes.string,
+      public: PropTypes.bool
   };
 
   constructor(props){
@@ -101,7 +103,8 @@ class MapView extends React.Component {
           tiles={this.state.tiles} 
           showBackground={true} 
           opacity={opacity}
-          mapType={this.state.selectedMapType} />
+          mapType={this.state.selectedMapType} 
+          public={this.props.public} />
         <div className="opacity-slider theme-secondary">
           Opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
         </div>

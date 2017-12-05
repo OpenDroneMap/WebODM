@@ -121,6 +121,31 @@ class TestApp(BootTestCase):
         res = c.get('/3d/project/{}/task/{}/'.format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
+        # Cannot access public URLs unless a task is shared
+        def test_public_views(client, expectedStatus):
+            res = client.get('/public/task/{}/map/'.format(task.id))
+            self.assertTrue(res.status_code == expectedStatus)
+            res = client.get('/public/task/{}/3d/'.format(task.id))
+            self.assertTrue(res.status_code == expectedStatus)
+            res = client.get('/public/task/{}/iframe/3d/'.format(task.id))
+            self.assertTrue(res.status_code == expectedStatus)
+            res = client.get('/public/task/{}/iframe/map/'.format(task.id))
+            self.assertTrue(res.status_code == expectedStatus)
+
+        test_public_views(c, status.HTTP_404_NOT_FOUND)
+
+        # Share task
+        task.public = True
+        task.save()
+
+        # Can now access URLs even as anonymous user
+        ac = Client()
+        test_public_views(ac, status.HTTP_200_OK)
+
+
+
+
+
     def test_default_group(self):
         # It exists
         self.assertTrue(Group.objects.filter(name='Default').count() == 1)

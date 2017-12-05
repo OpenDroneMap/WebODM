@@ -3,12 +3,13 @@ import os
 
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.models.functions import Envelope
-from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation
+from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.db import transaction
 from django.db.models.functions import Cast
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
@@ -56,7 +57,7 @@ class TaskViewSet(viewsets.ViewSet):
         get_and_check_project(request, project_pk, perms)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
         task.pending_action = pending_action
@@ -90,7 +91,7 @@ class TaskViewSet(viewsets.ViewSet):
         get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
         line_num = max(0, int(request.query_params.get('line', 0)))
@@ -109,7 +110,7 @@ class TaskViewSet(viewsets.ViewSet):
         get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
         serializer = TaskSerializer(task)
@@ -145,7 +146,7 @@ class TaskViewSet(viewsets.ViewSet):
         get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
         # Check that a user has access to reassign a project
@@ -171,13 +172,18 @@ class TaskViewSet(viewsets.ViewSet):
 
 class TaskNestedView(APIView):
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'console_output', )
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_and_check_task(self, request, pk, project_pk, annotate={}):
-        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.annotate(**annotate).get(pk=pk, project=project_pk)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
+
+        # Check for permissions, unless the task is public
+        if not task.public:
+            get_and_check_project(request, project_pk)
+
         return task
 
 

@@ -220,7 +220,10 @@ class TaskListItem extends React.Component {
 
   checkForMemoryError(lines){
     for (let line of lines){
-      if (line.indexOf("Killed") !== -1 || line.indexOf("MemoryError") !== -1){
+      if (line.indexOf("Killed") !== -1 || 
+          line.indexOf("MemoryError") !== -1 || 
+          line.indexOf("std::bad_alloc") !== -1 ||
+          line.indexOf("Child returned 137") !== -1){
         this.setState({memoryError: true});
       }
     }
@@ -352,7 +355,7 @@ class TaskListItem extends React.Component {
                 />
 
               {showMemoryErrorWarning ? 
-              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>Advanced Options</a>.</span></div> : ""}
+              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
             
               {showExitedWithCodeOneHints ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
@@ -361,8 +364,8 @@ class TaskListItem extends React.Component {
                     <li>Increase the <b>min-num-features</b> option, especially if your images have lots of vegetation</li>
                     <li>Enable the <b>use-pmvs</b> option.</li>
                   </ul>
-                  Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="https://github.com/OpenDroneMap/WebODM/issues" target="_blank">open an issue</a> on GitHub, making 
-                  sure include a <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>copy of your task's output</a> (the one you see above <i className="fa fa-arrow-up"></i>, click to <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>download</a> it). Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>
+                  Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making 
+                  sure to include a <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>copy of your task's output</a> (the one you see above <i className="fa fa-arrow-up"></i>, click to <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>download</a> it). Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>
                 </div>
               </div>
               : ""}

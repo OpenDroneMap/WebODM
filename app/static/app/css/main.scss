@@ -6,6 +6,37 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     padding-bottom: 8px;
 }
 
+#public-wrapper{
+    margin-left: 12px;
+    margin-right: 12px;
+    position: relative;
+    top: -8px;
+}
+
+#iframe{
+    .map-view{
+        height: 100%;
+        .map-type-selector{
+            z-index: 1000;
+            position: absolute;
+            float: none;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .switchModeButton{
+            bottom: 22px;
+        }
+        .opacity-slider{
+            bottom: 10px;
+        }
+    }
+    [data-mapview], .model-view{
+        height: calc(100vh);
+    }
+}
+
 #navbar-top{
     height: 50px;
     min-height: 50px;

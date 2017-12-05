@@ -33,6 +33,7 @@
     </style>
 </head>
 <body data-admin-utc-offset="{% now "Z" %}">
+{% block body %}
     <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -78,6 +79,7 @@
     {% autoescape off %}
     {% get_footer %}
     {% endautoescape %}
+{% endblock %}
 </body>
 <script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
 <script>

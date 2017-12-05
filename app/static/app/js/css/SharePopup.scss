@@ -1,0 +1,50 @@
+.sharePopup{
+	position: relative;
+	display: block;
+
+	&.top{
+		top: -32px;
+	}
+	&.bottom{
+		top: 32px;
+	}
+
+	&.popover.top > .arrow{
+		left: auto;
+		right: 60px;
+	}
+	&.popover.bottom > .arrow{
+		left: 25px;
+	}
+
+	h3.popover-title{
+		padding-top: 8px;
+	}
+
+	.checkbox{
+		margin-top: 0;
+	}
+
+	.fa-refresh{
+		margin-left: -25px;
+		margin-right: 5px;
+	}
+
+	.share-links{
+		& > div{
+			margin-top: 8px;
+			&:first-child{
+				margin-top: 4px;
+			}
+		}
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 1s ease-in-out;
+		
+		&.show{
+			max-height: 800px;
+			height: auto;
+		}
+	}
+}
+
