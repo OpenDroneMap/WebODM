@@ -275,7 +275,7 @@ class TestApiTask(BootTransactionTestCase):
 
         # Other user still does not have access to certain parts of the API
         res = other_client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
 
         # Restart a task
         testWatch.clear()
