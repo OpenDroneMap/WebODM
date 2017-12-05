@@ -72,7 +72,7 @@ class ModelView extends React.Component {
 
   handleMouseClick(e){
     // Make sure the share popup closes
-    this.shareButton.hidePopup();
+    if (this.shareButton) this.shareButton.hidePopup();
   }
 
   componentDidMount() {

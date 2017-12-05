@@ -62,7 +62,7 @@ class SharePopup extends React.Component{
   render(){
     const shareLink = Utils.absoluteUrl(`/public/task/${this.state.task.id}/${this.props.linksTarget}/`);
     const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/${this.props.linksTarget}/`);
-    const iframeCode = `<iframe>${iframeUrl}</iframe>`;
+    const iframeCode = `<iframe scrolling="no" title="WebODM" width="61.8033%" height="360" frameBorder="0" src="${iframeUrl}"></iframe>`;
 
     return (<div onMouseDown={e => { e.stopPropagation(); }}
         className={"sharePopup popover in " + this.props.placement}>
