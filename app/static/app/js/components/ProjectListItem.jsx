@@ -175,10 +175,12 @@ class ProjectListItem extends React.Component {
         .on("sending", (file, xhr, formData) => {
           const taskInfo = this.dz._taskInfo;
 
-          if (!formData.has("name")) formData.append("name", taskInfo.name);
-          if (!formData.has("options")) formData.append("options", JSON.stringify(taskInfo.options));
-          if (!formData.has("processing_node")) formData.append("processing_node", taskInfo.selectedNode.id);
-          if (!formData.has("auto_processing_node")) formData.append("auto_processing_node", taskInfo.selectedNode.key == "auto");
+          // Safari does not have support for has on FormData
+          // as of December 2017
+          if (!formData.has || !formData.has("name")) formData.append("name", taskInfo.name);
+          if (!formData.has || !formData.has("options")) formData.append("options", JSON.stringify(taskInfo.options));
+          if (!formData.has || !formData.has("processing_node")) formData.append("processing_node", taskInfo.selectedNode.id);
+          if (!formData.has || !formData.has("auto_processing_node")) formData.append("auto_processing_node", taskInfo.selectedNode.key == "auto");
         });
     }
   }
