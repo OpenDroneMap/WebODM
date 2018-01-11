@@ -45,15 +45,16 @@ cd WebODM
 ./webodm.sh start
 ```
 
-* If using Docker for Windows, open a browser and go to `http://localhost:8000/`. Docker Toolbox users can find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
+* Open a Web Browser to `http://localhost:8000` (unless you are on Windows using Docker Toolbox, see below)
+
+Docker Toolbox users need to find the IP of their docker machine by running this command from the Docker Quickstart Terminal:
 
 ```bash
 docker-machine ip
+192.168.1.100 (your output will be different)
 ```
 
-Linux / Mac, users can connect to 127.0.0.1.
-
-* Open a Web Browser to `http://<yourDockerMachineIp>:8000`
+The address to connect to would then be: `http://192.168.1.100:8000`.
 
 To stop WebODM press CTRL+C or run:
 
