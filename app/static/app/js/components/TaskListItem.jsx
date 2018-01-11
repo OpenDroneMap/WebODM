@@ -29,7 +29,8 @@ class TaskListItem extends React.Component {
       actionError: "",
       actionButtonsDisabled: false,
       editing: false,
-      memoryError: false
+      memoryError: false,
+      badDatasetError: false
     }
 
     for (let k in props.data){
@@ -40,7 +41,7 @@ class TaskListItem extends React.Component {
     this.consoleOutputUrl = this.consoleOutputUrl.bind(this);
     this.stopEditing = this.stopEditing.bind(this);
     this.startEditing = this.startEditing.bind(this);
-    this.checkForMemoryError = this.checkForMemoryError.bind(this);
+    this.checkForCommonErrors = this.checkForCommonErrors.bind(this);
     this.downloadTaskOutput = this.downloadTaskOutput.bind(this);
     this.handleEditTaskSave = this.handleEditTaskSave.bind(this);
   }
@@ -218,13 +219,15 @@ class TaskListItem extends React.Component {
     this.setState({editing: false});
   }
 
-  checkForMemoryError(lines){
+  checkForCommonErrors(lines){
     for (let line of lines){
       if (line.indexOf("Killed") !== -1 || 
           line.indexOf("MemoryError") !== -1 || 
           line.indexOf("std::bad_alloc") !== -1 ||
           line.indexOf("Child returned 137") !== -1){
         this.setState({memoryError: true});
+      }else if (line.indexOf("SVD did not converge") !== -1){
+        this.setState({badDatasetError: true});
       }
     }
   }
@@ -252,7 +255,8 @@ class TaskListItem extends React.Component {
     if (this.state.expanded){
       let showOrthophotoMissingWarning = false,
           showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
-          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && !showMemoryErrorWarning && task.status == statusCodes.FAILED,
+          showBadDatasetWarning = this.state.badDatasetError && task.status == statusCodes.FAILED,
+          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && !showMemoryErrorWarning && !showBadDatasetWarning && task.status == statusCodes.FAILED,
           memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
       
       let actionButtons = [];
@@ -351,12 +355,23 @@ class TaskListItem extends React.Component {
                 autoscroll={true}
                 height={200} 
                 ref={domNode => this.console = domNode}
-                onAddLines={this.checkForMemoryError}
+                onAddLines={this.checkForCommonErrors}
                 />
 
               {showMemoryErrorWarning ? 
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
+              
+              {showBadDatasetWarning ? 
+              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like the images might have one of the following problems: 
+              <ul>
+                <li>Not enough images</li>
+                <li>Not enough overlap between images</li>
+                <li>Images might be too blurry (common with phone cameras)</li>
+              </ul>
+              You can read more about best practices for capturing good images <a href="https://support.dronedeploy.com/v1.0/docs/making-successful-maps" target="_blank">here</a>.
+              </span></div> : ""}
             
+
               {showExitedWithCodeOneHints ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
                   "Process exited with code 1" means that part of the processing failed. Try tweaking the <a href="javascript:void(0);" onClick={this.startEditing}>Task Options</a> as follows:
