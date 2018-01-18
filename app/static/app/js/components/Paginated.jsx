@@ -34,7 +34,9 @@ class Paginated extends React.Component{
   }
 
   totalPages(itemsPerPage, totalItems){
-    return Math.ceil(totalItems / itemsPerPage);
+    let pages = Math.ceil(totalItems / itemsPerPage);
+    if (pages < 1) pages = 1;
+    return pages;
   }
 
   setPaginationState(props, done){

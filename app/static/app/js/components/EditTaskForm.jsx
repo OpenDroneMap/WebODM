@@ -73,9 +73,8 @@ class EditTaskForm extends React.Component {
   }
 
   loadProcessingNodes(){
-    function failed(){
-      // Try again
-      setTimeout(loadProcessingNodes, 1000);
+    const failed = () => {
+      this.setState({error: "Could not load list of processing nodes. Are you connected to the internet?"});
     }
 
     this.nodesRequest = 
@@ -203,9 +202,8 @@ class EditTaskForm extends React.Component {
   }
 
   loadPresets(){
-    function failed(){
-      // Try again
-      setTimeout(loadPresets, 1000);
+    const failed = () => {
+      this.setState({error: "Could not load list of presets. Are you connected to the internet?"});
     }
 
     this.presetsRequest = 
