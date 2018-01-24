@@ -81,6 +81,7 @@ class ModelView extends React.Component {
 
   componentDidMount() {
     let container = this.container;
+    if (!container) return; // Enzyme tests don't have support for all WebGL methods so we just skip this
 
     window.viewer = new Potree.Viewer(container);
     viewer.setEDLEnabled(true);

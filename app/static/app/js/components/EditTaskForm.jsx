@@ -163,7 +163,6 @@ class EditTaskForm extends React.Component {
       .fail((jqXHR, textStatus, errorThrown) => {
         // I don't expect this to fail, unless it's a development error or connection error.
         // in which case we don't need to notify the user directly. 
-        console.error("Error retrieving processing nodes", jqXHR, textStatus);
         failed();
       });
   }
@@ -256,7 +255,6 @@ class EditTaskForm extends React.Component {
       .fail((jqXHR, textStatus, errorThrown) => {
         // I don't expect this to fail, unless it's a development error or connection error.
         // in which case we don't need to notify the user directly. 
-        console.error("Error retrieving processing nodes", jqXHR, textStatus);
         failed();
       });
   }

@@ -124,6 +124,9 @@ class TestApi(BootTestCase):
         # images_count field exists
         self.assertTrue(res.data["images_count"] == 0)
 
+        # TODO: test can_rerun_from
+
+
         # Get console output
         res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)

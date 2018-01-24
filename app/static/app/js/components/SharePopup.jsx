@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import ErrorMessage from './ErrorMessage';
 import Utils from '../classes/Utils';
 import ClipboardInput from './ClipboardInput';
+import $ from 'jquery';
 
 class SharePopup extends React.Component{
   static propTypes = {

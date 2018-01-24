@@ -241,6 +241,31 @@ class TaskListItem extends React.Component {
     this.setAutoRefresh();
   }
 
+  getRestartSubmenuItems(task){
+    // Map rerun-from parameters to display items
+    const rfMap = {
+      "odm_meshing": {
+        label: "Meshing",
+        icon: "fa fa-cube",
+        onClick: (cb) => {
+          console.log("mesh");
+        }
+      },
+
+      "mvs_texturing": {
+        label: "Texturing",
+        icon: "fa fa-connectdevelop",
+        onClick: (cb) => {
+          console.log("tex");
+        }
+      }
+    };
+
+    return task.can_rerun_from
+            .map(rf => rfMap[rf])
+            .filter(rf => rf !== undefined);
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : `Task #${task.id}`;
@@ -297,6 +322,7 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node){
+
           addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genActionApiCall("restart", {
               success: () => {
                   if (this.console) this.console.clear();
@@ -305,13 +331,7 @@ class TaskListItem extends React.Component {
               defaultError: "Cannot restart task."
             }
           ), {
-            subItems: [{
-              label: "Meshing",
-              icon: "glyphicon glyphicon-remove-circle",
-              onClick: (cb) => {
-                console.log("OK");
-              }
-            }]
+            subItems: this.getRestartSubmenuItems(task)
           });
       }
 
