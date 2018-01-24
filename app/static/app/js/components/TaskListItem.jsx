@@ -260,9 +260,9 @@ class TaskListItem extends React.Component {
           memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
       
       let actionButtons = [];
-      const addActionButton = (label, className, icon, onClick) => {
+      const addActionButton = (label, className, icon, onClick, options = {}) => {
         actionButtons.push({
-          className, icon, label, onClick
+          className, icon, label, onClick, options
         });
       };
       
@@ -285,6 +285,8 @@ class TaskListItem extends React.Component {
           (!task.processing_node)){
         addActionButton("Edit", "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
+        }, {
+          className: "inline"
         });
       }
 
@@ -295,14 +297,22 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node){
-          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("restart", {
+          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genActionApiCall("restart", {
               success: () => {
                   if (this.console) this.console.clear();
                   this.setState({time: -1});
               },
               defaultError: "Cannot restart task."
             }
-          ));
+          ), {
+            subItems: [{
+              label: "Meshing",
+              icon: "glyphicon glyphicon-remove-circle",
+              onClick: (cb) => {
+                console.log("OK");
+              }
+            }]
+          });
       }
 
       addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
@@ -317,12 +327,25 @@ class TaskListItem extends React.Component {
               <AssetDownloadButtons task={this.state.task} disabled={disabled} />
             : ""}
             {actionButtons.map(button => {
+              const subItems = button.options.subItems || [];
+              const className = button.options.className || "";
+
               return (
-                  <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
-                    <i className={button.icon}></i>
-                    {button.label}
-                  </button> 
-                )
+                  <div className={"inline-block " + 
+                                  (subItems.length > 0 ? "btn-group" : "") + " " +
+                                  className}>
+                    <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
+                      <i className={button.icon}></i>
+                      {button.label}
+                    </button>
+                    {subItems.length > 0 && 
+                      [<button key="dropdown-button" type="button" className={"btn btn-sm dropdown-toggle "  + button.className} data-toggle="dropdown"><span className="caret"></span></button>,
+                      <ul key="dropdown-menu" className="dropdown-menu">
+                        {subItems.map(subItem => <li key={subItem.label}>
+                            <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon}></i>{subItem.label}</a>
+                          </li>)}
+                      </ul>]}
+                  </div>);
             })}
           </div>);
 
