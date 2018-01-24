@@ -41,8 +41,10 @@ class ApiClient:
     def task_remove(self, uuid):
         return requests.post(self.url('/task/remove'), data={'uuid': uuid}, timeout=TIMEOUT).json()
 
-    def task_restart(self, uuid):
-        return requests.post(self.url('/task/restart'), data={'uuid': uuid}, timeout=TIMEOUT).json()
+    def task_restart(self, uuid, options = None):
+        data = {'uuid': uuid}
+        if options is not None: data['options'] = json.dumps(options)
+        return requests.post(self.url('/task/restart'), data=data, timeout=TIMEOUT).json()
 
     def task_download(self, uuid, asset):
         res = requests.get(self.url('/task/{}/download/{}').format(uuid, asset), stream=True)

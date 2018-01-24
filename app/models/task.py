@@ -288,7 +288,7 @@ class Task(models.Model):
                     if self.processing_node:
 
                         # Check if the UUID is still valid, as processing nodes purge
-                        # results after a set amount of time, the UUID might have eliminated.
+                        # results after a set amount of time, the UUID might have been eliminated.
                         uuid_still_exists = False
 
                         if self.uuid:
@@ -301,7 +301,7 @@ class Task(models.Model):
                         if uuid_still_exists:
                             # Good to go
                             try:
-                                self.processing_node.restart_task(self.uuid)
+                                self.processing_node.restart_task(self.uuid, self.options)
                             except ProcessingError as e:
                                 # Something went wrong
                                 logger.warning("Could not restart {}, will start a new one".format(self))
