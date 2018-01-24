@@ -1,6 +1,6 @@
 {
   "name": "WebODM",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Open Source Drone Image Processing",
   "main": "index.js",
   "scripts": {
