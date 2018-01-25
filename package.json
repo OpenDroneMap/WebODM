@@ -46,6 +46,7 @@
     "node-sass": "^3.10.1",
     "object.values": "^1.0.3",
     "proj4": "^2.4.3",
+    "qrcode.react": "^0.7.2",
     "raw-loader": "^0.5.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
