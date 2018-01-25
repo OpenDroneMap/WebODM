@@ -298,6 +298,8 @@ class Task(models.Model):
                             except ProcessingException:
                                 pass
 
+                        need_to_reprocess = False
+
                         if uuid_still_exists:
                             # Good to go
                             try:
@@ -305,13 +307,21 @@ class Task(models.Model):
                             except ProcessingError as e:
                                 # Something went wrong
                                 logger.warning("Could not restart {}, will start a new one".format(self))
-                                self.uuid = ''
+                                need_to_reprocess = True
                         else:
+                            need_to_reprocess = True
+
+                        if need_to_reprocess:
+                            logger.info("{} needs to be reprocessed".format(self))
+
                             # Task has been purged (or processing node is offline)
                             # Process this as a new task
                             # Removing its UUID will cause the scheduler
                             # to process this the next tick
                             self.uuid = ''
+
+                            # We also remove the "rerun-from" parameter if it's set
+                            self.options = list(filter(lambda d: d['name'] != 'rerun-from', self.options))
 
                         self.console_output = ""
                         self.processing_time = -1

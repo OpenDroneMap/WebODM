@@ -241,29 +241,103 @@ class TaskListItem extends React.Component {
     this.setAutoRefresh();
   }
 
-  getRestartSubmenuItems(task){
+  getRestartSubmenuItems(){
+    const { task } = this.state;
+
     // Map rerun-from parameters to display items
     const rfMap = {
       "odm_meshing": {
-        label: "Meshing",
-        icon: "fa fa-cube",
-        onClick: (cb) => {
-          console.log("mesh");
-        }
+        label: "From Meshing",
+        icon: "fa fa-cube"
       },
 
       "mvs_texturing": {
-        label: "Texturing",
-        icon: "fa fa-connectdevelop",
-        onClick: (cb) => {
-          console.log("tex");
-        }
+        label: "From Texturing",
+        icon: "fa fa-connectdevelop"
+      },
+
+      "odm_georeferencing": {
+        label: "From Georeferencing",
+        icon: "fa fa-globe"
+      },
+
+      "odm_dem": {
+        label: "From DEM",
+        icon: "fa fa-area-chart"
+      },
+
+      "odm_orthophoto": {
+        label: "From Orthophoto",
+        icon: "fa fa-map-o"
       }
     };
+
+    // Create onClick handlers
+    for (let rfParam in rfMap){
+      rfMap[rfParam].onClick = this.genRestartAction(rfParam);
+    }
 
     return task.can_rerun_from
             .map(rf => rfMap[rf])
             .filter(rf => rf !== undefined);
+  }
+
+  genRestartAction(rerunFrom = null){
+    const { task } = this.state;
+
+    const restartAction = this.genActionApiCall("restart", {
+        success: () => {
+            if (this.console) this.console.clear();
+            this.setState({time: -1});
+        },
+        defaultError: "Cannot restart task."
+      }
+    );
+
+    const setTaskRerunFrom = (value) => {
+      this.setState({actionButtonsDisabled: true});
+
+      // Removing rerun-from?
+      if (value === null){
+        task.options = task.options.filter(opt => opt['name'] !== 'rerun-from');
+      }else{
+        // Adding rerun-from
+        let opt = null;
+        if (opt = task.options.find(opt => opt['name'] === 'rerun-from')){
+          opt['value'] = value;
+        }else{
+          // Not in existing list of options, append
+          task.options.push({
+            name: 'rerun-from',
+            value: value
+          });
+        }
+      }
+      
+
+      return $.ajax({
+          url: `/api/projects/${task.project}/tasks/${task.id}/`,
+          contentType: 'application/json',
+          data: JSON.stringify({
+            options: task.options
+          }),
+          dataType: 'json',
+          type: 'PATCH'
+        }).done((taskJson) => {
+            this.setState({task: taskJson});
+          })
+          .fail(() => {
+            this.setState({
+              actionError: `Cannot restart task from ${value || "the start"}.`,
+              actionButtonsDisabled: false
+            });
+          });
+    };
+
+    return () => {
+      setTaskRerunFrom(rerunFrom)
+        .then(restartAction);
+    };
   }
 
   render() {
@@ -323,15 +397,8 @@ class TaskListItem extends React.Component {
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node){
 
-          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genActionApiCall("restart", {
-              success: () => {
-                  if (this.console) this.console.clear();
-                  this.setState({time: -1});
-              },
-              defaultError: "Cannot restart task."
-            }
-          ), {
-            subItems: this.getRestartSubmenuItems(task)
+          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(), {
+            subItems: this.getRestartSubmenuItems()
           });
       }
 
@@ -351,15 +418,19 @@ class TaskListItem extends React.Component {
               const className = button.options.className || "";
 
               return (
-                  <div className={"inline-block " + 
+                  <div key={button.label} className={"inline-block " + 
                                   (subItems.length > 0 ? "btn-group" : "") + " " +
                                   className}>
-                    <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
+                    <button type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
                       <i className={button.icon}></i>
                       {button.label}
                     </button>
                     {subItems.length > 0 && 
-                      [<button key="dropdown-button" type="button" className={"btn btn-sm dropdown-toggle "  + button.className} data-toggle="dropdown"><span className="caret"></span></button>,
+                      [<button key="dropdown-button"
+                              disabled={disabled}
+                              type="button" 
+                              className={"btn btn-sm dropdown-toggle "  + button.className} 
+                              data-toggle="dropdown"><span className="caret"></span></button>,
                       <ul key="dropdown-menu" className="dropdown-menu">
                         {subItems.map(subItem => <li key={subItem.label}>
                             <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon}></i>{subItem.label}</a>
