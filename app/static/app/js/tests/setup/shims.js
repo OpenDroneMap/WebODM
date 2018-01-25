@@ -5,5 +5,5 @@ global.requestAnimationFrame = function(callback) {
 
 import $ from 'jquery';
 
-// Bootstrap polyfills
+// Bootstrap mocks
 $.prototype.modal = () => {};

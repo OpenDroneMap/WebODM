@@ -9,8 +9,6 @@ import {
 } from 'react-router-dom';
 import $ from 'jquery';
 
-console.log(React.version);
-
 class Dashboard extends React.Component {
   constructor(){
     super();

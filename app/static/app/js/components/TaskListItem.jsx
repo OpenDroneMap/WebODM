@@ -314,13 +314,17 @@ class TaskListItem extends React.Component {
         }
       }
       
+      let data = {
+        options: task.options
+      };
+
+      // Force reprocess
+      if (value === null) data.uuid = '';
 
       return $.ajax({
           url: `/api/projects/${task.project}/tasks/${task.id}/`,
           contentType: 'application/json',
-          data: JSON.stringify({
-            options: task.options
-          }),
+          data: JSON.stringify(data),
           dataType: 'json',
           type: 'PATCH'
         }).done((taskJson) => {
@@ -396,8 +400,13 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node){
+          // By default restart reruns every pipeline 
+          // step from the beginning
+          const rerunFrom = task.can_rerun_from.length > 1 ? 
+                              task.can_rerun_from[1] : 
+                              null;
 
-          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(), {
+          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
             subItems: this.getRestartSubmenuItems()
           });
       }
