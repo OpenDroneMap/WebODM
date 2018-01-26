@@ -73,9 +73,8 @@ class EditTaskForm extends React.Component {
   }
 
   loadProcessingNodes(){
-    function failed(){
-      // Try again
-      setTimeout(loadProcessingNodes, 1000);
+    const failed = () => {
+      this.setState({error: "Could not load list of processing nodes. Are you connected to the internet?"});
     }
 
     this.nodesRequest = 
@@ -164,7 +163,6 @@ class EditTaskForm extends React.Component {
       .fail((jqXHR, textStatus, errorThrown) => {
         // I don't expect this to fail, unless it's a development error or connection error.
         // in which case we don't need to notify the user directly. 
-        console.error("Error retrieving processing nodes", jqXHR, textStatus);
         failed();
       });
   }
@@ -203,9 +201,8 @@ class EditTaskForm extends React.Component {
   }
 
   loadPresets(){
-    function failed(){
-      // Try again
-      setTimeout(loadPresets, 1000);
+    const failed = () => {
+      this.setState({error: "Could not load list of presets. Are you connected to the internet?"});
     }
 
     this.presetsRequest = 
@@ -258,7 +255,6 @@ class EditTaskForm extends React.Component {
       .fail((jqXHR, textStatus, errorThrown) => {
         // I don't expect this to fail, unless it's a development error or connection error.
         // in which case we don't need to notify the user directly. 
-        console.error("Error retrieving processing nodes", jqXHR, textStatus);
         failed();
       });
   }

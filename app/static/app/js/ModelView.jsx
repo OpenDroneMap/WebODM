@@ -57,6 +57,10 @@ class ModelView extends React.Component {
     return this.props.task.available_assets.indexOf('orthophoto.tif') !== -1;
   }
 
+  hasTexturedModel(){
+    return this.props.task.available_assets.indexOf('textured_model.zip') !== -1;
+  }
+
   objFilePath(){
     let file =  this.hasGeoreferencedAssets() ?
                 'odm_textured_model_geo.obj' : 
@@ -77,6 +81,7 @@ class ModelView extends React.Component {
 
   componentDidMount() {
     let container = this.container;
+    if (!container) return; // Enzyme tests don't have support for all WebGL methods so we just skip this
 
     window.viewer = new Potree.Viewer(container);
     viewer.setEDLEnabled(true);
@@ -180,6 +185,7 @@ class ModelView extends React.Component {
   // React render
   render(){
     const showSwitchModeButton = this.hasGeoreferencedAssets();
+    const showTextureModelButton = this.hasTexturedModel();
     const hideWithTexturedModel = {display: this.state.showTexturedModel ? "none" : "block"};
 
     return (<div className="model-view">
@@ -207,7 +213,7 @@ class ModelView extends React.Component {
                   </span>
 
                   <div className="action-buttons">
-                    <div className="textured-model-chkbox-container">
+                    <div className={"textured-model-chkbox-container " + (!showTextureModelButton ? "hide" : "")}>
                       <label><input 
                                 type="checkbox" 
                                 onChange={this.toggleTexturedModel}

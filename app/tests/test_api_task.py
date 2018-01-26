@@ -153,6 +153,9 @@ class TestApiTask(BootTransactionTestCase):
         # Two images should have been uploaded
         self.assertTrue(ImageUpload.objects.filter(task=task).count() == 2)
 
+        # Can_rerun_from should be an empty list
+        self.assertTrue(len(res.data['can_rerun_from']) == 0)
+
         # No processing node is set
         self.assertTrue(task.processing_node is None)
 
@@ -208,6 +211,17 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED]) # Sometimes the task finishes and we can't test for RUNNING state
         self.assertTrue(len(task.uuid) > 0)
+
+        # Processing node should have a "rerun_from" option
+        pnode_rerun_from_opts = list(filter(lambda d: 'name' in d and d['name'] == 'rerun-from', pnode.available_options))[0]
+        self.assertTrue(len(pnode_rerun_from_opts['domain']) > 0)
+
+        # The can_rerun_from field of a task should now be populated
+        # with the same values as the "rerun_from" domain values of
+        # the processing node
+        res = client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        self.assertTrue(pnode_rerun_from_opts['domain'] == res.data['can_rerun_from'])
 
         time.sleep(DELAY)
 
@@ -361,8 +375,31 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.status == status_codes.COMPLETED)
 
 
-        # Test connection, timeout errors
+        # Test rerun-from clearing mechanism:
+
+        # 1 .Set some task options, including rerun_from
+        task.options = [{'name': 'mesh-size', 'value':1000},
+                        {'name': 'rerun-from', 'value': 'odm_meshing'}]
+        task.save()
+
+        # 2. Remove the task directly from node-odm (simulate a task purge)
+        self.assertTrue(task.processing_node.remove_task(task.uuid))
+
+        # 3. Restart the task
         res = client.post("/api/projects/{}/tasks/{}/restart/".format(project.id, task.id))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        task.refresh_from_db()
+        self.assertTrue(task.pending_action == pending_actions.RESTART)
+
+        # 4. Check that the rerun_from parameter has been cleared
+        #   but the other parameters are still set
+        scheduler.process_pending_tasks()
+        task.refresh_from_db()
+        self.assertTrue(len(task.uuid) == 0)
+        self.assertTrue(len(list(filter(lambda d: d['name'] == 'rerun-from', task.options))) == 0)
+        self.assertTrue(len(list(filter(lambda d: d['name'] == 'mesh-size', task.options))) == 1)
+
+        # Test connection, timeout errors
         def connTimeout(*args, **kwargs):
             raise requests.exceptions.ConnectTimeout("Simulated timeout")
 

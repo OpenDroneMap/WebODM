@@ -177,12 +177,12 @@ class ProcessingNode(models.Model):
             return res
 
     @api
-    def restart_task(self, uuid):
+    def restart_task(self, uuid, options = None):
         """
         Restarts a task that was previously canceled or that had failed to process
         """
         api_client = self.api_client()
-        return self.handle_generic_post_response(api_client.task_restart(uuid))
+        return self.handle_generic_post_response(api_client.task_restart(uuid, options))
 
     @staticmethod
     def handle_generic_post_response(result):

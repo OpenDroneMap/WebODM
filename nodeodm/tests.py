@@ -131,6 +131,17 @@ class TestClientApi(TestCase):
 
         wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not restart task")
 
+        # Can restart task by passing options
+        self.assertTrue(online_node.restart_task(uuid, [{'name': 'mesh-size', 'value': 12345},
+                                                        {'name': 'invalid', 'value': True}]))
+        wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not restart task with options")
+
+        # Verify that options have been updated after restarting the task
+        task_info = api.task_info(uuid)
+        self.assertTrue(len(task_info['options']) == 1)
+        self.assertTrue(task_info['options'][0]['name'] == 'mesh-size')
+        self.assertTrue(task_info['options'][0]['value'] == 12345)
+
         # Can cancel task (should work even if we completed the task)
         self.assertTrue(online_node.cancel_task(uuid))
         self.assertRaises(ProcessingError, online_node.cancel_task, "wrong-uuid")

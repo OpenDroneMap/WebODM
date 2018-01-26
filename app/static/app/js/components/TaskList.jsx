@@ -2,6 +2,7 @@ import React from 'react';
 import '../css/TaskList.scss';
 import TaskListItem from './TaskListItem';
 import PropTypes from 'prop-types';
+import $ from 'jquery';
 
 class TaskList extends React.Component {
   static propTypes = {
