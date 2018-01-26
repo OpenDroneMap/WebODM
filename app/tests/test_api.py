@@ -124,8 +124,8 @@ class TestApi(BootTestCase):
         # images_count field exists
         self.assertTrue(res.data["images_count"] == 0)
 
-        # TODO: test can_rerun_from
-
+        # can_rerun_from field exists, should be an empty list at this point
+        self.assertTrue(len(res.data["can_rerun_from"]) == 0)
 
         # Get console output
         res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
@@ -260,7 +260,8 @@ class TestApi(BootTestCase):
                 'status': -99,
                 'last_error': 'yo!',
                 'created_at': 0,
-                'pending_action': 0
+                'pending_action': 0,
+                'can_rerun_from': ['abc']
             }, format='json')
 
         # Operation should fail without errors, but nothing has changed in the DB
@@ -271,6 +272,7 @@ class TestApi(BootTestCase):
         self.assertTrue(task.last_error != 'yo!')
         self.assertTrue(task.created_at != 0)
         self.assertTrue(task.pending_action != 0)
+        self.assertTrue(len(res.data['can_rerun_from']) == 0)
 
     def test_processingnodes(self):
         client = APIClient()
