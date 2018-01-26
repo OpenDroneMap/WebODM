@@ -56,7 +56,7 @@ class ProcessingNodeOption extends React.Component {
   }
 
   handleSelectChange(e){
-    this.setState({value: this.state.value !== this.props.defaultValue ? e.target.value : ""});
+    this.setState({value: e.target.value !== this.props.defaultValue ? e.target.value : ""});
   }
 
   handleCheckboxChange(e){

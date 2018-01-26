@@ -29,7 +29,8 @@ class TaskListItem extends React.Component {
       actionError: "",
       actionButtonsDisabled: false,
       editing: false,
-      memoryError: false
+      memoryError: false,
+      badDatasetError: false
     }
 
     for (let k in props.data){
@@ -40,7 +41,7 @@ class TaskListItem extends React.Component {
     this.consoleOutputUrl = this.consoleOutputUrl.bind(this);
     this.stopEditing = this.stopEditing.bind(this);
     this.startEditing = this.startEditing.bind(this);
-    this.checkForMemoryError = this.checkForMemoryError.bind(this);
+    this.checkForCommonErrors = this.checkForCommonErrors.bind(this);
     this.downloadTaskOutput = this.downloadTaskOutput.bind(this);
     this.handleEditTaskSave = this.handleEditTaskSave.bind(this);
   }
@@ -218,13 +219,15 @@ class TaskListItem extends React.Component {
     this.setState({editing: false});
   }
 
-  checkForMemoryError(lines){
+  checkForCommonErrors(lines){
     for (let line of lines){
       if (line.indexOf("Killed") !== -1 || 
           line.indexOf("MemoryError") !== -1 || 
           line.indexOf("std::bad_alloc") !== -1 ||
           line.indexOf("Child returned 137") !== -1){
         this.setState({memoryError: true});
+      }else if (line.indexOf("SVD did not converge") !== -1){
+        this.setState({badDatasetError: true});
       }
     }
   }
@@ -236,6 +239,109 @@ class TaskListItem extends React.Component {
   handleEditTaskSave(task){
     this.setState({task, editing: false});
     this.setAutoRefresh();
+  }
+
+  getRestartSubmenuItems(){
+    const { task } = this.state;
+
+    // Map rerun-from parameters to display items
+    const rfMap = {
+      "odm_meshing": {
+        label: "From Meshing",
+        icon: "fa fa-cube"
+      },
+
+      "mvs_texturing": {
+        label: "From Texturing",
+        icon: "fa fa-connectdevelop"
+      },
+
+      "odm_georeferencing": {
+        label: "From Georeferencing",
+        icon: "fa fa-globe"
+      },
+
+      "odm_dem": {
+        label: "From DEM",
+        icon: "fa fa-area-chart"
+      },
+
+      "odm_orthophoto": {
+        label: "From Orthophoto",
+        icon: "fa fa-map-o"
+      }
+    };
+
+    // Create onClick handlers
+    for (let rfParam in rfMap){
+      rfMap[rfParam].onClick = this.genRestartAction(rfParam);
+    }
+
+    return task.can_rerun_from
+            .map(rf => rfMap[rf])
+            .filter(rf => rf !== undefined);
+  }
+
+  genRestartAction(rerunFrom = null){
+    const { task } = this.state;
+
+    const restartAction = this.genActionApiCall("restart", {
+        success: () => {
+            if (this.console) this.console.clear();
+            this.setState({time: -1});
+        },
+        defaultError: "Cannot restart task."
+      }
+    );
+
+    const setTaskRerunFrom = (value) => {
+      this.setState({actionButtonsDisabled: true});
+
+      // Removing rerun-from?
+      if (value === null){
+        task.options = task.options.filter(opt => opt['name'] !== 'rerun-from');
+      }else{
+        // Adding rerun-from
+        let opt = null;
+        if (opt = task.options.find(opt => opt['name'] === 'rerun-from')){
+          opt['value'] = value;
+        }else{
+          // Not in existing list of options, append
+          task.options.push({
+            name: 'rerun-from',
+            value: value
+          });
+        }
+      }
+      
+      let data = {
+        options: task.options
+      };
+
+      // Force reprocess
+      if (value === null) data.uuid = '';
+
+      return $.ajax({
+          url: `/api/projects/${task.project}/tasks/${task.id}/`,
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          dataType: 'json',
+          type: 'PATCH'
+        }).done((taskJson) => {
+            this.setState({task: taskJson});
+          })
+          .fail(() => {
+            this.setState({
+              actionError: `Cannot restart task from ${value || "the start"}.`,
+              actionButtonsDisabled: false
+            });
+          });
+    };
+
+    return () => {
+      setTaskRerunFrom(rerunFrom)
+        .then(restartAction);
+    };
   }
 
   render() {
@@ -252,13 +358,14 @@ class TaskListItem extends React.Component {
     if (this.state.expanded){
       let showOrthophotoMissingWarning = false,
           showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
-          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && !showMemoryErrorWarning && task.status == statusCodes.FAILED,
+          showBadDatasetWarning = this.state.badDatasetError && task.status == statusCodes.FAILED,
+          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && !showMemoryErrorWarning && !showBadDatasetWarning && task.status == statusCodes.FAILED,
           memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
       
       let actionButtons = [];
-      const addActionButton = (label, className, icon, onClick) => {
+      const addActionButton = (label, className, icon, onClick, options = {}) => {
         actionButtons.push({
-          className, icon, label, onClick
+          className, icon, label, onClick, options
         });
       };
       
@@ -281,6 +388,8 @@ class TaskListItem extends React.Component {
           (!task.processing_node)){
         addActionButton("Edit", "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
+        }, {
+          className: "inline"
         });
       }
 
@@ -291,14 +400,15 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node){
-          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("restart", {
-              success: () => {
-                  if (this.console) this.console.clear();
-                  this.setState({time: -1});
-              },
-              defaultError: "Cannot restart task."
-            }
-          ));
+          // By default restart reruns every pipeline 
+          // step from the beginning
+          const rerunFrom = task.can_rerun_from.length > 1 ? 
+                              task.can_rerun_from[1] : 
+                              null;
+
+          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
+            subItems: this.getRestartSubmenuItems()
+          });
       }
 
       addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
@@ -313,12 +423,29 @@ class TaskListItem extends React.Component {
               <AssetDownloadButtons task={this.state.task} disabled={disabled} />
             : ""}
             {actionButtons.map(button => {
+              const subItems = button.options.subItems || [];
+              const className = button.options.className || "";
+
               return (
-                  <button key={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
-                    <i className={button.icon}></i>
-                    {button.label}
-                  </button> 
-                )
+                  <div key={button.label} className={"inline-block " + 
+                                  (subItems.length > 0 ? "btn-group" : "") + " " +
+                                  className}>
+                    <button type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
+                      <i className={button.icon}></i>
+                      {button.label}
+                    </button>
+                    {subItems.length > 0 && 
+                      [<button key="dropdown-button"
+                              disabled={disabled}
+                              type="button" 
+                              className={"btn btn-sm dropdown-toggle "  + button.className} 
+                              data-toggle="dropdown"><span className="caret"></span></button>,
+                      <ul key="dropdown-menu" className="dropdown-menu">
+                        {subItems.map(subItem => <li key={subItem.label}>
+                            <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon}></i>{subItem.label}</a>
+                          </li>)}
+                      </ul>]}
+                  </div>);
             })}
           </div>);
 
@@ -351,12 +478,23 @@ class TaskListItem extends React.Component {
                 autoscroll={true}
                 height={200} 
                 ref={domNode => this.console = domNode}
-                onAddLines={this.checkForMemoryError}
+                onAddLines={this.checkForCommonErrors}
                 />
 
               {showMemoryErrorWarning ? 
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
+              
+              {showBadDatasetWarning ? 
+              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like the images might have one of the following problems: 
+              <ul>
+                <li>Not enough images</li>
+                <li>Not enough overlap between images</li>
+                <li>Images might be too blurry (common with phone cameras)</li>
+              </ul>
+              You can read more about best practices for capturing good images <a href="https://support.dronedeploy.com/v1.0/docs/making-successful-maps" target="_blank">here</a>.
+              </span></div> : ""}
             
+
               {showExitedWithCodeOneHints ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
                   "Process exited with code 1" means that part of the processing failed. Try tweaking the <a href="javascript:void(0);" onClick={this.startEditing}>Task Options</a> as follows:

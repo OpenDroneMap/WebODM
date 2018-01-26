@@ -73,6 +73,12 @@
                 margin-right: 4px;
             }
 
+            .btn-group{
+                button:first-child{
+                    margin-right: 0;
+                }
+            }
+
             .edit-button{
                 margin-right: 15px;
             }
@@ -81,5 +87,13 @@
                 margin-right: 4px;
             }
         }
+    }
+
+    .inline-block{
+        display: inline-block;
+    }
+
+    .inline{
+        display: inline;
     }
 }

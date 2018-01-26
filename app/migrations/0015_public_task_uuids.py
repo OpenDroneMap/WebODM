@@ -20,9 +20,19 @@ def restoreImageUploadFks(apps, schema_editor):
 
     for img in imageuploads:
         i = ImageUpload.objects.get(pk=img['id'])
-        print(img)
-        i.task = Task.objects.get(id=task_ids[img['task']])
+        old_image_path = i.image.name
+        task_id = task_ids[img['task']]
+
+        # project/2/task/5/DJI_0032.JPG --> project/2/task/<NEW_TASK_ID>/DJI_0032.JPG
+        dirs, filename = os.path.split(old_image_path)
+        head, tail = os.path.split(dirs)
+        new_image_path = os.path.join(head, str(task_id), filename)
+
+        i.task = Task.objects.get(id=task_id)
+        i.image.name = new_image_path
         i.save()
+
+        print("{} --> {} (Task {})".format(old_image_path, new_image_path, str(task_id)))
 
 
 def restore(apps, schema_editor):

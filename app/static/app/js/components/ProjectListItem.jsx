@@ -34,7 +34,6 @@ class ProjectListItem extends React.Component {
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
-    this.handleUpload = this.handleUpload.bind(this);
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
     this.handleTaskSaved = this.handleTaskSaved.bind(this);
@@ -127,7 +126,7 @@ class ProjectListItem extends React.Component {
         .on("addedfiles", files => {
           this.setUploadState({
             editing: true,
-            totalCount: files.length
+            totalCount: this.state.upload.totalCount + files.length
           });
         })
         .on("transformcompleted", (total) => {
@@ -168,17 +167,19 @@ class ProjectListItem extends React.Component {
           this.resetUploadState();
         })
         .on("dragenter", () => {
-          if (!this.state.upload.uploading && !this.state.upload.resizing){
+          if (!this.state.upload.editing){
             this.resetUploadState();
           }
         })
         .on("sending", (file, xhr, formData) => {
           const taskInfo = this.dz._taskInfo;
 
-          if (!formData.has("name")) formData.append("name", taskInfo.name);
-          if (!formData.has("options")) formData.append("options", JSON.stringify(taskInfo.options));
-          if (!formData.has("processing_node")) formData.append("processing_node", taskInfo.selectedNode.id);
-          if (!formData.has("auto_processing_node")) formData.append("auto_processing_node", taskInfo.selectedNode.key == "auto");
+          // Safari does not have support for has on FormData
+          // as of December 2017
+          if (!formData.has || !formData.has("name")) formData.append("name", taskInfo.name);
+          if (!formData.has || !formData.has("options")) formData.append("options", JSON.stringify(taskInfo.options));
+          if (!formData.has || !formData.has("processing_node")) formData.append("processing_node", taskInfo.selectedNode.id);
+          if (!formData.has || !formData.has("auto_processing_node")) formData.append("auto_processing_node", taskInfo.selectedNode.key == "auto");
         });
     }
   }
@@ -207,10 +208,6 @@ class ProjectListItem extends React.Component {
     this.dz.removeAllFiles(true);
   }
 
-  handleUpload(){
-    this.resetUploadState();
-  }
-
   taskDeleted(){
     this.refresh();
   }
@@ -237,7 +234,21 @@ class ProjectListItem extends React.Component {
       this.setUploadState({uploading: true, editing: false});
     }
 
-    this.dz.processQueue();
+    setTimeout(() => {
+      this.dz.processQueue();
+    }, 1);
+  }
+
+  handleTaskCanceled = () => {
+    this.dz.removeAllFiles(true);
+    this.resetUploadState();
+  }
+
+  handleUpload = () => {
+    // Not a second click for adding more files?
+    if (!this.state.upload.editing){
+      this.handleTaskCanceled();
+    }
   }
 
   handleEditProject(){
@@ -291,16 +302,16 @@ class ProjectListItem extends React.Component {
             {this.hasPermission("add") ? 
               <button type="button" 
                       className={"btn btn-primary btn-sm " + (this.state.upload.uploading ? "hide" : "")} 
-                      onClick={this.handleUpload} 
+                      onClick={this.handleUpload}
                       ref={this.setRef("uploadButton")}>
                 <i className="glyphicon glyphicon-upload"></i>
-                Upload Images and GCP
+                Select Images and GCP
               </button>
             : ""}
-              
+
             <button disabled={this.state.upload.error !== ""} 
-                    type="button" 
-                    className={"btn btn-primary btn-sm " + (!this.state.upload.uploading ? "hide" : "")} 
+                    type="button"
+                    className={"btn btn-danger btn-sm " + (!this.state.upload.uploading ? "hide" : "")} 
                     onClick={this.cancelUpload}>
               <i className="glyphicon glyphicon-remove-circle"></i>
               Cancel Upload
@@ -357,6 +368,7 @@ class ProjectListItem extends React.Component {
           {this.state.upload.editing ? 
             <NewTaskPanel
               onSave={this.handleTaskSaved}
+              onCancel={this.handleTaskCanceled}
               filesCount={this.state.upload.totalCount}
               showResize={true}
             />

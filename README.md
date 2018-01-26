@@ -1,8 +1,12 @@
-# WebODM
+<img alt="WebODM" src="https://user-images.githubusercontent.com/1951843/34074943-8f057c3c-e287-11e7-924d-3ccafa60c43a.png" width="180">
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM) [![Join Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/OpenDroneMap/web-development) [![GitHub version](https://badge.fury.io/gh/OpenDroneMap%2FWebODM.svg)](https://badge.fury.io/gh/OpenDroneMap%2FWebODM)
 
 A free, user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It uses [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) for processing.
+
+
+![image](https://user-images.githubusercontent.com/1951843/33631371-5c55cc2c-d9d8-11e7-8609-b9032d4bbbb6.png)
+
 
 * [Getting Started](#getting-started)
     * [Add More Processing Nodes](#add-more-processing-nodes)
@@ -22,11 +26,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 ![Alt text](https://user-images.githubusercontent.com/1951843/28586405-af18e8cc-7141-11e7-9853-a7feca7c9c6b.gif)
 
-![Alt text](/screenshots/ui-mockup.png?raw=true "WebODM")
-
 ![Alt text](/screenshots/pointcloud.png?raw=true "3D Display")
-
-![Alt text](https://user-images.githubusercontent.com/1951843/28586977-8588ebfe-7143-11e7-94d6-a66bf02c1517.png)
 
 
 ## Getting Started
@@ -36,22 +36,25 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
  - [Python](https://www.python.org/downloads/)
  - [Git](https://git-scm.com/downloads)
 
-* From the Docker Quickstart Terminal (Windows) or from the command line (Mac / Linux) type:
+* Windows users have a choice between Docker Toolbox (older product but more tutorials available) and Docker for Windows (more recent version that runs on Microsoft's Hyper-V virtualization engine, recommended by Docker). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes) . 
+
+* From the Docker Quickstart Terminal or Powershell (Windows), or from the command line (Mac / Linux), type:
 ```bash
 git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input
 cd WebODM
 ./webodm.sh start
 ```
 
-* If you're on Windows find the IP of your Docker machine by running this command from your Docker Quickstart Terminal:
+* Open a Web Browser to `http://localhost:8000` (unless you are on Windows using Docker Toolbox, see below)
+
+Docker Toolbox users need to find the IP of their docker machine by running this command from the Docker Quickstart Terminal:
 
 ```bash
 docker-machine ip
+192.168.1.100 (your output will be different)
 ```
 
-Linux / Mac, users can connect to 127.0.0.1.
-
-* Open a Web Browser to `http://<yourDockerMachineIp>:8000`
+The address to connect to would then be: `http://192.168.1.100:8000`.
 
 To stop WebODM press CTRL+C or run:
 
@@ -125,6 +128,7 @@ Task fails with `Process exited with code null`, no task console output | If the
 On Windows, docker-compose fails with `Failed to execute the script docker-compose` | Make sure you have enabled VT-x virtualization in the BIOS
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
+Cannot start WebODM via `./webodm.sh start`, error messages are different at each retry | You could be running out of memory. Make sure you have enough RAM available. 2GB should be the recommended minimum, unless you know what you are doing
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
