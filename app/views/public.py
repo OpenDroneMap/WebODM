@@ -53,7 +53,7 @@ def model_display(request, task_pk=None):
 def model_display_iframe(request, task_pk=None):
     return handle_model_display(request, 'app/public/3d_model_display_iframe.html', task_pk)
 
-def json(request, task_pk=None):
+def task_json(request, task_pk=None):
     task = get_public_task(task_pk)
     serializer = TaskSerializer(task)
     return JsonResponse(serializer.data)

@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^public/task/(?P<task_pk>[^/.]+)/iframe/map/$', public_views.map_iframe, name='public_map'),
     url(r'^public/task/(?P<task_pk>[^/.]+)/3d/$', public_views.model_display, name='public_map'),
     url(r'^public/task/(?P<task_pk>[^/.]+)/iframe/3d/$', public_views.model_display_iframe, name='public_map'),
-    url(r'^public/task/(?P<task_pk>[^/.]+)/json/$', public_views.json, name='public_map'),
+    url(r'^public/task/(?P<task_pk>[^/.]+)/json/$', public_views.task_json, name='public_map'),
 
     url(r'^processingnode/([\d]+)/$', app_views.processing_node, name='processing_node'),
 
