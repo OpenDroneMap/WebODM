@@ -8,6 +8,7 @@
   "project": 27,
   "processing_node": 10,
   "images_count": 48,
+  "can_rerun_from": [],
   "available_assets": [
     "all.zip",
     "orthophoto.tif",
@@ -43,6 +44,7 @@ id | int | Unique identifier
 project | int | [Project](#project) ID the task belongs to
 processing_node | int | The ID of the [Processing Node](#processing-node) this task has been assigned to, or `null` if no [Processing Node](#processing-node) has been assigned.
 images_count | int | Number of images
+can_rerun_from | string[] | List of possible "rerun-from" options that this task could restart from, given its currently assigned processing node. If this is an empty list, the task can only be restarted from the start of the pipeline.
 available_assets | string[] | List of [assets](#download-assets) available for download 
 uuid | string | Unique identifier assigned by a [Processing Node](#processing-node) once processing has started.
 name | string | User defined name for the task

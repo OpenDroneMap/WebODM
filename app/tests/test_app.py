@@ -131,6 +131,8 @@ class TestApp(BootTestCase):
             self.assertTrue(res.status_code == expectedStatus)
             res = client.get('/public/task/{}/iframe/map/'.format(task.id))
             self.assertTrue(res.status_code == expectedStatus)
+            res = client.get('/public/task/{}/json/'.format(task.id))
+            self.assertTrue(res.status_code == expectedStatus)
 
         test_public_views(c, status.HTTP_404_NOT_FOUND)
 
