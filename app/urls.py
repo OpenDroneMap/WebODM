@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 
 from .views import app as app_views, public as public_views
+from .plugins import get_url_patterns
 
 from app.boot import boot
 from webodm import settings
@@ -23,6 +24,10 @@ urlpatterns = [
 
     url(r'^api/', include("app.api.urls")),
 ]
+
+# TODO: is there a way to place plugins /public directories
+# into the static build directories and let nginx serve them?
+urlpatterns += get_url_patterns()
 
 # Test cases call boot() independently
 if not settings.TESTING:

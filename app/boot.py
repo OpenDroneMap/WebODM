@@ -9,6 +9,7 @@ from guardian.shortcuts import assign_perm
 
 from app.models import Preset
 from app.models import Theme
+from app.plugins import register_plugins
 from nodeodm.models import ProcessingNode
 # noinspection PyUnresolvedReferences
 from webodm.settings import MEDIA_ROOT
@@ -86,6 +87,9 @@ def boot():
 
         # Unlock any Task that might have been locked
         Task.objects.filter(processing_lock=True).update(processing_lock=False)
+
+        # Register plugins
+        register_plugins()
 
         if not settings.TESTING:
             # Setup and start scheduler
