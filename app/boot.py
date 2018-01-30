@@ -88,7 +88,6 @@ def boot():
         # Unlock any Task that might have been locked
         Task.objects.filter(processing_lock=True).update(processing_lock=False)
 
-        # Register plugins
         register_plugins()
 
         if not settings.TESTING:

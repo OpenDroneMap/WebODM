@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load i18n static settings compress %}
+    {% load i18n static settings compress plugins %}
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -21,6 +21,10 @@
 
     {% load render_bundle from webpack_loader %}
     {% render_bundle 'main' %}
+
+    {% autoescape off %}
+    {% get_plugins_js_includes %}
+    {% endautoescape %}
 
     <title>{{title|default:"Login"}} - {{ SETTINGS.app_name }}</title>
 

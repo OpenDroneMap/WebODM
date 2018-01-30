@@ -24,8 +24,19 @@ class PluginBase(ABC):
     def get_module_name(self):
         return self.__class__.__module__
 
+    def get_include_js_urls(self):
+        return ["/plugins/{}/{}".format(self.get_name(), js_file) for js_file in self.include_js_files()]
+
     def has_public_path(self):
         return os.path.isdir(self.get_path("public"))
+
+    def include_js_files(self):
+        """
+        Should be overriden by plugins to communicate
+        which JS files should be included in the WebODM interface
+        All paths are relative to a plugin's /public folder.
+        """
+        return []
 
     def __str__(self):
         return "[{}]".format(self.get_module_name())

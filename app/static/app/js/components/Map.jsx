@@ -1,6 +1,4 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import ReactDOM from 'react-dom';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
@@ -17,6 +15,7 @@ import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
+import PluginsAPI from '../classes/PluginsAPI';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -235,6 +234,13 @@ class Map extends React.Component {
             }
           }
         });
+    });
+
+    // PluginsAPI.events.addListener('Map::AddPanel', (e) => {
+    //   console.log("Received response: " + e);
+    // });
+    PluginsAPI.Map.Loaded({
+      map: this.map
     });
   }
 
