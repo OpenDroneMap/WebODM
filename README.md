@@ -120,6 +120,7 @@ Note that existing task results will not be available after the change. Refer to
 
 Sympthoms | Possible Solutions
 --------- | ------------------
+Accessing the WebODM interface gives you a `OperationalError at /could not translate host name "db" to address: Name or service not known` | Restart your computer, then run `./webodm.sh down && ./webodm.sh start`
 While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
 While starting WebODM you get: `could not translate host name “db” to address: Name or service not known` | Try restarting your computer, then type: `./webodm.sh down && ./webodm.sh start`
 Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
