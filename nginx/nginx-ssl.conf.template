@@ -64,15 +64,6 @@ http {
     }
 
     location / {
-      # CORS settings
-
-      # These settings are VERY permissive, consider tightening them
-
-      add_header 'Access-Control-Allow-Origin' '*';
-      add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-      add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
-      add_header 'Access-Control-Expose-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
-
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
       # enable this if and only if you use HTTPS
