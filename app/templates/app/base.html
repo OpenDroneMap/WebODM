@@ -18,12 +18,14 @@
 
     <script src="{% static 'app/js/vendor/modernizr-2.8.3.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
+    <script src="{% static 'app/js/vendor/system.js' %}"></script>
 
     {% load render_bundle from webpack_loader %}
     {% render_bundle 'main' %}
 
     {% autoescape off %}
     {% get_plugins_js_includes %}
+    {% get_plugins_css_includes %}
     {% endautoescape %}
 
     <title>{{title|default:"Login"}} - {{ SETTINGS.app_name }}</title>
@@ -88,6 +90,7 @@
 <script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
 <script>
 $(function(){
+return;
     $('#side-menu').metisMenu();
 
     $(window).bind("load resize", function() {

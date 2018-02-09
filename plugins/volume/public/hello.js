@@ -1,3 +1,6 @@
-PluginsAPI.Map.AddPanel(function(params){
-	console.log("GOT: ", params.map);
+PluginsAPI.Map.willAddControls(function(options){
+	console.log("GOT: ", options);
+});
+PluginsAPI.Map.didAddControls(function(options){
+	console.log("GOT2: ", options);
 });

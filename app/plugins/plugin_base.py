@@ -1,5 +1,5 @@
 import logging, os, sys
-from abc import ABC, abstractmethod
+from abc import ABC
 
 logger = logging.getLogger('app.logger')
 
@@ -7,7 +7,6 @@ class PluginBase(ABC):
     def __init__(self):
         self.name = self.get_module_name().split(".")[-2]
 
-    @abstractmethod
     def register(self):
         pass
 
@@ -27,6 +26,9 @@ class PluginBase(ABC):
     def get_include_js_urls(self):
         return ["/plugins/{}/{}".format(self.get_name(), js_file) for js_file in self.include_js_files()]
 
+    def get_include_css_urls(self):
+        return ["/plugins/{}/{}".format(self.get_name(), css_file) for css_file in self.include_css_files()]
+
     def has_public_path(self):
         return os.path.isdir(self.get_path("public"))
 
@@ -34,6 +36,14 @@ class PluginBase(ABC):
         """
         Should be overriden by plugins to communicate
         which JS files should be included in the WebODM interface
+        All paths are relative to a plugin's /public folder.
+        """
+        return []
+
+    def include_css_files(self):
+        """
+        Should be overriden by plugins to communicate
+        which CSS files should be included in the WebODM interface
         All paths are relative to a plugin's /public folder.
         """
         return []

@@ -73,6 +73,13 @@ export default {
             }
             throw message; // Fallback
         }
+    },
+
+    getCurrentScriptDir: function(){
+      let scripts= document.getElementsByTagName('script');
+      let path= scripts[scripts.length-1].src.split('?')[0];      // remove any ?query
+      let mydir= path.split('/').slice(0, -1).join('/')+'/';  // remove last filename part of path
+      return mydir;
     }
 };
 
