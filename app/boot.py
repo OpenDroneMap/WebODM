@@ -28,6 +28,8 @@ def boot():
     booted.value = True
     logger = logging.getLogger('app.logger')
 
+    logger.info("Booting WebODM {}".format(settings.VERSION))
+
     if settings.DEBUG:
        logger.warning("Debug mode is ON (for development this is OK)")
 
@@ -59,14 +61,13 @@ def boot():
         # Add default presets
         Preset.objects.get_or_create(name='DSM + DTM', system=True,
                                      options=[{'name': 'dsm', 'value': True}, {'name': 'dtm', 'value': True}])
+        Preset.objects.get_or_create(name='Fast Orthophoto', system=True,
+                                     options=[{'name': 'fast-orthophoto', 'value': True}])
         Preset.objects.get_or_create(name='High Quality', system=True,
                                                   options=[{'name': 'dsm', 'value': True},
-                                                           {'name': 'skip-resize', 'value': True},
                                                            {'name': 'mesh-octree-depth', 'value': "12"},
-                                                           {'name': 'use-25dmesh', 'value': True},
-                                                           {'name': 'min-num-features', 'value': 8000},
                                                            {'name': 'dem-resolution', 'value': "0.04"},
-                                                           {'name': 'orthophoto-resolution', 'value': "60"},
+                                                           {'name': 'orthophoto-resolution', 'value': "40"},
                                                         ])
         Preset.objects.get_or_create(name='Default', system=True, options=[{'name': 'dsm', 'value': True}])
 

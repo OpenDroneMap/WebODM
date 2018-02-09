@@ -3,7 +3,11 @@ import logging
 import importlib
 
 import django
+import json
 from django.conf.urls import url
+from functools import reduce
+
+from webodm import settings
 
 logger = logging.getLogger('app.logger')
 
@@ -49,6 +53,16 @@ def get_active_plugins():
         if os.path.isfile(disabled_path):
             continue
 
+        # Read manifest
+        with open(manifest_path) as manifest_file:
+            manifest = json.load(manifest_file)
+            if 'webodmMinVersion' in manifest:
+                min_version = manifest['webodmMinVersion']
+
+                if versionToInt(min_version) > versionToInt(settings.VERSION):
+                    logger.warning("In {} webodmMinVersion is set to {} but WebODM version is {}. Plugin will not be loaded. Update WebODM.".format(manifest_path, min_version, settings.VERSION))
+                    continue
+
         # Instantiate the plugin
         try:
             module = importlib.import_module("plugins.{}".format(dir))
@@ -63,3 +77,23 @@ def get_active_plugins():
 def get_plugins_path():
     current_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.abspath(os.path.join(current_path, "..", "..", "plugins"))
+
+
+def versionToInt(version):
+    """
+    Converts a WebODM version string (major.minor.build) to a integer value
+    for comparison
+    >>> versionToInt("1.2.3")
+    100203
+    >>> versionToInt("1")
+    100000
+    >>> versionToInt("1.2.3.4")
+    100203
+    >>> versionToInt("wrong")
+    -1
+    """
+
+    try:
+        return sum([reduce(lambda mult, ver: mult * ver, i) for i in zip([100000, 100, 1], map(int, version.split(".")))])
+    except:
+        return -1

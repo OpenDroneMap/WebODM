@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os, sys
+import os, sys, json
 
 import datetime
 
@@ -40,7 +40,9 @@ except ImportError:
 
     print("Generated secret key")
 
-
+with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
+    data = json.load(package_file)
+    VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
 
