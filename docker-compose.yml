@@ -36,6 +36,8 @@ services:
   worker:
     image: opendronemap/webodm_worker
     container_name: worker
+    entrypoint: /bin/bash -c \"/webodm/wait-for-it.sh broker:6379 -- /broker/start.sh\""
     depends_on:
       - broker
-
+    environment:
+      - WO_BROKER
