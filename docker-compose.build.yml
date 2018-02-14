@@ -6,3 +6,5 @@ services:
     build: ./db
   webapp:
     build: .
+  worker:
+    build: ./worker

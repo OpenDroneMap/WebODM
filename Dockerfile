@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.6
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -8,7 +8,7 @@ ENV PYTHONPATH $PYTHONPATH:/webodm
 RUN mkdir /webodm
 WORKDIR /webodm
 
-RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
+RUN curl --silent --location https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get -qq install -y nodejs
 
 # Configure use of testing branch of Debian
