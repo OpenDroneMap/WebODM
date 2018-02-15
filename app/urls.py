@@ -1,3 +1,4 @@
+import sys
 from django.conf.urls import url, include
 
 from .views import app as app_views, public as public_views
@@ -30,5 +31,7 @@ urlpatterns = [
 urlpatterns += get_url_patterns()
 
 # Test cases call boot() independently
-if not settings.TESTING:
+# Also don't execute boot with celery workers
+celery_running = sys.argv[2:3] == ["worker"]
+if not celery_running and not settings.TESTING:
     boot()

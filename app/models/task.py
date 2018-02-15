@@ -109,7 +109,7 @@ class Task(models.Model):
 
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
-    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
+    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration.")
 
     public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
 
@@ -221,7 +221,7 @@ class Task(models.Model):
     def process(self):
         """
         This method contains the logic for processing tasks asynchronously
-        from a background thread or from the scheduler. Here tasks that are
+        from a background thread or from a worker. Here tasks that are
         ready to be processed execute some logic. This could be communication
         with a processing node or executing a pending action.
         """

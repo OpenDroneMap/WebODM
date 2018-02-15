@@ -32,7 +32,7 @@ class Project(models.Model):
             super().delete(*args)
         else:
             # Need to remove all tasks before we can remove this project
-            # which will be deleted on the scheduler after pending actions
+            # which will be deleted by workers after pending actions
             # have been completed
             self.task_set.update(pending_action=pending_actions.REMOVE)
             self.deleting = True

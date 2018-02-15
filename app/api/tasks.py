@@ -17,8 +17,9 @@ from rest_framework.views import APIView
 from nodeodm import status_codes
 from .common import get_and_check_project, get_tile_json, path_traversal_check
 
-from app import models, scheduler, pending_actions
+from app import models, pending_actions
 from nodeodm.models import ProcessingNode
+from worker import tasks as worker_tasks
 
 
 class TaskIDsSerializer(serializers.BaseSerializer):
@@ -84,8 +85,8 @@ class TaskViewSet(viewsets.ViewSet):
         task.last_error = None
         task.save()
 
-        # Call the scheduler (speed things up)
-        scheduler.process_pending_tasks(background=True)
+        # Process pending tasks without waiting for the scheduler (speed things up)
+        worker_tasks.process_pending_tasks.delay()
 
         return Response({'success': True})
 
@@ -180,8 +181,8 @@ class TaskViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # Call the scheduler (speed things up)
-        scheduler.process_pending_tasks(background=True)
+        # Process pending tasks without waiting for the scheduler (speed things up)
+        worker_tasks.process_pending_tasks.delay()
 
         return Response(serializer.data)
 

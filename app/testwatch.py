@@ -1,6 +1,11 @@
-import time
+import time, redis
 
 import logging
+
+import marshal
+import types
+
+import json
 
 from webodm import settings
 
@@ -10,25 +15,31 @@ class TestWatch:
     def __init__(self):
         self.clear()
 
+    def func_to_name(f):
+        return "{}.{}".format(f.__module__, f.__name__)
+
     def clear(self):
         self._calls = {}
         self._intercept_list = {}
 
-    def func_to_name(f):
-        return "{}.{}".format(f.__module__, f.__name__)
-
     def intercept(self, fname, f = None):
         self._intercept_list[fname] = f if f is not None else True
 
-    def execute_intercept_function_replacement(self, fname, *args, **kwargs):
-        if fname in self._intercept_list and callable(self._intercept_list[fname]):
-            (self._intercept_list[fname])(*args, **kwargs)
+    def intercept_list_has(self, fname):
+        return fname in self._intercept_list
 
-    def should_prevent_execution(self, func):
-        return TestWatch.func_to_name(func) in self._intercept_list
+    def execute_intercept_function_replacement(self, fname, *args, **kwargs):
+        if self.intercept_list_has(fname) and callable(self._intercept_list[fname]):
+            (self._intercept_list[fname])(*args, **kwargs)
 
     def get_calls(self, fname):
         return self._calls[fname] if fname in self._calls else []
+
+    def set_calls(self, fname, value):
+        self._calls[fname] = value
+
+    def should_prevent_execution(self, func):
+        return self.intercept_list_has(TestWatch.func_to_name(func))
 
     def get_calls_count(self, fname):
         return len(self.get_calls(fname))
@@ -49,9 +60,9 @@ class TestWatch:
     def log_call(self, func, *args, **kwargs):
         fname = TestWatch.func_to_name(func)
         logger.info("{} called".format(fname))
-        list = self._calls[fname] if fname in self._calls else []
+        list = self.get_calls(fname)
         list.append({'f': fname, 'args': args, 'kwargs': kwargs})
-        self._calls[fname] = list
+        self.set_calls(fname, list)
 
     def hook_pre(self, func, *args, **kwargs):
         if settings.TESTING and self.should_prevent_execution(func):
@@ -79,5 +90,43 @@ class TestWatch:
                 return ret
             return wrapper
         return outer
+
+"""
+Redis-backed test watch
+suitable for cross-machine/cross-process
+test watching
+"""
+class SharedTestWatch(TestWatch):
+    """
+    :param redis_url same as celery broker URL, for ex. redis://localhost:1234
+    """
+    def __init__(self, redis_url):
+        self.r = redis.from_url(redis_url)
+        super().__init__()
+
+    def clear(self):
+        self.r.delete('testwatch:calls', 'testwatch:intercept_list')
+
+    def intercept(self, fname, f = None):
+        self.r.hmset('testwatch:intercept_list', {fname: marshal.dumps(f.__code__) if f is not None else 1})
+
+    def intercept_list_has(self, fname):
+        return self.r.hget('testwatch:intercept_list', fname) is not None
+
+    def execute_intercept_function_replacement(self, fname, *args, **kwargs):
+        if self.intercept_list_has(fname) and self.r.hget('testwatch:intercept_list', fname) != b'1':
+            # Rebuild function
+            fcode = self.r.hget('testwatch:intercept_list', fname)
+            f = types.FunctionType(marshal.loads(fcode), globals())
+            f(*args, **kwargs)
+
+    def get_calls(self, fname):
+        value = self.r.hget('testwatch:calls', fname)
+        if value is None: return []
+        else:
+            return json.loads(value.decode('utf-8'))
+
+    def set_calls(self, fname, value):
+        self.r.hmset('testwatch:calls', {fname: json.dumps(value)})
 
 testWatch = TestWatch()

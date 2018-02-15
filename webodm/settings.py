@@ -313,6 +313,16 @@ LIBSASS_CUSTOM_FUNCTIONS = {
     'scalebyiv': scalebyiv
 }
 
+# Celery
+CELERY_BROKER_URL = os.environ.get('WO_BROKER', 'redis://localhost')
+CELERY_RESULT_BACKEND = os.environ.get('WO_BROKER', 'redis://localhost')
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_INCLUDE=['worker.tasks']
+
+
 if TESTING:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 

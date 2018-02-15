@@ -7,13 +7,14 @@ from django.core.files import File
 from django.db.utils import ProgrammingError
 from guardian.shortcuts import assign_perm
 
+from worker import tasks as worker_tasks
 from app.models import Preset
 from app.models import Theme
 from app.plugins import register_plugins
 from nodeodm.models import ProcessingNode
 # noinspection PyUnresolvedReferences
 from webodm.settings import MEDIA_ROOT
-from . import scheduler, signals
+from . import signals
 import logging
 from .models import Task, Setting
 from webodm import settings
@@ -22,7 +23,7 @@ from webodm.wsgi import booted
 
 def boot():
     # booted is a shared memory variable to keep track of boot status
-    # as multiple workers could trigger the boot sequence twice
+    # as multiple gunicorn workers could trigger the boot sequence twice
     if not settings.DEBUG and booted.value: return
 
     booted.value = True
@@ -92,10 +93,7 @@ def boot():
         register_plugins()
 
         if not settings.TESTING:
-            # Setup and start scheduler
-            scheduler.setup()
-
-            scheduler.update_nodes_info(background=True)
+            worker_tasks.update_nodes_info.delay()
 
     except ProgrammingError:
         logger.warning("Could not touch the database. If running a migration, this is expected.")

@@ -16,7 +16,6 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from app import pending_actions
-from app import scheduler
 from django.utils import timezone
 from app.models import Project, Task, ImageUpload
 from app.models.task import task_directory_path, full_task_directory_path

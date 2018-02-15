@@ -37,6 +37,8 @@ services:
     image: opendronemap/webodm_worker
     container_name: worker
     entrypoint: /bin/bash -c \"/webodm/wait-for-it.sh broker:6379 -- /broker/start.sh\""
+    volumes:
+      - ${WO_MEDIA_DIR}:/worker/app/media
     depends_on:
       - broker
     environment:

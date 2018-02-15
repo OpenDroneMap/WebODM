@@ -201,15 +201,7 @@ class TestApp(BootTestCase):
         self.assertRaises(ValidationError, task.save)
 
 
-    def test_scheduler(self):
-        self.assertTrue(scheduler.setup() is None)
-
-        # Can call update_nodes_info()
-        self.assertTrue(scheduler.update_nodes_info() is None)
-
-        # Can call function in background
-        self.assertTrue(scheduler.update_nodes_info(background=True).join() is None)
-
-        self.assertTrue(scheduler.teardown() is None)
+    def test_worker(self):
+        self.assertTrue(True) # TODO!!!
 
 

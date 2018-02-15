@@ -3,6 +3,16 @@ set -eo pipefail
 __dirname=$(cd $(dirname "$0"); pwd -P)
 cd ${__dirname}
 
+usage(){
+  echo "Usage: $0 <command>"
+  echo
+  echo "This program manages the background worker processes. WebODM requires at least one background process worker to be running at all times."
+  echo 
+  echo "Command list:"
+  echo "	start		Start background worker"
+  exit
+}
+
 check_command(){
 	check_msg_prefix="Checking for $1... "
 	check_msg_result="\033[92m\033[1m OK\033[0m\033[39m"
@@ -36,11 +46,17 @@ environment_check(){
 	fi
 }
 
-environment_check
-echo "Starting worker using broker at $WO_BROKER"
 
-# Switch to parent directory
-# so that celery recognizes the package name
-cd ${__dirname}/../
+start(){
+	action=$1
 
-celery -A worker worker --loglevel=info
+	echo "Starting worker using broker at $WO_BROKER"
+	celery -A worker worker --loglevel=info
+}
+
+if [[ $1 = "start" ]]; then
+	environment_check
+	start
+else
+	usage
+fi
