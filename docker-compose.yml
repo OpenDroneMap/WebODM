@@ -17,7 +17,7 @@ services:
   webapp:
     image: opendronemap/webodm_webapp
     container_name: webapp
-    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-it.sh db:5432 -- /webodm/start.sh\""
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/start.sh\""
     volumes:
       - ${WO_MEDIA_DIR}:/webodm/app/media
     ports:
