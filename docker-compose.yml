@@ -25,6 +25,7 @@ services:
     depends_on:
       - db
       - broker
+      - worker
     environment:
       - WO_PORT
       - WO_HOST
