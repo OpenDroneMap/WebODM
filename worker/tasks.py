@@ -12,6 +12,7 @@ from nodeodm.models import ProcessingNode
 from .celery import app
 from celery.utils.log import get_task_logger
 from django.db import transaction
+from app.testwatch import testWatch
 
 logger = get_task_logger(__name__)
 
@@ -65,6 +66,9 @@ def process_task(taskId):
 
 @app.task
 def process_pending_tasks():
+    if settings.TESTING:
+        testWatch.manual_log_call('worker.tasks.process_pending_tasks')
+
     # All tasks that have a processing node assigned
     # Or that need one assigned (via auto)
     # or tasks that need a status update

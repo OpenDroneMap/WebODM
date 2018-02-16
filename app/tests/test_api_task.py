@@ -178,14 +178,13 @@ class TestApiTask(BootTransactionTestCase):
 
         # No UUID at this point
         self.assertTrue(len(task.uuid) == 0)
-
         # Assign processing node to task via API
         res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
             'processing_node': pnode.id
         })
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
-        # On update scheduler.processing_pending_tasks should have been called in the background
+        # On update worker.tasks.process_pending_tasks should have been called in the background
         testWatch.wait_until_call("worker.tasks.process_pending_tasks", timeout=5)
 
         # Processing should have started and a UUID is assigned
@@ -489,7 +488,7 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertTrue(task.processing_node is None)
 
-        # Bring a proessing node online
+        # Bring a processing node online
         pnode.last_refreshed = timezone.now()
         pnode.save()
         self.assertTrue(pnode.is_online())

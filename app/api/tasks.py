@@ -1,25 +1,20 @@
 import mimetypes
 import os
+from wsgiref.util import FileWrapper
 
-from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.db.models.functions import Envelope
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.db import transaction
-from django.db.models.functions import Cast
 from django.http import HttpResponse
-from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
-
-from nodeodm import status_codes
-from .common import get_and_check_project, get_tile_json, path_traversal_check
 
 from app import models, pending_actions
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
+from .common import get_and_check_project, get_tile_json, path_traversal_check
 
 
 class TaskIDsSerializer(serializers.BaseSerializer):

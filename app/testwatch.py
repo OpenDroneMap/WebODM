@@ -59,6 +59,9 @@ class TestWatch:
 
     def log_call(self, func, *args, **kwargs):
         fname = TestWatch.func_to_name(func)
+        self.manual_log_call(fname, *args, **kwargs)
+
+    def manual_log_call(self, fname, *args, **kwargs):
         logger.info("{} called".format(fname))
         list = self.get_calls(fname)
         list.append({'f': fname, 'args': args, 'kwargs': kwargs})
@@ -100,31 +103,19 @@ class SharedTestWatch(TestWatch):
     """
     :param redis_url same as celery broker URL, for ex. redis://localhost:1234
     """
-    def needs_redis(func):
-        # Lazy evaluator for redis instance
-        def wrapper(self, *args):
-            if not hasattr(self, 'r'):
-                self.r = redis.from_url(self.redis_url)
-            return func(self, *args)
-        return wrapper
-
     def __init__(self, redis_url):
-        self.redis_url = redis_url
+        self.r = redis.from_url(redis_url)
         super().__init__()
 
-    @needs_redis
     def clear(self):
         self.r.delete('testwatch:calls', 'testwatch:intercept_list')
 
-    @needs_redis
     def intercept(self, fname, f = None):
         self.r.hmset('testwatch:intercept_list', {fname: marshal.dumps(f.__code__) if f is not None else 1})
 
-    @needs_redis
     def intercept_list_has(self, fname):
         return self.r.hget('testwatch:intercept_list', fname) is not None
 
-    @needs_redis
     def execute_intercept_function_replacement(self, fname, *args, **kwargs):
         if self.intercept_list_has(fname) and self.r.hget('testwatch:intercept_list', fname) != b'1':
             # Rebuild function
@@ -132,19 +123,17 @@ class SharedTestWatch(TestWatch):
             f = types.FunctionType(marshal.loads(fcode), globals())
             f(*args, **kwargs)
 
-    @needs_redis
     def get_calls(self, fname):
         value = self.r.hget('testwatch:calls', fname)
         if value is None: return []
         else:
             return json.loads(value.decode('utf-8'))
 
-    @needs_redis
     def set_calls(self, fname, value):
         self.r.hmset('testwatch:calls', {fname: json.dumps(value)})
 
-    def watch(**kwargs):
-        return TestWatch.watch(tw=sharedTestWatch, **kwargs)
+    # def watch(**kwargs):
+    #     return TestWatch.watch(tw=sharedTestWatch, **kwargs)
+
 
 testWatch = TestWatch()
-sharedTestWatch = SharedTestWatch(settings.CELERY_BROKER_URL)
