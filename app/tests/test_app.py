@@ -4,7 +4,6 @@ from rest_framework import status
 
 from app.models import Project, Task
 from .classes import BootTestCase
-from app import scheduler
 from django.core.exceptions import ValidationError
 
 class TestApp(BootTestCase):
@@ -199,9 +198,3 @@ class TestApp(BootTestCase):
 
         task.options = [{'name': 'test', 'value': 1}, {"invalid": 1}]
         self.assertRaises(ValidationError, task.save)
-
-
-    def test_worker(self):
-        self.assertTrue(True) # TODO!!!
-
-

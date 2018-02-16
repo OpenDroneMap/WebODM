@@ -32,6 +32,5 @@ urlpatterns += get_url_patterns()
 
 # Test cases call boot() independently
 # Also don't execute boot with celery workers
-celery_running = sys.argv[2:3] == ["worker"]
-if not celery_running and not settings.TESTING:
+if not settings.WORKER_RUNNING and not settings.TESTING:
     boot()

@@ -33,5 +33,12 @@ app.conf.beat_schedule = {
     },
 }
 
+# We need this for tests
+@app.task(name='celery.ping')
+def ping():
+    # type: () -> str
+    """Simple task that just returns 'pong'."""
+    return 'pong'
+
 if __name__ == '__main__':
     app.start()

@@ -45,6 +45,7 @@ with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
     VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
+WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
 # SECURITY WARNING: don't run with debug turned on a public facing server!
 DEBUG = os.environ.get('WO_DEBUG', 'YES') == 'YES' or TESTING

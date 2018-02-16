@@ -1,8 +1,6 @@
 import os
-import subprocess
 import time
 
-import shutil
 
 import logging
 from datetime import timedelta
@@ -10,11 +8,10 @@ from datetime import timedelta
 import json
 import requests
 from django.contrib.auth.models import User
-from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.gdal import OGRGeometry
 from rest_framework import status
 from rest_framework.test import APIClient
 
+import worker
 from app import pending_actions
 from django.utils import timezone
 from app.models import Project, Task, ImageUpload
@@ -23,6 +20,7 @@ from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from app.testwatch import testWatch
+from .utils import start_processing_node, clear_test_media_root
 
 # We need to test the task API in a TransactionTestCase because
 # task processing happens on a separate thread, and normal TestCases
@@ -33,26 +31,10 @@ logger = logging.getLogger('app.logger')
 
 DELAY = 2  # time to sleep for during process launch, background processing, etc.
 
-def start_processing_node(*args):
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'] + list(args), shell=False,
-                                cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
-    time.sleep(DELAY)  # Wait for the server to launch
-    return node_odm
-
 class TestApiTask(BootTransactionTestCase):
     def setUp(self):
         super().setUp()
-
-        # We need to clear previous media_root content
-        # This points to the test directory, but just in case
-        # we double check that the directory is indeed a test directory
-        if "_test" in settings.MEDIA_ROOT:
-            if os.path.exists(settings.MEDIA_ROOT):
-                logger.info("Cleaning up {}".format(settings.MEDIA_ROOT))
-                shutil.rmtree(settings.MEDIA_ROOT)
-        else:
-            logger.warning("We did not remove MEDIA_ROOT because we couldn't find a _test suffix in its path.")
+        clear_test_media_root()
 
     def test_task(self):
         client = APIClient()
@@ -204,7 +186,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # On update scheduler.processing_pending_tasks should have been called in the background
-        testWatch.wait_until_call("app.scheduler.process_pending_tasks", timeout=5)
+        testWatch.wait_until_call("worker.tasks.process_pending_tasks", timeout=5)
 
         # Processing should have started and a UUID is assigned
         task.refresh_from_db()
@@ -225,7 +207,7 @@ class TestApiTask(BootTransactionTestCase):
         time.sleep(DELAY)
 
         # Calling process pending tasks should finish the process
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.COMPLETED)
 
@@ -294,7 +276,7 @@ class TestApiTask(BootTransactionTestCase):
         testWatch.clear()
         res = client.post("/api/projects/{}/tasks/{}/restart/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
-        testWatch.wait_until_call("app.scheduler.process_pending_tasks", timeout=5)
+        testWatch.wait_until_call("worker.tasks.process_pending_tasks", timeout=5)
         task.refresh_from_db()
 
         self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])
@@ -303,7 +285,7 @@ class TestApiTask(BootTransactionTestCase):
         testWatch.clear()
         res = client.post("/api/projects/{}/tasks/{}/cancel/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
-        testWatch.wait_until_call("app.scheduler.process_pending_tasks", timeout=5)
+        testWatch.wait_until_call("worker.tasks.process_pending_tasks", timeout=5)
 
         # Should have been canceled
         task.refresh_from_db()
@@ -312,7 +294,7 @@ class TestApiTask(BootTransactionTestCase):
         # Remove a task
         res = client.post("/api/projects/{}/tasks/{}/remove/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
-        testWatch.wait_until_call("app.scheduler.process_pending_tasks", 2, timeout=5)
+        testWatch.wait_until_call("worker.tasks.process_pending_tasks", 2, timeout=5)
 
         # Has been removed along with assets
         self.assertFalse(Task.objects.filter(pk=task.id).exists())
@@ -322,7 +304,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertFalse(os.path.exists(task_assets_path))
 
         testWatch.clear()
-        testWatch.intercept("app.scheduler.process_pending_tasks")
+        testWatch.intercept("worker.tasks.process_pending_tasks")
 
         # Create a task, then kill the processing node
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -339,7 +321,7 @@ class TestApiTask(BootTransactionTestCase):
 
         task.refresh_from_db()
         self.assertTrue(task.last_error is None)
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         # Processing should fail and set an error
         task.refresh_from_db()
@@ -356,20 +338,20 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.pending_action == pending_actions.RESTART)
 
         # After processing, the task should have restarted, and have no UUID or status
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
         task.refresh_from_db()
         self.assertTrue(task.status is None)
         self.assertTrue(len(task.uuid) == 0)
 
         # Another step and it should have acquired a UUID
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
         task.refresh_from_db()
         self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])
         self.assertTrue(len(task.uuid) > 0)
 
         # Another step and it should be completed
         time.sleep(DELAY)
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.COMPLETED)
 
@@ -392,7 +374,7 @@ class TestApiTask(BootTransactionTestCase):
 
         # 4. Check that the rerun_from parameter has been cleared
         #   but the other parameters are still set
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
         task.refresh_from_db()
         self.assertTrue(len(task.uuid) == 0)
         self.assertTrue(len(list(filter(lambda d: d['name'] == 'rerun-from', task.options))) == 0)
@@ -403,7 +385,7 @@ class TestApiTask(BootTransactionTestCase):
             raise requests.exceptions.ConnectTimeout("Simulated timeout")
 
         testWatch.intercept("nodeodm.api_client.task_output", connTimeout)
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         # Timeout errors should be handled by retrying again at a later time
         # and not fail
@@ -439,9 +421,9 @@ class TestApiTask(BootTransactionTestCase):
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_201_CREATED)
 
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
         time.sleep(DELAY)
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         task = Task.objects.get(pk=res.data['id'])
         self.assertTrue(task.status == status_codes.COMPLETED)
@@ -491,7 +473,7 @@ class TestApiTask(BootTransactionTestCase):
         task.last_error = "Test error"
         task.save()
 
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         # A processing node should not have been assigned
         task.refresh_from_db()
@@ -501,7 +483,7 @@ class TestApiTask(BootTransactionTestCase):
         task.last_error = None
         task.save()
 
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         # A processing node should not have been assigned because no processing nodes are online
         task.refresh_from_db()
@@ -513,7 +495,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(pnode.is_online())
 
         # A processing node has been assigned
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
         task.refresh_from_db()
         self.assertTrue(task.processing_node.id == pnode.id)
 
@@ -532,13 +514,13 @@ class TestApiTask(BootTransactionTestCase):
         task.status = None
         task.save()
 
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         # Processing node is now cleared and a new one will be assigned on the next tick
         task.refresh_from_db()
         self.assertTrue(task.processing_node is None)
 
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         task.refresh_from_db()
         self.assertTrue(task.processing_node.id == another_pnode.id)
@@ -554,7 +536,7 @@ class TestApiTask(BootTransactionTestCase):
         pnode.save()
         self.assertTrue(pnode.is_online())
 
-        scheduler.process_pending_tasks()
+        worker.tasks.process_pending_tasks()
 
         # A processing node should not have been assigned because we asked
         # not to via auto_processing_node = false

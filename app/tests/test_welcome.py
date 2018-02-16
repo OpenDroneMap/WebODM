@@ -1,11 +1,9 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.test import Client
-from rest_framework import status
 
-from app.models import Project, Task
+from app.models import Project
 from .classes import BootTestCase
-from app import scheduler
-from django.core.exceptions import ValidationError
+
 
 class TestWelcome(BootTestCase):
 

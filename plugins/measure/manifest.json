@@ -1,6 +1,6 @@
 {
 	"name": "Area/Length Measurements",
-	"webodmMinVersion": "0.4.2",
+	"webodmMinVersion": "0.5.0",
 	"description": "A plugin to compute area and length measurements on Leaflet",
 	"version": "0.1.0",
 	"author": "Piero Toffanin",

@@ -1,5 +1,6 @@
 import os
 
+import kombu
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
@@ -93,7 +94,11 @@ def boot():
         register_plugins()
 
         if not settings.TESTING:
-            worker_tasks.update_nodes_info.delay()
+            try:
+                worker_tasks.update_nodes_info.delay()
+            except kombu.exceptions.OperationalError as e:
+                logger.error("Cannot connect to celery broker at {}. Make sure that your redis-server is running at that address: {}".format(settings.CELERY_BROKER_URL, str(e)))
+
 
     except ProgrammingError:
         logger.warning("Could not touch the database. If running a migration, this is expected.")
