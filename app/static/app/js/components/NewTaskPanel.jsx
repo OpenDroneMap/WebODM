@@ -92,7 +92,7 @@ class NewTaskPanel extends React.Component {
                 <div className="btn-group">
                   <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
                     {this.state.resize ? 
-                     "Yes" : "Skip"} <span className="caret"></span>
+                     "Yes" : "No"} <span className="caret"></span>
                   </button>
                   <ul className="dropdown-menu">
                     <li>
