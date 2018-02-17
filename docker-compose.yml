@@ -3,9 +3,7 @@
 version: '2'
 volumes:
   dbdata:
-    driver: local
   appmedia:
-    driver: local
 services:
   db:
     image: opendronemap/webodm_db
@@ -30,17 +28,20 @@ services:
       - WO_PORT
       - WO_HOST
       - WO_DEBUG
+      - WO_BROKER
     restart: on-failure:10
   broker:
     image: redis
     container_name: broker
   worker:
-    image: opendronemap/webodm_worker
+    image: opendronemap/webodm_webapp
     container_name: worker
-    entrypoint: /bin/bash -c \"/webodm/wait-for-it.sh broker:6379 -- /broker/start.sh\""
+    entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh broker:6379 -- /webodm/worker.sh start"
     volumes:
-      - ${WO_MEDIA_DIR}:/worker/app/media
+      - ${WO_MEDIA_DIR}:/webodm/app/media
     depends_on:
+      - db
       - broker
     environment:
       - WO_BROKER
+      - WO_DEBUG
