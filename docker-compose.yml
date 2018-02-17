@@ -44,3 +44,4 @@ services:
       - broker
     environment:
       - WO_BROKER
+      - WO_DEBUG
