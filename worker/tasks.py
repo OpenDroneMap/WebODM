@@ -12,7 +12,6 @@ from nodeodm.models import ProcessingNode
 from .celery import app
 from celery.utils.log import get_task_logger
 from django.db import transaction
-from app.testwatch import testWatch
 
 logger = get_task_logger(__name__)
 
@@ -66,22 +65,16 @@ def process_task(taskId):
 
 @app.task
 def process_pending_tasks():
-    if settings.TESTING:
-        testWatch.manual_log_call('worker.tasks.process_pending_tasks')
-
     # All tasks that have a processing node assigned
     # Or that need one assigned (via auto)
     # or tasks that need a status update
     # or tasks that have a pending action
     # and that are not locked (being processed by another thread)
-    qs = Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
+    tasks = Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
                                 Q(Q(status=None) | Q(status__in=[status_codes.QUEUED, status_codes.RUNNING]),
                                   processing_node__isnull=False) |
                                 Q(pending_action__isnull=False)).exclude(Q(processing_lock=True))
 
-    tasks = list(qs)
-
-    if len(qs) > 0:
-        for task in tasks:
-            process_task.delay(task.id)
+    for task in tasks:
+        process_task.delay(task.id)
 

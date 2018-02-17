@@ -80,8 +80,8 @@ class TaskViewSet(viewsets.ViewSet):
         task.last_error = None
         task.save()
 
-        # Process pending tasks without waiting for the scheduler (speed things up)
-        worker_tasks.process_pending_tasks.delay()
+        # Process task right away
+        worker_tasks.process_task.delay(task.id)
 
         return Response({'success': True})
 
@@ -176,8 +176,8 @@ class TaskViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # Process pending tasks without waiting for the scheduler (speed things up)
-        worker_tasks.process_pending_tasks.delay()
+        # Process task right away
+        worker_tasks.process_task.delay(task.id)
 
         return Response(serializer.data)
 

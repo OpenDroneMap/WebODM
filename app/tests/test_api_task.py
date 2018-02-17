@@ -12,7 +12,6 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 import worker
-from app import pending_actions
 from django.utils import timezone
 from app.models import Project, Task, ImageUpload
 from app.models.task import task_directory_path, full_task_directory_path
@@ -174,10 +173,9 @@ class TestApiTask(BootTransactionTestCase):
         })
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
-        testWatch.clear()
-
         # No UUID at this point
         self.assertTrue(len(task.uuid) == 0)
+
         # Assign processing node to task via API
         res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
             'processing_node': pnode.id
@@ -185,7 +183,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # On update worker.tasks.process_pending_tasks should have been called in the background
-        testWatch.wait_until_call("worker.tasks.process_pending_tasks", timeout=5)
+        # (during tests this is sync)
 
         # Processing should have started and a UUID is assigned
         task.refresh_from_db()
@@ -275,16 +273,15 @@ class TestApiTask(BootTransactionTestCase):
         testWatch.clear()
         res = client.post("/api/projects/{}/tasks/{}/restart/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
-        testWatch.wait_until_call("worker.tasks.process_pending_tasks", timeout=5)
+        # process_task is called in the background
         task.refresh_from_db()
 
         self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])
 
         # Cancel a task
-        testWatch.clear()
         res = client.post("/api/projects/{}/tasks/{}/cancel/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
-        testWatch.wait_until_call("worker.tasks.process_pending_tasks", timeout=5)
+        # task is processed right away
 
         # Should have been canceled
         task.refresh_from_db()
@@ -293,7 +290,7 @@ class TestApiTask(BootTransactionTestCase):
         # Remove a task
         res = client.post("/api/projects/{}/tasks/{}/remove/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
-        testWatch.wait_until_call("worker.tasks.process_pending_tasks", 2, timeout=5)
+        # task is processed right away
 
         # Has been removed along with assets
         self.assertFalse(Task.objects.filter(pk=task.id).exists())
@@ -301,9 +298,6 @@ class TestApiTask(BootTransactionTestCase):
 
         task_assets_path = os.path.join(settings.MEDIA_ROOT, task_directory_path(task.id, task.project.id))
         self.assertFalse(os.path.exists(task_assets_path))
-
-        testWatch.clear()
-        testWatch.intercept("worker.tasks.process_pending_tasks")
 
         # Create a task, then kill the processing node
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -334,11 +328,8 @@ class TestApiTask(BootTransactionTestCase):
         res = client.post("/api/projects/{}/tasks/{}/restart/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
         task.refresh_from_db()
-        self.assertTrue(task.pending_action == pending_actions.RESTART)
 
         # After processing, the task should have restarted, and have no UUID or status
-        worker.tasks.process_pending_tasks()
-        task.refresh_from_db()
         self.assertTrue(task.status is None)
         self.assertTrue(len(task.uuid) == 0)
 
@@ -368,12 +359,9 @@ class TestApiTask(BootTransactionTestCase):
         # 3. Restart the task
         res = client.post("/api/projects/{}/tasks/{}/restart/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
-        task.refresh_from_db()
-        self.assertTrue(task.pending_action == pending_actions.RESTART)
 
         # 4. Check that the rerun_from parameter has been cleared
         #   but the other parameters are still set
-        worker.tasks.process_pending_tasks()
         task.refresh_from_db()
         self.assertTrue(len(task.uuid) == 0)
         self.assertTrue(len(list(filter(lambda d: d['name'] == 'rerun-from', task.options))) == 0)

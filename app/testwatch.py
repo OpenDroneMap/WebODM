@@ -1,12 +1,6 @@
-import time, redis
+import time
 
 import logging
-
-import marshal
-import types
-
-import json
-
 from webodm import settings
 
 logger = logging.getLogger('app.logger')
@@ -93,47 +87,5 @@ class TestWatch:
                 return ret
             return wrapper
         return outer
-
-"""
-Redis-backed test watch
-suitable for cross-machine/cross-process
-test watching
-"""
-class SharedTestWatch(TestWatch):
-    """
-    :param redis_url same as celery broker URL, for ex. redis://localhost:1234
-    """
-    def __init__(self, redis_url):
-        self.r = redis.from_url(redis_url)
-        super().__init__()
-
-    def clear(self):
-        self.r.delete('testwatch:calls', 'testwatch:intercept_list')
-
-    def intercept(self, fname, f = None):
-        self.r.hmset('testwatch:intercept_list', {fname: marshal.dumps(f.__code__) if f is not None else 1})
-
-    def intercept_list_has(self, fname):
-        return self.r.hget('testwatch:intercept_list', fname) is not None
-
-    def execute_intercept_function_replacement(self, fname, *args, **kwargs):
-        if self.intercept_list_has(fname) and self.r.hget('testwatch:intercept_list', fname) != b'1':
-            # Rebuild function
-            fcode = self.r.hget('testwatch:intercept_list', fname)
-            f = types.FunctionType(marshal.loads(fcode), globals())
-            f(*args, **kwargs)
-
-    def get_calls(self, fname):
-        value = self.r.hget('testwatch:calls', fname)
-        if value is None: return []
-        else:
-            return json.loads(value.decode('utf-8'))
-
-    def set_calls(self, fname, value):
-        self.r.hmset('testwatch:calls', {fname: json.dumps(value)})
-
-    # def watch(**kwargs):
-    #     return TestWatch.watch(tw=sharedTestWatch, **kwargs)
-
 
 testWatch = TestWatch()
