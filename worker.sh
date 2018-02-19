@@ -9,7 +9,9 @@ usage(){
   echo "This program manages the background worker processes. WebODM requires at least one background process worker to be running at all times."
   echo 
   echo "Command list:"
-  echo "	start		Start background worker"
+  echo "	start				Start background worker"
+  echo "	scheduler start		Start background worker scheduler"
+  echo "	scheduler stop 		Stop background worker scheduler"
   exit
 }
 
@@ -51,12 +53,41 @@ start(){
 	action=$1
 
 	echo "Starting worker using broker at $WO_BROKER"
-	celery -A worker worker --loglevel=info
+	celery -A worker worker --loglevel=warn > /dev/null
+}
+
+start_scheduler(){
+	stop_scheduler
+	if [[ ! -f ./celerybeat.pid ]]; then
+		celery -A worker beat &
+	else
+		echo "Scheduler already running (celerybeat.pid exists)."
+	fi
+}
+
+stop_scheduler(){
+	if [[ -f ./celerybeat.pid ]]; then
+		kill -9 $(cat ./celerybeat.pid) 2>/dev/null
+		rm ./celerybeat.pid 2>/dev/null
+		echo "Scheduler has shutdown."
+	else
+		echo "Scheduler is not running."
+	fi
 }
 
 if [[ $1 = "start" ]]; then
 	environment_check
 	start
+elif [[ $1 = "scheduler" ]]; then
+	if [[ $2 = "start" ]]; then
+		environment_check
+		start_scheduler
+	elif [[ $2 = "stop" ]]; then
+		environment_check
+		stop_scheduler
+	else
+		usage
+	fi
 else
 	usage
 fi

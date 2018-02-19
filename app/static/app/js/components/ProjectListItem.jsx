@@ -11,6 +11,7 @@ import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
+import ResizeModes from '../classes/ResizeModes';
 import $ from 'jquery';
 
 class ProjectListItem extends React.Component {
@@ -180,6 +181,10 @@ class ProjectListItem extends React.Component {
           if (!formData.has || !formData.has("options")) formData.append("options", JSON.stringify(taskInfo.options));
           if (!formData.has || !formData.has("processing_node")) formData.append("processing_node", taskInfo.selectedNode.id);
           if (!formData.has || !formData.has("auto_processing_node")) formData.append("auto_processing_node", taskInfo.selectedNode.key == "auto");
+
+          if (taskInfo.resizeMode === ResizeModes.YES){
+            if (!formData.has || !formData.has("resize_to")) formData.append("resize_to", taskInfo.resizeSize);
+          }
         });
     }
   }
@@ -225,8 +230,8 @@ class ProjectListItem extends React.Component {
     this.dz._taskInfo = taskInfo; // Allow us to access the task info from dz
 
     // Update dropzone settings
-    if (taskInfo.resizeTo !== null){
-      this.dz.options.resizeWidth = taskInfo.resizeTo;
+    if (taskInfo.resizeMode === ResizeModes.YESINBROWSER){
+      this.dz.options.resizeWidth = taskInfo.resizeSize;
       this.dz.options.resizeQuality = 1.0;
 
       this.setUploadState({resizing: true, editing: false});

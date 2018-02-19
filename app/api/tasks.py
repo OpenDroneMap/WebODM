@@ -145,7 +145,8 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
 
         with transaction.atomic():
-            task = models.Task.objects.create(project=project)
+            task = models.Task.objects.create(project=project,
+                                              pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
 
             for image in files:
                 models.ImageUpload.objects.create(task=task, image=image)
@@ -155,7 +156,9 @@ class TaskViewSet(viewsets.ViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            worker_tasks.process_task.delay(task.id)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
     def update(self, request, pk=None, project_pk=None, partial=False):

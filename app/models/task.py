@@ -4,6 +4,9 @@ import shutil
 import zipfile
 import uuid as uuid_module
 
+import piexif
+import re
+from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
@@ -21,6 +24,10 @@ from nodeodm.exceptions import ProcessingError, ProcessingTimeout, ProcessingExc
 from nodeodm.models import ProcessingNode
 from webodm import settings
 from .project import Project
+
+from functools import partial
+from multiprocessing import cpu_count
+from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger('app.logger')
 
@@ -57,6 +64,47 @@ def validate_task_options(value):
         raise ValidationError("Invalid options")
 
 
+
+def resize_image(image_path, resize_to):
+    try:
+        im = Image.open(image_path)
+        path, ext = os.path.splitext(image_path)
+        resized_image_path = os.path.join(path + '.resized' + ext)
+
+        width, height = im.size
+        max_side = max(width, height)
+        if max_side < resize_to:
+            logger.warning('You asked to make {} bigger ({} --> {}), but we are not going to do that.'.format(image_path, max_side, resize_to))
+            im.close()
+            return {'path': image_path, 'resize_ratio': 1}
+
+        ratio = float(resize_to) / float(max_side)
+        resized_width = int(width * ratio)
+        resized_height = int(height * ratio)
+
+        im.thumbnail((resized_width, resized_height), Image.LANCZOS)
+
+        if 'exif' in im.info:
+            exif_dict = piexif.load(im.info['exif'])
+            exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
+            exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
+            im.save(resized_image_path, "JPEG", exif=piexif.dump(exif_dict), quality=100)
+        else:
+            im.save(resized_image_path, "JPEG", quality=100)
+
+        im.close()
+
+        # Delete original image, rename resized image to original
+        os.remove(image_path)
+        os.rename(resized_image_path, image_path)
+
+        logger.info("Resized {} to {}x{}".format(image_path, resized_width, resized_height))
+    except IOError as e:
+        logger.warning("Cannot resize {}: {}.".format(image_path, str(e)))
+        return None
+
+    return {'path': image_path, 'resize_ratio': ratio}
+
 class Task(models.Model):
     ASSETS_MAP = {
             'all.zip': 'all.zip',
@@ -85,6 +133,7 @@ class Task(models.Model):
         (pending_actions.CANCEL, 'CANCEL'),
         (pending_actions.REMOVE, 'REMOVE'),
         (pending_actions.RESTART, 'RESTART'),
+        (pending_actions.RESIZE, 'RESIZE'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
@@ -112,6 +161,7 @@ class Task(models.Model):
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration.")
 
     public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
+    resize_to = models.IntegerField(default=-1, help_text="When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing.")
 
 
     def __init__(self, *args, **kwargs):
@@ -227,6 +277,11 @@ class Task(models.Model):
         """
 
         try:
+            if self.pending_action == pending_actions.RESIZE:
+                self.resize_images()
+                self.pending_action = None
+                self.save()
+
             if self.auto_processing_node and not self.status in [status_codes.FAILED, status_codes.CANCELED]:
                 # No processing node assigned and need to auto assign
                 if self.processing_node is None:
@@ -515,8 +570,31 @@ class Task(models.Model):
         self.pending_action = None
         self.save()
 
+
+    def resize_images(self):
+        """
+        Destructively resize this assets JPG images while retaining EXIF tags.
+        Resulting images are always converted to JPG.
+        TODO: add support for tiff files
+        :return list containing paths of resized images and resize ratios
+        """
+        if self.resize_to < 0:
+            logger.warning("We were asked to resize images to {}, this might be an error.".format(self.resize_to))
+            return []
+
+        directory = full_task_directory_path(self.id, self.project.id)
+        images_path = [os.path.join(directory, f) for f in os.listdir(directory) if
+                       re.match(r'.*\.jpe?g$', f, re.IGNORECASE)]
+
+        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
+            resized_images = list(filter(lambda i: i is not None, executor.map(
+                partial(resize_image, resize_to=self.resize_to),
+                images_path)))
+
+        return resized_images
+
+
     class Meta:
         permissions = (
             ('view_task', 'Can view task'),
         )
-
