@@ -4,6 +4,9 @@ import shutil
 import zipfile
 import uuid as uuid_module
 
+import json
+from shlex import quote
+
 import piexif
 import re
 from PIL import Image
@@ -28,6 +31,7 @@ from .project import Project
 from functools import partial
 from multiprocessing import cpu_count
 from concurrent.futures import ThreadPoolExecutor
+import subprocess
 
 logger = logging.getLogger('app.logger')
 
@@ -278,7 +282,8 @@ class Task(models.Model):
 
         try:
             if self.pending_action == pending_actions.RESIZE:
-                self.resize_images()
+                resized_images = self.resize_images()
+                self.resize_gcp(resized_images)
                 self.pending_action = None
                 self.save()
 
@@ -562,7 +567,6 @@ class Task(models.Model):
         except FileNotFoundError as e:
             logger.warning(e)
 
-
     def set_failure(self, error_message):
         logger.error("FAILURE FOR {}: {}".format(self, error_message))
         self.last_error = error_message
@@ -570,10 +574,14 @@ class Task(models.Model):
         self.pending_action = None
         self.save()
 
+    def find_all_files_matching(self, regex):
+        directory = full_task_directory_path(self.id, self.project.id)
+        return [os.path.join(directory, f) for f in os.listdir(directory) if
+                       re.match(regex, f, re.IGNORECASE)]
 
     def resize_images(self):
         """
-        Destructively resize this assets JPG images while retaining EXIF tags.
+        Destructively resize this task's JPG images while retaining EXIF tags.
         Resulting images are always converted to JPG.
         TODO: add support for tiff files
         :return list containing paths of resized images and resize ratios
@@ -582,9 +590,7 @@ class Task(models.Model):
             logger.warning("We were asked to resize images to {}, this might be an error.".format(self.resize_to))
             return []
 
-        directory = full_task_directory_path(self.id, self.project.id)
-        images_path = [os.path.join(directory, f) for f in os.listdir(directory) if
-                       re.match(r'.*\.jpe?g$', f, re.IGNORECASE)]
+        images_path = self.find_all_files_matching(r'.*\.jpe?g$')
 
         with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
             resized_images = list(filter(lambda i: i is not None, executor.map(
@@ -593,6 +599,34 @@ class Task(models.Model):
 
         return resized_images
 
+    def resize_gcp(self, resized_images):
+        """
+        Destructively change this task's GCP file (if any)
+        by resizing the location of GCP entries.
+        :param resized_images: list of objects having "path" and "resize_ratio" keys
+            for example [{'path': 'path/to/DJI_0018.jpg', 'resize_ratio': 0.25}, ...]
+        :return: path to changed GCP file or None if no GCP file was found/changed
+        """
+        gcp_path = self.find_all_files_matching(r'.*\.txt$')
+        if len(gcp_path) == 0: return None
+
+        # Assume we only have a single GCP file per task
+        gcp_path = gcp_path[0]
+        resize_script_path = os.path.join(settings.BASE_DIR, 'app', 'scripts', 'resize_gcp.js')
+
+        dict = {}
+        for ri in resized_images:
+            dict[os.path.basename(ri['path'])] = ri['resize_ratio']
+
+        try:
+            new_gcp_content = subprocess.check_output("node {} {} '{}'".format(quote(resize_script_path), quote(gcp_path), json.dumps(dict)), shell=True)
+            with open(gcp_path, 'w') as f:
+                f.write(new_gcp_content.decode('utf-8'))
+            logger.info("Resized GCP file {}".format(gcp_path))
+            return gcp_path
+        except subprocess.CalledProcessError as e:
+            logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
+            return None
 
     class Meta:
         permissions = (
