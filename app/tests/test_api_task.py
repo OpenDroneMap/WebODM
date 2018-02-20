@@ -299,7 +299,10 @@ class TestApiTask(BootTransactionTestCase):
         task_assets_path = os.path.join(settings.MEDIA_ROOT, task_directory_path(task.id, task.project.id))
         self.assertFalse(os.path.exists(task_assets_path))
 
-        # Create a task, then kill the processing node
+        # Stop processing node
+        node_odm.terminate()
+
+        # Create a task
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
             'images': [image1, image2],
             'name': 'test_task_offline',
@@ -308,13 +311,6 @@ class TestApiTask(BootTransactionTestCase):
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_201_CREATED)
         task = Task.objects.get(pk=res.data['id'])
-
-        # Stop processing node
-        node_odm.terminate()
-
-        task.refresh_from_db()
-        self.assertTrue(task.last_error is None)
-        worker.tasks.process_pending_tasks()
 
         # Processing should fail and set an error
         task.refresh_from_db()
