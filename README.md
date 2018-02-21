@@ -14,6 +14,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
     * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
+    * [Backup and Restore](#backup-and-restore)
  * [API Docs](#api-docs)
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
  * [Roadmap](#roadmap)
@@ -125,13 +126,35 @@ While starting WebODM you get: `'WaitNamedPipe','The system cannot find the file
 While Accessing the WebODM interface you get: `OperationalError at / could not translate host name “db” to address: Name or service not known` or `ProgrammingError at / relation “auth_user” does not exist` | Try restarting your computer, then type: `./webodm.sh down && ./webodm.sh start`
 Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
 After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` | Try to remove your WebODM folder and start from a fresh git clone
-Task fails with `Process exited with code null`, no task console output | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
+Task fails with `Process exited with code null`, no task console output - OR - console output shows `Illegal Instruction` | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
 On Windows, docker-compose fails with `Failed to execute the script docker-compose` | Make sure you have enabled VT-x virtualization in the BIOS
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
 Cannot start WebODM via `./webodm.sh start`, error messages are different at each retry | You could be running out of memory. Make sure you have enough RAM available. 2GB should be the recommended minimum, unless you know what you are doing
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
+
+### Backup and Restore
+
+If you want to move WebODM to another system, you just need to transfer the docker volumes (unless you are storing your files on the file system).
+
+On the old system:
+
+```bash
+mkdir -v backup
+docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubuntu tar cvf /backup/dbdata.tar /temp
+docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu tar cvf /backup/appmedia.tar /temp
+```
+
+Your backup files will be stored in the newly created `backup` directory. Transfer the `backup` directory to the new system, then on the new system:
+
+```bash
+ls backup # --> appmedia.tar  dbdata.tar
+./webodm.sh start && ./webodm.sh down # Create volumes
+docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/dbdata.tar"
+docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/appmedia.tar"
+./webodm.sh start
+```
 
 ## API Docs
 
