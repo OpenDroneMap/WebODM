@@ -1,0 +1,3 @@
+[submodule "nodeodm/external/node-OpenDroneMap"]
+	path = nodeodm/external/node-OpenDroneMap
+	url = https://github.com/OpenDroneMap/node-OpenDroneMap
