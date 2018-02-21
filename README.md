@@ -221,11 +221,23 @@ There are many ways to contribute back to the project:
  - ⭐️ us on GitHub.
  - Spread the word about WebODM and OpenDroneMap on social media.
  - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [premium support package](https://webodm.org/services#premium-support).
- - Become a contributor (see below).
+ - Become a contributor (see below to get free swag 🤘)
 
 ## Become a Contributor
 
-If you know Python, web technologies (JS, HTML, CSS, etc.) or both, it's easy to make a change to WebODM! Make a fork, clone the repository and run `./devenv.sh start`. That's it! See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information. All ideas are considered and people of all skill levels are welcome to contribute.
+The easiest way to get started is to take a look at our list of [outstanding issues](https://github.com/OpenDroneMap/WebODM/labels/help%20wanted) and pick one, or you can fix/improve something entirely new based on your experience with WebODM. All ideas are considered and people of all skill levels are welcome to contribute. 
+
+You don't necessarely need to be a developer to become a contributor either. We can use your help to write better documentation and improve the user interface texts and visuals. 
+
+If you know how to code, we primarily use Python (Django), Javascript (React), HTML and SCSS. See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information.
+
+To make a contribution, you will need to open a pull request ([here's how](https://www.thinkful.com/learn/github-pull-request-tutorial/)). To make changes to WebODM, make a clone of the repository and run `./devenv.sh start`.
+
+If you have questions visit us on the [forum](http://community.opendronemap.org/c/webodm) and we'll be happy to help you out with your first contribution.
+
+When your first pull request is accepted, don't forget to fill [this form](https://goo.gl/forms/PZkiPPeNKUHNz0qe2) to get your **free** WebODM t-shirt 🤘.
+
+<img src="https://user-images.githubusercontent.com/1951843/36511023-344f86b2-1733-11e8-8cae-236645db407b.png" alt="T-Shirt" width="50%">
 
 ## Run the docker version as a Linux Service
 
@@ -240,36 +252,28 @@ The following pre-requisites are required:
  * Requires docker installed via system (ubuntu: `sudo apt-get install docker.io`)
  * Requires screen to be installed
  * Requires odm user member of docker group
- * Required WebODM directory checked out to /opt/WebODM
- * Requires that /opt/WebODM is recursively owned by odm:odm
+ * Required WebODM directory checked out to /webodm
+ * Requires that /webodm is recursively owned by odm:odm
+ * Requires that a Python 3 environment is used at /webodm/python3-venv
 
 If all pre-requisites have been met, and repository is checked out to /opt/WebODM folder, then you can use the following steps to enable and manage the service:
 
-First, to install the service, and enable the service to run at startup from now on:
+First, to install the service, and enable the services to run at startup from now on:
 ```bash
-sudo systemctl enable /opt/WebODM/service/webodm.service
+sudo systemctl enable /webodm/service/webodm-gunicorn.service
+sudo systemctl enable /webodm/service/webodm-nginx.service
 ```
 
-To manually stop the service:
+To manually start/stop the service:
 ```bash
-sudo systemctl stop webodm
-```
-
-To manually start the service:
-```bash
-sudo systemctl start webodm
+sudo systemctl stop webodm-gunicorn
+sudo systemctl start webodm-gunicorn
 ```
 
 To manually check service status:
 ```bash
-sudo systemctl status webodm
+sudo systemctl status webodm-gunicorn
 ```
-
-The service runs within a screen session, so as the odm user you can easily jump into the screen session by using:
-```bash
-screen -r webodm
-```
-(if you wish to exit the screen session, don't use ctrl+c, that will kill webodm, use `CTRL+A` then hit the `D` key)
 
 ## Run it natively
 
