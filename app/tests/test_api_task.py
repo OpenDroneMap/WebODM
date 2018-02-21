@@ -7,6 +7,7 @@ from datetime import timedelta
 
 import json
 import requests
+from PIL import Image
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -67,6 +68,8 @@ class TestApiTask(BootTransactionTestCase):
         image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
         image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
 
+        img1 = Image.open("app/fixtures/tiny_drone_image.jpg")
+
         # Not authenticated?
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
             'images': [image1, image2]
@@ -109,6 +112,27 @@ class TestApiTask(BootTransactionTestCase):
         multiple_param_task = Task.objects.latest('created_at')
         self.assertTrue(multiple_param_task.name == 'test_task')
         self.assertTrue(multiple_param_task.processing_node.id == pnode.id)
+
+        # Uploaded images should be the same size as originals
+        with Image.open(multiple_param_task.task_path("tiny_drone_image.jpg")) as im:
+            self.assertTrue(im.size == img1.size)
+
+        # Normal case with images[], GCP, name and processing node parameter and resize_to option
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'images': [image1, image2],
+            'name': 'test_task',
+            'processing_node': pnode.id,
+            'resize_to': img1.size[0] / 2.0
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+        resized_task = Task.objects.latest('created_at')
+
+        # Uploaded images should have been resized
+        with Image.open(resized_task.task_path("tiny_drone_image.jpg")) as im:
+            self.assertTrue(im.size[0] == img1.size[0] / 2.0)
+
+        # TODO: gcp entries should have been resized
+        
 
         # Cannot create a task with images[], name, but invalid processing node parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {

@@ -226,9 +226,14 @@ class Task(models.Model):
         """
         Get a path relative to the place where assets are stored
         """
+        return self.task_path("assets", *args)
+
+    def task_path(self, *args):
+        """
+        Get path relative to the root task directory
+        """
         return os.path.join(settings.MEDIA_ROOT,
                             assets_directory_path(self.id, self.project.id, ""),
-                            "assets",
                             *args)
 
     def is_asset_available_slow(self, asset):
