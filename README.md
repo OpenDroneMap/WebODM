@@ -227,7 +227,7 @@ There are many ways to contribute back to the project:
 
 The easiest way to get started is to take a look at our list of [outstanding issues](https://github.com/OpenDroneMap/WebODM/labels/help%20wanted) and pick one. You can also fix/improve something entirely new based on your experience with WebODM. All ideas are considered and people of all skill levels are welcome to contribute. 
 
-You don't necessarely need to be a developer to become a contributor either. We can use your help to write better documentation and improve the user interface texts and visuals. 
+You don't necessarily need to be a developer to become a contributor. We can use your help to write better documentation and improve the user interface texts and visuals. 
 
 If you know how to code, we primarily use Python (Django), Javascript (React), HTML and SCSS. See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information.
 
