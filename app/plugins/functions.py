@@ -23,10 +23,18 @@ def get_url_patterns():
     """
     url_patterns = []
     for plugin in get_active_plugins():
+        for mount_point in plugin.mount_points():
+            url_patterns.append(url('^plugins/{}/{}'.format(plugin.get_name(), mount_point.url),
+                                mount_point.view,
+                                *mount_point.args,
+                                **mount_point.kwargs))
+
         if plugin.has_public_path():
             url_patterns.append(url('^plugins/{}/(.*)'.format(plugin.get_name()),
                                     django.views.static.serve,
                                     {'document_root': plugin.get_path("public")}))
+
+
     return url_patterns
 
 plugins = None

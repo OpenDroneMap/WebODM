@@ -24,10 +24,13 @@ class PluginBase(ABC):
         return self.__class__.__module__
 
     def get_include_js_urls(self):
-        return ["/plugins/{}/{}".format(self.get_name(), js_file) for js_file in self.include_js_files()]
+        return [self.url(js_file) for js_file in self.include_js_files()]
 
     def get_include_css_urls(self):
-        return ["/plugins/{}/{}".format(self.get_name(), css_file) for css_file in self.include_css_files()]
+        return [self.url(css_file) for css_file in self.include_css_files()]
+
+    def url(self, path):
+        return "/plugins/{}/{}".format(self.get_name(), path)
 
     def has_public_path(self):
         return os.path.isdir(self.get_path("public"))
@@ -45,6 +48,22 @@ class PluginBase(ABC):
         Should be overriden by plugins to communicate
         which CSS files should be included in the WebODM interface
         All paths are relative to a plugin's /public folder.
+        """
+        return []
+
+    def main_menu(self):
+        """
+        Should be overriden by plugins that want to add
+        items to the side menu.
+        :return: [] of Menu objects
+        """
+        return []
+
+    def mount_points(self):
+        """
+        Should be overriden by plugins that want to connect
+        custom Django views
+        :return: [] of MountPoint objects
         """
         return []
 

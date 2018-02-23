@@ -6,7 +6,7 @@ from nodeodm.models import ProcessingNode
 from .classes import BootTestCase
 from .utils import start_processing_node
 
-class TestWelcome(BootTestCase):
+class TestWorker(BootTestCase):
     def setUp(self):
         super().setUp()
 
