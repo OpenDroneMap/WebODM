@@ -62,7 +62,7 @@ def boot():
 
         # Add default presets
         Preset.objects.get_or_create(name='DSM + DTM', system=True,
-                                     options=[{'name': 'dsm', 'value': True}, {'name': 'dtm', 'value': True}])
+                                     options=[{'name': 'dsm', 'value': True}, {'name': 'dtm', 'value': True},  {'name': 'mesh-octree-depth', 'value': 11}])
         Preset.objects.get_or_create(name='Fast Orthophoto', system=True,
                                      options=[{'name': 'fast-orthophoto', 'value': True}])
         Preset.objects.get_or_create(name='High Quality', system=True,
@@ -71,7 +71,7 @@ def boot():
                                                            {'name': 'dem-resolution', 'value': "0.04"},
                                                            {'name': 'orthophoto-resolution', 'value': "40"},
                                                         ])
-        Preset.objects.get_or_create(name='Default', system=True, options=[{'name': 'dsm', 'value': True}])
+        Preset.objects.get_or_create(name='Default', system=True, options=[{'name': 'dsm', 'value': True}, {'name': 'mesh-octree-depth', 'value': 11}])
 
         # Add settings
         default_theme, created = Theme.objects.get_or_create(name='Default')

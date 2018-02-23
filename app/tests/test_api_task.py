@@ -75,6 +75,8 @@ class TestApiTask(BootTransactionTestCase):
             'images': [image1, image2]
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN);
+        image1.seek(0)
+        image2.seek(0)
 
         client.login(username="testuser", password="test1234")
 
@@ -83,12 +85,16 @@ class TestApiTask(BootTransactionTestCase):
             'images': [image1, image2]
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+        image1.seek(0)
+        image2.seek(0)
 
         # Cannot create a task for a project for which we have no access to
         res = client.post("/api/projects/{}/tasks/".format(other_project.id), {
             'images': [image1, image2]
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+        image1.seek(0)
+        image2.seek(0)
 
         # Cannot create a task without images
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -101,6 +107,7 @@ class TestApiTask(BootTransactionTestCase):
             'images': image1
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+        image1.seek(0)
 
         # Normal case with images[], name and processing node parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -112,27 +119,67 @@ class TestApiTask(BootTransactionTestCase):
         multiple_param_task = Task.objects.latest('created_at')
         self.assertTrue(multiple_param_task.name == 'test_task')
         self.assertTrue(multiple_param_task.processing_node.id == pnode.id)
+        image1.seek(0)
+        image2.seek(0)
 
         # Uploaded images should be the same size as originals
         with Image.open(multiple_param_task.task_path("tiny_drone_image.jpg")) as im:
             self.assertTrue(im.size == img1.size)
 
+
         # Normal case with images[], GCP, name and processing node parameter and resize_to option
+        gcp = open("app/fixtures/gcp.txt", 'r')
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
-            'images': [image1, image2],
+            'images': [image1, image2, gcp],
             'name': 'test_task',
             'processing_node': pnode.id,
             'resize_to': img1.size[0] / 2.0
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_201_CREATED)
         resized_task = Task.objects.latest('created_at')
+        image1.seek(0)
+        image2.seek(0)
+        gcp.seek(0)
 
         # Uploaded images should have been resized
         with Image.open(resized_task.task_path("tiny_drone_image.jpg")) as im:
             self.assertTrue(im.size[0] == img1.size[0] / 2.0)
 
-        # TODO: gcp entries should have been resized
-        
+        # GCP should have been scaled
+        with open(resized_task.task_path("gcp.txt")) as f:
+            lines = list(map(lambda l: l.strip(), f.readlines()))
+
+            [x, y, z, px, py, imagename, *extras] = lines[1].split(' ')
+            self.assertTrue(imagename == "tiny_drone_image.JPG") # case insensitive
+            self.assertTrue(float(px) == 2.0) # scaled by half
+            self.assertTrue(float(py) == 3.0) # scaled by half
+            self.assertTrue(float(x) == 576529.22) # Didn't change
+
+            [x, y, z, px, py, imagename, *extras] = lines[5].split(' ')
+            self.assertTrue(imagename == "missing_image.jpg")
+            self.assertTrue(float(px) == 8.0)  # Didn't change
+            self.assertTrue(float(py) == 8.0)  # Didn't change
+
+        # Case with malformed GCP file option
+        with open("app/fixtures/gcp_malformed.txt", 'r') as malformed_gcp:
+            res = client.post("/api/projects/{}/tasks/".format(project.id), {
+                'images': [image1, image2, malformed_gcp],
+                'name': 'test_task',
+                'processing_node': pnode.id,
+                'resize_to': img1.size[0] / 2.0
+            }, format="multipart")
+            self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+            malformed_gcp_task = Task.objects.latest('created_at')
+
+            # We just pass it along, it will get errored out during processing
+            # But we shouldn't fail.
+            with open(malformed_gcp_task.task_path("gcp_malformed.txt")) as f:
+                lines = list(map(lambda l: l.strip(), f.readlines()))
+                self.assertTrue(lines[1] == "<O_O>")
+
+            image1.seek(0)
+            image2.seek(0)
+
 
         # Cannot create a task with images[], name, but invalid processing node parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -141,6 +188,8 @@ class TestApiTask(BootTransactionTestCase):
             'processing_node': 9999
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+        image1.seek(0)
+        image2.seek(0)
 
         # Normal case with images[] parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -148,6 +197,8 @@ class TestApiTask(BootTransactionTestCase):
             'auto_processing_node': 'false'
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+        image1.seek(0)
+        image2.seek(0)
 
         # Should have returned the id of the newly created task
         task = Task.objects.latest('created_at')
@@ -335,6 +386,8 @@ class TestApiTask(BootTransactionTestCase):
         }, format="multipart")
         self.assertTrue(res.status_code == status.HTTP_201_CREATED)
         task = Task.objects.get(pk=res.data['id'])
+        image1.seek(0)
+        image2.seek(0)
 
         # Processing should fail and set an error
         task.refresh_from_db()
@@ -464,6 +517,7 @@ class TestApiTask(BootTransactionTestCase):
 
         image1.close()
         image2.close()
+        gcp.close()
         node_odm.terminate()
 
     def test_task_auto_processing_node(self):
