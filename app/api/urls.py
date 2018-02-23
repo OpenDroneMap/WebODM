@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 
 from app.api.presets import PresetViewSet
 from .projects import ProjectViewSet
-from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets
+from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets, TaskVolume
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
