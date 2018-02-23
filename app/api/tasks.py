@@ -24,7 +24,10 @@ from nodeodm.models import ProcessingNode
 class TaskIDsSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return obj.id
-
+    
+class geojsonSerializer(serializers.Serializer):
+    """docstring for geojsonSeria"""
+    geometry = serializers.JSONField(help_text="polygon contour to get volume")
 
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
@@ -303,3 +306,16 @@ class TaskAssets(TaskNestedView):
                                 content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
         response['Content-Disposition'] = "inline; filename={}".format(asset_filename)
         return response
+    
+class TaskVolume(TaskNestedView):
+    def post(self, request, pk=None, project_pk=None):
+        task = self.get_and_check_task(request, pk, project_pk)
+        serializer = geojsonSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # geometry = serializer.data.get('geometry')
+        # if geometry is None:
+        #     raise exceptions.ValidationError("A geoson file are not available.")
+        result=task.get_volume(request.data)
+        response = Response(result, status=status.HTTP_200_OK)
+        return response
+    
