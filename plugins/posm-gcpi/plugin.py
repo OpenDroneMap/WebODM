@@ -3,17 +3,12 @@ from django.shortcuts import render
 
 class Plugin(PluginBase):
 
-    def register(self):
-    	pass
-
     def main_menu(self):
-    	return [Menu("GCP Editor", self.url("index.html"), "fa fa-map-marker fa-fw")]
+        return [Menu("GCP Interface", self.public_url(""), "fa fa-map-marker fa-fw")]
 
     def mount_points(self):
-    	return [
-    		MountPoint("/test", test)
-    	]
+        return [
+            MountPoint('$', lambda request: render(request, self.template_path("app.html"), {'title': 'GCP Editor'}))
+        ]
 
 
-def test(request):
-    return render(request, 'app/dashboard.html', {'title': 'PLUGIN!!'})

@@ -260,3 +260,8 @@ footer{
         border-top-width: 1px;
     }
 }
+
+.full-height{
+    height: calc(100vh - 110px);
+    padding-bottom: 12px;
+}
