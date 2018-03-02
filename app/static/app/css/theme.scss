@@ -9,6 +9,9 @@ ul#side-menu.nav a,
 {
     color: theme("primary");
 }
+.theme-border-primary{
+    border-color: theme("primary");
+}
 .tooltip{
 	.tooltip-inner{
 		background-color: theme("primary");
@@ -161,6 +164,9 @@ footer,
 }
 .popover-title{
 	border-bottom-color: theme("border");
+}
+.theme-border{
+    border-color: theme("border");
 }
 
 /* Highlight */

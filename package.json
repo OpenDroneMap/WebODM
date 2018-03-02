@@ -1,6 +1,6 @@
 {
   "name": "WebODM",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Open Source Drone Image Processing",
   "main": "index.js",
   "scripts": {
@@ -35,6 +35,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "extract-text-webpack-plugin": "^3.0.0",
+    "fbemitter": "^2.1.1",
     "file-loader": "^0.9.0",
     "gl-matrix": "^2.3.2",
     "history": "^4.7.2",
@@ -42,7 +43,6 @@
     "jest": "^21.0.1",
     "json-loader": "^0.5.4",
     "leaflet": "^1.0.1",
-    "leaflet-measure": "^2.0.5",
     "node-sass": "^3.10.1",
     "object.values": "^1.0.3",
     "proj4": "^2.4.3",

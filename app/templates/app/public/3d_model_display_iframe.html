@@ -4,7 +4,7 @@
 	{% load render_bundle from webpack_loader %}
 	{% render_bundle 'ModelView' attrs='async' %}
 
-	<div data-modelview
+	<div data-modelview class="full-height"
 		{% for key, value in params %}
 			data-{{key}}="{{value}}"
 		{% endfor %}

@@ -287,7 +287,6 @@ class TaskListItem extends React.Component {
 
     const restartAction = this.genActionApiCall("restart", {
         success: () => {
-            if (this.console) this.console.clear();
             this.setState({time: -1});
         },
         defaultError: "Cannot restart task."
@@ -351,7 +350,7 @@ class TaskListItem extends React.Component {
     let status = statusCodes.description(task.status);
     if (status === "") status = "Uploading images";
 
-    if (!task.processing_node) status = "";
+    if (!task.processing_node) status = "Waiting for a node...";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
     let expanded = "";

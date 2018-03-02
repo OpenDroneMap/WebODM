@@ -21,6 +21,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
  * [Getting Help](#getting-help)
  * [Support the Project](#support-the-project)
  * [Become a Contributor](#become-a-contributor)
+ * [Architecture Overview](#architecture-overview)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
  
@@ -86,7 +87,7 @@ You **will not be able to distribute a single job across multiple processing nod
 If you want to run WebODM in production, make sure to pass the `--no-debug` flag while starting WebODM:
 
 ```bash
-./webodm.sh down && ./webodm.sh start --no-debug
+./webodm.sh restart --no-debug
 ```
 
 This will disable the `DEBUG` flag from `webodm/settings.py` within the docker container. This is [really important](https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG).
@@ -100,7 +101,7 @@ WebODM has the ability to automatically request and install a SSL certificate vi
  - Run the following:
 
 ```bash
-./webodm.sh down && ./webodm.sh start --ssl --hostname webodm.myorg.com
+./webodm.sh restart --ssl --hostname webodm.myorg.com
 ```
 
 That's it! The certificate will automatically renew when needed.
@@ -112,7 +113,7 @@ If you want to specify your own key/certificate pair, simply pass the `--ssl-key
 When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. If you want to store your files on the host filesystem instead of a docker volume, you need to pass a path via the `--media-dir` option:
 
 ```bash
-./webodm.sh down && ./webodm.sh start --media-dir /home/user/webodm_data
+./webodm.sh restart --media-dir /home/user/webodm_data
 ```
 
 Note that existing task results will not be available after the change. Refer to the [Migrate Data Volumes](https://docs.docker.com/engine/tutorials/dockervolumes/#backup-restore-or-migrate-data-volumes) section of the Docker documentation for information on migrating existing task results.
@@ -123,7 +124,7 @@ Sympthoms | Possible Solutions
 --------- | ------------------
 While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
 While starting WebODM you get: `'WaitNamedPipe','The system cannot find the file specified.'` | 1. Make sure you have enabled VT-x virtualization in the BIOS.<br/>2. Try to downgrade your version of Python to 2.7
-While Accessing the WebODM interface you get: `OperationalError at / could not translate host name “db” to address: Name or service not known` or `ProgrammingError at / relation “auth_user” does not exist` | Try restarting your computer, then type: `./webodm.sh down && ./webodm.sh start`
+While Accessing the WebODM interface you get: `OperationalError at / could not translate host name “db” to address: Name or service not known` or `ProgrammingError at / relation “auth_user” does not exist` | Try restarting your computer, then type: `./webodm.sh restart`
 Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
 After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` | Try to remove your WebODM folder and start from a fresh git clone
 Task fails with `Process exited with code null`, no task console output - OR - console output shows `Illegal Instruction` | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
@@ -191,7 +192,7 @@ Developer, I'm looking to build an app that will stay behind a firewall and just
 - [ ] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner
-- [ ] Plugins/Webhooks System
+- [X] Plugins/Webhooks System
 - [X] API
 - [X] Documentation
 - [ ] Android Mobile App
@@ -238,6 +239,17 @@ If you have questions visit us on the [forum](http://community.opendronemap.org/
 When your first pull request is accepted, don't forget to fill [this form](https://goo.gl/forms/PZkiPPeNKUHNz0qe2) to get your **free** WebODM T-Shirt 🤘
 
 <img src="https://user-images.githubusercontent.com/1951843/36511023-344f86b2-1733-11e8-8cae-236645db407b.png" alt="T-Shirt" width="50%">
+
+## Architecture Overview
+
+WebODM is built with scalability and performance in mind. While the default setup places all databases and applications on the same machine, users can separate its components for increased performance (ex. place a Celery worker on a separate machine for running background tasks).
+
+![Architecture](https://user-images.githubusercontent.com/1951843/36916884-3a269a7a-1e23-11e8-997a-a57cd6ca7950.png)
+
+A few things to note:
+ * We use Celery workers to do background tasks such as resizing images and processing task results, but we use an ad-hoc scheduling mechanism to communicate with node-OpenDroneMap (which processes the orthophotos, 3D models, etc.). The choice to use two separate systems for task scheduling is due to the flexibility that an ad-hoc mechanism gives us for certain operations (capture task output, persistent data and ability to restart tasks mid-way, communication via REST calls, etc.).
+ * If loaded on multiple machines, Celery workers should all share their `app/media` directory with the Django application (via network shares). You can manage workers via `./worker.sh`
+
 
 ## Run the docker version as a Linux Service
 
@@ -288,6 +300,7 @@ To run WebODM, you will need to install:
  * GDAL (>= 2.1)
  * Node.js (>= 6.0)
  * Nginx (Linux/MacOS) - OR - Apache + mod_wsgi (Windows)
+ * Redis (>= 2.6)
 
 On Linux, make sure you have:
 
@@ -329,15 +342,27 @@ ALTER SYSTEM SET postgis.enable_outdb_rasters TO True;
 ALTER SYSTEM SET postgis.gdal_enabled_drivers TO 'GTiff';
 ```
 
+Start the redis broker:
+
+```bash
+redis-server
+```
+
 Then:
 
 ```bash
 pip install -r requirements.txt
-sudo npm install -g webpack
+sudo npm install -g webpack@3.11.0
 npm install
 webpack
 python manage.py collectstatic --noinput
 chmod +x start.sh && ./start.sh --no-gunicorn
+```
+
+Finally, start at least one celery worker:
+
+```bash
+./worker.sh start
 ```
 
 The `start.sh` script will use Django's built-in server if you pass the `--no-gunicorn` parameter. This is good for testing, but bad for production. 
@@ -372,5 +397,6 @@ python --version
 pip --version
 npm --version
 gdalinfo --version
+redis-server --version
 ```
 Should all work without errors.

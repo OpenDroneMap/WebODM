@@ -226,11 +226,27 @@
                 <!--<li>
                     <a href="#"><i class="fa fa-plane fa-fw"></i> Mission Planner</a>
                 </li> -->
-                {% load processingnode_extras %}
+                {% load processingnode_extras plugins %}
                 {% can_view_processing_nodes as view_nodes %}
                 {% can_add_processing_nodes as add_nodes %}
                 {% get_visible_processing_nodes as nodes %}
 
+                {% get_plugins_main_menus as plugin_menus %}
+                {% for menu in plugin_menus %}
+                    <li>
+                        <a href="{{menu.link}}"><i class="{{menu.css_icon}}"></i> {{menu.label}}{% if menu.has_submenu %}<span class="fa arrow"></span>{% endif %}</a>
+
+                        {% if menu.has_submenu %}
+                            <ul class="nav nav-second-level">
+                            {% for menu in menu.submenu %}
+                                <li>
+                                    <a href="{{menu.link}}"><i class="{{menu.css_icon}}"></i> {{menu.label}}{% if menu.has_submenu %}<span class="fa arrow"></span>{% endif %}</a>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
 
                 {% if view_nodes %}
                 <li>
@@ -282,7 +298,6 @@
         <!-- /.sidebar-collapse -->
     </div>
     <!-- /.navbar-static-side -->
-</nav>
 {% endblock %}
 
 {% block page-wrapper %}

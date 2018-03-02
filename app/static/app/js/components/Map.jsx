@@ -1,12 +1,8 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import ReactDOM from 'react-dom';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
-import 'leaflet-measure/dist/leaflet-measure.css';
-import 'leaflet-measure/dist/leaflet-measure';
 import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
@@ -17,6 +13,7 @@ import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
+import PluginsAPI from '../classes/plugins/API';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -174,16 +171,22 @@ class Map extends React.Component {
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
-      positionControl: true
+      positionControl: true,
+      zoomControl: false
     });
 
-    const measureControl = Leaflet.control.measure({
-      primaryLengthUnit: 'meters',
-      secondaryLengthUnit: 'feet',
-      primaryAreaUnit: 'sqmeters',
-      secondaryAreaUnit: 'acres'
+    PluginsAPI.Map.triggerWillAddControls({
+      map: this.map
     });
-    measureControl.addTo(this.map);
+
+    Leaflet.control.scale({
+      maxWidth: 250,
+    }).addTo(this.map);
+
+    //add zoom control with your options
+    Leaflet.control.zoom({
+         position:'bottomleft'
+    }).addTo(this.map);
 
     if (showBackground) {
       this.basemaps = {
@@ -216,10 +219,6 @@ class Map extends React.Component {
     }).addTo(this.map);
 
     this.map.fitWorld();
-
-    Leaflet.control.scale({
-      maxWidth: 250,
-    }).addTo(this.map);
     this.map.attributionControl.setPrefix("");
 
     this.loadImageryLayers(true).then(() => {
@@ -235,6 +234,13 @@ class Map extends React.Component {
             }
           }
         });
+    });
+
+    // PluginsAPI.events.addListener('Map::AddPanel', (e) => {
+    //   console.log("Received response: " + e);
+    // });
+    PluginsAPI.Map.triggerDidAddControls({
+      map: this.map
     });
   }
 
@@ -269,6 +275,7 @@ class Map extends React.Component {
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
+
         <div 
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}

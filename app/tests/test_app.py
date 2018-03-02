@@ -4,7 +4,6 @@ from rest_framework import status
 
 from app.models import Project, Task
 from .classes import BootTestCase
-from app import scheduler
 from django.core.exceptions import ValidationError
 
 class TestApp(BootTestCase):
@@ -199,17 +198,3 @@ class TestApp(BootTestCase):
 
         task.options = [{'name': 'test', 'value': 1}, {"invalid": 1}]
         self.assertRaises(ValidationError, task.save)
-
-
-    def test_scheduler(self):
-        self.assertTrue(scheduler.setup() is None)
-
-        # Can call update_nodes_info()
-        self.assertTrue(scheduler.update_nodes_info() is None)
-
-        # Can call function in background
-        self.assertTrue(scheduler.update_nodes_info(background=True).join() is None)
-
-        self.assertTrue(scheduler.teardown() is None)
-
-

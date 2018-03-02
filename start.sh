@@ -69,6 +69,8 @@ if [ "$WO_SSL" = "YES" ]; then
     proto="https"
 fi
 
+./worker.sh scheduler start
+
 congrats(){
     (sleep 5; echo
     echo -e "\033[92m"      

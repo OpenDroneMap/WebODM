@@ -11,7 +11,7 @@ from guardian.models import UserObjectPermissionBase
 from .api_client import ApiClient
 import json
 from django.db.models import signals
-from datetime import datetime, timedelta
+from datetime import timedelta
 from .exceptions import ProcessingError, ProcessingTimeout
 import simplejson
 

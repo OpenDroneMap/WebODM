@@ -1,7 +1,6 @@
 import time
 
 import logging
-
 from webodm import settings
 
 logger = logging.getLogger('app.logger')
@@ -10,25 +9,31 @@ class TestWatch:
     def __init__(self):
         self.clear()
 
+    def func_to_name(f):
+        return "{}.{}".format(f.__module__, f.__name__)
+
     def clear(self):
         self._calls = {}
         self._intercept_list = {}
 
-    def func_to_name(f):
-        return "{}.{}".format(f.__module__, f.__name__)
-
     def intercept(self, fname, f = None):
         self._intercept_list[fname] = f if f is not None else True
 
-    def execute_intercept_function_replacement(self, fname, *args, **kwargs):
-        if fname in self._intercept_list and callable(self._intercept_list[fname]):
-            (self._intercept_list[fname])(*args, **kwargs)
+    def intercept_list_has(self, fname):
+        return fname in self._intercept_list
 
-    def should_prevent_execution(self, func):
-        return TestWatch.func_to_name(func) in self._intercept_list
+    def execute_intercept_function_replacement(self, fname, *args, **kwargs):
+        if self.intercept_list_has(fname) and callable(self._intercept_list[fname]):
+            (self._intercept_list[fname])(*args, **kwargs)
 
     def get_calls(self, fname):
         return self._calls[fname] if fname in self._calls else []
+
+    def set_calls(self, fname, value):
+        self._calls[fname] = value
+
+    def should_prevent_execution(self, func):
+        return self.intercept_list_has(TestWatch.func_to_name(func))
 
     def get_calls_count(self, fname):
         return len(self.get_calls(fname))
@@ -48,10 +53,13 @@ class TestWatch:
 
     def log_call(self, func, *args, **kwargs):
         fname = TestWatch.func_to_name(func)
+        self.manual_log_call(fname, *args, **kwargs)
+
+    def manual_log_call(self, fname, *args, **kwargs):
         logger.info("{} called".format(fname))
-        list = self._calls[fname] if fname in self._calls else []
+        list = self.get_calls(fname)
         list.append({'f': fname, 'args': args, 'kwargs': kwargs})
-        self._calls[fname] = list
+        self.set_calls(fname, list)
 
     def hook_pre(self, func, *args, **kwargs):
         if settings.TESTING and self.should_prevent_execution(func):
