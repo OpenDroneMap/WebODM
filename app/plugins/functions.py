@@ -53,6 +53,10 @@ def get_active_plugins():
         pluginpy_path = os.path.join(plugin_path, "plugin.py")
         disabled_path = os.path.join(plugin_path, "disabled")
 
+        # Do not load test plugin unless we're in test mode
+        if os.path.basename(plugin_path) == 'test' and not settings.TESTING:
+            continue
+
         if not os.path.isfile(manifest_path) or not os.path.isfile(pluginpy_path):
             logger.warning("Found invalid plugin in {}".format(plugin_path))
             continue
