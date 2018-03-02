@@ -1,5 +1,7 @@
 import sys
 from django.conf.urls import url, include
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from .views import app as app_views, public as public_views
 from .plugins import get_url_patterns
@@ -29,6 +31,9 @@ urlpatterns = [
 # TODO: is there a way to place plugins /public directories
 # into the static build directories and let nginx serve them?
 urlpatterns += get_url_patterns()
+
+handler404 = app_views.handler404
+handler500 = app_views.handler500
 
 # Test cases call boot() independently
 # Also don't execute boot with celery workers
