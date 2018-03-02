@@ -287,7 +287,6 @@ class TaskListItem extends React.Component {
 
     const restartAction = this.genActionApiCall("restart", {
         success: () => {
-            if (this.console) this.console.clear();
             this.setState({time: -1});
         },
         defaultError: "Cannot restart task."
