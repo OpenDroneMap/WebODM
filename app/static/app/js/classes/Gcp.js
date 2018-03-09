@@ -21,7 +21,7 @@ class Gcp{
 
       for (let i = 1; i < lines.length; i++){
         let line = lines[i].trim();
-        if (line !== ""){
+        if (line !== "" && line[0] !== "#"){
           let parts = line.split(/\s+/);
           if (parts.length >= 6){
             let [x, y, z, px, py, imagename, ...extracols] = parts;
