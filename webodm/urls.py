@@ -29,10 +29,7 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    import debug_toolbar
     urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-
         # Expose imagekit generated files and settings file uploads
         url(r'^media/CACHE/(?P<path>.*)$', serve, {
             'document_root': os.path.join(settings.MEDIA_ROOT, 'CACHE')

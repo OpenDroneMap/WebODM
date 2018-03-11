@@ -20,7 +20,7 @@ def index(request):
     if User.objects.filter(is_superuser=True).count() == 0:
         return redirect('welcome')
 
-    return redirect('dashboard' if request.user.is_authenticated()
+    return redirect('dashboard' if request.user.is_authenticated
                     else 'login')
 
 @login_required
