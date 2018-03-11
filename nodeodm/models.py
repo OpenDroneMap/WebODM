@@ -215,8 +215,8 @@ def auto_update_node_info(sender, instance, created, **kwargs):
             pass
 
 class ProcessingNodeUserObjectPermission(UserObjectPermissionBase):
-    content_object = models.ForeignKey(ProcessingNode)
+    content_object = models.ForeignKey(ProcessingNode, on_delete=models.CASCADE)
 
 
 class ProcessingNodeGroupObjectPermission(GroupObjectPermissionBase):
-    content_object = models.ForeignKey(ProcessingNode)
+    content_object = models.ForeignKey(ProcessingNode, on_delete=models.CASCADE)

@@ -68,8 +68,8 @@ def project_post_save(sender, instance, created, **kwargs):
 
 
 class ProjectUserObjectPermission(UserObjectPermissionBase):
-    content_object = models.ForeignKey(Project)
+    content_object = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 
 class ProjectGroupObjectPermission(GroupObjectPermissionBase):
-    content_object = models.ForeignKey(Project)
+    content_object = models.ForeignKey(Project, on_delete=models.CASCADE)

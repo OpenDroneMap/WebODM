@@ -16,7 +16,7 @@ def get_plugins_css_includes():
     css_urls = list(itertools.chain(*[plugin.get_include_css_urls() for plugin in get_active_plugins()]))
     return "\n".join(map(lambda url: "<link href='{}' rel='stylesheet' type='text/css'>".format(url), css_urls))
 
-@register.assignment_tag()
+@register.simple_tag()
 def get_plugins_main_menus():
     # Flatten list of menus
     return list(itertools.chain(*[plugin.main_menu() for plugin in get_active_plugins()]))

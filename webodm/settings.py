@@ -75,13 +75,11 @@ INSTALLED_APPS = [
     'imagekit',
     'codemirror2',
     'compressor',
-#    'debug_toolbar',
     'app',
     'nodeodm',
 ]
 
 MIDDLEWARE = [
-   # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -266,7 +264,7 @@ REST_FRAMEWORK = {
   ],
   'DEFAULT_FILTER_BACKENDS': [
     'rest_framework.filters.DjangoObjectPermissionsFilter',
-    'rest_framework.filters.DjangoFilterBackend',
+    'django_filters.rest_framework.DjangoFilterBackend',
     'rest_framework.filters.OrderingFilter',
   ],
   'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -276,6 +274,7 @@ REST_FRAMEWORK = {
     'app.api.authentication.JSONWebTokenAuthenticationQS',
   ),
   'PAGE_SIZE': 10,
+  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
 JWT_AUTH = {

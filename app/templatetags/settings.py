@@ -5,7 +5,7 @@ from django import template
 register = template.Library()
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def settings_image_url(context, image):
     return "/media/" + getattr(context['SETTINGS'], image).url
 
