@@ -3,6 +3,12 @@ import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
+
+import 'leaflet-measure/dist/leaflet-measure.css';
+import 'leaflet-measure/dist/leaflet-measure';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-draw/dist/leaflet.draw';
+
 import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
@@ -136,7 +142,7 @@ class Map extends React.Component {
                                     <i class="fa fa-cube"></i> 3D
                                 </button>`;
 
-            layer.bindPopup(popup);
+            //layer.bindPopup(popup);
 
             $('#layerOpacity', popup).on('change input', function() {
                 layer.setOpacity($('#layerOpacity', popup).val());
@@ -177,6 +183,79 @@ class Map extends React.Component {
 
     PluginsAPI.Map.triggerWillAddControls({
       map: this.map
+    });
+
+    measureControl.addTo(this.map);
+    
+    const featureGroup = L.featureGroup();
+    featureGroup.addTo(this.map);
+
+    new L.Control.Draw({
+        draw: {
+          polygon: {
+            allowIntersection: false, // Restricts shapes to simple polygons
+            shapeOptions: {
+              color: '#707070'
+            }
+          },
+          rectangle: false,
+          circle: false,
+          circlemarker: false,
+          marker: false
+        },
+        edit: {
+          featureGroup: featureGroup,
+          edit: {
+            selectedPathOptions: {
+              maintainColor: true,
+              dashArray: '10, 10'
+            }
+          }
+        }
+      }).addTo(this.map);
+      
+    this.map.on(L.Draw.Event.CREATED, function(e) {
+      e.layer.feature = {geometry: {type: 'Polygon'} }; 
+      featureGroup.addLayer(e.layer);
+
+      var paramList;
+        $.ajax({
+            type: 'POST',
+            async: false,
+            url: '/api/projects/4/tasks/7/volume',
+            data: JSON.stringify(e.layer.toGeoJSON()),
+            contentType: "application/json",
+            success: function (msg) {
+                paramList = msg;
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("get session failed " + errorThrown);
+            }
+        });
+
+      e.layer.bindPopup('Volume: ' + paramList.toFixed(2) + 'Mètres Cubes (m3)');
+    });
+
+    this.map.on(L.Draw.Event.EDITED, function(e) {
+      e.layers.eachLayer(function(layer) {
+        var paramList = null;
+        $.ajax({
+            type: 'POST',
+            async: false,
+            url: '/api/projects/1/tasks/4/volume',
+            data: JSON.stringify(layer.toGeoJSON()),
+            contentType: "application/json",
+            success: function (msg) {
+                paramList = msg;
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("get session failed " + errorThrown);
+            }
+        });
+
+      layer.setPopupContent('Volume: ' + paramList.toFixed(2) + 'Mètres Cubes (m3)');
+    
+      });
     });
 
     Leaflet.control.scale({

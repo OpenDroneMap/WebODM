@@ -3,6 +3,15 @@ import os
 import shutil
 import zipfile
 import uuid as uuid_module
+import json
+
+import osgeo.ogr
+import gdal
+import struct
+import statistics
+from .vertex import rings
+from .repro_json import reprojson
+from .cliprasterpol import clip_raster
 
 import json
 from shlex import quote
@@ -578,6 +587,25 @@ class Task(models.Model):
         self.status = status_codes.FAILED
         self.pending_action = None
         self.save()
+        
+    def get_volume(self, geojson):
+        try:
+            raster_path= self.assets_path("odm_dem", "dsm.tif")
+            raster=gdal.Open(raster_path)
+            gt=raster.GetGeoTransform() 
+            rb=raster.GetRasterBand(1)
+            gdal.UseExceptions()
+            geosom = reprojson(geojson, raster)
+            coords=[(entry[0],entry[1]) for entry in rings(raster_path, geosom)]
+            GSD=gt[1]
+            volume=0
+            med=statistics.median(entry[2] for entry in rings(raster_path, geosom))
+            clip=clip_raster(raster_path, geosom, gt=None, nodata=-9999)
+            return ((clip-med)*GSD*GSD)[clip!=-9999.0].sum()
+
+        except FileNotFoundError as e:
+            logger.warning(e)
+        
 
     def find_all_files_matching(self, regex):
         directory = full_task_directory_path(self.id, self.project.id)
