@@ -1,0 +1,6 @@
++proj=utm +zone=15 +ellps=WGS84 +datum=WGS84 +units=m +no_defs	
+576529.22	5188003.22	0	4	6	tiny_drone_image.JPG
+576529.25	5188003.25	0	7.75	8.25	tiny_drone_image.JPG
+576529.22	5188003.22	0	4	6	tiny_drone_image_2.jpg
+576529.27	5188003.27	0	8.19	8.42	tiny_drone_image_2.jpg
+576529.27	5188003.27	0	8	8	missing_image.jpg

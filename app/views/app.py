@@ -20,7 +20,7 @@ def index(request):
     if User.objects.filter(is_superuser=True).count() == 0:
         return redirect('welcome')
 
-    return redirect('dashboard' if request.user.is_authenticated()
+    return redirect('dashboard' if request.user.is_authenticated
                     else 'login')
 
 @login_required
@@ -134,3 +134,10 @@ def welcome(request):
                       'title': 'Welcome',
                       'firstuserform': fuf
                   })
+
+
+def handler404(request):
+    return render(request, '404.html', status=404)
+
+def handler500(request):
+    return render(request, '500.html', status=500)

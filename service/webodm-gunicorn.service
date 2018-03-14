@@ -8,7 +8,7 @@ User=odm
 Group=odm
 PIDFile=/run/webodm-gunicorn.pid
 WorkingDirectory=/webodm
-ExecStart=/webodm/python3-venv/bin/gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 360 --preload
+ExecStart=/webodm/python3-venv/bin/gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 300000 --max-requests 250 --preload
 ExecStop=/bin/kill -s QUIT $MAINPID
 Restart=on-failure
 

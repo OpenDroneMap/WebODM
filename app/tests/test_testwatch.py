@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from app.testwatch import TestWatch
 
 
@@ -9,7 +8,6 @@ def test(a, b):
 class TestTestWatch(TestCase):
     def test_methods(self):
         tw = TestWatch()
-
         self.assertTrue(tw.get_calls_count("app.tests.test_testwatch.test") == 0)
         self.assertTrue(tw.get_calls_count("app.tests.test_testwatch.nonexistent") == 0)
 
@@ -52,6 +50,4 @@ class TestTestWatch(TestCase):
         test3(d)
         self.assertFalse(d['a'])
         self.assertTrue(d['b'])
-
-
 

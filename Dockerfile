@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.6
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -8,7 +8,7 @@ ENV PYTHONPATH $PYTHONPATH:/webodm
 RUN mkdir /webodm
 WORKDIR /webodm
 
-RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
+RUN curl --silent --location https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get -qq install -y nodejs
 
 # Configure use of testing branch of Debian
@@ -36,7 +36,7 @@ WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install --quiet
 
 WORKDIR /webodm
-RUN npm install --quiet -g webpack && npm install --quiet && webpack
+RUN npm install --quiet -g webpack@3.11.0 && npm install --quiet && webpack
 RUN python manage.py collectstatic --noinput
 
 RUN rm /webodm/webodm/secret_key.py

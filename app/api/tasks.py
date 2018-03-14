@@ -1,24 +1,20 @@
 import mimetypes
 import os
+from wsgiref.util import FileWrapper
 
-from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.db.models.functions import Envelope
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.db import transaction
-from django.db.models.functions import Cast
 from django.http import HttpResponse
-from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
 
-from nodeodm import status_codes
-from .common import get_and_check_project, get_tile_json, path_traversal_check
-
-from app import models, scheduler, pending_actions
+from app import models, pending_actions
 from nodeodm.models import ProcessingNode
+from worker import tasks as worker_tasks
+from .common import get_and_check_project, get_tile_json, path_traversal_check
 
 
 class TaskIDsSerializer(serializers.BaseSerializer):
@@ -87,8 +83,8 @@ class TaskViewSet(viewsets.ViewSet):
         task.last_error = None
         task.save()
 
-        # Call the scheduler (speed things up)
-        scheduler.process_pending_tasks(background=True)
+        # Process task right away
+        worker_tasks.process_task.delay(task.id)
 
         return Response({'success': True})
 
@@ -152,7 +148,8 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
 
         with transaction.atomic():
-            task = models.Task.objects.create(project=project)
+            task = models.Task.objects.create(project=project,
+                                              pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
 
             for image in files:
                 models.ImageUpload.objects.create(task=task, image=image)
@@ -162,7 +159,9 @@ class TaskViewSet(viewsets.ViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            worker_tasks.process_task.delay(task.id)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
     def update(self, request, pk=None, project_pk=None, partial=False):
@@ -183,8 +182,8 @@ class TaskViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # Call the scheduler (speed things up)
-        scheduler.process_pending_tasks(background=True)
+        # Process task right away
+        worker_tasks.process_task.delay(task.id)
 
         return Response(serializer.data)
 

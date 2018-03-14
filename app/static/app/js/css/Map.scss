@@ -1,4 +1,6 @@
 .map{
+    position: relative; 
+
     .leaflet-popup-content{
         .title{
             font-weight: bold;
@@ -24,7 +26,7 @@
 
     .shareButton{
         z-index: 2000;
-        bottom: -11px;
+        bottom: 11px;
         right: 38px;
     }
 }
