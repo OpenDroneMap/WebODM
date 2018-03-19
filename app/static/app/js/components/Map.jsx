@@ -4,8 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
 
-import 'leaflet-measure/dist/leaflet-measure.css';
-import 'leaflet-measure/dist/leaflet-measure';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'leaflet-draw/dist/leaflet.draw';
 
@@ -105,6 +103,7 @@ class Map extends React.Component {
             
             // Associate metadata with this layer
             meta.name = info.name;
+            window.meta = meta;
             layer[Symbol.for("meta")] = meta;
 
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
@@ -185,8 +184,6 @@ class Map extends React.Component {
       map: this.map
     });
 
-    measureControl.addTo(this.map);
-    
     const featureGroup = L.featureGroup();
     featureGroup.addTo(this.map);
 
@@ -217,12 +214,13 @@ class Map extends React.Component {
     this.map.on(L.Draw.Event.CREATED, function(e) {
       e.layer.feature = {geometry: {type: 'Polygon'} }; 
       featureGroup.addLayer(e.layer);
+      const meta = window.meta;
 
       var paramList;
         $.ajax({
             type: 'POST',
             async: false,
-            url: '/api/projects/4/tasks/7/volume',
+            url: `/api/projects/${meta.task.project}/tasks/${meta.task.id}/volume`,
             data: JSON.stringify(e.layer.toGeoJSON()),
             contentType: "application/json",
             success: function (msg) {
@@ -238,11 +236,13 @@ class Map extends React.Component {
 
     this.map.on(L.Draw.Event.EDITED, function(e) {
       e.layers.eachLayer(function(layer) {
+        const meta = window.meta;
+
         var paramList = null;
         $.ajax({
             type: 'POST',
             async: false,
-            url: '/api/projects/1/tasks/4/volume',
+            url: `/api/projects/${meta.task.project}/tasks/${meta.task.id}/volume`,
             data: JSON.stringify(layer.toGeoJSON()),
             contentType: "application/json",
             success: function (msg) {

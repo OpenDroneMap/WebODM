@@ -46,8 +46,8 @@ class PluginBase(ABC):
         """
         return "plugins/{}/templates/{}".format(self.get_name(), path)
 
-    def has_public_path(self):
-        return os.path.isdir(self.get_path("public"))
+    def path_exists(self, path):
+        return os.path.exists(self.get_path(path))
 
     def include_js_files(self):
         """
@@ -73,10 +73,18 @@ class PluginBase(ABC):
         """
         return []
 
-    def mount_points(self):
+    def app_mount_points(self):
         """
         Should be overriden by plugins that want to connect
         custom Django views
+        :return: [] of MountPoint objects
+        """
+        return []
+
+    def api_mount_points(self):
+        """
+        Should be overriden by plugins that want to add
+        new API mount points
         :return: [] of MountPoint objects
         """
         return []

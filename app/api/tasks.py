@@ -20,10 +20,6 @@ from .common import get_and_check_project, get_tile_json, path_traversal_check
 class TaskIDsSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return obj.id
-    
-class geojsonSerializer(serializers.Serializer):
-    """docstring for geojsonSeria"""
-    geometry = serializers.JSONField(help_text="polygon contour to get volume")
 
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
@@ -196,15 +192,15 @@ class TaskNestedView(APIView):
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'console_output', )
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
-    def get_and_check_task(self, request, pk, project_pk, annotate={}):
+    def get_and_check_task(self, request, pk, annotate={}):
         try:
-            task = self.queryset.annotate(**annotate).get(pk=pk, project=project_pk)
+            task = self.queryset.annotate(**annotate).get(pk=pk)
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
         # Check for permissions, unless the task is public
         if not task.public:
-            get_and_check_project(request, project_pk)
+            get_and_check_project(request, task.project.id)
 
         return task
 
@@ -214,7 +210,7 @@ class TaskTiles(TaskNestedView):
         """
         Get a tile image
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk)
         tile_path = task.get_tile_path(tile_type, z, x, y)
         if os.path.isfile(tile_path):
             tile = open(tile_path, "rb")
@@ -228,7 +224,7 @@ class TaskTilesJson(TaskNestedView):
         """
         Get tile.json for this tasks's asset type
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk)
 
         extent_map = {
             'orthophoto': task.orthophoto_extent,
@@ -259,7 +255,7 @@ class TaskDownloads(TaskNestedView):
             """
             Downloads a task asset (if available)
             """
-            task = self.get_and_check_task(request, pk, project_pk)
+            task = self.get_and_check_task(request, pk)
 
             # Check and download
             try:
@@ -287,7 +283,7 @@ class TaskAssets(TaskNestedView):
         """
         Downloads a task asset (if available)
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk)
 
         # Check for directory traversal attacks
         try:
@@ -305,16 +301,3 @@ class TaskAssets(TaskNestedView):
                                 content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
         response['Content-Disposition'] = "inline; filename={}".format(asset_filename)
         return response
-    
-class TaskVolume(TaskNestedView):
-    def post(self, request, pk=None, project_pk=None):
-        task = self.get_and_check_task(request, pk, project_pk)
-        serializer = geojsonSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        # geometry = serializer.data.get('geometry')
-        # if geometry is None:
-        #     raise exceptions.ValidationError("A geoson file are not available.")
-        result=task.get_volume(request.data)
-        response = Response(result, status=status.HTTP_200_OK)
-        return response
-    

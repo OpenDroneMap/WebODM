@@ -1,8 +1,9 @@
 from django.conf.urls import url, include
 
 from app.api.presets import PresetViewSet
+from app.plugins import get_api_url_patterns
 from .projects import ProjectViewSet
-from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets, TaskVolume
+from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
@@ -28,8 +29,9 @@ urlpatterns = [
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/download/(?P<asset>.+)$', TaskDownloads.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/assets/(?P<unsafe_asset_path>.+)$', TaskAssets.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/volume$', TaskVolume.as_view()),
 
     url(r'^auth/', include('rest_framework.urls')),
     url(r'^token-auth/', obtain_jwt_token),
 ]
+
+urlpatterns += get_api_url_patterns()
