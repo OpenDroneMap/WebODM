@@ -59,6 +59,7 @@ def get_api_url_patterns():
 
     return url_patterns
 
+
 plugins = None
 def get_active_plugins():
     # Cache plugins search
@@ -106,6 +107,7 @@ def get_active_plugins():
             logger.warning("Failed to instantiate plugin {}: {}".format(dir, e))
 
     return plugins
+
 
 def get_plugin_by_name(name):
     plugins = get_active_plugins()
