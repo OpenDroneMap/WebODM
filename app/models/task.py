@@ -578,7 +578,7 @@ class Task(models.Model):
         self.status = status_codes.FAILED
         self.pending_action = None
         self.save()
-
+        
     def find_all_files_matching(self, regex):
         directory = full_task_directory_path(self.id, self.project.id)
         return [os.path.join(directory, f) for f in os.listdir(directory) if

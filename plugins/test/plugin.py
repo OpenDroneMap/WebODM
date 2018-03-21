@@ -12,7 +12,7 @@ class Plugin(PluginBase):
     def include_css_files(self):
     	return ['test.css']
 
-    def mount_points(self):
+    def app_mount_points(self):
         return [
             MountPoint('/app_mountpoint/$', lambda request: render(request, self.template_path("app.html"), {'title': 'Test'}))
         ]

@@ -3,6 +3,7 @@ import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
+
 import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
@@ -136,7 +137,7 @@ class Map extends React.Component {
                                     <i class="fa fa-cube"></i> 3D
                                 </button>`;
 
-            layer.bindPopup(popup);
+            //layer.bindPopup(popup);
 
             $('#layerOpacity', popup).on('change input', function() {
                 layer.setOpacity($('#layerOpacity', popup).val());

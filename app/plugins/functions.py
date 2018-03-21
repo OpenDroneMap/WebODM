@@ -1,6 +1,7 @@
 import os
 import logging
 import importlib
+import subprocess
 
 import django
 import json
@@ -13,29 +14,56 @@ logger = logging.getLogger('app.logger')
 
 def register_plugins():
     for plugin in get_active_plugins():
+
+        # Check for package.json in public directory
+        # and run npm install if needed
+        if plugin.path_exists("public/package.json") and not plugin.path_exists("public/node_modules"):
+            logger.info("Running npm install for {}".format(plugin.get_name()))
+            subprocess.call(['npm', 'install'], cwd=plugin.get_path("public"))
+
+        # Check for webpack.config.js (if we need to build it)
+        if plugin.path_exists("public/webpack.config.js") and not plugin.path_exists("public/build"):
+            logger.info("Running webpack for {}".format(plugin.get_name()))
+            subprocess.call(['webpack'], cwd=plugin.get_path("public"))
+
         plugin.register()
         logger.info("Registered {}".format(plugin))
 
 
-def get_url_patterns():
+def get_app_url_patterns():
     """
-    @return the patterns to expose the /public directory of each plugin (if needed)
+    @return the patterns to expose the /public directory of each plugin (if needed) and
+        each mount point
     """
     url_patterns = []
     for plugin in get_active_plugins():
-        for mount_point in plugin.mount_points():
+        for mount_point in plugin.app_mount_points():
             url_patterns.append(url('^plugins/{}/{}'.format(plugin.get_name(), mount_point.url),
                                 mount_point.view,
                                 *mount_point.args,
                                 **mount_point.kwargs))
 
-        if plugin.has_public_path():
+        if plugin.path_exists("public"):
             url_patterns.append(url('^plugins/{}/(.*)'.format(plugin.get_name()),
                                     django.views.static.serve,
                                     {'document_root': plugin.get_path("public")}))
 
+    return url_patterns
+
+def get_api_url_patterns():
+    """
+    @return the patterns to expose the plugin API mount points (if any)
+    """
+    url_patterns = []
+    for plugin in get_active_plugins():
+        for mount_point in plugin.api_mount_points():
+            url_patterns.append(url('^plugins/{}/{}'.format(plugin.get_name(), mount_point.url),
+                                mount_point.view,
+                                *mount_point.args,
+                                **mount_point.kwargs))
 
     return url_patterns
+
 
 plugins = None
 def get_active_plugins():
@@ -84,6 +112,12 @@ def get_active_plugins():
             logger.warning("Failed to instantiate plugin {}: {}".format(dir, e))
 
     return plugins
+
+
+def get_plugin_by_name(name):
+    plugins = get_active_plugins()
+    res = list(filter(lambda p: p.get_name() == name, plugins))
+    return res[0] if res else None
 
 
 def get_plugins_path():
