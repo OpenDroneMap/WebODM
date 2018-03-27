@@ -22,7 +22,7 @@ module.exports = {
 
   plugins: [
     new LiveReloadPlugin(),
-    new ExtractTextPlugin('css/[name].css', {
+    new ExtractTextPlugin('[name].css', {
         allChunks: true
     })
   ],
@@ -68,6 +68,7 @@ module.exports = {
     //  on the global let jQuery
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
-    "PluginsAPI": "PluginsAPI"
+    "PluginsAPI": "PluginsAPI",
+    "leaflet": "leaflet"
   }
 }

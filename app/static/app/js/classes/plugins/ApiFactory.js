@@ -24,7 +24,6 @@ export default class ApiFactory{
           this.events.addListener(`${api.namespace}::${eventName}`, (...args) => {
             Promise.all(callbackOrDeps.map(dep => SystemJS.import(dep)))
               .then((...deps) => {
-                console.log(eventName, deps);
                 callbackOrUndef(...(Array.from(args).concat(...deps)));
               });
             });
