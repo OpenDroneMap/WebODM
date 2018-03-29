@@ -36,6 +36,8 @@ module.exports = class MeasurePopup extends React.Component {
             lastCoord.dd.x
         ));
 
+    console.log(layers);
+
     // Did we select a layer?
     if (layers.length > 0){
         const layer = layers[layers.length - 1];
@@ -95,7 +97,7 @@ module.exports = class MeasurePopup extends React.Component {
         <p>Perimeter: {this.props.model.lengthDisplay}</p>
         {volume === null && !error && <p>Volume: <i>computing...</i> <i className="fa fa-cog fa-spin fa-fw" /></p>}
         {typeof volume === "number" && <p>Volume: {volume.toFixed("2")} Cubic Meters ({(volume * 35.3147).toFixed(2)} Cubic Feet)</p>}
-        {error && <p>Volume: <span className="error theme-background-failed">{error}</span></p>}
+        {error && <p>Volume: <span className={"error theme-background-failed " + (error.length > 200 ? 'long' : '')}>{error}</span></p>}
     </div>);
   }
 }

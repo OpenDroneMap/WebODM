@@ -40,12 +40,13 @@ class TaskVolume(TaskNestedView):
                 os.path.dirname(os.path.abspath(__file__)),
                 "calc_volume.grass"
             ), context.serialize()).get()
+            if isinstance(output, dict) and 'error' in output: raise GrassEngineException(output['error'])
 
             cols = output.split(':')
             if len(cols) == 7:
                 return Response({'volume': str(abs(float(cols[6])))}, status=status.HTTP_200_OK)
             else:
-                raise GrassEngineException("Invalid GRASS output: {}".format(output))
+                raise GrassEngineException(output)
         except GrassEngineException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
 

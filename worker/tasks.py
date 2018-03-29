@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from app.models import Project
 from app.models import Task
-from app.plugins.grass_engine import grass
+from app.plugins.grass_engine import grass, GrassEngineException
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
@@ -82,5 +82,8 @@ def process_pending_tasks():
 
 @app.task
 def execute_grass_script(script, serialized_context = {}):
-    ctx = grass.create_context(serialized_context)
-    return ctx.execute(script)
+    try:
+        ctx = grass.create_context(serialized_context)
+        return ctx.execute(script)
+    except GrassEngineException as e:
+        return {'error': str(e)}

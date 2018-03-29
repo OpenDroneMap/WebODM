@@ -2,4 +2,10 @@
     p{
         margin: 0;
     }
+
+    .error.long{
+        overflow: scroll;
+        display: block;
+        max-height: 200px;
+    }
 }
