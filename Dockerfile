@@ -18,7 +18,7 @@ RUN printf "deb     http://mirror.steadfast.net/debian/    stable main contrib n
 RUN printf "deb     http://mirror.steadfast.net/debian/    testing main contrib non-free\ndeb-src http://mirror.steadfast.net/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
 
 # Install Node.js GDAL, nginx, letsencrypt, psql
-RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx && apt-get -qq install -y gettext-base cron certbot postgresql-client-9.6
+RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx grass-core && apt-get -qq install -y gettext-base cron certbot postgresql-client-9.6
 
 
 # Install pip reqs

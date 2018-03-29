@@ -15,7 +15,8 @@ class GrassEngine:
     def __init__(self):
         self.grass_binary = shutil.which('grass7') or \
                             shutil.which('grass72') or \
-                            shutil.which('grass74')
+                            shutil.which('grass74') or \
+                            shutil.which('grass76')
 
         if self.grass_binary is None:
             logger.warning("Could not find a GRASS 7 executable. GRASS scripts will not work.")
