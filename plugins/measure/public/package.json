@@ -1,5 +1,5 @@
 {
-  "name": "volume",
+  "name": "measure",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,5 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "leaflet-draw": "^1.0.2"
-  }
+  "dependencies": {}
 }

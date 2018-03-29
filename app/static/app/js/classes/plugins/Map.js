@@ -1,4 +1,5 @@
 import Utils from '../Utils';
+import L from 'leaflet';
 
 const { assert } = Utils;
 

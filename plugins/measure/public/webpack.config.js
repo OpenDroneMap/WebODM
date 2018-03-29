@@ -69,6 +69,8 @@ module.exports = {
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
     "PluginsAPI": "PluginsAPI",
-    "leaflet": "leaflet"
+    "leaflet": "leaflet",
+    "ReactDOM": "ReactDOM",
+    "React": "React"
   }
 }

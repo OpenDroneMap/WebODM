@@ -200,7 +200,7 @@ pre.prettyprint,
 }
 
 /* Failed */
-.task-list-item .status-label.error{
+.task-list-item .status-label.error, .theme-background-failed{
 	background-color: theme("failed");
 }
 

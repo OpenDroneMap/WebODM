@@ -19,7 +19,9 @@ if (!window.PluginsAPI){
 
       // Globals always available in the window object
       'jQuery': { loader: 'globals-loader', exports: '$' },
-      'leaflet': { loader: 'globals-loader', exports: 'L' }
+      'leaflet': { loader: 'globals-loader', exports: 'L' },
+      'ReactDOM': { loader: 'globals-loader', exports: 'ReactDOM' },
+      'React': { loader: 'globals-loader', exports: 'React' }
     }
   });
 
