@@ -35,6 +35,10 @@ def boot():
     if settings.DEBUG:
        logger.warning("Debug mode is ON (for development this is OK)")
 
+    # Make sure our app/media/tmp folder exists
+    if not os.path.exists(settings.MEDIA_TMP):
+        os.mkdir(settings.MEDIA_TMP)
+
     # Check default group
     try:
         default_group, created = Group.objects.get_or_create(name='Default')

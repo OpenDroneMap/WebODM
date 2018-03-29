@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import './app.scss';
-import './dist/leaflet-measure';
-import './dist/leaflet-measure.css';
+import 'leaflet-measure-ex/dist/leaflet-measure';
+import 'leaflet-measure-ex/dist/leaflet-measure.css';
 import MeasurePopup from './MeasurePopup';
 import ReactDOM from 'ReactDOM';
 import React from 'react';

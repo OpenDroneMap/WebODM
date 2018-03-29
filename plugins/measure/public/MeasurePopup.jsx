@@ -18,10 +18,9 @@ module.exports = class MeasurePopup extends React.Component {
 
   constructor(props){
     super(props);
-    console.log(props);
 
     this.state = {
-        volume: null, // to be calculated,
+        volume: null, // to be calculated
         error: ""
     };
   }
@@ -51,7 +50,7 @@ module.exports = class MeasurePopup extends React.Component {
                 contentType: "application/json"
             }).done(result => {
                 if (result.volume){
-                    this.setState({volume});
+                    this.setState({volume: parseFloat(result.volume)});
                 }else if (result.error){
                     this.setState({error: result.error});
                 }else{
@@ -95,7 +94,7 @@ module.exports = class MeasurePopup extends React.Component {
         <p>Area: {this.props.model.areaDisplay}</p>
         <p>Perimeter: {this.props.model.lengthDisplay}</p>
         {volume === null && !error && <p>Volume: <i>computing...</i> <i className="fa fa-cog fa-spin fa-fw" /></p>}
-        {typeof volume === "number" && <p>Volume: {volume.toFixed("3")} Cubic Meters</p>}
+        {typeof volume === "number" && <p>Volume: {volume.toFixed("2")} Cubic Meters ({(volume * 35.3147).toFixed(2)} Cubic Feet)</p>}
         {error && <p>Volume: <span className="error theme-background-failed">{error}</span></p>}
     </div>);
   }

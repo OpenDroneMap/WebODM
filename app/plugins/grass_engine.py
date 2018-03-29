@@ -3,7 +3,11 @@ import shutil
 import tempfile
 import subprocess
 import os
+import geojson
+
 from string import Template
+
+from webodm import settings
 
 logger = logging.getLogger('app.logger')
 
@@ -18,24 +22,28 @@ class GrassEngine:
         else:
             logger.info("Initializing GRASS engine using {}".format(self.grass_binary))
 
-    def create_context(self):
+    def create_context(self, serialized_context = {}):
         if self.grass_binary is None: raise GrassEngineException("GRASS engine is unavailable")
-        return GrassContext(self.grass_binary)
-
+        return GrassContext(self.grass_binary, **serialized_context)
 
 
 class GrassContext:
-    def __init__(self, grass_binary):
+    def __init__(self, grass_binary, tmpdir = None, template_args = {}, location = None):
         self.grass_binary = grass_binary
-        self.cwd = tempfile.mkdtemp('_webodm_grass')
-        self.template_args = {}
-        self.location = None
+        if tmpdir is None:
+            tmpdir = os.path.basename(tempfile.mkdtemp('_grass_engine', dir=settings.MEDIA_TMP))
+        self.tmpdir = tmpdir
+        self.template_args = template_args
+        self.location = location
+
+    def get_cwd(self):
+        return os.path.join(settings.MEDIA_TMP, self.tmpdir)
 
     def add_file(self, filename, source, use_as_location=False):
         param = os.path.splitext(filename)[0] # filename without extension
 
-        dst_path = os.path.abspath(os.path.join(self.cwd, filename))
-        with open(dst_path) as f:
+        dst_path = os.path.abspath(os.path.join(self.get_cwd(), filename))
+        with open(dst_path, 'w') as f:
             f.write(source)
         self.template_args[param] = dst_path
 
@@ -51,7 +59,7 @@ class GrassContext:
         """
         :param location: either a "epsg:XXXXX" string or a path to a geospatial file defining the location
         """
-        if not location.startsWith('epsg:'):
+        if not location.startswith('epsg:'):
             location = os.path.abspath(location)
         self.location = location
 
@@ -74,23 +82,33 @@ class GrassContext:
         tmpl = Template(script_content)
 
         # Write script to disk
-        with open(os.path.join(self.cwd, 'script.sh')) as f:
+        with open(os.path.join(self.get_cwd(), 'script.sh'), 'w') as f:
             f.write(tmpl.substitute(self.template_args))
 
         # Execute it
         p = subprocess.Popen([self.grass_binary, '-c', self.location, 'location', '--exec', 'sh', 'script.sh'],
-                             cwd=self.cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                             cwd=self.get_cwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
+
+        out = out.decode('utf-8').strip()
+        err = err.decode('utf-8').strip()
 
         if p.returncode == 0:
             return out
         else:
-            raise GrassEngineException("Could not execute GRASS script {} from {}: {}".format(script, self.cwd, err))
+            raise GrassEngineException("Could not execute GRASS script {} from {}: {}".format(script, self.get_cwd(), err))
+
+    def serialize(self):
+        return {
+            'tmpdir': self.tmpdir,
+            'template_args': self.template_args,
+            'location': self.location
+        }
 
     def __del__(self):
         # Cleanup
-        if os.path.exists(self.cwd):
-            shutil.rmtree(self.cwd)
+        if os.path.exists(self.get_cwd()):
+            shutil.rmtree(self.get_cwd())
 
 class GrassEngineException(Exception):
     pass

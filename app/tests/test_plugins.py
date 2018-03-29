@@ -46,5 +46,4 @@ class TestPlugins(BootTestCase):
         self.assertTrue(os.path.exists(test_plugin.get_path("public/node_modules")))
 
         # TODO:
-        # test API endpoints
-        # test python hooks
+        # test GRASS engine
