@@ -1,6 +1,9 @@
+// Magic to include node_modules of root WebODM's directory
+process.env.NODE_PATH = "../../../node_modules";
+require("module").Module._initPaths();
+
 let path = require("path");
 let webpack = require('webpack');
-let BundleTracker = require('webpack-bundle-tracker');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 
@@ -8,22 +11,18 @@ module.exports = {
   context: __dirname,
 
   entry: {
-    main: ['./app/static/app/js/main.jsx'],
-    Console: ['./app/static/app/js/Console.jsx'],
-    Dashboard: ['./app/static/app/js/Dashboard.jsx'],
-    MapView: ['./app/static/app/js/MapView.jsx'],
-    ModelView: ['./app/static/app/js/ModelView.jsx']
+    app: ['./app.jsx']
   },
 
   output: {
-      path: path.join(__dirname, './app/static/app/bundles/'),
-      filename: "[name]-[hash].js"
+      path: path.join(__dirname, './build'),
+      filename: "[name].js",
+      libraryTarget: "amd"
   },
 
   plugins: [
     new LiveReloadPlugin(),
-    new BundleTracker({filename: './webpack-stats.json'}),
-    new ExtractTextPlugin('css/[name]-[hash].css', {
+    new ExtractTextPlugin('[name].css', {
         allChunks: true
     })
   ],
@@ -55,11 +54,6 @@ module.exports = {
       {
         test: /\.(png|jpg|jpeg|svg)/,
         loader: "url-loader?limit=100000"
-      },
-      {
-        // shaders
-        test: /\.(frag|vert|glsl)$/,
-        loader: 'raw-loader'
       }
     ]
   },
@@ -74,6 +68,9 @@ module.exports = {
     //  on the global let jQuery
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
+    "PluginsAPI": "PluginsAPI",
+    "leaflet": "leaflet",
+    "ReactDOM": "ReactDOM",
     "React": "React"
   }
 }

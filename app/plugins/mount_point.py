@@ -5,7 +5,7 @@ class MountPoint:
         """
 
         :param url: path to mount this view to, relative to plugins directory
-        :param view: Django view
+        :param view: Django/DjangoRestFramework view
         :param args: extra args to pass to url() call
         :param kwargs: extra kwargs to pass to url() call
         """

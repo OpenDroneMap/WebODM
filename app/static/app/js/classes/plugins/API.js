@@ -11,10 +11,17 @@ if (!window.PluginsAPI){
   SystemJS.config({
     baseURL: '/plugins',
     map: {
-      css: '/static/app/js/vendor/css.js'
+      'css': '/static/app/js/vendor/css.js',
+      'globals-loader': '/static/app/js/vendor/globals-loader.js'
     },
     meta: {
-      '*.css': { loader: 'css' }
+      '*.css': { loader: 'css' },
+
+      // Globals always available in the window object
+      'jQuery': { loader: 'globals-loader', exports: '$' },
+      'leaflet': { loader: 'globals-loader', exports: 'L' },
+      'ReactDOM': { loader: 'globals-loader', exports: 'ReactDOM' },
+      'React': { loader: 'globals-loader', exports: 'React' }
     }
   });
 

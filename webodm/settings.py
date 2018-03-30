@@ -249,6 +249,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
+MEDIA_TMP = os.path.join(MEDIA_ROOT, 'tmp')
 
 # Store flash messages in cookies
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

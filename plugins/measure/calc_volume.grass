@@ -1,0 +1,26 @@
+# area_file: Geospatial file containing the area to measure
+# points_file: Geospatial file containing the points defining the area
+# dsm_file: GeoTIFF DEM containing the surface
+# ------
+# output: prints the volume to stdout
+
+v.import input=${area_file} output=polygon_area --overwrite 
+v.import input=${points_file} output=polygon_points --overwrite
+v.buffer -s --overwrite input=polygon_area type=area output=region distance=3 minordistance=3
+r.external input=${dsm_file} output=dsm --overwrite
+
+g.region rast=dsm
+g.region vector=region
+
+# prevent : removing eventual existing mask
+r.mask -r
+r.mask vect=region
+
+v.what.rast map=polygon_points raster=dsm column=height
+v.to.rast input=polygon_area output=r_polygon_area use=val value=255 --overwrite
+
+#v.surf.rst --overwrite input=polygon_points zcolumn=height elevation=dsm_below_pile mask=r_polygon_area
+v.surf.bspline --overwrite input=polygon_points column=height raster_output=dsm_below_pile lambda_i=100
+
+r.mapcalc expression='pile_height_above_dsm=dsm-dsm_below_pile' --overwrite
+r.volume -f input=pile_height_above_dsm clump=r_polygon_area

@@ -41,11 +41,16 @@ export default class ApiFactory{
       };
     }
 
-    const obj = {};
+    let obj = {};
     api.endpoints.forEach(endpoint => {
       if (!Array.isArray(endpoint)) endpoint = [endpoint];
       addEndpoint(obj, ...endpoint);
     });
+
+    if (api.helpers){
+      obj = Object.assign(obj, api.helpers);
+    }
+
     return obj;
   }
 

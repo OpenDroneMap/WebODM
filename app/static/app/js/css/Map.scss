@@ -16,8 +16,15 @@
         }
     }
 
+    .leaflet-right .leaflet-control,
     .leaflet-control-measure.leaflet-control{
         margin-right: 12px;
+    }
+
+    .leaflet-touch .leaflet-control-layers-toggle{
+        width: 30px;
+        height: 30px;
+        background-size: 20px;
     }
 
     .popup-opacity-slider{

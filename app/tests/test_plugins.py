@@ -1,6 +1,9 @@
+import os
+
 from django.test import Client
 from rest_framework import status
 
+from app.plugins import get_plugin_by_name
 from .classes import BootTestCase
 
 class TestPlugins(BootTestCase):
@@ -37,6 +40,10 @@ class TestPlugins(BootTestCase):
         # And our menu entry
         self.assertContains(res, '<li><a href="/plugins/test/menu_url/"><i class="test-icon"></i> Test</a></li>', html=True)
 
+        # A node_modules directory has been created as a result of npm install
+        # because we have a package.json in the public director
+        test_plugin = get_plugin_by_name("test")
+        self.assertTrue(os.path.exists(test_plugin.get_path("public/node_modules")))
+
         # TODO:
-        # test API endpoints
-        # test python hooks
+        # test GRASS engine

@@ -1,0 +1,19 @@
+.leaflet-control-measure,
+.leaflet-measure-resultpopup{
+    h3{
+        font-size: 120%;
+    } 
+}
+
+.leaflet-control-measure-interaction{
+    a{
+        width: auto !important;
+        height: auto !important;
+        line-height: auto !important;
+        display: initial !important;
+
+        &:hover{
+            background-color: inherit !important;
+        }
+    }
+}

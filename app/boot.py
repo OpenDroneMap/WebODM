@@ -3,7 +3,7 @@ import os
 import kombu
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User, Group
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files import File
 from django.db.utils import ProgrammingError
 from guardian.shortcuts import assign_perm
@@ -35,6 +35,10 @@ def boot():
     if settings.DEBUG:
        logger.warning("Debug mode is ON (for development this is OK)")
 
+    # Make sure our app/media/tmp folder exists
+    if not os.path.exists(settings.MEDIA_TMP):
+        os.mkdir(settings.MEDIA_TMP)
+
     # Check default group
     try:
         default_group, created = Group.objects.get_or_create(name='Default')
@@ -60,18 +64,7 @@ def boot():
         # Add permission to view processing nodes
         default_group.permissions.add(Permission.objects.get(codename="view_processingnode"))
 
-        # Add default presets
-        Preset.objects.get_or_create(name='DSM + DTM', system=True,
-                                     options=[{'name': 'dsm', 'value': True}, {'name': 'dtm', 'value': True},  {'name': 'mesh-octree-depth', 'value': 11}])
-        Preset.objects.get_or_create(name='Fast Orthophoto', system=True,
-                                     options=[{'name': 'fast-orthophoto', 'value': True}])
-        Preset.objects.get_or_create(name='High Quality', system=True,
-                                                  options=[{'name': 'dsm', 'value': True},
-                                                           {'name': 'mesh-octree-depth', 'value': "12"},
-                                                           {'name': 'dem-resolution', 'value': "0.04"},
-                                                           {'name': 'orthophoto-resolution', 'value': "40"},
-                                                        ])
-        Preset.objects.get_or_create(name='Default', system=True, options=[{'name': 'dsm', 'value': True}, {'name': 'mesh-octree-depth', 'value': 11}])
+        add_default_presets()
 
         # Add settings
         default_theme, created = Theme.objects.get_or_create(name='Default')
@@ -102,3 +95,28 @@ def boot():
 
     except ProgrammingError:
         logger.warning("Could not touch the database. If running a migration, this is expected.")
+
+
+def add_default_presets():
+    try:
+        Preset.objects.update_or_create(name='DSM + DTM', system=True,
+                                        defaults={
+                                            'options': [{'name': 'dsm', 'value': True}, {'name': 'dtm', 'value': True},
+                                                        {'name': 'mesh-octree-depth', 'value': 6}]})
+        Preset.objects.update_or_create(name='Fast Orthophoto', system=True,
+                                        defaults={'options': [{'name': 'fast-orthophoto', 'value': True}]})
+        Preset.objects.update_or_create(name='High Quality', system=True,
+                                        defaults={'options': [{'name': 'dsm', 'value': True},
+                                                              {'name': 'mesh-octree-depth', 'value': "12"},
+                                                              {'name': 'dem-resolution', 'value': "0.04"},
+                                                              {'name': 'orthophoto-resolution', 'value': "40"},
+                                                              ]})
+        Preset.objects.update_or_create(name='Default', system=True,
+                                        defaults={'options': [{'name': 'dsm', 'value': True},
+                                                              {'name': 'mesh-octree-depth', 'value': 6}]})
+    except MultipleObjectsReturned:
+        # Mostly to handle a legacy code problem where
+        # multiple system presets with the same name were
+        # created if we changed the options
+        Preset.objects.filter(system=True).delete()
+        add_default_presets()
