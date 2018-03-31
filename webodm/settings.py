@@ -246,6 +246,7 @@ LOGIN_URL = '/login/'
 
 # CORS (very relaxed settings, users might want to change this in production)
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
