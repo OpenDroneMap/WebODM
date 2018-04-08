@@ -144,7 +144,7 @@ class ProcessingNode(models.Model):
         if isinstance(result, dict) and 'error' in result:
             raise ProcessingError(result['error'])
         elif isinstance(result, list):
-            return "".join(result)
+            return "\n".join(result)
         else:
             raise ProcessingError("Unknown response for console output: {}".format(result))
 

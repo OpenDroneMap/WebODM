@@ -13,8 +13,10 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
 from .celery import app
+import redis
 
 logger = get_task_logger(__name__)
+redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
 
 @app.task
 def update_nodes_info():
@@ -36,45 +38,47 @@ def cleanup_projects():
 
 @app.task
 def process_task(taskId):
-    # TODO: would a redis lock perform better here?
-    with transaction.atomic():
+    try:
+        lock = redis_client.lock('task_lock_{}'.format(taskId))
+        have_lock = lock.acquire(blocking=False)
+
+        if not have_lock:
+            return
+
         try:
-            task = Task.objects.filter(pk=taskId).select_for_update().get()
+            task = Task.objects.get(pk=taskId)
         except ObjectDoesNotExist:
             logger.info("Task id {} has already been deleted.".format(taskId))
             return
 
-        if not task.processing_lock:
-            task.processing_lock = True
-            task.save()
-        else:
-            return  # Another worker beat us to it
-
-    try:
-        task.process()
-    except Exception as e:
-        logger.error(
-            "Uncaught error! This is potentially bad. Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
-                e, traceback.format_exc()))
-        if settings.TESTING: raise e
+        try:
+            task.process()
+        except Exception as e:
+            logger.error(
+                "Uncaught error! This is potentially bad. Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
+                    e, traceback.format_exc()))
+            if settings.TESTING: raise e
     finally:
-        # Might have been deleted
-        if task.pk is not None:
-            task.processing_lock = False
-            task.save()
+        try:
+            if have_lock:
+                lock.release()
+        except redis.exceptions.LockError:
+            # A lock could have expired
+            pass
 
-
-@app.task
-def process_pending_tasks():
+def get_pending_tasks():
     # All tasks that have a processing node assigned
     # Or that need one assigned (via auto)
     # or tasks that need a status update
     # or tasks that have a pending action
-    # and that are not locked (being processed by another thread)
-    tasks = Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
+    return Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
                                 Q(Q(status=None) | Q(status__in=[status_codes.QUEUED, status_codes.RUNNING]),
                                   processing_node__isnull=False) |
-                                Q(pending_action__isnull=False)).exclude(Q(processing_lock=True))
+                                Q(pending_action__isnull=False))
+
+@app.task
+def process_pending_tasks():
+    tasks = get_pending_tasks()
 
     for task in tasks:
         process_task.delay(task.id)
