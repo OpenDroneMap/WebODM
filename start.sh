@@ -69,6 +69,7 @@ if [ "$WO_SSL" = "YES" ]; then
     proto="https"
 fi
 
+cat app/scripts/unlock_all_tasks.py | python manage.py shell
 ./worker.sh scheduler start
 
 congrats(){

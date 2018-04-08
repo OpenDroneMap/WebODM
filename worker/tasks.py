@@ -39,7 +39,7 @@ def cleanup_projects():
 @app.task
 def process_task(taskId):
     try:
-        lock = redis_client.lock('task_lock_{}'.format(taskId), timeout=360)
+        lock = redis_client.lock('task_lock_{}'.format(taskId))
         have_lock = lock.acquire(blocking=False)
 
         if not have_lock:
@@ -66,17 +66,19 @@ def process_task(taskId):
             # A lock could have expired
             pass
 
-
-@app.task
-def process_pending_tasks():
+def get_pending_tasks():
     # All tasks that have a processing node assigned
     # Or that need one assigned (via auto)
     # or tasks that need a status update
     # or tasks that have a pending action
-    tasks = Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
+    return Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
                                 Q(Q(status=None) | Q(status__in=[status_codes.QUEUED, status_codes.RUNNING]),
                                   processing_node__isnull=False) |
                                 Q(pending_action__isnull=False))
+
+@app.task
+def process_pending_tasks():
+    tasks = get_pending_tasks()
 
     for task in tasks:
         process_task.delay(task.id)
