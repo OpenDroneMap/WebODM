@@ -15,6 +15,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
     * [Backup and Restore](#backup-and-restore)
+    * [Reset Password](#reset-password)
  * [API Docs](#api-docs)
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
  * [Roadmap](#roadmap)
@@ -156,6 +157,16 @@ docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubunt
 docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/appmedia.tar"
 ./webodm.sh start
 ```
+
+### Reset Password
+
+If you forgot the password you picked the first time you logged into WebODM, to reset it just type:
+
+```bash
+./webodm.sh start && ./webodm.sh resetadminpassword newpass
+```
+
+The password will be reset to `newpass`. The command will also tell you what username you chose.
 
 ## API Docs
 
