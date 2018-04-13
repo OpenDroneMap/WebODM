@@ -246,7 +246,7 @@ resetpassword(){
 			exit 1
 		fi
 
-		docker exec -ti $container_hash bash -c "echo \"from django.contrib.auth.models import User;from django.contrib.auth.hashers import make_password;u=User.objects.filter(is_superuser=True)[0];u.password=make_password('$newpass');u.save();print('The following user was changed: {}'.format(u.username));\" | python manage.py shell"
+		docker exec $container_hash bash -c "echo \"from django.contrib.auth.models import User;from django.contrib.auth.hashers import make_password;u=User.objects.filter(is_superuser=True)[0];u.password=make_password('$newpass');u.save();print('The following user was changed: {}'.format(u.username));\" | python manage.py shell"
 		if [[ "$?" -eq 0 ]]; then
 			echo -e "\033[1mPassword changed!\033[0m"
 		else
