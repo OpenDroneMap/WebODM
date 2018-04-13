@@ -73,7 +73,7 @@ To update WebODM to the latest version use:
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
 
-For Windows users an [Installer](https://www.webodm.org/installer) is also available.
+For Windows and macOS users an [installer](https://www.webodm.org/installer) is also available.
 
 ### Add More Processing Nodes
 
