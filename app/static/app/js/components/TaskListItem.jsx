@@ -224,7 +224,8 @@ class TaskListItem extends React.Component {
       if (line.indexOf("Killed") !== -1 || 
           line.indexOf("MemoryError") !== -1 || 
           line.indexOf("std::bad_alloc") !== -1 ||
-          line.indexOf("Child returned 137") !== -1){
+          line.indexOf("Child returned 137") !== -1 ||
+          line.indexOf("Failed to allocate memory") !== -1){
         this.setState({memoryError: true});
       }else if (line.indexOf("SVD did not converge") !== -1){
         this.setState({badDatasetError: true});
