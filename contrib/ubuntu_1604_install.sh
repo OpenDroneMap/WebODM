@@ -2,7 +2,7 @@
 sudo apt-get autoremove -y install-info 
 sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update
-sudo apt-get install -y python-dev libpq-dev gdal-bin libgdal-dev libproj-dev python-virtualenv python3-dev
+sudo apt-get install -y python-dev libpq-dev gdal-bin libgdal-dev libproj-dev python-virtualenv python3-dev git binutils libproj-dev
 
 # Setup Postgres
 ppaexists=$( grep ^ /etc/apt/sources.list /etc/apt/sources.list.d/* | grep postgres )
@@ -40,7 +40,9 @@ sudo npm install -g bower
 virtualenv -p python3 env
 . env/bin/activate
 
-cd webodm/
+# Clone Repository and change folder
+git clone https://github.com/OpenDroneMap/WebODM
+cd WebODM/
 
 pip install -r requirements.txt
 
