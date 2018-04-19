@@ -422,8 +422,10 @@ class Task(models.Model):
                     self.processing_time = info["processingTime"]
                     self.status = info["status"]["code"]
 
-                    current_lines_count = len(self.console_output.split("\n")) - 1
-                    self.console_output += self.processing_node.get_task_console_output(self.uuid, current_lines_count)
+                    current_lines_count = len(self.console_output.split("\n"))
+                    console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
+                    if len(console_output) > 0:
+                        self.console_output += console_output + '\n'
 
                     if "errorMessage" in info["status"]:
                         self.last_error = info["status"]["errorMessage"]

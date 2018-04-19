@@ -111,7 +111,7 @@ class TaskViewSet(viewsets.ViewSet):
 
         line_num = max(0, int(request.query_params.get('line', 0)))
         output = task.console_output or ""
-        return Response('\n'.join(output.split('\n')[line_num:]))
+        return Response('\n'.join(output.rstrip().split('\n')[line_num:]))
 
 
     def list(self, request, project_pk=None):
