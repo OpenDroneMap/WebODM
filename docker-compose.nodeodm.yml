@@ -13,3 +13,4 @@ services:
     container_name: node-odm-1
     ports:
       - "3000"
+    restart: on-failure:10
