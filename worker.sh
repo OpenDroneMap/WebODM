@@ -52,7 +52,7 @@ start(){
 	action=$1
 
 	echo "Starting worker using broker at $WO_BROKER"
-	celery -A worker worker --loglevel=warn > /dev/null
+	celery -A worker worker --max-tasks-per-child 1000 --loglevel=warn > /dev/null
 }
 
 start_scheduler(){
