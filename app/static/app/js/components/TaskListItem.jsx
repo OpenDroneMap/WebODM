@@ -500,7 +500,6 @@ class TaskListItem extends React.Component {
                   "Process exited with code 1" means that part of the processing failed. Try tweaking the <a href="javascript:void(0);" onClick={this.startEditing}>Task Options</a> as follows:
                   <ul>
                     <li>Increase the <b>min-num-features</b> option, especially if your images have lots of vegetation</li>
-                    <li>Enable the <b>use-pmvs</b> option.</li>
                   </ul>
                   Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making 
                   sure to include a <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>copy of your task's output</a> (the one you see above <i className="fa fa-arrow-up"></i>, click to <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>download</a> it). Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>

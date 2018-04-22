@@ -10,7 +10,6 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 * [Getting Started](#getting-started)
     * [Add More Processing Nodes](#add-more-processing-nodes)
-    * [Security](#security)
     * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
@@ -83,16 +82,6 @@ WebODM can be linked to one or more processing nodes running [node-OpenDroneMap]
 Adding more processing nodes will allow you to run multiple jobs in parallel. 
 
 You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
-
-### Security
-
-If you want to run WebODM in production, make sure to pass the `--no-debug` flag while starting WebODM:
-
-```bash
-./webodm.sh restart --no-debug
-```
-
-This will disable the `DEBUG` flag from `webodm/settings.py` within the docker container. This is [really important](https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG).
 
 ### Enable SSL
 

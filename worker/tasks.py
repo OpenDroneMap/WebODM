@@ -79,7 +79,6 @@ def get_pending_tasks():
 @app.task
 def process_pending_tasks():
     tasks = get_pending_tasks()
-
     for task in tasks:
         process_task.delay(task.id)
 

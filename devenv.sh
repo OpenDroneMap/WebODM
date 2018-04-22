@@ -4,6 +4,8 @@ __dirname=$(cd $(dirname "$0"); pwd -P)
 
 ${__dirname}/webodm.sh checkenv
 
+export WO_DEBUG=YES
+
 usage(){
   echo "Usage: $0 <command> [options]"
   echo
