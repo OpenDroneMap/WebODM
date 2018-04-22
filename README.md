@@ -10,7 +10,6 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 * [Getting Started](#getting-started)
     * [Add More Processing Nodes](#add-more-processing-nodes)
-    * [Security](#security)
     * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
