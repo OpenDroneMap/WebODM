@@ -68,8 +68,8 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --no-debug)
-    export WO_DEBUG=NO
+    --debug)
+    export WO_DEBUG=YES
     shift # past argument
     ;;
 	--broker)
@@ -108,7 +108,7 @@ usage(){
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-cert	<path>	Manually specify a path to the certificate file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-insecure-port-redirect	<port>	Insecure port number to redirect from when SSL is enabled (default: $DEFAULT_SSL_INSECURE_PORT_REDIRECT)"
-  echo "	--no-debug	Disable debug for production environments (default: disabled)"
+  echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   exit
 }

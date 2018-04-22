@@ -84,16 +84,6 @@ Adding more processing nodes will allow you to run multiple jobs in parallel.
 
 You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
 
-### Security
-
-If you want to run WebODM in production, make sure to pass the `--no-debug` flag while starting WebODM:
-
-```bash
-./webodm.sh restart --no-debug
-```
-
-This will disable the `DEBUG` flag from `webodm/settings.py` within the docker container. This is [really important](https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG).
-
 ### Enable SSL
 
 WebODM has the ability to automatically request and install a SSL certificate via [Let’s Encrypt](https://letsencrypt.org/), or you can manually specify your own key/certificate pair.
