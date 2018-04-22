@@ -14,3 +14,4 @@ services:
     ports:
       - "3000"
     restart: on-failure:10
+    oom_score_adj: 500
