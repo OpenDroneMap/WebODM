@@ -37,8 +37,6 @@ services:
     image: redis
     container_name: broker
     restart: on-failure:10
-    mem_limit: 256m
-    oom_kill_disable: true
     oom_score_adj: -500
   worker:
     image: opendronemap/webodm_webapp
