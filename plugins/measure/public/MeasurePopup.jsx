@@ -36,8 +36,6 @@ module.exports = class MeasurePopup extends React.Component {
             lastCoord.dd.x
         ));
 
-    console.log(layers);
-
     // Did we select a layer?
     if (layers.length > 0){
         const layer = layers[layers.length - 1];

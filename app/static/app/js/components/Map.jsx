@@ -14,6 +14,7 @@ import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
+import update from 'immutability-helper';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -40,7 +41,8 @@ class Map extends React.Component {
     
     this.state = {
       error: "",
-      singleTask: null // When this is set to a task, show a switch mode button to view the 3d model
+      singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
+      pluginActionButtons: []
     };
 
     this.imageryLayers = [];
@@ -236,11 +238,16 @@ class Map extends React.Component {
         });
     });
 
-    // PluginsAPI.events.addListener('Map::AddPanel', (e) => {
-    //   console.log("Received response: " + e);
-    // });
     PluginsAPI.Map.triggerDidAddControls({
       map: this.map
+    });
+
+    PluginsAPI.Map.triggerAddActionButtons({
+      map: this.map
+    }, (button) => {
+      this.setState(update(this.state, {
+        pluginActionButtons: {$push: [button]}
+      }));
     });
   }
 
@@ -285,6 +292,7 @@ class Map extends React.Component {
         
 
         <div className="actionButtons">
+          {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
           {(!this.props.public && this.state.singleTask !== null) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
