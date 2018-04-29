@@ -237,7 +237,6 @@ class ModelView extends React.Component {
                       {showSwitchModeButton ? 
                         <SwitchModeButton 
                           public={this.props.public}
-                          style={{marginLeft: this.props.public ? '0' : '76px'}}
                           task={this.props.task}
                           type="modelToMap" /> : ""}
                     </div>

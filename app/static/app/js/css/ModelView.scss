@@ -5,7 +5,7 @@
     position: relative;
     height: 100%;
 
-    canvas{
+    #potree_render_area > canvas{
         width: 100% !important;
         height: 100% !important;
     }

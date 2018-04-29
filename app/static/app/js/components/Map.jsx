@@ -268,7 +268,7 @@ class Map extends React.Component {
 
   handleMapMouseDown(e){
     // Make sure the share popup closes
-    if (this.sharePopup) this.shareButton.hidePopup();
+    if (this.shareButton) this.shareButton.hidePopup();
   }
 
   render() {
