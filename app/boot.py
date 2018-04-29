@@ -99,18 +99,21 @@ def add_default_presets():
         Preset.objects.update_or_create(name='DSM + DTM', system=True,
                                         defaults={
                                             'options': [{'name': 'dsm', 'value': True}, {'name': 'dtm', 'value': True},
-                                                        {'name': 'mesh-octree-depth', 'value': 6}]})
+                                                        {'name': 'mesh-octree-depth', 'value': 6},
+                                                        {'name': 'mesh-solver-divide', 'value': 6}]})
         Preset.objects.update_or_create(name='Fast Orthophoto', system=True,
                                         defaults={'options': [{'name': 'fast-orthophoto', 'value': True}]})
         Preset.objects.update_or_create(name='High Quality', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True},
-                                                              {'name': 'mesh-octree-depth', 'value': "12"},
+                                                              {'name': 'mesh-octree-depth', 'value': 6},
+                                                              {'name': 'mesh-solver-divide', 'value': 6},
                                                               {'name': 'dem-resolution', 'value': "0.04"},
                                                               {'name': 'orthophoto-resolution', 'value': "40"},
                                                               ]})
         Preset.objects.update_or_create(name='Default', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True},
-                                                              {'name': 'mesh-octree-depth', 'value': 6}]})
+                                                              {'name': 'mesh-octree-depth', 'value': 6},
+                                                              {'name': 'mesh-solver-divide', 'value': 6}]})
     except MultipleObjectsReturned:
         # Mostly to handle a legacy code problem where
         # multiple system presets with the same name were
