@@ -1,4 +1,4 @@
-PluginsAPI.Map.addActionButtons([
+PluginsAPI.Map.addActionButton([
     	'osm-quickedit/main.css'
 	], function(options){
 	

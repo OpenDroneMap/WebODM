@@ -242,7 +242,7 @@ class Map extends React.Component {
       map: this.map
     });
 
-    PluginsAPI.Map.triggerAddActionButtons({
+    PluginsAPI.Map.triggerAddActionButton({
       map: this.map
     }, (button) => {
       this.setState(update(this.state, {
