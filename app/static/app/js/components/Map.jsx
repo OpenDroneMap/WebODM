@@ -14,6 +14,7 @@ import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
+import update from 'immutability-helper';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -40,7 +41,8 @@ class Map extends React.Component {
     
     this.state = {
       error: "",
-      singleTask: null // When this is set to a task, show a switch mode button to view the 3d model
+      singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
+      pluginActionButtons: []
     };
 
     this.imageryLayers = [];
@@ -167,7 +169,7 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
-    const { showBackground } = this.props;
+    const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
@@ -176,7 +178,8 @@ class Map extends React.Component {
     });
 
     PluginsAPI.Map.triggerWillAddControls({
-      map: this.map
+      map: this.map,
+      tiles
     });
 
     Leaflet.control.scale({
@@ -236,11 +239,18 @@ class Map extends React.Component {
         });
     });
 
-    // PluginsAPI.events.addListener('Map::AddPanel', (e) => {
-    //   console.log("Received response: " + e);
-    // });
     PluginsAPI.Map.triggerDidAddControls({
-      map: this.map
+      map: this.map,
+      tiles: tiles
+    });
+
+    PluginsAPI.Map.triggerAddActionButton({
+      map: this.map,
+      tiles
+    }, (button) => {
+      this.setState(update(this.state, {
+        pluginActionButtons: {$push: [button]}
+      }));
     });
   }
 
@@ -251,9 +261,7 @@ class Map extends React.Component {
     });
 
     if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers().then(() => {
-        // console.log("GOT: ", this.autolayers, this.autolayers.selectedOverlays);
-      });
+      this.loadImageryLayers();
     }
   }
 
@@ -268,7 +276,7 @@ class Map extends React.Component {
 
   handleMapMouseDown(e){
     // Make sure the share popup closes
-    if (this.sharePopup) this.shareButton.hidePopup();
+    if (this.shareButton) this.shareButton.hidePopup();
   }
 
   render() {
@@ -285,6 +293,7 @@ class Map extends React.Component {
         
 
         <div className="actionButtons">
+          {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
           {(!this.props.public && this.state.singleTask !== null) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}

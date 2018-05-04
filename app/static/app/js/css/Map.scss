@@ -31,9 +31,14 @@
         margin-bottom: 6px;
     }
 
-    .shareButton{
+    .actionButtons{
+        position: absolute;
         z-index: 2000;
-        bottom: 11px;
-        right: 38px;
+        right: 12px;
+        bottom: 20px;
+        & > *{
+            display: inline-block;
+            margin-left: 12px;
+        }
     }
 }
