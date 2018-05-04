@@ -1,4 +1,6 @@
 .map{
+    position: relative; 
+
     .leaflet-popup-content{
         .title{
             font-weight: bold;
@@ -14,17 +16,29 @@
         }
     }
 
+    .leaflet-right .leaflet-control,
     .leaflet-control-measure.leaflet-control{
         margin-right: 12px;
+    }
+
+    .leaflet-touch .leaflet-control-layers-toggle{
+        width: 30px;
+        height: 30px;
+        background-size: 20px;
     }
 
     .popup-opacity-slider{
         margin-bottom: 6px;
     }
 
-    .shareButton{
+    .actionButtons{
+        position: absolute;
         z-index: 2000;
-        bottom: -11px;
-        right: 38px;
+        right: 12px;
+        bottom: 20px;
+        & > *{
+            display: inline-block;
+            margin-left: 12px;
+        }
     }
 }

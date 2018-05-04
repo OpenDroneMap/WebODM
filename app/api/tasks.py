@@ -1,30 +1,25 @@
 import mimetypes
 import os
+from wsgiref.util import FileWrapper
 
-from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.db.models.functions import Envelope
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.db import transaction
-from django.db.models.functions import Cast
 from django.http import HttpResponse
-from wsgiref.util import FileWrapper
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
 from rest_framework.views import APIView
 
-from nodeodm import status_codes
-from .common import get_and_check_project, get_tile_json, path_traversal_check
-
-from app import models, scheduler, pending_actions
+from app import models, pending_actions
 from nodeodm.models import ProcessingNode
+from worker import tasks as worker_tasks
+from .common import get_and_check_project, get_tile_json, path_traversal_check
 
 
 class TaskIDsSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return obj.id
-
 
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
@@ -56,7 +51,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Task
-        exclude = ('processing_lock', 'console_output', 'orthophoto_extent', 'dsm_extent', 'dtm_extent', )
+        exclude = ('console_output', 'orthophoto_extent', 'dsm_extent', 'dtm_extent', )
         read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', )
 
 class TaskViewSet(viewsets.ViewSet):
@@ -84,8 +79,8 @@ class TaskViewSet(viewsets.ViewSet):
         task.last_error = None
         task.save()
 
-        # Call the scheduler (speed things up)
-        scheduler.process_pending_tasks(background=True)
+        # Process task right away
+        worker_tasks.process_task.delay(task.id)
 
         return Response({'success': True})
 
@@ -116,7 +111,7 @@ class TaskViewSet(viewsets.ViewSet):
 
         line_num = max(0, int(request.query_params.get('line', 0)))
         output = task.console_output or ""
-        return Response('\n'.join(output.split('\n')[line_num:]))
+        return Response('\n'.join(output.rstrip().split('\n')[line_num:]))
 
 
     def list(self, request, project_pk=None):
@@ -149,7 +144,8 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
 
         with transaction.atomic():
-            task = models.Task.objects.create(project=project)
+            task = models.Task.objects.create(project=project,
+                                              pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
 
             for image in files:
                 models.ImageUpload.objects.create(task=task, image=image)
@@ -159,7 +155,9 @@ class TaskViewSet(viewsets.ViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            worker_tasks.process_task.delay(task.id)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
     def update(self, request, pk=None, project_pk=None, partial=False):
@@ -180,8 +178,8 @@ class TaskViewSet(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # Call the scheduler (speed things up)
-        scheduler.process_pending_tasks(background=True)
+        # Process task right away
+        worker_tasks.process_task.delay(task.id)
 
         return Response(serializer.data)
 
@@ -194,15 +192,15 @@ class TaskNestedView(APIView):
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'console_output', )
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
-    def get_and_check_task(self, request, pk, project_pk, annotate={}):
+    def get_and_check_task(self, request, pk, annotate={}):
         try:
-            task = self.queryset.annotate(**annotate).get(pk=pk, project=project_pk)
+            task = self.queryset.annotate(**annotate).get(pk=pk)
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
         # Check for permissions, unless the task is public
         if not task.public:
-            get_and_check_project(request, project_pk)
+            get_and_check_project(request, task.project.id)
 
         return task
 
@@ -212,7 +210,7 @@ class TaskTiles(TaskNestedView):
         """
         Get a tile image
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk)
         tile_path = task.get_tile_path(tile_type, z, x, y)
         if os.path.isfile(tile_path):
             tile = open(tile_path, "rb")
@@ -226,7 +224,7 @@ class TaskTilesJson(TaskNestedView):
         """
         Get tile.json for this tasks's asset type
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk)
 
         extent_map = {
             'orthophoto': task.orthophoto_extent,
@@ -257,7 +255,7 @@ class TaskDownloads(TaskNestedView):
             """
             Downloads a task asset (if available)
             """
-            task = self.get_and_check_task(request, pk, project_pk)
+            task = self.get_and_check_task(request, pk)
 
             # Check and download
             try:
@@ -285,7 +283,7 @@ class TaskAssets(TaskNestedView):
         """
         Downloads a task asset (if available)
         """
-        task = self.get_and_check_task(request, pk, project_pk)
+        task = self.get_and_check_task(request, pk)
 
         # Check for directory traversal attacks
         try:

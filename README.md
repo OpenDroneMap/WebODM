@@ -10,16 +10,18 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 * [Getting Started](#getting-started)
     * [Add More Processing Nodes](#add-more-processing-nodes)
-    * [Security](#security)
     * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
+    * [Backup and Restore](#backup-and-restore)
+    * [Reset Password](#reset-password)
  * [API Docs](#api-docs)
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
  * [Roadmap](#roadmap)
  * [Getting Help](#getting-help)
  * [Support the Project](#support-the-project)
  * [Become a Contributor](#become-a-contributor)
+ * [Architecture Overview](#architecture-overview)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
  
@@ -34,6 +36,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 * Install the following applications (if they are not installed already):
  - [Docker](https://www.docker.com/)
  - [Python](https://www.python.org/downloads/)
+ - [Pip](https://pypi.python.org/pypi/pip/)
  - [Git](https://git-scm.com/downloads)
 
 * Windows users have a choice between Docker Toolbox (older product but more tutorials available) and Docker for Windows (more recent version that runs on Microsoft's Hyper-V virtualization engine, recommended by Docker). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes) . 
@@ -70,7 +73,7 @@ To update WebODM to the latest version use:
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
 
-For Windows users an [Installer](https://www.webodm.org/installer) is also available.
+For Windows and macOS users an [installer](https://www.webodm.org/installer) is also available.
 
 ### Add More Processing Nodes
 
@@ -79,16 +82,6 @@ WebODM can be linked to one or more processing nodes running [node-OpenDroneMap]
 Adding more processing nodes will allow you to run multiple jobs in parallel. 
 
 You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
-
-### Security
-
-If you want to run WebODM in production, make sure to pass the `--no-debug` flag while starting WebODM:
-
-```bash
-./webodm.sh down && ./webodm.sh start --no-debug
-```
-
-This will disable the `DEBUG` flag from `webodm/settings.py` within the docker container. This is [really important](https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG).
 
 ### Enable SSL
 
@@ -99,7 +92,7 @@ WebODM has the ability to automatically request and install a SSL certificate vi
  - Run the following:
 
 ```bash
-./webodm.sh down && ./webodm.sh start --ssl --hostname webodm.myorg.com
+./webodm.sh restart --ssl --hostname webodm.myorg.com
 ```
 
 That's it! The certificate will automatically renew when needed.
@@ -111,7 +104,7 @@ If you want to specify your own key/certificate pair, simply pass the `--ssl-key
 When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. If you want to store your files on the host filesystem instead of a docker volume, you need to pass a path via the `--media-dir` option:
 
 ```bash
-./webodm.sh down && ./webodm.sh start --media-dir /home/user/webodm_data
+./webodm.sh restart --media-dir /home/user/webodm_data
 ```
 
 Note that existing task results will not be available after the change. Refer to the [Migrate Data Volumes](https://docs.docker.com/engine/tutorials/dockervolumes/#backup-restore-or-migrate-data-volumes) section of the Docker documentation for information on migrating existing task results.
@@ -121,16 +114,49 @@ Note that existing task results will not be available after the change. Refer to
 Sympthoms | Possible Solutions
 --------- | ------------------
 While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
-While starting WebODM you get: `could not translate host name “db” to address: Name or service not known` | Try restarting your computer, then type: `./webodm.sh down && ./webodm.sh start`
+While starting WebODM you get: `'WaitNamedPipe','The system cannot find the file specified.'` | 1. Make sure you have enabled VT-x virtualization in the BIOS.<br/>2. Try to downgrade your version of Python to 2.7
+While Accessing the WebODM interface you get: `OperationalError at / could not translate host name “db” to address: Name or service not known` or `ProgrammingError at / relation “auth_user” does not exist` | Try restarting your computer, then type: `./webodm.sh restart`
 Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
 After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` | Try to remove your WebODM folder and start from a fresh git clone
-Task fails with `Process exited with code null`, no task console output | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
+Task fails with `Process exited with code null`, no task console output - OR - console output shows `Illegal Instruction` - OR - console output shows `Child returned 132` | If the computer running node-opendronemap is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup node-opendronemap natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
 On Windows, docker-compose fails with `Failed to execute the script docker-compose` | Make sure you have enabled VT-x virtualization in the BIOS
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
 Cannot start WebODM via `./webodm.sh start`, error messages are different at each retry | You could be running out of memory. Make sure you have enough RAM available. 2GB should be the recommended minimum, unless you know what you are doing
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
+
+### Backup and Restore
+
+If you want to move WebODM to another system, you just need to transfer the docker volumes (unless you are storing your files on the file system).
+
+On the old system:
+
+```bash
+mkdir -v backup
+docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubuntu tar cvf /backup/dbdata.tar /temp
+docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu tar cvf /backup/appmedia.tar /temp
+```
+
+Your backup files will be stored in the newly created `backup` directory. Transfer the `backup` directory to the new system, then on the new system:
+
+```bash
+ls backup # --> appmedia.tar  dbdata.tar
+./webodm.sh start && ./webodm.sh down # Create volumes
+docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/dbdata.tar"
+docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/appmedia.tar"
+./webodm.sh start
+```
+
+### Reset Password
+
+If you forgot the password you picked the first time you logged into WebODM, to reset it just type:
+
+```bash
+./webodm.sh start && ./webodm.sh resetadminpassword newpass
+```
+
+The password will be reset to `newpass`. The command will also tell you what username you chose.
 
 ## API Docs
 
@@ -164,10 +190,10 @@ Developer, I'm looking to build an app that will stay behind a firewall and just
 - [X] 2D Map Display 
 - [X] 3D Model Display
 - [ ] NDVI display
-- [ ] Volumetric Measurements
+- [X] Volumetric Measurements
 - [X] Cluster management and setup.
 - [ ] Mission Planner
-- [ ] Plugins/Webhooks System
+- [X] Plugins/Webhooks System
 - [X] API
 - [X] Documentation
 - [ ] Android Mobile App
@@ -197,11 +223,34 @@ There are many ways to contribute back to the project:
  - ⭐️ us on GitHub.
  - Spread the word about WebODM and OpenDroneMap on social media.
  - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [premium support package](https://webodm.org/services#premium-support).
- - Become a contributor (see below).
+ - Become a contributor (see below to get free swag 🤘)
 
 ## Become a Contributor
 
-If you know Python, web technologies (JS, HTML, CSS, etc.) or both, it's easy to make a change to WebODM! Make a fork, clone the repository and run `./devenv.sh start`. That's it! See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information. All ideas are considered and people of all skill levels are welcome to contribute.
+The easiest way to get started is to take a look at our list of [outstanding issues](https://github.com/OpenDroneMap/WebODM/labels/help%20wanted) and pick one. You can also fix/improve something entirely new based on your experience with WebODM. All ideas are considered and people of all skill levels are welcome to contribute. 
+
+You don't necessarily need to be a developer to become a contributor. We can use your help to write better documentation and improve the user interface texts and visuals. 
+
+If you know how to code, we primarily use Python (Django), Javascript (React), HTML and SCSS. See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information.
+
+To make a contribution, you will need to open a pull request ([here's how](https://github.com/Roshanjossey/first-contributions#fork-this-repository)). To make changes to WebODM, make a clone of the repository and run `./devenv.sh start`.
+
+If you have questions visit us on the [forum](http://community.opendronemap.org/c/webodm) and we'll be happy to help you out with your first contribution.
+
+When your first pull request is accepted, don't forget to fill [this form](https://goo.gl/forms/PZkiPPeNKUHNz0qe2) to get your **free** WebODM T-Shirt 🤘
+
+<img src="https://user-images.githubusercontent.com/1951843/36511023-344f86b2-1733-11e8-8cae-236645db407b.png" alt="T-Shirt" width="50%">
+
+## Architecture Overview
+
+WebODM is built with scalability and performance in mind. While the default setup places all databases and applications on the same machine, users can separate its components for increased performance (ex. place a Celery worker on a separate machine for running background tasks).
+
+![Architecture](https://user-images.githubusercontent.com/1951843/36916884-3a269a7a-1e23-11e8-997a-a57cd6ca7950.png)
+
+A few things to note:
+ * We use Celery workers to do background tasks such as resizing images and processing task results, but we use an ad-hoc scheduling mechanism to communicate with node-OpenDroneMap (which processes the orthophotos, 3D models, etc.). The choice to use two separate systems for task scheduling is due to the flexibility that an ad-hoc mechanism gives us for certain operations (capture task output, persistent data and ability to restart tasks mid-way, communication via REST calls, etc.).
+ * If loaded on multiple machines, Celery workers should all share their `app/media` directory with the Django application (via network shares). You can manage workers via `./worker.sh`
+
 
 ## Run the docker version as a Linux Service
 
@@ -216,36 +265,28 @@ The following pre-requisites are required:
  * Requires docker installed via system (ubuntu: `sudo apt-get install docker.io`)
  * Requires screen to be installed
  * Requires odm user member of docker group
- * Required WebODM directory checked out to /opt/WebODM
- * Requires that /opt/WebODM is recursively owned by odm:odm
+ * Required WebODM directory checked out to /webodm
+ * Requires that /webodm is recursively owned by odm:odm
+ * Requires that a Python 3 environment is used at /webodm/python3-venv
 
 If all pre-requisites have been met, and repository is checked out to /opt/WebODM folder, then you can use the following steps to enable and manage the service:
 
-First, to install the service, and enable the service to run at startup from now on:
+First, to install the service, and enable the services to run at startup from now on:
 ```bash
-sudo systemctl enable /opt/WebODM/service/webodm.service
+sudo systemctl enable /webodm/service/webodm-gunicorn.service
+sudo systemctl enable /webodm/service/webodm-nginx.service
 ```
 
-To manually stop the service:
+To manually start/stop the service:
 ```bash
-sudo systemctl stop webodm
-```
-
-To manually start the service:
-```bash
-sudo systemctl start webodm
+sudo systemctl stop webodm-gunicorn
+sudo systemctl start webodm-gunicorn
 ```
 
 To manually check service status:
 ```bash
-sudo systemctl status webodm
+sudo systemctl status webodm-gunicorn
 ```
-
-The service runs within a screen session, so as the odm user you can easily jump into the screen session by using:
-```bash
-screen -r webodm
-```
-(if you wish to exit the screen session, don't use ctrl+c, that will kill webodm, use `CTRL+A` then hit the `D` key)
 
 ## Run it natively
 
@@ -260,6 +301,7 @@ To run WebODM, you will need to install:
  * GDAL (>= 2.1)
  * Node.js (>= 6.0)
  * Nginx (Linux/MacOS) - OR - Apache + mod_wsgi (Windows)
+ * Redis (>= 2.6)
 
 On Linux, make sure you have:
 
@@ -301,15 +343,27 @@ ALTER SYSTEM SET postgis.enable_outdb_rasters TO True;
 ALTER SYSTEM SET postgis.gdal_enabled_drivers TO 'GTiff';
 ```
 
+Start the redis broker:
+
+```bash
+redis-server
+```
+
 Then:
 
 ```bash
 pip install -r requirements.txt
-sudo npm install -g webpack
+sudo npm install -g webpack@3.11.0
 npm install
 webpack
 python manage.py collectstatic --noinput
 chmod +x start.sh && ./start.sh --no-gunicorn
+```
+
+Finally, start at least one celery worker:
+
+```bash
+./worker.sh start
 ```
 
 The `start.sh` script will use Django's built-in server if you pass the `--no-gunicorn` parameter. This is good for testing, but bad for production. 
@@ -344,5 +398,6 @@ python --version
 pip --version
 npm --version
 gdalinfo --version
+redis-server --version
 ```
 Should all work without errors.

@@ -1,9 +1,11 @@
 import json
 from django.http import Http404
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django.shortcuts import render
 
+from app.api.tasks import TaskSerializer
 from app.models import Task
 
 
@@ -50,3 +52,8 @@ def model_display(request, task_pk=None):
 
 def model_display_iframe(request, task_pk=None):
     return handle_model_display(request, 'app/public/3d_model_display_iframe.html', task_pk)
+
+def task_json(request, task_pk=None):
+    task = get_public_task(task_pk)
+    serializer = TaskSerializer(task)
+    return JsonResponse(serializer.data)

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 __dirname=$(cd $(dirname "$0"); pwd -P)
-cd ${__dirname}
+cd "${__dirname}"
 
 platform="Linux" # Assumed
 uname=$(uname)
@@ -25,6 +25,7 @@ DEFAULT_HOST="$WO_HOST"
 DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
 DEFAULT_SSL="$WO_SSL"
 DEFAULT_SSL_INSECURE_PORT_REDIRECT="$WO_SSL_INSECURE_PORT_REDIRECT"
+DEFAULT_BROKER="$WO_BROKER"
 
 # Parse args for overrides
 POSITIONAL=()
@@ -67,9 +68,14 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --no-debug)
-    export WO_DEBUG=NO
+    --debug)
+    export WO_DEBUG=YES
     shift # past argument
+    ;;
+	--broker)
+    export WO_BROKER="$2"
+    shift # past argument
+    shift # past value
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -102,7 +108,8 @@ usage(){
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-cert	<path>	Manually specify a path to the certificate file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-insecure-port-redirect	<port>	Insecure port number to redirect from when SSL is enabled (default: $DEFAULT_SSL_INSECURE_PORT_REDIRECT)"
-  echo "	--no-debug	Disable debug for production environments (default: disabled)"
+  echo "	--debug	Enable debug for development environments (default: disabled)"
+  echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   exit
 }
 
@@ -146,6 +153,22 @@ run(){
 }
 
 start(){
+	echo "Starting WebODM..."
+	echo ""
+	echo "Using the following environment:"
+	echo "================================"
+	echo "Host: $WO_HOST"
+	echo "Port: $WO_PORT"
+	echo "Media directory: $WO_MEDIA_DIR"
+	echo "SSL: $WO_SSL"
+	echo "SSL key: $WO_SSL_KEY"
+	echo "SSL certificate: $WO_SSL_CERT"
+	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
+	echo "Celery Broker: $WO_BROKER"
+	echo "================================"
+	echo "Make sure to issue a $0 down if you decide to change the environment."
+	echo ""
+
 	command="docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml"
 	
 	if [ "$WO_SSL" = "YES" ]; then
@@ -189,6 +212,10 @@ start(){
 	run "$command start || $command up"
 }
 
+down(){
+	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml down"
+}
+
 rebuild(){
 	run "docker-compose down --remove-orphans"
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
@@ -219,7 +246,7 @@ resetpassword(){
 			exit 1
 		fi
 
-		docker exec -ti $container_hash bash -c "echo \"from django.contrib.auth.models import User;from django.contrib.auth.hashers import make_password;u=User.objects.filter(is_superuser=True)[0];u.password=make_password('$newpass');u.save();print('The following user was changed: {}'.format(u.username));\" | python manage.py shell"
+		docker exec $container_hash bash -c "echo \"from django.contrib.auth.models import User;from django.contrib.auth.hashers import make_password;u=User.objects.filter(is_superuser=True)[0];u.password=make_password('$newpass');u.save();print('The following user was changed: {}'.format(u.username));\" | python manage.py shell"
 		if [[ "$?" -eq 0 ]]; then
 			echo -e "\033[1mPassword changed!\033[0m"
 		else
@@ -232,30 +259,20 @@ resetpassword(){
 
 if [[ $1 = "start" ]]; then
 	environment_check
-	echo "Starting WebODM..."
-	echo ""
-	echo "Using the following environment:"
-	echo "================================"
-	echo "Host: $WO_HOST"
-	echo "Port: $WO_PORT"
-	echo "Media directory: $WO_MEDIA_DIR"
-	echo "SSL: $WO_SSL"
-	echo "SSL key: $WO_SSL_KEY"
-	echo "SSL certificate: $WO_SSL_CERT"
-	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
-	echo "================================"
-	echo "Make sure to issue a $0 down if you decide to change the environment."
-	echo ""
-
 	start
 elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
 	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml stop"
+elif [[ $1 = "restart" ]]; then
+	environment_check
+	echo "Restarting WebODM..."
+	down
+	start
 elif [[ $1 = "down" ]]; then
 	environment_check
 	echo "Tearing down WebODM..."
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml down"
+	down
 elif [[ $1 = "rebuild" ]]; then
 	environment_check
 	echo  "Rebuilding WebODM..."

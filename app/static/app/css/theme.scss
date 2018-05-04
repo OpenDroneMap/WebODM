@@ -9,6 +9,9 @@ ul#side-menu.nav a,
 {
     color: theme("primary");
 }
+.theme-border-primary{
+    border-color: theme("primary");
+}
 .tooltip{
 	.tooltip-inner{
 		background-color: theme("primary");
@@ -162,6 +165,9 @@ footer,
 .popover-title{
 	border-bottom-color: theme("border");
 }
+.theme-border{
+    border-color: theme("border");
+}
 
 /* Highlight */
 .task-list-item:nth-child(odd),
@@ -194,7 +200,7 @@ pre.prettyprint,
 }
 
 /* Failed */
-.task-list-item .status-label.error{
+.task-list-item .status-label.error, .theme-background-failed{
 	background-color: theme("failed");
 }
 

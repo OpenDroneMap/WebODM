@@ -1,4 +1,15 @@
---- REMOVE THIS LINE AFTER READING IT: Please open an issue only to report faults and bugs. For questions, comments and feature requests instead visit http://community.opendronemap.org/c/webodm. Every issue needs to follow the format specified below. Do not remove the questions, simply answer each question by typing below it. If you don't know how to answer a question, write so. Questions that don't follow these guidelines will be automatically closed.
+****************************************
+PLEASE REMOVE THIS NOTE AFTER READING IT!
+
+First of all, thank you for taking the time to report an issue.
+
+Before you continue, make sure you are in the right place. Please open an issue only to report faults and bugs. For questions, comments and feature requests, please open a topic on http://community.opendronemap.org/c/webodm. 
+
+Also, is your problem listed here? https://github.com/OpenDroneMap/WebODM#common-troubleshooting
+If so, do not open an issue. We already know about it and steps to solve it are already documented.
+
+Every issue needs to follow the format specified below. Do not remove the questions, simply answer each question by typing below it. If you don't know how to answer a question, write so. Questions that don't follow these guidelines will be automatically closed by our friendly IssueBot (who's not very smart and needs to see a particular format to keep an issue open).
+****************************************
 
 ### How did you install WebODM? (Docker, natively, ...)?
 

@@ -182,14 +182,16 @@ class TestApi(BootTestCase):
         res = client.post('/api/projects/{}/tasks/{}/cancel/'.format(project.id, task.id))
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
-        self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == pending_actions.CANCEL)
+
+        # Task should have failed to be canceled
+        self.assertTrue("has no processing node or UUID" in task.last_error)
 
         res = client.post('/api/projects/{}/tasks/{}/restart/'.format(project.id, task.id))
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
-        self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == pending_actions.RESTART)
+
+        # Task should have failed to be restarted
+        self.assertTrue("has no processing node" in task.last_error)
 
         # Cannot cancel, restart or delete a task for which we don't have permission
         for action in ['cancel', 'remove', 'restart']:
@@ -199,10 +201,9 @@ class TestApi(BootTestCase):
         # Can delete
         res = client.post('/api/projects/{}/tasks/{}/remove/'.format(project.id, task.id))
         self.assertTrue(res.data["success"])
-        task.refresh_from_db()
-        self.assertTrue(task.last_error is None)
-        self.assertTrue(task.pending_action == pending_actions.REMOVE)
+        self.assertFalse(Task.objects.filter(id=task.id).exists())
 
+        task = Task.objects.create(project=project)
         temp_project = Project.objects.create(owner=user)
 
         # We have permissions to do anything on a project that we own

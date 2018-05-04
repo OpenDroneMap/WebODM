@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os, sys
+import os, sys, json
 
 import datetime
 
@@ -40,8 +40,12 @@ except ImportError:
 
     print("Generated secret key")
 
+with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
+    data = json.load(package_file)
+    VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
+WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
 # SECURITY WARNING: don't run with debug turned on a public facing server!
 DEBUG = os.environ.get('WO_DEBUG', 'YES') == 'YES' or TESTING
@@ -71,13 +75,11 @@ INSTALLED_APPS = [
     'imagekit',
     'codemirror2',
     'compressor',
-#    'debug_toolbar',
     'app',
     'nodeodm',
 ]
 
 MIDDLEWARE = [
-   # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -96,6 +98,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'app', 'templates'),
             os.path.join(BASE_DIR, 'app', 'templates', 'app'),
+            BASE_DIR
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -243,9 +246,11 @@ LOGIN_URL = '/login/'
 
 # CORS (very relaxed settings, users might want to change this in production)
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
+MEDIA_TMP = os.path.join(MEDIA_ROOT, 'tmp')
 
 # Store flash messages in cookies
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
@@ -261,7 +266,7 @@ REST_FRAMEWORK = {
   ],
   'DEFAULT_FILTER_BACKENDS': [
     'rest_framework.filters.DjangoObjectPermissionsFilter',
-    'rest_framework.filters.DjangoFilterBackend',
+    'django_filters.rest_framework.DjangoFilterBackend',
     'rest_framework.filters.OrderingFilter',
   ],
   'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -271,6 +276,7 @@ REST_FRAMEWORK = {
     'app.api.authentication.JSONWebTokenAuthenticationQS',
   ),
   'PAGE_SIZE': 10,
+  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
 JWT_AUTH = {
@@ -309,6 +315,20 @@ LIBSASS_CUSTOM_FUNCTIONS = {
     'scaleby': scaleby,
     'scalebyiv': scalebyiv
 }
+
+# Celery
+CELERY_BROKER_URL = os.environ.get('WO_BROKER', 'redis://localhost')
+CELERY_RESULT_BACKEND = os.environ.get('WO_BROKER', 'redis://localhost')
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_INCLUDE=['worker.tasks']
+CELERY_WORKER_REDIRECT_STDOUTS = False
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+
+if TESTING:
+    CELERY_TASK_ALWAYS_EAGER = True
 
 if TESTING:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')

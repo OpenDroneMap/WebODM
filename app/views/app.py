@@ -14,34 +14,23 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django import forms
 
-from django.contrib.auth import login
-from django.contrib.auth.models import User
-
 def index(request):
     # Check first access where the user is expected to
     # create an admin account
     if User.objects.filter(is_superuser=True).count() == 0:
         return redirect('welcome')
 
-
-    # Auto login
-    if not request.user.is_authenticated():
-        login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
-        return redirect('dashboard')
-
-    return redirect('dashboard' if request.user.is_authenticated() 
+    return redirect('dashboard' if request.user.is_authenticated
                     else 'login')
 
+@login_required
 def dashboard(request):
-    if not request.user.is_authenticated():
-        login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
-     
     no_processingnodes = ProcessingNode.objects.count() == 0
-    no_tasks = False #Task.objects.filter(project__owner=request.user).count() == 0
+    no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
 
     # Create first project automatically
-    #if Project.objects.filter(owner=request.user).count() == 0:
-    #    Project.objects.create(owner=request.user, name=_("First Project"))
+    if Project.objects.filter(owner=request.user).count() == 0:
+        Project.objects.create(owner=request.user, name=_("First Project"))
 
     return render(request, 'app/dashboard.html', {'title': 'Dashboard',
         'no_processingnodes': no_processingnodes,
@@ -145,3 +134,10 @@ def welcome(request):
                       'title': 'Welcome',
                       'firstuserform': fuf
                   })
+
+
+def handler404(request):
+    return render(request, '404.html', status=404)
+
+def handler500(request):
+    return render(request, '500.html', status=500)

@@ -4,6 +4,12 @@ import shutil
 import zipfile
 import uuid as uuid_module
 
+import json
+from shlex import quote
+
+import piexif
+import re
+from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
@@ -21,6 +27,11 @@ from nodeodm.exceptions import ProcessingError, ProcessingTimeout, ProcessingExc
 from nodeodm.models import ProcessingNode
 from webodm import settings
 from .project import Project
+
+from functools import partial
+from multiprocessing import cpu_count
+from concurrent.futures import ThreadPoolExecutor
+import subprocess
 
 logger = logging.getLogger('app.logger')
 
@@ -57,6 +68,47 @@ def validate_task_options(value):
         raise ValidationError("Invalid options")
 
 
+
+def resize_image(image_path, resize_to):
+    try:
+        im = Image.open(image_path)
+        path, ext = os.path.splitext(image_path)
+        resized_image_path = os.path.join(path + '.resized' + ext)
+
+        width, height = im.size
+        max_side = max(width, height)
+        if max_side < resize_to:
+            logger.warning('You asked to make {} bigger ({} --> {}), but we are not going to do that.'.format(image_path, max_side, resize_to))
+            im.close()
+            return {'path': image_path, 'resize_ratio': 1}
+
+        ratio = float(resize_to) / float(max_side)
+        resized_width = int(width * ratio)
+        resized_height = int(height * ratio)
+
+        im.thumbnail((resized_width, resized_height), Image.LANCZOS)
+
+        if 'exif' in im.info:
+            exif_dict = piexif.load(im.info['exif'])
+            exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
+            exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
+            im.save(resized_image_path, "JPEG", exif=piexif.dump(exif_dict), quality=100)
+        else:
+            im.save(resized_image_path, "JPEG", quality=100)
+
+        im.close()
+
+        # Delete original image, rename resized image to original
+        os.remove(image_path)
+        os.rename(resized_image_path, image_path)
+
+        logger.info("Resized {} to {}x{}".format(image_path, resized_width, resized_height))
+    except IOError as e:
+        logger.warning("Cannot resize {}: {}.".format(image_path, str(e)))
+        return None
+
+    return {'path': image_path, 'resize_ratio': ratio}
+
 class Task(models.Model):
     ASSETS_MAP = {
             'all.zip': 'all.zip',
@@ -85,6 +137,7 @@ class Task(models.Model):
         (pending_actions.CANCEL, 'CANCEL'),
         (pending_actions.REMOVE, 'REMOVE'),
         (pending_actions.RESTART, 'RESTART'),
+        (pending_actions.RESIZE, 'RESIZE'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
@@ -92,9 +145,8 @@ class Task(models.Model):
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
     name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
-    processing_lock = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently locked for processing. When this flag is turned on, the task is in the middle of a processing step.")
     processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
-    processing_node = models.ForeignKey(ProcessingNode, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
+    processing_node = models.ForeignKey(ProcessingNode, on_delete=models.SET_NULL, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
     auto_processing_node = models.BooleanField(default=True, help_text="A flag indicating whether this task should be automatically assigned a processing node")
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
@@ -109,9 +161,10 @@ class Task(models.Model):
 
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
-    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.")
+    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration.")
 
     public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
+    resize_to = models.IntegerField(default=-1, help_text="When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing.")
 
 
     def __init__(self, *args, **kwargs):
@@ -172,9 +225,14 @@ class Task(models.Model):
         """
         Get a path relative to the place where assets are stored
         """
+        return self.task_path("assets", *args)
+
+    def task_path(self, *args):
+        """
+        Get path relative to the root task directory
+        """
         return os.path.join(settings.MEDIA_ROOT,
                             assets_directory_path(self.id, self.project.id, ""),
-                            "assets",
                             *args)
 
     def is_asset_available_slow(self, asset):
@@ -221,12 +279,18 @@ class Task(models.Model):
     def process(self):
         """
         This method contains the logic for processing tasks asynchronously
-        from a background thread or from the scheduler. Here tasks that are
+        from a background thread or from a worker. Here tasks that are
         ready to be processed execute some logic. This could be communication
         with a processing node or executing a pending action.
         """
 
         try:
+            if self.pending_action == pending_actions.RESIZE:
+                resized_images = self.resize_images()
+                self.resize_gcp(resized_images)
+                self.pending_action = None
+                self.save()
+
             if self.auto_processing_node and not self.status in [status_codes.FAILED, status_codes.CANCELED]:
                 # No processing node assigned and need to auto assign
                 if self.processing_node is None:
@@ -358,8 +422,10 @@ class Task(models.Model):
                     self.processing_time = info["processingTime"]
                     self.status = info["status"]["code"]
 
-                    current_lines_count = len(self.console_output.split("\n")) - 1
-                    self.console_output += self.processing_node.get_task_console_output(self.uuid, current_lines_count)
+                    current_lines_count = len(self.console_output.split("\n"))
+                    console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
+                    if len(console_output) > 0:
+                        self.console_output += console_output + '\n'
 
                     if "errorMessage" in info["status"]:
                         self.last_error = info["status"]["errorMessage"]
@@ -507,16 +573,68 @@ class Task(models.Model):
         except FileNotFoundError as e:
             logger.warning(e)
 
-
     def set_failure(self, error_message):
         logger.error("FAILURE FOR {}: {}".format(self, error_message))
         self.last_error = error_message
         self.status = status_codes.FAILED
         self.pending_action = None
         self.save()
+        
+    def find_all_files_matching(self, regex):
+        directory = full_task_directory_path(self.id, self.project.id)
+        return [os.path.join(directory, f) for f in os.listdir(directory) if
+                       re.match(regex, f, re.IGNORECASE)]
+
+    def resize_images(self):
+        """
+        Destructively resize this task's JPG images while retaining EXIF tags.
+        Resulting images are always converted to JPG.
+        TODO: add support for tiff files
+        :return list containing paths of resized images and resize ratios
+        """
+        if self.resize_to < 0:
+            logger.warning("We were asked to resize images to {}, this might be an error.".format(self.resize_to))
+            return []
+
+        images_path = self.find_all_files_matching(r'.*\.jpe?g$')
+
+        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
+            resized_images = list(filter(lambda i: i is not None, executor.map(
+                partial(resize_image, resize_to=self.resize_to),
+                images_path)))
+
+        return resized_images
+
+    def resize_gcp(self, resized_images):
+        """
+        Destructively change this task's GCP file (if any)
+        by resizing the location of GCP entries.
+        :param resized_images: list of objects having "path" and "resize_ratio" keys
+            for example [{'path': 'path/to/DJI_0018.jpg', 'resize_ratio': 0.25}, ...]
+        :return: path to changed GCP file or None if no GCP file was found/changed
+        """
+        gcp_path = self.find_all_files_matching(r'.*\.txt$')
+        if len(gcp_path) == 0: return None
+
+        # Assume we only have a single GCP file per task
+        gcp_path = gcp_path[0]
+        resize_script_path = os.path.join(settings.BASE_DIR, 'app', 'scripts', 'resize_gcp.js')
+
+        dict = {}
+        for ri in resized_images:
+            dict[os.path.basename(ri['path'])] = ri['resize_ratio']
+
+        try:
+            new_gcp_content = subprocess.check_output("node {} {} '{}'".format(quote(resize_script_path), quote(gcp_path), json.dumps(dict)), shell=True)
+            with open(gcp_path, 'w') as f:
+                f.write(new_gcp_content.decode('utf-8'))
+            logger.info("Resized GCP file {}".format(gcp_path))
+            return gcp_path
+        except subprocess.CalledProcessError as e:
+            logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
+            return None
 
     class Meta:
         permissions = (
             ('view_task', 'Can view task'),
         )
-

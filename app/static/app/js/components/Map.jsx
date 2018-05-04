@@ -1,12 +1,8 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import ReactDOM from 'react-dom';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
-import 'leaflet-measure/dist/leaflet-measure.css';
-import 'leaflet-measure/dist/leaflet-measure';
 import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
@@ -17,6 +13,8 @@ import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
+import PluginsAPI from '../classes/plugins/API';
+import update from 'immutability-helper';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -43,7 +41,8 @@ class Map extends React.Component {
     
     this.state = {
       error: "",
-      singleTask: null // When this is set to a task, show a switch mode button to view the 3d model
+      singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
+      pluginActionButtons: []
     };
 
     this.imageryLayers = [];
@@ -170,20 +169,27 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
-    const { showBackground } = this.props;
+    const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
-      positionControl: true
+      positionControl: true,
+      zoomControl: false
     });
 
-    const measureControl = Leaflet.control.measure({
-      primaryLengthUnit: 'meters',
-      secondaryLengthUnit: 'feet',
-      primaryAreaUnit: 'sqmeters',
-      secondaryAreaUnit: 'acres'
+    PluginsAPI.Map.triggerWillAddControls({
+      map: this.map,
+      tiles
     });
-    measureControl.addTo(this.map);
+
+    Leaflet.control.scale({
+      maxWidth: 250,
+    }).addTo(this.map);
+
+    //add zoom control with your options
+    Leaflet.control.zoom({
+         position:'bottomleft'
+    }).addTo(this.map);
 
     if (showBackground) {
       this.basemaps = {
@@ -216,10 +222,6 @@ class Map extends React.Component {
     }).addTo(this.map);
 
     this.map.fitWorld();
-
-    Leaflet.control.scale({
-      maxWidth: 250,
-    }).addTo(this.map);
     this.map.attributionControl.setPrefix("");
 
     this.loadImageryLayers(true).then(() => {
@@ -236,6 +238,20 @@ class Map extends React.Component {
           }
         });
     });
+
+    PluginsAPI.Map.triggerDidAddControls({
+      map: this.map,
+      tiles: tiles
+    });
+
+    PluginsAPI.Map.triggerAddActionButton({
+      map: this.map,
+      tiles
+    }, (button) => {
+      this.setState(update(this.state, {
+        pluginActionButtons: {$push: [button]}
+      }));
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -245,9 +261,7 @@ class Map extends React.Component {
     });
 
     if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers().then(() => {
-        // console.log("GOT: ", this.autolayers, this.autolayers.selectedOverlays);
-      });
+      this.loadImageryLayers();
     }
   }
 
@@ -262,13 +276,14 @@ class Map extends React.Component {
 
   handleMapMouseDown(e){
     // Make sure the share popup closes
-    this.shareButton.hidePopup();
+    if (this.shareButton) this.shareButton.hidePopup();
   }
 
   render() {
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
+
         <div 
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}
@@ -278,6 +293,7 @@ class Map extends React.Component {
         
 
         <div className="actionButtons">
+          {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
           {(!this.props.public && this.state.singleTask !== null) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}

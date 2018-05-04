@@ -2496,27 +2496,22 @@ var Dropzone = function (_Emitter) {
       // Modified for WebODM
       _this17.emit("transformstart", files);
 
-      // Process in batches based on the available number of cores
-      var stride = Math.max(1, (navigator.hardwareConcurrency || 2) - 1);
-
-      var process = function(i, s){
-        if (files[i + s]){
-            _this17.options.transformFile.call(_this17, files[i + s], function (transformedFile) {
-              transformedFiles[i + s] = transformedFile;
-              _this17.emit("transformcompleted", doneCounter + 1);
+      var process = function(i){
+        if (files[i]){
+            _this17.options.transformFile.call(_this17, files[i], function (transformedFile) {
+              transformedFiles[i] = transformedFile;
+              _this17.emit("transformcompleted", files[i], doneCounter + 1);
               if (++doneCounter === files.length) {
                 _this17.emit("transformend", files);
                 done(transformedFiles);
               }else{
-                process(i + stride, s);
+                process(i + 1);
               }
             });
         }
       }
       
-      for (var s = 0; s < stride; s++){
-        process(0, s);
-      }
+      process(0);
     }
 
     // Takes care of adding other input elements of the form to the AJAX request

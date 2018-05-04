@@ -34,16 +34,12 @@
 			<p>
 				<ul>
 					<li>{% trans 'You need at least 5 images' %}</li>
-					<li>{% trans 'Images must overlap by 60% or more' %}</li>
+					<li>{% trans 'Images must overlap by 65% or more' %}</li>
+					<li>{% trans 'For great 3D, images must overlap by 83%' %}</li>
 					<li>{% trans 'A <a href="https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-OpenDroneMap#running-odm-with-ground-control" target="_blank">GCP file</a> is optional, but can increase georeferencing accuracy' %}</li>
 				</ul>
 			</p>
 		{% endif %}
-
-		<h3>{% trans 'Welcome! ☺' %}</h3>
-		<p>
-			{% blocktrans %} You are currently in a demo. You cannot create new tasks, but you can look around to explore the software's features. {% endblocktrans %}
-		</p>
 
 		<div id="dashboard-app" data-dashboard></div>
 

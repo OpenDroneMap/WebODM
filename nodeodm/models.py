@@ -11,7 +11,7 @@ from guardian.models import UserObjectPermissionBase
 from .api_client import ApiClient
 import json
 from django.db.models import signals
-from datetime import datetime, timedelta
+from datetime import timedelta
 from .exceptions import ProcessingError, ProcessingTimeout
 import simplejson
 
@@ -66,7 +66,7 @@ class ProcessingNode(models.Model):
 
         :returns: True if information could be updated, False otherwise
         """
-        api_client = self.api_client()
+        api_client = self.api_client(timeout=5)
         try:
             info = api_client.info()
             self.api_version = info['version']
@@ -80,8 +80,8 @@ class ProcessingNode(models.Model):
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, json.decoder.JSONDecodeError, simplejson.JSONDecodeError):
             return False
 
-    def api_client(self):
-        return ApiClient(self.hostname, self.port)
+    def api_client(self, timeout=30):
+        return ApiClient(self.hostname, self.port, timeout)
 
     def get_available_options_json(self, pretty=False):
         """
@@ -144,7 +144,7 @@ class ProcessingNode(models.Model):
         if isinstance(result, dict) and 'error' in result:
             raise ProcessingError(result['error'])
         elif isinstance(result, list):
-            return "".join(result)
+            return "\n".join(result)
         else:
             raise ProcessingError("Unknown response for console output: {}".format(result))
 
@@ -215,8 +215,8 @@ def auto_update_node_info(sender, instance, created, **kwargs):
             pass
 
 class ProcessingNodeUserObjectPermission(UserObjectPermissionBase):
-    content_object = models.ForeignKey(ProcessingNode)
+    content_object = models.ForeignKey(ProcessingNode, on_delete=models.CASCADE)
 
 
 class ProcessingNodeGroupObjectPermission(GroupObjectPermissionBase):
-    content_object = models.ForeignKey(ProcessingNode)
+    content_object = models.ForeignKey(ProcessingNode, on_delete=models.CASCADE)

@@ -224,7 +224,8 @@ class TaskListItem extends React.Component {
       if (line.indexOf("Killed") !== -1 || 
           line.indexOf("MemoryError") !== -1 || 
           line.indexOf("std::bad_alloc") !== -1 ||
-          line.indexOf("Child returned 137") !== -1){
+          line.indexOf("Child returned 137") !== -1 ||
+          line.indexOf("Failed to allocate memory") !== -1){
         this.setState({memoryError: true});
       }else if (line.indexOf("SVD did not converge") !== -1){
         this.setState({badDatasetError: true});
@@ -287,7 +288,6 @@ class TaskListItem extends React.Component {
 
     const restartAction = this.genActionApiCall("restart", {
         success: () => {
-            if (this.console) this.console.clear();
             this.setState({time: -1});
         },
         defaultError: "Cannot restart task."
@@ -351,7 +351,7 @@ class TaskListItem extends React.Component {
     let status = statusCodes.description(task.status);
     if (status === "") status = "Uploading images";
 
-    if (!task.processing_node) status = "";
+    if (!task.processing_node) status = "Waiting for a node...";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
     let expanded = "";
@@ -500,7 +500,6 @@ class TaskListItem extends React.Component {
                   "Process exited with code 1" means that part of the processing failed. Try tweaking the <a href="javascript:void(0);" onClick={this.startEditing}>Task Options</a> as follows:
                   <ul>
                     <li>Increase the <b>min-num-features</b> option, especially if your images have lots of vegetation</li>
-                    <li>Enable the <b>use-pmvs</b> option.</li>
                   </ul>
                   Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making 
                   sure to include a <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>copy of your task's output</a> (the one you see above <i className="fa fa-arrow-up"></i>, click to <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>download</a> it). Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>

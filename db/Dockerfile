@@ -5,7 +5,6 @@ ENV POSTGIS_MAJOR 2.3
 
 RUN echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list \
 	  && apt-get update \
-      && apt-get install -t jessie-backports -y --no-install-recommends libsfcgal1 \
       && apt-get install -y --no-install-recommends \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \

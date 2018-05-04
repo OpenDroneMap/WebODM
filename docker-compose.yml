@@ -1,29 +1,54 @@
 # This configuration does not include a processing node
 # Which makes for faster setup times
-version: '2'
+version: '2.1'
 volumes:
   dbdata:
-    driver: local
   appmedia:
-    driver: local
 services:
   db:
+    image: opendronemap/webodm_db
     container_name: db
     ports:
       - "5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
+    restart: on-failure:10
+    oom_score_adj: -100
   webapp:
+    image: opendronemap/webodm_webapp
     container_name: webapp
-    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-it.sh db:5432 -- /webodm/start.sh\""
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh broker:6379 -- /webodm/start.sh\""
     volumes:
       - ${WO_MEDIA_DIR}:/webodm/app/media
     ports:
       - "${WO_PORT}:8000"
     depends_on:
       - db
+      - broker
+      - worker
     environment:
       - WO_PORT
       - WO_HOST
       - WO_DEBUG
+      - WO_BROKER
     restart: on-failure:10
+    oom_score_adj: 0
+  broker:
+    image: redis
+    container_name: broker
+    restart: on-failure:10
+    oom_score_adj: -500
+  worker:
+    image: opendronemap/webodm_webapp
+    container_name: worker
+    entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh broker:6379 -- /webodm/worker.sh start"
+    volumes:
+      - ${WO_MEDIA_DIR}:/webodm/app/media
+    depends_on:
+      - db
+      - broker
+    environment:
+      - WO_BROKER
+      - WO_DEBUG
+    restart: on-failure:10
+    oom_score_adj: 250
