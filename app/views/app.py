@@ -20,6 +20,11 @@ def index(request):
     if User.objects.filter(is_superuser=True).count() == 0:
         return redirect('welcome')
 
+    # Auto login
+    if not request.user.is_authenticated():
+        login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
+        return redirect('dashboard')
+
     return redirect('dashboard' if request.user.is_authenticated
                     else 'login')
 
