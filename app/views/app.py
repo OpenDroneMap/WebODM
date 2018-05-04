@@ -21,7 +21,7 @@ def index(request):
         return redirect('welcome')
 
     # Auto login
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
         return redirect('dashboard')
 
@@ -31,11 +31,7 @@ def index(request):
 @login_required
 def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
-    no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
-
-    # Create first project automatically
-    if Project.objects.filter(owner=request.user).count() == 0:
-        Project.objects.create(owner=request.user, name=_("First Project"))
+    no_tasks = False
 
     return render(request, 'app/dashboard.html', {'title': 'Dashboard',
         'no_processingnodes': no_processingnodes,
