@@ -5,6 +5,7 @@ const { assert } = Utils;
 
 const leafletPreCheck = (options) => {
   assert(options.map !== undefined);
+  assert(options.tiles !== undefined);
 };
 
 export default {

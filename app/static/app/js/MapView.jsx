@@ -105,7 +105,7 @@ class MapView extends React.Component {
           opacity={opacity}
           mapType={this.state.selectedMapType} 
           public={this.props.public} />
-        <div className="opacity-slider theme-secondary">
+        <div className="opacity-slider theme-secondary hidden-xs">
           Opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
         </div>
       </div>);

@@ -15,8 +15,12 @@ export default class ApiFactory{
     // are more robust as we can detect more easily if 
     // things break
     const addEndpoint = (obj, eventName, preTrigger = () => {}) => {
-      const askForResponse = (...args) => {
-        this.events.emit(`${api.namespace}::${eventName}::Response`, ...args);
+      const emitResponse = (...args) => {
+        // Timeout needed for modules that have no dependencies
+        // and load synchronously. Gives time to setup the listeners.
+        setTimeout(() => {
+          this.events.emit(`${api.namespace}::${eventName}::Response`, ...args);
+        }, 0);
       };
 
       obj[eventName] = (callbackOrDeps, callbackOrUndef) => {
@@ -27,13 +31,13 @@ export default class ApiFactory{
           this.events.addListener(`${api.namespace}::${eventName}`, (...args) => {
             Promise.all(callbackOrDeps.map(dep => SystemJS.import(dep)))
               .then((...deps) => {
-                askForResponse(callbackOrUndef(...(Array.from(args).concat(...deps))));
+                emitResponse(callbackOrUndef(...(Array.from(args).concat(...deps))));
               });
             });
         }else{
           // Callback
           this.events.addListener(`${api.namespace}::${eventName}`, (...args) => {
-            askForResponse(callbackOrDeps(...args));
+            emitResponse(callbackOrDeps(...args));
           });
         }
       }

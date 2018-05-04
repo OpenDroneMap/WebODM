@@ -169,7 +169,7 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
-    const { showBackground } = this.props;
+    const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
@@ -178,7 +178,8 @@ class Map extends React.Component {
     });
 
     PluginsAPI.Map.triggerWillAddControls({
-      map: this.map
+      map: this.map,
+      tiles
     });
 
     Leaflet.control.scale({
@@ -239,11 +240,13 @@ class Map extends React.Component {
     });
 
     PluginsAPI.Map.triggerDidAddControls({
-      map: this.map
+      map: this.map,
+      tiles: tiles
     });
 
     PluginsAPI.Map.triggerAddActionButton({
-      map: this.map
+      map: this.map,
+      tiles
     }, (button) => {
       this.setState(update(this.state, {
         pluginActionButtons: {$push: [button]}
@@ -258,9 +261,7 @@ class Map extends React.Component {
     });
 
     if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers().then(() => {
-        // console.log("GOT: ", this.autolayers, this.autolayers.selectedOverlays);
-      });
+      this.loadImageryLayers();
     }
   }
 
