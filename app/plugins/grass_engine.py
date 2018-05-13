@@ -60,7 +60,7 @@ class GrassContext:
         """
         :param location: either a "epsg:XXXXX" string or a path to a geospatial file defining the location
         """
-        if not location.startswith('epsg:'):
+        if not location.lower().startswith('epsg:'):
             location = os.path.abspath(location)
         self.location = location
 
@@ -107,6 +107,7 @@ class GrassContext:
         }
 
     def __del__(self):
+        pass
         # Cleanup
         if os.path.exists(self.get_cwd()):
             shutil.rmtree(self.get_cwd())

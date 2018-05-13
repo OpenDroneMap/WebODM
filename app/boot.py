@@ -37,7 +37,7 @@ def boot():
 
     # Make sure our app/media/tmp folder exists
     if not os.path.exists(settings.MEDIA_TMP):
-        os.mkdir(settings.MEDIA_TMP)
+        os.makedirs(settings.MEDIA_TMP)
 
     # Check default group
     try:

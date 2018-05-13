@@ -20,7 +20,7 @@ class TaskVolume(TaskNestedView):
     def post(self, request, pk=None):
         task = self.get_and_check_task(request, pk)
         if task.dsm_extent is None:
-            return Response({'error': 'No surface model available'})
+            return Response({'error': 'No surface model available. From the Dashboard, select this task, press Edit, from the options make sure to check "dsm", then press Restart --> From DEM.'})
 
         serializer = GeoJSONSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
