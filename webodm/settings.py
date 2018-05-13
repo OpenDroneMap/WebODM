@@ -250,6 +250,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
+if TESTING:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 MEDIA_TMP = os.path.join(MEDIA_ROOT, 'tmp')
 
 # Store flash messages in cookies
@@ -329,9 +331,6 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 if TESTING:
     CELERY_TASK_ALWAYS_EAGER = True
-
-if TESTING:
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 
 try:
     from .local_settings import *
