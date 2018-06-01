@@ -312,6 +312,7 @@ class Task(models.Model):
                         logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
                         self.uuid = ''
                         self.processing_node = None
+                        self.status = None
                         self.save()
                     else:
                         # Task was running and processing node went offline

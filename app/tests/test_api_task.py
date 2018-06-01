@@ -585,6 +585,7 @@ class TestApiTask(BootTransactionTestCase):
 
         task.refresh_from_db()
         self.assertTrue(task.processing_node.id == another_pnode.id)
+        self.assertTrue(task.status == None)
 
         # Set task to queued, bring node offline
         task.status = status_codes.RUNNING
