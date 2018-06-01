@@ -23,7 +23,7 @@ class TestApiPreset(BootTestCase):
     def check_default_presets(self):
         self.assertTrue(Preset.objects.filter(name="Default", system=True).exists())
         self.assertTrue(Preset.objects.filter(name="DSM + DTM", system=True).exists())
-        self.assertTrue(Preset.objects.filter(name="High Quality", system=True).exists())
+        self.assertTrue(Preset.objects.filter(name="High Resolution", system=True).exists())
 
     def test_preset(self):
         client = APIClient()
