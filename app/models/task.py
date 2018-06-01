@@ -305,11 +305,24 @@ class Task(models.Model):
 
                 # Processing node assigned, but is offline and no errors
                 if self.processing_node and not self.processing_node.is_online():
-                    # Detach processing node, will be processed at the next tick
-                    logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
-                    self.uuid = ''
-                    self.processing_node = None
-                    self.save()
+                    # If we are queued up
+                    # detach processing node, and reassignment
+                    # will be processed at the next tick
+                    if self.status == status_codes.QUEUED:
+                        logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
+                        self.uuid = ''
+                        self.processing_node = None
+                        self.status = None
+                        self.save()
+
+                    elif self.status == status_codes.RUNNING:
+                        # Task was running and processing node went offline
+                        # It could have crashed due to low memory
+                        # or perhaps it went offline due to network errors.
+                        # We can't easily differentiate between the two, so we need
+                        # to notify the user because if it crashed due to low memory
+                        # the user might need to take action (or be stuck in an infinite loop)
+                        raise ProcessingError("Processing node went offline. This could be due to insufficient memory or a network error.")
 
             if self.processing_node:
                 # Need to process some images (UUID not yet set and task doesn't have pending actions)?

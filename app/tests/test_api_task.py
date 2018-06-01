@@ -570,9 +570,9 @@ class TestApiTask(BootTransactionTestCase):
         another_pnode.last_refreshed = timezone.now()
         another_pnode.save()
 
-        # Remove error
+        # Remove error, set status to queued
         task.last_error = None
-        task.status = None
+        task.status = status_codes.QUEUED
         task.save()
 
         worker.tasks.process_pending_tasks()
@@ -580,11 +580,27 @@ class TestApiTask(BootTransactionTestCase):
         # Processing node is now cleared and a new one will be assigned on the next tick
         task.refresh_from_db()
         self.assertTrue(task.processing_node is None)
+        self.assertTrue(task.status is None)
 
         worker.tasks.process_pending_tasks()
 
         task.refresh_from_db()
         self.assertTrue(task.processing_node.id == another_pnode.id)
+
+        # Set task to queued, bring node offline
+        task.last_error = None
+        task.status = status_codes.RUNNING
+        task.save()
+        another_pnode.last_refreshed = timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
+        another_pnode.save()
+
+        worker.tasks.process_pending_tasks()
+        task.refresh_from_db()
+
+        # Processing node is still there, but task should have failed
+        self.assertTrue(task.status == status_codes.FAILED)
+        self.assertTrue("Processing node went offline." in task.last_error)
+
 
     def test_task_manual_processing_node(self):
         user = User.objects.get(username="testuser")
