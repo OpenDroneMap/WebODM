@@ -318,8 +318,8 @@ class Task(models.Model):
                         # It could have crashed due to low memory
                         # or perhaps it went offline due to network errors.
                         # We can't easily differentiate between the two, so we need
-                        # to notify the user because if it crashes because of low memory
-                        # the user might need to take action.
+                        # to notify the user because if it crashed due to low memory
+                        # the user might need to take action (or be stuck in an infinite loop)
                         raise ProcessingError("Processing node went offline. This could be due to insufficient memory or a network error.")
 
             if self.processing_node:
