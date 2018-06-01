@@ -580,14 +580,15 @@ class TestApiTask(BootTransactionTestCase):
         # Processing node is now cleared and a new one will be assigned on the next tick
         task.refresh_from_db()
         self.assertTrue(task.processing_node is None)
+        self.assertTrue(task.status is None)
 
         worker.tasks.process_pending_tasks()
 
         task.refresh_from_db()
         self.assertTrue(task.processing_node.id == another_pnode.id)
-        self.assertTrue(task.status == None)
 
         # Set task to queued, bring node offline
+        task.last_error = None
         task.status = status_codes.RUNNING
         task.save()
         another_pnode.last_refreshed = timezone.now() - timedelta(minutes=OFFLINE_MINUTES)

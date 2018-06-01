@@ -301,7 +301,6 @@ class Task(models.Model):
                         self.processing_node.save()
 
                         logger.info("Automatically assigned processing node {} to {}".format(self.processing_node, self))
-                        self.status = None
                         self.save()
 
                 # Processing node assigned, but is offline and no errors
@@ -313,7 +312,9 @@ class Task(models.Model):
                         logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
                         self.uuid = ''
                         self.processing_node = None
+                        self.status = None
                         self.save()
+
                     elif self.status == status_codes.RUNNING:
                         # Task was running and processing node went offline
                         # It could have crashed due to low memory
