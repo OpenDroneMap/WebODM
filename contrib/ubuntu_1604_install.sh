@@ -49,7 +49,10 @@ pip install -r requirements.txt
 # Build assets
 sudo npm install -g webpack
 npm install
+
+# When you run this command it ask: webpack-cli or webpack.command which one is to use ?
 webpack
+
 python manage.py collectstatic --noinput
 
 # Configure Docker (Processing Nodes)
