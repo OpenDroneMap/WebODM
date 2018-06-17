@@ -16,15 +16,8 @@ PluginsAPI.Map.addActionButton(function(options){
 					var mapLocation = options.map.getZoom() + "/" + 
 									  options.map.getCenter().lat + "/" + 
 									  options.map.getCenter().lng;
-
-					if (window.prompt("To start digitizing this map on OpenStreetMap:\n\n" +
-										"1. Copy the URL below.\n" + 
-										"2. When the editor loads, open the Background Settings (press B) and select \"Custom\".\n" +
-										"3. Press \"Edit Custom Background\".\n" + 
-										"4. Paste the URL you copied below.\n\n" + 
-										"Press OK to go to OpenStreetMap", url)){
-						window.location.href = "https://www.openstreetmap.org/edit?editor=id#map=" + mapLocation;
-					}
+					window.location.href = "https://www.openstreetmap.org/edit?editor=id#map=" + mapLocation + 
+											"&background=custom:" + url;
 				}
 			}, React.createElement("i", {className: "fa fa-map"}, ""), 
 				" OSM Digitize");
