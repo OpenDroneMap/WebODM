@@ -290,7 +290,7 @@ sudo systemctl status webodm-gunicorn
 
 ## Run it natively
 
-WebODM can run natively on Windows, MacOS and Linux. But unless you are a developer or have a valid reason for why the default docker setup does not work for you, we don't recommend it. Performance, for most users, is not a valid reason [1](https://stackoverflow.com/questions/21889053/what-is-the-runtime-performance-cost-of-a-docker-container).
+WebODM can run natively on Windows, MacOS and Linux. But unless you are a developer or have a valid reason for why the default docker setup does not work for you, we don't recommend it. Performance, for most users, is [not a valid reason](https://stackoverflow.com/questions/21889053/what-is-the-runtime-performance-cost-of-a-docker-container).
 
 Ubuntu 16.04 LTS users can refer to [this script](/contrib/ubuntu_1604_install.sh) to install WebODM natively on a new machine.
 
