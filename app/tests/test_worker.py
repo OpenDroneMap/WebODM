@@ -5,6 +5,7 @@ from app.models import Task
 from nodeodm.models import ProcessingNode
 from .classes import BootTestCase
 from .utils import start_processing_node
+from worker.tasks import redis_client
 
 class TestWorker(BootTestCase):
     def setUp(self):
@@ -12,6 +13,11 @@ class TestWorker(BootTestCase):
 
     def tearDown(self):
         pass
+
+    def test_redis(self):
+        # We can connect to redis. Other parts of the WebODM test suite
+        # rely on a valid redis connection.
+        self.assertTrue(redis_client.ping())
 
     def test_worker_tasks(self):
         project = Project.objects.get(name="User Test Project")
