@@ -94,9 +94,11 @@ class Map extends React.Component {
             const layer = Leaflet.tileLayer(info.tiles[0], {
                   bounds,
                   minZoom: info.minzoom,
-                  maxZoom: info.maxzoom,
+                  maxZoom: L.Browser.retina ? (info.maxzoom + 1) : info.maxzoom,
+                  maxNativeZoom: L.Browser.retina ? (info.maxzoom - 1) : info.maxzoom,
                   tms: info.scheme === 'tms',
-                  opacity: this.props.opacity / 100
+                  opacity: this.props.opacity / 100,
+                  detectRetina: true
                 });
             
             // Associate metadata with this layer
