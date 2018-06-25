@@ -22,7 +22,7 @@ class TestClientApi(TestCase):
     def setUpClass(cls):
         super(TestClientApi, cls).setUpClass()
         cls.node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False, cwd=path.join(current_dir, "external", "node-OpenDroneMap"))
-        time.sleep(5) # Wait for the server to launch
+        time.sleep(2) # Wait for the server to launch
 
 
     @classmethod
@@ -187,3 +187,105 @@ class TestClientApi(TestCase):
 
         # Best choice now is original processing node
         self.assertTrue(ProcessingNode.find_best_available_node().id == pnode.id)
+
+    def test_token_auth(self):
+        node_odm = subprocess.Popen(
+            ['node', 'index.js', '--port', '11224', '--token', 'test_token', '--test'], shell=False,
+            cwd=path.join(current_dir, "external", "node-OpenDroneMap"))
+        time.sleep(2)
+
+        def wait_for_status(api, uuid, status, num_retries=10, error_description="Failed to wait for status"):
+            retries = 0
+            while True:
+                try:
+                    task_info = api.task_info(uuid)
+                    if task_info['status']['code'] == status:
+                        return True
+                except ProcessingError:
+                    pass
+
+                time.sleep(0.5)
+                retries += 1
+                if retries >= num_retries:
+                    self.assertTrue(False, error_description)
+                    return False
+
+        api = ApiClient("localhost", 11224, "test_token")
+        online_node = ProcessingNode.objects.get(pk=3)
+
+        self.assertTrue(online_node.update_node_info(), "Could update info")
+
+        # Can always call info(), options() (even without valid tokens)
+        api.token = "invalid"
+        self.assertTrue(type(api.info()['version']) == str)
+        self.assertTrue(len(api.options()) > 0)
+
+        # Cannot call new_task() without token
+        import glob
+        res = api.new_task(
+            glob.glob("nodeodm/fixtures/test_images/*.JPG"))
+        self.assertTrue('error' in res)
+
+        # Can call new_task() with token
+        api.token = "test_token"
+        res = api.new_task(
+            glob.glob("nodeodm/fixtures/test_images/*.JPG"))
+        self.assertTrue('uuid' in res)
+        self.assertFalse('error' in res)
+        uuid = res['uuid']
+
+        # Can call task_info() with token
+        task_info = api.task_info(uuid)
+        self.assertTrue(isinstance(task_info['dateCreated'], int))
+
+        # Cannot call task_info() without token
+        api.token = "invalid"
+        res = api.task_info(uuid)
+        self.assertTrue('error' in res)
+        self.assertTrue('token does not match' in res['error'])
+
+        # Here we are waiting for the task to be completed
+        api.token = "test_token"
+        wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not download assets")
+
+        # Cannot download assets without token
+        api.token = "invalid"
+        res = api.task_download(uuid, "all.zip")
+        self.assertTrue('error' in res)
+
+        api.token = "test_token"
+        asset = api.task_download(uuid, "all.zip")
+        self.assertTrue(isinstance(asset, requests.Response))
+
+        # Cannot get task output without token
+        api.token = "invalid"
+        res = api.task_output(uuid, 0)
+        self.assertTrue('error' in res)
+
+        api.token = "test_token"
+        res = api.task_output(uuid, 0)
+        self.assertTrue(isinstance(res, list))
+
+        # Cannot restart task without token
+        online_node.token = "invalid"
+        self.assertRaises(ProcessingError, online_node.restart_task, uuid)
+
+        online_node.token = "test_token"
+        self.assertTrue(online_node.restart_task(uuid))
+
+        # Cannot cancel task without token
+        online_node.token = "invalid"
+        self.assertRaises(ProcessingError, online_node.cancel_task, uuid)
+        online_node.token = "test_token"
+        self.assertTrue(online_node.cancel_task(uuid))
+
+        # Wait for task to be canceled
+        wait_for_status(api, uuid, status_codes.CANCELED, 5, "Could not cancel task")
+
+        # Cannot delete task without token
+        online_node.token = "invalid"
+        self.assertRaises(ProcessingError, online_node.remove_task, "wrong-uuid")
+        online_node.token = "test_token"
+        self.assertTrue(online_node.remove_task(uuid))
+
+        node_odm.terminate();
