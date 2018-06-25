@@ -284,7 +284,7 @@ class TestClientApi(TestCase):
 
         # Cannot delete task without token
         online_node.token = "invalid"
-        self.assertRaises(ProcessingError, online_node.remove_task, "wrong-uuid")
+        self.assertRaises(ProcessingError, online_node.remove_task, "invalid token")
         online_node.token = "test_token"
         self.assertTrue(online_node.remove_task(uuid))
 
