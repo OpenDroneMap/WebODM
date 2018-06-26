@@ -4,6 +4,6 @@ from guardian.admin import GuardedModelAdmin
 from .models import ProcessingNode
 
 class ProcessingNodeAdmin(GuardedModelAdmin):
-    fields = ('hostname', 'port')
+    fields = ('hostname', 'port', 'token')
 
 admin.site.register(ProcessingNode, ProcessingNodeAdmin)

@@ -6,20 +6,24 @@ import requests
 import mimetypes
 import json
 import os
-from urllib.parse import urlunparse
+from urllib.parse import urlunparse, urlencode
 from app.testwatch import TestWatch
 
 class ApiClient:
-    def __init__(self, host, port, timeout=30):
+    def __init__(self, host, port, token = "", timeout=30):
         self.host = host
         self.port = port
+        self.token = token
         self.timeout = timeout
 
-    def url(self, url):
+    def url(self, url, query = {}):
         netloc = self.host if self.port == 80 else "{}:{}".format(self.host, self.port)
 
+        if len(self.token) > 0:
+            query['token'] = self.token
+
         # TODO: https support
-        return urlunparse(('http', netloc, url, '', '', ''))
+        return urlunparse(('http', netloc, url, '', urlencode(query), ''))
 
     def info(self):
         return requests.get(self.url('/info'), timeout=self.timeout).json()
@@ -32,7 +36,7 @@ class ApiClient:
 
     @TestWatch.watch()
     def task_output(self, uuid, line = 0):
-        return requests.get(self.url('/task/{}/output?line={}').format(uuid, line), timeout=self.timeout).json()
+        return requests.get(self.url('/task/{}/output', {'line': line}).format(uuid), timeout=self.timeout).json()
 
     def task_cancel(self, uuid):
         return requests.post(self.url('/task/cancel'), data={'uuid': uuid}, timeout=self.timeout).json()

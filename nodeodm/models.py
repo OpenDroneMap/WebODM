@@ -41,7 +41,8 @@ class ProcessingNode(models.Model):
     last_refreshed = models.DateTimeField(null=True, help_text="When was the information about this node last retrieved?")
     queue_count = models.PositiveIntegerField(default=0, help_text="Number of tasks currently being processed by this node (as reported by the node itself)")
     available_options = fields.JSONField(default=dict(), help_text="Description of the options that can be used for processing")
-    
+    token = models.CharField(max_length=1024, blank=True, default="", help_text="Token to use for authentication. If the node doesn't have authentication, you can leave this field blank.")
+
     def __str__(self):
         return '{}:{}'.format(self.hostname, self.port)
 
@@ -81,7 +82,7 @@ class ProcessingNode(models.Model):
             return False
 
     def api_client(self, timeout=30):
-        return ApiClient(self.hostname, self.port, timeout)
+        return ApiClient(self.hostname, self.port, self.token, timeout)
 
     def get_available_options_json(self, pretty=False):
         """
