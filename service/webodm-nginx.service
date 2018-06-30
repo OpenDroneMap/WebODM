@@ -4,7 +4,7 @@ After=syslog.target network.target remote-fs.target nss-lookup.target
 
 [Service]
 Type=forking
-PIDFile=/run/webodm-nginx.pid
+PIDFile=/run/nginx.pid
 ExecStartPre=/usr/sbin/nginx -t -c /webodm/nginx/nginx.conf
 ExecStart=/usr/sbin/nginx -c /webodm/nginx/nginx.conf
 ExecReload=/usr/sbin/nginx -s reload
