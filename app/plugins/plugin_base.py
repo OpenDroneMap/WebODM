@@ -1,5 +1,6 @@
 import logging, os, sys
 from abc import ABC
+from app.plugins import UserDataStore, GlobalDataStore
 
 logger = logging.getLogger('app.logger')
 
@@ -22,6 +23,22 @@ class PluginBase(ABC):
         :return: Name of current module (reflects the directory in which this plugin is stored)
         """
         return self.name
+
+    def get_user_data_store(self, user):
+        """
+        Helper function to instantiate a user data store associated
+        with this plugin
+        :return: UserDataStore
+        """
+        return UserDataStore(self.get_name(), user)
+
+    def get_global_data_store(self, user):
+        """
+        Helper function to instantiate a user data store associated
+        with this plugin
+        :return: GlobalDataStore
+        """
+        return GlobalDataStore(self.get_name())
 
     def get_module_name(self):
         return self.__class__.__module__
