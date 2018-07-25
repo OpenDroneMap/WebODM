@@ -3,11 +3,11 @@ process.env.NODE_PATH = "../../../node_modules";
 require("module").Module._initPaths();
 
 let path = require("path");
-let webpack = require('webpack');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
+  mode: 'production',
   context: __dirname,
 
   entry: {
@@ -29,18 +29,21 @@ module.exports = {
 
   module: {
     rules: [
-      { 
-        test: /\.jsx?$/, 
-        exclude: /(node_modules|bower_components)/, 
+      {
+        test: /\.jsx?$/,
+        exclude: /(node_modules|bower_components)/,
         use: [
           {
             loader: 'babel-loader',
             query: {
-              "plugins": [
-                 'syntax-class-properties',
-                 'transform-class-properties'
+              plugins: [
+                 '@babel/syntax-class-properties',
+                 '@babel/proposal-class-properties'
               ],
-              presets: ['es2015', 'react']
+              presets: [
+                '@babel/preset-env',
+                '@babel/preset-react'
+              ]
             }
           }
         ],
