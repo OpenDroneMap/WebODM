@@ -24,7 +24,7 @@ def register_plugins():
         # Check for webpack.config.js (if we need to build it)
         if plugin.path_exists("public/webpack.config.js") and not plugin.path_exists("public/build"):
             logger.info("Running webpack for {}".format(plugin.get_name()))
-            subprocess.call(['webpack'], cwd=plugin.get_path("public"))
+            subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
 
         plugin.register()
         logger.info("Registered {}".format(plugin))

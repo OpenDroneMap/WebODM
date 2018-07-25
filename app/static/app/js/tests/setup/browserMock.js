@@ -17,3 +17,6 @@ global.localStorage = {
 
 // Missing XMLHttpRequest methods
 XMLHttpRequest.prototype.abort = () => {};
+
+// Missing canvas methods
+HTMLCanvasElement.prototype.getContext = () => null;
