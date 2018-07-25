@@ -32,7 +32,7 @@ class Plugin(PluginBase):
                 form = TokenForm(request.POST)
                 if form.is_valid():
                     ds.set_string('token', form.cleaned_data['token'])
-                    messages.success(request, 'Token updated. Tasks can now be shared to OpenAerialMap.')
+                    messages.success(request, 'Token updated.')
 
             form = TokenForm(initial={'token': ds.get_string('token', default="")})
 

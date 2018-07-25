@@ -355,7 +355,7 @@ Then:
 
 ```bash
 pip install -r requirements.txt
-sudo npm install -g webpack@3.11.0
+sudo npm install -g webpack webpack-cli
 npm install
 webpack
 python manage.py collectstatic --noinput
