@@ -30,7 +30,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.4.0",
     "babel-loader": "^8.0.0-beta.4",
-    "canvas": "^1.6.11",
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
     "clipboard": "^1.7.1",
     "css-loader": "^0.25.0",
     "d3": "^3.5.5",
