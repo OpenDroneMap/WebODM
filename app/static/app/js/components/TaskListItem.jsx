@@ -8,6 +8,7 @@ import EditTaskPanel from './EditTaskPanel';
 import AssetDownloadButtons from './AssetDownloadButtons';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
+import TaskPluginActionButtons from './TaskPluginActionButtons';
 
 class TaskListItem extends React.Component {
   static propTypes = {
@@ -30,7 +31,8 @@ class TaskListItem extends React.Component {
       actionButtonsDisabled: false,
       editing: false,
       memoryError: false,
-      badDatasetError: false
+      badDatasetError: false,
+      pluginActionButtons: []
     }
 
     for (let k in props.data){
@@ -512,6 +514,7 @@ class TaskListItem extends React.Component {
             <ErrorMessage bind={[this, 'actionError']} />
             {actionButtons}
           </div>
+          <TaskPluginActionButtons task={task} />
         </div>
       );
 

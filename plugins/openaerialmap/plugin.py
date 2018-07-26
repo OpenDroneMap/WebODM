@@ -14,6 +14,9 @@ class Plugin(PluginBase):
     def main_menu(self):
         return [Menu("OpenAerialMap", self.public_url(""), "oam-icon fa fa-fw")]
 
+    def include_js_files(self):
+        return ['main.js']
+
     def include_css_files(self):
         return ['style.css']
 

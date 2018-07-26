@@ -1,0 +1,15 @@
+.plugin-action-buttons{
+    button{
+        margin-right: 4px;
+    }
+
+    .btn-group{
+        button:first-child{
+            margin-right: 0;
+        }
+    }
+
+    & > div{
+        display: inline-block;
+    }
+}

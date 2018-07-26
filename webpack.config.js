@@ -4,7 +4,7 @@ let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   context: __dirname,
 
   entry: {
