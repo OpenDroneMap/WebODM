@@ -46,7 +46,6 @@ def register_plugins():
 
                     with open(plugin.get_path('public/webpack.config.js'), 'w') as f:
                         f.write(wpc_content)
-                        logger.info('Wrote public/webpack.config.js for {}'.format(plugin))
             else:
                 logger.warning("Cannot generate webpack.config.js for {}, a path is missing: {}".format(plugin, ' '.join(build_paths)))
 
@@ -113,6 +112,10 @@ def get_active_plugins():
 
         # Do not load test plugin unless we're in test mode
         if os.path.basename(plugin_path) == 'test' and not settings.TESTING:
+            continue
+
+        # Ignore .gitignore
+        if os.path.basename(plugin_path) == '.gitignore':
             continue
 
         if not os.path.isfile(manifest_path) or not os.path.isfile(pluginpy_path):

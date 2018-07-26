@@ -5,6 +5,9 @@ from app.plugins import PluginBase, Menu, MountPoint
 from django.contrib.auth.decorators import login_required
 from django import forms
 
+from plugins.openaerialmap.api import ShareInfo, Share
+
+
 class TokenForm(forms.Form):
     token = forms.CharField(label='', required=False, max_length=1024, widget=forms.TextInput(attrs={'placeholder': 'Token'}))
 
@@ -38,6 +41,12 @@ class Plugin(PluginBase):
                     load_buttons_cb
                 )
             )
+        ]
+
+    def api_mount_points(self):
+        return [
+            MountPoint('task/(?P<pk>[^/.]+)/shareinfo', ShareInfo.as_view()),
+            MountPoint('task/(?P<pk>[^/.]+)/share', Share.as_view())
         ]
 
     def home_view(self):
