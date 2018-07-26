@@ -3,7 +3,6 @@ import shutil
 import tempfile
 import subprocess
 import os
-import geojson
 
 from string import Template
 

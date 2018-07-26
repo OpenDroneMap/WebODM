@@ -36,7 +36,7 @@ WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
 RUN npm install --quiet
 
 WORKDIR /webodm
-RUN npm install --quiet -g webpack && npm install --quiet -g webpack-cli && npm install --quiet && webpack
+RUN npm install --quiet -g webpack && npm install --quiet -g webpack-cli && npm install --quiet && webpack --mode production
 RUN python manage.py collectstatic --noinput
 
 RUN rm /webodm/webodm/secret_key.py

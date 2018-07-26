@@ -46,8 +46,20 @@ export default class ApiFactory{
 
       obj[triggerEventName] = (params, responseCb) => {
         preTrigger(params, responseCb);
+        if (responseCb){
+          this.events.addListener(`${api.namespace}::${eventName}::Response`, (...args) => {
+            // Give time to all listeners to receive the replies
+            // then remove the listener to avoid sending duplicate responses
+            const curSub = this.events._currentSubscription;
+
+            setTimeout(() => {
+              curSub.remove();
+            }, 0);
+
+            responseCb(...args);
+          });
+        }
         this.events.emit(`${api.namespace}::${eventName}`, params);
-        if (responseCb) this.events.addListener(`${api.namespace}::${eventName}::Response`, responseCb);
       };
     }
 

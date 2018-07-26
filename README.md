@@ -358,7 +358,7 @@ pip install -r requirements.txt
 sudo npm install -g webpack
 sudo npm install -g webpack-cli
 npm install
-webpack
+webpack --mode production
 python manage.py collectstatic --noinput
 chmod +x start.sh && ./start.sh --no-gunicorn
 ```

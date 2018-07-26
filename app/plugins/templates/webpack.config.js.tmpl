@@ -10,9 +10,7 @@ module.exports = {
   mode: 'production',
   context: __dirname,
 
-  entry: {
-    app: ['./app.jsx']
-  },
+  entry: ${entry_json},
 
   output: {
       path: path.join(__dirname, './build'),
@@ -30,7 +28,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.jsx?$$/,
         exclude: /(node_modules|bower_components)/,
         use: [
           {
@@ -49,7 +47,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.s?css$/,
+        test: /\.s?css$$/,
         use: ExtractTextPlugin.extract({
           use: 'css-loader!sass-loader'
         })

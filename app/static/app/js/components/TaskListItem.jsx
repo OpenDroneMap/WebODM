@@ -514,7 +514,7 @@ class TaskListItem extends React.Component {
             <ErrorMessage bind={[this, 'actionError']} />
             {actionButtons}
           </div>
-          <TaskPluginActionButtons task={task} />
+          <TaskPluginActionButtons task={task} disabled={disabled} />
         </div>
       );
 

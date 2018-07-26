@@ -7,6 +7,9 @@ import django
 import json
 from django.conf.urls import url
 from functools import reduce
+from string import Template
+
+from django.http import HttpResponse
 
 from webodm import settings
 
@@ -18,8 +21,35 @@ def register_plugins():
         # Check for package.json in public directory
         # and run npm install if needed
         if plugin.path_exists("public/package.json") and not plugin.path_exists("public/node_modules"):
-            logger.info("Running npm install for {}".format(plugin.get_name()))
+            logger.info("Running npm install for {}".format(plugin))
             subprocess.call(['npm', 'install'], cwd=plugin.get_path("public"))
+
+        # Check if we need to generate a webpack.config.js
+        if len(plugin.build_jsx_components()) > 0 and plugin.path_exists('public'):
+            logger.info("Generating webpack.config.js for {}".format(plugin))
+
+            build_paths = map(lambda p: os.path.join(plugin.get_path('public'), p), plugin.build_jsx_components())
+            paths_ok = not (False in map(lambda p: os.path.exists, build_paths))
+
+            if paths_ok:
+                wpc_path = os.path.join(settings.BASE_DIR, 'app', 'plugins', 'templates', 'webpack.config.js.tmpl')
+                with open(wpc_path) as f:
+                    tmpl = Template(f.read())
+
+                    # Create entry configuration
+                    entry = {}
+                    for e in plugin.build_jsx_components():
+                        entry[os.path.splitext(os.path.basename(e))[0]] = [os.path.join('.', e)]
+                    wpc_content = tmpl.substitute({
+                        'entry_json': json.dumps(entry)
+                    })
+
+                    with open(plugin.get_path('public/webpack.config.js'), 'w') as f:
+                        f.write(wpc_content)
+                        logger.info('Wrote public/webpack.config.js for {}'.format(plugin))
+            else:
+                logger.warning("Cannot generate webpack.config.js for {}, a path is missing: {}".format(plugin, ' '.join(build_paths)))
+
 
         # Check for webpack.config.js (if we need to build it)
         if plugin.path_exists("public/webpack.config.js") and not plugin.path_exists("public/build"):
@@ -123,6 +153,22 @@ def get_plugin_by_name(name):
 def get_plugins_path():
     current_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.abspath(os.path.join(current_path, "..", "..", "plugins"))
+
+
+def get_dynamic_script_handler(script_path, callback=None, **kwargs):
+    def handleRequest(request):
+        if callback is not None:
+            template_params = callback(request, **kwargs)
+            if not template_params:
+                return HttpResponse("")
+        else:
+            template_params = kwargs
+
+        with open(script_path) as f:
+            tmpl = Template(f.read())
+            return HttpResponse(tmpl.substitute(template_params))
+
+    return handleRequest
 
 
 def versionToInt(version):

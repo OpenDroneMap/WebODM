@@ -17,12 +17,27 @@ class Plugin(PluginBase):
     def include_js_files(self):
         return ['main.js']
 
+    def build_jsx_components(self):
+        return ['ShareButton.jsx']
+
     def include_css_files(self):
         return ['style.css']
 
     def app_mount_points(self):
+        def load_buttons_cb(request):
+            if request.user.is_authenticated:
+                ds = self.get_user_data_store(request.user)
+                return {'token': ds.get_string('token')}
+            else:
+                return False
+
         return [
-            MountPoint('$', self.home_view())
+            MountPoint('$', self.home_view()),
+            MountPoint('main.js', self.get_dynamic_script(
+                    'load_buttons.js',
+                    load_buttons_cb
+                )
+            )
         ]
 
     def home_view(self):

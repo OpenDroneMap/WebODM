@@ -6,11 +6,13 @@ import update from 'immutability-helper';
 
 class TaskPluginActionButtons extends React.Component {
     static defaultProps = {
-        task: null
+        task: null,
+        disabled: false
     };
 
     static propTypes = {
         task: PropTypes.object.isRequired,
+        disabled: PropTypes.bool
     };
 
     constructor(props){
@@ -24,7 +26,10 @@ class TaskPluginActionButtons extends React.Component {
     componentDidMount(){
         PluginsAPI.Dashboard.triggerAddTaskActionButton({
             task: this.props.task
-        }, ({button, task}) => {
+        }, (result) => {
+            if (!result) return;
+            const {button, task} = result;
+
             // Only process callbacks for
             // for the current task
             if (task === this.props.task){
@@ -38,7 +43,7 @@ class TaskPluginActionButtons extends React.Component {
     render(){
         if (this.state.buttons.length > 0){
             return (
-              <div className="row plugin-action-buttons">
+              <div className={"row plugin-action-buttons " + (this.props.disabled ? "disabled" : "")}>
                   {this.state.buttons.map((button, i) => <div key={i}>{button}</div>)}
               </div>);
         }else{
