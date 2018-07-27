@@ -153,7 +153,8 @@ def upload_orthophoto_to_oam(task_id, orthophoto_path, oam_params):
             # Attempt to cleanup intermediate results
             requests.get('https://www.webodm.org/oam/cleanup/{}'.format(os.path.basename(orthophoto_public_url)))
     else:
-        task_info['error'] = 'Could not upload orthophoto to intermediate location: {}.'.format(json.dumps(res))
+        err_message = res['error'] if 'error' in res else json.dumps(res)
+        task_info['error'] = 'Could not upload orthophoto to intermediate location: {}.'.format(err_message)
 
     task_info['sharing'] = False
     set_task_info(task_id, task_info)
