@@ -67,6 +67,14 @@ class DataStore(ABC):
     def has_key(self, key):
         return self.get_datum(key) is not None
 
+    def del_key(self, key):
+        datum = self.get_datum(key)
+        if datum is not None:
+            datum.delete()
+            return True
+        else:
+            return False
+
 
 class UserDataStore(DataStore):
     def __init__(self, namespace, user):

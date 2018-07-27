@@ -10,11 +10,12 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from app.models import ImageUpload
-from app.plugins import GlobalDataStore, get_site_settings
+from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals
 from app.plugins.views import TaskView
 from app.plugins.worker import task
 
 from webodm import settings
+from django.dispatch import receiver
 
 import requests
 
@@ -35,11 +36,15 @@ def get_task_info(task_id):
         'error': ''
     })
 
+
 def set_task_info(task_id, json):
     return ds.set_json(get_key_for(task_id, "info"), json)
 
 
-# TODO: task info cleanup when task is deleted via signal
+@receiver(plugin_signals.task_removed, dispatch_uid="oam_on_task_removed")
+def on_task_removed(sender, task_id, **kwargs):
+    logger.info("Cleaning up OAM datastore for task {}".format(str(task_id)))
+    ds.del_key(get_key_for(task_id, "info"))
 
 
 class Info(TaskView):
@@ -84,6 +89,7 @@ class Info(TaskView):
         set_task_info(task.id, task_info)
 
         return Response(task_info, status=status.HTTP_200_OK)
+
 
 class JSONSerializer(serializers.Serializer):
     oamParams = serializers.JSONField(help_text="OpenAerialMap share parameters (sensor, title, provider, etc.)")

@@ -30,7 +30,11 @@ class Plugin(PluginBase):
         def load_buttons_cb(request):
             if request.user.is_authenticated:
                 ds = self.get_user_data_store(request.user)
-                return {'token': ds.get_string('token')}
+                token = ds.get_string('token')
+                if token == '':
+                    return False
+
+                return {'token': token}
             else:
                 return False
 

@@ -499,6 +499,9 @@ class Task(models.Model):
 
                             self.update_available_assets_field()
                             self.save()
+
+                            from app.plugins import signals as plugin_signals
+                            plugin_signals.task_completed.send_robust(sender=self.__class__, task_id=self.id)
                         else:
                             # FAILED, CANCELED
                             self.save()
@@ -576,6 +579,10 @@ class Task(models.Model):
 
 
     def delete(self, using=None, keep_parents=False):
+        task_id = self.id
+        from app.plugins import signals as plugin_signals
+        plugin_signals.task_removing.send_robust(sender=self.__class__, task_id=task_id)
+
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
                                            task_directory_path(self.id, self.project.id))
 
@@ -586,6 +593,8 @@ class Task(models.Model):
             shutil.rmtree(directory_to_delete)
         except FileNotFoundError as e:
             logger.warning(e)
+
+        plugin_signals.task_removed.send_robust(sender=self.__class__, task_id=task_id)
 
     def set_failure(self, error_message):
         logger.error("FAILURE FOR {}: {}".format(self, error_message))
