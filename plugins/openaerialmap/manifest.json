@@ -1,6 +1,6 @@
 {
 	"name": "OpenAerialMap",
-	"webodmMinVersion": "0.5.3",
+	"webodmMinVersion": "0.6.0",
 	"description": "A plugin to upload orthophotos to OpenAerialMap",
 	"version": "0.1.0",
 	"author": "Piero Toffanin",

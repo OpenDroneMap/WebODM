@@ -61,7 +61,10 @@ module.exports = {
 
   resolve: {
     modules: ['node_modules', 'bower_components'],
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    alias: {
+        webodm: path.resolve(__dirname, '../../../app/static/app/js')
+    }
   },
 
   externals: {

@@ -553,21 +553,21 @@ class TaskListItem extends React.Component {
     return (
       <div className="task-list-item">
         <div className="row">
-          <div className="col-md-5 name">
+          <div className="col-sm-5 name">
             <i onClick={this.toggleExpanded} className={"clickable fa " + (this.state.expanded ? "fa-minus-square-o" : " fa-plus-square-o")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
           </div>
-          <div className="col-md-1 details">
+          <div className="col-sm-1 details">
             <i className="fa fa-image"></i> {task.images_count}
           </div> 
-          <div className="col-md-2 details">
+          <div className="col-sm-2 details">
             <i className="fa fa-clock-o"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
-          <div className="col-md-3">
+          <div className="col-sm-3">
             {showEditLink ? 
               <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
               : statusLabel}
           </div>
-          <div className="col-md-1 text-right">
+          <div className="col-sm-1 text-right">
             <div className="status-icon">
               <i className={statusIcon}></i>
             </div>

@@ -11,6 +11,7 @@ from string import Template
 
 from django.http import HttpResponse
 
+from app.models import Setting
 from webodm import settings
 
 logger = logging.getLogger('app.logger')
@@ -172,6 +173,10 @@ def get_dynamic_script_handler(script_path, callback=None, **kwargs):
             return HttpResponse(tmpl.substitute(template_params))
 
     return handleRequest
+
+
+def get_site_settings():
+    return Setting.objects.first()
 
 
 def versionToInt(version):

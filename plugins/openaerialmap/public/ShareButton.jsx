@@ -1,6 +1,9 @@
 import './ShareButton.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
+import ShareDialog from './ShareDialog';
+import Storage from 'webodm/classes/Storage';
+import ErrorMessage from 'webodm/components/ErrorMessage';
 import $ from 'jquery';
 
 module.exports = class ShareButton extends React.Component{
@@ -19,41 +22,125 @@ module.exports = class ShareButton extends React.Component{
 
         this.state = {
             loading: true,
-            shared: false,
+            taskInfo: {},
             error: ''
         };
-
-        console.log("AH!");
     }
 
     componentDidMount(){
-        const { task } = this.props; 
+        this.updateTaskInfo(false);
+    }
 
-        $.ajax({
-            type: 'GET',
-            url: `/api/plugins/openaerialmap/task/${task.id}/shareinfo`,
-            contentType: "application/json"
-        }).done(result => {
-            this.setState({shared: result.shared, loading: false})
-        }).fail(error => {
-            this.setState({error, loading: false});
-        });
+    updateTaskInfo = (showErrors) => {
+        const { task } = this.props; 
+        return $.ajax({
+                type: 'GET',
+                url: `/api/plugins/openaerialmap/task/${task.id}/info`,
+                contentType: 'application/json'
+            }).done(taskInfo => {
+                // Allow a user to specify a better name for the sensor
+                // and remember it.
+                let sensor = Storage.getItem("oam_sensor_pref_" + taskInfo.sensor);
+                if (sensor) taskInfo.sensor = sensor;
+
+                // Allow a user to change the default provider name
+                let provider = Storage.getItem("oam_provider_pref");
+                if (provider) taskInfo.provider = provider;
+
+                this.setState({taskInfo, loading: false});
+                if (taskInfo.error && showErrors) this.setState({error: taskInfo.error});
+            }).fail(error => {
+                this.setState({error, loading: false});
+            });
+    }
+
+    componentWillUnmount(){
+        if (this.monitorTimeout) clearTimeout(this.monitorTimeout);
     }
 
     handleClick = () => {
-        console.log("HEY!", this.props.token);
+        const { taskInfo } = this.state;
+        if (!taskInfo.shared){
+            this.shareDialog.show();
+        }else if (taskInfo.oam_upload_id){
+            window.open(`https://map.openaerialmap.org/#/upload/status/${encodeURIComponent(taskInfo.oam_upload_id)}`, '_blank');
+        }
+    }
+
+    shareToOAM = (formData) => {
+        const { task } = this.props;
+
+        const oamParams = {
+          token: this.props.token,
+          sensor: formData.sensor,
+          acquisition_start: formData.startDate,
+          acquisition_end: formData.endDate,
+          title: formData.title,
+          provider: formData.provider,
+          tags: formData.tags
+        };
+
+        return $.ajax({
+            url: `/api/plugins/openaerialmap/task/${task.id}/share`,
+            contentType: 'application/json',
+            data: JSON.stringify({
+                oamParams: oamParams
+            }),
+            dataType: 'json',
+            type: 'POST'
+          }).done(taskInfo => {
+            // Allow a user to associate the sensor name coming from the EXIF tags
+            // to one that perhaps is more human readable.
+            Storage.setItem("oam_sensor_pref_" + taskInfo.sensor, formData.sensor);
+            Storage.setItem("oam_provider_pref", formData.provider);
+
+            this.setState({taskInfo});
+            this.monitorProgress();
+          });
+    }
+
+    monitorProgress = () => {
+        if (this.state.taskInfo.sharing){
+            // Monitor progress
+            this.monitorTimeout = setTimeout(() => {
+                this.updateTaskInfo(true).always(this.monitorProgress);
+            }, 10000);
+        }
     }
 
     render(){
-        const { loading, shared } = this.state;
+        const { loading, taskInfo } = this.state;
 
-        return (<button
+        const getButtonIcon = () => {
+            if (loading || taskInfo.sharing) return "fa fa-circle-o-notch fa-spin fa-fw";
+            else return "oam-icon fa";
+        };
+
+        const getButtonLabel = () => {
+            if (loading) return "";
+            else if (taskInfo.sharing) return " Sharing...";
+            else if (taskInfo.shared) return " View In OAM";
+            else return " Share To OAM";
+        }
+
+        const result = [
+                <ErrorMessage bind={[this, "error"]} />,
+                <button
                 onClick={this.handleClick}
-                disabled={loading || shared}
+                disabled={loading || taskInfo.sharing}
                 className="btn btn-sm btn-primary">
-                    {loading ? 
-                    <i className="fa fa-circle-o-notch fa-spin fa-fw"></i> :
-                    [<i className="oam-icon fa"></i>, (shared ? "Shared To OAM" : " Share To OAM")]}
-                </button>);
+                    {[<i className={getButtonIcon()}></i>, getButtonLabel()]}
+                </button>];
+
+        if (taskInfo.sensor !== undefined){
+            result.unshift(<ShareDialog 
+                  ref={(domNode) => { this.shareDialog = domNode; }}
+                  task={this.props.task}
+                  taskInfo={taskInfo}
+                  saveAction={this.shareToOAM}
+                />);
+        }
+
+        return result;
     }
 }
