@@ -104,7 +104,7 @@ module.exports = class ShareButton extends React.Component{
             // Monitor progress
             this.monitorTimeout = setTimeout(() => {
                 this.updateTaskInfo(true).always(this.monitorProgress);
-            }, 10000);
+            }, 5000);
         }
     }
 

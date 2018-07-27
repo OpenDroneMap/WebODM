@@ -42,7 +42,11 @@ def set_task_info(task_id, json):
 
 
 @receiver(plugin_signals.task_removed, dispatch_uid="oam_on_task_removed")
-def on_task_removed(sender, task_id, **kwargs):
+@receiver(plugin_signals.task_completed, dispatch_uid="oam_on_task_completed")
+def oam_cleanup(sender, task_id, **kwargs):
+    # When a task is removed, simply remove clutter
+    # When a task is re-processed, make sure we can re-share it if we shared a task previously
+
     logger.info("Cleaning up OAM datastore for task {}".format(str(task_id)))
     ds.del_key(get_key_for(task_id, "info"))
 
@@ -61,32 +65,32 @@ class Info(TaskView):
         # TODO: for better data we could look over all images
         # and find actual end and start time
         # Here we're picking an image at random and assuming a one hour flight
+        if not 'sensor' in task_info:
+            task_info['endDate'] = datetime.utcnow().timestamp() * 1000
+            task_info['sensor'] = ''
+            task_info['title'] = task.name
+            task_info['provider'] = get_site_settings().organization_name
 
-        task_info['endDate'] = datetime.utcnow().timestamp() * 1000
-        task_info['sensor'] = ''
-        task_info['title'] = task.name
-        task_info['provider'] = get_site_settings().organization_name
+            if 'exif' in im.info:
+                exif_dict = piexif.load(im.info['exif'])
+                if 'Exif' in exif_dict:
+                    if piexif.ExifIFD.DateTimeOriginal in exif_dict['Exif']:
+                        try:
+                            parsed_date = datetime.strptime(exif_dict['Exif'][piexif.ExifIFD.DateTimeOriginal].decode('ascii'),
+                                                          '%Y:%m:%d %H:%M:%S')
+                            task_info['endDate'] = parsed_date.timestamp() * 1000
+                        except ValueError:
+                            # Ignore date field if we can't parse it
+                            pass
+                if '0th' in exif_dict:
+                    if piexif.ImageIFD.Make in exif_dict['0th']:
+                        task_info['sensor'] = exif_dict['0th'][piexif.ImageIFD.Make].decode('ascii').strip(' \t\r\n\0')
 
-        if 'exif' in im.info:
-            exif_dict = piexif.load(im.info['exif'])
-            if 'Exif' in exif_dict:
-                if piexif.ExifIFD.DateTimeOriginal in exif_dict['Exif']:
-                    try:
-                        parsed_date = datetime.strptime(exif_dict['Exif'][piexif.ExifIFD.DateTimeOriginal].decode('ascii'),
-                                                      '%Y:%m:%d %H:%M:%S')
-                        task_info['endDate'] = parsed_date.timestamp() * 1000
-                    except ValueError:
-                        # Ignore date field if we can't parse it
-                        pass
-            if '0th' in exif_dict:
-                if piexif.ImageIFD.Make in exif_dict['0th']:
-                    task_info['sensor'] = exif_dict['0th'][piexif.ImageIFD.Make].decode('ascii').strip(' \t\r\n\0')
+                    if piexif.ImageIFD.Model in exif_dict['0th']:
+                        task_info['sensor'] = (task_info['sensor'] + " " + exif_dict['0th'][piexif.ImageIFD.Model].decode('ascii')).strip(' \t\r\n\0')
 
-                if piexif.ImageIFD.Model in exif_dict['0th']:
-                    task_info['sensor'] = (task_info['sensor'] + " " + exif_dict['0th'][piexif.ImageIFD.Model].decode('ascii')).strip(' \t\r\n\0')
-
-        task_info['startDate'] = task_info['endDate'] - 60 * 60 * 1000
-        set_task_info(task.id, task_info)
+            task_info['startDate'] = task_info['endDate'] - 60 * 60 * 1000
+            set_task_info(task.id, task_info)
 
         return Response(task_info, status=status.HTTP_200_OK)
 
@@ -104,15 +108,15 @@ class Share(TaskView):
 
         oam_params = serializer['oamParams'].value
 
-        upload_orthophoto_to_oam.delay(task.id,
-                                       task.get_asset_download_path('orthophoto.tif'),
-                                       oam_params)
-
         task_info = get_task_info(task.id)
         task_info['sharing'] = True
         task_info['oam_upload_id'] = ''
         task_info['error'] = ''
         set_task_info(task.id, task_info)
+
+        upload_orthophoto_to_oam.delay(task.id,
+                                       task.get_asset_download_path('orthophoto.tif'),
+                                       oam_params)
 
         return Response(task_info, status=status.HTTP_200_OK)
 
