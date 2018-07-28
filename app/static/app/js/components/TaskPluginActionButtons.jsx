@@ -26,17 +26,12 @@ class TaskPluginActionButtons extends React.Component {
     componentDidMount(){
         PluginsAPI.Dashboard.triggerAddTaskActionButton({
             task: this.props.task
-        }, (result) => {
-            if (!result) return;
-            const {button, task} = result;
+        }, (button) => {
+            if (!button) return;
 
-            // Only process callbacks for
-            // for the current task
-            if (task === this.props.task){
-              this.setState(update(this.state, {
+            this.setState(update(this.state, {
                 buttons: {$push: [button]}
-              }));
-            }
+            }));
         });
     }
 

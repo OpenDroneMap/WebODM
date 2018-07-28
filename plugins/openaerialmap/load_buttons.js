@@ -5,10 +5,7 @@ PluginsAPI.Dashboard.addTaskActionButton([
         var task = args.task;
 
         if (task.available_assets.indexOf("orthophoto.tif") !== -1){
-            return {
-                button: React.createElement(ShareButton, {task: task, token: "${token}"}),
-                task: task
-            };
+            return React.createElement(ShareButton, {task: task, token: "${token}"});
         }
     }
 );

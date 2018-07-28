@@ -15,11 +15,11 @@ export default class ApiFactory{
     // are more robust as we can detect more easily if 
     // things break
     const addEndpoint = (obj, eventName, preTrigger = () => {}) => {
-      const emitResponse = (...args) => {
+      const emitResponse = response => {
         // Timeout needed for modules that have no dependencies
         // and load synchronously. Gives time to setup the listeners.
         setTimeout(() => {
-          this.events.emit(`${api.namespace}::${eventName}::Response`, ...args);
+          this.events.emit(`${api.namespace}::${eventName}::Response`, response);
         }, 0);
       };
 
@@ -28,26 +28,36 @@ export default class ApiFactory{
           // Deps
           // Load dependencies, then raise event as usual
           // by appending the dependencies to the argument list
-          this.events.addListener(`${api.namespace}::${eventName}`, (...args) => {
+          this.events.addListener(`${api.namespace}::${eventName}`, args => {
             Promise.all(callbackOrDeps.map(dep => SystemJS.import(dep)))
               .then((...deps) => {
-                emitResponse(callbackOrUndef(...(Array.from(args).concat(...deps))));
+                const response = {
+                  result: callbackOrUndef(...(Array.from([args]).concat(...deps))),
+                  placeholder: args._placeholder
+                };
+                emitResponse(response);
               });
             });
         }else{
           // Callback
-          this.events.addListener(`${api.namespace}::${eventName}`, (...args) => {
-            emitResponse(callbackOrDeps(...args));
+          this.events.addListener(`${api.namespace}::${eventName}`, args => {
+            const response = {
+              result: callbackOrDeps(args),
+              placeholder: args._placeholder
+            };
+            emitResponse(response);
           });
         }
       }
 
       const triggerEventName = "trigger" + eventName[0].toUpperCase() + eventName.slice(1);
 
-      obj[triggerEventName] = (params, responseCb) => {
-        preTrigger(params, responseCb);
+      obj[triggerEventName] = (args, responseCb) => {
+        args._placeholder = {};
+        
+        preTrigger(args, responseCb);
         if (responseCb){
-          this.events.addListener(`${api.namespace}::${eventName}::Response`, (...args) => {
+          this.events.addListener(`${api.namespace}::${eventName}::Response`, response => {
             // Give time to all listeners to receive the replies
             // then remove the listener to avoid sending duplicate responses
             const curSub = this.events._currentSubscription;
@@ -56,10 +66,10 @@ export default class ApiFactory{
               curSub.remove();
             }, 0);
 
-            responseCb(...args);
+            if (response.placeholder === args._placeholder) responseCb(response.result);
           });
         }
-        this.events.emit(`${api.namespace}::${eventName}`, params);
+        this.events.emit(`${api.namespace}::${eventName}`, args);
       };
     }
 
