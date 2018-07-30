@@ -351,11 +351,10 @@ class Task(models.Model):
                         # We don't care if this fails (we tried)
                         try:
                             self.processing_node.cancel_task(self.uuid)
-                            self.status = None
                         except ProcessingException:
                             logger.warning("Could not cancel {} on processing node. We'll proceed anyway...".format(self))
-                            self.status = status_codes.CANCELED
 
+                        self.status = status_codes.CANCELED
                         self.pending_action = None
                         self.save()
                     else:
