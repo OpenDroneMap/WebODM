@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
 
-from app.api.tasks import TaskNestedView
+from app.plugins.views import TaskView
 
 from worker.tasks import execute_grass_script
 
@@ -16,7 +16,7 @@ class GeoJSONSerializer(serializers.Serializer):
     area = serializers.JSONField(help_text="Polygon contour defining the volume area to compute")
 
 
-class TaskVolume(TaskNestedView):
+class TaskVolume(TaskView):
     def post(self, request, pk=None):
         task = self.get_and_check_task(request, pk)
         if task.dsm_extent is None:

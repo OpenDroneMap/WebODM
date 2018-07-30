@@ -1,0 +1,29 @@
+{% extends "app/plugins/templates/base.html" %}
+
+
+{% block content %}
+    <h3><i class="oam-icon fa"></i> OpenAerialMap</h3>
+
+
+
+{% if not form.token.value %}
+    <p>OpenAerialMap (OAM) is a set of tools for searching, sharing, and using openly licensed satellite and unmanned aerial vehicle (UAV) imagery.</p>
+    <p>To share your results with OAM:</p>
+    <ol>
+        <li>Sign-in from <a href="https://map.openaerialmap.org" target="_blank">map.openaerialmap.org</a>.</li>
+        <li>Navigate to your OAM profile page (click your user's avatar) and press the <b>Request 3rd Party API Token</b> button.</li>
+        <li>Copy and paste the token in the form below.</li>
+    </ol>
+    {% else %}
+        <p><b>You are all set!</b> To share a task, select it from the <a href="/dashboard/">dashboard</a> and press the <b>Share to OAM</b> button.</p>
+        <p>Your submissions can be managed from your OAM profile page.</p>
+        <p><a class="btn btn-sm btn-default" href="https://map.openaerialmap.org" target="_blank"><i class="fa fa-external-link"></i> Go To OpenAerialMap</a></p>
+    {% endif %}
+
+    <form action="" method="post" class="oam-form oam-token-form">
+        <h4>Token Settings</h4>
+        {% csrf_token %}
+        {% include "app/plugins/templates/form.html" %}
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save fa-fw"></i> Set Token</i></button>
+    </form>
+{% endblock %}

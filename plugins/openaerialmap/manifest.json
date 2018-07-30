@@ -1,12 +1,12 @@
 {
-	"name": "POSM GCP Interface",
+	"name": "OpenAerialMap",
 	"webodmMinVersion": "0.6.0",
-	"description": "A plugin to create GCP files from images",
+	"description": "A plugin to upload orthophotos to OpenAerialMap",
 	"version": "0.1.0",
 	"author": "Piero Toffanin",
 	"email": "pt@masseranolabs.com",
 	"repository": "https://github.com/OpenDroneMap/WebODM",
-	"tags": ["gcp", "posm"],
+	"tags": ["oam", "openaerialmap"],
 	"homepage": "https://github.com/OpenDroneMap/WebODM",
 	"experimental": true,
 	"deprecated": false

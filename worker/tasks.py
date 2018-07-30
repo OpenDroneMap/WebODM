@@ -2,7 +2,6 @@ import traceback
 
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
 from django.db.models import Count
 from django.db.models import Q
 

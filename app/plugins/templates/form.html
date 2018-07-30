@@ -1,0 +1,14 @@
+{% load bootstrap_extras %}
+
+{% for field in form %}
+<div class="form-group {% if field.errors %}has-error{% endif %}">
+    <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+    {{ field|with_class:'form-control' }}
+    {% if field.errors %}
+        <span class='text-danger'>{{ field.errors|join:'<br />' }}</span>
+    {% endif %}
+    {% if field.help_text %}
+        <span class="help-block ">{{ field.help_text }}</span>
+    {% endif %}
+</div>
+{% endfor %}

@@ -7,5 +7,6 @@ module.exports = {
   },
   setupFiles: ["<rootDir>/app/static/app/js/tests/setup/shims.js",
   				"<rootDir>/app/static/app/js/tests/setup/setupTests.js", 
-  				"<rootDir>/app/static/app/js/tests/setup/browserMock.js"]
+  				"<rootDir>/app/static/app/js/tests/setup/browserMock.js"],
+  testURL: "http://localhost:8000/"
 };
