@@ -1,6 +1,7 @@
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
+from app.models import PluginDatum
 from app.models import Preset
 from .models import Project, Task, ImageUpload, Setting, Theme
 from django import forms
@@ -60,3 +61,5 @@ class ThemeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Theme, ThemeAdmin)
+
+admin.site.register(PluginDatum, admin.ModelAdmin)
