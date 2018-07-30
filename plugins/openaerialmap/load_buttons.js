@@ -1,6 +1,5 @@
 PluginsAPI.Dashboard.addTaskActionButton([
-        'openaerialmap/build/ShareButton.js',
-        'openaerialmap/build/ShareButton.css'
+        'openaerialmap/build/ShareButton.js'
     ],function(args, ShareButton){
         var task = args.task;
 

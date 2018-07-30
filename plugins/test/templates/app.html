@@ -2,4 +2,10 @@
 
 {% block content %}
 Hello world!
+
+<form>
+    {% csrf_token %}
+    {% include "app/plugins/templates/form.html" with form=test_form %}
+    <button type="submit">Submit</button>
+</form>
 {% endblock %}

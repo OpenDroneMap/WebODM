@@ -14,6 +14,14 @@ export default class ApiFactory{
     // We could just use events, but methods
     // are more robust as we can detect more easily if 
     // things break
+
+    // TODO: we should consider refactoring this code
+    // to use functions instead of events. Originally
+    // we chose to use events because that would have 
+    // decreased coupling, but since all API pubsub activity
+    // evolved to require a call to the PluginsAPI object, we might have
+    // added a bunch of complexity for no real advantage here.
+
     const addEndpoint = (obj, eventName, preTrigger = () => {}) => {
       const emitResponse = response => {
         // Timeout needed for modules that have no dependencies

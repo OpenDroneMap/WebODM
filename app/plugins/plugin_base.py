@@ -32,7 +32,7 @@ class PluginBase(ABC):
         """
         return UserDataStore(self.get_name(), user)
 
-    def get_global_data_store(self, user):
+    def get_global_data_store(self):
         """
         Helper function to instantiate a user data store associated
         with this plugin

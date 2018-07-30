@@ -6,6 +6,11 @@ import subprocess
 
 import logging
 
+from unittest import mock
+from contextlib import contextmanager
+
+import random
+
 from webodm import settings
 
 logger = logging.getLogger('app.logger')
@@ -27,3 +32,12 @@ def clear_test_media_root():
             shutil.rmtree(settings.MEDIA_ROOT)
     else:
         logger.warning("We did not remove MEDIA_ROOT because we couldn't find a _test suffix in its path.")
+
+
+@contextmanager
+def catch_signal(signal):
+    """Catch django signal and return the mocked call."""
+    handler = mock.Mock()
+    signal.connect(handler, dispatch_uid=str(random.random()))
+    yield handler
+    signal.disconnect(handler)

@@ -1,5 +1,5 @@
 from abc import ABC
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from app.models import PluginDatum
 import logging
 
@@ -29,6 +29,8 @@ class DataStore(ABC):
             # This should never happen
             logger.warning("A plugin data store for the {} plugin returned multiple objects. This is potentially bad. The plugin developer needs to fix this! The data store will not be changed.".format(self.namespace))
             PluginDatum.objects.filter(key=self.db_key(key), user=self.user).delete()
+        except ValidationError as e:
+            raise InvalidDataStoreValue(e)
 
     def get_value(self, type, key, default=None):
         datum = self.get_datum(key)
@@ -82,4 +84,8 @@ class UserDataStore(DataStore):
 
 
 class GlobalDataStore(DataStore):
+    pass
+
+
+class InvalidDataStoreValue(Exception):
     pass

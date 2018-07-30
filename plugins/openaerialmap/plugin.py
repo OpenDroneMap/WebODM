@@ -40,7 +40,7 @@ class Plugin(PluginBase):
 
         return [
             MountPoint('$', self.home_view()),
-            MountPoint('main.js', self.get_dynamic_script(
+            MountPoint('main.js$', self.get_dynamic_script(
                     'load_buttons.js',
                     load_buttons_cb
                 )

@@ -170,7 +170,10 @@ def get_dynamic_script_handler(script_path, callback=None, **kwargs):
 
         with open(script_path) as f:
             tmpl = Template(f.read())
-            return HttpResponse(tmpl.substitute(template_params))
+            try:
+                return HttpResponse(tmpl.substitute(template_params))
+            except TypeError as e:
+                return HttpResponse("Template substitution failed with params: {}. {}".format(str(template_params), e))
 
     return handleRequest
 

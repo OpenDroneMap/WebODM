@@ -16,11 +16,12 @@ import worker
 from django.utils import timezone
 from app.models import Project, Task, ImageUpload
 from app.models.task import task_directory_path, full_task_directory_path
+from app.plugins.signals import task_completed, task_removed, task_removing
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from app.testwatch import testWatch
-from .utils import start_processing_node, clear_test_media_root
+from .utils import start_processing_node, clear_test_media_root, catch_signal
 
 # We need to test the task API in a TransactionTestCase because
 # task processing happens on a separate thread, and normal TestCases
@@ -279,9 +280,17 @@ class TestApiTask(BootTransactionTestCase):
         time.sleep(DELAY)
 
         # Calling process pending tasks should finish the process
-        worker.tasks.process_pending_tasks()
-        task.refresh_from_db()
-        self.assertTrue(task.status == status_codes.COMPLETED)
+        # and invoke the plugins completed signal
+        with catch_signal(task_completed) as handler:
+            worker.tasks.process_pending_tasks()
+            task.refresh_from_db()
+            self.assertTrue(task.status == status_codes.COMPLETED)
+
+        handler.assert_called_with(
+            sender=Task,
+            task_id=task.id,
+            signal=task_completed,
+        )
 
         # Can download assets
         for asset in list(task.ASSETS_MAP.keys()):
@@ -362,9 +371,15 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.CANCELED)
 
-        # Remove a task
-        res = client.post("/api/projects/{}/tasks/{}/remove/".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        # Remove a task and verify that it calls the proper plugins signals
+        with catch_signal(task_removing) as h1:
+            with catch_signal(task_removed) as h2:
+                res = client.post("/api/projects/{}/tasks/{}/remove/".format(project.id, task.id))
+                self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        h1.assert_called_once_with(sender=Task, task_id=task.id, signal=task_removing)
+        h2.assert_called_once_with(sender=Task, task_id=task.id, signal=task_removed)
+
         # task is processed right away
 
         # Has been removed along with assets
