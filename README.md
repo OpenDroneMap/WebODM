@@ -15,6 +15,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
     * [Common Troubleshooting](#common-troubleshooting)
     * [Backup and Restore](#backup-and-restore)
     * [Reset Password](#reset-password)
+ * [Customizing and Extending](#customizing-and-extending)
  * [API Docs](#api-docs)
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
  * [Roadmap](#roadmap)
@@ -157,6 +158,16 @@ If you forgot the password you picked the first time you logged into WebODM, to 
 ```
 
 The password will be reset to `newpass`. The command will also tell you what username you chose.
+
+## Customizing and Extending
+
+Small customizations such as changing the application colors, name, logo, or addying custom CSS/HTML/Javascript can be performed directly from the Customize -- Brand/Theme panels within WebODM. No need to fork or change the code.
+
+More advanced customizations can be achieved by writing [plugins](https://github.com/OpenDroneMap/WebODM/tree/master/plugins). This is the preferred way to add new functionality to WebODM since it requires less effort than maintaining a separate fork. The plugin system features server-side [signals](https://github.com/OpenDroneMap/WebODM/blob/master/app/plugins/signals.py) that can be used to be notified of various events, a ES6/React build system, a dynamic [client-side API](https://github.com/OpenDroneMap/WebODM/tree/master/app/static/app/js/classes/plugins) for adding elements to the UI, a built-in data store, an async task runner, a GRASS engine, hooks to add menu items and functions to rapidly inject CSS, Javascript and Django views.
+
+The plugin system is still in beta. The best source of documentation currently is to look at existing [code](https://github.com/OpenDroneMap/WebODM/tree/master/plugins). If a particular hook / entrypoint for your plugin does not yet exist, [request it](https://github.com/OpenDroneMap/WebODM/issues). We are adding hooks and entrypoints as we go.
+
+To create a plugin simply copy the `plugins/test` plugin into a new directory (for example, `plugins/myplugin`), then modify `manifest.json`, `plugin.py` and issue a `./webodm.sh restart`.
 
 ## API Docs
 
