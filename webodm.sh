@@ -246,7 +246,7 @@ down(){
 
 rebuild(){
 	run "docker-compose down --remove-orphans"
-    plugin_cleanup
+	plugin_cleanup
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
 	run "rm -fr nodeodm/external/node-OpenDroneMap || sudo rm -fr nodeodm/external/node-OpenDroneMap"
 	run "docker-compose -f docker-compose.yml -f docker-compose.build.yml build --no-cache"
