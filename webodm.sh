@@ -18,6 +18,16 @@ if [[ $platform = "Windows" ]]; then
 	export COMPOSE_CONVERT_WINDOWS_PATHS=1
 fi
 
+# Plugin commands require us to mount a docker volume
+# but older version of Windows and certain macOS directory locations
+# require user interaction. We will add better support for these in the near future.
+plugins_volume=false
+if [[ $platform = "Linux" ]]; then
+    plugins_volume=true
+elif [[ $platform = "MacOS / OSX" ]] && [[ $(pwd) == /Users* ]]; then
+    plugins_volume=true
+fi
+
 # Load default values
 source .env
 DEFAULT_PORT="$WO_PORT"
@@ -77,6 +87,10 @@ case $key in
     shift # past argument
     shift # past value
     ;;
+    --mount-plugins-volume)
+    plugins_volume=true
+    shift # past argument
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -99,11 +113,13 @@ usage(){
   echo "	checkenv		Do an environment check and install missing components"
   echo "	test			Run the unit test suite (developers only)"
   echo "	resetadminpassword <new password>	Reset the administrator's password to a new one. WebODM must be running when executing this command."
-  echo ""
-  echo "	plugin enable <plugin name>	Enable a plugin"
-  echo "	plugin disable <plugin name>	Disable a plugin"
-  echo "	plugin list		List all available plugins"
-  echo "	plugin cleanup		Cleanup plugins build directories"
+  if [[ $plugins_volume = true ]]; then
+    echo ""
+    echo "	plugin enable <plugin name>	Enable a plugin"
+    echo "	plugin disable <plugin name>	Disable a plugin"
+    echo "	plugin list		List all available plugins"
+    echo "	plugin cleanup		Cleanup plugins build directories"
+  fi
   echo ""
   echo "Options:"
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
@@ -115,6 +131,9 @@ usage(){
   echo "	--ssl-insecure-port-redirect	<port>	Insecure port number to redirect from when SSL is enabled (default: $DEFAULT_SSL_INSECURE_PORT_REDIRECT)"
   echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
+  if [[ $plugins_volume = false ]]; then
+    echo "	--mount-plugins-volume	Always mount the ./plugins volume, even on unsupported platforms (developers only) (default: disabled)"
+  fi
   exit
 }
 
@@ -214,6 +233,10 @@ start(){
 		echo "Will enable SSL ($method)"
 	fi
 
+    if [[ $plugins_volume = true ]]; then
+        command+=" -f docker-compose.plugins.yml"
+    fi
+
 	run "$command start || $command up"
 }
 
@@ -255,9 +278,22 @@ plugin_check(){
     fi
 }
 
+plugin_volume_check(){
+    if [[ $plugins_volume = false ]]; then
+        path=$(realpath ./plugins)
+        echo "================"
+        echo "WARNING: Your platform does not support automatic volume mounting. If you want to enable/disable/develop plugins you need to:"
+        echo "1. Make sure docker can mount [$path] by modifying the docker File Sharing options"
+        echo "2. Pass the --mount-plugins-volume option to ./webodm.sh commands"
+        echo "================"
+        echo
+    fi
+}
+
 plugin_enable(){
     plugin_name="$1"
     plugin_check $plugin_name
+    plugin_volume_check
 
     if [ -e "plugins/$plugin_name/disabled" ]; then
         rm "plugins/$plugin_name/disabled"
@@ -270,7 +306,8 @@ plugin_enable(){
 plugin_disable(){
     plugin_name="$1"
     plugin_check $plugin_name
-
+    plugin_volume_check
+    
     if [ ! -e "plugins/$plugin_name/disabled" ]; then
         touch "plugins/$plugin_name/disabled"
         echo "Plugin disabled. Run ./webodm.sh restart to apply the changes."
