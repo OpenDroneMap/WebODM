@@ -256,7 +256,7 @@ rebuild(){
 
 plugin_cleanup(){
     # Delete all node_modules and build directories within plugins' public/ folders
-    find plugins/ -type d \( -name build -o -name node_modules \) -path 'plugins/*/public/*' -exec rm -frv '{}' \; 2>/dev/null
+    find plugins/ -type d \( -name build -o -name node_modules \) -path 'plugins/*/public/*' -exec rm -frv '{}' \;
 }
 
 plugin_list(){
