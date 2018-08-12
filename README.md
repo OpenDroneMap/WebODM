@@ -45,7 +45,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 * From the Docker Quickstart Terminal or Powershell (Windows), or from the command line (Mac / Linux), type:
 ```bash
-git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input
+git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
 cd WebODM
 ./webodm.sh start
 ```
@@ -350,7 +350,7 @@ brew install postgres postgis
 Then these steps should be sufficient to get you up and running:
 
 ```bash
-git clone https://github.com/OpenDroneMap/WebODM
+git clone --depth 1 https://github.com/OpenDroneMap/WebODM
 ```
 
 Create a `WebODM/webodm/local_settings.py` file containing your database settings:
