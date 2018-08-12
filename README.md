@@ -15,6 +15,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
     * [Common Troubleshooting](#common-troubleshooting)
     * [Backup and Restore](#backup-and-restore)
     * [Reset Password](#reset-password)
+    * [Manage Plugins](#manage-plugins)
  * [Customizing and Extending](#customizing-and-extending)
  * [API Docs](#api-docs)
  * [OpenDroneMap, node-OpenDroneMap, WebODM... what?](#opendronemap-node-opendronemap-webodm-what)
@@ -158,6 +159,24 @@ If you forgot the password you picked the first time you logged into WebODM, to 
 ```
 
 The password will be reset to `newpass`. The command will also tell you what username you chose.
+
+### Manage Plugins
+
+To list all available plugins type:
+
+```bash
+./webodm.sh plugin list
+```
+
+To enable/disable a plugin type:
+
+```bash
+./webodm.sh plugin enable <plugin name>
+./webodm.sh plugin disable <plugin name>
+./webodm.sh restart
+```
+
+On some platforms (eg. Windows), if you want to manage plugins, you will need to make sure that the `./plugins` directory can be mounted as a docker volume and then pass the `--mount-plugins-volume` flag to `webodm.sh`. Check the docker documentation.
 
 ## Customizing and Extending
 
