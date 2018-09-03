@@ -32,6 +32,7 @@ class TaskListItem extends React.Component {
       editing: false,
       memoryError: false,
       badDatasetError: false,
+      illegalInstructionError: false,
       pluginActionButtons: []
     }
 
@@ -99,7 +100,7 @@ class TaskListItem extends React.Component {
           }
 
           if (this.state.task.status !== statusCodes.FAILED){
-            this.setState({memoryError: false});
+            this.setState({memoryError: false, badDatasetError: false, illegalInstructionError: false});
           }
         }
       }else{
@@ -231,6 +232,9 @@ class TaskListItem extends React.Component {
         this.setState({memoryError: true});
       }else if (line.indexOf("SVD did not converge") !== -1){
         this.setState({badDatasetError: true});
+      }else if (line.indexOf("Illegal instruction") !== -1 ||
+                line.indexOf("Child returned 132") !== -1){
+        this.setState({illegalInstructionError: true});
       }
     }
   }
@@ -361,7 +365,12 @@ class TaskListItem extends React.Component {
       let showOrthophotoMissingWarning = false,
           showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
           showBadDatasetWarning = this.state.badDatasetError && task.status == statusCodes.FAILED,
-          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && !showMemoryErrorWarning && !showBadDatasetWarning && task.status == statusCodes.FAILED,
+          showIllegalInstructionWarning = this.state.illegalInstructionError && task.status == statusCodes.FAILED,
+          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && 
+                                       !showMemoryErrorWarning && 
+                                       !showBadDatasetWarning && 
+                                       !showIllegalInstructionWarning &&
+                                       task.status == statusCodes.FAILED,
           memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
       
       let actionButtons = [];
@@ -495,7 +504,10 @@ class TaskListItem extends React.Component {
               </ul>
               You can read more about best practices for capturing good images <a href="https://support.dronedeploy.com/v1.0/docs/making-successful-maps" target="_blank">here</a>.
               </span></div> : ""}
-            
+                
+              {showIllegalInstructionWarning ? 
+              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See <a href="https://github.com/OpenDroneMap/WebODM#common-troubleshooting">this page</a> for more information.
+              </span></div> : ""}
 
               {showExitedWithCodeOneHints ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
