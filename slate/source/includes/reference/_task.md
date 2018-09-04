@@ -121,6 +121,7 @@ Asset | Description
 all.zip   | Archive (.zip) containing all assets, including an orthophoto, TMS tiles, a textured 3D model and point cloud in various formats.
 orthophoto.tif | GeoTIFF orthophoto.
 orthophoto.png | PNG orthophoto.
+orthophoto.mbtiles | Orthophoto MBTiles archive.
 textured_model.zip | Archive containing the textured 3D model
 georeferenced_model.las | Point cloud in .LAS format.
 georeferenced_model.ply | Point cloud in .PLY format.
