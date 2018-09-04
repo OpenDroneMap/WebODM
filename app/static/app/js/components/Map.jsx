@@ -14,6 +14,7 @@ import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
+import Basemaps from '../classes/Basemaps';
 import update from 'immutability-helper';
 
 class Map extends React.Component {
@@ -194,27 +195,20 @@ class Map extends React.Component {
     }).addTo(this.map);
 
     if (showBackground) {
-      this.basemaps = {
-        "Google Maps Hybrid": L.tileLayer('//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-            attribution: 'Map data: &copy; Google Maps',
-            subdomains: ['mt0','mt1','mt2','mt3'],
-            maxZoom: 21,
-            minZoom: 0,
-            label: 'Google Maps Hybrid'
-        }).addTo(this.map),
-        "ESRI Satellite": L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-            maxZoom: 21,
-            minZoom: 0,
-            label: 'ESRI Satellite'  // optional label used for tooltip
-        }),
-        "OSM Mapnik": L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 21,
-            minZoom: 0,
-            label: 'OSM Mapnik'  // optional label used for tooltip
-        })
-      };
+      this.basemaps = Basemaps.map((src, idx) => {
+        const { url, ...props } = src;
+        const layer = L.tileLayer(url, props);
+
+        if (idx === 0) {
+          layer.addTo(this.map);
+        }
+
+        return [props.label, layer];
+      }).reduce((acc, [k, v]) => {
+        acc[k] = v;
+
+        return acc;
+      });
     }
 
     this.autolayers = Leaflet.control.autolayers({
