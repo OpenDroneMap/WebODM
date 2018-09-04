@@ -31,8 +31,7 @@ class TaskListItem extends React.Component {
       actionButtonsDisabled: false,
       editing: false,
       memoryError: false,
-      badDatasetError: false,
-      illegalInstructionError: false,
+      friendlyTaskError: "",
       pluginActionButtons: []
     }
 
@@ -100,7 +99,7 @@ class TaskListItem extends React.Component {
           }
 
           if (this.state.task.status !== statusCodes.FAILED){
-            this.setState({memoryError: false, badDatasetError: false, illegalInstructionError: false});
+            this.setState({memoryError: false, friendlyTaskError: ""});
           }
         }
       }else{
@@ -231,10 +230,18 @@ class TaskListItem extends React.Component {
           line.indexOf("Failed to allocate memory") !== -1){
         this.setState({memoryError: true});
       }else if (line.indexOf("SVD did not converge") !== -1){
-        this.setState({badDatasetError: true});
+        this.setState({friendlyTaskError: `It looks like the images might have one of the following problems: 
+        <ul>
+          <li>Not enough images</li>
+          <li>Not enough overlap between images</li>
+          <li>Images might be too blurry (common with phone cameras)</li>
+        </ul>
+        You can read more about best practices for capturing good images <a href='https://support.dronedeploy.com/v1.0/docs/making-successful-maps' target='_blank'>here</a>.`});
       }else if (line.indexOf("Illegal instruction") !== -1 ||
                 line.indexOf("Child returned 132") !== -1){
-        this.setState({illegalInstructionError: true});
+        this.setState({friendlyTaskError: "It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See <a href='https://github.com/OpenDroneMap/WebODM#common-troubleshooting'>this page</a> for more information."});
+      }else if (line.indexOf("Child returned 127") !== -1){
+        this.setState({friendlyTaskError: "The processing node is missing a program necessary to complete the task. This might indicate a corrupted installation. If you built OpenDroneMap, please check that all programs built without errors."});
       }
     }
   }
@@ -364,12 +371,10 @@ class TaskListItem extends React.Component {
     if (this.state.expanded){
       let showOrthophotoMissingWarning = false,
           showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
-          showBadDatasetWarning = this.state.badDatasetError && task.status == statusCodes.FAILED,
-          showIllegalInstructionWarning = this.state.illegalInstructionError && task.status == statusCodes.FAILED,
+          showTaskWarning = this.state.friendlyTaskError !== "" && task.status == statusCodes.FAILED,
           showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && 
                                        !showMemoryErrorWarning && 
-                                       !showBadDatasetWarning && 
-                                       !showIllegalInstructionWarning &&
+                                       !showTaskWarning &&
                                        task.status == statusCodes.FAILED,
           memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
       
@@ -495,19 +500,8 @@ class TaskListItem extends React.Component {
               {showMemoryErrorWarning ? 
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or tweak the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
               
-              {showBadDatasetWarning ? 
-              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like the images might have one of the following problems: 
-              <ul>
-                <li>Not enough images</li>
-                <li>Not enough overlap between images</li>
-                <li>Images might be too blurry (common with phone cameras)</li>
-              </ul>
-              You can read more about best practices for capturing good images <a href="https://support.dronedeploy.com/v1.0/docs/making-successful-maps" target="_blank">here</a>.
-              </span></div> : ""}
-                
-              {showIllegalInstructionWarning ? 
-              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See <a href="https://github.com/OpenDroneMap/WebODM#common-troubleshooting">this page</a> for more information.
-              </span></div> : ""}
+              {showTaskWarning ? 
+              <div className="task-warning"><i className="fa fa-support"></i> <span dangerouslySetInnerHTML={this.state.friendlyTaskError} /></div> : ""}
 
               {showExitedWithCodeOneHints ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
