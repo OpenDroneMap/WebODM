@@ -1,5 +1,5 @@
 import React from 'react'; // can import React
 
-module.exports = {
+export default {
     es6func: () => {} // ES6 transpiler works
 };

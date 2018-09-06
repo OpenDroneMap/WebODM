@@ -4,7 +4,7 @@ import './MeasurePopup.scss';
 import $ from 'jquery';
 import L from 'leaflet';
 
-module.exports = class MeasurePopup extends React.Component {
+export default class MeasurePopup extends React.Component {
   static defaultProps = {
     map: {}, 
     model: {},

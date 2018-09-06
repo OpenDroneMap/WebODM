@@ -7,7 +7,7 @@ import ReactDOM from 'ReactDOM';
 import React from 'react';
 import $ from 'jquery';
 
-module.exports = class App{
+export default class App{
     constructor(map){
         this.map = map;
 
