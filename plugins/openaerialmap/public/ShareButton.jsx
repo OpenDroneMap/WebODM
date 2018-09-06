@@ -5,7 +5,7 @@ import Storage from 'webodm/classes/Storage';
 import ErrorMessage from 'webodm/components/ErrorMessage';
 import $ from 'jquery';
 
-module.exports = class ShareButton extends React.Component{
+export default class ShareButton extends React.Component{
     static defaultProps = {
         task: null,
         token: ""

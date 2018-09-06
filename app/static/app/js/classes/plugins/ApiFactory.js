@@ -39,6 +39,13 @@ export default class ApiFactory{
           this.events.addListener(`${api.namespace}::${eventName}`, args => {
             Promise.all(callbackOrDeps.map(dep => SystemJS.import(dep)))
               .then((...deps) => {
+                
+                // For each dependency, see if it exports a default module (ES6 style)
+                // if it does, export just the default module, otherwise export all modules
+                deps = deps.map(dep => {
+                    return dep.map(exp => exp.default ? exp.default : exp);
+                });
+
                 const response = {
                   result: callbackOrUndef(...(Array.from([args]).concat(...deps))),
                   placeholder: args._placeholder
