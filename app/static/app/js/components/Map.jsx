@@ -195,7 +195,9 @@ class Map extends React.Component {
     }).addTo(this.map);
 
     if (showBackground) {
-      this.basemaps = Basemaps.map((src, idx) => {
+      this.basemaps = {};
+      
+      Basemaps.forEach((src, idx) => {
         const { url, ...props } = src;
         const layer = L.tileLayer(url, props);
 
@@ -203,11 +205,7 @@ class Map extends React.Component {
           layer.addTo(this.map);
         }
 
-        return [props.label, layer];
-      }).reduce((acc, [k, v]) => {
-        acc[k] = v;
-
-        return acc;
+        this.basemaps[props.label] = layer;
       });
     }
 
