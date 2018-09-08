@@ -1,6 +1,7 @@
 [Unit]
 Description=Start WebODM Celery Service Container
-Requires=webodm-nginx.service
+Requires=webodm-gunicorn.service
+After=webodm-gunicorn.service
 
 [Service]
 Type=simple
