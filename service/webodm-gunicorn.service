@@ -1,7 +1,7 @@
 [Unit]
 Description=Start WebODM Gunicorn Service Container
-Requires=webodm-nginx.service postgresql.service
-After=webodm-nginx.service postgresql.service
+Requires=webodm-nginx.service postgresql.service redis.service
+After=webodm-nginx.service postgresql.service redis.service
 
 [Service]
 Type=simple
