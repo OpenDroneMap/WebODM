@@ -25,7 +25,7 @@ from webodm.wsgi import booted
 def boot():
     # booted is a shared memory variable to keep track of boot status
     # as multiple gunicorn workers could trigger the boot sequence twice
-    if not settings.DEBUG and booted.value: return
+    if (not settings.DEBUG and booted.value) or settings.MIGRATING: return
 
     booted.value = True
     logger = logging.getLogger('app.logger')
