@@ -103,8 +103,8 @@ def add_default_presets():
                                         defaults={'options': [{'name': 'fast-orthophoto', 'value': True}]})
         Preset.objects.update_or_create(name='High Resolution', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True},
-                                                              {'name': 'dem-resolution', 'value': "0.04"},
-                                                              {'name': 'orthophoto-resolution', 'value': "40"},
+                                                              {'name': 'dem-resolution', 'value': "2.5"},
+                                                              {'name': 'orthophoto-resolution', 'value': "2.5"},
                                                               ]})
         Preset.objects.update_or_create(name='Default', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True}]})
