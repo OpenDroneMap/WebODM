@@ -25,7 +25,7 @@ from webodm.wsgi import booted
 def boot():
     # booted is a shared memory variable to keep track of boot status
     # as multiple gunicorn workers could trigger the boot sequence twice
-    if not settings.DEBUG and booted.value: return
+    if (not settings.DEBUG and booted.value) or settings.MIGRATING: return
 
     booted.value = True
     logger = logging.getLogger('app.logger')
@@ -103,8 +103,8 @@ def add_default_presets():
                                         defaults={'options': [{'name': 'fast-orthophoto', 'value': True}]})
         Preset.objects.update_or_create(name='High Resolution', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True},
-                                                              {'name': 'dem-resolution', 'value': "0.04"},
-                                                              {'name': 'orthophoto-resolution', 'value': "40"},
+                                                              {'name': 'dem-resolution', 'value': "2.5"},
+                                                              {'name': 'orthophoto-resolution', 'value': "2.5"},
                                                               ]})
         Preset.objects.update_or_create(name='Default', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True}]})

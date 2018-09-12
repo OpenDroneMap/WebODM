@@ -45,6 +45,7 @@ with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
     VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
+MIGRATING = sys.argv[1:2] == ['migrate']
 WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
 # SECURITY WARNING: don't run with debug turned on a public facing server!
