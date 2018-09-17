@@ -26,6 +26,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
  * [Architecture Overview](#architecture-overview)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
+ * [Run it on the cloud (Google Compute, Amazon AWS)](#run-it-on-the-cloud-google-compute-amazon-aws)
  
 
 ![Alt text](https://user-images.githubusercontent.com/1951843/28586405-af18e8cc-7141-11e7-9853-a7feca7c9c6b.gif)
