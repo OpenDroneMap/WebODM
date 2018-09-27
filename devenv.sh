@@ -14,6 +14,7 @@ usage(){
   echo "Command list:"
   echo "	start			Start the development environment"
   echo "	stop			Stop the development environment"
+  echo "	down			Tear down the development environment"
   echo "	runtests		Run unit tests"
   exit
 }
@@ -31,6 +32,10 @@ stop(){
 	run "${__dirname}/webodm.sh stop"
 }
 
+down(){
+	run "${__dirname}/webodm.sh down"
+}
+
 runtests(){
 	run "docker-compose exec webapp /bin/bash -c \"/webodm/webodm.sh test\""
 }
@@ -41,6 +46,9 @@ if [[ $1 = "start" ]]; then
 elif [[ $1 = "stop" ]]; then
 	echo "Stopping development environment..."
 	stop
+elif [[ $1 = "down" ]]; then
+	echo "Tearing down development environment..."
+	down
 elif [[ $1 = "runtests" ]]; then
 	echo "Starting tests..."
 	runtests "$2"
