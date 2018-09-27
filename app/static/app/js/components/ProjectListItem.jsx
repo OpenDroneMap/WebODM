@@ -204,7 +204,7 @@ class ProjectListItem extends React.Component {
             this.setUploadState({
               totalCount: this.state.upload.totalCount - invalidFilesCount,
               uploading: false,
-              error: `${invalidFilesCount} files ignored. Only images (.jpg, .png) and GCP files (.txt) can be selected.`
+              error: `${invalidFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .png) and GCP files (.txt) can be uploaded. Try again.`
             });
           }
         })
