@@ -180,7 +180,8 @@ class ProjectListItem extends React.Component {
         })
         .on("completemultiple", (files) => {
           // Check
-          let success = files.length > 0 && files.filter(file => file.status !== "success").length === 0;
+          const invalidFilesCount = files.filter(file => file.status !== "success").length;
+          let success = files.length > 0 && invalidFilesCount === 0;
 
           // All files have uploaded!
           if (success){
@@ -201,8 +202,9 @@ class ProjectListItem extends React.Component {
             }
           }else{
             this.setUploadState({
+              totalCount: this.state.upload.totalCount - invalidFilesCount,
               uploading: false,
-              error: "Could not upload all files. An error occurred. Please try again."
+              error: `${invalidFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .png) and GCP files (.txt) can be uploaded. Try again.`
             });
           }
         })
