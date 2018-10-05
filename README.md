@@ -442,7 +442,7 @@ Should all work without errors.
 
 These steps are for Google Cloud, but can also be used for Amazon AWS, and other cloud platforms with small modifications:
 
-1. Launch a Google Cloud instance of Ubuntu 18.0 TLS.
+1. Launch a Google Cloud instance of Ubuntu 18.0 LTS.
 2. Open the SSH terminal - Google offers SSH via the website.
 2. Run sudo apt-get update
 3. Run sudo apt-get upgrade
