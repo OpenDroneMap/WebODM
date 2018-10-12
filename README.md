@@ -438,7 +438,7 @@ Should all work without errors.
 
 ## Run it on the cloud (Google Compute, Amazon AWS)
 
-12 steps, to have WebODM running on a cloud instance.
+11 steps, to have WebODM running on a cloud instance.
 
 These steps are for Google Cloud, but can also be used for Amazon AWS, and other cloud platforms with small modifications:
 
@@ -452,11 +452,12 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 7. cd WebODM (Linux is case sensitive)
 8. sudo ./webodm.sh start
 9. You now can access webodm via the public IP address for your google instance. Remember the default port of 8000.
-10. Open http://GooglepublicIPaddressforyourinstance:8000 
+10. Open http://GooglepublicIPaddressforyourinstance:8000
+11. Check that your instance firewall is allowing inbound TCP connections on port 8000! If you forget this step you will not be able to connect to WebODM.
 
 The WebODM Website will open, and you can proceed to create a username and password.
 
-Firewalll exclusions will need to be set, to be able to use the default TCP Port 8000 from the installation:
+Firewall exclusions will need to be set, to be able to use the default TCP Port 8000 from the installation:
 Open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
 
 
