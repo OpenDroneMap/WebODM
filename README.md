@@ -438,28 +438,23 @@ Should all work without errors.
 
 ## Run it on the cloud (Google Compute, Amazon AWS)
 
-11 steps, to have WebODM running on a cloud instance.
+12 steps, to have WebODM running on a cloud instance.
 
 These steps are for Google Cloud, but can also be used for Amazon AWS, and other cloud platforms with small modifications:
 
 1. Launch a Google Cloud instance of Ubuntu 18.0 LTS.
 2. Open the SSH terminal - Google offers SSH via the website.
-2. Run sudo apt-get update
-3. Run sudo apt-get upgrade
-4. Run sudo apt-get install docker-compose
-5. Run sudo apt-get install python-pip
-6. Run git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
-7. cd WebODM (Linux is case sensitive)
-8. sudo ./webodm.sh start
-9. You now can access webodm via the public IP address for your google instance. Remember the default port of 8000.
-10. Open http://GooglepublicIPaddressforyourinstance:8000
-11. Check that your instance firewall is allowing inbound TCP connections on port 8000! If you forget this step you will not be able to connect to WebODM.
+3. Run sudo apt-get update
+4. Run sudo apt-get upgrade
+5. Run sudo apt-get install docker-compose
+6. Run sudo apt-get install python-pip
+7. Run git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
+8. cd WebODM (Linux is case sensitive)
+9. sudo ./webodm.sh start
+10. You now can access webodm via the public IP address for your google instance. Remember the default port of 8000.
+11. Check that your instance's firewall is allowing inbound TCP connections on port 8000! If you forget this step you will not be able to connect to WebODM.
+12. Open http://GooglepublicIPaddressforyourinstance:8000
 
-The WebODM Website will open, and you can proceed to create a username and password.
-
-Firewall exclusions will need to be set, to be able to use the default TCP Port 8000 from the installation:
-Open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
-
-
+To setup the firewall on Google Cloud, open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
 
 
