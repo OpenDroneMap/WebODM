@@ -78,6 +78,8 @@ We recommend that you read the [Docker Documentation](https://docs.docker.com/) 
 
 For Windows and macOS users an [installer](https://www.webodm.org/installer) is also available.
 
+You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
+
 ### Add More Processing Nodes
 
 WebODM can be linked to one or more processing nodes running [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
