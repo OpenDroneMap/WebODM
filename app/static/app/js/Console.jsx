@@ -28,7 +28,7 @@ class Console extends React.Component {
 
   componentDidMount(){
     this.checkAutoscroll();
-    this.setupDynamicSource();    
+    this.setupDynamicSource();
   }
 
   setupDynamicSource(){
@@ -72,7 +72,7 @@ class Console extends React.Component {
 
         //Firefox requires the link to be in the body
         document.body.appendChild(link);
-        
+
         //simulate click
         link.click();
 
@@ -84,6 +84,16 @@ class Console extends React.Component {
     }
 
     saveAs("data:application/octet-stream," + encodeURIComponent(this.state.lines.join("\r\n")), filename);
+  }
+
+  copyTxt(){
+    const el = document.createElement('textarea');
+    el.value = this.state.lines.join("\r\n");
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    console.log("Task output copied to clipboard");
   }
 
   tearDownDynamicSource(){
@@ -131,8 +141,8 @@ class Console extends React.Component {
     let i = 0;
 
     return (
-      <pre className={`console prettyprint 
-          ${this.props.lang ? `lang-${this.props.lang}` : ""} 
+      <pre className={`console prettyprint
+          ${this.props.lang ? `lang-${this.props.lang}` : ""}
           ${this.props.lines ? "linenums" : ""}`}
           style={{height: (this.props.height ? this.props.height : "auto")}}
           onMouseOver={this.handleMouseOver}
@@ -151,7 +161,7 @@ class Console extends React.Component {
 
 $(function(){
     $("[data-console]").each(function(){
-        window.ReactDOM.render(<Console 
+        window.ReactDOM.render(<Console
                 lang={$(this).data("console-lang")}
                 height={$(this).data("console-height")}
                 autoscroll={typeof $(this).attr("autoscroll") !== 'undefined' && $(this).attr("autoscroll") !== false}

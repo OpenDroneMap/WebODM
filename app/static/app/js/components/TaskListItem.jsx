@@ -45,6 +45,7 @@ class TaskListItem extends React.Component {
     this.startEditing = this.startEditing.bind(this);
     this.checkForCommonErrors = this.checkForCommonErrors.bind(this);
     this.downloadTaskOutput = this.downloadTaskOutput.bind(this);
+    this.copyTaskOutput = this.copyTaskOutput.bind(this);
     this.handleEditTaskSave = this.handleEditTaskSave.bind(this);
   }
 
@@ -105,7 +106,7 @@ class TaskListItem extends React.Component {
       }else{
         console.warn("Cannot refresh task: " + json);
       }
-      
+
       this.setAutoRefresh();
     })
     .fail(( _, __, errorThrown) => {
@@ -132,7 +133,7 @@ class TaskListItem extends React.Component {
     const expanded = !this.state.expanded;
 
     this.historyNav.toggleQSListItem("project_task_expanded", this.props.data.id, expanded);
-    
+
     this.setState({
       expanded: expanded
     });
@@ -205,6 +206,10 @@ class TaskListItem extends React.Component {
     this.console.downloadTxt("task_output.txt");
   }
 
+  copyTaskOutput(){
+    this.console.copyTxt();
+  }
+
   optionsToList(options){
     if (!Array.isArray(options)) return "";
     else if (options.length === 0) return "Default";
@@ -223,15 +228,15 @@ class TaskListItem extends React.Component {
 
   checkForCommonErrors(lines){
     for (let line of lines){
-      if (line.indexOf("Killed") !== -1 || 
-          line.indexOf("MemoryError") !== -1 || 
+      if (line.indexOf("Killed") !== -1 ||
+          line.indexOf("MemoryError") !== -1 ||
           line.indexOf("std::bad_alloc") !== -1 ||
           line.indexOf("Child returned 137") !== -1 ||
           line.indexOf("loky.process_executor.TerminatedWorkerError:") !== -1 ||
           line.indexOf("Failed to allocate memory") !== -1){
         this.setState({memoryError: true});
       }else if (line.indexOf("SVD did not converge") !== -1){
-        this.setState({friendlyTaskError: `It looks like the images might have one of the following problems: 
+        this.setState({friendlyTaskError: `It looks like the images might have one of the following problems:
         <ul>
           <li>Not enough images</li>
           <li>Not enough overlap between images</li>
@@ -327,7 +332,7 @@ class TaskListItem extends React.Component {
           });
         }
       }
-      
+
       let data = {
         options: task.options
       };
@@ -373,19 +378,19 @@ class TaskListItem extends React.Component {
       let showOrthophotoMissingWarning = false,
           showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
           showTaskWarning = this.state.friendlyTaskError !== "" && task.status == statusCodes.FAILED,
-          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" && 
-                                       !showMemoryErrorWarning && 
+          showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" &&
+                                       !showMemoryErrorWarning &&
                                        !showTaskWarning &&
                                        task.status == statusCodes.FAILED,
           memoryErrorLink = this.isMacOS() ? "http://stackoverflow.com/a/39720010" : "https://docs.docker.com/docker-for-windows/#advanced";
-      
+
       let actionButtons = [];
       const addActionButton = (label, className, icon, onClick, options = {}) => {
         actionButtons.push({
           className, icon, label, onClick, options
         });
       };
-      
+
       if (task.status === statusCodes.COMPLETED){
         if (task.available_assets.indexOf("orthophoto.tif") !== -1){
           addActionButton(" View Map", "btn-primary", "fa fa-globe", () => {
@@ -394,7 +399,7 @@ class TaskListItem extends React.Component {
         }else{
           showOrthophotoMissingWarning = true;
         }
-        
+
         addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
           location.href = `/3d/project/${task.project}/task/${task.id}/`;
         });
@@ -417,10 +422,10 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node){
-          // By default restart reruns every pipeline 
+          // By default restart reruns every pipeline
           // step from the beginning
-          const rerunFrom = task.can_rerun_from.length > 1 ? 
-                              task.can_rerun_from[1] : 
+          const rerunFrom = task.can_rerun_from.length > 1 ?
+                              task.can_rerun_from[1] :
                               null;
 
           addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
@@ -436,7 +441,7 @@ class TaskListItem extends React.Component {
       const disabled = this.state.actionButtonsDisabled || !!task.pending_action;
 
       actionButtons = (<div className="action-buttons">
-            {task.status === statusCodes.COMPLETED ? 
+            {task.status === statusCodes.COMPLETED ?
               <AssetDownloadButtons task={this.state.task} disabled={disabled} />
             : ""}
             {actionButtons.map(button => {
@@ -444,18 +449,18 @@ class TaskListItem extends React.Component {
               const className = button.options.className || "";
 
               return (
-                  <div key={button.label} className={"inline-block " + 
+                  <div key={button.label} className={"inline-block " +
                                   (subItems.length > 0 ? "btn-group" : "") + " " +
                                   className}>
                     <button type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
                       <i className={button.icon}></i>
                       {button.label}
                     </button>
-                    {subItems.length > 0 && 
+                    {subItems.length > 0 &&
                       [<button key="dropdown-button"
                               disabled={disabled}
-                              type="button" 
-                              className={"btn btn-sm dropdown-toggle "  + button.className} 
+                              type="button"
+                              className={"btn btn-sm dropdown-toggle "  + button.className}
                               data-toggle="dropdown"><span className="caret"></span></button>,
                       <ul key="dropdown-menu" className="dropdown-menu">
                         {subItems.map(subItem => <li key={subItem.label}>
@@ -484,24 +489,30 @@ class TaskListItem extends React.Component {
               : ""}
               {/* TODO: List of images? */}
 
-              {showOrthophotoMissingWarning ? 
+              {showOrthophotoMissingWarning ?
               <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.</span></div> : ""}
 
             </div>
             <div className="col-md-8">
-              <Console 
-                source={this.consoleOutputUrl} 
-                refreshInterval={this.shouldRefresh() ? 3000 : undefined} 
+              <Console
+                source={this.consoleOutputUrl}
+                refreshInterval={this.shouldRefresh() ? 3000 : undefined}
                 autoscroll={true}
-                height={200} 
+                height={200}
                 ref={domNode => this.console = domNode}
                 onAddLines={this.checkForCommonErrors}
                 />
-
-              {showMemoryErrorWarning ? 
+              <a href="javascript:void(0);" onClick={this.downloadTaskOutput} class="btn btn-sm btn-primary pull-right" title="Download task output">
+                <i class="fa fa-download"></i>
+              </a>
+              <a href="javascript:void(0);" onClick={this.copyTaskOutput} class="btn btn-sm btn-primary pull-right" title="Copy task output">
+                <i class="fa fa-clipboard"></i>
+              </a>
+              <div class="clearfix"></div>
+              {showMemoryErrorWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
-              
-              {showTaskWarning ? 
+
+              {showTaskWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span dangerouslySetInnerHTML={{__html: this.state.friendlyTaskError}} /></div> : ""}
 
               {showExitedWithCodeOneHints ?
@@ -510,7 +521,7 @@ class TaskListItem extends React.Component {
                   <ul>
                     <li>Increase the <b>min-num-features</b> option, especially if your images have lots of vegetation</li>
                   </ul>
-                  Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making 
+                  Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making
                   sure to include a <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>copy of your task's output</a> (the one you see above <i className="fa fa-arrow-up"></i>, click to <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>download</a> it). Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>
                 </div>
               </div>
@@ -565,12 +576,12 @@ class TaskListItem extends React.Component {
           </div>
           <div className="col-sm-1 details">
             <i className="fa fa-image"></i> {task.images_count}
-          </div> 
+          </div>
           <div className="col-sm-2 details">
             <i className="fa fa-clock-o"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
           <div className="col-sm-3">
-            {showEditLink ? 
+            {showEditLink ?
               <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
               : statusLabel}
           </div>
