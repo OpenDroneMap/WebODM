@@ -42,7 +42,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
  - [Pip](https://pypi.python.org/pypi/pip/)
  - [Git](https://git-scm.com/downloads)
 
-* Windows users have a choice between Docker Toolbox (older product but more tutorials available) and Docker for Windows (more recent version that runs on Microsoft's Hyper-V virtualization engine, recommended by Docker). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes) . 
+* Windows users have a choice between Docker Toolbox (Windows 10 Home or older) and Docker for Windows (Windows 10 Pro or newer). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes). 
 
 * From the Docker Quickstart Terminal or Powershell (Windows), or from the command line (Mac / Linux), type:
 ```bash
