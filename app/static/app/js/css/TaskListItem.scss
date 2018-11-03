@@ -96,4 +96,14 @@
     .inline{
         display: inline;
     }
+
+    .console-buttons{
+        margin-left: 16px;
+        margin-bottom: 16px;
+        float: right;
+        text-align: right;
+        a{
+            margin-left: 4px;
+        }
+    }
 }

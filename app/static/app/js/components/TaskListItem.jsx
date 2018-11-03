@@ -70,7 +70,10 @@ class TaskListItem extends React.Component {
   }
 
   unloadTimer(){
-    if (this.processingTimeInterval) clearInterval(this.processingTimeInterval);
+    if (this.processingTimeInterval){
+        clearInterval(this.processingTimeInterval);
+        this.processingTimeInterval = null;
+    }
     if (this.state.task.processing_time) this.setState({time: this.state.task.processing_time});
   }
 
@@ -235,7 +238,8 @@ class TaskListItem extends React.Component {
           line.indexOf("loky.process_executor.TerminatedWorkerError:") !== -1 ||
           line.indexOf("Failed to allocate memory") !== -1){
         this.setState({memoryError: true});
-      }else if (line.indexOf("SVD did not converge") !== -1){
+      }else if (line.indexOf("SVD did not converge") !== -1 || 
+                line.indexOf("0 partial reconstructions in total") !== -1){
         this.setState({friendlyTaskError: `It looks like the images might have one of the following problems:
         <ul>
           <li>Not enough images</li>
@@ -502,13 +506,16 @@ class TaskListItem extends React.Component {
                 ref={domNode => this.console = domNode}
                 onAddLines={this.checkForCommonErrors}
                 />
-              <a href="javascript:void(0);" onClick={this.downloadTaskOutput} class="btn btn-sm btn-primary pull-right" title="Download task output">
-                <i class="fa fa-download"></i>
-              </a>
-              <a href="javascript:void(0);" onClick={this.copyTaskOutput} class="btn btn-sm btn-primary pull-right" title="Copy task output">
-                <i class="fa fa-clipboard"></i>
-              </a>
-              <div class="clearfix"></div>
+
+              <div className="console-buttons">
+                <a href="javascript:void(0);" onClick={this.downloadTaskOutput} className="btn btn-sm btn-primary" title="Download Task Output">
+                    <i className="fa fa-download"></i>
+                </a>
+                <a href="javascript:void(0);" onClick={this.copyTaskOutput} className="btn btn-sm btn-primary" title="Copy Task Output">
+                    <i className="fa fa-clipboard"></i>
+                </a>
+              </div>
+
               {showMemoryErrorWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
 
@@ -528,7 +535,7 @@ class TaskListItem extends React.Component {
               : ""}
             </div>
           </div>
-          <div className="row">
+          <div className="row clearfix">
             <ErrorMessage bind={[this, 'actionError']} />
             {actionButtons}
           </div>
