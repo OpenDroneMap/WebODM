@@ -235,7 +235,8 @@ class TaskListItem extends React.Component {
           line.indexOf("loky.process_executor.TerminatedWorkerError:") !== -1 ||
           line.indexOf("Failed to allocate memory") !== -1){
         this.setState({memoryError: true});
-      }else if (line.indexOf("SVD did not converge") !== -1){
+      }else if (line.indexOf("SVD did not converge") !== -1 || 
+                line.indexOf("0 partial reconstructions in total") !== -1){
         this.setState({friendlyTaskError: `It looks like the images might have one of the following problems:
         <ul>
           <li>Not enough images</li>
@@ -531,7 +532,7 @@ class TaskListItem extends React.Component {
               : ""}
             </div>
           </div>
-          <div className="row">
+          <div className="row clearfix">
             <ErrorMessage bind={[this, 'actionError']} />
             {actionButtons}
           </div>
