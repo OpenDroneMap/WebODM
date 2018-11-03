@@ -502,13 +502,16 @@ class TaskListItem extends React.Component {
                 ref={domNode => this.console = domNode}
                 onAddLines={this.checkForCommonErrors}
                 />
-              <a href="javascript:void(0);" onClick={this.downloadTaskOutput} class="btn btn-sm btn-primary pull-right" title="Download task output">
-                <i class="fa fa-download"></i>
-              </a>
-              <a href="javascript:void(0);" onClick={this.copyTaskOutput} class="btn btn-sm btn-primary pull-right" title="Copy task output">
-                <i class="fa fa-clipboard"></i>
-              </a>
-              <div class="clearfix"></div>
+
+              <div className="console-buttons">
+                <a href="javascript:void(0);" onClick={this.downloadTaskOutput} className="btn btn-sm btn-primary" title="Download Task Output">
+                    <i className="fa fa-download"></i>
+                </a>
+                <a href="javascript:void(0);" onClick={this.copyTaskOutput} className="btn btn-sm btn-primary" title="Copy Task Output">
+                    <i className="fa fa-clipboard"></i>
+                </a>
+              </div>
+
               {showMemoryErrorWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
 
