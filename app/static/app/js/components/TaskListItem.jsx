@@ -70,7 +70,10 @@ class TaskListItem extends React.Component {
   }
 
   unloadTimer(){
-    if (this.processingTimeInterval) clearInterval(this.processingTimeInterval);
+    if (this.processingTimeInterval){
+        clearInterval(this.processingTimeInterval);
+        this.processingTimeInterval = null;
+    }
     if (this.state.task.processing_time) this.setState({time: this.state.task.processing_time});
   }
 
