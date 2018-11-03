@@ -38,7 +38,7 @@ class Gcp{
             }
 
             let extra = extracols.length > 0 ? ' ' + extracols.join(' ') : '';
-            output += `${x} ${y} ${z} ${px.toFixed(2)} ${py.toFixed(2)} ${imagename}${extra}\n`;
+            output += `${x} ${y} ${z} ${px.toFixed(8)} ${py.toFixed(8)} ${imagename}${extra}\n`;
           }else{
             if (!muteWarnings) console.warn(`Invalid GCP format at line ${i}: ${line}`);
             output += line + '\n';
