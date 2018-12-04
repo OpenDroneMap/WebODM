@@ -17,13 +17,13 @@ class ApiClient:
         self.timeout = timeout
 
     def url(self, url, query = {}):
-        netloc = self.host if self.port == 80 else "{}:{}".format(self.host, self.port)
+        netloc = self.host if (self.port == 80 or self.port == 443) else "{}:{}".format(self.host, self.port)
+        proto = 'https' if self.port == 443 else 'http'
 
         if len(self.token) > 0:
             query['token'] = self.token
 
-        # TODO: https support
-        return urlunparse(('http', netloc, url, '', urlencode(query), ''))
+        return urlunparse((proto, netloc, url, '', urlencode(query), ''))
 
     def info(self):
         return requests.get(self.url('/info'), timeout=self.timeout).json()

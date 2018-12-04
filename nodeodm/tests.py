@@ -157,6 +157,10 @@ class TestClientApi(TestCase):
         # Task has been deleted
         self.assertRaises(ProcessingError, online_node.get_task_info, uuid)
 
+        # Test URL building for HTTPS
+        sslApi = ApiClient("localhost", 443, 'abc')
+        self.assertEqual(sslApi.url('/info'), 'https://localhost/info?token=abc')
+
     def test_find_best_available_node_and_is_online(self):
         # Fixtures are all offline
         self.assertTrue(ProcessingNode.find_best_available_node() is None)
