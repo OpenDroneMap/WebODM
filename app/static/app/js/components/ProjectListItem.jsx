@@ -79,7 +79,8 @@ class ProjectListItem extends React.Component {
       progress: 0,
       totalCount: 0,
       totalBytes: 0,
-      totalBytesSent: 0
+      totalBytesSent: 0,
+      lastUpdated: 0
     };
   }
 
@@ -152,9 +153,18 @@ class ProjectListItem extends React.Component {
       });
 
       this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
-          this.setUploadState({
-            progress, totalBytes, totalBytesSent
-          });
+          // Limit updates since this gets called a lot
+          let now = (new Date()).getTime();
+
+          // Progress 100 is sent multiple times at the end
+          // this makes it so that we update the state only once.
+          if (progress === 100) now = now + 9999999999;
+
+          if (this.state.upload.lastUpdated + 500 < now){
+              this.setUploadState({
+                progress, totalBytes, totalBytesSent, lastUpdated: now
+              });
+          }
         })
         .on("addedfiles", files => {
           this.setUploadState({
@@ -164,7 +174,7 @@ class ProjectListItem extends React.Component {
         })
         .on("transformcompleted", (file, total) => {
           if (this.dz._resizeMap) this.dz._resizeMap[file.name] = this.dz._taskInfo.resizeSize / Math.max(file.width, file.height);
-          this.setUploadState({resizedImages: total});
+          if (this.dz.options.resizeWidth) this.setUploadState({resizedImages: total});
         })
         .on("transformstart", (files) => {
           if (this.dz.options.resizeWidth){

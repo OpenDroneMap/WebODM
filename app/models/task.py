@@ -334,7 +334,9 @@ class Task(models.Model):
                     images = [image.path() for image in self.imageupload_set.all()]
 
                     def callback(progress):
-                        logger.info(progress)
+                        # TODO: add step_progress field in task to track progress
+                        pass
+
 
                     # This takes a while
                     uuid = self.processing_node.process_new_task(images, self.name, self.options, callback)
