@@ -11,6 +11,7 @@
     "api_version": "1.0.1",
     "last_refreshed": "2017-03-01T21:14:49.918276Z",
     "queue_count": 0,
+    "max_images": null,
     "available_options": [
         {
             "help": "Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9",
@@ -34,6 +35,7 @@ port | int | Port
 api_version | string | Version of NodeODM currently running
 last_refreshed | string | Date and time this node was last seen online. This value is typically refreshed every 15-30 seconds and is used to decide whether a node is offline or not
 queue_count | int | Number of [Task](#task) items currently being processed/queued on this node.
+max_images | int | Optional maximum number of images this processing node can accept. null indicates no limit.
 available_options | JSON[] | JSON-encoded list of options that this node is capable of handling. See [Available Options](#available-options) for more information
 
 
@@ -83,6 +85,7 @@ hostname | | "" | Filter by hostname
 port | | "" | Filter by port
 api_version | | "" | Filter by API version
 queue_count | | "" | Filter by queue count
+max_images | | "" | Filter by max images
 ordering | | "" | Ordering field to sort results by
 has_available_options | | "" | Return only processing nodes that have a valid set of processing options (check that the `available_options` field is populated). Either `true` or `false`.
 
