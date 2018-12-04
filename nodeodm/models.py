@@ -99,7 +99,7 @@ class ProcessingNode(models.Model):
         return json.dumps(self.available_options, **kwargs)
 
     @api
-    def process_new_task(self, images, name=None, options=[]):
+    def process_new_task(self, images, name=None, options=[], progress_callback=None):
         """
         Sends a set of images (and optional GCP file) via the API
         to start processing.
@@ -107,6 +107,7 @@ class ProcessingNode(models.Model):
         :param images: list of path images
         :param name: name of the task
         :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
+        :param progress_callback: optional callback invoked during the upload images process to be used to report status.
 
         :returns UUID of the newly created task
         """
@@ -114,7 +115,7 @@ class ProcessingNode(models.Model):
 
         api_client = self.api_client()
         try:
-            result = api_client.new_task(images, name, options)
+            result = api_client.new_task(images, name, options, progress_callback)
         except requests.exceptions.ConnectionError as e:
             raise ProcessingError(e)
 

@@ -2,12 +2,55 @@
 An interface to NodeODM's API
 https://github.com/pierotofy/NodeODM/blob/master/docs/index.adoc
 """
+from requests.packages.urllib3.fields import RequestField
+from requests_toolbelt.multipart import encoder
 import requests
 import mimetypes
 import json
 import os
 from urllib.parse import urlunparse, urlencode
 from app.testwatch import TestWatch
+
+# Extends class to support multipart form data
+# fields with the same name
+# https://github.com/requests/toolbelt/issues/225
+class MultipartEncoder(encoder.MultipartEncoder):
+    """Multiple files with the same name support, i.e. files[]"""
+
+    def _iter_fields(self):
+        _fields = self.fields
+        if hasattr(self.fields, 'items'):
+            _fields = list(self.fields.items())
+        for k, v in _fields:
+            for field in self._iter_field(k, v):
+                yield field
+
+    @classmethod
+    def _iter_field(cls, field_name, field):
+        file_name = None
+        file_type = None
+        file_headers = None
+        if field and isinstance(field, (list, tuple)):
+            if all([isinstance(f, (list, tuple)) for f in field]):
+                for f in field:
+                    yield next(cls._iter_field(field_name, f))
+                else:
+                    raise StopIteration()
+            if len(field) == 2:
+                file_name, file_pointer = field
+            elif len(field) == 3:
+                file_name, file_pointer, file_type = field
+            else:
+                file_name, file_pointer, file_type, file_headers = field
+        else:
+            file_pointer = field
+
+        field = RequestField(name=field_name,
+                             data=file_pointer,
+                             filename=file_name,
+                             headers=file_headers)
+        field.make_multipart(content_type=file_type)
+        yield field
 
 class ApiClient:
     def __init__(self, host, port, token = "", timeout=30):
@@ -56,12 +99,13 @@ class ApiClient:
         else:
             return res
 
-    def new_task(self, images, name=None, options=[]):
+    def new_task(self, images, name=None, options=[], progress_callback=None):
         """
         Starts processing of a new task
         :param images: list of path images
         :param name: name of the task
         :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
+        :param progress_callback: optional callback invoked during the upload images process to be used to report status.
         :return: UUID or error
         """
 
@@ -72,9 +116,24 @@ class ApiClient:
             with open(path, 'rb') as f:
                 return f.read()
 
-        files = [('images',
-                  (os.path.basename(image), read_file(image), (mimetypes.guess_type(image)[0] or "image/jpg"))
-                 ) for image in images]
+        fields = {
+            'name': name,
+            'options': json.dumps(options),
+            'images': [(os.path.basename(image), read_file(image), (mimetypes.guess_type(image)[0] or "image/jpg")) for image in images]
+        }
+
+        def create_callback(mpe):
+            total_bytes = mpe.len
+
+            def callback(monitor):
+                if progress_callback is not None and total_bytes > 0:
+                    progress_callback(monitor.bytes_read / total_bytes)
+
+            return callback
+
+        e = MultipartEncoder(fields=fields)
+        m = encoder.MultipartEncoderMonitor(e, create_callback(e))
+
         return requests.post(self.url("/task/new"),
-                             files=files,
-                             data={'name': name, 'options': json.dumps(options)}).json()
+                             data=m,
+                             headers={'Content-Type': m.content_type}).json()

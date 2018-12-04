@@ -4,3 +4,6 @@ services:
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh --create-default-pnode --setup-devenv\""
     volumes:
       - .:/webodm
+  worker:
+    volumes:
+      - .:/webodm
