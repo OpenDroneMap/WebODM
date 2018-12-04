@@ -474,13 +474,16 @@ class TaskListItem extends React.Component {
                   </div>);
             })}
           </div>);
-
+    
       expanded = (
         <div className="expanded-panel">
           <div className="row">
             <div className="col-md-4 no-padding">
               <div className="labels">
                 <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
+              </div>
+              <div className="labels">
+                  <strong>Processing Node: </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
               </div>
               {status ? <div className="labels">
                   <strong>Status: </strong> {status}<br/>

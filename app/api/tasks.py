@@ -24,8 +24,15 @@ class TaskIDsSerializer(serializers.BaseSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
+    processing_node_name = serializers.SerializerMethodField()
     images_count = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
+
+    def get_processing_node_name(self, obj):
+        if obj.processing_node is not None:
+            return str(obj.processing_node)
+        else:
+            return None
 
     def get_images_count(self, obj):
         return obj.imageupload_set.count()

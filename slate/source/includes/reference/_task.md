@@ -7,6 +7,7 @@
   "id": 134,
   "project": 27,
   "processing_node": 10,
+  "processing_node_name": "localhost:3000",
   "images_count": 48,
   "can_rerun_from": [],
   "available_assets": [
@@ -43,6 +44,7 @@ Field | Type | Description
 id | int | Unique identifier
 project | int | [Project](#project) ID the task belongs to
 processing_node | int | The ID of the [Processing Node](#processing-node) this task has been assigned to, or `null` if no [Processing Node](#processing-node) has been assigned.
+processing_node_name | string | The name of the processing node below, or `null` if no [Processing Node](#processing-node) has been assigned.
 images_count | int | Number of images
 can_rerun_from | string[] | List of possible "rerun-from" options that this task could restart from, given its currently assigned processing node. If this is an empty list, the task can only be restarted from the start of the pipeline.
 available_assets | string[] | List of [assets](#download-assets) available for download 
@@ -91,6 +93,7 @@ Parameters are the same as above.
         "id": 6,
         "project": 2,
         "processing_node": 2,
+        "processing_node_name": "localhost:3000",
         "images_count": 89,
         "uuid": "2e8b687d-c269-4e2f-91b3-5a2cd51b5321",
         "name": "Test name",
