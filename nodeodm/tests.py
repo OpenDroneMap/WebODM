@@ -215,10 +215,10 @@ class TestClientApi(TestCase):
 
         self.assertTrue(online_node.update_node_info(), "Could update info")
 
-        # Can always call info(), options() (even without valid tokens)
+        # Cannot call info(), options()  without tokens
         api.token = "invalid"
-        self.assertTrue(type(api.info()['version']) == str)
-        self.assertTrue(len(api.options()) > 0)
+        self.assertTrue(type(api.info()['error']) == str)
+        self.assertTrue(type(api.options()['error']) == str)
 
         # Cannot call new_task() without token
         import glob

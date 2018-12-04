@@ -70,6 +70,9 @@ class ProcessingNode(models.Model):
         api_client = self.api_client(timeout=5)
         try:
             info = api_client.info()
+            if 'error' in info:
+                return False
+
             self.api_version = info['version']
             self.queue_count = info['taskQueueCount']
 
