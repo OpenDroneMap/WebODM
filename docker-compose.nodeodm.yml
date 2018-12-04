@@ -9,7 +9,7 @@ services:
     depends_on:
       - node-odm-1
   node-odm-1:
-    image: opendronemap/node-opendronemap
+    image: opendronemap/nodeodm
     container_name: node-odm-1
     ports:
       - "3000"

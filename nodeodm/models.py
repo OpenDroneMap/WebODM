@@ -189,7 +189,7 @@ class ProcessingNode(models.Model):
     def handle_generic_post_response(result):
         """
         Handles a POST response that has either a "success" flag, or an error message.
-        This is a common response in node-OpenDroneMap POST calls.
+        This is a common response in NodeODM POST calls.
         :param result: result of API call
         :return: True on success, raises ProcessingException otherwise
         """

@@ -21,7 +21,7 @@ class TestClientApi(TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestClientApi, cls).setUpClass()
-        cls.node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False, cwd=path.join(current_dir, "external", "node-OpenDroneMap"))
+        cls.node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False, cwd=path.join(current_dir, "external", "NodeODM"))
         time.sleep(2) # Wait for the server to launch
 
 
@@ -191,7 +191,7 @@ class TestClientApi(TestCase):
     def test_token_auth(self):
         node_odm = subprocess.Popen(
             ['node', 'index.js', '--port', '11224', '--token', 'test_token', '--test'], shell=False,
-            cwd=path.join(current_dir, "external", "node-OpenDroneMap"))
+            cwd=path.join(current_dir, "external", "NodeODM"))
         time.sleep(2)
 
         def wait_for_status(api, uuid, status, num_retries=10, error_description="Failed to wait for status"):

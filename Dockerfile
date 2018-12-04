@@ -32,7 +32,7 @@ RUN ln -s /webodm/nginx/crontab /etc/cron.d/nginx-cron && chmod 0644 /webodm/ngi
 
 RUN git submodule update --init
 
-WORKDIR /webodm/nodeodm/external/node-OpenDroneMap
+WORKDIR /webodm/nodeodm/external/NodeODM
 RUN npm install --quiet
 
 WORKDIR /webodm

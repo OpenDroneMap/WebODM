@@ -43,7 +43,7 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     
     echo Setup npm dependencies...
     npm install
-    cd nodeodm/external/node-OpenDroneMap
+    cd nodeodm/external/NodeODM
     npm install
     cd /webodm
 

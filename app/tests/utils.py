@@ -18,7 +18,7 @@ logger = logging.getLogger('app.logger')
 def start_processing_node(*args):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'] + list(args), shell=False,
-                                cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
+                                cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "NodeODM"))
     time.sleep(2)  # Wait for the server to launch
     return node_odm
 

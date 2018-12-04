@@ -39,7 +39,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
         TODO: this could be improved by returning an empty array if a task was created
         and purged by the processing node (which would require knowing how long a task is being kept
-        see https://github.com/OpenDroneMap/node-OpenDroneMap/issues/32
+        see https://github.com/OpenDroneMap/NodeODM/issues/32
         :return: array of valid rerun-from parameters
         """
         if obj.processing_node is not None:

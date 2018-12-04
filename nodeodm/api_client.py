@@ -1,6 +1,6 @@
 """
-An interface to node-OpenDroneMap's API
-https://github.com/pierotofy/node-OpenDroneMap/blob/master/docs/index.adoc
+An interface to NodeODM's API
+https://github.com/pierotofy/NodeODM/blob/master/docs/index.adoc
 """
 import requests
 import mimetypes
