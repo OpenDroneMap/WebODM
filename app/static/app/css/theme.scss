@@ -131,6 +131,14 @@ a, a:hover, a:focus{
 	}
 }
 
+.theme-color-button-danger{
+    color: theme("button_danger");
+}
+
+.theme-color-button-primary{
+    color: theme("button_primary");
+}
+
 /* Header background */
 #navbar-top{
 	background-color: theme("header_background");
@@ -203,7 +211,6 @@ pre.prettyprint,
 .task-list-item .status-label.error, .theme-background-failed{
 	background-color: theme("failed");
 }
-
 
 /* ModelView.jsx specific */
 .model-view #potree_sidebar_container {
