@@ -24,6 +24,8 @@ class Console extends React.Component {
     this.setRef = this.setRef.bind(this);
     this.handleMouseOver = this.handleMouseOver.bind(this);
     this.handleMouseOut = this.handleMouseOut.bind(this);
+    this.downloadTxt = this.downloadTxt.bind(this);
+    this.copyTxt = this.copyTxt.bind(this);
   }
 
   componentDidMount(){
@@ -64,6 +66,7 @@ class Console extends React.Component {
   }
 
   downloadTxt(filename="console.txt"){
+      console.log(filename);
     function saveAs(uri, filename) {
       let link = document.createElement('a');
       if (typeof link.download === 'string') {
@@ -93,7 +96,7 @@ class Console extends React.Component {
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    console.log("Task output copied to clipboard");
+    console.log("Output copied to clipboard");
   }
 
   tearDownDynamicSource(){
@@ -140,22 +143,41 @@ class Console extends React.Component {
     }
     let i = 0;
 
-    return (
-      <pre className={`console prettyprint
-          ${this.props.lang ? `lang-${this.props.lang}` : ""}
-          ${this.props.lines ? "linenums" : ""}`}
-          style={{height: (this.props.height ? this.props.height : "auto")}}
-          onMouseOver={this.handleMouseOver}
-          onMouseOut={this.handleMouseOut}
-          ref={this.setRef}
-        >
-        {this.state.lines.map(line => {
-          if (this.props.lang) return (<div key={i++} dangerouslySetInnerHTML={prettyLine(line)}></div>);
-          else return line + "\n";
-        })}
-        {"\n"}
-      </pre>
-    );
+    let lines = this.state.lines;
+    if (this.props.maximumLines && lines.length > this.props.maximumLines){
+        lines = lines.slice(-this.props.maximumLines);
+        lines.unshift(`... output truncated at ${this.props.maximumLines} lines ...`);
+    }
+
+    const items = [
+        <pre key="console" className={`console prettyprint
+            ${this.props.lang ? `lang-${this.props.lang}` : ""}
+            ${this.props.lines ? "linenums" : ""}
+            ${this.props.className || ""}`}
+            style={{height: (this.props.height ? this.props.height : "auto")}}
+            onMouseOver={this.handleMouseOver}
+            onMouseOut={this.handleMouseOut}
+            ref={this.setRef}
+            >
+            {lines.map(line => {
+            if (this.props.lang) return (<div key={i++} dangerouslySetInnerHTML={prettyLine(line)}></div>);
+            else return line + "\n";
+            })}
+            {"\n"}
+        </pre>];
+
+    if (this.props.showConsoleButtons){
+        items.push(<div key="buttons" className="console-buttons">
+            <a href="javascript:void(0);" onClick={() => this.downloadTxt()} className="btn btn-sm btn-primary" title="Download To File">
+                <i className="fa fa-download"></i>
+            </a>
+            <a href="javascript:void(0);" onClick={this.copyTxt} className="btn btn-sm btn-primary" title="Copy To Clipboard">
+                <i className="fa fa-clipboard"></i>
+            </a>
+        </div>);
+    }
+
+    return items;
   }
 }
 

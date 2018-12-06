@@ -97,13 +97,23 @@
         display: inline;
     }
 
-    .console-buttons{
-        margin-left: 16px;
-        margin-bottom: 16px;
-        float: right;
-        text-align: right;
+    .switch-view{
+        margin-bottom: 8px;
+        font-size: 90%;
+        
         a{
-            margin-left: 4px;
+            margin-right: 8px;
+            &.selected{
+                font-weight: bold;
+            }
+            &:last-child{
+                margin-right: 0;
+            }
+        }
+
+        i{
+            margin-left: 8px;
         }
     }
+
 }

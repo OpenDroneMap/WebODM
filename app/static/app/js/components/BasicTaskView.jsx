@@ -1,0 +1,198 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import '../css/BasicTaskView.scss';
+import update from 'immutability-helper';
+import RerunFromParams from '../classes/RerunFromParams';
+import StatusCodes from '../classes/StatusCodes';
+import $ from 'jquery';
+
+class BasicTaskView extends React.Component {
+    static defaultProps = {};
+
+    static propTypes = {
+        source: PropTypes.oneOfType([
+            PropTypes.string.isRequired,
+            PropTypes.func.isRequired
+        ]),
+        taskStatus: PropTypes.number,
+        onAddLines: PropTypes.func
+    };
+
+    constructor(props){
+        super();
+
+        this.state = {
+            lines: [],
+            currentRf: 0,
+            rf: RerunFromParams.get()
+        };
+
+        // Add a post processing step
+        this.state.rf.push({
+            action: "postprocessing",
+            label: "Post Processing",
+            icon: "fa fa-file-archive-o",
+            beginsWith: "Running ODM OrthoPhoto Cell - Finished",
+            endsWith: null
+        });
+
+        this.addLines = this.addLines.bind(this);
+        this.setupDynamicSource = this.setupDynamicSource.bind(this);
+        this.reset = this.reset.bind(this);
+        this.tearDownDynamicSource = this.tearDownDynamicSource.bind(this);
+        this.getRfEndStatus = this.getRfEndStatus.bind(this);
+        this.getRfRunningStatus = this.getRfRunningStatus.bind(this);
+        this.suffixFor = this.suffixFor.bind(this);
+        this.updateRfState = this.updateRfState.bind(this);
+        this.getInitialStatus = this.getInitialStatus.bind(this);
+    }
+
+    componentDidMount(){
+        this.reset();
+    }
+
+    setupDynamicSource(){
+        const updateFromSource = () => {
+            let sourceUrl = typeof this.props.source === 'function' ?
+                            this.props.source(this.state.lines.length) :
+                            this.props.source;
+
+            // Fetch
+            this.sourceRequest = $.get(sourceUrl, text => {
+                    if (text !== ""){
+                        let lines = text.split("\n");
+                        this.addLines(lines);
+                    }
+                })
+                .always((_, textStatus) => {
+                    if (textStatus !== "abort" && this.props.refreshInterval !== undefined){
+                        this.sourceTimeout = setTimeout(updateFromSource, this.props.refreshInterval);
+                    }
+                });
+        };
+
+        updateFromSource();
+    }
+
+    getRfEndStatus(){
+        return this.props.taskStatus === StatusCodes.COMPLETED ? 
+                'completed' : 
+                'errored';
+    }
+
+    getRfRunningStatus(){
+        return [StatusCodes.RUNNING, StatusCodes.QUEUED].indexOf(this.props.taskStatus) !== -1 ?
+                                        'running' :
+                                        'errored';
+    }
+
+    getInitialStatus(){
+        if ([StatusCodes.QUEUED, StatusCodes.RUNNING].indexOf(this.props.taskStatus) !== -1){
+            return 'queued';
+        }else{
+            return this.getRfEndStatus();
+        }
+    }
+
+    reset(){
+        this.state.rf.forEach(p => {
+            p.state = this.getInitialStatus();
+        });
+
+        this.tearDownDynamicSource();
+        this.setState({lines: [], currentRf: 0});
+        this.setupDynamicSource();
+    }
+
+    tearDownDynamicSource(){
+        if (this.sourceTimeout) clearTimeout(this.sourceTimeout);
+        if (this.sourceRequest) this.sourceRequest.abort();
+    }
+
+    componentDidUpdate(prevProps){
+        let taskFailed = [StatusCodes.RUNNING, StatusCodes.QUEUED].indexOf(prevProps.taskStatus) !== -1 && 
+                         [StatusCodes.FAILED, StatusCodes.CANCELED].indexOf(this.props.taskStatus) !== -1;
+        this.updateRfState(taskFailed);
+    }
+
+    componentWillUnmount(){
+        this.tearDownDynamicSource();
+    }
+
+    addLines(lines){
+        if (!Array.isArray(lines)) lines = [lines];
+
+        let currentRf = this.state.currentRf;
+
+        const updateRf = (rfIndex, line) => {
+            const current = this.state.rf[rfIndex];
+            if (!current) return;
+
+            if (current.beginsWith && line.endsWith(current.beginsWith)){
+                current.state = this.getRfRunningStatus();
+                
+                // Set previous as done
+                if (this.state.rf[rfIndex - 1]){
+                    this.state.rf[rfIndex - 1].state = 'completed';
+                }
+            }else if (current.endsWith && line.endsWith(current.endsWith)){
+                current.state = this.getRfEndStatus();
+                
+                // Check next
+                updateRf(rfIndex + 1, line);
+
+                currentRf = rfIndex + 1;
+            }
+        };
+
+        lines.forEach(line => {
+            updateRf(currentRf, line);
+        });
+
+        this.setState(update(this.state, {
+            lines: {$push: lines}
+        }));
+        this.setState({
+            rf: this.state.rf,
+            currentRf
+        });
+        this.updateRfState();
+
+        if (this.props.onAddLines) this.props.onAddLines(lines);
+    }
+
+    updateRfState(taskFailed){
+        // If the task has just failed, update all items that were either running or in queued state
+        if (taskFailed){
+            this.state.rf.forEach(p => {
+                if (p.state === 'queued' || p.state === 'running') p.state = this.getInitialStatus();
+            });
+        }
+
+        // The last is always dependent on the task status
+        this.state.rf[this.state.rf.length - 1].state = this.getInitialStatus();
+
+    }
+
+    suffixFor(state){
+        if (state === 'running'){
+            return (<span>...</span>);
+        }else if (state === 'completed'){
+            return (<i className="fa fa-check"></i>);
+        }else if (state === 'errored'){
+            return (<i className="fa fa-times"></i>);
+        }
+    }
+
+    render() {
+        return (<div className="basic-task-view">
+            {this.state.rf.map(p => {
+                return (<div key={p.action} className={p.state + " processing-step"}>
+                    <i className={p.icon + " fa-fw"}></i> {p.label} {this.suffixFor(p.state)}
+                </div>);
+            })}
+        </div>);
+    }
+}
+
+export default BasicTaskView;

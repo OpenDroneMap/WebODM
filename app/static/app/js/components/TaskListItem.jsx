@@ -9,6 +9,8 @@ import AssetDownloadButtons from './AssetDownloadButtons';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import TaskPluginActionButtons from './TaskPluginActionButtons';
+import RerunFromParams from '../classes/RerunFromParams';
+import BasicTaskView from './BasicTaskView';
 
 class TaskListItem extends React.Component {
   static propTypes = {
@@ -32,7 +34,8 @@ class TaskListItem extends React.Component {
       editing: false,
       memoryError: false,
       friendlyTaskError: "",
-      pluginActionButtons: []
+      pluginActionButtons: [],
+      view: "basic"
     }
 
     for (let k in props.data){
@@ -44,9 +47,8 @@ class TaskListItem extends React.Component {
     this.stopEditing = this.stopEditing.bind(this);
     this.startEditing = this.startEditing.bind(this);
     this.checkForCommonErrors = this.checkForCommonErrors.bind(this);
-    this.downloadTaskOutput = this.downloadTaskOutput.bind(this);
-    this.copyTaskOutput = this.copyTaskOutput.bind(this);
     this.handleEditTaskSave = this.handleEditTaskSave.bind(this);
+    this.setView = this.setView.bind(this);
   }
 
   shouldRefresh(){
@@ -67,6 +69,12 @@ class TaskListItem extends React.Component {
         this.setState({time: this.state.time += 1000});
       }, 1000);
     }
+  }
+
+  setView(type){
+      return () => {
+          this.setState({view: type});
+      }
   }
 
   unloadTimer(){
@@ -96,6 +104,7 @@ class TaskListItem extends React.Component {
         if (oldStatus !== this.state.task.status){
           if (this.state.task.status === statusCodes.RUNNING){
             if (this.console) this.console.clear();
+            if (this.basicView) this.basicView.reset();
             this.loadTimer(this.state.task.processing_time);
           }else{
             this.setState({time: this.state.task.processing_time});
@@ -205,14 +214,6 @@ class TaskListItem extends React.Component {
     };
   }
 
-  downloadTaskOutput(){
-    this.console.downloadTxt("task_output.txt");
-  }
-
-  copyTaskOutput(){
-    this.console.copyTxt();
-  }
-
   optionsToList(options){
     if (!Array.isArray(options)) return "";
     else if (options.length === 0) return "Default";
@@ -269,35 +270,13 @@ class TaskListItem extends React.Component {
     const { task } = this.state;
 
     // Map rerun-from parameters to display items
-    const rfMap = {
-      "odm_meshing": {
-        label: "From Meshing",
-        icon: "fa fa-cube"
-      },
-
-      "mvs_texturing": {
-        label: "From Texturing",
-        icon: "fa fa-connectdevelop"
-      },
-
-      "odm_georeferencing": {
-        label: "From Georeferencing",
-        icon: "fa fa-globe"
-      },
-
-      "odm_dem": {
-        label: "From DEM",
-        icon: "fa fa-area-chart"
-      },
-
-      "odm_orthophoto": {
-        label: "From Orthophoto",
-        icon: "fa fa-map-o"
-      }
-    };
+    // (remove the first item so that 'dataset' is not displayed)
+    const rfMap = {};
+    RerunFromParams.get().slice(1).forEach(rf => rfMap[rf.action] = rf);
 
     // Create onClick handlers
     for (let rfParam in rfMap){
+      rfMap[rfParam].label = "From " + rfMap[rfParam].label;
       rfMap[rfParam].onClick = this.genRestartAction(rfParam);
     }
 
@@ -468,7 +447,7 @@ class TaskListItem extends React.Component {
                               data-toggle="dropdown"><span className="caret"></span></button>,
                       <ul key="dropdown-menu" className="dropdown-menu">
                         {subItems.map(subItem => <li key={subItem.label}>
-                            <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon}></i>{subItem.label}</a>
+                            <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon + ' fa-fw '}></i>{subItem.label}</a>
                           </li>)}
                       </ul>]}
                   </div>);
@@ -501,23 +480,35 @@ class TaskListItem extends React.Component {
 
             </div>
             <div className="col-md-8">
-              <Console
-                source={this.consoleOutputUrl}
-                refreshInterval={this.shouldRefresh() ? 3000 : undefined}
-                autoscroll={true}
-                height={200}
-                ref={domNode => this.console = domNode}
-                onAddLines={this.checkForCommonErrors}
-                />
-
-              <div className="console-buttons">
-                <a href="javascript:void(0);" onClick={this.downloadTaskOutput} className="btn btn-sm btn-primary" title="Download Task Output">
-                    <i className="fa fa-download"></i>
-                </a>
-                <a href="javascript:void(0);" onClick={this.copyTaskOutput} className="btn btn-sm btn-primary" title="Copy Task Output">
-                    <i className="fa fa-clipboard"></i>
-                </a>
+              <div className="switch-view text-right pull-right">
+                    <i className="fa fa-list-ul"></i> <a href="javascript:void(0);" onClick={this.setView("basic")}
+                            className={this.state.view === 'basic' ? "selected" : ""}>Basic</a>
+                    | 
+                    <i className="fa fa-desktop"></i> <a href="javascript:void(0);" onClick={this.setView("console")}
+                            className={this.state.view === 'console' ? "selected" : ""}>Console</a>
               </div>
+            
+              {this.state.view === 'console' ?
+                <Console
+                    className="clearfix"
+                    source={this.consoleOutputUrl}
+                    refreshInterval={this.shouldRefresh() ? 3000 : undefined}
+                    autoscroll={true}
+                    height={200}
+                    ref={domNode => this.console = domNode}
+                    onAddLines={this.checkForCommonErrors}
+                    showConsoleButtons={true}
+                    maximumLines={500}
+                    /> : ""}
+
+              {this.state.view === 'basic' ? 
+                <BasicTaskView
+                    source={this.consoleOutputUrl}
+                    ref={domNode => this.basicView = domNode}
+                    refreshInterval={this.shouldRefresh() ? 3000 : undefined}
+                    onAddLines={this.checkForCommonErrors}
+                    taskStatus={task.status}
+                /> : ""}
 
               {showMemoryErrorWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
@@ -532,7 +523,7 @@ class TaskListItem extends React.Component {
                     <li>Increase the <b>min-num-features</b> option, especially if your images have lots of vegetation</li>
                   </ul>
                   Still not working? Upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making
-                  sure to include a <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>copy of your task's output</a> (the one you see above <i className="fa fa-arrow-up"></i>, click to <a href="javascript:void(0);" onClick={this.downloadTaskOutput}>download</a> it). Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>
+                  sure to include a <a href="javascript:void(0);" onClick={this.setView("console")}>copy of your task's output</a>. Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>
                 </div>
               </div>
               : ""}

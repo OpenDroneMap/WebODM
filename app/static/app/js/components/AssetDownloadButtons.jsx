@@ -45,7 +45,7 @@ class AssetDownloadButtons extends React.Component {
             {assetDownloads.map((asset, i) => {
                 if (!asset.separator){
                     return (<li key={i}>
-                            <a href="javascript:void(0);" onClick={this.downloadAsset(asset)}><i className={asset.icon}></i> {asset.label}</a>
+                            <a href="javascript:void(0);" onClick={this.downloadAsset(asset)}><i className={asset.icon + " fa-fw"}></i> {asset.label}</a>
                         </li>);
                 }else{
                     return (<li key={i} className="divider"></li>);
