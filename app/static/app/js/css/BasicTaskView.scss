@@ -1,6 +1,10 @@
 .basic-task-view{
     margin-bottom: 8px;
-    
+    opacity: 0.7;
+    &.loaded{
+        opacity: 1;
+    }
+
     .processing-step{
         opacity: 0.7;
 

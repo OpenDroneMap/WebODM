@@ -24,7 +24,8 @@ class BasicTaskView extends React.Component {
         this.state = {
             lines: [],
             currentRf: 0,
-            rf: PipelineSteps.get()
+            rf: PipelineSteps.get(),
+            loaded: false
         };
 
         this.imageUpload = {
@@ -74,6 +75,7 @@ class BasicTaskView extends React.Component {
                     if (textStatus !== "abort" && this.props.refreshInterval !== undefined){
                         this.sourceTimeout = setTimeout(updateFromSource, this.props.refreshInterval);
                     }
+                    if (!this.state.loaded) this.setState({loaded: true});
                 });
         };
 
@@ -110,7 +112,7 @@ class BasicTaskView extends React.Component {
         }
 
         this.tearDownDynamicSource();
-        this.setState({lines: [], currentRf: 0});
+        this.setState({lines: [], currentRf: 0, loaded: false});
         this.setupDynamicSource();
     }
 
@@ -195,18 +197,20 @@ class BasicTaskView extends React.Component {
     }
 
     render() {
-        const { rf } = this.state;
+        const { rf, loaded } = this.state;
         const imageUploadState = this.props.taskStatus === null 
                                 ? 'running' 
                                 : 'completed';
 
-        return (<div className="basic-task-view">
+        return (<div className={"basic-task-view " + (loaded ? 'loaded' : '')}>
             <div className={imageUploadState + " processing-step"}>
                 <i className={this.imageUpload.icon + " fa-fw"}></i> {this.imageUpload.label} {this.suffixFor(imageUploadState)}
             </div>
             {rf.map(p => {
-                return (<div key={p.action} className={p.state + " processing-step"}>
-                    <i className={p.icon + " fa-fw"}></i> {p.label} {this.suffixFor(p.state)}
+                const state = loaded ? p.state : 'queued';
+
+                return (<div key={p.action} className={state + " processing-step"}>
+                    <i className={p.icon + " fa-fw"}></i> {p.label} {this.suffixFor(state)}
                 </div>);
             })}
         </div>);

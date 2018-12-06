@@ -457,7 +457,7 @@ class TaskListItem extends React.Component {
       expanded = (
         <div className="expanded-panel">
           <div className="row">
-            <div className="col-md-4 no-padding">
+            <div className="col-md-3 no-padding">
               <div className="labels">
                 <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
               </div>
@@ -479,7 +479,7 @@ class TaskListItem extends React.Component {
               <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.</span></div> : ""}
 
             </div>
-            <div className="col-md-8">
+            <div className="col-md-9">
               <div className="switch-view text-right pull-right">
                     <i className="fa fa-list-ul"></i> <a href="javascript:void(0);" onClick={this.setView("basic")}
                             className={this.state.view === 'basic' ? "selected" : ""}>Basic</a>
@@ -490,7 +490,7 @@ class TaskListItem extends React.Component {
             
               {this.state.view === 'console' ?
                 <Console
-                    className="clearfix"
+                    className="floatfix"
                     source={this.consoleOutputUrl}
                     refreshInterval={this.shouldRefresh() ? 3000 : undefined}
                     autoscroll={true}

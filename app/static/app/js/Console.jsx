@@ -158,8 +158,7 @@ class Console extends React.Component {
             onMouseOver={this.handleMouseOver}
             onMouseOut={this.handleMouseOut}
             ref={this.setRef}
-            >
-            {lines.map(line => {
+            >{lines.map(line => {
             if (this.props.lang) return (<div key={i++} dangerouslySetInnerHTML={prettyLine(line)}></div>);
             else return line + "\n";
             })}
