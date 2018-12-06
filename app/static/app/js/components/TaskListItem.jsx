@@ -9,7 +9,7 @@ import AssetDownloadButtons from './AssetDownloadButtons';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import TaskPluginActionButtons from './TaskPluginActionButtons';
-import RerunFromParams from '../classes/RerunFromParams';
+import PipelineSteps from '../classes/PipelineSteps';
 import BasicTaskView from './BasicTaskView';
 
 class TaskListItem extends React.Component {
@@ -272,7 +272,7 @@ class TaskListItem extends React.Component {
     // Map rerun-from parameters to display items
     // (remove the first item so that 'dataset' is not displayed)
     const rfMap = {};
-    RerunFromParams.get().slice(1).forEach(rf => rfMap[rf.action] = rf);
+    PipelineSteps.get().slice(1).forEach(rf => rfMap[rf.action] = rf);
 
     // Create onClick handlers
     for (let rfParam in rfMap){

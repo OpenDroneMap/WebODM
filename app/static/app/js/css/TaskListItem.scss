@@ -100,6 +100,8 @@
     .switch-view{
         margin-bottom: 8px;
         font-size: 90%;
+        position: relative;
+        z-index: 99;
         
         a{
             margin-right: 8px;

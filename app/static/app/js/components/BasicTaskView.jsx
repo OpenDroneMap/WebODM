@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/BasicTaskView.scss';
 import update from 'immutability-helper';
-import RerunFromParams from '../classes/RerunFromParams';
+import PipelineSteps from '../classes/PipelineSteps';
 import StatusCodes from '../classes/StatusCodes';
 import $ from 'jquery';
 
@@ -24,7 +24,13 @@ class BasicTaskView extends React.Component {
         this.state = {
             lines: [],
             currentRf: 0,
-            rf: RerunFromParams.get()
+            rf: PipelineSteps.get()
+        };
+
+        this.imageUpload = {
+            action: "imageupload",
+            label: "Image Resize / Upload",
+            icon: "fa fa-image"
         };
 
         // Add a post processing step
@@ -87,7 +93,7 @@ class BasicTaskView extends React.Component {
     }
 
     getInitialStatus(){
-        if ([StatusCodes.QUEUED, StatusCodes.RUNNING].indexOf(this.props.taskStatus) !== -1){
+        if ([null, StatusCodes.QUEUED, StatusCodes.RUNNING].indexOf(this.props.taskStatus) !== -1){
             return 'queued';
         }else{
             return this.getRfEndStatus();
@@ -98,6 +104,10 @@ class BasicTaskView extends React.Component {
         this.state.rf.forEach(p => {
             p.state = this.getInitialStatus();
         });
+
+        if ([StatusCodes.RUNNING].indexOf(this.props.taskStatus) !== -1){
+            this.state.rf[0].state = 'running';
+        }
 
         this.tearDownDynamicSource();
         this.setState({lines: [], currentRf: 0});
@@ -185,8 +195,16 @@ class BasicTaskView extends React.Component {
     }
 
     render() {
+        const { rf } = this.state;
+        const imageUploadState = this.props.taskStatus === null 
+                                ? 'running' 
+                                : 'completed';
+
         return (<div className="basic-task-view">
-            {this.state.rf.map(p => {
+            <div className={imageUploadState + " processing-step"}>
+                <i className={this.imageUpload.icon + " fa-fw"}></i> {this.imageUpload.label} {this.suffixFor(imageUploadState)}
+            </div>
+            {rf.map(p => {
                 return (<div key={p.action} className={p.state + " processing-step"}>
                     <i className={p.icon + " fa-fw"}></i> {p.label} {this.suffixFor(p.state)}
                 </div>);

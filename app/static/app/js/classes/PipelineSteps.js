@@ -9,7 +9,7 @@ export default {
             },
             {
                 action: "opensfm",
-                label: "Structure From Motion",
+                label: "Structure From Motion / MVS",
                 icon: "fa fa-camera",
                 beginsWith: "Running ODM OpenSfM Cell",
                 endsWith: "Running ODM Meshing Cell"
