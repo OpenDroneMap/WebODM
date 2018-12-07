@@ -156,6 +156,22 @@ class Task(models.Model):
         (pending_actions.RESIZE, 'RESIZE'),
     )
 
+    # Not an exact science
+    TASK_OUTPUT_MILESTONES = {
+        'Running ODM Load Dataset Cell': 0.01,
+        'Running ODM Load Dataset Cell - Finished': 0.05,
+        'opensfm/bin/opensfm match_features': 0.10,
+        'opensfm/bin/opensfm reconstruct': 0.20,
+        'opensfm/bin/opensfm export_visualsfm': 0.30,
+        'Running ODM Meshing Cell': 0.60,
+        'Running MVS Texturing Cell': 0.65,
+        'Running ODM Georeferencing Cell': 0.70,
+        'Running ODM DEM Cell': 0.80,
+        'Running ODM Orthophoto Cell': 0.85,
+        'Running ODM OrthoPhoto Cell - Finished': 0.90,
+        'Compressing all.zip:': 0.95
+    }
+
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
 
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
@@ -186,6 +202,9 @@ class Task(models.Model):
                                         blank=True)
     resize_progress = models.FloatField(default=0.0,
                                         help_text="Value between 0 and 1 indicating the resize progress of this task's images.",
+                                        blank=True)
+    running_progress = models.FloatField(default=0.0,
+                                        help_text="Value between 0 and 1 indicating the running progress (estimated) of this task's.",
                                         blank=True)
 
     def __init__(self, *args, **kwargs):
@@ -429,12 +448,14 @@ class Task(models.Model):
 
                             # We also remove the "rerun-from" parameter if it's set
                             self.options = list(filter(lambda d: d['name'] != 'rerun-from', self.options))
+                            self.upload_progress = 0
 
                         self.console_output = ""
                         self.processing_time = -1
                         self.status = None
                         self.last_error = None
                         self.pending_action = None
+                        self.running_progress = 0
                         self.save()
                     else:
                         raise ProcessingError("Cannot restart a task that has no processing node")
@@ -468,7 +489,14 @@ class Task(models.Model):
                     current_lines_count = len(self.console_output.split("\n"))
                     console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
                     if len(console_output) > 0:
-                        self.console_output += console_output + '\n'
+                        self.console_output += "\n".join(console_output) + '\n'
+
+                        # Update running progress
+                        for line in console_output:
+                            for line_match, value in self.TASK_OUTPUT_MILESTONES.items():
+                                if line_match in line:
+                                    self.running_progress = value
+                                    break
 
                     if "errorMessage" in info["status"]:
                         self.last_error = info["status"]["errorMessage"]
@@ -527,6 +555,7 @@ class Task(models.Model):
                                     logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
                             self.update_available_assets_field()
+                            self.running_progress = 1.0
                             self.save()
 
                             from app.plugins import signals as plugin_signals

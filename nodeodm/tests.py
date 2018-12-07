@@ -121,7 +121,7 @@ class TestClientApi(TestCase):
 
         # task_output
         self.assertTrue(isinstance(api.task_output(uuid, 0), list))
-        self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), str))
+        self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), list))
 
         self.assertRaises(ProcessingError, online_node.get_task_console_output, "wrong-uuid", 0)
 

@@ -112,7 +112,7 @@ class BasicTaskView extends React.Component {
         }
 
         this.tearDownDynamicSource();
-        this.setState({lines: [], currentRf: 0, loaded: false});
+        this.setState({lines: [], currentRf: 0, loaded: false, rf: this.state.rf});
         this.setupDynamicSource();
     }
 
@@ -122,9 +122,18 @@ class BasicTaskView extends React.Component {
     }
 
     componentDidUpdate(prevProps){
-        let taskFailed = [StatusCodes.RUNNING, StatusCodes.QUEUED].indexOf(prevProps.taskStatus) !== -1 && 
-                         [StatusCodes.FAILED, StatusCodes.CANCELED].indexOf(this.props.taskStatus) !== -1;
-        this.updateRfState(taskFailed);
+        
+        let taskFailed;
+        let taskCompleted;
+        let taskRestarted;
+
+        if (prevProps.taskStatus !== this.props.taskStatus){
+            taskFailed = [StatusCodes.FAILED, StatusCodes.CANCELED].indexOf(this.props.taskStatus) !== -1;
+            taskCompleted = this.props.taskStatus === StatusCodes.COMPLETED;
+            taskRestarted = this.props.taskStatus === null;
+        }
+        
+        this.updateRfState(taskFailed, taskCompleted, taskRestarted);
     }
 
     componentWillUnmount(){
@@ -173,7 +182,7 @@ class BasicTaskView extends React.Component {
         if (this.props.onAddLines) this.props.onAddLines(lines);
     }
 
-    updateRfState(taskFailed){
+    updateRfState(taskFailed, taskCompleted, taskRestarted){
         // If the task has just failed, update all items that were either running or in queued state
         if (taskFailed){
             this.state.rf.forEach(p => {
@@ -181,9 +190,14 @@ class BasicTaskView extends React.Component {
             });
         }
 
-        // The last is always dependent on the task status
-        this.state.rf[this.state.rf.length - 1].state = this.getInitialStatus();
+        // If completed, all steps must have completed
+        if (taskCompleted){
+            this.state.rf.forEach(p => p.state = 'completed');
+        }
 
+        if (taskRestarted){
+            this.state.rf.forEach(p => p.state = 'queued');
+        }
     }
 
     suffixFor(state){

@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import TaskPluginActionButtons from './TaskPluginActionButtons';
 import PipelineSteps from '../classes/PipelineSteps';
 import BasicTaskView from './BasicTaskView';
+import Css from '../classes/Css';
 
 class TaskListItem extends React.Component {
   static propTypes = {
@@ -49,6 +50,10 @@ class TaskListItem extends React.Component {
     this.checkForCommonErrors = this.checkForCommonErrors.bind(this);
     this.handleEditTaskSave = this.handleEditTaskSave.bind(this);
     this.setView = this.setView.bind(this);
+
+    // Retrieve CSS values for status bar colors
+    this.backgroundSuccessColor = Css.getValue('theme-background-success', 'backgroundColor');
+    this.backgroundFailedColor = Css.getValue('theme-background-failed', 'backgroundColor');
   }
 
   shouldRefresh(){
@@ -351,7 +356,7 @@ class TaskListItem extends React.Component {
     const name = task.name !== null ? task.name : `Task #${task.id}`;
 
     let status = statusCodes.description(task.status);
-    if (status === "") status = "Uploading images";
+    if (status === "") status = "Uploading images to processing node";
 
     if (!task.processing_node) status = "Waiting for a node...";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
@@ -464,10 +469,6 @@ class TaskListItem extends React.Component {
               <div className="labels">
                   <strong>Processing Node: </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
               </div>
-              {status ? <div className="labels">
-                  <strong>Status: </strong> {status}<br/>
-                </div>
-              : ""}
               {Array.isArray(task.options) ?
                  <div className="labels">
                   <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
@@ -482,7 +483,7 @@ class TaskListItem extends React.Component {
             <div className="col-md-9">
               <div className="switch-view text-right pull-right">
                     <i className="fa fa-list-ul"></i> <a href="javascript:void(0);" onClick={this.setView("basic")}
-                            className={this.state.view === 'basic' ? "selected" : ""}>Basic</a>
+                            className={this.state.view === 'basic' ? "selected" : ""}>Simple</a>
                     | 
                     <i className="fa fa-desktop"></i> <a href="javascript:void(0);" onClick={this.setView("console")}
                             className={this.state.view === 'console' ? "selected" : ""}>Console</a>
@@ -551,8 +552,15 @@ class TaskListItem extends React.Component {
       }
     }
 
-    const getStatusLabel = (text, classes = "") => {
-      return (<div className={"status-label " + classes} title={text}>{text}</div>);
+    // @param type {String} one of: ['neutral', 'done', 'error']
+    const getStatusLabel = (text, type = 'neutral', progress = 100) => {
+      let color = 'rgba(255, 255, 255, 0.0)';
+      if (type === 'done') color = this.backgroundSuccessColor;
+      else if (type === 'error') color = this.backgroundFailedColor;
+      return (<div 
+            className={"status-label theme-border-primary " + type} 
+            style={{background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)`}}
+            title={text}>{text}</div>);
     }
 
     let statusLabel = "";
@@ -560,13 +568,28 @@ class TaskListItem extends React.Component {
     let showEditLink = false;
 
     if (task.last_error){
-      statusLabel = getStatusLabel(task.last_error, "error");
+      statusLabel = getStatusLabel(task.last_error, 'error');
     }else if (!task.processing_node){
       statusLabel = getStatusLabel("Set a processing node");
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;
     }else{
-      statusLabel = getStatusLabel(status, task.status == 40 ? "done" : "");
+      let progress = 100;
+      let type = 'done';
+
+      if (task.pending_action === pendingActions.RESIZE){
+          progress = task.resize_progress * 100;
+      }else if (task.status === null){
+          progress = task.upload_progress * 100;
+      }else if (task.status === statusCodes.RUNNING){
+          progress = task.running_progress * 100;
+      }else if (task.status === statusCodes.FAILED){
+          type = 'error';
+      }else if (task.status !== statusCodes.COMPLETED){
+          type = 'neutral';
+      }
+
+      statusLabel = getStatusLabel(status, type, progress);
     }
 
     return (
