@@ -70,7 +70,13 @@ def validate_task_options(value):
 
 
 
-def resize_image(image_path, resize_to):
+def resize_image(image_path, resize_to, done=None):
+    """
+    :param image_path: path to the image
+    :param resize_to: target size to resize this image to (largest side)
+    :param done: optional callback
+    :return: path and resize ratio
+    """
     try:
         im = Image.open(image_path)
         path, ext = os.path.splitext(image_path)
@@ -106,9 +112,16 @@ def resize_image(image_path, resize_to):
         logger.info("Resized {} to {}x{}".format(image_path, resized_width, resized_height))
     except IOError as e:
         logger.warning("Cannot resize {}: {}.".format(image_path, str(e)))
+        if done is not None:
+            done()
         return None
 
-    return {'path': image_path, 'resize_ratio': ratio}
+    retval = {'path': image_path, 'resize_ratio': ratio}
+
+    if done is not None:
+        done(retval)
+
+    return retval
 
 class Task(models.Model):
     ASSETS_MAP = {
@@ -295,6 +308,7 @@ class Task(models.Model):
         try:
             if self.pending_action == pending_actions.RESIZE:
                 resized_images = self.resize_images()
+                self.refresh_from_db()
                 self.resize_gcp(resized_images)
                 self.pending_action = None
                 self.save()
@@ -635,10 +649,24 @@ class Task(models.Model):
             return []
 
         images_path = self.find_all_files_matching(r'.*\.jpe?g$')
+        total_images = len(images_path)
+        resized_images_count = 0
+        last_update = 0
+
+        def callback(retval=None):
+            nonlocal last_update
+            nonlocal resized_images_count
+            nonlocal total_images
+
+            resized_images_count += 1
+            if time.time() - last_update >= 2 or resized_images_count == total_images:
+                logger.info(self.id)
+                Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
+                last_update = time.time()
 
         with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
             resized_images = list(filter(lambda i: i is not None, executor.map(
-                partial(resize_image, resize_to=self.resize_to),
+                partial(resize_image, resize_to=self.resize_to, done=callback),
                 images_path)))
 
         return resized_images
