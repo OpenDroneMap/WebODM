@@ -198,13 +198,13 @@ class Task(models.Model):
     resize_to = models.IntegerField(default=-1, help_text="When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing.")
 
     upload_progress = models.FloatField(default=0.0,
-                                        help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node.",
+                                        help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node",
                                         blank=True)
     resize_progress = models.FloatField(default=0.0,
-                                        help_text="Value between 0 and 1 indicating the resize progress of this task's images.",
+                                        help_text="Value between 0 and 1 indicating the resize progress of this task's images",
                                         blank=True)
     running_progress = models.FloatField(default=0.0,
-                                        help_text="Value between 0 and 1 indicating the running progress (estimated) of this task's.",
+                                        help_text="Value between 0 and 1 indicating the running progress (estimated) of this task",
                                         blank=True)
 
     def __init__(self, *args, **kwargs):

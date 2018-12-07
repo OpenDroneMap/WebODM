@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='running_progress',
-            field=models.FloatField(blank=True, default=0.0, help_text="Value between 0 and 1 indicating the running progress (estimated) of this task's."),
+            field=models.FloatField(blank=True, default=0.0, help_text="Value between 0 and 1 indicating the running progress (estimated) of this task"),
         ),
     ]

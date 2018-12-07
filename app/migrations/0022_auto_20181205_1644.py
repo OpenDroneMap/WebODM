@@ -17,11 +17,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='resize_progress',
-            field=models.FloatField(blank=True, default=0.0, help_text="Value between 0 and 1 indicating the resize progress of this task's images."),
+            field=models.FloatField(blank=True, default=0.0, help_text="Value between 0 and 1 indicating the resize progress of this task's images"),
         ),
         migrations.AddField(
             model_name='task',
             name='upload_progress',
-            field=models.FloatField(blank=True, default=0.0, help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node."),
+            field=models.FloatField(blank=True, default=0.0, help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node"),
         ),
     ]
