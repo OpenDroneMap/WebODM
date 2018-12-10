@@ -45,6 +45,7 @@ class TestClientApi(TestCase):
         info = self.api_client.info()
         self.assertTrue(isinstance(info['version'], six.string_types), "Found version string")
         self.assertTrue(isinstance(info['taskQueueCount'], int), "Found task queue count")
+        self.assertTrue(isinstance(info['maxImages'], int), "Found task max images")
 
     def test_options(self):
         options = self.api_client.options()
@@ -58,9 +59,10 @@ class TestClientApi(TestCase):
         self.assertTrue(online_node.api_version == "", "API version is not set")
 
         self.assertTrue(online_node.update_node_info(), "Could update info")
-        self.assertTrue(online_node.last_refreshed != None, "Last refreshed is set")
+        self.assertTrue(online_node.last_refreshed is not None, "Last refreshed is set")
         self.assertTrue(len(online_node.available_options) > 0, "Available options are set")
         self.assertTrue(online_node.api_version != "", "API version is set")
+        self.assertTrue(online_node.max_images > 0, "Max images is set")
         
         self.assertTrue(isinstance(online_node.get_available_options_json(), six.string_types), "Available options json works")
         self.assertTrue(isinstance(online_node.get_available_options_json(pretty=True), six.string_types), "Available options json works with pretty")

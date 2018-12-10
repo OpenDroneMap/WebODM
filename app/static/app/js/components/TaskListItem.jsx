@@ -512,7 +512,7 @@ class TaskListItem extends React.Component {
                 /> : ""}
 
               {showMemoryErrorWarning ?
-              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>.</span></div> : ""}
+              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>. You can also try to use a <a href="https://www.opendronemap.org/webodm/lightning/" target="_blank">cloud processing node</a>.</span></div> : ""}
 
               {showTaskWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span dangerouslySetInnerHTML={{__html: this.state.friendlyTaskError}} /></div> : ""}
