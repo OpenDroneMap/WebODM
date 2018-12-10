@@ -127,8 +127,6 @@ class TestApiTask(BootTransactionTestCase):
         with Image.open(multiple_param_task.task_path("tiny_drone_image.jpg")) as im:
             self.assertTrue(im.size == img1.size)
 
-        multiple_param_task.delete()
-
         # Normal case with images[], GCP, name and processing node parameter and resize_to option
         gcp = open("app/fixtures/gcp.txt", 'r')
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -169,8 +167,6 @@ class TestApiTask(BootTransactionTestCase):
         # Upload progress is 100%
         self.assertEqual(resized_task.upload_progress, 1.0)
 
-        resized_task.delete()
-
         # Case with malformed GCP file option
         with open("app/fixtures/gcp_malformed.txt", 'r') as malformed_gcp:
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -190,9 +186,6 @@ class TestApiTask(BootTransactionTestCase):
 
             image1.seek(0)
             image2.seek(0)
-
-            malformed_gcp_task.delete()
-
 
         # Cannot create a task with images[], name, but invalid processing node parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -282,20 +275,26 @@ class TestApiTask(BootTransactionTestCase):
         # Processing should have started and a UUID is assigned
         # Calling process pending tasks should finish the process
         # and invoke the plugins completed signal
+        task.refresh_from_db()
+        self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])  # Sometimes this finishes before we get here
+        self.assertTrue(len(task.uuid) > 0)
+
         with catch_signal(task_completed) as handler:
-            task.refresh_from_db()
-            self.assertTrue(task.status in [status_codes.RUNNING,
-                                            status_codes.COMPLETED])  # Sometimes the task finishes and we can't test for RUNNING state
-            self.assertTrue(len(task.uuid) > 0)
-            worker.tasks.process_pending_tasks()
-            time.sleep(DELAY * 2)
-            task.refresh_from_db()
+            retry_count = 0
+            while task.status != status_codes.COMPLETED:
+                worker.tasks.process_pending_tasks()
+                time.sleep(DELAY)
+                task.refresh_from_db()
+                retry_count += 1
+                if retry_count > 10:
+                    break
+
             self.assertEqual(task.status, status_codes.COMPLETED)
 
             # Progress is 100%
             self.assertTrue(task.running_progress == 1.0)
 
-        handler.assert_called_with(
+        handler.assert_any_call(
             sender=Task,
             task_id=task.id,
             signal=task_completed,
