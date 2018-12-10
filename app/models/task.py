@@ -688,8 +688,7 @@ class Task(models.Model):
             nonlocal total_images
 
             resized_images_count += 1
-            if time.time() - last_update >= 2 or resized_images_count == total_images:
-                logger.info(self.id)
+            if time.time() - last_update >= 2:
                 Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
                 last_update = time.time()
 
@@ -697,6 +696,8 @@ class Task(models.Model):
             resized_images = list(filter(lambda i: i is not None, executor.map(
                 partial(resize_image, resize_to=self.resize_to, done=callback),
                 images_path)))
+
+        Task.objects.filter(pk=self.id).update(resize_progress=1.0)
 
         return resized_images
 

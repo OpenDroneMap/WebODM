@@ -163,6 +163,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(float(py) == 8.0)  # Didn't change
 
         # Resize progress is 100%
+        resized_task.refresh_from_db()
         self.assertEqual(resized_task.resize_progress, 1.0)
 
         # Upload progress is 100%
