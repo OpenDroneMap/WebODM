@@ -288,9 +288,9 @@ class TestApiTask(BootTransactionTestCase):
                                             status_codes.COMPLETED])  # Sometimes the task finishes and we can't test for RUNNING state
             self.assertTrue(len(task.uuid) > 0)
             worker.tasks.process_pending_tasks()
-            time.sleep(DELAY)
+            time.sleep(DELAY * 2)
             task.refresh_from_db()
-            self.assertTrue(task.status == status_codes.COMPLETED)
+            self.assertEqual(task.status, status_codes.COMPLETED)
 
             # Progress is 100%
             self.assertTrue(task.running_progress == 1.0)
