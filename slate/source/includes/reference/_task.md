@@ -7,6 +7,7 @@
   "id": 134,
   "project": 27,
   "processing_node": 10,
+  "processing_node_name": "localhost:3000",
   "images_count": 48,
   "can_rerun_from": [],
   "available_assets": [
@@ -30,9 +31,11 @@
       "value": true
     }
   ],
-  "ground_control_points": null,
   "created_at": "2017-02-18T18:01:55.402551Z",
-  "pending_action": null
+  "pending_action": null,
+  "upload_progress": 1.0,
+  "resize_progress": 0.0,
+  "running_progress": 1.0
 }
 ```
 
@@ -43,6 +46,7 @@ Field | Type | Description
 id | int | Unique identifier
 project | int | [Project](#project) ID the task belongs to
 processing_node | int | The ID of the [Processing Node](#processing-node) this task has been assigned to, or `null` if no [Processing Node](#processing-node) has been assigned.
+processing_node_name | string | The name of the processing node below, or `null` if no [Processing Node](#processing-node) has been assigned.
 images_count | int | Number of images
 can_rerun_from | string[] | List of possible "rerun-from" options that this task could restart from, given its currently assigned processing node. If this is an empty list, the task can only be restarted from the start of the pipeline.
 available_assets | string[] | List of [assets](#download-assets) available for download 
@@ -53,9 +57,12 @@ auto_processing_node | boolean | Whether WebODM should automatically assign the 
 status | int | One of [Status Codes](#status-codes), or `null` if no status is available.
 last_error | string | The last error message reported by a [Processing Node](#processing-node) in case of processing failure.
 options | JSON[] | JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a [Processing Node](#processing-node).
-ground_control_points | string | Currently unused. See [#37](https://github.com/OpenDroneMap/WebODM/issues/37)
-created_at | string | Creation date and time
+created_at | string | Creation date and time.
 pending_action | int | One of [Pending Actions](#pending-actions), or `null` if no pending action is set.
+upload_progress | float | Value between 0 and 1 indicating the upload progress of this task's files to the processing node.
+resize_progress | float | Value between 0 and 1 indicating the resize progress of this task's images.
+running_progress | float | Value between 0 and 1 indicating the running progress (estimated) of this task.
+
 
 <aside class="notice">Tasks inherit the permission settings from the <a href="#project">Project</a> they belong to.</aside>
 
@@ -91,6 +98,7 @@ Parameters are the same as above.
         "id": 6,
         "project": 2,
         "processing_node": 2,
+        "processing_node_name": "localhost:3000",
         "images_count": 89,
         "uuid": "2e8b687d-c269-4e2f-91b3-5a2cd51b5321",
         "name": "Test name",
@@ -99,9 +107,11 @@ Parameters are the same as above.
         "status": 40,
         "last_error": null,
         "options": [],
-        "ground_control_points": null,
         "created_at": "2016-12-08T13:32:28.139474Z",
-        "pending_action": null
+        "pending_action": null,
+        "upload_progress": 1.0,
+        "resize_progress": 0.0,
+        "running_progress": 1.0
     }
 ]
 ```

@@ -265,3 +265,7 @@ footer{
     height: calc(100vh - 110px);
     padding-bottom: 12px;
 }
+
+.floatfix{
+    clear: both;
+}

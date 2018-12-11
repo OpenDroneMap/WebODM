@@ -248,7 +248,7 @@ rebuild(){
 	run "docker-compose down --remove-orphans"
 	plugin_cleanup
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
-	run "rm -fr nodeodm/external/node-OpenDroneMap || sudo rm -fr nodeodm/external/node-OpenDroneMap"
+	run "rm -fr nodeodm/external/NodeODM || sudo rm -fr nodeodm/external/NodeODM"
 	run "docker-compose -f docker-compose.yml -f docker-compose.build.yml build --no-cache"
 	#run "docker images --no-trunc -aqf \"dangling=true\" | xargs docker rmi"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
@@ -371,7 +371,7 @@ elif [[ $1 = "rebuild" ]]; then
 elif [[ $1 = "update" ]]; then
 	echo "Updating WebODM..."
 	run "git pull origin master"
-	run "docker pull opendronemap/node-opendronemap"
+	run "docker pull opendronemap/nodeodm"
 	run "docker pull opendronemap/webodm_db"
 	run "docker pull opendronemap/webodm_webapp"
 	run "docker-compose down --remove-orphans"

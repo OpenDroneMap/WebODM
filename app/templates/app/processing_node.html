@@ -24,6 +24,10 @@
 		<td>{{ processing_node.queue_count }}</td>
 	</tr>
 	<tr>
+		<td>{% trans "Max Images Limit" %}</td>
+		<td>{{ processing_node.max_images }}</td>
+	</tr>
+	<tr>
 		<td>{% trans "Last Refreshed" %}</td>
 		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'ago' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
 	</tr>

@@ -21,7 +21,7 @@ class TestClientApi(TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestClientApi, cls).setUpClass()
-        cls.node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False, cwd=path.join(current_dir, "external", "node-OpenDroneMap"))
+        cls.node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'], shell=False, cwd=path.join(current_dir, "external", "NodeODM"))
         time.sleep(2) # Wait for the server to launch
 
 
@@ -45,6 +45,7 @@ class TestClientApi(TestCase):
         info = self.api_client.info()
         self.assertTrue(isinstance(info['version'], six.string_types), "Found version string")
         self.assertTrue(isinstance(info['taskQueueCount'], int), "Found task queue count")
+        self.assertTrue(info['maxImages'] is None, "Found task max images")
 
     def test_options(self):
         options = self.api_client.options()
@@ -58,9 +59,10 @@ class TestClientApi(TestCase):
         self.assertTrue(online_node.api_version == "", "API version is not set")
 
         self.assertTrue(online_node.update_node_info(), "Could update info")
-        self.assertTrue(online_node.last_refreshed != None, "Last refreshed is set")
+        self.assertTrue(online_node.last_refreshed is not None, "Last refreshed is set")
         self.assertTrue(len(online_node.available_options) > 0, "Available options are set")
         self.assertTrue(online_node.api_version != "", "API version is set")
+        self.assertTrue(online_node.max_images is None, "No max images limit is set")
         
         self.assertTrue(isinstance(online_node.get_available_options_json(), six.string_types), "Available options json works")
         self.assertTrue(isinstance(online_node.get_available_options_json(pretty=True), six.string_types), "Available options json works with pretty")
@@ -121,7 +123,7 @@ class TestClientApi(TestCase):
 
         # task_output
         self.assertTrue(isinstance(api.task_output(uuid, 0), list))
-        self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), str))
+        self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), list))
 
         self.assertRaises(ProcessingError, online_node.get_task_console_output, "wrong-uuid", 0)
 
@@ -157,6 +159,10 @@ class TestClientApi(TestCase):
         # Task has been deleted
         self.assertRaises(ProcessingError, online_node.get_task_info, uuid)
 
+        # Test URL building for HTTPS
+        sslApi = ApiClient("localhost", 443, 'abc')
+        self.assertEqual(sslApi.url('/info'), 'https://localhost/info?token=abc')
+
     def test_find_best_available_node_and_is_online(self):
         # Fixtures are all offline
         self.assertTrue(ProcessingNode.find_best_available_node() is None)
@@ -191,7 +197,7 @@ class TestClientApi(TestCase):
     def test_token_auth(self):
         node_odm = subprocess.Popen(
             ['node', 'index.js', '--port', '11224', '--token', 'test_token', '--test'], shell=False,
-            cwd=path.join(current_dir, "external", "node-OpenDroneMap"))
+            cwd=path.join(current_dir, "external", "NodeODM"))
         time.sleep(2)
 
         def wait_for_status(api, uuid, status, num_retries=10, error_description="Failed to wait for status"):
@@ -215,10 +221,10 @@ class TestClientApi(TestCase):
 
         self.assertTrue(online_node.update_node_info(), "Could update info")
 
-        # Can always call info(), options() (even without valid tokens)
+        # Cannot call info(), options()  without tokens
         api.token = "invalid"
-        self.assertTrue(type(api.info()['version']) == str)
-        self.assertTrue(len(api.options()) > 0)
+        self.assertTrue(type(api.info()['error']) == str)
+        self.assertTrue(type(api.options()['error']) == str)
 
         # Cannot call new_task() without token
         import glob

@@ -127,7 +127,6 @@ class TestApiTask(BootTransactionTestCase):
         with Image.open(multiple_param_task.task_path("tiny_drone_image.jpg")) as im:
             self.assertTrue(im.size == img1.size)
 
-
         # Normal case with images[], GCP, name and processing node parameter and resize_to option
         gcp = open("app/fixtures/gcp.txt", 'r')
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -161,6 +160,13 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(float(px) == 8.0)  # Didn't change
             self.assertTrue(float(py) == 8.0)  # Didn't change
 
+        # Resize progress is 100%
+        resized_task.refresh_from_db()
+        self.assertEqual(resized_task.resize_progress, 1.0)
+
+        # Upload progress is 100%
+        self.assertEqual(resized_task.upload_progress, 1.0)
+
         # Case with malformed GCP file option
         with open("app/fixtures/gcp_malformed.txt", 'r') as malformed_gcp:
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -180,7 +186,6 @@ class TestApiTask(BootTransactionTestCase):
 
             image1.seek(0)
             image2.seek(0)
-
 
         # Cannot create a task with images[], name, but invalid processing node parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -206,11 +211,17 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue('id' in res.data)
         self.assertTrue(str(task.id) == res.data['id'])
 
+        # Progress is at 0%
+        self.assertEqual(task.running_progress, 0.0)
+
         # Two images should have been uploaded
         self.assertTrue(ImageUpload.objects.filter(task=task).count() == 2)
 
         # Can_rerun_from should be an empty list
         self.assertTrue(len(res.data['can_rerun_from']) == 0)
+
+        # processing_node_name should be null
+        self.assertTrue(res.data['processing_node_name'] is None)
 
         # No processing node is set
         self.assertTrue(task.processing_node is None)
@@ -262,9 +273,32 @@ class TestApiTask(BootTransactionTestCase):
         # (during tests this is sync)
 
         # Processing should have started and a UUID is assigned
+        # Calling process pending tasks should finish the process
+        # and invoke the plugins completed signal
         task.refresh_from_db()
-        self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED]) # Sometimes the task finishes and we can't test for RUNNING state
+        self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])  # Sometimes this finishes before we get here
         self.assertTrue(len(task.uuid) > 0)
+
+        with catch_signal(task_completed) as handler:
+            retry_count = 0
+            while task.status != status_codes.COMPLETED:
+                worker.tasks.process_pending_tasks()
+                time.sleep(DELAY)
+                task.refresh_from_db()
+                retry_count += 1
+                if retry_count > 10:
+                    break
+
+            self.assertEqual(task.status, status_codes.COMPLETED)
+
+            # Progress is 100%
+            self.assertTrue(task.running_progress == 1.0)
+
+        handler.assert_any_call(
+            sender=Task,
+            task_id=task.id,
+            signal=task_completed,
+        )
 
         # Processing node should have a "rerun_from" option
         pnode_rerun_from_opts = list(filter(lambda d: 'name' in d and d['name'] == 'rerun-from', pnode.available_options))[0]
@@ -277,20 +311,8 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
         self.assertTrue(pnode_rerun_from_opts['domain'] == res.data['can_rerun_from'])
 
-        time.sleep(DELAY)
-
-        # Calling process pending tasks should finish the process
-        # and invoke the plugins completed signal
-        with catch_signal(task_completed) as handler:
-            worker.tasks.process_pending_tasks()
-            task.refresh_from_db()
-            self.assertTrue(task.status == status_codes.COMPLETED)
-
-        handler.assert_called_with(
-            sender=Task,
-            task_id=task.id,
-            signal=task_completed,
-        )
+        # processing_node_name should be the name of the pnode
+        self.assertEqual(res.data['processing_node_name'], str(pnode))
 
         # Can download assets
         for asset in list(task.ASSETS_MAP.keys()):

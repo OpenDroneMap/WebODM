@@ -6,8 +6,8 @@ language_tabs:
 
 toc_footers:
   - <a href='https://github.com/OpenDroneMap/WebODM'>WebODM on GitHub</a>
-  - <a href='https://github.com/OpenDroneMap/OpenDroneMap'>OpenDroneMap on GitHub</a>
-  - <a href='https://github.com/OpenDroneMap/node-OpenDroneMap'>node-OpenDroneMap on GitHub</a>
+  - <a href='https://github.com/OpenDroneMap/ODM'>ODM on GitHub</a>
+  - <a href='https://github.com/OpenDroneMap/NodeODM'>NodeODM on GitHub</a>
 
 search: true
 

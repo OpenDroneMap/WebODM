@@ -350,6 +350,9 @@ class TestApi(BootTestCase):
         # Should be set to false
         self.assertFalse(res.data['online'])
 
+        # Verify max images field
+        self.assertTrue("max_images" in res.data)
+
         # Cannot delete a processing node as normal user
         res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
         self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)

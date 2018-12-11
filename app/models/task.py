@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import zipfile
+import time
 import uuid as uuid_module
 
 import json
@@ -69,7 +70,13 @@ def validate_task_options(value):
 
 
 
-def resize_image(image_path, resize_to):
+def resize_image(image_path, resize_to, done=None):
+    """
+    :param image_path: path to the image
+    :param resize_to: target size to resize this image to (largest side)
+    :param done: optional callback
+    :return: path and resize ratio
+    """
     try:
         im = Image.open(image_path)
         path, ext = os.path.splitext(image_path)
@@ -105,9 +112,16 @@ def resize_image(image_path, resize_to):
         logger.info("Resized {} to {}x{}".format(image_path, resized_width, resized_height))
     except IOError as e:
         logger.warning("Cannot resize {}: {}.".format(image_path, str(e)))
+        if done is not None:
+            done()
         return None
 
-    return {'path': image_path, 'resize_ratio': ratio}
+    retval = {'path': image_path, 'resize_ratio': ratio}
+
+    if done is not None:
+        done(retval)
+
+    return retval
 
 class Task(models.Model):
     ASSETS_MAP = {
@@ -142,6 +156,22 @@ class Task(models.Model):
         (pending_actions.RESIZE, 'RESIZE'),
     )
 
+    # Not an exact science
+    TASK_OUTPUT_MILESTONES = {
+        'Running ODM Load Dataset Cell': 0.01,
+        'Running ODM Load Dataset Cell - Finished': 0.05,
+        'opensfm/bin/opensfm match_features': 0.10,
+        'opensfm/bin/opensfm reconstruct': 0.20,
+        'opensfm/bin/opensfm export_visualsfm': 0.30,
+        'Running ODM Meshing Cell': 0.60,
+        'Running MVS Texturing Cell': 0.65,
+        'Running ODM Georeferencing Cell': 0.70,
+        'Running ODM DEM Cell': 0.80,
+        'Running ODM Orthophoto Cell': 0.85,
+        'Running ODM OrthoPhoto Cell - Finished': 0.90,
+        'Compressing all.zip:': 0.95
+    }
+
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
 
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
@@ -155,7 +185,6 @@ class Task(models.Model):
     options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
     available_assets = fields.ArrayField(models.CharField(max_length=80), default=list(), blank=True, help_text="List of available assets to download")
     console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
-    ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
     orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
     dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM created by OpenDroneMap")
@@ -168,6 +197,15 @@ class Task(models.Model):
     public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
     resize_to = models.IntegerField(default=-1, help_text="When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing.")
 
+    upload_progress = models.FloatField(default=0.0,
+                                        help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node",
+                                        blank=True)
+    resize_progress = models.FloatField(default=0.0,
+                                        help_text="Value between 0 and 1 indicating the resize progress of this task's images",
+                                        blank=True)
+    running_progress = models.FloatField(default=0.0,
+                                        help_text="Value between 0 and 1 indicating the running progress (estimated) of this task",
+                                        blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -289,6 +327,7 @@ class Task(models.Model):
         try:
             if self.pending_action == pending_actions.RESIZE:
                 resized_images = self.resize_images()
+                self.refresh_from_db()
                 self.resize_gcp(resized_images)
                 self.pending_action = None
                 self.save()
@@ -333,8 +372,17 @@ class Task(models.Model):
 
                     images = [image.path() for image in self.imageupload_set.all()]
 
+                    # Track upload progress, but limit the number of DB updates
+                    # to every 2 seconds (and always record the 100% progress)
+                    last_update = 0
+                    def callback(progress):
+                        nonlocal last_update
+                        if time.time() - last_update >= 2 or (progress >= 1.0 - 1e-6 and progress <= 1.0 + 1e-6):
+                            Task.objects.filter(pk=self.id).update(upload_progress=progress)
+                            last_update = time.time()
+
                     # This takes a while
-                    uuid = self.processing_node.process_new_task(images, self.name, self.options)
+                    uuid = self.processing_node.process_new_task(images, self.name, self.options, callback)
 
                     # Refresh task object before committing change
                     self.refresh_from_db()
@@ -400,12 +448,14 @@ class Task(models.Model):
 
                             # We also remove the "rerun-from" parameter if it's set
                             self.options = list(filter(lambda d: d['name'] != 'rerun-from', self.options))
+                            self.upload_progress = 0
 
                         self.console_output = ""
                         self.processing_time = -1
                         self.status = None
                         self.last_error = None
                         self.pending_action = None
+                        self.running_progress = 0
                         self.save()
                     else:
                         raise ProcessingError("Cannot restart a task that has no processing node")
@@ -439,7 +489,14 @@ class Task(models.Model):
                     current_lines_count = len(self.console_output.split("\n"))
                     console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
                     if len(console_output) > 0:
-                        self.console_output += console_output + '\n'
+                        self.console_output += "\n".join(console_output) + '\n'
+
+                        # Update running progress
+                        for line in console_output:
+                            for line_match, value in self.TASK_OUTPUT_MILESTONES.items():
+                                if line_match in line:
+                                    self.running_progress = value
+                                    break
 
                     if "errorMessage" in info["status"]:
                         self.last_error = info["status"]["errorMessage"]
@@ -498,6 +555,7 @@ class Task(models.Model):
                                     logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
                             self.update_available_assets_field()
+                            self.running_progress = 1.0
                             self.save()
 
                             from app.plugins import signals as plugin_signals
@@ -620,11 +678,26 @@ class Task(models.Model):
             return []
 
         images_path = self.find_all_files_matching(r'.*\.jpe?g$')
+        total_images = len(images_path)
+        resized_images_count = 0
+        last_update = 0
+
+        def callback(retval=None):
+            nonlocal last_update
+            nonlocal resized_images_count
+            nonlocal total_images
+
+            resized_images_count += 1
+            if time.time() - last_update >= 2:
+                Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
+                last_update = time.time()
 
         with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
             resized_images = list(filter(lambda i: i is not None, executor.map(
-                partial(resize_image, resize_to=self.resize_to),
+                partial(resize_image, resize_to=self.resize_to, done=callback),
                 images_path)))
+
+        Task.objects.filter(pk=self.id).update(resize_progress=1.0)
 
         return resized_images
 

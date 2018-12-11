@@ -24,8 +24,15 @@ class TaskIDsSerializer(serializers.BaseSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
+    processing_node_name = serializers.SerializerMethodField()
     images_count = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
+
+    def get_processing_node_name(self, obj):
+        if obj.processing_node is not None:
+            return str(obj.processing_node)
+        else:
+            return None
 
     def get_images_count(self, obj):
         return obj.imageupload_set.count()
@@ -39,7 +46,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
         TODO: this could be improved by returning an empty array if a task was created
         and purged by the processing node (which would require knowing how long a task is being kept
-        see https://github.com/OpenDroneMap/node-OpenDroneMap/issues/32
+        see https://github.com/OpenDroneMap/NodeODM/issues/32
         :return: array of valid rerun-from parameters
         """
         if obj.processing_node is not None:

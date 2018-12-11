@@ -42,6 +42,7 @@ class ProcessingNode(models.Model):
     queue_count = models.PositiveIntegerField(default=0, help_text="Number of tasks currently being processed by this node (as reported by the node itself)")
     available_options = fields.JSONField(default=dict(), help_text="Description of the options that can be used for processing")
     token = models.CharField(max_length=1024, blank=True, default="", help_text="Token to use for authentication. If the node doesn't have authentication, you can leave this field blank.")
+    max_images = models.PositiveIntegerField(help_text="Maximum number of images accepted by this node.", blank=True, null=True)
 
     def __str__(self):
         return '{}:{}'.format(self.hostname, self.port)
@@ -70,8 +71,14 @@ class ProcessingNode(models.Model):
         api_client = self.api_client(timeout=5)
         try:
             info = api_client.info()
+            if 'error' in info:
+                return False
+
             self.api_version = info['version']
             self.queue_count = info['taskQueueCount']
+
+            if 'maxImages' in info:
+                self.max_images = info['maxImages']
 
             options = api_client.options()
             self.available_options = options
@@ -92,7 +99,7 @@ class ProcessingNode(models.Model):
         return json.dumps(self.available_options, **kwargs)
 
     @api
-    def process_new_task(self, images, name=None, options=[]):
+    def process_new_task(self, images, name=None, options=[], progress_callback=None):
         """
         Sends a set of images (and optional GCP file) via the API
         to start processing.
@@ -100,6 +107,7 @@ class ProcessingNode(models.Model):
         :param images: list of path images
         :param name: name of the task
         :param options: options to be used for processing ([{'name': optionName, 'value': optionValue}, ...])
+        :param progress_callback: optional callback invoked during the upload images process to be used to report status.
 
         :returns UUID of the newly created task
         """
@@ -107,7 +115,7 @@ class ProcessingNode(models.Model):
 
         api_client = self.api_client()
         try:
-            result = api_client.new_task(images, name, options)
+            result = api_client.new_task(images, name, options, progress_callback)
         except requests.exceptions.ConnectionError as e:
             raise ProcessingError(e)
 
@@ -145,7 +153,7 @@ class ProcessingNode(models.Model):
         if isinstance(result, dict) and 'error' in result:
             raise ProcessingError(result['error'])
         elif isinstance(result, list):
-            return "\n".join(result)
+            return result
         else:
             raise ProcessingError("Unknown response for console output: {}".format(result))
 
@@ -189,7 +197,7 @@ class ProcessingNode(models.Model):
     def handle_generic_post_response(result):
         """
         Handles a POST response that has either a "success" flag, or an error message.
-        This is a common response in node-OpenDroneMap POST calls.
+        This is a common response in NodeODM POST calls.
         :param result: result of API call
         :return: True on success, raises ProcessingException otherwise
         """

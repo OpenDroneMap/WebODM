@@ -41,6 +41,8 @@
         padding: 4px;
         width: 100%;
         font-size: 90%;
+        border-style: solid;
+        border-width: 1px;
     }
 
     .clickable:hover{
@@ -97,13 +99,25 @@
         display: inline;
     }
 
-    .console-buttons{
-        margin-left: 16px;
-        margin-bottom: 16px;
-        float: right;
-        text-align: right;
+    .switch-view{
+        margin-bottom: 8px;
+        font-size: 90%;
+        position: relative;
+        z-index: 99;
+        
         a{
-            margin-left: 4px;
+            margin-right: 8px;
+            &.selected{
+                font-weight: bold;
+            }
+            &:last-child{
+                margin-right: 0;
+            }
+        }
+
+        i{
+            margin-left: 8px;
         }
     }
+
 }

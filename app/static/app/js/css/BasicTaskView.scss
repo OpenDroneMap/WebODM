@@ -1,0 +1,38 @@
+.basic-task-view{
+    margin-bottom: 8px;
+    opacity: 0.7;
+    &.loaded{
+        opacity: 1;
+    }
+
+    .processing-step{
+        opacity: 0.7;
+
+        &.completed{
+            opacity: 1;
+            /* font-weight: bold; */
+        }
+        &.running{
+            opacity: 1;
+            animation: pulse ease-in-out 1.4833s infinite;
+        }
+        &.queued{
+
+        }
+        &.errored{
+            opacity: 1;
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 0.7;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0.7;
+        }
+    }
+}

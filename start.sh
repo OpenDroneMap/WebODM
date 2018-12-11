@@ -43,9 +43,12 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     
     echo Setup npm dependencies...
     npm install
-    cd nodeodm/external/node-OpenDroneMap
+    cd nodeodm/external/NodeODM
     npm install
     cd /webodm
+
+    echo Setup pip requirements...
+    pip install -r requirements.txt
 
     echo Setup webpack watch...
     webpack --watch &
