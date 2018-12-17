@@ -111,8 +111,8 @@
       </div>
         <ul class="toc-footer">
             <li><a href='https://github.com/OpenDroneMap/WebODM'>WebODM on GitHub</a></li>
-            <li><a href='https://github.com/OpenDroneMap/OpenDroneMap'>OpenDroneMap on GitHub</a></li>
-            <li><a href='https://github.com/OpenDroneMap/node-OpenDroneMap'>node-OpenDroneMap on GitHub</a></li>
+            <li><a href='https://github.com/OpenDroneMap/ODM'>ODM on GitHub</a></li>
+            <li><a href='https://github.com/OpenDroneMap/NodeODM'>NodeODM on GitHub</a></li>
         </ul>
     </div>
     <div class="page-wrapper">
@@ -491,7 +491,9 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
   </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">134</span><span class="p">,</span><span class="w">
   </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="w">
   </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"processing_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost:3000"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"can_rerun_from"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
   </span><span class="s2">"available_assets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="s2">"all.zip"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"orthophoto.tif"</span><span class="p">,</span><span class="w">
@@ -513,9 +515,11 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
       </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">],</span><span class="w">
-  </span><span class="s2">"ground_control_points"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
   </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-02-18T18:01:55.402551Z"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+  </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"upload_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"resize_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"running_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>A <a href="#task">Task</a> is the basic processing unit of WebODM. To compute an orthophoto, point cloud and textured model from a set of images, you need to create a <a href="#task">Task</a>.</p>
@@ -543,9 +547,19 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <td>The ID of the <a href="#processing-node">Processing Node</a> this task has been assigned to, or <code class="prettyprint">null</code> if no <a href="#processing-node">Processing Node</a> has been assigned.</td>
 </tr>
 <tr>
+<td>processing_node_name</td>
+<td>string</td>
+<td>The name of the processing node below, or <code class="prettyprint">null</code> if no <a href="#processing-node">Processing Node</a> has been assigned.</td>
+</tr>
+<tr>
 <td>images_count</td>
 <td>int</td>
 <td>Number of images</td>
+</tr>
+<tr>
+<td>can_rerun_from</td>
+<td>string[]</td>
+<td>List of possible &ldquo;rerun-from&rdquo; options that this task could restart from, given its currently assigned processing node. If this is an empty list, the task can only be restarted from the start of the pipeline.</td>
 </tr>
 <tr>
 <td>available_assets</td>
@@ -588,19 +602,29 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <td>JSON-encoded list of name/value pairs, where each pair represents a command line option to be passed to a <a href="#processing-node">Processing Node</a>.</td>
 </tr>
 <tr>
-<td>ground_control_points</td>
-<td>string</td>
-<td>Currently unused. See <a href="https://github.com/OpenDroneMap/WebODM/issues/37">#37</a></td>
-</tr>
-<tr>
 <td>created_at</td>
 <td>string</td>
-<td>Creation date and time</td>
+<td>Creation date and time.</td>
 </tr>
 <tr>
 <td>pending_action</td>
 <td>int</td>
 <td>One of <a href="#pending-actions">Pending Actions</a>, or <code class="prettyprint">null</code> if no pending action is set.</td>
+</tr>
+<tr>
+<td>upload_progress</td>
+<td>float</td>
+<td>Value between 0 and 1 indicating the upload progress of this task&rsquo;s files to the processing node.</td>
+</tr>
+<tr>
+<td>resize_progress</td>
+<td>float</td>
+<td>Value between 0 and 1 indicating the resize progress of this task&rsquo;s images.</td>
+</tr>
+<tr>
+<td>running_progress</td>
+<td>float</td>
+<td>Value between 0 and 1 indicating the running progress (estimated) of this task.</td>
 </tr>
 </tbody></table>
 
@@ -668,6 +692,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
         </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
         </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
         </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"processing_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost:3000"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">89</span><span class="p">,</span><span class="w">
         </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2e8b687d-c269-4e2f-91b3-5a2cd51b5321"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test name"</span><span class="p">,</span><span class="w">
@@ -676,9 +701,11 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
         </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
         </span><span class="s2">"last_error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
         </span><span class="s2">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-        </span><span class="s2">"ground_control_points"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
         </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-08T13:32:28.139474Z"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+        </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"upload_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"resize_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"running_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
 </span></code></pre>
@@ -709,6 +736,10 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <tr>
 <td>orthophoto.png</td>
 <td>PNG orthophoto.</td>
+</tr>
+<tr>
+<td>orthophoto.mbtiles</td>
+<td>Orthophoto MBTiles archive.</td>
 </tr>
 <tr>
 <td>textured_model.zip</td>
@@ -884,6 +915,7 @@ These paths could change in future versions of WebODM. If the asset you need can
     </span><span class="s2">"api_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.1"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"last_refreshed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-03-01T21:14:49.918276Z"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"queue_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"max_images"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
     </span><span class="s2">"available_options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
             </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
@@ -895,7 +927,7 @@ These paths could change in future versions of WebODM. If the asset you need can
     </span><span class="err">...</span><span class="w">
 </span></code></pre>
 <p>Processing nodes are associated with zero or more tasks and
-take care of processing input images. Processing nodes are computers or virtual machines running <a href="https://github.com/OpenDroneMap/node-OpenDroneMap/">node-OpenDroneMap</a> or any other API compatible with it.</p>
+take care of processing input images. Processing nodes are computers or virtual machines running <a href="https://github.com/OpenDroneMap/NodeODM">NodeODM</a> or any other API compatible with it.</p>
 
 <table><thead>
 <tr>
@@ -927,7 +959,7 @@ take care of processing input images. Processing nodes are computers or virtual 
 <tr>
 <td>api_version</td>
 <td>string</td>
-<td>Version of node-OpenDroneMap currently running</td>
+<td>Version of NodeODM currently running</td>
 </tr>
 <tr>
 <td>last_refreshed</td>
@@ -938,6 +970,11 @@ take care of processing input images. Processing nodes are computers or virtual 
 <td>queue_count</td>
 <td>int</td>
 <td>Number of <a href="#task">Task</a> items currently being processed/queued on this node.</td>
+</tr>
+<tr>
+<td>max_images</td>
+<td>int</td>
+<td>Optional maximum number of images this processing node can accept. null indicates no limit.</td>
 </tr>
 <tr>
 <td>available_options</td>
@@ -972,7 +1009,7 @@ take care of processing input images. Processing nodes are computers or virtual 
 </tr>
 <tr>
 <td>domain</td>
-<td>Restriction of the range of values that this option allows. Examples are <code class="prettyprint">float</code>, <code class="prettyprint">negative integer</code>, <code class="prettyprint">percent</code>, <code class="prettyprint">float: 0 &lt;= x &lt;= 10</code>, etc. for all possible values, check <a href="https://github.com/OpenDroneMap/node-OpenDroneMap/blob/master/libs/odmOptions.js#L135">node-OpenDroneMap&rsquo;s odmOptions.js code</a></td>
+<td>Restriction of the range of values that this option allows. Examples are <code class="prettyprint">float</code>, <code class="prettyprint">negative integer</code>, <code class="prettyprint">percent</code>, <code class="prettyprint">float: 0 &lt;= x &lt;= 10</code>, etc. for all possible values, check <a href="https://github.com/OpenDroneMap/NodeODM/blob/master/libs/odmOptions.js#L135">NodeODM&rsquo;s odmOptions.js code</a></td>
 </tr>
 </tbody></table>
 
@@ -1059,6 +1096,12 @@ take care of processing input images. Processing nodes are computers or virtual 
 <td>Filter by queue count</td>
 </tr>
 <tr>
+<td>max_images</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by max images</td>
+</tr>
+<tr>
 <td>ordering</td>
 <td></td>
 <td>&ldquo;&rdquo;</td>
@@ -1112,7 +1155,7 @@ take care of processing input images. Processing nodes are computers or virtual 
 
 <p>Use this list of options to check whether a particular option is supported by all online processing nodes. If you use the automatic processing node assignment feature for processing tasks, this is the list you want to display to the user for choosing the options to use during processing.</p>
 
-<aside class="notice">While WebODM is capable of handling processing nodes running different versions of node-OpenDroneMap, we don&rsquo;t recommend doing so. When all processing nodes use the same node-OpenDroneMap version, the output of this API call will be identical to the <b>available_options</b> field of any node.</aside>
+<aside class="notice">While WebODM is capable of handling processing nodes running different versions of NodeODM, we don&rsquo;t recommend doing so. When all processing nodes use the same NodeODM version, the output of this API call will be identical to the <b>available_options</b> field of any node.</aside>
 
           <h2 id="permissions">Permissions</h2>
 
@@ -1222,7 +1265,7 @@ model-wise (can a user add a project? can a user view projects?).</p>
 
 <h2 id="run-unit-tests">Run Unit Tests</h2>
 
-<p>We think testing is a necessary part of delivering robust software. We try to achieve complete test coverage for backend code, while we are more relaxed about frontend testing. See <a href="https://github.com/OpenDroneMap/WebODM/issues/119">#119</a>.</p>
+<p>We think testing is a necessary part of delivering robust software. We try to achieve complete test coverage for backend code and at a minimum robust smoke testing for frontend code.</p>
 
 <p>To run the unit tests, simply type:</p>
 
@@ -1250,7 +1293,7 @@ model-wise (can a user add a project? can a user view projects?).</p>
 </tr>
 <tr>
 <td><code class="prettyprint">/nodeodm</code></td>
-<td>Application that bridges the communication between WebODM and <a href="https://github.com/OpenDroneMap/node-OpenDroneMap">node-OpenDroneMap</a>. Includes its own unit tests and models.</td>
+<td>Application that bridges the communication between WebODM and <a href="https://github.com/OpenDroneMap/NodeODM">NodeODM</a>. Includes its own unit tests and models.</td>
 </tr>
 <tr>
 <td><code class="prettyprint">/webodm</code></td>
