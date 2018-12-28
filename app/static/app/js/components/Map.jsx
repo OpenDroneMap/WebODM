@@ -7,17 +7,17 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
-import {addTempLayer} from '../classes/TemplateLayer';
+import {addTempLayer} from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import update from 'immutability-helper';
-import Dropzone from 'react-dropzone';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -174,6 +174,15 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
+    var thisComponent = this;
+    var mapTempLayerDrop = new Dropzone(this.container, {url : "/", clickable : false});
+    mapTempLayerDrop.on("addedfile", function(file) {
+      addTempLayer(file, thisComponent);
+    });
+    mapTempLayerDrop.on("error", function(file) {
+      mapTempLayerDrop.removeFile(file);
+    });
+    
     const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
@@ -275,44 +284,34 @@ class Map extends React.Component {
     if (this.shareButton) this.shareButton.hidePopup();
   }
 
-  onDrop(file, reject, _this) {
-    addTempLayer(file, reject, _this);
-  }
-
   render() {
     return (
-      <Dropzone
-      onDrop={(accepted, rejected) => { this.onDrop(accepted, rejected, this) }} disableClick={true} 
-      maxSize={this.maxTempLayerSize} multiple={false}
-      >
-        {({ getRootProps, getInputProps }) => (
-          <div {...getRootProps()} style={{ height: "100%" }} className="map">
-            <ErrorMessage bind={[this, 'error']} />
+      <div style={{height: "100%"}} className="map">
+        <ErrorMessage bind={[this, 'error']} />
 
-            <div {...getInputProps()}
-              style={{ height: "100%" }}
-              ref={(domNode) => (this.container = domNode)}
-              onMouseDown={this.handleMapMouseDown}
-            >
-            </div>
+        <div 
+          style={{height: "100%"}}
+          ref={(domNode) => (this.container = domNode)}
+          onMouseDown={this.handleMapMouseDown}
+          >
+        </div>
+        
 
-            <div className="actionButtons">
-              {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
-              {(!this.props.public && this.state.singleTask !== null) ?
-                <ShareButton
-                  ref={(ref) => { this.shareButton = ref; }}
-                  task={this.state.singleTask}
-                  linksTarget="map"
-                />
-                : ""}
-              <SwitchModeButton
-                task={this.state.singleTask}
-                type="mapToModel"
-                public={this.props.public} />
-            </div>
-          </div>
-          )}
-      </Dropzone>
+        <div className="actionButtons">
+          {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
+          {(!this.props.public && this.state.singleTask !== null) ? 
+            <ShareButton 
+              ref={(ref) => { this.shareButton = ref; }}
+              task={this.state.singleTask} 
+              linksTarget="map"
+            />
+          : ""}
+          <SwitchModeButton 
+            task={this.state.singleTask}
+            type="mapToModel" 
+            public={this.props.public} />
+        </div>
+      </div>
     );
   }
 }

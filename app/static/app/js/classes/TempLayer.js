@@ -1,9 +1,11 @@
 import shp from 'shpjs';
 import Spinner from 'spin';
 
-export function addTempLayer(file, rejected, _this) {
+export function addTempLayer(file, _this) {
+  let maxSize = 10485760;
+
   //random color for each feature
-  let getColor = (_geojson) => {
+  let getColor = () => {
     return 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
   }
 
@@ -16,17 +18,13 @@ export function addTempLayer(file, rejected, _this) {
   //show wait spinner
   var spinner = new Spinner({ color: '#fff', lines: 12 }).spin(_this.map._container);
 
-  if (typeof rejected !== 'undefined' && rejected.length > 0) {
+  if (file && file.size > maxSize) {
     let err = {};
-    if (rejected[0].size > _this.maxTempLayerSize) {
-      err.message = "File is bigger than " + _this.maxTempLayerSize + " bytes";
-    } else {
-      err.message = "Data error";
-    }
+    err.message = "File is bigger than 10 MB.";
     writeMessage(err);
   } else {
     //get just the first file
-    file = file[0];
+    //file = file[0];
     let reader = new FileReader();
     let isZipFile = file.name.slice(-3) === 'zip';
     if (isZipFile) {
@@ -35,14 +33,12 @@ export function addTempLayer(file, rejected, _this) {
         if (reader.readyState != 2 || reader.error) {
           return;
         } else {
-          if (isZipFile) {
-            shp(reader.result).then(function (geojson) {
-              addLayer(geojson);
-            }).catch(function (err) {
-              err.message = "Not a proper zipped shapefile!";
-              writeMessage(err);
-            })
-          }
+          shp(reader.result).then(function (geojson) {
+            addLayer(geojson);
+          }).catch(function (err) {
+            err.message = "Not a proper zipped shapefile " + file.name;
+            writeMessage(err);
+          })
         }
       }
       reader.readAsArrayBuffer(file);
@@ -53,7 +49,7 @@ export function addTempLayer(file, rejected, _this) {
           let geojson = JSON.parse(reader.result);
           addLayer(geojson);
         } catch (err) {
-          err.message = "Not a proper json file!";
+          err.message = "Not a proper json file " + file.name;
           writeMessage(err);
         }
       }
