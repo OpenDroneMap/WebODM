@@ -19,6 +19,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.utils import timezone
+from django.template.defaultfilters import filesizeformat
 
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
@@ -157,19 +158,20 @@ class Task(models.Model):
     )
 
     # Not an exact science
+    TASK_OUTPUT_MILESTONES_LAST_VALUE = 0.85
     TASK_OUTPUT_MILESTONES = {
         'Running ODM Load Dataset Cell': 0.01,
         'Running ODM Load Dataset Cell - Finished': 0.05,
         'opensfm/bin/opensfm match_features': 0.10,
         'opensfm/bin/opensfm reconstruct': 0.20,
         'opensfm/bin/opensfm export_visualsfm': 0.30,
-        'Running ODM Meshing Cell': 0.60,
-        'Running MVS Texturing Cell': 0.65,
-        'Running ODM Georeferencing Cell': 0.70,
-        'Running ODM DEM Cell': 0.80,
-        'Running ODM Orthophoto Cell': 0.85,
-        'Running ODM OrthoPhoto Cell - Finished': 0.90,
-        'Compressing all.zip:': 0.95
+        'Running ODM Meshing Cell': 0.50,
+        'Running MVS Texturing Cell': 0.55,
+        'Running ODM Georeferencing Cell': 0.60,
+        'Running ODM DEM Cell': 0.70,
+        'Running ODM Orthophoto Cell': 0.75,
+        'Running ODM OrthoPhoto Cell - Finished': 0.80,
+        'Compressing all.zip:': TASK_OUTPUT_MILESTONES_LAST_VALUE
     }
 
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
@@ -520,11 +522,33 @@ class Task(models.Model):
                             # Download all assets
                             zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
                             zip_path = os.path.join(assets_dir, "all.zip")
+
+                            # Keep track of download progress (if possible)
+                            content_length = zip_stream.headers.get('content-length')
+                            total_length = int(content_length) if content_length is not None else None
+                            downloaded = 0
+                            last_update = 0
+
+                            self.console_output += "Downloading results (%s). Please wait...\n" % (filesizeformat(total_length) if total_length is not None else 'unknown size');
+                            self.save()
+
                             with open(zip_path, 'wb') as fd:
                                 for chunk in zip_stream.iter_content(4096):
+                                    downloaded += len(chunk)
+
+                                    # Track progress if we know the content header length
+                                    # every 2 seconds
+                                    if total_length > 0 and time.time() - last_update >= 2:
+                                        Task.objects.filter(pk=self.id).update(running_progress=(self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(downloaded) / total_length) * 0.1))
+                                        last_update = time.time()
+
                                     fd.write(chunk)
 
                             logger.info("Done downloading all.zip for {}".format(self))
+
+                            self.refresh_from_db()
+                            self.console_output += "Extracting results. This could take a few minutes...\n";
+                            self.save()
 
                             # Extract from zip
                             with zipfile.ZipFile(zip_path, "r") as zip_h:
@@ -556,6 +580,7 @@ class Task(models.Model):
 
                             self.update_available_assets_field()
                             self.running_progress = 1.0
+                            self.console_output += "Done!\n";
                             self.save()
 
                             from app.plugins import signals as plugin_signals
