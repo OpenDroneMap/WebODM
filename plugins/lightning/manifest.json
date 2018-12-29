@@ -1,6 +1,6 @@
 {
 	"name": "Lightning Network Bridge",
-	"webodmMinVersion": "0.7.0",
+	"webodmMinVersion": "0.7.1",
 	"description": "A plugin to sync accounts from webodm.net",
 	"version": "0.1.0",
 	"author": "Piero Toffanin",

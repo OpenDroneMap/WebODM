@@ -1,13 +1,23 @@
 {% extends "app/plugins/templates/base.html" %}
 
 {% block content %}
-<!-- <script src="./Chart.min.js"></script> -->
+<script>
+PluginsAPI.App.ready([
+    	'lightning/build/app.js'
+	], function(args, App){
+    
+    $("[data-lightning-panel]").each(function(){
+        let props = $(this).data();
+        delete(props.lightningPanel);
+        window.ReactDOM.render(window.React.createElement(App, props), $(this).get(0));
+    });
+});
+</script>
 <h2>Test</h2>
 
 <div class="row text-center">
-    <div class="col-md-4 col-sm-12">
-    </div>
-    <div class="col-md-4 col-sm-12">
+    <div class="col-md-12">
+        <div data-lightning-panel data-api-key="test"></div>
     </div>
 </div>
 

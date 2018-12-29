@@ -8,11 +8,11 @@ class Plugin(PluginBase):
 
     def app_mount_points(self):
         @login_required
-        def diagnostic(request):
-            return render(request, self.template_path("index.html"))
+        def main(request):
+            return render(request, self.template_path("index.html"), {'title': 'Lightning Network'})
 
         return [
-            MountPoint('$', diagnostic)
+            MountPoint('$', main)
         ]
 
 
