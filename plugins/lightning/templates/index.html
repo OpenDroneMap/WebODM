@@ -3,7 +3,8 @@
 {% block content %}
 <script>
 PluginsAPI.App.ready([
-    	'lightning/build/app.js'
+        'lightning/build/app.js',
+        'lightning/build/app.css'
 	], function(args, App){
     
     $("[data-lightning-panel]").each(function(){
@@ -13,11 +14,10 @@ PluginsAPI.App.ready([
     });
 });
 </script>
-<h2>Test</h2>
 
-<div class="row text-center">
+<div class="row">
     <div class="col-md-12">
-        <div data-lightning-panel data-api-key="test"></div>
+        <div data-lightning-panel data-api-key="{{ api_key }}"></div>
     </div>
 </div>
 
