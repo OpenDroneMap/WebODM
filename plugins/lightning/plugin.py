@@ -21,6 +21,12 @@ class Plugin(PluginBase):
     def main_menu(self):
         return [Menu("Lightning Network", self.public_url(""), "fa fa-bolt fa-fw")]
 
+    def include_js_files(self):
+        return ['add_cost_estimate.js']
+
+    def build_jsx_components(self):
+        return ['app.jsx', 'CostEstimateItem.jsx']
+
     def app_mount_points(self):
         @login_required
         def main(request):
