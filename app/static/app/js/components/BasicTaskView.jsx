@@ -127,9 +127,10 @@ class BasicTaskView extends React.Component {
         let taskCompleted;
         let taskRestarted;
 
+        taskFailed = [StatusCodes.FAILED, StatusCodes.CANCELED].indexOf(this.props.taskStatus) !== -1;
+        taskCompleted = this.props.taskStatus === StatusCodes.COMPLETED;
+        
         if (prevProps.taskStatus !== this.props.taskStatus){
-            taskFailed = [StatusCodes.FAILED, StatusCodes.CANCELED].indexOf(this.props.taskStatus) !== -1;
-            taskCompleted = this.props.taskStatus === StatusCodes.COMPLETED;
             taskRestarted = this.props.taskStatus === null;
         }
         
