@@ -2,7 +2,7 @@ import shp from 'shpjs';
 import Spinner from 'spin';
 
 export function addTempLayer(file, _this) {
-  let maxSize = 10485760;
+  let maxSize = 5242880;
 
   //random color for each feature
   let getColor = () => {
@@ -20,7 +20,7 @@ export function addTempLayer(file, _this) {
 
   if (file && file.size > maxSize) {
     let err = {};
-    err.message = "File is bigger than 10 MB.";
+    err.message = file.name + " is bigger than 5 MB.";
     writeMessage(err);
   } else {
     //get just the first file
