@@ -9,6 +9,8 @@ from rest_framework_jwt.settings import api_settings
 
 from app import pending_actions
 from app.models import Project, Task
+from app.plugins.signals import processing_node_removed
+from app.tests.utils import catch_signal
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from .classes import BootTestCase
 
@@ -364,8 +366,11 @@ class TestApi(BootTestCase):
         client.login(username="testsuperuser", password="test1234")
 
         # Can delete a processing node as super user
-        res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
-        self.assertTrue(res.status_code, status.HTTP_200_OK)
+        # and a signal is sent when a processing node is deleted
+        with catch_signal(processing_node_removed) as h1:
+            res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
+            self.assertTrue(res.status_code, status.HTTP_200_OK)
+        h1.assert_called_once_with(sender=ProcessingNode, processing_node_id=pnode.id, signal=processing_node_removed)
 
         # Can create a processing node as super user
         res = client.post('/api/processingnodes/', {'hostname': 'localhost', 'port':'1000'})
