@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
 import ResizeModes from '../classes/ResizeModes';
 import update from 'immutability-helper';
+import PluginsAPI from '../classes/plugins/API';
 
 class NewTaskPanel extends React.Component {
   static defaultProps = {
