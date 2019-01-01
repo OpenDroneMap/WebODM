@@ -17,6 +17,7 @@ import {addTempLayer} from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
+import Standby from './Standby';
 import update from 'immutability-helper';
 
 class Map extends React.Component {
@@ -45,7 +46,8 @@ class Map extends React.Component {
     this.state = {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
-      pluginActionButtons: []
+      pluginActionButtons: [],
+      showLoading: false
     };
 
     this.imageryLayers = [];
@@ -174,10 +176,22 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
-    var thisComponent = this;
     var mapTempLayerDrop = new Dropzone(this.container, {url : "/", clickable : false});
-    mapTempLayerDrop.on("addedfile", function(file) {
-      addTempLayer(file, thisComponent);
+    mapTempLayerDrop.on("addedfile", (file) => {
+      this.setState({showLoading: true});
+      addTempLayer(file, (err, tempLayer, filename) => {
+        if (!err){
+          tempLayer.addTo(this.map);
+          //add layer to layer switcher with file name
+          this.autolayers.addOverlay(tempLayer, filename);
+          //zoom to all features
+          this.map.fitBounds(tempLayer.getBounds());
+        }else{
+          this.setState({ error: err.message || JSON.stringify(err) });
+        }
+
+        this.setState({showLoading: false});
+      });
     });
     mapTempLayerDrop.on("error", function(file) {
       mapTempLayerDrop.removeFile(file);
@@ -288,7 +302,11 @@ class Map extends React.Component {
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
-
+        <Standby 
+            message="Loading..."
+            show={this.state.showLoading}
+            />
+            
         <div 
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}

@@ -1,7 +1,6 @@
 import shp from 'shpjs';
-import Spinner from 'spin';
 
-export function addTempLayer(file, _this) {
+export function addTempLayer(file, cb) {
   let maxSize = 5242880;
 
   //random color for each feature
@@ -9,19 +8,10 @@ export function addTempLayer(file, _this) {
     return 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
   }
 
-  //notifications on top
-  let writeMessage = (_err) => {
-    _this.setState({ error: _err.message || JSON.stringify(_err) });
-    spinner.stop();
-  }
-
-  //show wait spinner
-  var spinner = new Spinner({ color: '#fff', lines: 12 }).spin(_this.map._container);
-
   if (file && file.size > maxSize) {
     let err = {};
     err.message = file.name + " is bigger than 5 MB.";
-    writeMessage(err);
+    cb(err);
   } else {
     //get just the first file
     //file = file[0];
@@ -37,7 +27,7 @@ export function addTempLayer(file, _this) {
             addLayer(geojson);
           }).catch(function (err) {
             err.message = "Not a proper zipped shapefile " + file.name;
-            writeMessage(err);
+            cb(err);
           })
         }
       }
@@ -50,7 +40,7 @@ export function addTempLayer(file, _this) {
           addLayer(geojson);
         } catch (err) {
           err.message = "Not a proper json file " + file.name;
-          writeMessage(err);
+          cb(err);
         }
       }
       reader.readAsText(file);
@@ -89,11 +79,8 @@ export function addTempLayer(file, _this) {
           }
         }
       });
-    tempLayer.addTo(_this.map);
-    //add layer to layer switcher with file name
-    _this.autolayers.addOverlay(tempLayer, file.name);
-    //zoom to all features
-    _this.map.fitBounds(tempLayer.getBounds());
-    spinner.stop();
+    tempLayer.options.bounds = tempLayer.getBounds();
+    
+    cb(null, tempLayer, file.name);
   }
 }
