@@ -7,11 +7,13 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
+import {addTempLayer} from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
@@ -172,6 +174,15 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
+    var thisComponent = this;
+    var mapTempLayerDrop = new Dropzone(this.container, {url : "/", clickable : false});
+    mapTempLayerDrop.on("addedfile", function(file) {
+      addTempLayer(file, thisComponent);
+    });
+    mapTempLayerDrop.on("error", function(file) {
+      mapTempLayerDrop.removeFile(file);
+    });
+    
     const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
