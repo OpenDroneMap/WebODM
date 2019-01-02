@@ -107,14 +107,14 @@ export default class CostEstimateItem extends React.Component {
             this.setState({loading: false});
             this.estimateRequest = null;
         });
-    }
+    };
 
     if (this.props.filesCount > 0){
         if (this.imageWidth === null && this.imageHeight === null){
             const files = this.props.getFiles();
             const imageFile = Array.prototype.find.call(files, f => f.type.startsWith("image/"));
             if (imageFile){
-                this.extractImageDimensions(files[0], dims => {
+                this.extractImageDimensions(imageFile, dims => {
                     this.imageWidth = dims.width;
                     this.imageHeight = dims.height;
                     getEstimate();

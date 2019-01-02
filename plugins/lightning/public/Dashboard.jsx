@@ -18,7 +18,7 @@ export default class Dashboard extends React.Component {
     this.state = {
         error: "",
         loading: true,
-        loadingMessage: "Loading dashboard...",
+        loadingMessage: "",
         user: null,
         nodes: [],
         syncingNodes: false
@@ -30,12 +30,20 @@ export default class Dashboard extends React.Component {
   };
 
   componentDidMount = () => {
+    this.loadDashboard();
+  }
+
+  loadDashboard = () => {
+    this.setState({loading: true, loadingMessage: "Loading dashboard..."});
+
     $.get(this.apiUrl('/r/user')).done(json => {
         if (json.balance !== undefined){
             this.setState({ loading: false, user: json });
             this.handleSyncProcessingNode();
+        }else if (json.message === "Unauthorized"){
+            this.props.onLogout();
         }else{
-            this.setState({ loading: false, error: `Cannot load lightning dashboard. Invalid response from server: ${JSON.stringify(json)}. Are you running the latest version of WebODM?` });
+            this.setState({ loading: false, error: `Cannot load lightning dashboard. Server responded: ${JSON.stringify(json)}. Are you running the latest version of WebODM?` });
         }
     })
     .fail(() => {
@@ -55,7 +63,6 @@ export default class Dashboard extends React.Component {
         port: node.port,
         token: tokens[0].id
     }).done(json => {
-        console.log(json);
         if (json.error){
             this.setState({error: json.error});
         }else{
@@ -90,6 +97,10 @@ export default class Dashboard extends React.Component {
       window.open("https://webodm.net/dashboard?bc=0");
   }
 
+  handleRefresh = () => {
+    this.loadDashboard();
+  }
+
   handleOpenDashboard = () => {
       window.open("https://webodm.net/dashboard");
   }
@@ -105,7 +116,12 @@ export default class Dashboard extends React.Component {
         <div>
             { user ? 
             <div>
-                <div className="balance">Balance: <strong>{ user.balance }</strong> credits <button className="btn btn-primary btn-sm" onClick={this.handleBuyCredits}><i className="fa fa-shopping-cart"></i> Buy Credits</button></div>
+                <div className="balance">
+                    Balance: <strong>{ user.balance }</strong> credits 
+                    <button className="btn btn-primary btn-sm" onClick={this.handleBuyCredits}><i className="fa fa-shopping-cart"></i> Buy Credits</button>
+                    <button className="btn btn-primary btn-sm" onClick={this.handleRefresh}><i className="fa fa-refresh"></i> Refresh Balance</button>
+                </div>
+                
                 <h4>Hello, <a href="javascript:void(0)" onClick={this.handleOpenDashboard}>{ user.email }</a></h4>
 
                 <div className="lightning-nodes">
