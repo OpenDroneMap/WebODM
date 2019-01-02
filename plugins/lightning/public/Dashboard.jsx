@@ -35,11 +35,11 @@ export default class Dashboard extends React.Component {
             this.setState({ loading: false, user: json });
             this.handleSyncProcessingNode();
         }else{
-            this.setState({ loading: false, error: `Cannot load dashboard. Invalid response from server: ${JSON.stringify(json)}. Are you running the latest version of WebODM?` });
+            this.setState({ loading: false, error: `Cannot load lightning dashboard. Invalid response from server: ${JSON.stringify(json)}. Are you running the latest version of WebODM?` });
         }
     })
     .fail(() => {
-        this.setState({ loading: false, error: `Cannot load dashboard. Please make sure you are connected to the internet, or try again in an hour.`});
+        this.setState({ loading: false, error: `Cannot load lightning dashboard. Please make sure you are connected to the internet, or try again in an hour.`});
     });
   }
 
