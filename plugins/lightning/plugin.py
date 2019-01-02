@@ -14,6 +14,8 @@ from django.views.decorators.http import require_POST
 from nodeodm.models import ProcessingNode
 from app.api.processingnodes import ProcessingNodeSerializer
 
+ds = GlobalDataStore('lightning')
+
 def JsonResponse(dict):
     return HttpResponse(json.dumps(dict), content_type='application/json')
 
@@ -30,11 +32,11 @@ class Plugin(PluginBase):
     def app_mount_points(self):
         @login_required
         def main(request):
-            ds = UserDataStore('lightning', request.user)
+            uds = UserDataStore('lightning', request.user)
 
             return render(request, self.template_path("index.html"), {
                 'title': 'Lightning Network',
-                'api_key': ds.get_string("api_key")
+                'api_key': uds.get_string("api_key")
             })
 
         @login_required
@@ -44,16 +46,14 @@ class Plugin(PluginBase):
             if api_key is None:
                 return JsonResponse({'error': 'api_key is required'})
 
-            ds = UserDataStore('lightning', request.user)
-            ds.set_string('api_key', api_key)
+            uds = UserDataStore('lightning', request.user)
+            uds.set_string('api_key', api_key)
 
             return JsonResponse({'success': True})
 
         @login_required
         @require_POST
         def sync_processing_node(request):
-            ds = GlobalDataStore('lightning')
-
             hostname = request.POST.get('hostname')
             port = int(request.POST.get('port'))
             token = request.POST.get('token')
@@ -83,8 +83,6 @@ class Plugin(PluginBase):
 
         @login_required
         def get_processing_nodes(request):
-            ds = GlobalDataStore('lightning')
-
             nodes = get_objects_for_user(request.user, 'view_processingnode', ProcessingNode,
                                          accept_global_perms=False)
             lightning_node_ids = ds.get_json("nodes", [])
@@ -94,19 +92,23 @@ class Plugin(PluginBase):
 
             return JsonResponse(serializer.data)
 
+        @login_required
+        def is_lightning_node(request):
+            lightning_node_ids = ds.get_json("nodes", [])
+            return JsonResponse({'result': int(request.GET.get('id')) in lightning_node_ids})
+
 
         return [
             MountPoint('$', main),
             MountPoint('save_api_key$', save_api_key),
             MountPoint('sync_processing_node$', sync_processing_node),
             MountPoint('get_processing_nodes$', get_processing_nodes),
+            MountPoint('is_lightning_node$', is_lightning_node),
         ]
 
 
 @receiver(signals.processing_node_removed, dispatch_uid="lightning_on_processing_node_removed")
 def lightning_on_processing_node_removed(sender, processing_node_id, **kwargs):
-    ds = GlobalDataStore('lightning')
-
     node_ids = ds.get_json('nodes', [])
     try:
         node_ids.remove(processing_node_id)

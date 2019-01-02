@@ -76,6 +76,10 @@ class NewTaskPanel extends React.Component {
   setResizeMode(v){
     return e => {
       this.setState({resizeMode: v});
+
+      setTimeout(() => {
+          this.handleFormChanged();
+      }, 0);
     }
   }
 
@@ -84,6 +88,10 @@ class NewTaskPanel extends React.Component {
     let n = parseInt(e.target.value.replace(/[^\d]*/g, ""));
     if (isNaN(n)) n = "";
     this.setState({resizeSize: n});
+    
+    setTimeout(() => {
+        this.handleFormChanged();
+    }, 0);
   }
 
   handleFormTaskLoaded(){
@@ -139,6 +147,7 @@ class NewTaskPanel extends React.Component {
               {this.state.items.map((Item, i) => <div key={i} className="form-group">
                 <Item taskInfo={this.state.taskInfo}
                       getFiles={this.props.getFiles}
+                      filesCount={this.props.filesCount}
                     />
               </div>)}
             </div>

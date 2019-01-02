@@ -26,7 +26,7 @@ export default class Dashboard extends React.Component {
   }
 
   apiUrl = url => {
-    return `http://192.168.2.253:5000${url}?api_key=${this.props.apiKey}`;
+    return `https://webodm.net${url}?api_key=${this.props.apiKey}`;
   };
 
   componentDidMount = () => {
@@ -121,10 +121,11 @@ export default class Dashboard extends React.Component {
                     </div> }
                 </div>
 
-                <div className="estimator">
-                    <h5>Cost Calculator</h5>
-                    Drag &amp; drop some images below to estimate the number of credits required to process them with lightning.
-                </div>
+                {nodes.length > 0 ? 
+                <div>
+                    <hr/>
+                    <i className="fa fa-thumbs-o-up"></i> You are all set! When creating a new task from the <a href="/dashboard">Dashboard</a>, select <strong>{nodes[0].hostname}:{nodes[0].port}</strong> from the <strong>Processing Node</strong> drop-down instead of Auto.
+                </div> : ""}
 
                 <div className="buttons text-right">
                     <hr/>

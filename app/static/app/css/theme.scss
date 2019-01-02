@@ -180,6 +180,7 @@ footer,
 /* Highlight */
 .task-list-item:nth-child(odd),
 .table-striped>tbody>tr:nth-of-type(odd),
+select.form-control option[disabled],
 .theme-background-highlight{
 	background-color: theme("highlight");
 }

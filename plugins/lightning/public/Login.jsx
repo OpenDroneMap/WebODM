@@ -33,7 +33,7 @@ export default class Login extends React.Component {
   handleLogin = () => {
       this.setState({loggingIn: true});
 
-      $.post("http://192.168.2.253:5000/r/auth/login",//"https://webodm.net/r/auth/login",
+      $.post("https://webodm.net/r/auth/login",
         {
           username: this.state.email,
           password: this.state.password
