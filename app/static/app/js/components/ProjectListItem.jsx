@@ -77,6 +77,7 @@ class ProjectListItem extends React.Component {
       resizedImages: 0,
       error: "",
       progress: 0,
+      files: [],
       totalCount: 0,
       totalBytes: 0,
       totalBytesSent: 0,
@@ -169,7 +170,8 @@ class ProjectListItem extends React.Component {
         .on("addedfiles", files => {
           this.setUploadState({
             editing: true,
-            totalCount: this.state.upload.totalCount + files.length
+            totalCount: this.state.upload.totalCount + files.length,
+            files
           });
         })
         .on("transformcompleted", (file, total) => {
@@ -430,6 +432,7 @@ class ProjectListItem extends React.Component {
               onCancel={this.handleTaskCanceled}
               filesCount={this.state.upload.totalCount}
               showResize={true}
+              getFiles={() => this.state.upload.files }
             />
           : ""}
 

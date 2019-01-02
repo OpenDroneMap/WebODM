@@ -68,6 +68,7 @@ export default class ApiFactory{
       const triggerEventName = "trigger" + eventName[0].toUpperCase() + eventName.slice(1);
 
       obj[triggerEventName] = (args, responseCb) => {
+        if (!args) args = {};
         args._placeholder = {};
         
         preTrigger(args, responseCb);

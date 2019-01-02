@@ -208,6 +208,14 @@ class ProcessingNode(models.Model):
         else:
             raise ProcessingError("Unknown response: {}".format(result))
 
+    def delete(self, using=None, keep_parents=False):
+        pnode_id = self.id
+        super(ProcessingNode, self).delete(using, keep_parents)
+
+        from app.plugins import signals as plugin_signals
+        plugin_signals.processing_node_removed.send_robust(sender=self.__class__, processing_node_id=pnode_id)
+
+
     class Meta:
         permissions = (
             ('view_processingnode', 'Can view processing node'),

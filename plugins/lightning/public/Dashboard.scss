@@ -1,0 +1,36 @@
+.plugin-lightning .lightning-dashboard{
+    .loading{
+        margin-top: 12px;
+    }
+
+    .balance{
+        float: right;
+        font-size: 120%;
+        button{
+            margin-left: 4px;
+        }
+    }
+
+    .buttons > button{
+        clear: both;
+        margin-right: 4px;
+    }
+
+    .lightning-nodes{
+        margin-top: 12px;
+        ul{
+            padding-left: 0;
+        }
+        li{
+            list-style-type: none;
+        }
+    }
+
+    .estimator{
+        margin-top: 12px;
+    }
+
+    h5{
+        font-weight: bold;
+    }    
+}

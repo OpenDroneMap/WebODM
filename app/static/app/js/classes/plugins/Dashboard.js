@@ -2,7 +2,8 @@ export default {
   namespace: "Dashboard",
 
   endpoints: [
-	"addTaskActionButton"
+    "addTaskActionButton",
+    "addNewTaskPanelItem"
   ]
 };
 
