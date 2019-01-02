@@ -508,6 +508,9 @@ class Task(models.Model):
                         logger.info("Processing status: {} for {}".format(self.status, self))
 
                         if self.status == status_codes.COMPLETED:
+                            # Since we're downloading/extracting results, set temporarely the status back to running
+                            self.status = status_codes.RUNNING
+
                             assets_dir = self.assets_path("")
 
                             # Remove previous assets directory
@@ -529,7 +532,7 @@ class Task(models.Model):
                             downloaded = 0
                             last_update = 0
 
-                            self.console_output += "Downloading results (%s). Please wait...\n" % (filesizeformat(total_length) if total_length is not None else 'unknown size');
+                            self.console_output += "Downloading results (%s). Please wait...\n" % (filesizeformat(total_length) if total_length is not None else 'unknown size')
                             self.save()
 
                             with open(zip_path, 'wb') as fd:
@@ -580,7 +583,8 @@ class Task(models.Model):
 
                             self.update_available_assets_field()
                             self.running_progress = 1.0
-                            self.console_output += "Done!\n";
+                            self.console_output += "Done!\n"
+                            self.status = status_codes.COMPLETED
                             self.save()
 
                             from app.plugins import signals as plugin_signals
