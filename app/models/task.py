@@ -10,6 +10,8 @@ from shlex import quote
 
 import piexif
 import re
+
+import requests
 from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
@@ -19,7 +21,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.utils import timezone
-from django.template.defaultfilters import filesizeformat
+from requests.packages.urllib3.exceptions import ReadTimeoutError
 
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
@@ -508,9 +510,6 @@ class Task(models.Model):
                         logger.info("Processing status: {} for {}".format(self.status, self))
 
                         if self.status == status_codes.COMPLETED:
-                            # Since we're downloading/extracting results, set temporarely the status back to running
-                            self.status = status_codes.RUNNING
-
                             assets_dir = self.assets_path("")
 
                             # Remove previous assets directory
@@ -523,29 +522,29 @@ class Task(models.Model):
                             logger.info("Downloading all.zip for {}".format(self))
 
                             # Download all assets
-                            zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
-                            zip_path = os.path.join(assets_dir, "all.zip")
+                            try:
+                                zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
+                                zip_path = os.path.join(assets_dir, "all.zip")
 
-                            # Keep track of download progress (if possible)
-                            content_length = zip_stream.headers.get('content-length')
-                            total_length = int(content_length) if content_length is not None else None
-                            downloaded = 0
-                            last_update = 0
+                                # Keep track of download progress (if possible)
+                                content_length = zip_stream.headers.get('content-length')
+                                total_length = int(content_length) if content_length is not None else None
+                                downloaded = 0
+                                last_update = 0
 
-                            self.console_output += "Downloading results (%s). Please wait...\n" % (filesizeformat(total_length) if total_length is not None else 'unknown size')
-                            self.save()
+                                with open(zip_path, 'wb') as fd:
+                                    for chunk in zip_stream.iter_content(4096):
+                                        downloaded += len(chunk)
 
-                            with open(zip_path, 'wb') as fd:
-                                for chunk in zip_stream.iter_content(4096):
-                                    downloaded += len(chunk)
+                                        # Track progress if we know the content header length
+                                        # every 2 seconds
+                                        if total_length > 0 and time.time() - last_update >= 2:
+                                            Task.objects.filter(pk=self.id).update(running_progress=(self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(downloaded) / total_length) * 0.1))
+                                            last_update = time.time()
 
-                                    # Track progress if we know the content header length
-                                    # every 2 seconds
-                                    if total_length > 0 and time.time() - last_update >= 2:
-                                        Task.objects.filter(pk=self.id).update(running_progress=(self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(downloaded) / total_length) * 0.1))
-                                        last_update = time.time()
-
-                                    fd.write(chunk)
+                                        fd.write(chunk)
+                            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                                raise ProcessingTimeout(e)
 
                             logger.info("Done downloading all.zip for {}".format(self))
 
