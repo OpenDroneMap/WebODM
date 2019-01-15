@@ -319,6 +319,11 @@ class TestApiTask(BootTransactionTestCase):
             res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
+        # We can stream downloads
+        res = client.get("/api/projects/{}/tasks/{}/download/{}?_force_stream=1".format(project.id, task.id, task.ASSETS_MAP.keys()[0]))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        self.assertTrue(res.has_header('_stream'))
+
         # A textured mesh archive file should exist
         self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
 
