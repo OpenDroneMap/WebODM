@@ -142,6 +142,18 @@ class Task(models.Model):
             },
             'dtm.tif': os.path.join('odm_dem', 'dtm.tif'),
             'dsm.tif': os.path.join('odm_dem', 'dsm.tif'),
+            'dtm_tiles.zip': {
+                'deferred_path': 'dtm_tiles.zip',
+                'deferred_compress_dir': 'dtm_tiles'
+            },
+            'dsm_tiles.zip': {
+                'deferred_path': 'dsm_tiles.zip',
+                'deferred_compress_dir': 'dsm_tiles'
+            },
+            'orthophoto_tiles.zip': {
+                'deferred_path': 'orthophoto_tiles.zip',
+                'deferred_compress_dir': 'orthophoto_tiles'
+            },
     }
 
     STATUS_CODES = (

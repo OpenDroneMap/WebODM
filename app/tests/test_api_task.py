@@ -322,6 +322,11 @@ class TestApiTask(BootTransactionTestCase):
         # A textured mesh archive file should exist
         self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
 
+        # Tiles archives should have been created
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["dsm_tiles.zip"]["deferred_path"])))
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["dtm_tiles.zip"]["deferred_path"])))
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["orthophoto_tiles.zip"]["deferred_path"])))
+
         # Can download raw assets
         res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
@@ -550,6 +555,7 @@ class TestApiTask(BootTransactionTestCase):
         # but others such as textured_model.zip should be available
         res = client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
         self.assertFalse('orthophoto.tif' in res.data['available_assets'])
+        self.assertFalse('orthophoto_tiles.zip' in res.data['available_assets'])
         self.assertTrue('textured_model.zip' in res.data['available_assets'])
 
         image1.close()
