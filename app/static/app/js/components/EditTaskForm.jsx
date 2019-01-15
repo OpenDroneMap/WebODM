@@ -108,7 +108,7 @@ class EditTaskForm extends React.Component {
             return {
               id: node.id,
               key: node.id,
-              label: `${node.hostname}:${node.port} (queue: ${node.queue_count})`,
+              label: `${node.label} (queue: ${node.queue_count})`,
               options: node.available_options,
               queue_count: node.queue_count,
               enabled: node.online,
