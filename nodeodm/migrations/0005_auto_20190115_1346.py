@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='processingnode',
             name='odm_version',
-            field=models.CharField(help_text='OpenDroneMap version used by the node.', max_length=32, null=True),
+            field=models.CharField(help_text='ODM version used by the node.', max_length=32, null=True),
         ),
     ]

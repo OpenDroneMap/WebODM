@@ -12,6 +12,7 @@
     "last_refreshed": "2017-03-01T21:14:49.918276Z",
     "queue_count": 0,
     "max_images": null,
+    "label": "nodeodm.masseranolabs.com:80",
     "available_options": [
         {
             "help": "Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9",
@@ -33,9 +34,11 @@ online | bool | Whether the processing node could be reached in the last 5 minut
 hostname | string | Hostname/IP address
 port | int | Port
 api_version | string | Version of NodeODM currently running
+odm_version | string | Version of ODM currently being used
 last_refreshed | string | Date and time this node was last seen online. This value is typically refreshed every 15-30 seconds and is used to decide whether a node is offline or not
 queue_count | int | Number of [Task](#task) items currently being processed/queued on this node.
 max_images | int | Optional maximum number of images this processing node can accept. null indicates no limit.
+label | string | Label for the node
 available_options | JSON[] | JSON-encoded list of options that this node is capable of handling. See [Available Options](#available-options) for more information
 
 
