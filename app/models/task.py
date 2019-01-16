@@ -198,8 +198,8 @@ class Task(models.Model):
     auto_processing_node = models.BooleanField(default=True, help_text="A flag indicating whether this task should be automatically assigned a processing node")
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
-    options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
-    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list(), blank=True, help_text="List of available assets to download")
+    options = fields.JSONField(default=dict, blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
+    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text="List of available assets to download")
     console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
 
     orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
@@ -769,8 +769,3 @@ class Task(models.Model):
         except subprocess.CalledProcessError as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
             return None
-
-    class Meta:
-        permissions = (
-            ('view_task', 'Can view task'),
-        )

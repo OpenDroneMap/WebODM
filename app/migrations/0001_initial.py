@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import app.models
-import app.postgis
 from django.conf import settings
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
@@ -39,9 +38,6 @@ class Migration(migrations.Migration):
                 ('deleting', models.BooleanField(db_index=True, default=False, help_text='Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted.')),
                 ('owner', models.ForeignKey(help_text='The person who created the project', on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
             ],
-            options={
-                'permissions': (('view_project', 'Can view project'),),
-            },
         ),
         migrations.CreateModel(
             name='ProjectGroupObjectPermission',
@@ -80,15 +76,12 @@ class Migration(migrations.Migration):
                 ('options', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default={}, help_text='Options that are being used to process this task', validators=[app.models.validate_task_options])),
                 ('console_output', models.TextField(blank=True, default='', help_text="Console output of the OpenDroneMap's process")),
                 ('ground_control_points', models.FileField(blank=True, help_text='Optional Ground Control Points file to use for processing', null=True, upload_to=app.models.gcp_directory_path)),
-                ('orthophoto', app.postgis.OffDbRasterField(blank=True, help_text='Orthophoto created by OpenDroneMap', null=True, srid=4326)),
+                ('orthophoto', django.contrib.gis.db.models.RasterField(blank=True, help_text='Orthophoto created by OpenDroneMap', null=True, srid=4326)),
                 ('created_at', models.DateTimeField(default=django.utils.timezone.now, help_text='Creation date')),
                 ('pending_action', models.IntegerField(blank=True, choices=[(1, 'CANCEL'), (2, 'REMOVE'), (3, 'RESTART')], db_index=True, help_text='A requested action to be performed on the task. The selected action will be performed by the scheduler at the next iteration.', null=True)),
                 ('processing_node', models.ForeignKey(blank=True, help_text='Processing node assigned to this task (or null if this task has not been associated yet)', null=True, on_delete=django.db.models.deletion.CASCADE, to='nodeodm.ProcessingNode')),
                 ('project', models.ForeignKey(help_text='Project that this task belongs to', on_delete=django.db.models.deletion.CASCADE, to='app.Project')),
             ],
-            options={
-                'permissions': (('view_task', 'Can view task'),),
-            },
         ),
         migrations.AddField(
             model_name='imageupload',

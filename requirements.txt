@@ -11,7 +11,7 @@ django-codemirror2==0.2
 django-colorfield==0.1.14
 django-compressor==2.2
 django-cors-headers==2.2.0
-django-filter==1.1.0
+django-filter==2.0.0
 django-guardian==1.4.9
 django-imagekit==4.0.1
 django-libsass==0.7

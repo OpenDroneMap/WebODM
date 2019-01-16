@@ -265,7 +265,7 @@ MESSAGE_TAGS = {
 # Use Django's standard django.contrib.auth permissions (no anonymous usage)
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': [
-    'app.permissions.GuardianObjectPermissions',
+    'rest_framework.permissions.DjangoObjectPermissions',
   ],
   'DEFAULT_FILTER_BACKENDS': [
     'rest_framework.filters.DjangoObjectPermissionsFilter',

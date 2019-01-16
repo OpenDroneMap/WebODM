@@ -320,7 +320,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # We can stream downloads
-        res = client.get("/api/projects/{}/tasks/{}/download/{}?_force_stream=1".format(project.id, task.id, task.ASSETS_MAP.keys()[0]))
+        res = client.get("/api/projects/{}/tasks/{}/download/{}?_force_stream=1".format(project.id, task.id, list(task.ASSETS_MAP.keys())[0]))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
         self.assertTrue(res.has_header('_stream'))
 

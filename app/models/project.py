@@ -51,11 +51,6 @@ class Project(models.Model):
                 ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
                 .only('id', 'project_id')]
 
-    class Meta:
-        permissions = (
-            ('view_project', 'Can view project'),
-        )
-
 
 @receiver(signals.post_save, sender=Project, dispatch_uid="project_post_save")
 def project_post_save(sender, instance, created, **kwargs):
