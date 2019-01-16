@@ -9,7 +9,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 
 * [Getting Started](#getting-started)
-    * [Add More Processing Nodes](#add-more-processing-nodes)
+    * [Manage Processing Nodes](#manage-processing-nodes)
     * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
@@ -80,13 +80,19 @@ For Windows and macOS users an [installer](https://www.webodm.org/installer) is 
 
 You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
 
-### Add More Processing Nodes
+### Manage Processing Nodes
 
 WebODM can be linked to one or more processing nodes running [NodeODM](https://github.com/OpenDroneMap/NodeODM). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
 
 Adding more processing nodes will allow you to run multiple jobs in parallel. 
 
 You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
+
+If you don't need the default "node-odm-1" node, simply pass the `--no-default-node` flag when starting WebODM:
+
+`./webodm.sh restart --no-default-node`. 
+
+Then from the web interface simply manually remove the "node-odm-1" node.
 
 ### Enable SSL
 
