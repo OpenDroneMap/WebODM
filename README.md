@@ -223,7 +223,7 @@ To run a standalone installation of WebODM (the user interface), including the p
 
 Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is still a work in progress, so currently a good video card does not improve performance.
 
-WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms. 
+WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms and there's a [native installer for Ubuntu 16.04](https://www.opendronemap.org/webodm/server-installer/) also available.
 
 [NodeODM](https://github.com/OpenDroneMap/NodeODM) and [ODM](https://github.com/OpenDroneMap/ODM) cannot run natively on Mac and Windows and this is the reason we mostly recommend people to use docker.
 
