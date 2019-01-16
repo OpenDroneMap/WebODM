@@ -17,6 +17,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
     * [Reset Password](#reset-password)
     * [Manage Plugins](#manage-plugins)
     * [Update](#update)
+ * [Recommended Machine Specs](#recommended-machine-specs)
  * [Customizing and Extending](#customizing-and-extending)
  * [API Docs](#api-docs)
  * [ODM, NodeODM, WebODM... what?](#odm-nodeodm-webodm-what)
@@ -189,6 +190,8 @@ To enable/disable a plugin type:
 
 On some platforms (eg. Windows), if you want to manage plugins, you will need to make sure that the `./plugins` directory can be mounted as a docker volume and then pass the `--mount-plugins-volume` flag to `webodm.sh`. Check the docker documentation.
 
+If you are running WebODM natively, you'll need to restart your web server and gunicorn services.
+
 ### Update
 
 If you use docker, updating is as simple as running:
@@ -210,6 +213,21 @@ webpack --mode production
 python manage.py collectstatic --noinput
 python manage.py migrate
 ```
+
+## Recommended Machine Specs
+
+To run a standalone installation of WebODM (the user interface), including the processing component (NodeODM), we recommend at a minimum:
+
+* 100 GB free disk space
+* 16 GB RAM
+
+Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is still a work in progress, so currently a good video card does not improve performance.
+
+WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms. 
+
+[NodeODM](https://github.com/OpenDroneMap/NodeODM) and [ODM](https://github.com/OpenDroneMap/ODM) cannot run natively on Mac and Windows and this is the reason we mostly recommend people to use docker.
+
+WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine. Lots of choices and freedom!
 
 ## Customizing and Extending
 
