@@ -355,6 +355,19 @@ class TestApi(BootTestCase):
         # Verify max images field
         self.assertTrue("max_images" in res.data)
 
+        # Verify odm version
+        self.assertTrue("odm_version" in res.data)
+
+        # label should be hostname:port (since no label is set)
+        self.assertEqual(res.data['label'], pnode.hostname + ":" + str(pnode.port))
+
+        # If we update the label, the label is used instead
+        pnode.label = "Test"
+        pnode.save()
+
+        res = client.get('/api/processingnodes/{}/'.format(pnode.id))
+        self.assertEqual(res.data['label'], "Test")
+
         # Cannot delete a processing node as normal user
         res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
         self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)

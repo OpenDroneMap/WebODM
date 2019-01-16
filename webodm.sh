@@ -28,6 +28,8 @@ elif [[ $platform = "MacOS / OSX" ]] && [[ $(pwd) == /Users* ]]; then
     plugins_volume=true
 fi
 
+load_default_node=true
+
 # Load default values
 source .env
 DEFAULT_PORT="$WO_PORT"
@@ -91,6 +93,10 @@ case $key in
     plugins_volume=true
     shift # past argument
     ;;
+    --no-default-node)
+    load_default_node=false
+    shift # past argument
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -125,6 +131,7 @@ usage(){
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
+  echo "	--no-default-node	Do not create a default NodeODM node attached to WebODM on startup (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-cert	<path>	Manually specify a path to the certificate file (.pem) to use with nginx to enable SSL (default: None)"
@@ -193,7 +200,11 @@ start(){
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
 
-	command="docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml"
+	command="docker-compose -f docker-compose.yml"
+
+    if [[ $load_default_node = true ]]; then
+        command+=" -f docker-compose.nodeodm.yml"
+    fi
 	
 	if [ "$WO_SSL" = "YES" ]; then
 		if [ ! -z "$WO_SSL_KEY" ] && [ ! -e "$WO_SSL_KEY" ]; then

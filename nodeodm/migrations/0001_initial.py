@@ -29,9 +29,6 @@ class Migration(migrations.Migration):
                 ('queue_count', models.PositiveIntegerField(default=0, help_text='Number of tasks currently being processed by this node (as reported by the node itself)')),
                 ('available_options', django.contrib.postgres.fields.jsonb.JSONField(default={}, help_text='Description of the options that can be used for processing')),
             ],
-            options={
-                'permissions': (('view_processingnode', 'Can view processing node'),),
-            },
         ),
         migrations.CreateModel(
             name='ProcessingNodeGroupObjectPermission',

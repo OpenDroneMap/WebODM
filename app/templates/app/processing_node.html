@@ -20,12 +20,20 @@
 		<td>{{ processing_node.api_version }}</td>
 	</tr>
 	<tr>
+		<td>{% trans "ODM Version" %}</td>
+		<td>{{ processing_node.odm_version }}</td>
+	</tr>
+	<tr>
 		<td>{% trans "Queue Count" %}</td>
 		<td>{{ processing_node.queue_count }}</td>
 	</tr>
 	<tr>
 		<td>{% trans "Max Images Limit" %}</td>
 		<td>{{ processing_node.max_images }}</td>
+	</tr>
+	<tr>
+		<td>{% trans "Label" %}</td>
+		<td>{{ processing_node.label|default:"None" }}</td>
 	</tr>
 	<tr>
 		<td>{% trans "Last Refreshed" %}</td>

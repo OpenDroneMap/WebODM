@@ -130,7 +130,7 @@ export default class Dashboard extends React.Component {
                     <div>
                         <ul>
                             {nodes.map(n => 
-                                <li key={n.id}><i className="fa fa-laptop"></i> <a href={`/processingnode/${n.id}/`}>{n.hostname}:{n.port}</a></li>
+                                <li key={n.id}><i className="fa fa-laptop"></i> <a href={`/processingnode/${n.id}/`}>{n.label}</a></li>
                             )}
                         </ul>
                         <button className="btn btn-sm btn-default" onClick={this.handleSyncProcessingNode}><i className="fa fa-refresh"></i> Resync</button>
@@ -140,7 +140,7 @@ export default class Dashboard extends React.Component {
                 {nodes.length > 0 ? 
                 <div>
                     <hr/>
-                    <i className="fa fa-thumbs-o-up"></i> You are all set! When creating a new task from the <a href="/dashboard">Dashboard</a>, select <strong>{nodes[0].hostname}:{nodes[0].port}</strong> from the <strong>Processing Node</strong> drop-down instead of Auto.
+                    <i className="fa fa-thumbs-o-up"></i> You are all set! When creating a new task from the <a href="/dashboard">Dashboard</a>, select <strong>{nodes[0].label}</strong> from the <strong>Processing Node</strong> drop-down instead of Auto.
                 </div> : ""}
 
                 <div className="buttons text-right">

@@ -64,7 +64,7 @@ class Plugin(PluginBase):
                 matches = [n for n in nodes if n.hostname == hostname and n.port == port and n.token == token]
                 if len(matches) == 0:
                     # Add
-                    node = ProcessingNode.objects.create(hostname=hostname, port=port, token=token)
+                    node = ProcessingNode.objects.create(hostname=hostname, port=port, token=token, label="Lightning")
                     assign_perm('view_processingnode', request.user, node)
                     assign_perm('change_processingnode', request.user, node)
                     assign_perm('delete_processingnode', request.user, node)

@@ -426,7 +426,10 @@ class TaskListItem extends React.Component {
         defaultError: "Cannot delete task."
       }));
 
-      const disabled = this.state.actionButtonsDisabled || !!task.pending_action;
+      const disabled = this.state.actionButtonsDisabled || 
+                    ([pendingActions.CANCEL,
+                      pendingActions.REMOVE, 
+                      pendingActions.RESTART].indexOf(task.pending_action) !== -1);
 
       actionButtons = (<div className="action-buttons">
             {task.status === statusCodes.COMPLETED ?

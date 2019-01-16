@@ -9,13 +9,14 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 
 * [Getting Started](#getting-started)
-    * [Add More Processing Nodes](#add-more-processing-nodes)
+    * [Manage Processing Nodes](#manage-processing-nodes)
     * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
     * [Backup and Restore](#backup-and-restore)
     * [Reset Password](#reset-password)
     * [Manage Plugins](#manage-plugins)
+    * [Update](#update)
  * [Customizing and Extending](#customizing-and-extending)
  * [API Docs](#api-docs)
  * [ODM, NodeODM, WebODM... what?](#odm-nodeodm-webodm-what)
@@ -80,13 +81,19 @@ For Windows and macOS users an [installer](https://www.webodm.org/installer) is 
 
 You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
 
-### Add More Processing Nodes
+### Manage Processing Nodes
 
 WebODM can be linked to one or more processing nodes running [NodeODM](https://github.com/OpenDroneMap/NodeODM). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
 
 Adding more processing nodes will allow you to run multiple jobs in parallel. 
 
 You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
+
+If you don't need the default "node-odm-1" node, simply pass the `--no-default-node` flag when starting WebODM:
+
+`./webodm.sh restart --no-default-node`. 
+
+Then from the web interface simply manually remove the "node-odm-1" node.
 
 ### Enable SSL
 
@@ -128,6 +135,7 @@ On Windows, docker-compose fails with `Failed to execute the script docker-compo
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
 Cannot start WebODM via `./webodm.sh start`, error messages are different at each retry | You could be running out of memory. Make sure you have enough RAM available. 2GB should be the recommended minimum, unless you know what you are doing
+While running WebODM with Docker Toolbox (VirtualBox) you cannot access WebODM from another computer in the same network. | As Administrator, run `cmd.exe` and then type `"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm "default" natpf1 "rule-name,tcp,,8000,,8000"`
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
@@ -180,6 +188,28 @@ To enable/disable a plugin type:
 ```
 
 On some platforms (eg. Windows), if you want to manage plugins, you will need to make sure that the `./plugins` directory can be mounted as a docker volume and then pass the `--mount-plugins-volume` flag to `webodm.sh`. Check the docker documentation.
+
+### Update
+
+If you use docker, updating is as simple as running:
+
+```bash
+./webodm.sh update
+```
+
+If you are running WebODM [natively](#run-it-natively), these commands should do it:
+
+```bash
+cd /webodm
+sudo su odm # Only in case you are running WebODM with a different user
+git pull origin master
+source python3-venv/bin/activate # If you are running a virtualenv
+npm install
+pip install -r requirements.txt
+webpack --mode production
+python manage.py collectstatic --noinput
+python manage.py migrate
+```
 
 ## Customizing and Extending
 

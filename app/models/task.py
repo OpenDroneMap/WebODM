@@ -10,6 +10,8 @@ from shlex import quote
 
 import piexif
 import re
+
+import requests
 from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
@@ -19,7 +21,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.utils import timezone
-from django.template.defaultfilters import filesizeformat
+from requests.packages.urllib3.exceptions import ReadTimeoutError
 
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
@@ -37,7 +39,8 @@ import subprocess
 
 logger = logging.getLogger('app.logger')
 
-
+class TaskInterruptedException(Exception):
+    pass
 
 def task_directory_path(taskId, projectId):
     return 'project/{0}/task/{1}/'.format(projectId, taskId)
@@ -140,6 +143,18 @@ class Task(models.Model):
             },
             'dtm.tif': os.path.join('odm_dem', 'dtm.tif'),
             'dsm.tif': os.path.join('odm_dem', 'dsm.tif'),
+            'dtm_tiles.zip': {
+                'deferred_path': 'dtm_tiles.zip',
+                'deferred_compress_dir': 'dtm_tiles'
+            },
+            'dsm_tiles.zip': {
+                'deferred_path': 'dsm_tiles.zip',
+                'deferred_compress_dir': 'dsm_tiles'
+            },
+            'orthophoto_tiles.zip': {
+                'deferred_path': 'orthophoto_tiles.zip',
+                'deferred_compress_dir': 'orthophoto_tiles'
+            },
     }
 
     STATUS_CODES = (
@@ -184,8 +199,8 @@ class Task(models.Model):
     auto_processing_node = models.BooleanField(default=True, help_text="A flag indicating whether this task should be automatically assigned a processing node")
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
-    options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
-    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list(), blank=True, help_text="List of available assets to download")
+    options = fields.JSONField(default=dict, blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
+    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text="List of available assets to download")
     console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
 
     orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
@@ -379,7 +394,13 @@ class Task(models.Model):
                     last_update = 0
                     def callback(progress):
                         nonlocal last_update
-                        if time.time() - last_update >= 2 or (progress >= 1.0 - 1e-6 and progress <= 1.0 + 1e-6):
+
+                        time_has_elapsed = time.time() - last_update >= 2
+
+                        if time_has_elapsed:
+                            self.check_if_canceled()
+
+                        if time_has_elapsed or (progress >= 1.0 - 1e-6 and progress <= 1.0 + 1e-6):
                             Task.objects.filter(pk=self.id).update(upload_progress=progress)
                             last_update = time.time()
 
@@ -508,9 +529,6 @@ class Task(models.Model):
                         logger.info("Processing status: {} for {}".format(self.status, self))
 
                         if self.status == status_codes.COMPLETED:
-                            # Since we're downloading/extracting results, set temporarely the status back to running
-                            self.status = status_codes.RUNNING
-
                             assets_dir = self.assets_path("")
 
                             # Remove previous assets directory
@@ -523,29 +541,29 @@ class Task(models.Model):
                             logger.info("Downloading all.zip for {}".format(self))
 
                             # Download all assets
-                            zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
-                            zip_path = os.path.join(assets_dir, "all.zip")
+                            try:
+                                zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
+                                zip_path = os.path.join(assets_dir, "all.zip")
 
-                            # Keep track of download progress (if possible)
-                            content_length = zip_stream.headers.get('content-length')
-                            total_length = int(content_length) if content_length is not None else None
-                            downloaded = 0
-                            last_update = 0
+                                # Keep track of download progress (if possible)
+                                content_length = zip_stream.headers.get('content-length')
+                                total_length = int(content_length) if content_length is not None else None
+                                downloaded = 0
+                                last_update = 0
 
-                            self.console_output += "Downloading results (%s). Please wait...\n" % (filesizeformat(total_length) if total_length is not None else 'unknown size')
-                            self.save()
+                                with open(zip_path, 'wb') as fd:
+                                    for chunk in zip_stream.iter_content(4096):
+                                        downloaded += len(chunk)
 
-                            with open(zip_path, 'wb') as fd:
-                                for chunk in zip_stream.iter_content(4096):
-                                    downloaded += len(chunk)
+                                        # Track progress if we know the content header length
+                                        # every 2 seconds
+                                        if total_length > 0 and time.time() - last_update >= 2:
+                                            Task.objects.filter(pk=self.id).update(running_progress=(self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(downloaded) / total_length) * 0.1))
+                                            last_update = time.time()
 
-                                    # Track progress if we know the content header length
-                                    # every 2 seconds
-                                    if total_length > 0 and time.time() - last_update >= 2:
-                                        Task.objects.filter(pk=self.id).update(running_progress=(self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(downloaded) / total_length) * 0.1))
-                                        last_update = time.time()
-
-                                    fd.write(chunk)
+                                        fd.write(chunk)
+                            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                                raise ProcessingTimeout(e)
 
                             logger.info("Done downloading all.zip for {}".format(self))
 
@@ -602,7 +620,9 @@ class Task(models.Model):
             logger.warning("{} cannot communicate with processing node: {}".format(self, str(e)))
         except ProcessingTimeout as e:
             logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
-
+        except TaskInterruptedException as e:
+            # Task was interrupted during image resize / upload
+            logger.warning("{} interrupted".format(self, str(e)))
 
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
@@ -695,6 +715,12 @@ class Task(models.Model):
         return [os.path.join(directory, f) for f in os.listdir(directory) if
                        re.match(regex, f, re.IGNORECASE)]
 
+    def check_if_canceled(self):
+        # Check if task has been canceled/removed
+        if Task.objects.only("pending_action").get(pk=self.id).pending_action in [pending_actions.CANCEL,
+                                                                                  pending_actions.REMOVE]:
+            raise TaskInterruptedException()
+
     def resize_images(self):
         """
         Destructively resize this task's JPG images while retaining EXIF tags.
@@ -718,13 +744,12 @@ class Task(models.Model):
 
             resized_images_count += 1
             if time.time() - last_update >= 2:
+                # Update progress
                 Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
+                self.check_if_canceled()
                 last_update = time.time()
 
-        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
-            resized_images = list(filter(lambda i: i is not None, executor.map(
-                partial(resize_image, resize_to=self.resize_to, done=callback),
-                images_path)))
+        resized_images = list(map(partial(resize_image, resize_to=self.resize_to, done=callback), images_path))
 
         Task.objects.filter(pk=self.id).update(resize_progress=1.0)
 
@@ -758,8 +783,3 @@ class Task(models.Model):
         except subprocess.CalledProcessError as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
             return None
-
-    class Meta:
-        permissions = (
-            ('view_task', 'Can view task'),
-        )

@@ -1,9 +1,10 @@
-import mimetypes
 import os
 from wsgiref.util import FileWrapper
 
+import mimetypes
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.db import transaction
+from django.http import FileResponse
 from django.http import HttpResponse
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.decorators import detail_route
@@ -253,33 +254,52 @@ class TaskTilesJson(TaskNestedView):
         return Response(json)
 
 
+def download_file_response(request, filePath, content_disposition):
+    filename = os.path.basename(filePath)
+    filesize = os.stat(filePath).st_size
+    file = open(filePath, "rb")
+
+    # More than 100mb, normal http response, otherwise stream
+    # Django docs say to avoid streaming when possible
+    stream = filesize > 1e8 or request.GET.get('_force_stream', False)
+    if stream:
+        response = FileResponse(file)
+    else:
+        response = HttpResponse(FileWrapper(file),
+                                content_type=(mimetypes.guess_type(filename)[0] or "application/zip"))
+
+    response['Content-Type'] = mimetypes.guess_type(filename)[0] or "application/zip"
+    response['Content-Disposition'] = "{}; filename={}".format(content_disposition, filename)
+    response['Content-Length'] = filesize
+
+    # For testing
+    if stream:
+        response['_stream'] = 'yes'
+
+    return response
+
+
 """
 Task downloads are simply aliases to download the task's assets
 (but require a shorter path and look nicer the API user)
 """
 class TaskDownloads(TaskNestedView):
-        def get(self, request, pk=None, project_pk=None, asset=""):
-            """
-            Downloads a task asset (if available)
-            """
-            task = self.get_and_check_task(request, pk)
+    def get(self, request, pk=None, project_pk=None, asset=""):
+        """
+        Downloads a task asset (if available)
+        """
+        task = self.get_and_check_task(request, pk)
 
-            # Check and download
-            try:
-                asset_path = task.get_asset_download_path(asset)
-            except FileNotFoundError:
-                raise exceptions.NotFound("Asset does not exist")
+        # Check and download
+        try:
+            asset_path = task.get_asset_download_path(asset)
+        except FileNotFoundError:
+            raise exceptions.NotFound("Asset does not exist")
 
-            if not os.path.exists(asset_path):
-                raise exceptions.NotFound("Asset does not exist")
+        if not os.path.exists(asset_path):
+            raise exceptions.NotFound("Asset does not exist")
 
-            asset_filename = os.path.basename(asset_path)
-
-            file = open(asset_path, "rb")
-            response = HttpResponse(FileWrapper(file),
-                                    content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
-            response['Content-Disposition'] = "attachment; filename={}".format(asset)
-            return response
+        return download_file_response(request, asset_path, 'attachment')
 
 """
 Raw access to the task's asset folder resources
@@ -301,10 +321,4 @@ class TaskAssets(TaskNestedView):
         if (not os.path.exists(asset_path)) or os.path.isdir(asset_path):
             raise exceptions.NotFound("Asset does not exist")
 
-        asset_filename = os.path.basename(asset_path)
-
-        file = open(asset_path, "rb")
-        response = HttpResponse(FileWrapper(file),
-                                content_type=(mimetypes.guess_type(asset_filename)[0] or "application/zip"))
-        response['Content-Disposition'] = "inline; filename={}".format(asset_filename)
-        return response
+        return download_file_response(request, asset_path, 'inline')
