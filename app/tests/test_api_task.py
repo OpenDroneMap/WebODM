@@ -15,7 +15,7 @@ from rest_framework.test import APIClient
 import worker
 from django.utils import timezone
 from app.models import Project, Task, ImageUpload
-from app.models.task import task_directory_path, full_task_directory_path
+from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
 from app.plugins.signals import task_completed, task_removed, task_removing
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
@@ -394,9 +394,16 @@ class TestApiTask(BootTransactionTestCase):
 
         self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])
 
+        # Should return without issues
+        task.check_if_canceled()
+
         # Cancel a task
         res = client.post("/api/projects/{}/tasks/{}/cancel/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        # Should raise TaskInterruptedException
+        self.assertRaises(TaskInterruptedException, task.check_if_canceled)
+
         # task is processed right away
 
         # Should have been canceled

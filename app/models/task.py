@@ -39,7 +39,8 @@ import subprocess
 
 logger = logging.getLogger('app.logger')
 
-
+class TaskInterruptedException(Exception):
+    pass
 
 def task_directory_path(taskId, projectId):
     return 'project/{0}/task/{1}/'.format(projectId, taskId)
@@ -395,6 +396,7 @@ class Task(models.Model):
                         nonlocal last_update
                         if time.time() - last_update >= 2 or (progress >= 1.0 - 1e-6 and progress <= 1.0 + 1e-6):
                             Task.objects.filter(pk=self.id).update(upload_progress=progress)
+                            self.check_if_canceled()
                             last_update = time.time()
 
                     # This takes a while
@@ -613,7 +615,9 @@ class Task(models.Model):
             logger.warning("{} cannot communicate with processing node: {}".format(self, str(e)))
         except ProcessingTimeout as e:
             logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
-
+        except TaskInterruptedException as e:
+            # Task was interrupted during image resize / upload
+            logger.warning("{} interrupted".format(self, str(e)))
 
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
@@ -706,6 +710,12 @@ class Task(models.Model):
         return [os.path.join(directory, f) for f in os.listdir(directory) if
                        re.match(regex, f, re.IGNORECASE)]
 
+    def check_if_canceled(self):
+        # Check if task has been canceled/removed
+        if Task.objects.only("pending_action").get(pk=self.id).pending_action in [pending_actions.CANCEL,
+                                                                                  pending_actions.REMOVE]:
+            raise TaskInterruptedException()
+
     def resize_images(self):
         """
         Destructively resize this task's JPG images while retaining EXIF tags.
@@ -729,7 +739,9 @@ class Task(models.Model):
 
             resized_images_count += 1
             if time.time() - last_update >= 2:
+                # Update progress
                 Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
+                self.check_if_canceled()
                 last_update = time.time()
 
         with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
