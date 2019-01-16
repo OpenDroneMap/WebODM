@@ -16,6 +16,7 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
     * [Backup and Restore](#backup-and-restore)
     * [Reset Password](#reset-password)
     * [Manage Plugins](#manage-plugins)
+    * [Update](#update)
  * [Customizing and Extending](#customizing-and-extending)
  * [API Docs](#api-docs)
  * [ODM, NodeODM, WebODM... what?](#odm-nodeodm-webodm-what)
@@ -134,6 +135,7 @@ On Windows, docker-compose fails with `Failed to execute the script docker-compo
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
 Cannot start WebODM via `./webodm.sh start`, error messages are different at each retry | You could be running out of memory. Make sure you have enough RAM available. 2GB should be the recommended minimum, unless you know what you are doing
+While running WebODM with Docker Toolbox (VirtualBox) you cannot access WebODM from another computer in the same network. | As Administrator, run `cmd.exe` and then type `"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm "default" natpf1 "rule-name,tcp,,8000,,8000"`
 
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
@@ -186,6 +188,28 @@ To enable/disable a plugin type:
 ```
 
 On some platforms (eg. Windows), if you want to manage plugins, you will need to make sure that the `./plugins` directory can be mounted as a docker volume and then pass the `--mount-plugins-volume` flag to `webodm.sh`. Check the docker documentation.
+
+### Update
+
+If you use docker, updating is as simple as running:
+
+```bash
+./webodm.sh update
+```
+
+If you are running WebODM [natively](#run-it-natively), these commands should do it:
+
+```bash
+cd /webodm
+sudo su odm # Only in case you are running WebODM with a different user
+git pull origin master
+source python3-venv/bin/activate # If you are running a virtualenv
+npm install
+pip install -r requirements.txt
+webpack --mode production
+python manage.py collectstatic --noinput
+python manage.py migrate
+```
 
 ## Customizing and Extending
 

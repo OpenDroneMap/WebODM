@@ -14,6 +14,8 @@ from rest_framework.test import APIClient
 
 import worker
 from django.utils import timezone
+
+from app import pending_actions
 from app.models import Project, Task, ImageUpload
 from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
 from app.plugins.signals import task_completed, task_removed, task_removing
@@ -401,14 +403,23 @@ class TestApiTask(BootTransactionTestCase):
         res = client.post("/api/projects/{}/tasks/{}/cancel/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
-        # Should raise TaskInterruptedException
-        self.assertRaises(TaskInterruptedException, task.check_if_canceled)
-
         # task is processed right away
 
         # Should have been canceled
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.CANCELED)
+        self.assertTrue(task.pending_action is None)
+
+        # Manually set pending action
+        task.pending_action = pending_actions.CANCEL
+        task.save()
+
+        # Should raise TaskInterruptedException
+        self.assertRaises(TaskInterruptedException, task.check_if_canceled)
+
+        # Restore
+        task.pending_action = None
+        task.save()
 
         # Remove a task and verify that it calls the proper plugins signals
         with catch_signal(task_removing) as h1:

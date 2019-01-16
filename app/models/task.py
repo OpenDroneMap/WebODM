@@ -394,9 +394,14 @@ class Task(models.Model):
                     last_update = 0
                     def callback(progress):
                         nonlocal last_update
-                        if time.time() - last_update >= 2 or (progress >= 1.0 - 1e-6 and progress <= 1.0 + 1e-6):
-                            Task.objects.filter(pk=self.id).update(upload_progress=progress)
+
+                        time_has_elapsed = time.time() - last_update >= 2
+
+                        if time_has_elapsed:
                             self.check_if_canceled()
+
+                        if time_has_elapsed or (progress >= 1.0 - 1e-6 and progress <= 1.0 + 1e-6):
+                            Task.objects.filter(pk=self.id).update(upload_progress=progress)
                             last_update = time.time()
 
                     # This takes a while
@@ -744,10 +749,7 @@ class Task(models.Model):
                 self.check_if_canceled()
                 last_update = time.time()
 
-        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
-            resized_images = list(filter(lambda i: i is not None, executor.map(
-                partial(resize_image, resize_to=self.resize_to, done=callback),
-                images_path)))
+        resized_images = list(map(partial(resize_image, resize_to=self.resize_to, done=callback), images_path))
 
         Task.objects.filter(pk=self.id).update(resize_progress=1.0)
 
