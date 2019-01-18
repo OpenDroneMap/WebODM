@@ -380,12 +380,12 @@ elif [[ $1 = "rebuild" ]]; then
 	echo  "Rebuilding WebODM..."
 	rebuild
 elif [[ $1 = "update" ]]; then
+	down
 	echo "Updating WebODM..."
 	run "git pull origin master"
 	run "docker pull opendronemap/nodeodm"
 	run "docker pull opendronemap/webodm_db"
 	run "docker pull opendronemap/webodm_webapp"
-	down
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 elif [[ $1 = "checkenv" ]]; then
 	environment_check
