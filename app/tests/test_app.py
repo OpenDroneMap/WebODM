@@ -3,6 +3,8 @@ from django.test import Client
 from rest_framework import status
 
 from app.models import Project, Task
+from app.models import Setting
+from app.models import Theme
 from .classes import BootTestCase
 from django.core.exceptions import ValidationError
 
@@ -21,8 +23,6 @@ class TestApp(BootTestCase):
         # Add user to test Group
         User.objects.get(pk=1).groups.add(my_group)
 
-    def tearDown(self):
-        pass
 
     def test_user_login(self):
         c = Client()
@@ -149,19 +149,24 @@ class TestApp(BootTestCase):
 
     def test_admin_views(self):
         c = Client()
-        c.login(username="testsuperuser", password="test1234")
+        c.login(username='testsuperuser', password='test1234')
+
+        settingId = Setting.objects.all()[0].id # During tests, sometimes this is != 1
+        themeId = Theme.objects.all()[0].id # During tests, sometimes this is != 1
 
         # Can access admin menu items
-        admin_menu_items = ['/admin/app/setting/1/change/',
-                            '/admin/app/theme/1/change/',
+        admin_menu_items = ['/admin/app/setting/{}/change/'.format(settingId),
+                            '/admin/app/theme/{}/change/'.format(themeId),
                             '/admin/',
                             ]
+
         for url in admin_menu_items:
             res = c.get(url)
             self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         # Cannot access admin views as normal user
-        c.login(username=self.credentials['username'], password=self.credentials['password'])
+        c.logout()
+        c.login(username='testuser', password='test1234')
 
         for url in admin_menu_items:
             res = c.get(url, follow=True)
