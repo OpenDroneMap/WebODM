@@ -69,6 +69,10 @@ class TestApp(BootTestCase):
         # We should have a project created from the dashboard
         self.assertTrue(Project.objects.count() >= 1)
 
+        # Can access API page
+        res = c.get('/api/')
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+
         # We can access a processingnode view that exists
         res = c.get('/processingnode/1/')
         self.assertTrue(res.status_code == 200)
@@ -143,8 +147,25 @@ class TestApp(BootTestCase):
         ac = Client()
         test_public_views(ac, status.HTTP_200_OK)
 
+    def test_admin_views(self):
+        c = Client()
+        c.login(username="testsuperuser", password="test1234")
 
+        # Can access admin menu items
+        admin_menu_items = ['/admin/app/setting/1/change/',
+                            '/admin/app/theme/1/change/',
+                            '/admin/',
+                            ]
+        for url in admin_menu_items:
+            res = c.get(url)
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
 
+        # Cannot access admin views as normal user
+        c.login(username=self.credentials['username'], password=self.credentials['password'])
+
+        for url in admin_menu_items:
+            res = c.get(url, follow=True)
+            self.assertRedirects(res, '/admin/login/?next={}'.format(url))
 
 
     def test_default_group(self):
