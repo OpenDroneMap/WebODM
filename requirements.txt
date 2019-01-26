@@ -8,7 +8,7 @@ coreapi==2.0.9
 Django==2.1.5
 django-appconf==1.0.2
 django-codemirror2==0.2
-django-colorfield==0.1.14
+django-colorfield==0.1.15
 django-compressor==2.2
 django-cors-headers==2.2.0
 django-filter==2.0.0
