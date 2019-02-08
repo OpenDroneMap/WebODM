@@ -81,10 +81,10 @@ class ProcessingNode(models.Model):
         kwargs = dict(indent=4, separators=(',', ": ")) if pretty else dict() 
         return json.dumps(self.available_options, **kwargs)
 
-    def options_list_to_kv(self, options = []):
+    def options_list_to_dict(self, options = []):
         """
         Convers options formatted as a list ([{'name': optionName, 'value': optionValue}, ...])
-        to a dictionary {optionName: value, ...}
+        to a dictionary {optionName: optionValue, ...}
         :param options: options
         :return: dict
         """
@@ -111,7 +111,7 @@ class ProcessingNode(models.Model):
 
         api_client = self.api_client()
 
-        opts = self.options_list_to_kv(options)
+        opts = self.options_list_to_dict(options)
 
         task = api_client.create_task(images, opts, name, progress_callback)
         return task.uuid
@@ -166,7 +166,7 @@ class ProcessingNode(models.Model):
 
         api_client = self.api_client()
         task = api_client.get_task(uuid)
-        return task.restart(self.options_list_to_kv(options))
+        return task.restart(self.options_list_to_dict(options))
 
     def delete(self, using=None, keep_parents=False):
         pnode_id = self.id
