@@ -1,4 +1,5 @@
-from datetime import timedelta
+import os
+from datetime import timedelta, datetime
 
 import requests
 from django.test import TestCase
@@ -6,10 +7,11 @@ from django.utils import six
 import subprocess, time
 from django.utils import timezone
 from os import path
+
+from pyodm import Node
+from pyodm.exceptions import NodeConnectionError, NodeServerError, NodeResponseError
+from webodm import settings
 from .models import ProcessingNode, OFFLINE_MINUTES
-from .api_client import ApiClient
-from requests.exceptions import ConnectionError
-from .exceptions import ProcessingError
 from . import status_codes
 
 current_dir = path.dirname(path.realpath(__file__))
@@ -31,21 +33,21 @@ class TestClientApi(TestCase):
         cls.node_odm.terminate()
 
     def setUp(self):
-        self.api_client = ApiClient("localhost", 11223)
+        self.api_client = Node("localhost", 11223)
 
     def tearDown(self):
         pass
 
     def test_offline_api(self):
-        api = ApiClient("offline-host", 3000)
-        self.assertRaises(ConnectionError, api.info)
-        self.assertRaises(ConnectionError, api.options)
+        api = Node("offline-host", 3000)
+        self.assertRaises(NodeConnectionError, api.info)
+        self.assertRaises(NodeConnectionError, api.options)
 
     def test_info(self):
         info = self.api_client.info()
-        self.assertTrue(isinstance(info['version'], six.string_types), "Found version string")
-        self.assertTrue(isinstance(info['taskQueueCount'], int), "Found task queue count")
-        self.assertTrue(info['maxImages'] is None, "Found task max images")
+        self.assertTrue(isinstance(info.version, six.string_types), "Found version string")
+        self.assertTrue(isinstance(info.task_queue_count, int), "Found task queue count")
+        self.assertTrue(info.max_images is None, "Found task max images")
 
     def test_options(self):
         options = self.api_client.options()
@@ -82,10 +84,10 @@ class TestClientApi(TestCase):
             retries = 0
             while True:
                 try:
-                    task_info = api.task_info(uuid)
-                    if task_info['status']['code'] == status:
+                    task_info = api.get_task(uuid).info()
+                    if task_info.status.value == status:
                         return True
-                except ProcessingError:
+                except (NodeServerError, NodeResponseError):
                     pass
 
                 time.sleep(0.5)
@@ -94,42 +96,43 @@ class TestClientApi(TestCase):
                     self.assertTrue(False, error_description)
                     return False
 
-        api = ApiClient("localhost", 11223)
+        api = Node("localhost", 11223)
         online_node = ProcessingNode.objects.get(pk=1)
 
         # Can call info(), options()
-        self.assertTrue(type(api.info()['version']) == str)
+        self.assertTrue(type(api.info().version) == str)
         self.assertTrue(len(api.options()) > 0)
         
         # Can call new_task()
         import glob
-        res = api.new_task(
+        res = api.create_task(
                 glob.glob("nodeodm/fixtures/test_images/*.JPG"), 
-                "test", 
-                [{'name': 'force-ccd', 'value': 6.16}])
-        uuid = res['uuid']
+                {'force-ccd': 6.16},
+                "test")
+        uuid = res.uuid
         self.assertTrue(uuid != None)
 
         # Can call task_info()
-        task_info = api.task_info(uuid)
-        self.assertTrue(isinstance(task_info['dateCreated'], int))
-        self.assertTrue(isinstance(task_info['uuid'], str))
+        task = api.get_task(uuid)
+        task_info = task.info()
+        self.assertTrue(isinstance(task_info.date_created, datetime))
+        self.assertTrue(isinstance(task_info.uuid, str))
 
         # Can download assets?
         # Here we are waiting for the task to be completed
         wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not download assets")
-        asset = api.task_download(uuid, "all.zip")
-        self.assertTrue(isinstance(asset, requests.Response))
+        asset = api.get_task(uuid).download_zip(settings.MEDIA_TMP)
+        self.assertTrue(os.path.exists(asset))
 
         # task_output
-        self.assertTrue(isinstance(api.task_output(uuid, 0), list))
+        self.assertTrue(isinstance(api.get_task(uuid).output(0), list))
         self.assertTrue(isinstance(online_node.get_task_console_output(uuid, 0), list))
 
-        self.assertRaises(ProcessingError, online_node.get_task_console_output, "wrong-uuid", 0)
+        self.assertRaises(NodeResponseError, online_node.get_task_console_output, "wrong-uuid", 0)
 
         # Can restart task
         self.assertTrue(online_node.restart_task(uuid))
-        self.assertRaises(ProcessingError, online_node.restart_task, "wrong-uuid")
+        self.assertRaises(NodeResponseError, online_node.restart_task, "wrong-uuid")
 
         wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not restart task")
 
@@ -139,28 +142,28 @@ class TestClientApi(TestCase):
         wait_for_status(api, uuid, status_codes.COMPLETED, 10, "Could not restart task with options")
 
         # Verify that options have been updated after restarting the task
-        task_info = api.task_info(uuid)
-        self.assertTrue(len(task_info['options']) == 1)
-        self.assertTrue(task_info['options'][0]['name'] == 'mesh-size')
-        self.assertTrue(task_info['options'][0]['value'] == 12345)
+        task_info = api.get_task(uuid).info()
+        self.assertTrue(len(task_info.options) == 1)
+        self.assertTrue(task_info.options[0]['name'] == 'mesh-size')
+        self.assertTrue(task_info.options[0]['value'] == 12345)
 
         # Can cancel task (should work even if we completed the task)
         self.assertTrue(online_node.cancel_task(uuid))
-        self.assertRaises(ProcessingError, online_node.cancel_task, "wrong-uuid")
+        self.assertRaises(NodeResponseError, online_node.cancel_task, "wrong-uuid")
 
         # Wait for task to be canceled
         wait_for_status(api, uuid, status_codes.CANCELED, 5, "Could not remove task")
         self.assertTrue(online_node.remove_task(uuid))
-        self.assertRaises(ProcessingError, online_node.remove_task, "wrong-uuid")
+        self.assertRaises(NodeResponseError, online_node.remove_task, "wrong-uuid")
 
         # Cannot delete task again
-        self.assertRaises(ProcessingError, online_node.remove_task, uuid)
+        self.assertRaises(NodeResponseError, online_node.remove_task, uuid)
 
         # Task has been deleted
-        self.assertRaises(ProcessingError, online_node.get_task_info, uuid)
+        self.assertRaises(NodeResponseError, online_node.get_task_info, uuid)
 
         # Test URL building for HTTPS
-        sslApi = ApiClient("localhost", 443, 'abc')
+        sslApi = Node("localhost", 443, 'abc')
         self.assertEqual(sslApi.url('/info'), 'https://localhost/info?token=abc')
 
     def test_find_best_available_node_and_is_online(self):
@@ -204,10 +207,10 @@ class TestClientApi(TestCase):
             retries = 0
             while True:
                 try:
-                    task_info = api.task_info(uuid)
-                    if task_info['status']['code'] == status:
+                    task_info = api.get_task(uuid).info()
+                    if task_info.status.value == status:
                         return True
-                except ProcessingError:
+                except (NodeResponseError, NodeServerError):
                     pass
 
                 time.sleep(0.5)
@@ -216,39 +219,37 @@ class TestClientApi(TestCase):
                     self.assertTrue(False, error_description)
                     return False
 
-        api = ApiClient("localhost", 11224, "test_token")
+        api = Node("localhost", 11224, "test_token")
         online_node = ProcessingNode.objects.get(pk=3)
 
         self.assertTrue(online_node.update_node_info(), "Could update info")
 
         # Cannot call info(), options()  without tokens
         api.token = "invalid"
-        self.assertTrue(type(api.info()['error']) == str)
-        self.assertTrue(type(api.options()['error']) == str)
+        self.assertRaises(NodeResponseError, api.info)
+        self.assertRaises(NodeResponseError, api.options)
 
-        # Cannot call new_task() without token
+        # Cannot call create_task() without token
         import glob
-        res = api.new_task(
-            glob.glob("nodeodm/fixtures/test_images/*.JPG"))
-        self.assertTrue('error' in res)
+        self.assertRaises(NodeResponseError, api.create_task, glob.glob("nodeodm/fixtures/test_images/*.JPG"))
 
-        # Can call new_task() with token
+        # Can call create_task() with token
         api.token = "test_token"
-        res = api.new_task(
+        res = api.create_task(
             glob.glob("nodeodm/fixtures/test_images/*.JPG"))
-        self.assertTrue('uuid' in res)
-        self.assertFalse('error' in res)
-        uuid = res['uuid']
+        uuid = res.uuid
+        self.assertTrue(uuid != None)
 
         # Can call task_info() with token
-        task_info = api.task_info(uuid)
-        self.assertTrue(isinstance(task_info['dateCreated'], int))
+        task_info = api.get_task(uuid).info()
+        self.assertTrue(isinstance(task_info.date_created, datetime))
 
         # Cannot call task_info() without token
         api.token = "invalid"
-        res = api.task_info(uuid)
-        self.assertTrue('error' in res)
-        self.assertTrue('token does not match' in res['error'])
+        try:
+            api.get_task(uuid).info()
+        except NodeResponseError as e:
+            self.assertTrue('token does not match' in str(e))
 
         # Here we are waiting for the task to be completed
         api.token = "test_token"
@@ -256,32 +257,32 @@ class TestClientApi(TestCase):
 
         # Cannot download assets without token
         api.token = "invalid"
-        res = api.task_download(uuid, "all.zip")
-        self.assertTrue('error' in res)
+        task = api.get_task(uuid)
+        self.assertRaises(NodeResponseError, task.download_assets, settings.MEDIA_TMP)
 
         api.token = "test_token"
-        asset = api.task_download(uuid, "all.zip")
-        self.assertTrue(isinstance(asset, requests.Response))
+        asset_archive = task.download_zip(settings.MEDIA_TMP)
+        self.assertTrue(os.path.exists(asset_archive))
+        os.unlink(asset_archive)
 
         # Cannot get task output without token
         api.token = "invalid"
-        res = api.task_output(uuid, 0)
-        self.assertTrue('error' in res)
+        self.assertRaises(NodeResponseError, task.output, 0)
 
         api.token = "test_token"
-        res = api.task_output(uuid, 0)
+        res = task.output()
         self.assertTrue(isinstance(res, list))
 
         # Cannot restart task without token
         online_node.token = "invalid"
-        self.assertRaises(ProcessingError, online_node.restart_task, uuid)
+        self.assertRaises(NodeResponseError, online_node.restart_task, uuid)
 
         online_node.token = "test_token"
         self.assertTrue(online_node.restart_task(uuid))
 
         # Cannot cancel task without token
         online_node.token = "invalid"
-        self.assertRaises(ProcessingError, online_node.cancel_task, uuid)
+        self.assertRaises(NodeResponseError, online_node.cancel_task, uuid)
         online_node.token = "test_token"
         self.assertTrue(online_node.cancel_task(uuid))
 
@@ -290,8 +291,8 @@ class TestClientApi(TestCase):
 
         # Cannot delete task without token
         online_node.token = "invalid"
-        self.assertRaises(ProcessingError, online_node.remove_task, "invalid token")
+        self.assertRaises(NodeResponseError, online_node.remove_task, "invalid token")
         online_node.token = "test_token"
         self.assertTrue(online_node.remove_task(uuid))
 
-        node_odm.terminate();
+        node_odm.terminate()
