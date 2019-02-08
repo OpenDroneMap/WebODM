@@ -130,6 +130,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(im.size == img1.size)
 
         # Normal case with images[], GCP, name and processing node parameter and resize_to option
+        testWatch.clear()
         gcp = open("app/fixtures/gcp.txt", 'r')
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
             'images': [image1, image2, gcp],
@@ -168,6 +169,9 @@ class TestApiTask(BootTransactionTestCase):
 
         # Upload progress is 100%
         self.assertEqual(resized_task.upload_progress, 1.0)
+
+        # Upload progress callback has been called
+        self.assertTrue(testWatch.get_calls_count("Task.process.callback") > 0)
 
         # Case with malformed GCP file option
         with open("app/fixtures/gcp_malformed.txt", 'r') as malformed_gcp:

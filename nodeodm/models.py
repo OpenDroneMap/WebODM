@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import requests
 from django.db import models
 from django.contrib.postgres import fields
 from django.utils import timezone
@@ -8,29 +7,12 @@ from django.dispatch import receiver
 from guardian.models import GroupObjectPermissionBase
 from guardian.models import UserObjectPermissionBase
 
-from .api_client import ApiClient
 import json
+from pyodm import Node
+from pyodm import exceptions
 from django.db.models import signals
 from datetime import timedelta
-from .exceptions import ProcessingError, ProcessingTimeout
-import simplejson
 
-
-def api(func):
-    """
-    Catches JSON decoding errors that might happen when the server
-    answers unexpectedly
-    """
-    def wrapper(*args,**kwargs):
-        try:
-            return func(*args, **kwargs)
-        except (json.decoder.JSONDecodeError, simplejson.JSONDecodeError) as e:
-            raise ProcessingError(str(e))
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-            raise ProcessingTimeout(str(e))
-
-
-    return wrapper
 
 OFFLINE_MINUTES = 5 # Number of minutes a node hasn't been seen before it should be considered offline
 
@@ -65,7 +47,6 @@ class ProcessingNode(models.Model):
         return self.last_refreshed is not None and \
                self.last_refreshed >= timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
 
-    @api
     def update_node_info(self):
         """
         Retrieves information and options from the node API
@@ -76,27 +57,22 @@ class ProcessingNode(models.Model):
         api_client = self.api_client(timeout=5)
         try:
             info = api_client.info()
-            if 'error' in info:
-                return False
 
-            self.api_version = info['version']
-            self.queue_count = info['taskQueueCount']
+            self.api_version = info.version
+            self.queue_count = info.task_queue_count
+            self.max_images = info.max_images
+            self.odm_version = info.odm_version
 
-            if 'maxImages' in info:
-                self.max_images = info['maxImages']
-            if 'odmVersion' in info:
-                self.odm_version = info['odmVersion']
-
-            options = api_client.options()
+            options = list(map(lambda o: o.__dict__, api_client.options()))
             self.available_options = options
             self.last_refreshed = timezone.now()
             self.save()
             return True
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, json.decoder.JSONDecodeError, simplejson.JSONDecodeError):
+        except exceptions.OdmError:
             return False
 
     def api_client(self, timeout=30):
-        return ApiClient(self.hostname, self.port, self.token, timeout)
+        return Node(self.hostname, self.port, self.token, timeout)
 
     def get_available_options_json(self, pretty=False):
         """
@@ -105,7 +81,20 @@ class ProcessingNode(models.Model):
         kwargs = dict(indent=4, separators=(',', ": ")) if pretty else dict() 
         return json.dumps(self.available_options, **kwargs)
 
-    @api
+    def options_list_to_kv(self, options = []):
+        """
+        Convers options formatted as a list ([{'name': optionName, 'value': optionValue}, ...])
+        to a dictionary {optionName: value, ...}
+        :param options: options
+        :return: dict
+        """
+        opts = {}
+        if options is not None:
+            for o in options:
+                opts[o['name']] = o['value']
+
+        return opts
+
     def process_new_task(self, images, name=None, options=[], progress_callback=None):
         """
         Sends a set of images (and optional GCP file) via the API
@@ -118,22 +107,15 @@ class ProcessingNode(models.Model):
 
         :returns UUID of the newly created task
         """
-        if len(images) < 2: raise ProcessingError("Need at least 2 images")
+        if len(images) < 2: raise exceptions.NodeServerError("Need at least 2 images")
 
         api_client = self.api_client()
-        try:
-            result = api_client.new_task(images, name, options, progress_callback)
-        except requests.exceptions.ConnectionError as e:
-            raise ProcessingError(e)
 
-        if isinstance(result, dict) and 'uuid' in result:
-            return result['uuid']
-        elif isinstance(result, dict) and 'error' in result:
-            raise ProcessingError(result['error'])
-        else:
-            raise ProcessingError("Unexpected answer from server: {}".format(result))
+        opts = self.options_list_to_kv(options)
 
-    @api
+        task = api_client.create_task(images, opts, name, progress_callback)
+        return task.uuid
+
     def get_task_info(self, uuid):
         """
         Gets information about this task, such as name, creation date, 
@@ -141,79 +123,50 @@ class ProcessingNode(models.Model):
         images being processed.
         """
         api_client = self.api_client()
-        result = api_client.task_info(uuid)
-        if isinstance(result, dict) and 'uuid' in result:
-            return result
-        elif isinstance(result, dict) and 'error' in result:
-            raise ProcessingError(result['error'])
-        else:
-            raise ProcessingError("Unknown result from task info: {}".format(result))
+        task = api_client.get_task(uuid)
+        return task.info()
 
-    @api
     def get_task_console_output(self, uuid, line):
         """
         Retrieves the console output of the OpenDroneMap's process.
         Useful for monitoring execution and to provide updates to the user.
         """
         api_client = self.api_client()
-        result = api_client.task_output(uuid, line)
-        if isinstance(result, dict) and 'error' in result:
-            raise ProcessingError(result['error'])
-        elif isinstance(result, list):
-            return result
-        else:
-            raise ProcessingError("Unknown response for console output: {}".format(result))
+        task = api_client.get_task(uuid)
+        return task.output(line)
 
-    @api
     def cancel_task(self, uuid):
         """
         Cancels a task (stops its execution, or prevents it from being executed)
         """
         api_client = self.api_client()
-        return self.handle_generic_post_response(api_client.task_cancel(uuid))
+        task = api_client.get_task(uuid)
+        return task.cancel()
 
-    @api
     def remove_task(self, uuid):
         """
         Removes a task and deletes all of its assets
         """
         api_client = self.api_client()
-        return self.handle_generic_post_response(api_client.task_remove(uuid))
+        task = api_client.get_task(uuid)
+        return task.remove()
 
-    @api
-    def download_task_asset(self, uuid, asset):
+    def download_task_assets(self, uuid, destination, progress_callback):
         """
         Downloads a task asset
         """
         api_client = self.api_client()
-        res = api_client.task_download(uuid, asset)
-        if isinstance(res, dict) and 'error' in res:
-            raise ProcessingError(res['error'])
-        else:
-            return res
+        task = api_client.get_task(uuid)
+        return task.download_zip(destination, progress_callback)
 
-    @api
     def restart_task(self, uuid, options = None):
         """
         Restarts a task that was previously canceled or that had failed to process
         """
-        api_client = self.api_client()
-        return self.handle_generic_post_response(api_client.task_restart(uuid, options))
 
-    @staticmethod
-    def handle_generic_post_response(result):
-        """
-        Handles a POST response that has either a "success" flag, or an error message.
-        This is a common response in NodeODM POST calls.
-        :param result: result of API call
-        :return: True on success, raises ProcessingException otherwise
-        """
-        if isinstance(result, dict) and 'error' in result:
-            raise ProcessingError(result['error'])
-        elif isinstance(result, dict) and 'success' in result:
-            return True
-        else:
-            raise ProcessingError("Unknown response: {}".format(result))
+        api_client = self.api_client()
+        task = api_client.get_task(uuid)
+        return task.restart(self.options_list_to_kv(options))
 
     def delete(self, using=None, keep_parents=False):
         pnode_id = self.id
@@ -229,7 +182,7 @@ def auto_update_node_info(sender, instance, created, **kwargs):
     if created:
         try:
             instance.update_node_info()
-        except ProcessingError:
+        except exceptions.OdmError:
             pass
 
 class ProcessingNodeUserObjectPermission(UserObjectPermissionBase):
