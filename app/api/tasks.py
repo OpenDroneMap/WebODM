@@ -8,7 +8,7 @@ from django.http import FileResponse
 from django.http import HttpResponse
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.decorators import detail_route
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -198,7 +198,7 @@ class TaskViewSet(viewsets.ViewSet):
 
 class TaskNestedView(APIView):
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'console_output', )
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (AllowAny, )
 
     def get_and_check_task(self, request, pk, annotate={}):
         try:
