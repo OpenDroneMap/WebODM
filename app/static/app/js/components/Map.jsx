@@ -232,6 +232,29 @@ class Map extends React.Component {
 
         this.basemaps[props.label] = layer;
       });
+
+      const customLayer = L.layerGroup();
+      customLayer.on("add", a => {
+        let url = window.prompt(`Enter a tile URL template. Valid tokens are:
+{z}, {x}, {y} for Z/X/Y tile scheme
+{-y} for flipped TMS-style Y coordinates
+
+Example:
+https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
+`, 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png');
+        
+        if (url){
+          customLayer.clearLayers();
+          const l = L.tileLayer(url, {
+            maxZoom: 21,
+            minZoom: 0
+          });
+          customLayer.addLayer(l);
+          l.bringToBack();
+        }
+      });
+      this.basemaps["Custom"] = customLayer;
+      this.basemaps["None"] = L.layerGroup();
     }
 
     this.autolayers = Leaflet.control.autolayers({
