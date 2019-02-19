@@ -415,10 +415,6 @@ class ProjectListItem extends React.Component {
             /> 
           : ""}
 
-          {this.state.upload.uploading || this.state.upload.resizing ? 
-            <i className="fa fa-refresh fa-spin fa-fw" />
-            : ""}
-          
           {this.state.upload.error !== "" ? 
             <div className="alert alert-warning alert-dismissible">
                 <button type="button" className="close" aria-label="Close" onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
