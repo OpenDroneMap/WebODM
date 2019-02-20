@@ -2,6 +2,8 @@ import os
 from wsgiref.util import FileWrapper
 
 import mimetypes
+
+import datetime
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.db import transaction
 from django.http import FileResponse
@@ -13,10 +15,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app import models, pending_actions
+from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
 from .common import get_and_check_project, get_tile_json, path_traversal_check
 
+
+def flatten_files(request_files):
+    # MultiValueDict in, flat array of files out
+    return [file for filesList in map(
+        lambda key: request_files.getlist(key),
+        [keys for keys in request_files])
+     for file in filesList]
 
 class TaskIDsSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
@@ -36,6 +46,7 @@ class TaskSerializer(serializers.ModelSerializer):
             return None
 
     def get_images_count(self, obj):
+        # TODO: create a field in the model for this
         return obj.imageupload_set.count()
 
     def get_can_rerun_from(self, obj):
@@ -142,11 +153,7 @@ class TaskViewSet(viewsets.ViewSet):
     def create(self, request, project_pk=None):
         project = get_and_check_project(request, project_pk, ('change_project', ))
         
-        # MultiValueDict in, flat array of files out
-        files = [file for filesList in map(
-                        lambda key: request.FILES.getlist(key), 
-                        [keys for keys in request.FILES])
-                    for file in filesList]
+        files = flatten_files(request.FILES)
 
         if len(files) <= 1:
             raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
@@ -322,3 +329,37 @@ class TaskAssets(TaskNestedView):
             raise exceptions.NotFound("Asset does not exist")
 
         return download_file_response(request, asset_path, 'inline')
+
+"""
+Task assets import
+"""
+class TaskAssetsImport(APIView):
+    permission_classes = (permissions.AllowAny,)
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser,)
+
+    def post(self, request, project_pk=None):
+        project = get_and_check_project(request, project_pk, ('change_project',))
+
+        files = flatten_files(request.FILES)
+
+        if len(files) != 1:
+            raise exceptions.ValidationError(detail="Cannot create task, you need to upload 1 file")
+
+        with transaction.atomic():
+            task = models.Task.objects.create(project=project,
+                                              auto_processing_node=False,
+                                              name="Imported Task",
+                                              import_url="file://all.zip",
+                                              status=status_codes.RUNNING,
+                                              pending_action=pending_actions.IMPORT)
+            task.create_task_directories()
+
+            destination_file = task.assets_path("all.zip")
+            with open(destination_file, 'wb+') as fd:
+                for chunk in files[0].chunks():
+                    fd.write(chunk)
+
+            worker_tasks.process_task.delay(task.id)
+
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -3,6 +3,7 @@ import React from 'react';
 import update from 'immutability-helper';
 import TaskList from './TaskList';
 import NewTaskPanel from './NewTaskPanel';
+import ImportTaskPanel from './ImportTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import ProgressBar from './ProgressBar';
 import ErrorMessage from './ErrorMessage';
@@ -32,7 +33,8 @@ class ProjectListItem extends React.Component {
       upload: this.getDefaultUploadState(),
       error: "",
       data: props.data,
-      refreshing: false
+      refreshing: false,
+      importing: false
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
@@ -335,6 +337,14 @@ class ProjectListItem extends React.Component {
     location.href = `/map/project/${this.state.data.id}/`;
   }
 
+  handleImportTask = () => {
+    this.setState({importing: true});
+  }
+
+  handleCancelImportTask = () => {
+    this.setState({importing: false});
+  }
+
   render() {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
@@ -361,13 +371,17 @@ class ProjectListItem extends React.Component {
           <ErrorMessage bind={[this, 'error']} />
           <div className="btn-group pull-right">
             {this.hasPermission("add") ? 
-              <button type="button" 
-                      className={"btn btn-primary btn-sm " + (this.state.upload.uploading ? "hide" : "")} 
+              <div className={"asset-download-buttons btn-group " + (this.state.upload.uploading ? "hide" : "")}>
+                <button type="button" 
+                      className="btn btn-primary btn-sm"
                       onClick={this.handleUpload}
                       ref={this.setRef("uploadButton")}>
                 <i className="glyphicon glyphicon-upload"></i>
                 Select Images and GCP
-              </button>
+              </button><button type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
+              <ul className="dropdown-menu">
+                <li><a href="javascript:void(0);" onClick={this.handleImportTask}><i className="glyphicon glyphicon-import"></i> Import Existing Assets</a></li>
+             </ul></div>
             : ""}
 
             <button disabled={this.state.upload.error !== ""} 
@@ -429,6 +443,13 @@ class ProjectListItem extends React.Component {
               filesCount={this.state.upload.totalCount}
               showResize={true}
               getFiles={() => this.state.upload.files }
+            />
+          : ""}
+
+          {this.state.importing ? 
+            <ImportTaskPanel
+              onCancel={this.handleCancelImportTask}
+              projectId={this.state.data.id}
             />
           : ""}
 

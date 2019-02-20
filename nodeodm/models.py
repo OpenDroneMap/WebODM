@@ -43,7 +43,7 @@ class ProcessingNode(models.Model):
     available_options = fields.JSONField(default=dict, help_text="Description of the options that can be used for processing")
     token = models.CharField(max_length=1024, blank=True, default="", help_text="Token to use for authentication. If the node doesn't have authentication, you can leave this field blank.")
     max_images = models.PositiveIntegerField(help_text="Maximum number of images accepted by this node.", blank=True, null=True)
-    odm_version = models.CharField(max_length=32, null=True, help_text="OpenDroneMap version used by the node")
+    odm_version = models.CharField(max_length=32, null=True, help_text="ODM version used by the node.")
     label = models.CharField(max_length=255, default="", blank=True, help_text="Optional label for this node. When set, this label will be shown instead of the hostname:port name.")
 
     def __str__(self):
