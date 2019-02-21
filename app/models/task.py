@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-import zipfile
 import time
 import uuid as uuid_module
 
@@ -11,6 +10,8 @@ from shlex import quote
 import errno
 import piexif
 import re
+
+import zipfile
 
 import requests
 from PIL import Image
@@ -22,20 +23,19 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.utils import timezone
-from requests.packages.urllib3.exceptions import ReadTimeoutError
+from urllib3.exceptions import ReadTimeoutError
 
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
 
+from app.testwatch import testWatch
 from nodeodm import status_codes
-from nodeodm.exceptions import ProcessingError, ProcessingTimeout, ProcessingException
 from nodeodm.models import ProcessingNode
+from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
 from webodm import settings
 from .project import Project
 
 from functools import partial
-from multiprocessing import cpu_count
-from concurrent.futures import ThreadPoolExecutor
 import subprocess
 
 logger = logging.getLogger('app.logger')
@@ -369,7 +369,7 @@ class Task(models.Model):
                         fd.write(chunk)
 
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
-                raise ProcessingError(e)
+                raise NodeServerError(e)
 
         self.refresh_from_db()
         self.extract_assets_and_complete()
@@ -438,7 +438,7 @@ class Task(models.Model):
                         # We can't easily differentiate between the two, so we need
                         # to notify the user because if it crashed due to low memory
                         # the user might need to take action (or be stuck in an infinite loop)
-                        raise ProcessingError("Processing node went offline. This could be due to insufficient memory or a network error.")
+                        raise NodeServerError("Processing node went offline. This could be due to insufficient memory or a network error.")
 
             if self.processing_node:
                 # Need to process some images (UUID not yet set and task doesn't have pending actions)?
@@ -456,17 +456,22 @@ class Task(models.Model):
                         time_has_elapsed = time.time() - last_update >= 2
 
                         if time_has_elapsed:
+                            testWatch.manual_log_call("Task.process.callback")
                             self.check_if_canceled()
-
-                        if time_has_elapsed or (progress >= 1.0 - 1e-6 and progress <= 1.0 + 1e-6):
-                            Task.objects.filter(pk=self.id).update(upload_progress=progress)
+                            Task.objects.filter(pk=self.id).update(upload_progress=float(progress) / 100.0)
                             last_update = time.time()
 
                     # This takes a while
-                    uuid = self.processing_node.process_new_task(images, self.name, self.options, callback)
+                    try:
+                        uuid = self.processing_node.process_new_task(images, self.name, self.options, callback)
+                    except NodeConnectionError as e:
+                        # If we can't create a task because the node is offline
+                        # We want to fail instead of trying again
+                        raise NodeServerError('Connection error: ' + str(e))
 
                     # Refresh task object before committing change
                     self.refresh_from_db()
+                    self.upload_progress = 1.0
                     self.uuid = uuid
                     self.save()
 
@@ -481,7 +486,7 @@ class Task(models.Model):
                         # We don't care if this fails (we tried)
                         try:
                             self.processing_node.cancel_task(self.uuid)
-                        except ProcessingException:
+                        except OdmError:
                             logger.warning("Could not cancel {} on processing node. We'll proceed anyway...".format(self))
 
                         self.status = status_codes.CANCELED
@@ -493,7 +498,7 @@ class Task(models.Model):
                         self.pending_action = None
                         self.save()
                     else:
-                        raise ProcessingError("Cannot cancel a task that has no processing node or UUID")
+                        raise NodeServerError("Cannot cancel a task that has no processing node or UUID")
 
                 elif self.pending_action == pending_actions.RESTART:
                     logger.info("Restarting {}".format(self))
@@ -506,8 +511,8 @@ class Task(models.Model):
                         if self.uuid:
                             try:
                                 info = self.processing_node.get_task_info(self.uuid)
-                                uuid_still_exists = info['uuid'] == self.uuid
-                            except ProcessingException:
+                                uuid_still_exists = info.uuid == self.uuid
+                            except OdmError:
                                 pass
 
                         need_to_reprocess = False
@@ -516,7 +521,7 @@ class Task(models.Model):
                             # Good to go
                             try:
                                 self.processing_node.restart_task(self.uuid, self.options)
-                            except ProcessingError as e:
+                            except (NodeServerError, NodeResponseError) as e:
                                 # Something went wrong
                                 logger.warning("Could not restart {}, will start a new one".format(self))
                                 need_to_reprocess = True
@@ -544,7 +549,7 @@ class Task(models.Model):
                         self.running_progress = 0
                         self.save()
                     else:
-                        raise ProcessingError("Cannot restart a task that has no processing node")
+                        raise NodeServerError("Cannot restart a task that has no processing node")
 
                 elif self.pending_action == pending_actions.REMOVE:
                     logger.info("Removing {}".format(self))
@@ -554,7 +559,7 @@ class Task(models.Model):
                         # Are expected to be purged on their own after a set amount of time anyway
                         try:
                             self.processing_node.remove_task(self.uuid)
-                        except ProcessingException:
+                        except OdmError:
                             pass
 
                     # What's more important is that we delete our task properly here
@@ -569,8 +574,8 @@ class Task(models.Model):
                     # Update task info from processing node
                     info = self.processing_node.get_task_info(self.uuid)
 
-                    self.processing_time = info["processingTime"]
-                    self.status = info["status"]["code"]
+                    self.processing_time = info.processing_time
+                    self.status = info.status.value
 
                     current_lines_count = len(self.console_output.split("\n"))
                     console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
@@ -584,8 +589,8 @@ class Task(models.Model):
                                     self.running_progress = value
                                     break
 
-                    if "errorMessage" in info["status"]:
-                        self.last_error = info["status"]["errorMessage"]
+                    if info.last_error != "":
+                        self.last_error = info.last_error
 
                     # Has the task just been canceled, failed, or completed?
                     if self.status in [status_codes.FAILED, status_codes.COMPLETED, status_codes.CANCELED]:
@@ -604,35 +609,24 @@ class Task(models.Model):
                             logger.info("Downloading all.zip for {}".format(self))
 
                             # Download all assets
-                            try:
-                                zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
-                                zip_path = os.path.join(assets_dir, "all.zip")
+                            last_update = 0
 
-                                # Keep track of download progress (if possible)
-                                content_length = zip_stream.headers.get('content-length')
-                                total_length = int(content_length) if content_length is not None else None
-                                downloaded = 0
-                                last_update = 0
+                            def callback(progress):
+                                nonlocal last_update
 
-                                with open(zip_path, 'wb') as fd:
-                                    for chunk in zip_stream.iter_content(4096):
-                                        downloaded += len(chunk)
+                                time_has_elapsed = time.time() - last_update >= 2
 
-                                        # Track progress if we know the content header length
-                                        # every 2 seconds
-                                        if total_length > 0 and time.time() - last_update >= 2:
-                                            Task.objects.filter(pk=self.id).update(running_progress=(self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(downloaded) / total_length) * 0.1))
-                                            last_update = time.time()
+                                if time_has_elapsed or int(progress) == 100:
+                                    Task.objects.filter(pk=self.id).update(running_progress=(
+                                    self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(progress) / 100.0) * 0.1))
+                                    last_update = time.time()
 
-                                        fd.write(chunk)
-                            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
-                                raise ProcessingTimeout(e)
+                            zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
 
-                            logger.info("Done downloading all.zip for {}".format(self))
+                            # Rename to all.zip
+                            os.rename(zip_path, os.path.join(os.path.dirname(zip_path), 'all.zip'))
 
-                            self.refresh_from_db()
-                            self.console_output += "Extracting results. This could take a few minutes...\n";
-                            self.save()
+                            logger.info("Extracting all.zip for {}".format(self))
 
                             self.extract_assets_and_complete()
                         else:
@@ -642,12 +636,10 @@ class Task(models.Model):
                         # Still waiting...
                         self.save()
 
-        except ProcessingError as e:
+        except (NodeServerError, NodeResponseError) as e:
             self.set_failure(str(e))
-        except (ConnectionRefusedError, ConnectionError) as e:
-            logger.warning("{} cannot communicate with processing node: {}".format(self, str(e)))
-        except ProcessingTimeout as e:
-            logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
+        except NodeConnectionError as e:
+            logger.warning("{} connection/timeout error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
         except TaskInterruptedException as e:
             # Task was interrupted during image resize / upload
             logger.warning("{} interrupted".format(self, str(e)))
@@ -665,7 +657,7 @@ class Task(models.Model):
             with zipfile.ZipFile(zip_path, "r") as zip_h:
                 zip_h.extractall(assets_dir)
         except zipfile.BadZipFile:
-            raise ProcessingError("Corrupted zip file")
+            raise NodeServerError("Corrupted zip file")
 
         logger.info("Extracted all.zip for {}".format(self))
 

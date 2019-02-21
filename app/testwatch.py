@@ -56,10 +56,10 @@ class TestWatch:
         self.manual_log_call(fname, *args, **kwargs)
 
     def manual_log_call(self, fname, *args, **kwargs):
-        logger.info("{} called".format(fname))
-        list = self.get_calls(fname)
-        list.append({'f': fname, 'args': args, 'kwargs': kwargs})
-        self.set_calls(fname, list)
+        if settings.TESTING:
+            list = self.get_calls(fname)
+            list.append({'f': fname, 'args': args, 'kwargs': kwargs})
+            self.set_calls(fname, list)
 
     def hook_pre(self, func, *args, **kwargs):
         if settings.TESTING and self.should_prevent_execution(func):
