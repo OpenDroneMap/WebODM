@@ -348,6 +348,7 @@ class Task(models.Model):
                 # TODO: this is potentially vulnerable to a zip bomb attack
                 #       mitigated by the fact that a valid account is needed to
                 #       import tasks
+                logger.info("Importing task assets from {} for {}".format(self.import_url, self))
                 download_stream = requests.get(self.import_url, stream=True, timeout=10)
                 content_length = download_stream.headers.get('content-length')
                 total_length = int(content_length) if content_length is not None else None
@@ -657,7 +658,7 @@ class Task(models.Model):
             with zipfile.ZipFile(zip_path, "r") as zip_h:
                 zip_h.extractall(assets_dir)
         except zipfile.BadZipFile:
-            raise NodeServerError("Corrupted zip file")
+            raise NodeServerError("Invalid zip file")
 
         logger.info("Extracted all.zip for {}".format(self))
 
