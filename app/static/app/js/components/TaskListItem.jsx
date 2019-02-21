@@ -354,12 +354,14 @@ class TaskListItem extends React.Component {
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : `Task #${task.id}`;
+    const imported = task.import_url !== "";
 
     let status = statusCodes.description(task.status);
     if (status === "") status = "Uploading images to processing node";
 
-    if (!task.processing_node) status = "Waiting for a node...";
+    if (!task.processing_node && !imported) status = "Waiting for a node...";
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
+
 
     let expanded = "";
     if (this.state.expanded){
@@ -404,12 +406,13 @@ class TaskListItem extends React.Component {
       }
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
-          task.processing_node){
+          (task.processing_node || imported)){
         addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: "Cannot cancel task."}));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
-            task.processing_node){
+            task.processing_node &&
+            !imported){
           // By default restart reruns every pipeline
           // step from the beginning
           const rerunFrom = task.can_rerun_from.length > 1 ?
@@ -572,7 +575,7 @@ class TaskListItem extends React.Component {
 
     if (task.last_error){
       statusLabel = getStatusLabel(task.last_error, 'error');
-    }else if (!task.processing_node){
+    }else if (!task.processing_node && !imported){
       statusLabel = getStatusLabel("Set a processing node");
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;

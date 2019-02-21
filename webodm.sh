@@ -29,6 +29,7 @@ elif [[ $platform = "MacOS / OSX" ]] && [[ $(pwd) == /Users* ]]; then
 fi
 
 load_default_node=true
+dev_mode=false
 
 # Load default values
 source .env
@@ -84,6 +85,11 @@ case $key in
     export WO_DEBUG=YES
     shift # past argument
     ;;
+    --dev)
+    export WO_DEBUG=YES
+    dev_mode=true
+    shift # past argument
+    ;;
 	--broker)
     export WO_BROKER="$2"
     shift # past argument
@@ -137,6 +143,7 @@ usage(){
   echo "	--ssl-cert	<path>	Manually specify a path to the certificate file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-insecure-port-redirect	<port>	Insecure port number to redirect from when SSL is enabled (default: $DEFAULT_SSL_INSECURE_PORT_REDIRECT)"
   echo "	--debug	Enable debug for development environments (default: disabled)"
+  echo "	--dev	Enable development mode. In development mode you can make modifications to WebODM source files and changes will be reflected live. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   if [[ $plugins_volume = false ]]; then
     echo "	--mount-plugins-volume	Always mount the ./plugins volume, even on unsupported platforms (developers only) (default: disabled)"
@@ -184,7 +191,12 @@ run(){
 }
 
 start(){
-	echo "Starting WebODM..."
+    if [[ $dev_mode = true ]]; then
+	    echo "Starting WebODM in development mode..."
+        down
+    else
+        echo "Starting WebODM..."
+    fi
 	echo ""
 	echo "Using the following environment:"
 	echo "================================"
@@ -204,6 +216,10 @@ start(){
 
     if [[ $load_default_node = true ]]; then
         command+=" -f docker-compose.nodeodm.yml"
+    fi
+
+    if [[ $dev_mode = true ]]; then
+        command+=" -f docker-compose.dev.yml"
     fi
 	
 	if [ "$WO_SSL" = "YES" ]; then
@@ -328,14 +344,22 @@ plugin_disable(){
 }
 
 run_tests(){
-	echo -e "\033[1mRunning frontend tests\033[0m"
-	run "npm run test"
+    # If in a container, we run the actual test commands
+    # otherwise we launch this command from the container
+    in_container=$(grep 'docker\|lxc' /proc/1/cgroup || true)
+    if [[ "$in_container" != "" ]]; then
+        echo -e "\033[1mRunning frontend tests\033[0m"
+        run "npm run test"
 
-	echo "\033[1mRunning backend tests\033[0m"
-	run "python manage.py test"
+        echo "\033[1mRunning backend tests\033[0m"
+        run "python manage.py test"
 
-	echo ""
-	echo -e "\033[1mDone!\033[0m Everything looks in order."
+        echo ""
+        echo -e "\033[1mDone!\033[0m Everything looks in order."
+    else
+        echo "Running tests in webapp container"
+        run "docker-compose exec webapp /bin/bash -c \"/webodm/webodm.sh test\""
+    fi
 }
 
 resetpassword(){

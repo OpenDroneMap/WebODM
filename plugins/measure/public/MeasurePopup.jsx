@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './MeasurePopup.scss';
+import Utils from 'webodm/classes/Utils';
 import $ from 'jquery';
 import L from 'leaflet';
 
@@ -23,10 +24,46 @@ export default class MeasurePopup extends React.Component {
         volume: null, // to be calculated
         error: ""
     };
+
+    this.exportMeasurement = this.exportMeasurement.bind(this);
+    this.getProperties = this.getProperties.bind(this);
+    this.getGeoJSON = this.getGeoJSON.bind(this);
   }
 
   componentDidMount(){
     this.calculateVolume();
+    this.props.resultFeature._measurePopup = this;
+  }
+
+  componentWillUnmount(){
+    this.props.resultFeature._measurePopup = null;
+  }
+
+  getProperties(){
+    const result = {
+        Length: this.props.model.length,
+        Area: this.props.model.area
+    };
+    if (this.state.volume !== null && this.state.volume !== false){
+        result.Volume = this.state.volume;
+    }
+    
+    return result;
+  }
+
+  getGeoJSON(){
+    const geoJSON = this.props.resultFeature.toGeoJSON();
+    geoJSON.properties = this.getProperties();
+    return geoJSON;
+  }
+
+  exportMeasurement(){
+    const geoJSON = {
+      type: "FeatureCollection",
+      features: [this.getGeoJSON()]
+    };
+
+    Utils.saveAs(JSON.stringify(geoJSON, null, 4), "measurement.geojson")
   }
 
   calculateVolume(){
@@ -96,6 +133,7 @@ export default class MeasurePopup extends React.Component {
         {volume === null && !error && <p>Volume: <i>computing...</i> <i className="fa fa-cog fa-spin fa-fw" /></p>}
         {typeof volume === "number" && <p>Volume: {volume.toFixed("2")} Cubic Meters ({(volume * 35.3147).toFixed(2)} Cubic Feet)</p>}
         {error && <p>Volume: <span className={"error theme-background-failed " + (error.length > 200 ? 'long' : '')}>{error}</span></p>}
+        <a href="#" onClick={this.exportMeasurement} className="export-measurements"><i className="fa fa-download"></i> Export to GeoJSON</a>
     </div>);
   }
 }

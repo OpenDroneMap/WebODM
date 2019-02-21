@@ -7,10 +7,13 @@ import uuid as uuid_module
 import json
 from shlex import quote
 
+import errno
 import piexif
 import re
 
 import zipfile
+
+import requests
 from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
@@ -20,6 +23,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.utils import timezone
+from urllib3.exceptions import ReadTimeoutError
 
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
@@ -167,6 +171,7 @@ class Task(models.Model):
         (pending_actions.REMOVE, 'REMOVE'),
         (pending_actions.RESTART, 'RESTART'),
         (pending_actions.RESIZE, 'RESIZE'),
+        (pending_actions.IMPORT, 'IMPORT'),
     )
 
     # Not an exact science
@@ -220,6 +225,8 @@ class Task(models.Model):
     running_progress = models.FloatField(default=0.0,
                                         help_text="Value between 0 and 1 indicating the running progress (estimated) of this task",
                                         blank=True)
+    import_url = models.TextField(null=False, default="", blank=True, help_text="URL this task is imported from (only for imported tasks)")
+    images_count = models.IntegerField(null=False, blank=True, default=0, help_text="Number of images associated with this task")
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -330,6 +337,58 @@ class Task(models.Model):
         else:
             raise FileNotFoundError("{} is not a valid asset".format(asset))
 
+    def handle_import(self):
+        self.console_output += "Importing assets...\n"
+        self.save()
+
+        zip_path = self.assets_path("all.zip")
+
+        if self.import_url and not os.path.exists(zip_path):
+            try:
+                # TODO: this is potentially vulnerable to a zip bomb attack
+                #       mitigated by the fact that a valid account is needed to
+                #       import tasks
+                logger.info("Importing task assets from {} for {}".format(self.import_url, self))
+                download_stream = requests.get(self.import_url, stream=True, timeout=10)
+                content_length = download_stream.headers.get('content-length')
+                total_length = int(content_length) if content_length is not None else None
+                downloaded = 0
+                last_update = 0
+
+                with open(zip_path, 'wb') as fd:
+                    for chunk in download_stream.iter_content(4096):
+                        downloaded += len(chunk)
+
+                        if time.time() - last_update >= 2:
+                            # Update progress
+                            if total_length is not None:
+                                Task.objects.filter(pk=self.id).update(running_progress=(float(downloaded) / total_length) * 0.9)
+
+                            self.check_if_canceled()
+                            last_update = time.time()
+
+                        fd.write(chunk)
+
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                raise NodeServerError(e)
+
+        self.refresh_from_db()
+        self.extract_assets_and_complete()
+
+        images_json = self.assets_path("images.json")
+        if os.path.exists(images_json):
+            try:
+                with open(images_json) as f:
+                    images = json.load(f)
+                    self.images_count = len(images)
+            except:
+                logger.warning("Cannot read images count from imported task {}".format(self))
+                pass
+
+        self.pending_action = None
+        self.processing_time = 0
+        self.save()
+
     def process(self):
         """
         This method contains the logic for processing tasks asynchronously
@@ -339,6 +398,9 @@ class Task(models.Model):
         """
 
         try:
+            if self.pending_action == pending_actions.IMPORT:
+                self.handle_import()
+
             if self.pending_action == pending_actions.RESIZE:
                 resized_images = self.resize_images()
                 self.refresh_from_db()
@@ -428,6 +490,11 @@ class Task(models.Model):
                         except OdmError:
                             logger.warning("Could not cancel {} on processing node. We'll proceed anyway...".format(self))
 
+                        self.status = status_codes.CANCELED
+                        self.pending_action = None
+                        self.save()
+                    elif self.import_url:
+                        # Imported tasks need no special action
                         self.status = status_codes.CANCELED
                         self.pending_action = None
                         self.save()
@@ -557,43 +624,12 @@ class Task(models.Model):
 
                             zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
 
-                            logger.info("Extracting all.zip for {}".format(self))
-
-                            with zipfile.ZipFile(zip_path, "r") as zip_h:
-                                zip_h.extractall(assets_dir)
-
                             # Rename to all.zip
                             os.rename(zip_path, os.path.join(os.path.dirname(zip_path), 'all.zip'))
 
-                            # Populate *_extent fields
-                            extent_fields = [
-                                (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
-                                 'orthophoto_extent'),
-                                (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
-                                 'dsm_extent'),
-                                (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
-                                 'dtm_extent'),
-                            ]
+                            logger.info("Extracting all.zip for {}".format(self))
 
-                            for raster_path, field in extent_fields:
-                                if os.path.exists(raster_path):
-                                    # Read extent and SRID
-                                    raster = GDALRaster(raster_path)
-                                    extent = OGRGeometry.from_bbox(raster.extent)
-
-                                    # It will be implicitly transformed into the SRID of the model’s field
-                                    # self.field = GEOSGeometry(...)
-                                    setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
-
-                                    logger.info("Populated extent field with {} for {}".format(raster_path, self))
-
-                            self.update_available_assets_field()
-                            self.running_progress = 1.0
-                            self.console_output += "Done!\n"
-                            self.save()
-
-                            from app.plugins import signals as plugin_signals
-                            plugin_signals.task_completed.send_robust(sender=self.__class__, task_id=self.id)
+                            self.extract_assets_and_complete()
                         else:
                             # FAILED, CANCELED
                             self.save()
@@ -608,6 +644,54 @@ class Task(models.Model):
         except TaskInterruptedException as e:
             # Task was interrupted during image resize / upload
             logger.warning("{} interrupted".format(self, str(e)))
+
+    def extract_assets_and_complete(self):
+        """
+        Extracts assets/all.zip and populates task fields where required.
+        :return:
+        """
+        assets_dir = self.assets_path("")
+        zip_path = self.assets_path("all.zip")
+
+        # Extract from zip
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_h:
+                zip_h.extractall(assets_dir)
+        except zipfile.BadZipFile:
+            raise NodeServerError("Invalid zip file")
+
+        logger.info("Extracted all.zip for {}".format(self))
+
+        # Populate *_extent fields
+        extent_fields = [
+            (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
+             'orthophoto_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
+             'dsm_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
+             'dtm_extent'),
+        ]
+
+        for raster_path, field in extent_fields:
+            if os.path.exists(raster_path):
+                # Read extent and SRID
+                raster = GDALRaster(raster_path)
+                extent = OGRGeometry.from_bbox(raster.extent)
+
+                # It will be implicitly transformed into the SRID of the model’s field
+                # self.field = GEOSGeometry(...)
+                setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
+
+                logger.info("Populated extent field with {} for {}".format(raster_path, self))
+
+        self.update_available_assets_field()
+        self.running_progress = 1.0
+        self.console_output += "Done!\n"
+        self.status = status_codes.COMPLETED
+        self.save()
+
+        from app.plugins import signals as plugin_signals
+        plugin_signals.task_completed.send_robust(sender=self.__class__, task_id=self.id)
 
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
@@ -768,3 +852,16 @@ class Task(models.Model):
         except subprocess.CalledProcessError as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
             return None
+
+    def create_task_directories(self):
+        """
+        Create directories for this task (if they don't exist already)
+        """
+        assets_dir = self.assets_path("")
+        try:
+            os.makedirs(assets_dir)
+        except OSError as exc:  # Python >2.5
+            if exc.errno == errno.EEXIST and os.path.isdir(assets_dir):
+                pass
+            else:
+                raise

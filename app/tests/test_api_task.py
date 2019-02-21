@@ -122,6 +122,7 @@ class TestApiTask(BootTransactionTestCase):
         multiple_param_task = Task.objects.latest('created_at')
         self.assertTrue(multiple_param_task.name == 'test_task')
         self.assertTrue(multiple_param_task.processing_node.id == pnode.id)
+        self.assertEqual(multiple_param_task.import_url, "")
         image1.seek(0)
         image2.seek(0)
 
