@@ -36,7 +36,6 @@ class TaskSerializer(serializers.ModelSerializer):
     project = serializers.PrimaryKeyRelatedField(queryset=models.Project.objects.all())
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
     processing_node_name = serializers.SerializerMethodField()
-    images_count = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
 
     def get_processing_node_name(self, obj):
@@ -44,10 +43,6 @@ class TaskSerializer(serializers.ModelSerializer):
             return str(obj.processing_node)
         else:
             return None
-
-    def get_images_count(self, obj):
-        # TODO: create a field in the model for this
-        return obj.imageupload_set.count()
 
     def get_can_rerun_from(self, obj):
         """
@@ -164,6 +159,7 @@ class TaskViewSet(viewsets.ViewSet):
 
             for image in files:
                 models.ImageUpload.objects.create(task=task, image=image)
+            task.images_count = len(files)
 
             # Update other parameters such as processing node, task name, etc.
             serializer = TaskSerializer(task, data=request.data, partial=True)
@@ -341,23 +337,29 @@ class TaskAssetsImport(APIView):
         project = get_and_check_project(request, project_pk, ('change_project',))
 
         files = flatten_files(request.FILES)
+        import_url = request.data.get('url', None)
+        task_name = request.data.get('name', 'Imported Task')
 
-        if len(files) != 1:
+        if not import_url and len(files) != 1:
             raise exceptions.ValidationError(detail="Cannot create task, you need to upload 1 file")
+
+        if import_url and len(files) > 0:
+            raise exceptions.ValidationError(detail="Cannot create task, either specify a URL or upload 1 file.")
 
         with transaction.atomic():
             task = models.Task.objects.create(project=project,
                                               auto_processing_node=False,
-                                              name="Imported Task",
-                                              import_url="file://all.zip",
+                                              name=task_name,
+                                              import_url=import_url if import_url else "file://all.zip",
                                               status=status_codes.RUNNING,
                                               pending_action=pending_actions.IMPORT)
             task.create_task_directories()
 
-            destination_file = task.assets_path("all.zip")
-            with open(destination_file, 'wb+') as fd:
-                for chunk in files[0].chunks():
-                    fd.write(chunk)
+            if len(files) > 0:
+                destination_file = task.assets_path("all.zip")
+                with open(destination_file, 'wb+') as fd:
+                    for chunk in files[0].chunks():
+                        fd.write(chunk)
 
             worker_tasks.process_task.delay(task.id)
 

@@ -226,7 +226,7 @@ class Task(models.Model):
                                         help_text="Value between 0 and 1 indicating the running progress (estimated) of this task",
                                         blank=True)
     import_url = models.TextField(null=False, default="", blank=True, help_text="URL this task is imported from (only for imported tasks)")
-
+    images_count = models.IntegerField(null=False, blank=True, default=0, help_text="Number of images associated with this task")
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -340,7 +340,50 @@ class Task(models.Model):
     def handle_import(self):
         self.console_output += "Importing assets...\n"
         self.save()
+
+        zip_path = self.assets_path("all.zip")
+
+        if self.import_url and not os.path.exists(zip_path):
+            try:
+                # TODO: this is potentially vulnerable to a zip bomb attack
+                #       mitigated by the fact that a valid account is needed to
+                #       import tasks
+                download_stream = requests.get(self.import_url, stream=True, timeout=10)
+                content_length = download_stream.headers.get('content-length')
+                total_length = int(content_length) if content_length is not None else None
+                downloaded = 0
+                last_update = 0
+
+                with open(zip_path, 'wb') as fd:
+                    for chunk in download_stream.iter_content(4096):
+                        downloaded += len(chunk)
+
+                        if time.time() - last_update >= 2:
+                            # Update progress
+                            if total_length is not None:
+                                Task.objects.filter(pk=self.id).update(running_progress=(float(downloaded) / total_length) * 0.9)
+
+                            self.check_if_canceled()
+                            last_update = time.time()
+
+                        fd.write(chunk)
+
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                raise ProcessingError(e)
+
+        self.refresh_from_db()
         self.extract_assets_and_complete()
+
+        images_json = self.assets_path("images.json")
+        if os.path.exists(images_json):
+            try:
+                with open(images_json) as f:
+                    images = json.load(f)
+                    self.images_count = len(images)
+            except:
+                logger.warning("Cannot read images count from imported task {}".format(self))
+                pass
+
         self.pending_action = None
         self.processing_time = 0
         self.save()
@@ -441,6 +484,11 @@ class Task(models.Model):
                         except ProcessingException:
                             logger.warning("Could not cancel {} on processing node. We'll proceed anyway...".format(self))
 
+                        self.status = status_codes.CANCELED
+                        self.pending_action = None
+                        self.save()
+                    elif self.import_url:
+                        # Imported tasks need no special action
                         self.status = status_codes.CANCELED
                         self.pending_action = None
                         self.save()
@@ -613,8 +661,11 @@ class Task(models.Model):
         zip_path = self.assets_path("all.zip")
 
         # Extract from zip
-        with zipfile.ZipFile(zip_path, "r") as zip_h:
-            zip_h.extractall(assets_dir)
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_h:
+                zip_h.extractall(assets_dir)
+        except zipfile.BadZipFile:
+            raise ProcessingError("Corrupted zip file")
 
         logger.info("Extracted all.zip for {}".format(self))
 

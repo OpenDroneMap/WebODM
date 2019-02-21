@@ -204,13 +204,7 @@ class ProjectListItem extends React.Component {
               let response = JSON.parse(files[0].xhr.response);
               if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
               
-              if (this.state.showTaskList){
-                this.taskList.refresh();
-              }else{
-                this.setState({showTaskList: true});
-              }
-              this.resetUploadState();
-              this.refresh();
+              this.newTaskAdded();
             }catch(e){
               this.setUploadState({error: `Invalid response from server: ${e.message}`, uploading: false})
             }
@@ -245,6 +239,18 @@ class ProjectListItem extends React.Component {
           }
         });
     }
+  }
+
+  newTaskAdded = () => {
+    this.setState({importing: false});
+    
+    if (this.state.showTaskList){
+      this.taskList.refresh();
+    }else{
+      this.setState({showTaskList: true});
+    }
+    this.resetUploadState();
+    this.refresh();
   }
 
   setRef(prop){
@@ -448,6 +454,7 @@ class ProjectListItem extends React.Component {
 
           {this.state.importing ? 
             <ImportTaskPanel
+              onImported={this.newTaskAdded}
               onCancel={this.handleCancelImportTask}
               projectId={this.state.data.id}
             />

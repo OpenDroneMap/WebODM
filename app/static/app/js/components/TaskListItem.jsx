@@ -406,12 +406,13 @@ class TaskListItem extends React.Component {
       }
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
-          task.processing_node){
+          (task.processing_node || imported)){
         addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: "Cannot cancel task."}));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
-            task.processing_node){
+            task.processing_node &&
+            !imported){
           // By default restart reruns every pipeline
           // step from the beginning
           const rerunFrom = task.can_rerun_from.length > 1 ?
