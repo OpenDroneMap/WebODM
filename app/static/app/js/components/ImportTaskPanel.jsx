@@ -37,59 +37,61 @@ class ImportTaskPanel extends React.Component {
   componentDidMount(){
     Dropzone.autoDiscover = false;
 
-    this.dz = new Dropzone(this.dropzone, {
-        paramName: "file",
-        url : `/api/projects/${this.props.projectId}/tasks/import`,
-        parallelUploads: 1,
-        uploadMultiple: false,
-        acceptedFiles: "application/zip",
-        autoProcessQueue: true,
-        createImageThumbnails: false,
-        previewTemplate: '<div style="display:none"></div>',
-        clickable: this.uploadButton,
-        chunkSize: 2147483647,
-        timeout: 2147483647,
-        
-        headers: {
-          [csrf.header]: csrf.token
-        }
-    });
-
-    this.dz.on("error", (file) => {
-        if (this.state.uploading) this.setState({error: "Cannot upload file. Check your internet connection and try again."});
-      })
-      .on("sending", () => {
-        this.setState({typeUrl: false, uploading: true, totalCount: 1});
-      })
-      .on("reset", () => {
-        this.setState({uploading: false, progress: 0, totalBytes: 0, totalBytesSent: 0});
-      })
-      .on("uploadprogress", (file, progress, bytesSent) => {
-          this.setState({
-            progress,
-            totalBytes: file.size,
-            totalBytesSent: bytesSent
-          });
-      })
-      .on("sending", (file, xhr, formData) => {
-        // Safari does not have support for has on FormData
-        // as of December 2017
-        if (!formData.has || !formData.has("name")) formData.append("name", this.defaultTaskName());
-      })
-      .on("complete", (file) => {
-        if (file.status === "success"){
-          this.setState({uploading: false});
-          try{
-            let response = JSON.parse(file.xhr.response);
-            if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
-            this.props.onImported();
-          }catch(e){
-            this.setState({error: `Invalid response from server: ${e.message}`});
+    if (this.dropzone){
+      this.dz = new Dropzone(this.dropzone, {
+          paramName: "file",
+          url : `/api/projects/${this.props.projectId}/tasks/import`,
+          parallelUploads: 1,
+          uploadMultiple: false,
+          acceptedFiles: "application/zip",
+          autoProcessQueue: true,
+          createImageThumbnails: false,
+          previewTemplate: '<div style="display:none"></div>',
+          clickable: this.uploadButton,
+          chunkSize: 2147483647,
+          timeout: 2147483647,
+          
+          headers: {
+            [csrf.header]: csrf.token
           }
-        }else if (this.state.uploading){
-          this.setState({uploading: false, error: "An error occured while uploading the file. Please try again."});
-        }
       });
+
+      this.dz.on("error", (file) => {
+          if (this.state.uploading) this.setState({error: "Cannot upload file. Check your internet connection and try again."});
+        })
+        .on("sending", () => {
+          this.setState({typeUrl: false, uploading: true, totalCount: 1});
+        })
+        .on("reset", () => {
+          this.setState({uploading: false, progress: 0, totalBytes: 0, totalBytesSent: 0});
+        })
+        .on("uploadprogress", (file, progress, bytesSent) => {
+            this.setState({
+              progress,
+              totalBytes: file.size,
+              totalBytesSent: bytesSent
+            });
+        })
+        .on("sending", (file, xhr, formData) => {
+          // Safari does not have support for has on FormData
+          // as of December 2017
+          if (!formData.has || !formData.has("name")) formData.append("name", this.defaultTaskName());
+        })
+        .on("complete", (file) => {
+          if (file.status === "success"){
+            this.setState({uploading: false});
+            try{
+              let response = JSON.parse(file.xhr.response);
+              if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
+              this.props.onImported();
+            }catch(e){
+              this.setState({error: `Invalid response from server: ${e.message}`});
+            }
+          }else if (this.state.uploading){
+            this.setState({uploading: false, error: "An error occured while uploading the file. Please try again."});
+          }
+        });
+    }
   }
 
   cancel = (e) => {
@@ -125,6 +127,8 @@ class ImportTaskPanel extends React.Component {
         name: this.defaultTaskName()
       }
     ).done(json => {
+      this.setState({importingFromUrl: false});
+
       if (json.id){
         this.props.onImported();
       }else{
@@ -132,10 +136,7 @@ class ImportTaskPanel extends React.Component {
       }
     })
     .fail(() => {
-        this.setState({error: "Cannot import from URL. Check your internet connection."});
-    })
-    .always(() => {
-      this.setState({importingFromUrl: false});
+        this.setState({importingFromUrl: false, error: "Cannot import from URL. Check your internet connection."});
     });
   }
 
