@@ -7,13 +7,17 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
+import {addTempLayer} from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
+import Basemaps from '../classes/Basemaps';
+import Standby from './Standby';
 import update from 'immutability-helper';
 
 class Map extends React.Component {
@@ -42,7 +46,8 @@ class Map extends React.Component {
     this.state = {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
-      pluginActionButtons: []
+      pluginActionButtons: [],
+      showLoading: false
     };
 
     this.imageryLayers = [];
@@ -94,9 +99,11 @@ class Map extends React.Component {
             const layer = Leaflet.tileLayer(info.tiles[0], {
                   bounds,
                   minZoom: info.minzoom,
-                  maxZoom: info.maxzoom,
+                  maxZoom: L.Browser.retina ? (info.maxzoom + 1) : info.maxzoom,
+                  maxNativeZoom: L.Browser.retina ? (info.maxzoom - 1) : info.maxzoom,
                   tms: info.scheme === 'tms',
-                  opacity: this.props.opacity / 100
+                  opacity: this.props.opacity / 100,
+                  detectRetina: true
                 });
             
             // Associate metadata with this layer
@@ -169,6 +176,27 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
+    var mapTempLayerDrop = new Dropzone(this.container, {url : "/", clickable : false});
+    mapTempLayerDrop.on("addedfile", (file) => {
+      this.setState({showLoading: true});
+      addTempLayer(file, (err, tempLayer, filename) => {
+        if (!err){
+          tempLayer.addTo(this.map);
+          //add layer to layer switcher with file name
+          this.autolayers.addOverlay(tempLayer, filename);
+          //zoom to all features
+          this.map.fitBounds(tempLayer.getBounds());
+        }else{
+          this.setState({ error: err.message || JSON.stringify(err) });
+        }
+
+        this.setState({showLoading: false});
+      });
+    });
+    mapTempLayerDrop.on("error", function(file) {
+      mapTempLayerDrop.removeFile(file);
+    });
+    
     const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
@@ -192,27 +220,41 @@ class Map extends React.Component {
     }).addTo(this.map);
 
     if (showBackground) {
-      this.basemaps = {
-        "Google Maps Hybrid": L.tileLayer('//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-            attribution: 'Map data: &copy; Google Maps',
-            subdomains: ['mt0','mt1','mt2','mt3'],
+      this.basemaps = {};
+      
+      Basemaps.forEach((src, idx) => {
+        const { url, ...props } = src;
+        const layer = L.tileLayer(url, props);
+
+        if (idx === 0) {
+          layer.addTo(this.map);
+        }
+
+        this.basemaps[props.label] = layer;
+      });
+
+      const customLayer = L.layerGroup();
+      customLayer.on("add", a => {
+        let url = window.prompt(`Enter a tile URL template. Valid tokens are:
+{z}, {x}, {y} for Z/X/Y tile scheme
+{-y} for flipped TMS-style Y coordinates
+
+Example:
+https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
+`, 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png');
+        
+        if (url){
+          customLayer.clearLayers();
+          const l = L.tileLayer(url, {
             maxZoom: 21,
-            minZoom: 0,
-            label: 'Google Maps Hybrid'
-        }).addTo(this.map),
-        "ESRI Satellite": L.tileLayer('//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-            maxZoom: 21,
-            minZoom: 0,
-            label: 'ESRI Satellite'  // optional label used for tooltip
-        }),
-        "OSM Mapnik": L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 21,
-            minZoom: 0,
-            label: 'OSM Mapnik'  // optional label used for tooltip
-        })
-      };
+            minZoom: 0
+          });
+          customLayer.addLayer(l);
+          l.bringToBack();
+        }
+      });
+      this.basemaps["Custom"] = customLayer;
+      this.basemaps["None"] = L.layerGroup();
     }
 
     this.autolayers = Leaflet.control.autolayers({
@@ -283,7 +325,11 @@ class Map extends React.Component {
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
-
+        <Standby 
+            message="Loading..."
+            show={this.state.showLoading}
+            />
+            
         <div 
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}

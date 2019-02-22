@@ -254,7 +254,7 @@
                     <ul class="nav nav-second-level">
                         {% for node in nodes %}
                         <li>
-                            <a href="{% url 'processing_node' node.id %}"><span class="fa fa-laptop"></span> {{node}}</a>
+                            <a href="{% url 'processing_node' node.id %}"><span class="fa fa-laptop {% if node.is_online %}theme-color-button-primary{% else %}theme-color-button-danger{% endif %}"></span> {{node}}</a>
                         </li>
                         {% endfor %}
 
@@ -275,9 +275,6 @@
                 {% endif %}
                 <li>
                     <a href="/api/"><i class="fa fa-book fa-fw"></i> {% trans 'API' %}</a>
-                </li>
-                <li>
-                    <a href="http://docs.webodm.org" target="_blank"><i class="fa fa-life-saver fa-fw"></i> {% trans 'Documentation' %}</a>
                 </li>
 
                 {% if user.is_staff %}

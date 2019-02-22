@@ -1,5 +1,6 @@
 import logging, os, sys
 from abc import ABC
+from app.plugins import UserDataStore, GlobalDataStore
 
 logger = logging.getLogger('app.logger')
 
@@ -22,6 +23,22 @@ class PluginBase(ABC):
         :return: Name of current module (reflects the directory in which this plugin is stored)
         """
         return self.name
+
+    def get_user_data_store(self, user):
+        """
+        Helper function to instantiate a user data store associated
+        with this plugin
+        :return: UserDataStore
+        """
+        return UserDataStore(self.get_name(), user)
+
+    def get_global_data_store(self):
+        """
+        Helper function to instantiate a user data store associated
+        with this plugin
+        :return: GlobalDataStore
+        """
+        return GlobalDataStore(self.get_name())
 
     def get_module_name(self):
         return self.__class__.__module__
@@ -65,6 +82,15 @@ class PluginBase(ABC):
         """
         return []
 
+    def build_jsx_components(self):
+        """
+        Experimental
+        Should be overriden by plugins that want to automatically
+        build JSX files.
+        All paths are relative to a plugin's /public folder.
+        """
+        return []
+
     def main_menu(self):
         """
         Should be overriden by plugins that want to add
@@ -88,6 +114,21 @@ class PluginBase(ABC):
         :return: [] of MountPoint objects
         """
         return []
+
+    def get_dynamic_script(self, script_path, callback = None, **template_args):
+        """
+        Retrieves a view handler that serves a dynamic script from
+        the plugin's directory. Dynamic scripts are normal Javascript
+        files that optionally support Template variable substitution
+        via ${vars}, computed on the server.
+        :param script_path: path to script relative to plugin's directory.
+        :param callback: optional callback. The callback can prevent the script from being returned if it returns False.
+            If it returns a dictionary, the dictionary items are used for variable substitution.
+        :param template_args: Parameters to use for variable substitution (unless a callback is specified)
+        :return: Django view
+        """
+        from app.plugins import get_dynamic_script_handler
+        return get_dynamic_script_handler(self.get_path(script_path), callback, **template_args)
 
     def __str__(self):
         return "[{}]".format(self.get_module_name())

@@ -45,6 +45,7 @@ with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
     VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
+MIGRATING = sys.argv[1:2] == ['migrate']
 WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
 # SECURITY WARNING: don't run with debug turned on a public facing server!
@@ -250,6 +251,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
+if TESTING:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 MEDIA_TMP = os.path.join(MEDIA_ROOT, 'tmp')
 
 # Store flash messages in cookies
@@ -262,7 +265,7 @@ MESSAGE_TAGS = {
 # Use Django's standard django.contrib.auth permissions (no anonymous usage)
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': [
-    'app.permissions.GuardianObjectPermissions',
+    'rest_framework.permissions.DjangoObjectPermissions',
   ],
   'DEFAULT_FILTER_BACKENDS': [
     'rest_framework.filters.DjangoObjectPermissionsFilter',
@@ -329,9 +332,6 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 if TESTING:
     CELERY_TASK_ALWAYS_EAGER = True
-
-if TESTING:
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 
 try:
     from .local_settings import *

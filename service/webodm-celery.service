@@ -1,0 +1,19 @@
+[Unit]
+Description=Start WebODM Celery Service Container
+Requires=webodm-gunicorn.service
+After=webodm-gunicorn.service
+
+[Service]
+Type=simple
+User=odm
+Group=odm
+Environment=SHELL=/bin/bash
+Environment=LANG=en_US.UTF-8
+PIDFile=/run/webodm-celery.pid
+WorkingDirectory=/webodm
+ExecStart=/webodm/python3-venv/bin/celery -A worker worker --autoscale 8,2 --max-tasks-per-child 1000 --loglevel=warn
+ExecStop=/bin/kill -s QUIT $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

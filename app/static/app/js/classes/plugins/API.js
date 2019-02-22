@@ -1,6 +1,8 @@
 import { EventEmitter } from 'fbemitter';
 import ApiFactory from './ApiFactory';
 import Map from './Map';
+import Dashboard from './Dashboard';
+import App from './App';
 import $ from 'jquery';
 import SystemJS from 'SystemJS';
 
@@ -27,6 +29,8 @@ if (!window.PluginsAPI){
 
   window.PluginsAPI = {
     Map: factory.create(Map),
+    Dashboard: factory.create(Dashboard),
+    App: factory.create(App),
 
     SystemJS,
     events

@@ -9,6 +9,8 @@ from rest_framework_jwt.settings import api_settings
 
 from app import pending_actions
 from app.models import Project, Task
+from app.plugins.signals import processing_node_removed
+from app.tests.utils import catch_signal
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from .classes import BootTestCase
 
@@ -350,6 +352,22 @@ class TestApi(BootTestCase):
         # Should be set to false
         self.assertFalse(res.data['online'])
 
+        # Verify max images field
+        self.assertTrue("max_images" in res.data)
+
+        # Verify odm version
+        self.assertTrue("odm_version" in res.data)
+
+        # label should be hostname:port (since no label is set)
+        self.assertEqual(res.data['label'], pnode.hostname + ":" + str(pnode.port))
+
+        # If we update the label, the label is used instead
+        pnode.label = "Test"
+        pnode.save()
+
+        res = client.get('/api/processingnodes/{}/'.format(pnode.id))
+        self.assertEqual(res.data['label'], "Test")
+
         # Cannot delete a processing node as normal user
         res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
         self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -361,8 +379,11 @@ class TestApi(BootTestCase):
         client.login(username="testsuperuser", password="test1234")
 
         # Can delete a processing node as super user
-        res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
-        self.assertTrue(res.status_code, status.HTTP_200_OK)
+        # and a signal is sent when a processing node is deleted
+        with catch_signal(processing_node_removed) as h1:
+            res = client.delete('/api/processingnodes/{}/'.format(pnode.id))
+            self.assertTrue(res.status_code, status.HTTP_200_OK)
+        h1.assert_called_once_with(sender=ProcessingNode, processing_node_id=pnode.id, signal=processing_node_removed)
 
         # Can create a processing node as super user
         res = client.post('/api/processingnodes/', {'hostname': 'localhost', 'port':'1000'})

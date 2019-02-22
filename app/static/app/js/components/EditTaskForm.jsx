@@ -11,7 +11,8 @@ import $ from 'jquery';
 class EditTaskForm extends React.Component {
   static defaultProps = {
     selectedNode: null,
-    task: null
+    task: null,
+    onFormChanged: () => {},
   };
 
   static propTypes = {
@@ -20,6 +21,7 @@ class EditTaskForm extends React.Component {
         PropTypes.number
       ]),
       onFormLoaded: PropTypes.func,
+      onFormChanged: PropTypes.func,
       task: PropTypes.object
   };
 
@@ -64,12 +66,18 @@ class EditTaskForm extends React.Component {
     this.getAvailableOptionsOnly = this.getAvailableOptionsOnly.bind(this);
     this.getAvailableOptionsOnlyText = this.getAvailableOptionsOnlyText.bind(this);
     this.saveLastPresetToStorage = this.saveLastPresetToStorage.bind(this);
+    this.formReady = this.formReady.bind(this);
+  }
+
+  formReady(){
+    return this.state.loadedProcessingNodes && 
+            this.state.selectedNode && 
+            this.state.loadedPresets &&
+            this.state.selectedPreset;
   }
 
   notifyFormLoaded(){
-    if (this.props.onFormLoaded && 
-        this.state.loadedPresets && 
-        this.state.loadedProcessingNodes) this.props.onFormLoaded();
+    if (this.props.onFormLoaded && this.formReady()) this.props.onFormLoaded();
   }
 
   loadProcessingNodes(){
@@ -100,7 +108,7 @@ class EditTaskForm extends React.Component {
             return {
               id: node.id,
               key: node.id,
-              label: `${node.hostname}:${node.port} (queue: ${node.queue_count})`,
+              label: `${node.label} (queue: ${node.queue_count})`,
               options: node.available_options,
               queue_count: node.queue_count,
               enabled: node.online,
@@ -271,6 +279,18 @@ class EditTaskForm extends React.Component {
   componentDidMount(){
     this.loadProcessingNodes();
     this.loadPresets();
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    // Monitor changes of certain form items (user driven)
+    // and fire event when appropriate
+    if (!this.formReady()) return;
+    
+    let changed = false;
+    ['name', 'selectedNode', 'selectedPreset'].forEach(prop => {
+        if (prevState[prop] !== this.state[prop]) changed = true;
+    });
+    if (changed) this.props.onFormChanged();
   }
 
   componentWillUnmount(){
@@ -457,10 +477,7 @@ class EditTaskForm extends React.Component {
     }
 
     let taskOptions = "";
-    if (this.state.loadedProcessingNodes && 
-      this.state.selectedNode && 
-      this.state.loadedPresets &&
-      this.state.selectedPreset){
+    if (this.formReady()){
 
       taskOptions = (
         <div>

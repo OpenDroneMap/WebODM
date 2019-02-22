@@ -22,7 +22,7 @@ Once you have a development environment, read about the [project overview](#proj
 
 Follow the [Getting Started](https://github.com/OpenDroneMap/WebODM#getting-started) instructions, then run:
 
-`./devenv.sh start`
+`./webodm.sh start --dev`
 
 That's it! You can modify any of the files, including SASS and React.js files. Changes will be reflected in the running WebODM instance automatically. 
 
@@ -36,7 +36,7 @@ We think testing is a necessary part of delivering robust software. We try to ac
 
 To run the unit tests, simply type:
 
-`./devenv.sh runtests`
+`./webodm.sh test`
 
 ## Project Overview
 
@@ -51,7 +51,7 @@ Directories of interest are listed as follow:
 Directory | Description
 --------- | -----------
 `/app`	  | Main application, includes the UI components, API, tests and backend logic.
-`/nodeodm`| Application that bridges the communication between WebODM and [node-OpenDroneMap](https://github.com/OpenDroneMap/node-OpenDroneMap). Includes its own unit tests and models.
+`/nodeodm`| Application that bridges the communication between WebODM and [NodeODM](https://github.com/OpenDroneMap/NodeODM). Includes its own unit tests and models.
 `/webodm` | Django's main project directory. Setting files are here.
 
 ### Frontend

@@ -1,14 +1,19 @@
 import logging
 import os
 import shutil
-import zipfile
+import time
 import uuid as uuid_module
 
 import json
 from shlex import quote
 
+import errno
 import piexif
 import re
+
+import zipfile
+
+import requests
 from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
@@ -18,24 +23,25 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.utils import timezone
+from urllib3.exceptions import ReadTimeoutError
 
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
 
+from app.testwatch import testWatch
 from nodeodm import status_codes
-from nodeodm.exceptions import ProcessingError, ProcessingTimeout, ProcessingException
 from nodeodm.models import ProcessingNode
+from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
 from webodm import settings
 from .project import Project
 
 from functools import partial
-from multiprocessing import cpu_count
-from concurrent.futures import ThreadPoolExecutor
 import subprocess
 
 logger = logging.getLogger('app.logger')
 
-
+class TaskInterruptedException(Exception):
+    pass
 
 def task_directory_path(taskId, projectId):
     return 'project/{0}/task/{1}/'.format(projectId, taskId)
@@ -69,7 +75,13 @@ def validate_task_options(value):
 
 
 
-def resize_image(image_path, resize_to):
+def resize_image(image_path, resize_to, done=None):
+    """
+    :param image_path: path to the image
+    :param resize_to: target size to resize this image to (largest side)
+    :param done: optional callback
+    :return: path and resize ratio
+    """
     try:
         im = Image.open(image_path)
         path, ext = os.path.splitext(image_path)
@@ -105,16 +117,25 @@ def resize_image(image_path, resize_to):
         logger.info("Resized {} to {}x{}".format(image_path, resized_width, resized_height))
     except IOError as e:
         logger.warning("Cannot resize {}: {}.".format(image_path, str(e)))
+        if done is not None:
+            done()
         return None
 
-    return {'path': image_path, 'resize_ratio': ratio}
+    retval = {'path': image_path, 'resize_ratio': ratio}
+
+    if done is not None:
+        done(retval)
+
+    return retval
 
 class Task(models.Model):
     ASSETS_MAP = {
             'all.zip': 'all.zip',
             'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
             'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
+            'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
             'georeferenced_model.las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.las'),
+            'georeferenced_model.laz': os.path.join('odm_georeferencing', 'odm_georeferenced_model.laz'),
             'georeferenced_model.ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
             'georeferenced_model.csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv'),
             'textured_model.zip': {
@@ -123,6 +144,18 @@ class Task(models.Model):
             },
             'dtm.tif': os.path.join('odm_dem', 'dtm.tif'),
             'dsm.tif': os.path.join('odm_dem', 'dsm.tif'),
+            'dtm_tiles.zip': {
+                'deferred_path': 'dtm_tiles.zip',
+                'deferred_compress_dir': 'dtm_tiles'
+            },
+            'dsm_tiles.zip': {
+                'deferred_path': 'dsm_tiles.zip',
+                'deferred_compress_dir': 'dsm_tiles'
+            },
+            'orthophoto_tiles.zip': {
+                'deferred_path': 'orthophoto_tiles.zip',
+                'deferred_compress_dir': 'orthophoto_tiles'
+            },
     }
 
     STATUS_CODES = (
@@ -138,7 +171,25 @@ class Task(models.Model):
         (pending_actions.REMOVE, 'REMOVE'),
         (pending_actions.RESTART, 'RESTART'),
         (pending_actions.RESIZE, 'RESIZE'),
+        (pending_actions.IMPORT, 'IMPORT'),
     )
+
+    # Not an exact science
+    TASK_OUTPUT_MILESTONES_LAST_VALUE = 0.85
+    TASK_OUTPUT_MILESTONES = {
+        'Running ODM Load Dataset Cell': 0.01,
+        'Running ODM Load Dataset Cell - Finished': 0.05,
+        'opensfm/bin/opensfm match_features': 0.10,
+        'opensfm/bin/opensfm reconstruct': 0.20,
+        'opensfm/bin/opensfm export_visualsfm': 0.30,
+        'Running ODM Meshing Cell': 0.50,
+        'Running MVS Texturing Cell': 0.55,
+        'Running ODM Georeferencing Cell': 0.60,
+        'Running ODM DEM Cell': 0.70,
+        'Running ODM Orthophoto Cell': 0.75,
+        'Running ODM OrthoPhoto Cell - Finished': 0.80,
+        'Compressing all.zip:': TASK_OUTPUT_MILESTONES_LAST_VALUE
+    }
 
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
 
@@ -150,10 +201,9 @@ class Task(models.Model):
     auto_processing_node = models.BooleanField(default=True, help_text="A flag indicating whether this task should be automatically assigned a processing node")
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
-    options = fields.JSONField(default=dict(), blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
-    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list(), blank=True, help_text="List of available assets to download")
+    options = fields.JSONField(default=dict, blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
+    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text="List of available assets to download")
     console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
-    ground_control_points = models.FileField(null=True, blank=True, upload_to=gcp_directory_path, help_text="Optional Ground Control Points file to use for processing")
 
     orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
     dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM created by OpenDroneMap")
@@ -166,6 +216,17 @@ class Task(models.Model):
     public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
     resize_to = models.IntegerField(default=-1, help_text="When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing.")
 
+    upload_progress = models.FloatField(default=0.0,
+                                        help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node",
+                                        blank=True)
+    resize_progress = models.FloatField(default=0.0,
+                                        help_text="Value between 0 and 1 indicating the resize progress of this task's images",
+                                        blank=True)
+    running_progress = models.FloatField(default=0.0,
+                                        help_text="Value between 0 and 1 indicating the running progress (estimated) of this task",
+                                        blank=True)
+    import_url = models.TextField(null=False, default="", blank=True, help_text="URL this task is imported from (only for imported tasks)")
+    images_count = models.IntegerField(null=False, blank=True, default=0, help_text="Number of images associated with this task")
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -276,6 +337,58 @@ class Task(models.Model):
         else:
             raise FileNotFoundError("{} is not a valid asset".format(asset))
 
+    def handle_import(self):
+        self.console_output += "Importing assets...\n"
+        self.save()
+
+        zip_path = self.assets_path("all.zip")
+
+        if self.import_url and not os.path.exists(zip_path):
+            try:
+                # TODO: this is potentially vulnerable to a zip bomb attack
+                #       mitigated by the fact that a valid account is needed to
+                #       import tasks
+                logger.info("Importing task assets from {} for {}".format(self.import_url, self))
+                download_stream = requests.get(self.import_url, stream=True, timeout=10)
+                content_length = download_stream.headers.get('content-length')
+                total_length = int(content_length) if content_length is not None else None
+                downloaded = 0
+                last_update = 0
+
+                with open(zip_path, 'wb') as fd:
+                    for chunk in download_stream.iter_content(4096):
+                        downloaded += len(chunk)
+
+                        if time.time() - last_update >= 2:
+                            # Update progress
+                            if total_length is not None:
+                                Task.objects.filter(pk=self.id).update(running_progress=(float(downloaded) / total_length) * 0.9)
+
+                            self.check_if_canceled()
+                            last_update = time.time()
+
+                        fd.write(chunk)
+
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                raise NodeServerError(e)
+
+        self.refresh_from_db()
+        self.extract_assets_and_complete()
+
+        images_json = self.assets_path("images.json")
+        if os.path.exists(images_json):
+            try:
+                with open(images_json) as f:
+                    images = json.load(f)
+                    self.images_count = len(images)
+            except:
+                logger.warning("Cannot read images count from imported task {}".format(self))
+                pass
+
+        self.pending_action = None
+        self.processing_time = 0
+        self.save()
+
     def process(self):
         """
         This method contains the logic for processing tasks asynchronously
@@ -285,8 +398,12 @@ class Task(models.Model):
         """
 
         try:
+            if self.pending_action == pending_actions.IMPORT:
+                self.handle_import()
+
             if self.pending_action == pending_actions.RESIZE:
                 resized_images = self.resize_images()
+                self.refresh_from_db()
                 self.resize_gcp(resized_images)
                 self.pending_action = None
                 self.save()
@@ -305,11 +422,24 @@ class Task(models.Model):
 
                 # Processing node assigned, but is offline and no errors
                 if self.processing_node and not self.processing_node.is_online():
-                    # Detach processing node, will be processed at the next tick
-                    logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
-                    self.uuid = ''
-                    self.processing_node = None
-                    self.save()
+                    # If we are queued up
+                    # detach processing node, and reassignment
+                    # will be processed at the next tick
+                    if self.status == status_codes.QUEUED:
+                        logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
+                        self.uuid = ''
+                        self.processing_node = None
+                        self.status = None
+                        self.save()
+
+                    elif self.status == status_codes.RUNNING:
+                        # Task was running and processing node went offline
+                        # It could have crashed due to low memory
+                        # or perhaps it went offline due to network errors.
+                        # We can't easily differentiate between the two, so we need
+                        # to notify the user because if it crashed due to low memory
+                        # the user might need to take action (or be stuck in an infinite loop)
+                        raise NodeServerError("Processing node went offline. This could be due to insufficient memory or a network error.")
 
             if self.processing_node:
                 # Need to process some images (UUID not yet set and task doesn't have pending actions)?
@@ -318,11 +448,31 @@ class Task(models.Model):
 
                     images = [image.path() for image in self.imageupload_set.all()]
 
+                    # Track upload progress, but limit the number of DB updates
+                    # to every 2 seconds (and always record the 100% progress)
+                    last_update = 0
+                    def callback(progress):
+                        nonlocal last_update
+
+                        time_has_elapsed = time.time() - last_update >= 2
+
+                        if time_has_elapsed:
+                            testWatch.manual_log_call("Task.process.callback")
+                            self.check_if_canceled()
+                            Task.objects.filter(pk=self.id).update(upload_progress=float(progress) / 100.0)
+                            last_update = time.time()
+
                     # This takes a while
-                    uuid = self.processing_node.process_new_task(images, self.name, self.options)
+                    try:
+                        uuid = self.processing_node.process_new_task(images, self.name, self.options, callback)
+                    except NodeConnectionError as e:
+                        # If we can't create a task because the node is offline
+                        # We want to fail instead of trying again
+                        raise NodeServerError('Connection error: ' + str(e))
 
                     # Refresh task object before committing change
                     self.refresh_from_db()
+                    self.upload_progress = 1.0
                     self.uuid = uuid
                     self.save()
 
@@ -337,15 +487,19 @@ class Task(models.Model):
                         # We don't care if this fails (we tried)
                         try:
                             self.processing_node.cancel_task(self.uuid)
-                            self.status = None
-                        except ProcessingException:
+                        except OdmError:
                             logger.warning("Could not cancel {} on processing node. We'll proceed anyway...".format(self))
-                            self.status = status_codes.CANCELED
 
+                        self.status = status_codes.CANCELED
+                        self.pending_action = None
+                        self.save()
+                    elif self.import_url:
+                        # Imported tasks need no special action
+                        self.status = status_codes.CANCELED
                         self.pending_action = None
                         self.save()
                     else:
-                        raise ProcessingError("Cannot cancel a task that has no processing node or UUID")
+                        raise NodeServerError("Cannot cancel a task that has no processing node or UUID")
 
                 elif self.pending_action == pending_actions.RESTART:
                     logger.info("Restarting {}".format(self))
@@ -358,8 +512,8 @@ class Task(models.Model):
                         if self.uuid:
                             try:
                                 info = self.processing_node.get_task_info(self.uuid)
-                                uuid_still_exists = info['uuid'] == self.uuid
-                            except ProcessingException:
+                                uuid_still_exists = info.uuid == self.uuid
+                            except OdmError:
                                 pass
 
                         need_to_reprocess = False
@@ -368,7 +522,7 @@ class Task(models.Model):
                             # Good to go
                             try:
                                 self.processing_node.restart_task(self.uuid, self.options)
-                            except ProcessingError as e:
+                            except (NodeServerError, NodeResponseError) as e:
                                 # Something went wrong
                                 logger.warning("Could not restart {}, will start a new one".format(self))
                                 need_to_reprocess = True
@@ -386,15 +540,17 @@ class Task(models.Model):
 
                             # We also remove the "rerun-from" parameter if it's set
                             self.options = list(filter(lambda d: d['name'] != 'rerun-from', self.options))
+                            self.upload_progress = 0
 
                         self.console_output = ""
                         self.processing_time = -1
                         self.status = None
                         self.last_error = None
                         self.pending_action = None
+                        self.running_progress = 0
                         self.save()
                     else:
-                        raise ProcessingError("Cannot restart a task that has no processing node")
+                        raise NodeServerError("Cannot restart a task that has no processing node")
 
                 elif self.pending_action == pending_actions.REMOVE:
                     logger.info("Removing {}".format(self))
@@ -404,7 +560,7 @@ class Task(models.Model):
                         # Are expected to be purged on their own after a set amount of time anyway
                         try:
                             self.processing_node.remove_task(self.uuid)
-                        except ProcessingException:
+                        except OdmError:
                             pass
 
                     # What's more important is that we delete our task properly here
@@ -419,16 +575,23 @@ class Task(models.Model):
                     # Update task info from processing node
                     info = self.processing_node.get_task_info(self.uuid)
 
-                    self.processing_time = info["processingTime"]
-                    self.status = info["status"]["code"]
+                    self.processing_time = info.processing_time
+                    self.status = info.status.value
 
                     current_lines_count = len(self.console_output.split("\n"))
                     console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
                     if len(console_output) > 0:
-                        self.console_output += console_output + '\n'
+                        self.console_output += "\n".join(console_output) + '\n'
 
-                    if "errorMessage" in info["status"]:
-                        self.last_error = info["status"]["errorMessage"]
+                        # Update running progress
+                        for line in console_output:
+                            for line_match, value in self.TASK_OUTPUT_MILESTONES.items():
+                                if line_match in line:
+                                    self.running_progress = value
+                                    break
+
+                    if info.last_error != "":
+                        self.last_error = info.last_error
 
                     # Has the task just been canceled, failed, or completed?
                     if self.status in [status_codes.FAILED, status_codes.COMPLETED, status_codes.CANCELED]:
@@ -447,44 +610,26 @@ class Task(models.Model):
                             logger.info("Downloading all.zip for {}".format(self))
 
                             # Download all assets
-                            zip_stream = self.processing_node.download_task_asset(self.uuid, "all.zip")
-                            zip_path = os.path.join(assets_dir, "all.zip")
-                            with open(zip_path, 'wb') as fd:
-                                for chunk in zip_stream.iter_content(4096):
-                                    fd.write(chunk)
+                            last_update = 0
 
-                            logger.info("Done downloading all.zip for {}".format(self))
+                            def callback(progress):
+                                nonlocal last_update
 
-                            # Extract from zip
-                            with zipfile.ZipFile(zip_path, "r") as zip_h:
-                                zip_h.extractall(assets_dir)
+                                time_has_elapsed = time.time() - last_update >= 2
 
-                            logger.info("Extracted all.zip for {}".format(self))
+                                if time_has_elapsed or int(progress) == 100:
+                                    Task.objects.filter(pk=self.id).update(running_progress=(
+                                    self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(progress) / 100.0) * 0.1))
+                                    last_update = time.time()
 
-                            # Populate *_extent fields
-                            extent_fields = [
-                                (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
-                                 'orthophoto_extent'),
-                                (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
-                                 'dsm_extent'),
-                                (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
-                                 'dtm_extent'),
-                            ]
+                            zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
 
-                            for raster_path, field in extent_fields:
-                                if os.path.exists(raster_path):
-                                    # Read extent and SRID
-                                    raster = GDALRaster(raster_path)
-                                    extent = OGRGeometry.from_bbox(raster.extent)
+                            # Rename to all.zip
+                            os.rename(zip_path, os.path.join(os.path.dirname(zip_path), 'all.zip'))
 
-                                    # It will be implicitly transformed into the SRID of the model’s field
-                                    # self.field = GEOSGeometry(...)
-                                    setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
+                            logger.info("Extracting all.zip for {}".format(self))
 
-                                    logger.info("Populated extent field with {} for {}".format(raster_path, self))
-
-                            self.update_available_assets_field()
-                            self.save()
+                            self.extract_assets_and_complete()
                         else:
                             # FAILED, CANCELED
                             self.save()
@@ -492,13 +637,61 @@ class Task(models.Model):
                         # Still waiting...
                         self.save()
 
-        except ProcessingError as e:
+        except (NodeServerError, NodeResponseError) as e:
             self.set_failure(str(e))
-        except (ConnectionRefusedError, ConnectionError) as e:
-            logger.warning("{} cannot communicate with processing node: {}".format(self, str(e)))
-        except ProcessingTimeout as e:
-            logger.warning("{} timed out with error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
+        except NodeConnectionError as e:
+            logger.warning("{} connection/timeout error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
+        except TaskInterruptedException as e:
+            # Task was interrupted during image resize / upload
+            logger.warning("{} interrupted".format(self, str(e)))
 
+    def extract_assets_and_complete(self):
+        """
+        Extracts assets/all.zip and populates task fields where required.
+        :return:
+        """
+        assets_dir = self.assets_path("")
+        zip_path = self.assets_path("all.zip")
+
+        # Extract from zip
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_h:
+                zip_h.extractall(assets_dir)
+        except zipfile.BadZipFile:
+            raise NodeServerError("Invalid zip file")
+
+        logger.info("Extracted all.zip for {}".format(self))
+
+        # Populate *_extent fields
+        extent_fields = [
+            (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
+             'orthophoto_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
+             'dsm_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
+             'dtm_extent'),
+        ]
+
+        for raster_path, field in extent_fields:
+            if os.path.exists(raster_path):
+                # Read extent and SRID
+                raster = GDALRaster(raster_path)
+                extent = OGRGeometry.from_bbox(raster.extent)
+
+                # It will be implicitly transformed into the SRID of the model’s field
+                # self.field = GEOSGeometry(...)
+                setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
+
+                logger.info("Populated extent field with {} for {}".format(raster_path, self))
+
+        self.update_available_assets_field()
+        self.running_progress = 1.0
+        self.console_output += "Done!\n"
+        self.status = status_codes.COMPLETED
+        self.save()
+
+        from app.plugins import signals as plugin_signals
+        plugin_signals.task_completed.send_robust(sender=self.__class__, task_id=self.id)
 
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
@@ -562,6 +755,10 @@ class Task(models.Model):
 
 
     def delete(self, using=None, keep_parents=False):
+        task_id = self.id
+        from app.plugins import signals as plugin_signals
+        plugin_signals.task_removing.send_robust(sender=self.__class__, task_id=task_id)
+
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
                                            task_directory_path(self.id, self.project.id))
 
@@ -572,6 +769,8 @@ class Task(models.Model):
             shutil.rmtree(directory_to_delete)
         except FileNotFoundError as e:
             logger.warning(e)
+
+        plugin_signals.task_removed.send_robust(sender=self.__class__, task_id=task_id)
 
     def set_failure(self, error_message):
         logger.error("FAILURE FOR {}: {}".format(self, error_message))
@@ -585,6 +784,12 @@ class Task(models.Model):
         return [os.path.join(directory, f) for f in os.listdir(directory) if
                        re.match(regex, f, re.IGNORECASE)]
 
+    def check_if_canceled(self):
+        # Check if task has been canceled/removed
+        if Task.objects.only("pending_action").get(pk=self.id).pending_action in [pending_actions.CANCEL,
+                                                                                  pending_actions.REMOVE]:
+            raise TaskInterruptedException()
+
     def resize_images(self):
         """
         Destructively resize this task's JPG images while retaining EXIF tags.
@@ -597,11 +802,25 @@ class Task(models.Model):
             return []
 
         images_path = self.find_all_files_matching(r'.*\.jpe?g$')
+        total_images = len(images_path)
+        resized_images_count = 0
+        last_update = 0
 
-        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
-            resized_images = list(filter(lambda i: i is not None, executor.map(
-                partial(resize_image, resize_to=self.resize_to),
-                images_path)))
+        def callback(retval=None):
+            nonlocal last_update
+            nonlocal resized_images_count
+            nonlocal total_images
+
+            resized_images_count += 1
+            if time.time() - last_update >= 2:
+                # Update progress
+                Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
+                self.check_if_canceled()
+                last_update = time.time()
+
+        resized_images = list(map(partial(resize_image, resize_to=self.resize_to, done=callback), images_path))
+
+        Task.objects.filter(pk=self.id).update(resize_progress=1.0)
 
         return resized_images
 
@@ -634,7 +853,15 @@ class Task(models.Model):
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
             return None
 
-    class Meta:
-        permissions = (
-            ('view_task', 'Can view task'),
-        )
+    def create_task_directories(self):
+        """
+        Create directories for this task (if they don't exist already)
+        """
+        assets_dir = self.assets_path("")
+        try:
+            os.makedirs(assets_dir)
+        except OSError as exc:  # Python >2.5
+            if exc.errno == errno.EEXIST and os.path.isdir(assets_dir):
+                pass
+            else:
+                raise

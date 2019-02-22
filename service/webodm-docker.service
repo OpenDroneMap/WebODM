@@ -1,6 +1,7 @@
 [Unit]
 Description=Start WebODM OpenDroneMap Service Container
 Requires=docker.service
+After=docker.service
 
 [Service]
 Type=forking

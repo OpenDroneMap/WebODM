@@ -6,6 +6,11 @@ import subprocess
 
 import logging
 
+from unittest import mock
+from contextlib import contextmanager
+
+import random
+
 from webodm import settings
 
 logger = logging.getLogger('app.logger')
@@ -13,7 +18,7 @@ logger = logging.getLogger('app.logger')
 def start_processing_node(*args):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'] + list(args), shell=False,
-                                cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "node-OpenDroneMap"))
+                                cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "NodeODM"))
     time.sleep(2)  # Wait for the server to launch
     return node_odm
 
@@ -27,3 +32,12 @@ def clear_test_media_root():
             shutil.rmtree(settings.MEDIA_ROOT)
     else:
         logger.warning("We did not remove MEDIA_ROOT because we couldn't find a _test suffix in its path.")
+
+
+@contextmanager
+def catch_signal(signal):
+    """Catch django signal and return the mocked call."""
+    handler = mock.Mock()
+    signal.connect(handler, dispatch_uid=str(random.random()))
+    yield handler
+    signal.disconnect(handler)

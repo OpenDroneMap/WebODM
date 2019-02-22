@@ -3,6 +3,7 @@ import React from 'react';
 import update from 'immutability-helper';
 import TaskList from './TaskList';
 import NewTaskPanel from './NewTaskPanel';
+import ImportTaskPanel from './ImportTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import ProgressBar from './ProgressBar';
 import ErrorMessage from './ErrorMessage';
@@ -32,7 +33,8 @@ class ProjectListItem extends React.Component {
       upload: this.getDefaultUploadState(),
       error: "",
       data: props.data,
-      refreshing: false
+      refreshing: false,
+      importing: false
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
@@ -77,9 +79,11 @@ class ProjectListItem extends React.Component {
       resizedImages: 0,
       error: "",
       progress: 0,
+      files: [],
       totalCount: 0,
       totalBytes: 0,
-      totalBytesSent: 0
+      totalBytesSent: 0,
+      lastUpdated: 0
     };
   }
 
@@ -152,19 +156,29 @@ class ProjectListItem extends React.Component {
       });
 
       this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
-          this.setUploadState({
-            progress, totalBytes, totalBytesSent
-          });
+          // Limit updates since this gets called a lot
+          let now = (new Date()).getTime();
+
+          // Progress 100 is sent multiple times at the end
+          // this makes it so that we update the state only once.
+          if (progress === 100) now = now + 9999999999;
+
+          if (this.state.upload.lastUpdated + 500 < now){
+              this.setUploadState({
+                progress, totalBytes, totalBytesSent, lastUpdated: now
+              });
+          }
         })
         .on("addedfiles", files => {
           this.setUploadState({
             editing: true,
-            totalCount: this.state.upload.totalCount + files.length
+            totalCount: this.state.upload.totalCount + files.length,
+            files
           });
         })
         .on("transformcompleted", (file, total) => {
           if (this.dz._resizeMap) this.dz._resizeMap[file.name] = this.dz._taskInfo.resizeSize / Math.max(file.width, file.height);
-          this.setUploadState({resizedImages: total});
+          if (this.dz.options.resizeWidth) this.setUploadState({resizedImages: total});
         })
         .on("transformstart", (files) => {
           if (this.dz.options.resizeWidth){
@@ -180,7 +194,8 @@ class ProjectListItem extends React.Component {
         })
         .on("completemultiple", (files) => {
           // Check
-          let success = files.length > 0 && files.filter(file => file.status !== "success").length === 0;
+          const invalidFilesCount = files.filter(file => file.status !== "success").length;
+          let success = files.length > 0 && invalidFilesCount === 0;
 
           // All files have uploaded!
           if (success){
@@ -189,20 +204,15 @@ class ProjectListItem extends React.Component {
               let response = JSON.parse(files[0].xhr.response);
               if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
               
-              if (this.state.showTaskList){
-                this.taskList.refresh();
-              }else{
-                this.setState({showTaskList: true});
-              }
-              this.resetUploadState();
-              this.refresh();
+              this.newTaskAdded();
             }catch(e){
               this.setUploadState({error: `Invalid response from server: ${e.message}`, uploading: false})
             }
           }else{
             this.setUploadState({
+              totalCount: this.state.upload.totalCount - invalidFilesCount,
               uploading: false,
-              error: "Could not upload all files. An error occurred. Please try again."
+              error: `${invalidFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .png) and GCP files (.txt) can be uploaded. Try again.`
             });
           }
         })
@@ -229,6 +239,18 @@ class ProjectListItem extends React.Component {
           }
         });
     }
+  }
+
+  newTaskAdded = () => {
+    this.setState({importing: false});
+    
+    if (this.state.showTaskList){
+      this.taskList.refresh();
+    }else{
+      this.setState({showTaskList: true});
+    }
+    this.resetUploadState();
+    this.refresh();
   }
 
   setRef(prop){
@@ -321,6 +343,14 @@ class ProjectListItem extends React.Component {
     location.href = `/map/project/${this.state.data.id}/`;
   }
 
+  handleImportTask = () => {
+    this.setState({importing: true});
+  }
+
+  handleCancelImportTask = () => {
+    this.setState({importing: false});
+  }
+
   render() {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
@@ -347,13 +377,17 @@ class ProjectListItem extends React.Component {
           <ErrorMessage bind={[this, 'error']} />
           <div className="btn-group pull-right">
             {this.hasPermission("add") ? 
-              <button type="button" 
-                      className={"btn btn-primary btn-sm " + (this.state.upload.uploading ? "hide" : "")} 
+              <div className={"asset-download-buttons btn-group " + (this.state.upload.uploading ? "hide" : "")}>
+                <button type="button" 
+                      className="btn btn-primary btn-sm"
                       onClick={this.handleUpload}
                       ref={this.setRef("uploadButton")}>
                 <i className="glyphicon glyphicon-upload"></i>
                 Select Images and GCP
-              </button>
+              </button><button type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
+              <ul className="dropdown-menu">
+                <li><a href="javascript:void(0);" onClick={this.handleImportTask}><i className="glyphicon glyphicon-import"></i> Import Existing Assets</a></li>
+             </ul></div>
             : ""}
 
             <button disabled={this.state.upload.error !== ""} 
@@ -401,10 +435,6 @@ class ProjectListItem extends React.Component {
             /> 
           : ""}
 
-          {this.state.upload.uploading || this.state.upload.resizing ? 
-            <i className="fa fa-refresh fa-spin fa-fw" />
-            : ""}
-          
           {this.state.upload.error !== "" ? 
             <div className="alert alert-warning alert-dismissible">
                 <button type="button" className="close" aria-label="Close" onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
@@ -418,6 +448,15 @@ class ProjectListItem extends React.Component {
               onCancel={this.handleTaskCanceled}
               filesCount={this.state.upload.totalCount}
               showResize={true}
+              getFiles={() => this.state.upload.files }
+            />
+          : ""}
+
+          {this.state.importing ? 
+            <ImportTaskPanel
+              onImported={this.newTaskAdded}
+              onCancel={this.handleCancelImportTask}
+              projectId={this.state.data.id}
             />
           : ""}
 

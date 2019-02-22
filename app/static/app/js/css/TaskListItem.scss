@@ -15,6 +15,7 @@
 
     .name{
         padding-left: 0;
+        margin-top: 4px;
     }
     
     .details{
@@ -41,6 +42,8 @@
         padding: 4px;
         width: 100%;
         font-size: 90%;
+        border-style: solid;
+        border-width: 1px;
     }
 
     .clickable:hover{
@@ -96,4 +99,26 @@
     .inline{
         display: inline;
     }
+
+    .switch-view{
+        margin-bottom: 8px;
+        font-size: 90%;
+        position: relative;
+        z-index: 99;
+        
+        a{
+            margin-right: 8px;
+            &.selected{
+                font-weight: bold;
+            }
+            &:last-child{
+                margin-right: 0;
+            }
+        }
+
+        i{
+            margin-left: 8px;
+        }
+    }
+
 }

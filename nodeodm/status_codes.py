@@ -1,5 +1,6 @@
-QUEUED = 10
-RUNNING = 20
-FAILED = 30
-COMPLETED = 40
-CANCELED = 50
+from pyodm.types import TaskStatus
+QUEUED = TaskStatus.QUEUED.value
+RUNNING = TaskStatus.RUNNING.value
+FAILED = TaskStatus.FAILED.value
+COMPLETED = TaskStatus.COMPLETED.value
+CANCELED = TaskStatus.CANCELED.value

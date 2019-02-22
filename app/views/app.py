@@ -33,6 +33,10 @@ def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
     no_tasks = False
 
+    # Create first project automatically
+    if Project.objects.count() == 0:
+        Project.objects.create(owner=request.user, name=_("First Project"))
+
     return render(request, 'app/dashboard.html', {'title': 'Dashboard',
         'no_processingnodes': no_processingnodes,
         'no_tasks': no_tasks

@@ -1,0 +1,100 @@
+{% extends "app/plugins/templates/base.html" %}
+
+{% block content %}
+<script src="./Chart.min.js"></script>
+<h2>Diagnostic Information</h2>
+
+<p><b>App Version:</b> {{ version }}</p>
+
+<div class="row text-center">
+    <div class="col-md-4 col-sm-12">
+        <h4>Storage Space</h4>
+        <div style="width: 80%; margin-left: 10%;">
+            <canvas id="diskChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
+        </div>
+        <p><b>Free:</b> {{ free_disk_space|filesizeformat }} |
+            <b>Used:</b> {{ used_disk_space|filesizeformat }} |
+            <b>Total:</b> {{ total_disk_space|filesizeformat }}</p>
+    </div>
+    <div class="col-md-4 col-sm-12">
+        {% if total_memory %}
+        <h4>Memory</h4>
+        <div style="width: 80%; margin-left: 10%;">
+            <canvas id="memoryChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
+        </div>
+        <p><b>Free:</b> {{ free_memory|filesizeformat }} |
+            <b>Used:</b> {{ used_memory|filesizeformat }} |
+            <b>Total:</b> {{ total_memory|filesizeformat }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<hr/>
+<div style="margin-top: 20px;"><strong>Note!</strong> These values might be relative to the virtualization environment in which the application is running, not necessarely the values of the your machine. See instructions for <a href="http://stackoverflow.com/a/39720010">MacOS</a> and <a href="https://docs.docker.com/docker-for-windows/#advanced">Windows</a> for changing these values in a docker setup.</div>
+
+<script>
+(function(){
+    var ctx = document.getElementById('diskChart').getContext('2d');
+    var labels = {
+        'Used': '{{ used_disk_space|filesizeformat }}',
+        'Free': '{{ free_disk_space|filesizeformat }}'
+    };
+    var chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Used", "Free"],
+            datasets: [{
+                label: "Disk Space",
+                backgroundColor:[
+                    "rgb(255, 99, 132)",
+                    "rgb(54, 162, 235)"
+                ],
+                data: [ {{ used_disk_space }}, {{ free_disk_space }} ],
+            }]
+        },
+        options: {
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return labels[data.labels[tooltipItem.index]];
+                    }
+                }
+            }
+        }
+    });
+})();
+
+{% if total_memory %}
+(function(){
+    var ctx = document.getElementById('memoryChart').getContext('2d');
+    var labels = {
+        'Used': '{{ used_memory|filesizeformat }}',
+        'Free': '{{ free_memory|filesizeformat }}'
+    };
+    var chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Used", "Free"],
+            datasets: [{
+                label: "Disk Space",
+                backgroundColor:[
+                    "rgb(255, 99, 132)",
+                    "rgb(54, 162, 235)"
+                ],
+                data: [ {{ used_memory }}, {{ free_memory }} ],
+            }]
+        },
+        options: {
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return labels[data.labels[tooltipItem.index]];
+                    }
+                }
+            }
+        }
+    });
+})();
+{% endif %}
+</script>
+{% endblock %}

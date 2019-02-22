@@ -96,3 +96,4 @@ pip-selfcheck.json
 .idea/
 package-lock.json
 .cronenv
+.initialized

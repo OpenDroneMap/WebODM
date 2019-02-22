@@ -10,9 +10,13 @@ from nodeodm.models import ProcessingNode
 
 class ProcessingNodeSerializer(serializers.ModelSerializer):
     online = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
 
     def get_online(self, obj):
         return obj.is_online()
+
+    def get_label(self, obj):
+        return str(obj)
 
     class Meta:
         model = ProcessingNode
@@ -30,7 +34,7 @@ class ProcessingNodeFilter(FilterSet):
 
     class Meta:
         model = ProcessingNode
-        fields = ['has_available_options', 'id', 'hostname', 'port', 'api_version', 'queue_count', ]
+        fields = ['has_available_options', 'id', 'hostname', 'port', 'api_version', 'queue_count', 'max_images', 'label', ]
 
 class ProcessingNodeViewSet(viewsets.ModelViewSet):
     """

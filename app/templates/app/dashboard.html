@@ -14,7 +14,7 @@
 	{% if no_processingnodes %}
 		<h3>{% trans 'Welcome! ☺' %}</h3>
 		{% trans 'Add a Processing Node' as add_processing_node %}
-		{% with nodeodm_link='<a href="https://github.com/pierotofy/node-OpenDroneMap" target="_blank">node-OpenDroneMap</a>' api_link='<a href="https://github.com/pierotofy/node-OpenDroneMap/blob/master/docs/index.adoc" target="_blank">API</a>' %}
+		{% with nodeodm_link='<a href="https://github.com/OpenDroneMap/NodeODM" target="_blank">NodeODM</a>' api_link='<a href="https://github.com/OpenDroneMap/NodeODM/blob/master/docs/index.adoc" target="_blank">API</a>' %}
 			<p>
 			{% blocktrans %} 
 				To get started, "{{ add_processing_node }}". A processing node is a computer running an instance of {{ nodeodm_link }} or some other software that implements this {{ api_link }}.

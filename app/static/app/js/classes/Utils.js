@@ -80,6 +80,29 @@ export default {
       let path= scripts[scripts.length-1].src.split('?')[0];      // remove any ?query
       let mydir= path.split('/').slice(0, -1).join('/')+'/';  // remove last filename part of path
       return mydir;
+    },
+
+    saveAs: function(text, filename){
+      function save(uri, filename) {
+        let link = document.createElement('a');
+        if (typeof link.download === 'string') {
+          link.href = uri;
+          link.download = filename;
+
+          //Firefox requires the link to be in the body
+          document.body.appendChild(link);
+
+          //simulate click
+          link.click();
+
+          //remove the link when done
+          document.body.removeChild(link);
+        } else {
+          window.open(uri);
+        }
+      }
+
+      save("data:application/octet-stream," + encodeURIComponent(text), filename);
     }
 };
 

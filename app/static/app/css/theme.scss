@@ -131,6 +131,14 @@ a, a:hover, a:focus{
 	}
 }
 
+.theme-color-button-danger{
+    color: theme("button_danger");
+}
+
+.theme-color-button-primary{
+    color: theme("button_primary");
+}
+
 /* Header background */
 #navbar-top{
 	background-color: theme("header_background");
@@ -172,6 +180,7 @@ footer,
 /* Highlight */
 .task-list-item:nth-child(odd),
 .table-striped>tbody>tr:nth-of-type(odd),
+select.form-control option[disabled],
 .theme-background-highlight{
 	background-color: theme("highlight");
 }
@@ -203,7 +212,6 @@ pre.prettyprint,
 .task-list-item .status-label.error, .theme-background-failed{
 	background-color: theme("failed");
 }
-
 
 /* ModelView.jsx specific */
 .model-view #potree_sidebar_container {

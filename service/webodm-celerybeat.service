@@ -1,0 +1,17 @@
+[Unit]
+Description=Start WebODM Celery Scheduler Service Container
+Requires=webodm-gunicorn.service
+After=webodm-gunicorn.service
+
+[Service]
+Type=simple
+User=odm
+Group=odm
+PIDFile=/run/webodm-celerybeat.pid
+WorkingDirectory=/webodm
+ExecStart=/webodm/python3-venv/bin/celery -A worker beat --pidfile=
+ExecStop=/bin/kill -s QUIT $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

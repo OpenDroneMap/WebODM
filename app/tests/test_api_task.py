@@ -14,13 +14,16 @@ from rest_framework.test import APIClient
 
 import worker
 from django.utils import timezone
+
+from app import pending_actions
 from app.models import Project, Task, ImageUpload
-from app.models.task import task_directory_path, full_task_directory_path
+from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
+from app.plugins.signals import task_completed, task_removed, task_removing
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from app.testwatch import testWatch
-from .utils import start_processing_node, clear_test_media_root
+from .utils import start_processing_node, clear_test_media_root, catch_signal
 
 # We need to test the task API in a TransactionTestCase because
 # task processing happens on a separate thread, and normal TestCases
@@ -119,6 +122,7 @@ class TestApiTask(BootTransactionTestCase):
         multiple_param_task = Task.objects.latest('created_at')
         self.assertTrue(multiple_param_task.name == 'test_task')
         self.assertTrue(multiple_param_task.processing_node.id == pnode.id)
+        self.assertEqual(multiple_param_task.import_url, "")
         image1.seek(0)
         image2.seek(0)
 
@@ -126,8 +130,8 @@ class TestApiTask(BootTransactionTestCase):
         with Image.open(multiple_param_task.task_path("tiny_drone_image.jpg")) as im:
             self.assertTrue(im.size == img1.size)
 
-
         # Normal case with images[], GCP, name and processing node parameter and resize_to option
+        testWatch.clear()
         gcp = open("app/fixtures/gcp.txt", 'r')
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
             'images': [image1, image2, gcp],
@@ -160,6 +164,16 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(float(px) == 8.0)  # Didn't change
             self.assertTrue(float(py) == 8.0)  # Didn't change
 
+        # Resize progress is 100%
+        resized_task.refresh_from_db()
+        self.assertEqual(resized_task.resize_progress, 1.0)
+
+        # Upload progress is 100%
+        self.assertEqual(resized_task.upload_progress, 1.0)
+
+        # Upload progress callback has been called
+        self.assertTrue(testWatch.get_calls_count("Task.process.callback") > 0)
+
         # Case with malformed GCP file option
         with open("app/fixtures/gcp_malformed.txt", 'r') as malformed_gcp:
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -179,7 +193,6 @@ class TestApiTask(BootTransactionTestCase):
 
             image1.seek(0)
             image2.seek(0)
-
 
         # Cannot create a task with images[], name, but invalid processing node parameter
         res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -205,11 +218,17 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue('id' in res.data)
         self.assertTrue(str(task.id) == res.data['id'])
 
+        # Progress is at 0%
+        self.assertEqual(task.running_progress, 0.0)
+
         # Two images should have been uploaded
         self.assertTrue(ImageUpload.objects.filter(task=task).count() == 2)
 
         # Can_rerun_from should be an empty list
         self.assertTrue(len(res.data['can_rerun_from']) == 0)
+
+        # processing_node_name should be null
+        self.assertTrue(res.data['processing_node_name'] is None)
 
         # No processing node is set
         self.assertTrue(task.processing_node is None)
@@ -261,9 +280,32 @@ class TestApiTask(BootTransactionTestCase):
         # (during tests this is sync)
 
         # Processing should have started and a UUID is assigned
+        # Calling process pending tasks should finish the process
+        # and invoke the plugins completed signal
         task.refresh_from_db()
-        self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED]) # Sometimes the task finishes and we can't test for RUNNING state
+        self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])  # Sometimes this finishes before we get here
         self.assertTrue(len(task.uuid) > 0)
+
+        with catch_signal(task_completed) as handler:
+            retry_count = 0
+            while task.status != status_codes.COMPLETED:
+                worker.tasks.process_pending_tasks()
+                time.sleep(DELAY)
+                task.refresh_from_db()
+                retry_count += 1
+                if retry_count > 10:
+                    break
+
+            self.assertEqual(task.status, status_codes.COMPLETED)
+
+            # Progress is 100%
+            self.assertTrue(task.running_progress == 1.0)
+
+        handler.assert_any_call(
+            sender=Task,
+            task_id=task.id,
+            signal=task_completed,
+        )
 
         # Processing node should have a "rerun_from" option
         pnode_rerun_from_opts = list(filter(lambda d: 'name' in d and d['name'] == 'rerun-from', pnode.available_options))[0]
@@ -276,20 +318,26 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
         self.assertTrue(pnode_rerun_from_opts['domain'] == res.data['can_rerun_from'])
 
-        time.sleep(DELAY)
-
-        # Calling process pending tasks should finish the process
-        worker.tasks.process_pending_tasks()
-        task.refresh_from_db()
-        self.assertTrue(task.status == status_codes.COMPLETED)
+        # processing_node_name should be the name of the pnode
+        self.assertEqual(res.data['processing_node_name'], str(pnode))
 
         # Can download assets
         for asset in list(task.ASSETS_MAP.keys()):
             res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
+        # We can stream downloads
+        res = client.get("/api/projects/{}/tasks/{}/download/{}?_force_stream=1".format(project.id, task.id, list(task.ASSETS_MAP.keys())[0]))
+        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        self.assertTrue(res.has_header('_stream'))
+
         # A textured mesh archive file should exist
         self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
+
+        # Tiles archives should have been created
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["dsm_tiles.zip"]["deferred_path"])))
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["dtm_tiles.zip"]["deferred_path"])))
+        self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["orthophoto_tiles.zip"]["deferred_path"])))
 
         # Can download raw assets
         res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
@@ -353,18 +401,40 @@ class TestApiTask(BootTransactionTestCase):
 
         self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])
 
+        # Should return without issues
+        task.check_if_canceled()
+
         # Cancel a task
         res = client.post("/api/projects/{}/tasks/{}/cancel/".format(project.id, task.id))
         self.assertTrue(res.status_code == status.HTTP_200_OK)
+
         # task is processed right away
 
         # Should have been canceled
         task.refresh_from_db()
         self.assertTrue(task.status == status_codes.CANCELED)
+        self.assertTrue(task.pending_action is None)
 
-        # Remove a task
-        res = client.post("/api/projects/{}/tasks/{}/remove/".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_200_OK)
+        # Manually set pending action
+        task.pending_action = pending_actions.CANCEL
+        task.save()
+
+        # Should raise TaskInterruptedException
+        self.assertRaises(TaskInterruptedException, task.check_if_canceled)
+
+        # Restore
+        task.pending_action = None
+        task.save()
+
+        # Remove a task and verify that it calls the proper plugins signals
+        with catch_signal(task_removing) as h1:
+            with catch_signal(task_removed) as h2:
+                res = client.post("/api/projects/{}/tasks/{}/remove/".format(project.id, task.id))
+                self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+        h1.assert_called_once_with(sender=Task, task_id=task.id, signal=task_removing)
+        h2.assert_called_once_with(sender=Task, task_id=task.id, signal=task_removed)
+
         # task is processed right away
 
         # Has been removed along with assets
@@ -513,6 +583,7 @@ class TestApiTask(BootTransactionTestCase):
         # but others such as textured_model.zip should be available
         res = client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
         self.assertFalse('orthophoto.tif' in res.data['available_assets'])
+        self.assertFalse('orthophoto_tiles.zip' in res.data['available_assets'])
         self.assertTrue('textured_model.zip' in res.data['available_assets'])
 
         image1.close()
@@ -570,9 +641,9 @@ class TestApiTask(BootTransactionTestCase):
         another_pnode.last_refreshed = timezone.now()
         another_pnode.save()
 
-        # Remove error
+        # Remove error, set status to queued
         task.last_error = None
-        task.status = None
+        task.status = status_codes.QUEUED
         task.save()
 
         worker.tasks.process_pending_tasks()
@@ -580,11 +651,27 @@ class TestApiTask(BootTransactionTestCase):
         # Processing node is now cleared and a new one will be assigned on the next tick
         task.refresh_from_db()
         self.assertTrue(task.processing_node is None)
+        self.assertTrue(task.status is None)
 
         worker.tasks.process_pending_tasks()
 
         task.refresh_from_db()
         self.assertTrue(task.processing_node.id == another_pnode.id)
+
+        # Set task to queued, bring node offline
+        task.last_error = None
+        task.status = status_codes.RUNNING
+        task.save()
+        another_pnode.last_refreshed = timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
+        another_pnode.save()
+
+        worker.tasks.process_pending_tasks()
+        task.refresh_from_db()
+
+        # Processing node is still there, but task should have failed
+        self.assertTrue(task.status == status_codes.FAILED)
+        self.assertTrue("Processing node went offline." in task.last_error)
+
 
     def test_task_manual_processing_node(self):
         user = User.objects.get(username="testuser")
