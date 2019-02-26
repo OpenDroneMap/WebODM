@@ -43,7 +43,7 @@ class ImportTaskPanel extends React.Component {
           url : `/api/projects/${this.props.projectId}/tasks/import`,
           parallelUploads: 1,
           uploadMultiple: false,
-          acceptedFiles: "application/zip",
+          acceptedFiles: "application/zip,application/octet-stream,application/x-zip-compressed,multipart/x-zip",
           autoProcessQueue: true,
           createImageThumbnails: false,
           previewTemplate: '<div style="display:none"></div>',
