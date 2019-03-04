@@ -3,8 +3,9 @@ from wsgiref.util import FileWrapper
 
 import mimetypes
 
-import datetime
+from shutil import copyfileobj
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.http import FileResponse
 from django.http import HttpResponse
@@ -357,9 +358,14 @@ class TaskAssetsImport(APIView):
 
             if len(files) > 0:
                 destination_file = task.assets_path("all.zip")
+
                 with open(destination_file, 'wb+') as fd:
-                    for chunk in files[0].chunks():
-                        fd.write(chunk)
+                    if isinstance(files[0], InMemoryUploadedFile):
+                        for chunk in files[0].chunks():
+                            fd.write(chunk)
+                    else:
+                        with open(files[0].temporary_file_path(), 'rb') as file:
+                            copyfileobj(file, fd)
 
             worker_tasks.process_task.delay(task.id)
 
