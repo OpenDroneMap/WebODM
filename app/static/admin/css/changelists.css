@@ -9,6 +9,10 @@
     width: 100%;
 }
 
+#changelist .field-plugin_actions a[disabled]{
+    pointer-events: none;
+}
+
 .change-list .hiddenfields { display:none; }
 
 .change-list .filtered table {

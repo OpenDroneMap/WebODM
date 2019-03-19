@@ -1,8 +1,8 @@
 {
 	"name": "Diagnostic",
 	"webodmMinVersion": "0.6.2",
-	"description": "description",
-	"version": "0.1.0",
+	"description": "Display program version, memory and disk space usage statistics",
+	"version": "1.0.0",
 	"author": "Piero Toffanin",
 	"email": "pt@masseranolabs.com",
 	"repository": "https://github.com/OpenDroneMap/WebODM",
