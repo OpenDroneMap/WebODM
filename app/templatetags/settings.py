@@ -1,14 +1,20 @@
 import datetime
 
+import logging
 from django import template
 
 register = template.Library()
+logger = logging.getLogger('app.logger')
 
 
 @register.simple_tag(takes_context=True)
 def settings_image_url(context, image):
-    return "/media/" + getattr(context['SETTINGS'], image).url
-
+    img_cache = getattr(context['SETTINGS'], image)
+    try:
+        return "/media/" + img_cache.url
+    except FileNotFoundError:
+        logger.warning("Cannot get %s, this could mean the image was deleted." % image)
+        return ''
 
 @register.simple_tag(takes_context=True)
 def get_footer(context):

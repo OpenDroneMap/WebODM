@@ -93,7 +93,6 @@ class PluginAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         urls = super().get_urls()
-        print(urls)
         custom_urls = [
             url(
                 r'^(?P<plugin_name>.+)/enable/$',
