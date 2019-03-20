@@ -27,6 +27,11 @@ def sync_plugin_db():
     Creates db entries for undiscovered plugins to keep track
     of enabled/disabled plugins
     """
+
+    # Erase cache
+    global plugins
+    plugins = None
+
     db_plugins = Plugin.objects.all()
     fs_plugins = get_plugins()
 
