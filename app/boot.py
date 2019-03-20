@@ -11,7 +11,7 @@ from guardian.shortcuts import assign_perm
 from worker import tasks as worker_tasks
 from app.models import Preset
 from app.models import Theme
-from app.plugins import register_plugins
+from app.plugins import init_plugins
 from nodeodm.models import ProcessingNode
 # noinspection PyUnresolvedReferences
 from webodm.settings import MEDIA_ROOT
@@ -81,7 +81,7 @@ def boot():
 
             logger.info("Created settings")
 
-        register_plugins()
+        init_plugins()
 
         if not settings.TESTING:
             try:
@@ -96,6 +96,12 @@ def boot():
 
 def add_default_presets():
     try:
+        Preset.objects.update_or_create(name='Volume Analysis', system=True,
+                                        defaults={'options': [{'name': 'use-opensfm-dense', 'value': True},
+                                                              {'name': 'dsm', 'value': True},
+                                                              {'name': 'dem-resolution', 'value': '2'},
+                                                              {'name': 'depthmap-resolution', 'value': '1000'},
+                                                              {'name': 'opensfm-depthmap-min-patch-sd', 'value': '0'}]})
         Preset.objects.update_or_create(name='3D Model', system=True,
                                         defaults={'options': [{'name': 'mesh-octree-depth', 'value': "11"},
                                                               {'name': 'use-3dmesh', 'value': True},

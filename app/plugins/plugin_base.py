@@ -1,3 +1,4 @@
+import json
 import logging, os, sys
 from abc import ABC
 from app.plugins import UserDataStore, GlobalDataStore
@@ -7,6 +8,7 @@ logger = logging.getLogger('app.logger')
 class PluginBase(ABC):
     def __init__(self):
         self.name = self.get_module_name().split(".")[-2]
+        self.manifest = None
 
     def register(self):
         pass
@@ -129,6 +131,18 @@ class PluginBase(ABC):
         """
         from app.plugins import get_dynamic_script_handler
         return get_dynamic_script_handler(self.get_path(script_path), callback, **template_args)
+
+    def get_manifest(self):
+        # Lazy loading
+        if self.manifest: return self.manifest
+
+        manifest_path = self.get_path("manifest.json")
+
+        # Read manifest
+        with open(manifest_path) as manifest_file:
+            self.manifest = json.load(manifest_file)
+
+        return self.manifest
 
     def __str__(self):
         return "[{}]".format(self.get_module_name())

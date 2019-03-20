@@ -18,16 +18,6 @@ if [[ $platform = "Windows" ]]; then
 	export COMPOSE_CONVERT_WINDOWS_PATHS=1
 fi
 
-# Plugin commands require us to mount a docker volume
-# but older version of Windows and certain macOS directory locations
-# require user interaction. We will add better support for these in the near future.
-plugins_volume=false
-if [[ $platform = "Linux" ]]; then
-    plugins_volume=true
-elif [[ $platform = "MacOS / OSX" ]] && [[ $(pwd) == /Users* ]]; then
-    plugins_volume=true
-fi
-
 load_default_node=true
 dev_mode=false
 
@@ -95,10 +85,6 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --mount-plugins-volume)
-    plugins_volume=true
-    shift # past argument
-    ;;
     --no-default-node)
     load_default_node=false
     shift # past argument
@@ -125,13 +111,6 @@ usage(){
   echo "	checkenv		Do an environment check and install missing components"
   echo "	test			Run the unit test suite (developers only)"
   echo "	resetadminpassword <new password>	Reset the administrator's password to a new one. WebODM must be running when executing this command."
-  if [[ $plugins_volume = true ]]; then
-    echo ""
-    echo "	plugin enable <plugin name>	Enable a plugin"
-    echo "	plugin disable <plugin name>	Disable a plugin"
-    echo "	plugin list		List all available plugins"
-    echo "	plugin cleanup		Cleanup plugins build directories"
-  fi
   echo ""
   echo "Options:"
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
@@ -145,9 +124,6 @@ usage(){
   echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--dev	Enable development mode. In development mode you can make modifications to WebODM source files and changes will be reflected live. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
-  if [[ $plugins_volume = false ]]; then
-    echo "	--mount-plugins-volume	Always mount the ./plugins volume, even on unsupported platforms (developers only) (default: disabled)"
-  fi
   exit
 }
 
@@ -260,10 +236,6 @@ start(){
 		echo "Will enable SSL ($method)"
 	fi
 
-    if [[ $plugins_volume = true ]]; then
-        command+=" -f docker-compose.plugins.yml"
-    fi
-
 	run "$command start || $command up"
 }
 
@@ -273,74 +245,11 @@ down(){
 
 rebuild(){
 	run "docker-compose down --remove-orphans"
-	plugin_cleanup
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
 	run "rm -fr nodeodm/external/NodeODM || sudo rm -fr nodeodm/external/NodeODM"
 	run "docker-compose -f docker-compose.yml -f docker-compose.build.yml build --no-cache"
 	#run "docker images --no-trunc -aqf \"dangling=true\" | xargs docker rmi"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
-}
-
-plugin_cleanup(){
-    # Delete all node_modules and build directories within plugins' public/ folders
-    find plugins/ -type d \( -name build -o -name node_modules \) -path 'plugins/*/public/*' -exec rm -frv '{}' \;
-}
-
-plugin_list(){
-    plugins=$(ls plugins/ --hide test)
-    for plugin in $plugins; do
-        if [ -e "plugins/$plugin/disabled" ]; then
-            echo "$plugin [disabled]"
-        else
-            echo "$plugin"
-        fi
-    done
-}
-
-plugin_check(){
-    plugin_name="$1"
-    if [ ! -e "plugins/$plugin_name" ]; then
-        echo "Plugin $plugin_name does not exist."
-        exit 1
-    fi
-}
-
-plugin_volume_check(){
-    if [[ $plugins_volume = false ]]; then
-        path=$(realpath ./plugins)
-        echo "================"
-        echo "WARNING: Your platform does not support automatic volume mounting. If you want to enable/disable/develop plugins you need to:"
-        echo "1. Make sure docker can mount [$path] by modifying the docker File Sharing options"
-        echo "2. Pass the --mount-plugins-volume option to ./webodm.sh commands"
-        echo "================"
-        echo
-    fi
-}
-
-plugin_enable(){
-    plugin_name="$1"
-    plugin_check $plugin_name
-    plugin_volume_check
-
-    if [ -e "plugins/$plugin_name/disabled" ]; then
-        rm "plugins/$plugin_name/disabled"
-        echo "Plugin enabled. Run ./webodm.sh restart to apply the changes."
-    else
-        echo "Plugin already enabled."
-    fi
-}
-
-plugin_disable(){
-    plugin_name="$1"
-    plugin_check $plugin_name
-    plugin_volume_check
-    
-    if [ ! -e "plugins/$plugin_name/disabled" ]; then
-        touch "plugins/$plugin_name/disabled"
-        echo "Plugin disabled. Run ./webodm.sh restart to apply the changes."
-    else
-        echo "Plugin already disabled."
-    fi
 }
 
 run_tests(){
@@ -417,26 +326,6 @@ elif [[ $1 = "test" ]]; then
 	run_tests
 elif [[ $1 = "resetadminpassword" ]]; then
 	resetpassword $2
-elif [[ $1 = "plugin" ]]; then
-    if [[ $2 = "cleanup" ]]; then
-        plugin_cleanup
-    elif [[ $2 = "list" ]]; then
-        plugin_list
-    elif [[ $2 = "enable" ]]; then
-        if [[ ! -z "$3" ]]; then
-            plugin_enable $3
-        else
-            usage
-        fi
-    elif [[ $2 = "disable" ]]; then
-        if [[ ! -z "$3" ]]; then
-            plugin_disable $3
-        else
-            usage
-        fi
-    else
-        usage
-    fi
 else
 	usage
 fi
