@@ -54,12 +54,6 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     webpack --watch &
 fi
 
-if [[ ! -e .initialized ]]; then
-    echo Cleaning up plugins
-    ./webodm.sh plugin cleanup
-    touch .initialized
-fi
-
 echo Running migrations
 python manage.py migrate
 
