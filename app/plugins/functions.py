@@ -190,10 +190,13 @@ def get_plugins():
 
 def get_active_plugins():
     plugins = []
-    enabled_plugins = [p.name for p in Plugin.objects.filter(enabled=True).all()]
-    for plugin in get_plugins():
-        if plugin.get_name() in enabled_plugins:
-            plugins.append(plugin)
+    try:
+        enabled_plugins = [p.name for p in Plugin.objects.filter(enabled=True).all()]
+        for plugin in get_plugins():
+            if plugin.get_name() in enabled_plugins:
+                plugins.append(plugin)
+    except Exception as e:
+        logger.warning("Cannot get active plugins. If running a migration this is expected: %s" % str(e))
 
     return plugins
 
