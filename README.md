@@ -173,23 +173,7 @@ The password will be reset to `newpass`. The command will also tell you what use
 
 ### Manage Plugins
 
-To list all available plugins type:
-
-```bash
-./webodm.sh plugin list
-```
-
-To enable/disable a plugin type:
-
-```bash
-./webodm.sh plugin enable <plugin name>
-./webodm.sh plugin disable <plugin name>
-./webodm.sh restart
-```
-
-On some platforms (eg. Windows), if you want to manage plugins, you will need to make sure that the `./plugins` directory can be mounted as a docker volume and then pass the `--mount-plugins-volume` flag to `webodm.sh`. Check the docker documentation.
-
-If you are running WebODM natively, you'll need to restart your web server and gunicorn services.
+Plugins can be enabled and disabled from the user interface. Simply go to Administration -- Plugins.
 
 ### Update
 
