@@ -27,6 +27,7 @@ def sync_plugin_db():
     Creates db entries for undiscovered plugins to keep track
     of enabled/disabled plugins
     """
+    if settings.MIGRATING: return
 
     # Erase cache
     global plugins
@@ -189,6 +190,8 @@ def get_plugins():
 
 
 def get_active_plugins():
+    if settings.MIGRATING: return []
+
     plugins = []
     try:
         enabled_plugins = [p.name for p in Plugin.objects.filter(enabled=True).all()]
