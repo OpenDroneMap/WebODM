@@ -86,6 +86,7 @@ class GrassContext:
             f.write(tmpl.substitute(self.template_args))
 
         # Execute it
+        logger.info("Executing grass script from {}: {} -c {} location --exec sh script.sh".format(self.get_cwd(), self.grass_binary, self.location))
         p = subprocess.Popen([self.grass_binary, '-c', self.location, 'location', '--exec', 'sh', 'script.sh'],
                              cwd=self.get_cwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
