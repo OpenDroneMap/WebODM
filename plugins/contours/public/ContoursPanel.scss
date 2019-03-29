@@ -1,6 +1,7 @@
 .leaflet-control-contours .contours-panel{
   padding: 6px 10px 6px 6px;
   background: #fff;
+  min-width: 250px; 
 
   .close-button{
     display: inline-block;
@@ -17,14 +18,56 @@
     left: 2px;
 
     &:hover{
-      opacity: 0.8;
+      opacity: 0.7;
       cursor: pointer;
     }
   }
 
   .title{
-    font-weight: bold;
-    font-size: 1.2em;
+    font-size: 120%;
     margin-right: 60px;
+  }
+
+  hr{
+    clear: both;
+    margin: 6px 0px;
+    border-color: #ddd;
+  }
+
+  label{
+    padding-top: 5px;
+  }
+
+  select, input{
+    height: auto;
+    padding: 4px;
+  }
+
+  input.custom-interval{
+    width: 80px;
+  }
+
+  *{
+    font-size: 12px;
+  }
+
+  .row.form-group.form-inline{
+    margin-bottom: 8px;
+  }
+
+  .dropdown-menu{
+    a{
+      display: inline;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+  }
+
+  .btn-preview{
+    margin-right: 8px;
+  }
+
+  .action-buttons{
+    margin-top: 12px;
   }
 }
