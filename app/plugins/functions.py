@@ -30,8 +30,7 @@ def sync_plugin_db():
     if settings.MIGRATING: return
 
     # Erase cache
-    global plugins
-    plugins = None
+    clear_plugins_cache()
 
     db_plugins = Plugin.objects.all()
     fs_plugins = get_plugins()
@@ -55,6 +54,11 @@ def sync_plugin_db():
             )
             if created:
                 logger.info("Added [{}] plugin to database".format(plugin.get_name()))
+
+
+def clear_plugins_cache():
+    global plugins
+    plugins = None
 
 
 def build_plugins():
@@ -204,15 +208,21 @@ def get_active_plugins():
     return plugins
 
 
-def get_plugin_by_name(name, only_active=True):
+def get_plugin_by_name(name, only_active=True, refresh_cache_if_none=False):
     if only_active:
         plugins = get_active_plugins()
     else:
         plugins = get_plugins()
 
     res = list(filter(lambda p: p.get_name() == name, plugins))
-    return res[0] if res else None
+    res = res[0] if res else None
 
+    if refresh_cache_if_none and res is None:
+        # Retry after clearing the cache
+        clear_plugins_cache()
+        return get_plugin_by_name(name, only_active=only_active, refresh_cache_if_none=False)
+    else:
+        return res
 
 def get_plugins_path():
     current_path = os.path.dirname(os.path.realpath(__file__))
