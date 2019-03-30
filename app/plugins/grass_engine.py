@@ -28,13 +28,14 @@ class GrassEngine:
 
 
 class GrassContext:
-    def __init__(self, grass_binary, tmpdir = None, template_args = {}, location = None):
+    def __init__(self, grass_binary, tmpdir = None, template_args = {}, location = None, auto_cleanup=True):
         self.grass_binary = grass_binary
         if tmpdir is None:
             tmpdir = os.path.basename(tempfile.mkdtemp('_grass_engine', dir=settings.MEDIA_TMP))
         self.tmpdir = tmpdir
         self.template_args = template_args
         self.location = location
+        self.auto_cleanup = auto_cleanup
 
     def get_cwd(self):
         return os.path.join(settings.MEDIA_TMP, self.tmpdir)
@@ -82,6 +83,9 @@ class GrassContext:
         tmpl = Template(script_content)
 
         # Write script to disk
+        if not os.path.exists(self.get_cwd()):
+            os.mkdir(self.get_cwd())
+
         with open(os.path.join(self.get_cwd(), 'script.sh'), 'w') as f:
             f.write(tmpl.substitute(self.template_args))
 
@@ -94,6 +98,9 @@ class GrassContext:
         out = out.decode('utf-8').strip()
         err = err.decode('utf-8').strip()
 
+        logger.info("GOT!")
+        logger.info(out)
+
         if p.returncode == 0:
             return out
         else:
@@ -103,14 +110,17 @@ class GrassContext:
         return {
             'tmpdir': self.tmpdir,
             'template_args': self.template_args,
-            'location': self.location
+            'location': self.location,
+            'auto_cleanup': self.auto_cleanup
         }
 
-    def __del__(self):
-        pass
-        # Cleanup
+    def cleanup(self):
         if os.path.exists(self.get_cwd()):
             shutil.rmtree(self.get_cwd())
+
+    def __del__(self):
+        if self.auto_cleanup:
+            self.cleanup()
 
 class GrassEngineException(Exception):
     pass

@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="-153.03452"
-     inkscape:cy="0.31522247"
+     inkscape:zoom="3.959798"
+     inkscape:cx="-34.955332"
+     inkscape:cy="20.815973"
      inkscape:document-units="mm"
      inkscape:current-layer="g831"
      showgrid="false"
@@ -73,19 +73,19 @@
              id="g831"
              transform="translate(0.45113764,-0.11484945)">
             <ellipse
+               style="opacity:1;vector-effect:none;fill:#eeeeee;fill-opacity:1;stroke:#191919;stroke-width:1.06403518;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+               id="ellipse827"
+               ry="4.5824556"
+               rx="5.6119952"
+               cy="290.63126"
+               cx="5.5822544" />
+            <ellipse
                ry="1.9139358"
                rx="2.7945361"
                cy="290.63126"
                cx="5.5822544"
                id="path825"
-               style="opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#191919;stroke-width:1.33004403;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal" />
-            <ellipse
-               style="opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#191919;stroke-width:1.06403518;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
-               id="ellipse827"
-               cx="5.5822544"
-               cy="290.63126"
-               rx="5.6119952"
-               ry="4.5824556" />
+               style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#191919;stroke-width:1.33004403;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal" />
           </g>
         </g>
       </g>

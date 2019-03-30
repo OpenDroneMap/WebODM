@@ -113,11 +113,13 @@ class TestPlugins(BootTestCase):
 }""")
         ctx.set_location("EPSG:4326")
 
-        output = execute_grass_script.delay(
+        result = execute_grass_script.delay(
                 os.path.join(grass_scripts_dir, "simple_test.grass"),
                 ctx.serialize()
             ).get()
-        self.assertTrue("Number of points:       1" in output)
+        self.assertTrue("Number of points:       1" in result.get('output'))
+
+        self.assertTrue(result.get('context') == ctx.serialize())
 
         error = execute_grass_script.delay(
                 os.path.join(grass_scripts_dir, "nonexistant_script.grass"),
@@ -129,6 +131,7 @@ class TestPlugins(BootTestCase):
         with self.assertRaises(GrassEngineException):
             ctx.execute(os.path.join(grass_scripts_dir, "nonexistant_script.grass"))
 
+        # TODO: verify autocleanup works
 
     def test_plugin_datastore(self):
         test_plugin = get_plugin_by_name("test")

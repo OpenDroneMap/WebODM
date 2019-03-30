@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import Storage from 'webodm/classes/Storage';
 import L from 'leaflet';
 import './ContoursPanel.scss';
+import ErrorMessage from 'webodm/components/ErrorMessage';
 
 export default class ContoursPanel extends React.Component {
   static defaultProps = {
-
   };
   static propTypes = {
-    onClose: PropTypes.func.isRequired
+    onClose: PropTypes.func.isRequired,
+    tasks: PropTypes.object.isRequired,
+    isShowed: PropTypes.bool.isRequired
   }
 
   constructor(props){
@@ -17,37 +19,52 @@ export default class ContoursPanel extends React.Component {
 
     this.state = {
         error: "",
+        permanentError: "",
         interval: Storage.getItem("last_contours_interval") || "1",
         customInterval: Storage.getItem("last_contours_custom_interval") || "1",
         layer: "",
-        projection: Storage.getItem("last_contours_projection") || "4326",
-        customProjection: Storage.getItem("last_contours_custom_projection") || "4326",
+        epsg: Storage.getItem("last_contours_epsg") || "4326",
+        customEpsg: Storage.getItem("last_contours_custom_epsg") || "4326",
+        layers: [],
+        loading: true,
+        task: props.tasks[0] || null,
+        previewLoading: false,
     };
   }
 
-  componentDidMount(){
+  componentDidUpdate(){
+    if (this.props.isShowed && this.state.loading){
+      const {id, project} = this.state.task;
+
+      this.loadingReq = $.getJSON(`/api/projects/${project}/tasks/${id}/`)
+          .done(res => {
+              const { available_assets } = res;
+              let layers = [];
+
+              if (available_assets.indexOf("dsm.tif") !== -1) layers.push("DSM");
+              if (available_assets.indexOf("dtm.tif") !== -1) layers.push("DTM");
+
+              if (layers.length > 0){
+                this.setState({layers, layer: layers[0]});
+            }else{
+                this.setState({permanentError: "No DSM or DTM is available. To export contours, make sure to process a task with either the --dsm or --dtm option checked."});
+              }
+          })
+          .fail(() => {
+            this.setState({permanentError: `Cannot retrieve information for task ${id}. Are you are connected to the internet.`})
+          })
+          .always(() => {
+            this.setState({loading: false});
+            this.loadingReq = null;
+          });
+    }
   }
 
   componentWillUnmount(){
-  }
-
-    calculateVolume(){
-            // $.ajax({
-            //     type: 'POST',
-            //     url: `/api/plugins/measure/task/${task.id}/volume`,
-            //     data: JSON.stringify({'area': this.props.resultFeature.toGeoJSON()}),
-            //     contentType: "application/json"
-            // }).done(result => {
-            //     if (result.volume){
-            //         this.setState({volume: parseFloat(result.volume)});
-            //     }else if (result.error){
-            //         this.setState({error: result.error});
-            //     }else{
-            //         this.setState({error: "Invalid response: " + result});
-            //     }
-            // }).fail(error => {
-            //     this.setState({error});
-            // });
+    if (this.loadingReq){
+      this.loadingReq.abort();
+      this.loadingReq = null;
+    }
   }
 
   handleSelectInterval = e => {
@@ -62,95 +79,150 @@ export default class ContoursPanel extends React.Component {
     this.setState({customInterval: e.target.value});
   }
 
-  handleSelectProjection = e => {
-    this.setState({projection: e.target.value});
+  handleSelectEpsg = e => {
+    this.setState({Epsg: e.target.value});
   }
 
-  handleChangeCustomProjection = e => {
-    this.setState({customProjection: e.target.value});
+  handleChangeCustomEpsg = e => {
+    this.setState({customEpsg: e.target.value});
+  }
+
+  getFormValues = () => {
+    const { interval, customInterval, epsg, customEpsg, layer } = this.state;
+    return {
+      interval: interval !== "custom" ? interval : customInterval,
+      epsg: epsg !== "custom" ? epsg : customEpsg,
+      layer
+    };
+  }
+
+  handleShowPreview = () => {
+    this.setState({previewLoading: true});
+
+    const data = this.getFormValues();
+    data.interval = 1;
+    data.epsg = 3857;
+    data.format = "GeoJSON";
+    data.simplify = 0.05;
+
+    $.ajax({
+        type: 'POST',
+        url: `/api/plugins/contours/task/${this.state.task.id}/contours/generate`,
+        data: data
+    }).done(result => {
+        if (result.celery_task_id){
+          console.log(result);
+        }else if (result.error){
+            this.setState({error: result.error});
+        }else{
+            this.setState({error: "Invalid response: " + result});
+        }
+
+        this.setState({previewLoading: false});
+    }).fail(error => {
+        this.setState({previewLoading: false, error: JSON.stringify(error)});
+    });
   }
 
   render(){
-    const { error, interval, customInterval, layer, 
-            projection, customProjection } = this.state;
+    const { loading, task, layers, error, permanentError, interval, customInterval, layer, 
+            epsg, customEpsg,
+            previewLoading } = this.state;
     const intervalValues = [0.25, 0.5, 1, 1.5, 2];
+
+    const disabled = (interval === "custom" && !customInterval) ||
+                      (epsg === "custom" && !customEpsg);
+
+    let content = "";
+    if (loading) content = (<span><i className="fa fa-circle-o-notch fa-spin"></i> Loading...</span>);
+    else if (error) content = (<ErrorMessage bind={[this, "error"]} />);
+    else if (permanentError) content = (<div className="alert alert-warning">{permanentError}</div>);
+    else{
+      content = (<div>
+        <div className="row form-group form-inline">
+          <label className="col-sm-3 control-label">Interval:</label>
+          <div className="col-sm-9 ">
+            <select className="form-control" value={interval} onChange={this.handleSelectInterval}>
+              {intervalValues.map(iv => <option value={iv}>{iv} meter</option>)}
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+        {interval === "custom" ? 
+          <div className="row form-group form-inline">
+            <label className="col-sm-3 control-label">Value:</label>
+            <div className="col-sm-9 ">
+              <input type="number" className="form-control custom-interval" value={customInterval} onChange={this.handleChangeCustomInterval} /><span> meter</span>
+            </div>
+          </div>
+        : ""}
+
+        <div className="row form-group form-inline">
+          <label className="col-sm-3 control-label">Layer:</label>
+          <div className="col-sm-9 ">
+            <select className="form-control" value={layer} onChange={this.handleSelectLayer}>
+              {layers.map(l => <option value={l}>{l}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="row form-group form-inline">
+          <label className="col-sm-3 control-label">Epsg:</label>
+          <div className="col-sm-9 ">
+            <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
+              <option value="4326">WGS84 (EPSG:4326)</option>
+              <option value="3857">Web Mercator (EPSG:3857)</option>
+              <option value="custom">Custom EPSG</option>
+            </select>
+          </div>
+        </div>
+        {epsg === "custom" ? 
+          <div className="row form-group form-inline">
+            <label className="col-sm-3 control-label">EPSG:</label>
+            <div className="col-sm-9 ">
+              <input type="number" className="form-control custom-interval" value={customEpsg} onChange={this.handleChangeCustomEpsg} />
+            </div>
+          </div>
+        : ""}
+
+        <div className="text-right action-buttons">
+          <button onClick={this.handleShowPreview}
+                  disabled={disabled || previewLoading} type="button" className="btn btn-sm btn-primary btn-preview">
+            {previewLoading ? <i className="fa fa-spin fa-circle-o-notch"/> : <i className="glyphicon glyphicon-eye-open"/>} Preview
+          </button>
+
+          <div className="btn-group">
+            <button disabled={disabled} type="button" className="btn btn-sm btn-primary" data-toggle="dropdown">
+              <i className="glyphicon glyphicon-download"></i> Export
+            </button>
+            <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
+            <ul className="dropdown-menu  pull-right">
+              <li>
+                <a href="javascript:void(0);">
+                  <i className="fa fa-globe fa-fw"></i> GeoPackage (.GPKG)
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);">
+                  <i className="fa fa-file-o fa-fw"></i> AutoCAD (.DXF)
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);">
+                  <i className="fa fa-file-zip-o fa-fw"></i> ShapeFile (.SHP)
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>);
+    }
 
     return (<div className="contours-panel">
       <span className="close-button" onClick={this.props.onClose}/>
       <div className="title">Contours</div>
       <hr/>
-
-      <div className="row form-group form-inline">
-        <label className="col-sm-3 control-label">Interval:</label>
-        <div className="col-sm-9 ">
-          <select className="form-control" value={interval} onChange={this.handleSelectInterval}>
-            {intervalValues.map(iv => <option value={iv}>{iv} meter</option>)}
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-      </div>
-      {interval === "custom" ? 
-        <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">Value:</label>
-          <div className="col-sm-9 ">
-            <input type="number" className="form-control custom-interval" value={customInterval} onChange={this.handleChangeCustomInterval} /><span> meter</span>
-          </div>
-        </div>
-      : ""}
-
-      <div className="row form-group form-inline">
-        <label className="col-sm-3 control-label">Layer:</label>
-        <div className="col-sm-9 ">
-          <select className="form-control" value={layer} onChange={this.handleSelectLayer}>
-            <option value="DSM">DSM</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="row form-group form-inline">
-        <label className="col-sm-3 control-label">Projection:</label>
-        <div className="col-sm-9 ">
-          <select className="form-control" value={projection} onChange={this.handleSelectProjection}>
-            <option value="4326">WGS84 (EPSG:4326)</option>
-            <option value="3857">Web Mercator (EPSG:3857)</option>
-            <option value="custom">Custom EPSG</option>
-          </select>
-        </div>
-      </div>
-      {projection === "custom" ? 
-        <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">EPSG:</label>
-          <div className="col-sm-9 ">
-            <input type="number" className="form-control custom-interval" value={customProjection} onChange={this.handleChangeCustomProjection} />
-          </div>
-        </div>
-      : ""}
-
-      <div className="text-right action-buttons">
-        <button type="button" className="btn btn-sm btn-primary btn-preview">
-          <i className="glyphicon glyphicon-eye-open"></i> Preview
-        </button>
-
-        <div className="btn-group">
-          <button type="button" className="btn btn-sm btn-primary" data-toggle="dropdown">
-            <i className="glyphicon glyphicon-download"></i> Export
-          </button>
-          <button type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
-          <ul className="dropdown-menu">
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-map-o fa-fw"></i> Orthophoto (GeoTIFF)
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0);">
-                <i className="fa fa-map-o fa-fw"></i> Orthophoto (GeoTIFF)
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
+      {content}
     </div>);
   }
 }

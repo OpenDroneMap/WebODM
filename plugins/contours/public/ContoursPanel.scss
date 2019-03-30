@@ -2,6 +2,7 @@
   padding: 6px 10px 6px 6px;
   background: #fff;
   min-width: 250px; 
+  max-width: 300px;
 
   .close-button{
     display: inline-block;
@@ -57,9 +58,11 @@
 
   .dropdown-menu{
     a{
-      display: inline;
-      padding-top: 8px;
-      padding-bottom: 8px;
+      width: 100%;
+      text-align: left;
+      display: block;
+      padding-top: 0;
+      padding-bottom: 0;
     }
   }
 

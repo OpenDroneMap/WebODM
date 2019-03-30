@@ -86,6 +86,6 @@ def process_pending_tasks():
 def execute_grass_script(script, serialized_context = {}):
     try:
         ctx = grass.create_context(serialized_context)
-        return ctx.execute(script)
+        return {'output': ctx.execute(script), 'context': ctx.serialize()}
     except GrassEngineException as e:
         return {'error': str(e)}
