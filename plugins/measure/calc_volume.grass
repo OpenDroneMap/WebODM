@@ -7,7 +7,7 @@
 #Import raster and vector
 v.import input=${area_file} output=polygon_area --overwrite 
 v.import input=${points_file} output=polygon_points --overwrite
-v.buffer -s --overwrite input=polygon_area type=area output=region distance=3 minordistance=3
+v.buffer -s --overwrite input=polygon_area type=area output=region distance=1 minordistance=1
 r.external input=${dsm_file} output=dsm --overwrite
 
 # Set Grass region to vector bbox
