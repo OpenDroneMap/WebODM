@@ -1,10 +1,14 @@
+import mimetypes
 import os
 
+from django.http import FileResponse
+from django.http import HttpResponse
+from wsgiref.util import FileWrapper
 from rest_framework import status
 from rest_framework.response import Response
 from app.plugins.views import TaskView
 from worker.tasks import execute_grass_script
-from app.plugins.grass_engine import grass, GrassEngineException
+from app.plugins.grass_engine import grass, GrassEngineException, cleanup_grass_context
 from worker.celery import app as celery
 
 class TaskContoursGenerate(TaskView):
@@ -52,21 +56,47 @@ class TaskContoursGenerate(TaskView):
 
 class TaskContoursCheck(TaskView):
     def get(self, request, pk=None, celery_task_id=None):
-        task = self.get_and_check_task(request, pk)
+        res = celery.AsyncResult(celery_task_id)
+        if not res.ready():
+            return Response({'ready': False}, status=status.HTTP_200_OK)
+        else:
+            result = res.get()
+            if result.get('error', None) is not None:
+                cleanup_grass_context(result['context'])
+                return Response({'ready': True, 'error': result['error']})
 
-        # res = celery.AsyncResult(celery_task_id)
-        # res.wait()
-        # print(res.get())
+            contours_file = result.get('output')
+            if not contours_file:
+                cleanup_grass_context(result['context'])
+                return Response({'ready': True, 'error': 'No contours file was generated. This could be a bug.'})
 
-        #while not res.ready():
+            request.session['contours_' + celery_task_id] = contours_file
+            return Response({'ready': True})
 
-        #if isinstance(output, dict) and 'error' in output: raise GrassEngineException(output['error'])
 
-        # if isinstance(output, dict) and 'error' in output: raise GrassEngineException(output['error'])
-        #
-        # cols = output.split(':')
-        # if len(cols) == 7:
-        #     return Response({'volume': str(abs(float(cols[6])))}, status=status.HTTP_200_OK)
-        # else:
-        #     raise GrassEngineException(output)
+class TaskContoursDownload(TaskView):
+    def get(self, request, pk=None, celery_task_id=None):
+        contours_file = request.session.get('contours_' + celery_task_id, None)
 
+        if contours_file is not None:
+            filename = os.path.basename(contours_file)
+            filesize = os.stat(contours_file).st_size
+
+            f = open(contours_file, "rb")
+
+            # More than 100mb, normal http response, otherwise stream
+            # Django docs say to avoid streaming when possible
+            stream = filesize > 1e8
+            if stream:
+                response = FileResponse(f)
+            else:
+                response = HttpResponse(FileWrapper(f),
+                                        content_type=(mimetypes.guess_type(filename)[0] or "application/zip"))
+
+            response['Content-Type'] = mimetypes.guess_type(filename)[0] or "application/zip"
+            response['Content-Disposition'] = "inline; filename={}".format(filename)
+            response['Content-Length'] = filesize
+
+            return response
+        else:
+            return Response({'error': 'Invalid contours download id'})

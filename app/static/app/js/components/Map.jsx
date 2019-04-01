@@ -120,8 +120,12 @@ class Map extends React.Component {
 
             // For some reason, getLatLng is not defined for tileLayer?
             // We need this function if other code calls layer.openPopup()
+            let self = this;
             layer.getLatLng = function(){
-              return this.options.bounds.getCenter();
+              let latlng = self.lastClickedLatLng ? 
+                            self.lastClickedLatLng : 
+                            this.options.bounds.getCenter();
+              return latlng;
             };
 
             var popup = L.DomUtil.create('div', 'infoWindow');
@@ -270,6 +274,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
           // Find first tile layer at the selected coordinates 
           for (let layer of this.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
+              this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
               layer.openPopup();
               break;
@@ -279,6 +284,8 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
             // Load task assets links in popup
             if (e.popup && e.popup._source && e.popup._content){
                 const infoWindow = e.popup._content;
+                if (typeof infoWindow === 'string') return;
+
                 const $assetLinks = $("ul.asset-links", infoWindow);
                 
                 if ($assetLinks.length > 0 && $assetLinks.hasClass('loading')){

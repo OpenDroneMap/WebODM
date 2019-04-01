@@ -55,3 +55,6 @@ class TestWorker(BootTestCase):
         self.assertFalse(Project.objects.filter(pk=project.id).exists())
 
         pnserver.terminate()
+
+        # TODO: check tmp directory cleanup
+

@@ -125,4 +125,8 @@ class GrassContext:
 class GrassEngineException(Exception):
     pass
 
+def cleanup_grass_context(serialized_context):
+    ctx = grass.create_context(serialized_context)
+    ctx.cleanup()
+
 grass = GrassEngine()

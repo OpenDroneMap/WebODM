@@ -11,7 +11,8 @@ export default class ContoursPanel extends React.Component {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
     tasks: PropTypes.object.isRequired,
-    isShowed: PropTypes.bool.isRequired
+    isShowed: PropTypes.bool.isRequired,
+    map: PropTypes.object.isRequired
   }
 
   constructor(props){
@@ -65,6 +66,10 @@ export default class ContoursPanel extends React.Component {
       this.loadingReq.abort();
       this.loadingReq = null;
     }
+    if (this.generateReq){
+      this.generateReq.abort();
+      this.generateReq = null;
+    }
   }
 
   handleSelectInterval = e => {
@@ -80,7 +85,7 @@ export default class ContoursPanel extends React.Component {
   }
 
   handleSelectEpsg = e => {
-    this.setState({Epsg: e.target.value});
+    this.setState({epsg: e.target.value});
   }
 
   handleChangeCustomEpsg = e => {
@@ -96,29 +101,100 @@ export default class ContoursPanel extends React.Component {
     };
   }
 
+  waitForCompletion = (taskId, celery_task_id, cb) => {
+    let errorCount = 0;
+
+    const check = () => {
+      $.ajax({
+          type: 'GET',
+          url: `/api/plugins/contours/task/${taskId}/contours/check/${celery_task_id}`
+      }).done(result => {
+          if (result.error){
+            cb(result.error);
+          }else if (result.ready){
+            cb();
+          }else{
+            // Retry
+            setTimeout(() => check(), 2000);
+          }
+      }).fail(error => {
+          console.warn(error);
+          if (errorCount++ < 10) setTimeout(() => check(), 2000);
+          else cb(JSON.stringify(error));
+      });
+    };
+
+    check();
+  }
+
+  addGeoJSONFromURL = (url, cb) => {
+    const { map } = this.props;
+
+    $.getJSON(url)
+     .done((geojson) => {
+      try{
+        if (this.previewLayer){
+          map.removeLayer(this.previewLayer);
+          this.previewLayer = null;
+        }
+
+        this.previewLayer = L.geoJSON(geojson, {
+          onEachFeature: (feature, layer) => {
+              if (feature.properties && feature.properties.elevation !== undefined) {
+                  layer.bindPopup(`<b>Elevation:</b> ${feature.properties.elevation} meters`);
+              }
+          },
+          style: feature => {
+              // TODO: different colors for different elevations?
+              return {color: "yellow"};
+          }
+        });
+        this.previewLayer.addTo(map);
+
+        cb();
+      }catch(e){
+        cb(e.message);
+      }
+     })
+     .fail(cb);
+  }
+
   handleShowPreview = () => {
     this.setState({previewLoading: true});
 
     const data = this.getFormValues();
-    data.interval = 1;
-    data.epsg = 3857;
+    data.epsg = 4326;
     data.format = "GeoJSON";
     data.simplify = 0.05;
+    const taskId = this.state.task.id;
 
-    $.ajax({
+    this.generateReq = $.ajax({
         type: 'POST',
-        url: `/api/plugins/contours/task/${this.state.task.id}/contours/generate`,
+        url: `/api/plugins/contours/task/${taskId}/contours/generate`,
         data: data
     }).done(result => {
         if (result.celery_task_id){
-          console.log(result);
-        }else if (result.error){
-            this.setState({error: result.error});
-        }else{
-            this.setState({error: "Invalid response: " + result});
-        }
+          this.waitForCompletion(taskId, result.celery_task_id, error => {
+            if (error) this.setState({previewLoading: false, error});
+            else{
+              const fileUrl = `/api/plugins/contours/task/${taskId}/contours/download/${result.celery_task_id}`;
 
-        this.setState({previewLoading: false});
+              // Preview
+              this.addGeoJSONFromURL(fileUrl, e => {
+                if (e) this.setState({error: JSON.stringify(e)});
+                this.setState({previewLoading: false});
+              });
+
+              // Download
+              // location.href = ;
+              // this.setState({previewLoading: false});
+            }
+          });
+        }else if (result.error){
+            this.setState({previewLoading: false, error: result.error});
+        }else{
+            this.setState({previewLoading: false, error: "Invalid response: " + result});
+        }
     }).fail(error => {
         this.setState({previewLoading: false, error: JSON.stringify(error)});
     });
@@ -167,7 +243,7 @@ export default class ContoursPanel extends React.Component {
         </div>
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">Epsg:</label>
+          <label className="col-sm-3 control-label">Projection:</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
               <option value="4326">WGS84 (EPSG:4326)</option>

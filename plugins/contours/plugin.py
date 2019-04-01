@@ -2,6 +2,7 @@ from app.plugins import PluginBase
 from app.plugins import MountPoint
 from .api import TaskContoursGenerate
 from .api import TaskContoursCheck
+from .api import TaskContoursDownload
 
 
 class Plugin(PluginBase):
@@ -15,4 +16,5 @@ class Plugin(PluginBase):
         return [
             MountPoint('task/(?P<pk>[^/.]+)/contours/generate', TaskContoursGenerate.as_view()),
             MountPoint('task/(?P<pk>[^/.]+)/contours/check/(?P<celery_task_id>.+)', TaskContoursCheck.as_view()),
+            MountPoint('task/(?P<pk>[^/.]+)/contours/download/(?P<celery_task_id>.+)', TaskContoursDownload.as_view()),
         ]

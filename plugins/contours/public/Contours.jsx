@@ -7,7 +7,8 @@ import ContoursPanel from './ContoursPanel';
 
 class ContoursButton extends React.Component {
   static propTypes = {
-    tasks: PropTypes.object.isRequired
+    tasks: PropTypes.object.isRequired,
+    map: PropTypes.object.isRequired
   }
 
   constructor(props){
@@ -33,7 +34,7 @@ class ContoursButton extends React.Component {
         <a href="javascript:void(0);" 
             onClick={this.handleOpen} 
             className="leaflet-control-contours-button leaflet-bar-part theme-secondary"></a>
-        <ContoursPanel isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
+        <ContoursPanel map={this.props.map} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
     </div>);
   }
 }
@@ -46,7 +47,7 @@ export default L.Control.extend({
     onAdd: function (map) {
         var container = L.DomUtil.create('div', 'leaflet-control-contours leaflet-bar leaflet-control');
         L.DomEvent.disableClickPropagation(container);
-        ReactDOM.render(<ContoursButton tasks={this.options.tasks} />, container);
+        ReactDOM.render(<ContoursButton map={this.options.map} tasks={this.options.tasks} />, container);
 
         return container;
     }

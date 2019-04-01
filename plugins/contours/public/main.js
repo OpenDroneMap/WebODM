@@ -9,6 +9,6 @@ PluginsAPI.Map.willAddControls([
 
 	// TODO: add support for map view where multiple tasks are available?
 	if (tasks.length === 1){
-		args.map.addControl(new Contours({tasks: tasks}));
+		args.map.addControl(new Contours({map: args.map, tasks: tasks}));
 	}
 });

@@ -19,8 +19,8 @@ elif [ "${format}" = "ESRI Shapefile" ]; then
     ext="shp"
 fi
 
-gdal_contour -i ${interval} -f GPKG "${dem_file}" contours.gpkg > /dev/null
-ogr2ogr -simplify ${simplify} -t_srs EPSG:${epsg} -overwrite -f "${format}" output.$$ext contours.gpkg > /dev/null
+gdal_contour -a elevation -i ${interval} -f GPKG "${dem_file}" contours.gpkg > /dev/null
+ogr2ogr -dialect SQLite -where "ST_Length(geom) > 4" -simplify ${simplify} -t_srs EPSG:${epsg} -overwrite -f "${format}" output.$$ext contours.gpkg > /dev/null
 
 if [ -e "output.$$ext" ]; then
     # ESRI ShapeFile extra steps to compress into a zip archive
