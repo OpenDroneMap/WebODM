@@ -98,9 +98,6 @@ class GrassContext:
         out = out.decode('utf-8').strip()
         err = err.decode('utf-8').strip()
 
-        logger.info("GOT!")
-        logger.info(out)
-
         if p.returncode == 0:
             return out
         else:
