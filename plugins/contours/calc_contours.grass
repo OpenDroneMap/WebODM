@@ -10,7 +10,7 @@
 
 ext=""
 if [ "${format}" = "GeoJSON" ]; then
-    ext="geojson"
+    ext="json"
 elif [ "${format}" = "GPKG" ]; then
     ext="gpkg"
 elif [ "${format}" = "DXF" ]; then
@@ -19,8 +19,20 @@ elif [ "${format}" = "ESRI Shapefile" ]; then
     ext="shp"
 fi
 
-gdal_contour -a elevation -i ${interval} -f GPKG "${dem_file}" contours.gpkg > /dev/null
-ogr2ogr -dialect SQLite -where "ST_Length(geom) > 4" -simplify ${simplify} -t_srs EPSG:${epsg} -overwrite -f "${format}" output.$$ext contours.gpkg > /dev/null
+#gdal_contour -a elevation -i ${interval} -f GPKG "${dem_file}" contours.gpkg > /dev/null
+#ogr2ogr -dialect SQLite -where "ST_Length(geom) > 4" -simplify ${simplify} -t_srs EPSG:${epsg} -overwrite -f "${format}" output.$$ext contours.gpkg > /dev/null
+
+MIN_CONTOUR_LENGTH=5
+
+r.external input="${dem_file}" output=dem --overwrite
+r.contour input=dem output=contours step=${interval} --overwrite
+v.generalize --overwrite input=contours output=contours_smooth method=douglas threshold=${simplify}
+v.generalize --overwrite input=contours_smooth output=contours_simplified method=chaiken threshold=1
+v.generalize --overwrite input=contours_simplified output=contours_final method=douglas threshold=${simplify}
+v.edit map=contours_final tool=delete threshold=-1,0,-$$MIN_CONTOUR_LENGTH query=length
+v.out.ogr input=contours_final output=temp.gpkg format="GPKG"
+
+ogr2ogr -t_srs EPSG:${epsg} -overwrite -f "${format}" output.$$ext temp.gpkg > /dev/null
 
 if [ -e "output.$$ext" ]; then
     # ESRI ShapeFile extra steps to compress into a zip archive

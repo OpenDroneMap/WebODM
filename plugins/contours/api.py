@@ -43,7 +43,8 @@ class TaskContoursGenerate(TaskView):
             context.add_param('format', format)
             context.add_param('simplify', simplify)
             context.add_param('epsg', epsg)
-            context.set_location('epsg:' + str(epsg))
+            #context.set_location('epsg:' + str(epsg))
+            context.set_location(dem)
 
             celery_task_id = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
@@ -66,9 +67,9 @@ class TaskContoursCheck(TaskView):
                 return Response({'ready': True, 'error': result['error']})
 
             contours_file = result.get('output')
-            if not contours_file:
+            if not contours_file or not os.path.exists(contours_file):
                 cleanup_grass_context(result['context'])
-                return Response({'ready': True, 'error': 'No contours file was generated. This could be a bug.'})
+                return Response({'ready': True, 'error': 'Contours file could not be generated. This might be a bug.'})
 
             request.session['contours_' + celery_task_id] = contours_file
             return Response({'ready': True})
@@ -94,7 +95,7 @@ class TaskContoursDownload(TaskView):
                                         content_type=(mimetypes.guess_type(filename)[0] or "application/zip"))
 
             response['Content-Type'] = mimetypes.guess_type(filename)[0] or "application/zip"
-            response['Content-Disposition'] = "inline; filename={}".format(filename)
+            response['Content-Disposition'] = "attachment; filename={}".format(filename)
             response['Content-Length'] = filesize
 
             return response

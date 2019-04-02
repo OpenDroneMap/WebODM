@@ -112,6 +112,7 @@ class GrassContext:
         }
 
     def cleanup(self):
+        return
         if os.path.exists(self.get_cwd()):
             shutil.rmtree(self.get_cwd())
 
