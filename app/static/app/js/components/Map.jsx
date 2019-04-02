@@ -67,7 +67,6 @@ class Map extends React.Component {
 
   loadImageryLayers(forceAddLayers = false){
     const { tiles } = this.props,
-          assets = AssetDownloads.excludeSeparators(),
           layerId = layer => {
             const meta = layer[Symbol.for("meta")];
             return meta.task.project + "_" + meta.task.id;
@@ -121,8 +120,12 @@ class Map extends React.Component {
 
             // For some reason, getLatLng is not defined for tileLayer?
             // We need this function if other code calls layer.openPopup()
+            let self = this;
             layer.getLatLng = function(){
-              return this.options.bounds.getCenter();
+              let latlng = self.lastClickedLatLng ? 
+                            self.lastClickedLatLng : 
+                            this.options.bounds.getCenter();
+              return latlng;
             };
 
             var popup = L.DomUtil.create('div', 'infoWindow');
@@ -132,10 +135,8 @@ class Map extends React.Component {
                                 </div>
                                 <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-                                    <ul class="asset-links">
-                                    ${assets.map(asset => {
-                                        return `<li><a href="${asset.downloadUrl(meta.task.project, meta.task.id)}">${asset.label}</a></li>`;
-                                    }).join("")}
+                                <ul class="asset-links loading">
+                                    <li><i class="fa fa-spin fa-refresh fa-spin fa-fw"></i></li>
                                 </ul>
 
                                 <button
@@ -273,11 +274,42 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
           // Find first tile layer at the selected coordinates 
           for (let layer of this.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
+              this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
               layer.openPopup();
               break;
             }
           }
+        }).on('popupopen', e => {
+            // Load task assets links in popup
+            if (e.popup && e.popup._source && e.popup._content){
+                const infoWindow = e.popup._content;
+                if (typeof infoWindow === 'string') return;
+
+                const $assetLinks = $("ul.asset-links", infoWindow);
+                
+                if ($assetLinks.length > 0 && $assetLinks.hasClass('loading')){
+                    const {id, project} = (e.popup._source[Symbol.for("meta")] || {}).task;
+
+                    $.getJSON(`/api/projects/${project}/tasks/${id}/`)
+                        .done(res => {
+                            const { available_assets } = res;
+                            const assets = AssetDownloads.excludeSeparators();
+                            const linksHtml = assets.filter(a => available_assets.indexOf(a.asset) !== -1)
+                                              .map(asset => {
+                                                    return `<li><a href="${asset.downloadUrl(project, id)}">${asset.label}</a></li>`;
+                                              })
+                                              .join("");
+                            $assetLinks.append($(linksHtml));
+                        })
+                        .fail(() => {
+                            $assetLinks.append($("<li>Error: cannot load assets list. </li>"));
+                        })
+                        .always(() => {
+                            $assetLinks.removeClass('loading');
+                        });
+                }
+            }
         });
     });
 

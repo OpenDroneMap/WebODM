@@ -1,0 +1,13 @@
+{
+	"name": "Contours",
+	"webodmMinVersion": "0.9.0",
+	"description": "Compute, preview and export contours from DEMs",
+	"version": "1.0.0",
+	"author": "Piero Toffanin",
+	"email": "pt@masseranolabs.com",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["contours", "dsm", "dem", "dtm"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

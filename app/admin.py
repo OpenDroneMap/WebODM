@@ -80,15 +80,15 @@ class PluginAdmin(admin.ModelAdmin):
         return False
 
     def description(self, obj):
-        manifest = get_plugin_by_name(obj.name, only_active=False).get_manifest()
+        manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
         return manifest.get('description', '')
 
     def version(self, obj):
-        manifest = get_plugin_by_name(obj.name, only_active=False).get_manifest()
+        manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
         return manifest.get('version', '')
 
     def author(self, obj):
-        manifest = get_plugin_by_name(obj.name, only_active=False).get_manifest()
+        manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
         return manifest.get('author', '')
 
     def get_urls(self):

@@ -1,0 +1,24 @@
+.leaflet-control-contours{
+  z-index: 999;
+
+  a.leaflet-control-contours-button{
+    background: url(icon.svg) no-repeat 0 0;
+    background-size: 26px 26px;
+    border-radius: 2px;
+  }
+
+  div.contours-panel{ display: none; }
+  
+  .open{
+    a.leaflet-control-contours-button{
+      display: none;
+    }
+
+    div.contours-panel{
+      display: block;
+    }
+  }
+}
+.leaflet-touch .leaflet-control-contours a {
+  background-position: 2px 2px;
+}

@@ -4,14 +4,12 @@
 # ------
 # output: prints the volume to stdout
 
-#Import raster ans vector
+#Import raster and vector
 v.import input=${area_file} output=polygon_area --overwrite 
 v.import input=${points_file} output=polygon_points --overwrite
-v.buffer -s --overwrite input=polygon_area type=area output=region distance=3 minordistance=3
+v.buffer -s --overwrite input=polygon_area type=area output=region distance=1 minordistance=1
 r.external input=${dsm_file} output=dsm --overwrite
 
-# Set Grass region to DSM resolution
-g.region rast=dsm
 # Set Grass region to vector bbox
 g.region vector=region
 
@@ -20,13 +18,15 @@ r.mask vect=region
 
 # Transfer dsm raster data to vector
 v.what.rast map=polygon_points raster=dsm column=height
-v.to.rast input=polygon_area output=r_polygon_area use=val value=255 --overwrite
 
 # Decimate DSM and generate interpolation of new terrain
-#v.surf.rst --overwrite input=polygon_points zcolumn=height elevation=dsm_below_pile mask=r_polygon_area
-v.surf.bspline --overwrite input=polygon_points column=height raster_output=dsm_below_pile lambda_i=100
+v.surf.rst --overwrite input=polygon_points zcolumn=height elevation=dsm_below_pile
 
 # Compute difference between dsm and new dsm
 r.mapcalc expression='pile_height_above_dsm=dsm-dsm_below_pile' --overwrite
+
+# Set region to polygon area to calculate volume
+g.region vect=polygon_area
+
 # Volume output from difference
-r.volume -f input=pile_height_above_dsm clump=r_polygon_area
+r.volume -f input=pile_height_above_dsm

@@ -1,5 +1,8 @@
+import os
+import shutil
 import traceback
 
+import time
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
@@ -33,6 +36,26 @@ def cleanup_projects():
     ).filter(tasks_count=0).delete()
     if total > 0 and 'app.Project' in count_dict:
         logger.info("Deleted {} projects".format(count_dict['app.Project']))
+
+
+@app.task
+def cleanup_tmp_directory():
+    # Delete files and folder in the tmp directory that are
+    # older than 24 hours
+    tmpdir = settings.MEDIA_TMP
+    time_limit = 60 * 60 * 24
+
+    for f in os.listdir(tmpdir):
+        now = time.time()
+        filepath = os.path.join(tmpdir, f)
+        modified = os.stat(filepath).st_mtime
+        if modified < now - time_limit:
+            if os.path.isfile(filepath):
+                os.remove(filepath)
+            else:
+                shutil.rmtree(filepath, ignore_errors=True)
+
+            logger.info('Cleaned up: %s (%s)' % (f, modified))
 
 
 @app.task
@@ -86,6 +109,6 @@ def process_pending_tasks():
 def execute_grass_script(script, serialized_context = {}):
     try:
         ctx = grass.create_context(serialized_context)
-        return ctx.execute(script)
+        return {'output': ctx.execute(script), 'context': ctx.serialize()}
     except GrassEngineException as e:
         return {'error': str(e)}

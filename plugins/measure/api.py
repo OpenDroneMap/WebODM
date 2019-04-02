@@ -36,12 +36,15 @@ class TaskVolume(TaskView):
             context.add_param('dsm_file', dsm)
             context.set_location(dsm)
 
-            output = execute_grass_script.delay(os.path.join(
+            result = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
                 "calc_volume.grass"
             ), context.serialize()).get()
-            if isinstance(output, dict) and 'error' in output: raise GrassEngineException(output['error'])
 
+            if not isinstance(result, dict): raise GrassEngineException("Unexpected output from GRASS (expected dict)")
+            if 'error' in result: raise GrassEngineException(result['error'])
+
+            output = result.get('output', '')
             cols = output.split(':')
             if len(cols) == 7:
                 return Response({'volume': str(abs(float(cols[6])))}, status=status.HTTP_200_OK)
