@@ -3,7 +3,6 @@
 # format: OGR output format
 # simplify: Simplify value
 # epsg: target EPSG code
-# destination: destination folder. If it does not exist, it will be created.
 #
 # ------
 # output: If successful, prints the full path to the contours file. Otherwise it prints "error"
