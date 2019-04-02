@@ -95,7 +95,7 @@ class TestPlugins(BootTestCase):
         grass_scripts_dir = os.path.join(cwd, "grass_scripts")
 
         ctx = grass.create_context()
-        ctx.add_file('test.geojson', """{
+        points = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -110,7 +110,8 @@ class TestPlugins(BootTestCase):
       }
     }
   ]
-}""")
+}"""
+        ctx.add_file('test.geojson', points)
         ctx.set_location("EPSG:4326")
 
         result = execute_grass_script.delay(
@@ -120,6 +121,9 @@ class TestPlugins(BootTestCase):
         self.assertTrue("Number of points:       1" in result.get('output'))
 
         self.assertTrue(result.get('context') == ctx.serialize())
+
+        # Context dir has been cleaned up automatically
+        self.assertFalse(os.path.exists(ctx.get_cwd()))
 
         error = execute_grass_script.delay(
                 os.path.join(grass_scripts_dir, "nonexistant_script.grass"),
@@ -131,7 +135,23 @@ class TestPlugins(BootTestCase):
         with self.assertRaises(GrassEngineException):
             ctx.execute(os.path.join(grass_scripts_dir, "nonexistant_script.grass"))
 
-        # TODO: verify autocleanup works
+        ctx = grass.create_context({"auto_cleanup": False})
+        ctx.add_file('test.geojson', points)
+        ctx.set_location("EPSG:4326")
+
+        result = execute_grass_script.delay(
+            os.path.join(grass_scripts_dir, "simple_test.grass"),
+            ctx.serialize()
+        ).get()
+        self.assertTrue("Number of points:       1" in result.get('output'))
+
+        # Path still there
+        self.assertTrue(os.path.exists(ctx.get_cwd()))
+
+        ctx.cleanup()
+
+        # Cleanup worked
+        self.assertFalse(os.path.exists(ctx.get_cwd()))
 
     def test_plugin_datastore(self):
         test_plugin = get_plugin_by_name("test")
