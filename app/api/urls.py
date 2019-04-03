@@ -2,7 +2,6 @@ from django.conf.urls import url, include
 
 from app.api.presets import PresetViewSet
 from app.plugins import get_api_url_patterns
-from webodm import settings
 from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets, TaskAssetsImport
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
@@ -22,7 +21,10 @@ urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
 
     url(r'^', include(router.urls)),
+
     url(r'^', include(tasks_router.urls)),
+
+    # url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/', TaskGet.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.png$', TaskTiles.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles\.json$', TaskTilesJson.as_view()),

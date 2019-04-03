@@ -77,11 +77,22 @@ class TaskViewSet(viewsets.ViewSet):
     """
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dsm_extent', 'dtm_extent', 'console_output', )
     
-    # We don't use object level permissions on tasks, relying on
-    # project's object permissions instead (but standard model permissions still apply)
-    permission_classes = (permissions.DjangoModelPermissions, )
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        We don't use object level permissions on tasks, relying on
+        project's object permissions instead (but standard model permissions still apply)
+        and with the exception of 'retrieve' (task GET) for public tasks access
+        """
+        if self.action == 'retrieve':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.DjangoModelPermissions, ]
+
+        return [permission() for permission in permission_classes]
 
     def set_pending_action(self, pending_action, request, pk=None, project_pk=None, perms=('change_project', )):
         get_and_check_project(request, project_pk, perms)
@@ -128,7 +139,6 @@ class TaskViewSet(viewsets.ViewSet):
         output = task.console_output or ""
         return Response('\n'.join(output.rstrip().split('\n')[line_num:]))
 
-
     def list(self, request, project_pk=None):
         get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
@@ -137,11 +147,13 @@ class TaskViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, project_pk=None):
-        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
+
+        if not task.public:
+            get_and_check_project(request, task.project.id)
 
         serializer = TaskSerializer(task)
         return Response(serializer.data)
