@@ -2,7 +2,6 @@ from django.conf.urls import url, include
 
 from app.api.presets import PresetViewSet
 from app.plugins import get_api_url_patterns
-from webodm import settings
 from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets, TaskAssetsImport
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView

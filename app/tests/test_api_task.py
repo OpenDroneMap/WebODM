@@ -371,6 +371,9 @@ class TestApiTask(BootTransactionTestCase):
             res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles/16/16020/42443.png".format(project.id, task.id, tile_type))
             self.assertTrue(res.status_code == expectedStatus)
 
+            res = other_client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
+            self.assertTrue(res.status_code == expectedStatus)
+
         accessResources(status.HTTP_404_NOT_FOUND)
 
         # Original owner enables sharing
@@ -382,15 +385,17 @@ class TestApiTask(BootTransactionTestCase):
         # Now other user can acccess resources
         accessResources(status.HTTP_200_OK)
 
+        # He cannot change a task
+        res = other_client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+            'name': "Changed! Uh oh"
+        })
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
         # User logs out
         other_client.logout()
 
         # He can still access the resources as anonymous
         accessResources(status.HTTP_200_OK)
-
-        # Other user still does not have access to certain parts of the API
-        res = other_client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
-        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
 
         # Restart a task
         testWatch.clear()

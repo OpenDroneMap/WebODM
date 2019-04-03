@@ -56,7 +56,7 @@ export default class ContoursPanel extends React.Component {
               }
           })
           .fail(() => {
-            this.setState({permanentError: `Cannot retrieve information for task ${id}. Are you are connected to the internet.`})
+            this.setState({permanentError: `Cannot retrieve information for task ${id}. Are you are connected to the internet?`})
           })
           .always(() => {
             this.setState({loading: false});
