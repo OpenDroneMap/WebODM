@@ -21,10 +21,7 @@ urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
 
     url(r'^', include(router.urls)),
-
     url(r'^', include(tasks_router.urls)),
-
-    # url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/', TaskGet.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.png$', TaskTiles.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles\.json$', TaskTilesJson.as_view()),
