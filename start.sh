@@ -45,6 +45,8 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     npm install
     cd nodeodm/external/NodeODM
     npm install
+    cd nodeodm/external/NodeMICMAC
+    npm install
     cd /webodm
 
     echo Setup pip requirements...
@@ -59,6 +61,10 @@ python manage.py migrate
 
 if [[ "$1" = "--create-default-pnode" ]]; then
    echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-odm-1', defaults={'hostname': 'node-odm-1', 'port': 3000})" | python manage.py shell
+fi
+
+if [[ "$1" = "--create-micmac-pnode" ]]; then
+   echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-micmac-1', defaults={'hostname': 'node-micmac-1', 'port': 3001})" | python manage.py shell
 fi
 
 export WO_HOST="${WO_HOST:=localhost}"
