@@ -373,7 +373,11 @@ class Task(models.Model):
                 raise NodeServerError(e)
 
         self.refresh_from_db()
-        self.extract_assets_and_complete()
+
+        try:
+            self.extract_assets_and_complete()
+        except zipfile.BadZipFile:
+            raise NodeServerError("Invalid zip file")
 
         images_json = self.assets_path("images.json")
         if os.path.exists(images_json):
@@ -607,9 +611,10 @@ class Task(models.Model):
 
                             os.makedirs(assets_dir)
 
-                            logger.info("Downloading all.zip for {}".format(self))
-
-                            # Download all assets
+                            # Download and try to extract results up to 4 times
+                            # (~95% of the times, on large downloads, the archive could be corrupted)
+                            retry_num = 0
+                            extracted = False
                             last_update = 0
 
                             def callback(progress):
@@ -619,17 +624,32 @@ class Task(models.Model):
 
                                 if time_has_elapsed or int(progress) == 100:
                                     Task.objects.filter(pk=self.id).update(running_progress=(
-                                    self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(progress) / 100.0) * 0.1))
+                                        self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(progress) / 100.0) * 0.1))
                                     last_update = time.time()
 
-                            zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
+                            while not extracted:
+                                last_update = 0
+                                logger.info("Downloading all.zip for {}".format(self))
 
-                            # Rename to all.zip
-                            os.rename(zip_path, os.path.join(os.path.dirname(zip_path), 'all.zip'))
+                                # Download all assets
+                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
 
-                            logger.info("Extracting all.zip for {}".format(self))
+                                # Rename to all.zip
+                                all_zip_path = self.assets_path("all.zip")
+                                os.rename(zip_path, all_zip_path)
 
-                            self.extract_assets_and_complete()
+                                logger.info("Extracting all.zip for {}".format(self))
+
+                                try:
+                                    self.extract_assets_and_complete()
+                                    extracted = True
+                                except zipfile.BadZipFile:
+                                    if retry_num < 4:
+                                        logger.warning("{} seems corrupted. Retrying...".format(all_zip_path))
+                                        retry_num += 1
+                                        os.remove(all_zip_path)
+                                    else:
+                                        raise NodeServerError("Invalid zip file")
                         else:
                             # FAILED, CANCELED
                             self.save()
@@ -648,17 +668,15 @@ class Task(models.Model):
     def extract_assets_and_complete(self):
         """
         Extracts assets/all.zip and populates task fields where required.
+        It will raise a zipfile.BadZipFile exception is the archive is corrupted.
         :return:
         """
         assets_dir = self.assets_path("")
         zip_path = self.assets_path("all.zip")
 
         # Extract from zip
-        try:
-            with zipfile.ZipFile(zip_path, "r") as zip_h:
-                zip_h.extractall(assets_dir)
-        except zipfile.BadZipFile:
-            raise NodeServerError("Invalid zip file")
+        with zipfile.ZipFile(zip_path, "r") as zip_h:
+            zip_h.extractall(assets_dir)
 
         logger.info("Extracted all.zip for {}".format(self))
 
