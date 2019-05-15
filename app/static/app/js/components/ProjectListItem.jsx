@@ -388,7 +388,7 @@ class ProjectListItem extends React.Component {
                 <button type="button" 
                       className="btn btn-default btn-sm"
                       onClick={this.handleImportTask}>
-                  <i className="glyphicon glyphicon-import"></i> Import Existing
+                  <i className="glyphicon glyphicon-import"></i> Import
                 </button>
               </div>
             : ""}

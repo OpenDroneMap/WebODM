@@ -22,6 +22,7 @@ from django.contrib.postgres import fields
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
+from django.db import connection
 from django.utils import timezone
 from urllib3.exceptions import ReadTimeoutError
 
@@ -695,6 +696,12 @@ class Task(models.Model):
                 # Read extent and SRID
                 raster = GDALRaster(raster_path)
                 extent = OGRGeometry.from_bbox(raster.extent)
+
+                # Make sure PostGIS supports it
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT SRID FROM spatial_ref_sys WHERE SRID = %s", [raster.srid])
+                    if cursor.rowcount == 0:
+                        raise NodeServerError("Unsupported SRS {}. Please make sure you picked a supported SRS.".format(raster.srid))
 
                 # It will be implicitly transformed into the SRID of the model’s field
                 # self.field = GEOSGeometry(...)
