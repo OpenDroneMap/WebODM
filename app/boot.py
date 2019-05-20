@@ -97,11 +97,9 @@ def boot():
 def add_default_presets():
     try:
         Preset.objects.update_or_create(name='Volume Analysis', system=True,
-                                        defaults={'options': [{'name': 'use-opensfm-dense', 'value': True},
-                                                              {'name': 'dsm', 'value': True},
+                                        defaults={'options': [{'name': 'dsm', 'value': True},
                                                               {'name': 'dem-resolution', 'value': '2'},
-                                                              {'name': 'depthmap-resolution', 'value': '1000'},
-                                                              {'name': 'opensfm-depthmap-min-patch-sd', 'value': '0'}]})
+                                                              {'name': 'depthmap-resolution', 'value': '1000'}]})
         Preset.objects.update_or_create(name='3D Model', system=True,
                                         defaults={'options': [{'name': 'mesh-octree-depth', 'value': "11"},
                                                               {'name': 'use-3dmesh', 'value': True},
@@ -126,7 +124,8 @@ def add_default_presets():
         Preset.objects.update_or_create(name='Fast Orthophoto', system=True,
                                         defaults={'options': [{'name': 'fast-orthophoto', 'value': True}]})
         Preset.objects.update_or_create(name='High Resolution', system=True,
-                                        defaults={'options': [{'name': 'dsm', 'value': True},
+                                        defaults={'options': [{'name': 'ignore-gsd', 'value': True},
+                                                              {'name': 'dsm', 'value': True},
                                                               {'name': 'depthmap-resolution', 'value': '1000'},
                                                               {'name': 'dem-resolution', 'value': "2.0"},
                                                               {'name': 'orthophoto-resolution', 'value': "2.0"},

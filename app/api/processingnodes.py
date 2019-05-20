@@ -34,7 +34,7 @@ class ProcessingNodeFilter(FilterSet):
 
     class Meta:
         model = ProcessingNode
-        fields = ['has_available_options', 'id', 'hostname', 'port', 'api_version', 'queue_count', 'max_images', 'label', ]
+        fields = ['has_available_options', 'id', 'hostname', 'port', 'api_version', 'queue_count', 'max_images', 'label', 'engine', 'engine_version', ]
 
 class ProcessingNodeViewSet(viewsets.ModelViewSet):
     """

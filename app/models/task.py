@@ -175,22 +175,7 @@ class Task(models.Model):
         (pending_actions.IMPORT, 'IMPORT'),
     )
 
-    # Not an exact science
-    TASK_OUTPUT_MILESTONES_LAST_VALUE = 0.85
-    TASK_OUTPUT_MILESTONES = {
-        'Running ODM Load Dataset Cell': 0.01,
-        'Running ODM Load Dataset Cell - Finished': 0.05,
-        'opensfm/bin/opensfm match_features': 0.10,
-        'opensfm/bin/opensfm reconstruct': 0.20,
-        'opensfm/bin/opensfm export_visualsfm': 0.30,
-        'Running ODM Meshing Cell': 0.50,
-        'Running MVS Texturing Cell': 0.55,
-        'Running ODM Georeferencing Cell': 0.60,
-        'Running ODM DEM Cell': 0.70,
-        'Running ODM Orthophoto Cell': 0.75,
-        'Running ODM OrthoPhoto Cell - Finished': 0.80,
-        'Compressing all.zip:': TASK_OUTPUT_MILESTONES_LAST_VALUE
-    }
+    TASK_PROGRESS_LAST_VALUE = 0.85
 
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
 
@@ -578,22 +563,18 @@ class Task(models.Model):
                 # Need to update status (first time, queued or running?)
                 if self.uuid and self.status in [None, status_codes.QUEUED, status_codes.RUNNING]:
                     # Update task info from processing node
-                    info = self.processing_node.get_task_info(self.uuid)
+                    current_lines_count = len(self.console_output.split("\n"))
+
+                    info = self.processing_node.get_task_info(self.uuid, current_lines_count)
 
                     self.processing_time = info.processing_time
                     self.status = info.status.value
 
-                    current_lines_count = len(self.console_output.split("\n"))
-                    console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
-                    if len(console_output) > 0:
-                        self.console_output += "\n".join(console_output) + '\n'
+                    if len(info.output) > 0:
+                        self.console_output += "\n".join(info.output) + '\n'
 
                         # Update running progress
-                        for line in console_output:
-                            for line_match, value in self.TASK_OUTPUT_MILESTONES.items():
-                                if line_match in line:
-                                    self.running_progress = value
-                                    break
+                        self.running_progress = (info.progress / 100.0) * self.TASK_PROGRESS_LAST_VALUE
 
                     if info.last_error != "":
                         self.last_error = info.last_error
@@ -625,7 +606,7 @@ class Task(models.Model):
 
                                 if time_has_elapsed or int(progress) == 100:
                                     Task.objects.filter(pk=self.id).update(running_progress=(
-                                        self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(progress) / 100.0) * 0.1))
+                                        self.TASK_PROGRESS_LAST_VALUE + (float(progress) / 100.0) * 0.1))
                                     last_update = time.time()
 
                             while not extracted:
