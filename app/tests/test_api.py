@@ -355,8 +355,11 @@ class TestApi(BootTestCase):
         # Verify max images field
         self.assertTrue("max_images" in res.data)
 
-        # Verify odm version
-        self.assertTrue("odm_version" in res.data)
+        # Verify engine version
+        self.assertTrue("engine_version" in res.data)
+
+        # Verify engine
+        self.assertTrue("engine" in res.data)
 
         # label should be hostname:port (since no label is set)
         self.assertEqual(res.data['label'], pnode.hostname + ":" + str(pnode.port))

@@ -382,12 +382,15 @@ class ProjectListItem extends React.Component {
                       className="btn btn-primary btn-sm"
                       onClick={this.handleUpload}
                       ref={this.setRef("uploadButton")}>
-                <i className="glyphicon glyphicon-upload"></i>
-                Select Images and GCP
-              </button><button type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
-              <ul className="dropdown-menu">
-                <li><a href="javascript:void(0);" onClick={this.handleImportTask}><i className="glyphicon glyphicon-import"></i> Import Existing Assets</a></li>
-             </ul></div>
+                  <i className="glyphicon glyphicon-upload"></i>
+                  Select Images and GCP
+                </button>
+                <button type="button" 
+                      className="btn btn-default btn-sm"
+                      onClick={this.handleImportTask}>
+                  <i className="glyphicon glyphicon-import"></i> Import
+                </button>
+              </div>
             : ""}
 
             <button disabled={this.state.upload.error !== ""} 
