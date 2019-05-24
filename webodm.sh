@@ -326,18 +326,18 @@ elif [[ $1 = "update" ]]; then
 	echo "Updating WebODM..."
 	run "git pull origin master"
 
-    command="docker-compose -f docker-compose.yml"
+	command="docker-compose -f docker-compose.yml"
 
-    if [[ $load_default_node = true ]]; then
-        command+=" -f docker-compose.nodeodm.yml"
-    fi
+	if [[ $load_default_node = true ]]; then
+		command+=" -f docker-compose.nodeodm.yml"
+	fi
 
-    if [[ $load_micmac_node = true ]]; then
-        command+=" -f docker-compose.nodemicmac.yml"
-    fi
+	if [[ $load_micmac_node = true ]]; then
+		command+=" -f docker-compose.nodemicmac.yml"
+	fi
 
-    command+=" pull"
-    run "$command"
+	command+=" pull"
+	run "$command"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 elif [[ $1 = "checkenv" ]]; then
 	environment_check
