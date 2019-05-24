@@ -45,8 +45,6 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     npm install
     cd nodeodm/external/NodeODM
     npm install
-    cd nodeodm/external/NodeMICMAC
-    npm install
     cd /webodm
 
     echo Setup pip requirements...
