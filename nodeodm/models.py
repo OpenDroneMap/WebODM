@@ -25,8 +25,9 @@ class ProcessingNode(models.Model):
     available_options = fields.JSONField(default=dict, help_text="Description of the options that can be used for processing")
     token = models.CharField(max_length=1024, blank=True, default="", help_text="Token to use for authentication. If the node doesn't have authentication, you can leave this field blank.")
     max_images = models.PositiveIntegerField(help_text="Maximum number of images accepted by this node.", blank=True, null=True)
-    odm_version = models.CharField(max_length=32, null=True, help_text="ODM version used by the node.")
+    engine_version = models.CharField(max_length=32, null=True, help_text="Engine version used by the node.")
     label = models.CharField(max_length=255, default="", blank=True, help_text="Optional label for this node. When set, this label will be shown instead of the hostname:port name.")
+    engine = models.CharField(max_length=255, null=True, help_text="Engine used by the node.")
 
     def __str__(self):
         if self.label != "":
@@ -61,7 +62,8 @@ class ProcessingNode(models.Model):
             self.api_version = info.version
             self.queue_count = info.task_queue_count
             self.max_images = info.max_images
-            self.odm_version = info.odm_version
+            self.engine_version = info.engine_version
+            self.engine = info.engine
 
             options = list(map(lambda o: o.__dict__, api_client.options()))
             self.available_options = options
@@ -116,7 +118,7 @@ class ProcessingNode(models.Model):
         task = api_client.create_task(images, opts, name, progress_callback)
         return task.uuid
 
-    def get_task_info(self, uuid):
+    def get_task_info(self, uuid, with_output=None):
         """
         Gets information about this task, such as name, creation date, 
         processing time, status, command line options and number of 
@@ -124,7 +126,13 @@ class ProcessingNode(models.Model):
         """
         api_client = self.api_client()
         task = api_client.get_task(uuid)
-        return task.info()
+        task_info = task.info(with_output)
+
+        # Output support for older clients
+        if not api_client.version_greater_or_equal_than("1.5.1") and with_output:
+            task_info.output = self.get_task_console_output(uuid, with_output)
+
+        return task_info
 
     def get_task_console_output(self, uuid, line):
         """

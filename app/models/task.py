@@ -22,6 +22,7 @@ from django.contrib.postgres import fields
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
+from django.db import connection
 from django.utils import timezone
 from urllib3.exceptions import ReadTimeoutError
 
@@ -115,7 +116,7 @@ def resize_image(image_path, resize_to, done=None):
         os.rename(resized_image_path, image_path)
 
         logger.info("Resized {} to {}x{}".format(image_path, resized_width, resized_height))
-    except IOError as e:
+    except (IOError, ValueError) as e:
         logger.warning("Cannot resize {}: {}.".format(image_path, str(e)))
         if done is not None:
             done()
@@ -174,22 +175,7 @@ class Task(models.Model):
         (pending_actions.IMPORT, 'IMPORT'),
     )
 
-    # Not an exact science
-    TASK_OUTPUT_MILESTONES_LAST_VALUE = 0.85
-    TASK_OUTPUT_MILESTONES = {
-        'Running ODM Load Dataset Cell': 0.01,
-        'Running ODM Load Dataset Cell - Finished': 0.05,
-        'opensfm/bin/opensfm match_features': 0.10,
-        'opensfm/bin/opensfm reconstruct': 0.20,
-        'opensfm/bin/opensfm export_visualsfm': 0.30,
-        'Running ODM Meshing Cell': 0.50,
-        'Running MVS Texturing Cell': 0.55,
-        'Running ODM Georeferencing Cell': 0.60,
-        'Running ODM DEM Cell': 0.70,
-        'Running ODM Orthophoto Cell': 0.75,
-        'Running ODM OrthoPhoto Cell - Finished': 0.80,
-        'Compressing all.zip:': TASK_OUTPUT_MILESTONES_LAST_VALUE
-    }
+    TASK_PROGRESS_LAST_VALUE = 0.85
 
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
 
@@ -373,7 +359,11 @@ class Task(models.Model):
                 raise NodeServerError(e)
 
         self.refresh_from_db()
-        self.extract_assets_and_complete()
+
+        try:
+            self.extract_assets_and_complete()
+        except zipfile.BadZipFile:
+            raise NodeServerError("Invalid zip file")
 
         images_json = self.assets_path("images.json")
         if os.path.exists(images_json):
@@ -573,22 +563,18 @@ class Task(models.Model):
                 # Need to update status (first time, queued or running?)
                 if self.uuid and self.status in [None, status_codes.QUEUED, status_codes.RUNNING]:
                     # Update task info from processing node
-                    info = self.processing_node.get_task_info(self.uuid)
+                    current_lines_count = len(self.console_output.split("\n"))
+
+                    info = self.processing_node.get_task_info(self.uuid, current_lines_count)
 
                     self.processing_time = info.processing_time
                     self.status = info.status.value
 
-                    current_lines_count = len(self.console_output.split("\n"))
-                    console_output = self.processing_node.get_task_console_output(self.uuid, current_lines_count)
-                    if len(console_output) > 0:
-                        self.console_output += "\n".join(console_output) + '\n'
+                    if len(info.output) > 0:
+                        self.console_output += "\n".join(info.output) + '\n'
 
                         # Update running progress
-                        for line in console_output:
-                            for line_match, value in self.TASK_OUTPUT_MILESTONES.items():
-                                if line_match in line:
-                                    self.running_progress = value
-                                    break
+                        self.running_progress = (info.progress / 100.0) * self.TASK_PROGRESS_LAST_VALUE
 
                     if info.last_error != "":
                         self.last_error = info.last_error
@@ -607,9 +593,10 @@ class Task(models.Model):
 
                             os.makedirs(assets_dir)
 
-                            logger.info("Downloading all.zip for {}".format(self))
-
-                            # Download all assets
+                            # Download and try to extract results up to 4 times
+                            # (~95% of the times, on large downloads, the archive could be corrupted)
+                            retry_num = 0
+                            extracted = False
                             last_update = 0
 
                             def callback(progress):
@@ -619,17 +606,32 @@ class Task(models.Model):
 
                                 if time_has_elapsed or int(progress) == 100:
                                     Task.objects.filter(pk=self.id).update(running_progress=(
-                                    self.TASK_OUTPUT_MILESTONES_LAST_VALUE + (float(progress) / 100.0) * 0.1))
+                                        self.TASK_PROGRESS_LAST_VALUE + (float(progress) / 100.0) * 0.1))
                                     last_update = time.time()
 
-                            zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
+                            while not extracted:
+                                last_update = 0
+                                logger.info("Downloading all.zip for {}".format(self))
 
-                            # Rename to all.zip
-                            os.rename(zip_path, os.path.join(os.path.dirname(zip_path), 'all.zip'))
+                                # Download all assets
+                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
 
-                            logger.info("Extracting all.zip for {}".format(self))
+                                # Rename to all.zip
+                                all_zip_path = self.assets_path("all.zip")
+                                os.rename(zip_path, all_zip_path)
 
-                            self.extract_assets_and_complete()
+                                logger.info("Extracting all.zip for {}".format(self))
+
+                                try:
+                                    self.extract_assets_and_complete()
+                                    extracted = True
+                                except zipfile.BadZipFile:
+                                    if retry_num < 4:
+                                        logger.warning("{} seems corrupted. Retrying...".format(all_zip_path))
+                                        retry_num += 1
+                                        os.remove(all_zip_path)
+                                    else:
+                                        raise NodeServerError("Invalid zip file")
                         else:
                             # FAILED, CANCELED
                             self.save()
@@ -648,17 +650,15 @@ class Task(models.Model):
     def extract_assets_and_complete(self):
         """
         Extracts assets/all.zip and populates task fields where required.
+        It will raise a zipfile.BadZipFile exception is the archive is corrupted.
         :return:
         """
         assets_dir = self.assets_path("")
         zip_path = self.assets_path("all.zip")
 
         # Extract from zip
-        try:
-            with zipfile.ZipFile(zip_path, "r") as zip_h:
-                zip_h.extractall(assets_dir)
-        except zipfile.BadZipFile:
-            raise NodeServerError("Invalid zip file")
+        with zipfile.ZipFile(zip_path, "r") as zip_h:
+            zip_h.extractall(assets_dir)
 
         logger.info("Extracted all.zip for {}".format(self))
 
@@ -677,6 +677,12 @@ class Task(models.Model):
                 # Read extent and SRID
                 raster = GDALRaster(raster_path)
                 extent = OGRGeometry.from_bbox(raster.extent)
+
+                # Make sure PostGIS supports it
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT SRID FROM spatial_ref_sys WHERE SRID = %s", [raster.srid])
+                    if cursor.rowcount == 0:
+                        raise NodeServerError("Unsupported SRS {}. Please make sure you picked a supported SRS.".format(raster.srid))
 
                 # It will be implicitly transformed into the SRID of the model’s field
                 # self.field = GEOSGeometry(...)

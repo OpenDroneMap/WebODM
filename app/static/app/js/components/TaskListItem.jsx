@@ -10,7 +10,6 @@ import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import TaskPluginActionButtons from './TaskPluginActionButtons';
 import PipelineSteps from '../classes/PipelineSteps';
-import BasicTaskView from './BasicTaskView';
 import Css from '../classes/Css';
 
 class TaskListItem extends React.Component {
@@ -468,33 +467,33 @@ class TaskListItem extends React.Component {
       expanded = (
         <div className="expanded-panel">
           <div className="row">
-            <div className="col-md-3 no-padding">
-              <div className="labels">
-                <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
+            <div className="col-md-12 no-padding">
+              <div className="console-switch text-right pull-right">
+                  <div className="console-output-label">Task Output: </div><ul className="list-inline">
+                    <li>
+                      <div className="btn-group btn-toggle"> 
+                        <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>On</button>
+                        <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>Off</button>
+                      </div>
+                    </li>
+                  </ul>
               </div>
-              <div className="labels">
-                  <strong>Processing Node: </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
-              </div>
-              {Array.isArray(task.options) ?
-                 <div className="labels">
-                  <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
+
+              <div className="mb">
+                <div className="labels">
+                  <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
                 </div>
-              : ""}
-              {/* TODO: List of images? */}
-
-              {showOrthophotoMissingWarning ?
-              <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.</span></div> : ""}
-
-            </div>
-            <div className="col-md-9">
-              <div className="switch-view text-right pull-right">
-                    <i className="fa fa-list-ul"></i> <a href="javascript:void(0);" onClick={this.setView("basic")}
-                            className={this.state.view === 'basic' ? "selected" : ""}>Simple</a>
-                    | 
-                    <i className="fa fa-desktop"></i> <a href="javascript:void(0);" onClick={this.setView("console")}
-                            className={this.state.view === 'console' ? "selected" : ""}>Console</a>
-              </div>
-            
+                <div className="labels">
+                    <strong>Processing Node: </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
+                </div>
+                {Array.isArray(task.options) ?
+                   <div className="labels">
+                    <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
+                  </div>
+                : ""}
+                {/* TODO: List of images? */}
+              </div> 
+              
               {this.state.view === 'console' ?
                 <Console
                     className="floatfix"
@@ -508,14 +507,8 @@ class TaskListItem extends React.Component {
                     maximumLines={500}
                     /> : ""}
 
-              {this.state.view === 'basic' ? 
-                <BasicTaskView
-                    source={this.consoleOutputUrl}
-                    ref={domNode => this.basicView = domNode}
-                    refreshInterval={this.shouldRefresh() ? 3000 : undefined}
-                    onAddLines={this.checkForCommonErrors}
-                    taskStatus={task.status}
-                /> : ""}
+              {showOrthophotoMissingWarning ?
+              <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.</span></div> : ""}
 
               {showMemoryErrorWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>. You can also try to use a <a href="https://www.opendronemap.org/webodm/lightning/" target="_blank">cloud processing node</a>.</span></div> : ""}
