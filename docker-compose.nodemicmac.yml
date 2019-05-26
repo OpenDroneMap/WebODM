@@ -5,9 +5,10 @@
 version: '2.1'
 services:
   webapp:
-    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh --create-micmac-pnode\""
     depends_on:
       - node-micmac-1
+    environment:
+      - WO_CREATE_MICMAC_PNODE=YES
   node-micmac-1:
     image: dronemapper/node-micmac
     container_name: node-micmac-1

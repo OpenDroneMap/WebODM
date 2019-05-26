@@ -57,11 +57,11 @@ fi
 echo Running migrations
 python manage.py migrate
 
-if [[ "$1" = "--create-default-pnode" ]]; then
+if [[ "$WO_CREATE_DEFAULT_PNODE" = "YES" ]]; then
    echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-odm-1', defaults={'hostname': 'node-odm-1', 'port': 3000})" | python manage.py shell
 fi
 
-if [[ "$1" = "--create-micmac-pnode" ]]; then
+if [[ "$WO_CREATE_MICMAC_PNODE" = "YES" ]]; then
    echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-micmac-1', defaults={'hostname': 'node-micmac-1', 'port': 3000})" | python manage.py shell
 fi
 
