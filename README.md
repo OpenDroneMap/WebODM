@@ -98,7 +98,7 @@ Then from the web interface simply manually remove the "node-odm-1" node.
 
 ### Enable MicMac
 
-WebODM can use [MicMac](https://github.com/micmacIGN/micmac) as a processing engine via [NodeMICMAC](https://github.com/dronemapper-io/NodeMICMAC/). To add MicMac as a processing node, simply run:
+WebODM can use [MicMac](https://github.com/micmacIGN/micmac) as a processing engine via [NodeMICMAC](https://github.com/dronemapper-io/NodeMICMAC/). To add MicMac, simply run:
 
 `./webodm.sh restart --with-micmac`
 
