@@ -324,7 +324,7 @@ class TestApiTask(BootTransactionTestCase):
         # Can download assets
         for asset in list(task.ASSETS_MAP.keys()):
             res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
-            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         # We can stream downloads
         res = client.get("/api/projects/{}/tasks/{}/download/{}?_force_stream=1".format(project.id, task.id, list(task.ASSETS_MAP.keys())[0]))

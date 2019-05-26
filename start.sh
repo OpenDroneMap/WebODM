@@ -61,6 +61,10 @@ if [[ "$1" = "--create-default-pnode" ]]; then
    echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-odm-1', defaults={'hostname': 'node-odm-1', 'port': 3000})" | python manage.py shell
 fi
 
+if [[ "$1" = "--create-micmac-pnode" ]]; then
+   echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-micmac-1', defaults={'hostname': 'node-micmac-1', 'port': 3000})" | python manage.py shell
+fi
+
 export WO_HOST="${WO_HOST:=localhost}"
 export WO_PORT="${WO_PORT:=8000}"
 

@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.dispatch import receiver
 from guardian.models import GroupObjectPermissionBase
 from guardian.models import UserObjectPermissionBase
+from webodm import settings
 
 import json
 from pyodm import Node
@@ -115,7 +116,15 @@ class ProcessingNode(models.Model):
 
         opts = self.options_list_to_dict(options)
 
-        task = api_client.create_task(images, opts, name, progress_callback)
+        if not settings.TESTING:
+            task = api_client.create_task(images, opts, name, progress_callback)
+        else:
+            # The create_task function uses multi-threaded parallel uploads
+            # but Django tests cannot cope with DB updates from different threads
+            # (and progress_callback often updates the DB). So during testing
+            # we use the fallback function equivalent which is single-threaded
+            task = api_client.create_task_fallback(images, opts, name, progress_callback)
+
         return task.uuid
 
     def get_task_info(self, uuid, with_output=None):
