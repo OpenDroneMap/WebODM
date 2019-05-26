@@ -102,7 +102,7 @@ WebODM can use [MicMac](https://github.com/micmacIGN/micmac) as a processing eng
 
 `./webodm.sh restart --with-micmac`
 
-This will create a "node-micmac-1" processing node on the same machine running WebODM. Please note that NodeMicMac is in active development and is currently experimental. If you find issues, please [report them](https://github.com/dronemapper-io/NodeMICMAC/issues) on the NodeMICMAC repository.
+This will create a "node-micmac-1" processing node on the same machine running WebODM. Please note that NodeMICMAC is in active development and is currently experimental. If you find issues, please [report them](https://github.com/dronemapper-io/NodeMICMAC/issues) on the NodeMICMAC repository.
 
 ### Enable SSL
 
