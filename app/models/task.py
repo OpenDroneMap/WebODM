@@ -572,8 +572,8 @@ class Task(models.Model):
                     if len(info.output) > 0:
                         self.console_output += "\n".join(info.output) + '\n'
 
-                        # Update running progress
-                        self.running_progress = (info.progress / 100.0) * self.TASK_PROGRESS_LAST_VALUE
+                    # Update running progress
+                    self.running_progress = (info.progress / 100.0) * self.TASK_PROGRESS_LAST_VALUE
 
                     if info.last_error != "":
                         self.last_error = info.last_error
