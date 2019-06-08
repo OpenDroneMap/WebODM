@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'ReactDOM';
 import './css/ModelView.scss';
 import ErrorMessage from './components/ErrorMessage';
 import SwitchModeButton from './components/SwitchModeButton';
@@ -8,7 +7,6 @@ import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
-
 
 window.Potree = require('./vendor/potree');
 require('./vendor/OBJLoader');
@@ -137,7 +135,7 @@ class ModelView extends React.Component {
       viewer.toggleSidebar();
 
       if (this.hasTexturedModel()){
-          ReactDOM.render(<TexturedModelMenu toggleTexturedModel={this.toggleTexturedModel}/>, $("#textured_model_button").get(0));
+          window.ReactDOM.render(<TexturedModelMenu toggleTexturedModel={this.toggleTexturedModel}/>, $("#textured_model_button").get(0));
       }else{
           $("#textured_model").hide();
           $("#textured_model_container").hide();
