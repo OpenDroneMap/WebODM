@@ -353,13 +353,14 @@ class Exporter{
 
 }
 
-exports.Tag = Tag;
-exports.Type = Type;
-exports.IFDEntry = IFDEntry;
-exports.Image = Image;
-exports.Reader = Reader;
-exports.Exporter = Exporter;
+const exp = {};
+exp.Tag = Tag;
+exp.Type = Type;
+exp.IFDEntry = IFDEntry;
+exp.Image = Image;
+exp.Reader = Reader;
+exp.Exporter = Exporter;
 
-return exports;
+return exp;
 
 }({}));

@@ -658,7 +658,7 @@ export class Renderer {
 
 	renderNodes(octree, nodes, visibilityTextureData, camera, target, shader, params) {
 
-		if (exports.measureTimings) performance.mark("renderNodes-start");
+		if (Potree.measureTimings) performance.mark("renderNodes-start");
 
 		let gl = this.gl;
 
@@ -886,7 +886,7 @@ export class Renderer {
 
 		gl.bindVertexArray(null);
 
-		if (exports.measureTimings) {
+		if (Potree.measureTimings) {
 			performance.mark("renderNodes-end");
 			performance.measure("render.renderNodes", "renderNodes-start", "renderNodes-end");
 		}
