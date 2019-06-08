@@ -188,11 +188,12 @@ class ModelView extends React.Component {
             const objLoader = new THREE.OBJLoader();
             objLoader.setMaterials(materials);
             objLoader.load(this.objFilePath(), (object) => {
-                
-                object.position.set(this.pointCloud.position.x, 
-                                    this.pointCloud.position.y, 
-                                    this.pointCloud.position.z);
-                
+                const bboxWorld = this.pointCloud.getBoundingBoxWorld();
+                const pcCenter = new THREE.Vector3();
+                bboxWorld.getCenter(pcCenter);
+
+                object.position.set(pcCenter.x, pcCenter.y, pcCenter.z);
+
                 // Bring the model close to center
                 if (object.children.length > 0){
                   const geom = object.children[0].geometry;
@@ -200,10 +201,11 @@ class ModelView extends React.Component {
                   // Compute center
                   geom.computeBoundingBox();
 
-                  const center = geom.boundingBox.getCenter();
+                  let center = new THREE.Vector3();
+                  geom.boundingBox.getCenter(center);
 
-                  object.translateX(-center.x + this.pointCloud.boundingBox.max.x / 2);
-                  object.translateY(-center.y + this.pointCloud.boundingBox.max.y / 2);
+                  object.translateX(-center.x);
+                  object.translateY(-center.y);
                   object.translateZ(-center.z);
                 } 
 

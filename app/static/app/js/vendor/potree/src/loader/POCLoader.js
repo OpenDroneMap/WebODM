@@ -109,7 +109,9 @@ export class POCLoader {
 					pco.nodes = nodes;
 
 					callback(pco);
-				}
+				}else if (xhr.status === 404){
+                    callback();
+                }
 			};
 
 			xhr.send(null);
