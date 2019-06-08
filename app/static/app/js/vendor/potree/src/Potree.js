@@ -118,6 +118,7 @@ export function loadPointCloud(path, name, callback){
 	} else if (path.indexOf('ept.json') > 0) {
 		Potree.EptLoader.load(path, function(geometry) {
 			if (!geometry) {
+                callback({type: 'loading_failed'});
 				console.error(new Error(`failed to load point cloud from URL: ${path}`));
 			}
 			else {
@@ -129,7 +130,7 @@ export function loadPointCloud(path, name, callback){
 		// We check if the path string starts with 'greyhound:', if so we assume it's a greyhound server URL.
 		GreyhoundLoader.load(path, function (geometry) {
 			if (!geometry) {
-				//callback({type: 'loading_failed'});
+				callback({type: 'loading_failed'});
 				console.error(new Error(`failed to load point cloud from URL: ${path}`));
 			} else {
 				let pointcloud = new PointCloudOctree(geometry);
@@ -139,7 +140,7 @@ export function loadPointCloud(path, name, callback){
 	} else if (path.indexOf('cloud.js') > 0) {
 		POCLoader.load(path, function (geometry) {
 			if (!geometry) {
-				//callback({type: 'loading_failed'});
+				callback({type: 'loading_failed'});
 				console.error(new Error(`failed to load point cloud from URL: ${path}`));
 			} else {
 				let pointcloud = new PointCloudOctree(geometry);
@@ -149,7 +150,7 @@ export function loadPointCloud(path, name, callback){
 	} else if (path.indexOf('.vpc') > 0) {
 		PointCloudArena4DGeometry.load(path, function (geometry) {
 			if (!geometry) {
-				//callback({type: 'loading_failed'});
+				callback({type: 'loading_failed'});
 				console.error(new Error(`failed to load point cloud from URL: ${path}`));
 			} else {
 				let pointcloud = new PointCloudArena4D(geometry);
@@ -157,7 +158,7 @@ export function loadPointCloud(path, name, callback){
 			}
 		});
 	} else {
-		//callback({'type': 'loading_failed'});
+		callback({'type': 'loading_failed'});
 		console.error(new Error(`failed to load point cloud from URL: ${path}`));
 	}
 };
