@@ -1,8 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  */
-var THREE = require('./potree/js/three');
-
 THREE.OBJLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;

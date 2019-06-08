@@ -8,44 +8,38 @@ class AssetDownloadButtons extends React.Component {
         disabled: false,
         direction: "down", // or "up",
         buttonClass: "btn-primary",
-        task: null
+        task: null,
+        showLabel: true
     };
 
     static propTypes = {
         disabled: PropTypes.bool,
         task: PropTypes.object.isRequired,
         direction: PropTypes.string,
-        buttonClass: PropTypes.string
+        buttonClass: PropTypes.string,
+        showLabel: PropTypes.bool
     };
 
     constructor(props){
         super();
-
-        this.downloadAsset = this.downloadAsset.bind(this);
-    }
-
-    downloadAsset(asset){
-        return (e) => {
-            e.preventDefault();
-            location.href = asset.downloadUrl(this.props.task.project, this.props.task.id)
-        };
     }
 
     render(){
         const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
 
-        return (<div className={"asset-download-buttons btn-group " + (this.props.direction === "up" ? "dropup" : "")}>
+        return (<div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
           <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
-            <i className="glyphicon glyphicon-download"></i> Download Assets
+            <i className="glyphicon glyphicon-download"></i>{this.props.showLabel ? " Download Assets" : ""}
           </button>
+          {this.props.showLabel ? 
           <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
                 <span className="caret"></span>
-          </button>
+          </button> : ""}
           <ul className="dropdown-menu">
             {assetDownloads.map((asset, i) => {
                 if (!asset.separator){
                     return (<li key={i}>
-                            <a href="javascript:void(0);" onClick={this.downloadAsset(asset)}><i className={asset.icon + " fa-fw"}></i> {asset.label}</a>
+                            <a href={asset.downloadUrl(this.props.task.project, this.props.task.id)}><i className={asset.icon + " fa-fw"}></i> {asset.label}</a>
                         </li>);
                 }else{
                     return (<li key={i} className="divider"></li>);
