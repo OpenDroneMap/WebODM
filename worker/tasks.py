@@ -60,6 +60,8 @@ def cleanup_tmp_directory():
 
 @app.task
 def process_task(taskId):
+    have_lock = False
+
     try:
         lock = redis_client.lock('task_lock_{}'.format(taskId))
         have_lock = lock.acquire(blocking=False)
