@@ -105,14 +105,16 @@ def process_task(taskId):
                     e, traceback.format_exc()))
             if settings.TESTING: raise e
     finally:
+        if cancel_monitor is not None:
+            cancel_monitor()
+
         try:
             redis_client.delete(lock_id)
         except redis.exceptions.RedisError:
             # Ignore errors, the lock will expire at some point
             pass
 
-        if cancel_monitor is not None:
-            cancel_monitor()
+
 
 def get_pending_tasks():
     # All tasks that have a processing node assigned
