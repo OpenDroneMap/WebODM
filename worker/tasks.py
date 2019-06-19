@@ -18,7 +18,7 @@ from webodm import settings
 from .celery import app
 import redis
 
-logger = get_task_logger(__name__)
+logger = get_task_logger("app.logger")
 redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
 
 @app.task
@@ -74,6 +74,7 @@ def setInterval(interval, func, *args):
 def process_task(taskId):
     lock_id = 'task_lock_{}'.format(taskId)
     cancel_monitor = None
+    delete_lock = True
 
     try:
         task_lock_last_update = redis_client.getset(lock_id, time.time())
@@ -81,6 +82,7 @@ def process_task(taskId):
             # Check if lock has expired
             if time.time() - float(task_lock_last_update) <= 30:
                 # Locked
+                delete_lock = False
                 return
             else:
                 # Expired
@@ -89,7 +91,7 @@ def process_task(taskId):
         # Set lock
         def update_lock():
             redis_client.set(lock_id, time.time())
-        cancel_monitor = setInterval(10, update_lock)
+        cancel_monitor = setInterval(5, update_lock)
 
         try:
             task = Task.objects.get(pk=taskId)
@@ -108,11 +110,12 @@ def process_task(taskId):
         if cancel_monitor is not None:
             cancel_monitor()
 
-        try:
-            redis_client.delete(lock_id)
-        except redis.exceptions.RedisError:
-            # Ignore errors, the lock will expire at some point
-            pass
+        if delete_lock:
+            try:
+                redis_client.delete(lock_id)
+            except redis.exceptions.RedisError:
+                # Ignore errors, the lock will expire at some point
+                pass
 
 
 
