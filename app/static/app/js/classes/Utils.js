@@ -1,3 +1,5 @@
+const FileSaver = require('file-saver');
+
 let escapeEntityMap = {
   "&": "&amp;",
   "<": "&lt;",
@@ -83,26 +85,8 @@ export default {
     },
 
     saveAs: function(text, filename){
-      function save(uri, filename) {
-        let link = document.createElement('a');
-        if (typeof link.download === 'string') {
-          link.href = uri;
-          link.download = filename;
-
-          //Firefox requires the link to be in the body
-          document.body.appendChild(link);
-
-          //simulate click
-          link.click();
-
-          //remove the link when done
-          document.body.removeChild(link);
-        } else {
-          window.open(uri);
-        }
-      }
-
-      save("data:application/octet-stream," + encodeURIComponent(text), filename);
+      var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+      FileSaver.saveAs(blob, filename);
     }
 };
 
