@@ -116,15 +116,7 @@ class ProcessingNode(models.Model):
 
         opts = self.options_list_to_dict(options)
 
-        if not settings.TESTING:
-            task = api_client.create_task(images, opts, name, progress_callback)
-        else:
-            # The create_task function uses multi-threaded parallel uploads
-            # but Django tests cannot cope with DB updates from different threads
-            # (and progress_callback often updates the DB). So during testing
-            # we use the fallback function equivalent which is single-threaded
-            task = api_client.create_task_fallback(images, opts, name, progress_callback)
-
+        task = api_client.create_task(images, opts, name, progress_callback)
         return task.uuid
 
     def get_task_info(self, uuid, with_output=None):
