@@ -570,6 +570,9 @@ class TaskListItem extends React.Component {
       statusLabel = getStatusLabel("Set a processing node");
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;
+    }else if (task.partial && !task.pending_action){
+      statusIcon = "fa fa-hourglass-3";
+      statusLabel = getStatusLabel("Waiting for image upload...");
     }else{
       let progress = 100;
       let type = 'done';

@@ -81,6 +81,7 @@ class ProjectListItem extends React.Component {
       progress: 0,
       files: [],
       totalCount: 0,
+      uploadedCount: 0,
       totalBytes: 0,
       totalBytesSent: 0,
       lastUpdated: 0
@@ -109,9 +110,9 @@ class ProjectListItem extends React.Component {
     if (this.hasPermission("add")){
       this.dz = new Dropzone(this.dropzone, {
           paramName: "images",
-          url : `/api/projects/${this.state.data.id}/tasks/`,
-          parallelUploads: 2147483647,
-          uploadMultiple: true,
+          url : 'TO_BE_CHANGED',
+          parallelUploads: 10,
+          uploadMultiple: false,
           acceptedFiles: "image/*,text/*",
           autoProcessQueue: false,
           createImageThumbnails: false,
@@ -155,26 +156,38 @@ class ProjectListItem extends React.Component {
           }
       });
 
-      this.dz.on("totaluploadprogress", (progress, totalBytes, totalBytesSent) => {
-          // Limit updates since this gets called a lot
-          let now = (new Date()).getTime();
-
-          // Progress 100 is sent multiple times at the end
-          // this makes it so that we update the state only once.
-          if (progress === 100) now = now + 9999999999;
-
-          if (this.state.upload.lastUpdated + 500 < now){
-              this.setUploadState({
-                progress, totalBytes, totalBytesSent, lastUpdated: now
-              });
+      this.dz.on("addedfiles", files => {
+          let totalBytes = 0;
+          for (let i = 0; i < files.length; i++){
+              totalBytes += files[i].size;
+              files[i].deltaBytesSent = 0;
+              files[i].trackedBytesSent = 0;
+              files[i].retries = 0;
           }
-        })
-        .on("addedfiles", files => {
+
           this.setUploadState({
             editing: true,
             totalCount: this.state.upload.totalCount + files.length,
-            files
+            files,
+            totalBytes: this.state.upload.totalBytes + totalBytes
           });
+        })
+        .on("uploadprogress", (file, progress, bytesSent) => {
+            const now = new Date().getTime();
+
+            if (now - this.state.upload.lastUpdated > 500){
+                file.deltaBytesSent = bytesSent - file.deltaBytesSent;
+                file.trackedBytesSent += file.deltaBytesSent;
+
+                const totalBytesSent = this.state.upload.totalBytesSent + file.deltaBytesSent;
+                const progress = totalBytesSent / this.state.upload.totalBytes * 100;
+
+                this.setUploadState({
+                    progress,
+                    totalBytesSent,
+                    lastUpdated: now
+                });
+            }
         })
         .on("transformcompleted", (file, total) => {
           if (this.dz._resizeMap) this.dz._resizeMap[file.name] = this.dz._taskInfo.resizeSize / Math.max(file.width, file.height);
@@ -192,29 +205,89 @@ class ProjectListItem extends React.Component {
         .on("transformend", () => {
           this.setUploadState({resizing: false, uploading: true});
         })
-        .on("completemultiple", (files) => {
-          // Check
-          const invalidFilesCount = files.filter(file => file.status !== "success").length;
-          let success = files.length > 0 && invalidFilesCount === 0;
+        .on("complete", (file) => {
+            // Retry
+            const retry = () => {
+                const MAX_RETRIES = 10;
 
-          // All files have uploaded!
-          if (success){
-            this.setUploadState({uploading: false});
+                if (file.retries < MAX_RETRIES){
+                    // Update progress
+                    const totalBytesSent = this.state.upload.totalBytesSent - file.trackedBytesSent;
+                    const progress = totalBytesSent / this.state.upload.totalBytes * 100;
+        
+                    this.setUploadState({
+                        progress,
+                        totalBytesSent,
+                    });
+        
+                    file.status = Dropzone.QUEUED;
+                    file.deltaBytesSent = 0;
+                    file.trackedBytesSent = 0;
+                    file.retries++;
+                    this.dz.processQueue();
+                }else{
+                    throw new Error(`Cannot upload ${file.name}, exceeded max retries (${MAX_RETRIES})`);
+                }
+            };
+
             try{
-              let response = JSON.parse(files[0].xhr.response);
-              if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
-              
-              this.newTaskAdded();
+                if (file.status === "error"){
+                    retry();
+                }else{
+                    // Check response
+                    let response = JSON.parse(file.xhr.response);
+                    if (response.success){
+                        // Update progress by removing the tracked progress and 
+                        // use the file size as the true number of bytes
+                        let totalBytesSent = this.state.upload.totalBytesSent + file.size;
+                        if (file.trackedBytesSent) totalBytesSent -= file.trackedBytesSent;
+        
+                        const progress = totalBytesSent / this.state.upload.totalBytes * 100;
+        
+                        this.setUploadState({
+                            progress,
+                            totalBytesSent,
+                            uploadedCount: this.state.upload.uploadedCount + 1
+                        });
+
+                        this.dz.processQueue();
+                    }else{
+                        retry();
+                    }
+                }
             }catch(e){
-              this.setUploadState({error: `Invalid response from server: ${e.message}`, uploading: false})
+                this.setUploadState({error: `${e.message}`, uploading: false});
+                this.dz.cancelUpload();
             }
-          }else{
-            this.setUploadState({
-              totalCount: this.state.upload.totalCount - invalidFilesCount,
-              uploading: false,
-              error: `${invalidFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .png) and GCP files (.txt) can be uploaded. Try again.`
-            });
-          }
+        })
+        .on("queuecomplete", () => {
+            const remainingFilesCount = this.state.upload.totalCount - this.state.upload.uploadedCount;
+            if (remainingFilesCount === 0){
+                // All files have uploaded!
+                this.setUploadState({uploading: false});
+
+                $.ajax({
+                    url: `/api/projects/${this.state.data.id}/tasks/${this.dz._taskInfo.id}/commit/`,
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    type: 'POST'
+                  }).done((task) => {
+                    if (task && task.id){
+                        this.newTaskAdded();
+                    }else{
+                        this.setUploadState({error: `Cannot create new task. Invalid response from server: ${JSON.stringify(task)}`});
+                    }
+                  }).fail(() => {
+                    this.setUploadState({error: "Cannot create new task. Please try again later."});
+                  });
+            }else if (this.dz.getQueuedFiles() === 0){
+                // Done but didn't upload all?
+                this.setUploadState({
+                    totalCount: this.state.upload.totalCount - remainingFilesCount,
+                    uploading: false,
+                    error: `${remainingFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .png) and GCP files (.txt) can be uploaded. Try again.`
+                });
+            }
         })
         .on("reset", () => {
           this.resetUploadState();
@@ -222,20 +295,6 @@ class ProjectListItem extends React.Component {
         .on("dragenter", () => {
           if (!this.state.upload.editing){
             this.resetUploadState();
-          }
-        })
-        .on("sending", (file, xhr, formData) => {
-          const taskInfo = this.dz._taskInfo;
-
-          // Safari does not have support for has on FormData
-          // as of December 2017
-          if (!formData.has || !formData.has("name")) formData.append("name", taskInfo.name);
-          if (!formData.has || !formData.has("options")) formData.append("options", JSON.stringify(taskInfo.options));
-          if (!formData.has || !formData.has("processing_node")) formData.append("processing_node", taskInfo.selectedNode.id);
-          if (!formData.has || !formData.has("auto_processing_node")) formData.append("auto_processing_node", taskInfo.selectedNode.key == "auto");
-
-          if (taskInfo.resizeMode === ResizeModes.YES){
-            if (!formData.has || !formData.has("resize_to")) formData.append("resize_to", taskInfo.resizeSize);
           }
         });
     }
@@ -303,9 +362,38 @@ class ProjectListItem extends React.Component {
       this.setUploadState({uploading: true, editing: false});
     }
 
-    setTimeout(() => {
-      this.dz.processQueue();
-    }, 1);
+    // Create task
+    const formData = {
+        name: taskInfo.name,
+        options: taskInfo.options,
+        processing_node:  taskInfo.selectedNode.id,
+        auto_processing_node: taskInfo.selectedNode.key == "auto",
+        partial: true
+    };
+    if (taskInfo.resizeMode === ResizeModes.YES){
+        formData["resize_to"] = taskInfo.resizeSize
+    }
+
+    $.ajax({
+        url: `/api/projects/${this.state.data.id}/tasks/`,
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        dataType: 'json',
+        type: 'POST'
+      }).done((task) => {
+        if (task && task.id){
+            console.log(this.dz._taskInfo);
+            this.dz._taskInfo.id = task.id;
+            this.dz.options.url = `/api/projects/${this.state.data.id}/tasks/${task.id}/upload/`;
+            this.dz.processQueue();
+        }else{
+            this.setState({error: `Cannot create new task. Invalid response from server: ${JSON.stringify(task)}`});
+            this.handleTaskCanceled();
+        }
+      }).fail(() => {
+        this.setState({error: "Cannot create new task. Please try again later."});
+        this.handleTaskCanceled();
+      });
   }
 
   handleTaskCanceled = () => {
