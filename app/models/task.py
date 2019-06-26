@@ -156,6 +156,7 @@ class Task(models.Model):
                 'deferred_path': 'orthophoto_tiles.zip',
                 'deferred_compress_dir': 'orthophoto_tiles'
             },
+            'cameras.json': 'cameras.json',
     }
 
     STATUS_CODES = (

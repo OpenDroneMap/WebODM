@@ -121,6 +121,7 @@ class NewTaskPanel extends React.Component {
             <EditTaskForm
               onFormLoaded={this.handleFormTaskLoaded}
               onFormChanged={this.handleFormChanged}
+              inReview={this.state.inReview}
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
 
