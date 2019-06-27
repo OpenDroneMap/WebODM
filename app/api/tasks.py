@@ -174,6 +174,10 @@ class TaskViewSet(viewsets.ViewSet):
 
         task.partial = False
         task.images_count = models.ImageUpload.objects.filter(task=task).count()
+
+        if task.images_count < 2:
+            raise exceptions.ValidationError(detail="You need to upload at least 2 images before commit")
+
         task.save()
         worker_tasks.process_task.delay(task.id)
 

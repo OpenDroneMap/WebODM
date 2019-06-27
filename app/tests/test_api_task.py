@@ -174,6 +174,9 @@ class TestApiTask(BootTransactionTestCase):
         # Upload progress callback has been called
         self.assertTrue(testWatch.get_calls_count("Task.process.callback") > 0)
 
+        # This is not a partial task
+        self.assertFalse(resized_task.partial)
+
         # Case with malformed GCP file option
         with open("app/fixtures/gcp_malformed.txt", 'r') as malformed_gcp:
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -301,11 +304,11 @@ class TestApiTask(BootTransactionTestCase):
             # Progress is 100%
             self.assertTrue(task.running_progress == 1.0)
 
-        handler.assert_any_call(
-            sender=Task,
-            task_id=task.id,
-            signal=task_completed,
-        )
+            handler.assert_any_call(
+                sender=Task,
+                task_id=task.id,
+                signal=task_completed,
+            )
 
         # Processing node should have a "rerun_from" option
         pnode_rerun_from_opts = list(filter(lambda d: 'name' in d and d['name'] == 'rerun-from', pnode.available_options))[0]
@@ -696,7 +699,105 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertTrue(task.processing_node is None)
 
+    def test_task_chunked_uploads(self):
+        node_odm = start_processing_node()
+        client = APIClient()
 
+        user = User.objects.get(username="testuser")
+        self.assertFalse(user.is_superuser)
+
+        project = Project.objects.create(
+            owner=user,
+            name="test project"
+        )
+
+        pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+
+        # task creation via chunked upload
+        image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
+        image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
+
+        # Cannot create partial task without credentials
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'auto_processing_node': 'true',
+            'partial': 'true'
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN);
+
+        client.login(username="testuser", password="test1234")
+
+        # Can after login
+        res = client.post("/api/projects/{}/tasks/".format(project.id), {
+            'auto_processing_node': 'true',
+            'partial': 'true'
+        }, format="multipart")
+        self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+
+        task = Task.objects.get(pk=res.data['id'])
+
+        # It's partial
+        self.assertTrue(task.partial)
+
+        # It should not get processed
+        worker.tasks.process_pending_tasks()
+        time.sleep(DELAY)
+        self.assertEqual(task.upload_progress, 0.0)
+
+        # Upload to inexisting task lead to 404
+        wrong_task_id = '11111111-1111-1111-1111-111111111111'
+        res = client.post("/api/projects/{}/tasks/{}/upload/".format(project.id, wrong_task_id), {
+            'images': [image1],
+        }, format="multipart")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        image1.seek(0)
+
+        # Upload works with one image
+        res = client.post("/api/projects/{}/tasks/{}/upload/".format(project.id, task.id), {
+            'images': [image1],
+        }, format="multipart")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['success'], True)
+        image1.seek(0)
+
+        # Cannot commit with a single image
+        res = client.post("/api/projects/{}/tasks/{}/commit/".format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # And second image
+        res = client.post("/api/projects/{}/tasks/{}/upload/".format(project.id, task.id), {
+            'images': [image2],
+        }, format="multipart")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['success'], True)
+        image2.seek(0)
+
+        # Task hasn't started
+        self.assertEqual(task.upload_progress, 0.0)
+
+        # Can commit with two images
+        res = client.post("/api/projects/{}/tasks/{}/commit/".format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['id'], str(task.id))
+
+        task.refresh_from_db()
+
+        # No longer partial
+        self.assertFalse(task.partial)
+
+        # Image count has been updated
+        self.assertEqual(task.images_count, 2)
+
+        # Make sure processing begins
+        worker.tasks.process_pending_tasks()
+        time.sleep(DELAY)
+
+        task.refresh_from_db()
+        self.assertEqual(task.upload_progress, 1.0)
+
+        image1.close()
+        image2.close()
+
+        node_odm.terminate()
 
 
 
