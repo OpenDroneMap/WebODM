@@ -60,7 +60,15 @@ class NewTaskPanel extends React.Component {
       this.taskForm.saveLastPresetToStorage();
       Storage.setItem('resize_size', this.state.resizeSize);
       Storage.setItem('resize_mode', this.state.resizeMode);
-      if (this.props.onSave) this.props.onSave(this.getTaskInfo());
+
+      const taskInfo = this.getTaskInfo();
+      if (taskInfo.selectedNode.key != "auto"){
+        Storage.setItem('last_processing_node', taskInfo.selectedNode.id);
+      }else{
+        Storage.setItem('last_processing_node', '');
+      }
+
+      if (this.props.onSave) this.props.onSave(taskInfo);
     }
   }
 
@@ -119,6 +127,7 @@ class NewTaskPanel extends React.Component {
           <div className={this.state.inReview ? "disabled" : ""}>
             <p>{this.props.filesCount} files selected. Please check these additional options:</p>
             <EditTaskForm
+              selectedNode={Storage.getItem("last_processing_node") || "auto"}
               onFormLoaded={this.handleFormTaskLoaded}
               onFormChanged={this.handleFormChanged}
               inReview={this.state.inReview}

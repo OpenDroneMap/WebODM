@@ -102,6 +102,7 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
 
         task.pending_action = pending_action
+        task.partial = False # Otherwise this will not be processed
         task.last_error = None
         task.save()
 
@@ -168,6 +169,8 @@ class TaskViewSet(viewsets.ViewSet):
             task = self.queryset.get(pk=pk, project=project_pk)
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
+
+        # TODO: check at least two images are present
 
         task.partial = False
         task.images_count = models.ImageUpload.objects.filter(task=task).count()

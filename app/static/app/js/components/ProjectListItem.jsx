@@ -5,15 +5,12 @@ import TaskList from './TaskList';
 import NewTaskPanel from './NewTaskPanel';
 import ImportTaskPanel from './ImportTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
-import ProgressBar from './ProgressBar';
 import ErrorMessage from './ErrorMessage';
 import EditProjectDialog from './EditProjectDialog';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
-import ResizeModes from '../classes/ResizeModes';
-import Gcp from '../classes/Gcp';
 import $ from 'jquery';
 
 class ProjectListItem extends React.Component {
@@ -75,8 +72,6 @@ class ProjectListItem extends React.Component {
     return {
       uploading: false,
       editing: false,
-      resizing: false,
-      resizedImages: 0,
       error: "",
       progress: 0,
       files: [],
@@ -122,37 +117,6 @@ class ProjectListItem extends React.Component {
           
           headers: {
             [csrf.header]: csrf.token
-          },
-
-          transformFile: (file, done) => {
-            // Resize image?
-            if ((this.dz.options.resizeWidth || this.dz.options.resizeHeight) && file.type.match(/image.*/)) {
-              return this.dz.resizeImage(file, this.dz.options.resizeWidth, this.dz.options.resizeHeight, this.dz.options.resizeMethod, done);
-            // Resize GCP? This should always be executed last (we sort in transformstart)
-            } else if (this.dz.options.resizeWidth && file.type.match(/text.*/)){
-              // Read GCP content
-              const fileReader = new FileReader();
-              fileReader.onload = (e) => {
-                const originalGcp = new Gcp(e.target.result);
-                const resizedGcp = originalGcp.resize(this.dz._resizeMap);
-                // Create new GCP file
-                let gcp = new Blob([resizedGcp.toString()], {type: "text/plain"});
-                gcp.lastModifiedDate = file.lastModifiedDate;
-                gcp.lastModified = file.lastModified;
-                gcp.name = file.name;
-                gcp.previewElement = file.previewElement;
-                gcp.previewTemplate = file.previewTemplate;
-                gcp.processing = file.processing;
-                gcp.status = file.status;
-                gcp.upload = file.upload;
-                gcp.upload.total = gcp.size; // not a typo
-                gcp.webkitRelativePath = file.webkitRelativePath;
-                done(gcp);
-              };
-              fileReader.readAsText(file);
-            } else {
-              return done(file);
-            }
           }
       });
 
@@ -188,22 +152,6 @@ class ProjectListItem extends React.Component {
                     lastUpdated: now
                 });
             }
-        })
-        .on("transformcompleted", (file, total) => {
-          if (this.dz._resizeMap) this.dz._resizeMap[file.name] = this.dz._taskInfo.resizeSize / Math.max(file.width, file.height);
-          if (this.dz.options.resizeWidth) this.setUploadState({resizedImages: total});
-        })
-        .on("transformstart", (files) => {
-          if (this.dz.options.resizeWidth){
-            // Sort so that a GCP file is always last
-            files.sort(f => f.type.match(/text.*/) ? 1 : -1)
-
-            // Create filename --> resize ratio dict
-            this.dz._resizeMap = {};
-          }
-        })
-        .on("transformend", () => {
-          this.setUploadState({resizing: false, uploading: true});
         })
         .on("complete", (file) => {
             // Retry
@@ -352,15 +300,7 @@ class ProjectListItem extends React.Component {
   handleTaskSaved(taskInfo){
     this.dz._taskInfo = taskInfo; // Allow us to access the task info from dz
 
-    // Update dropzone settings
-    if (taskInfo.resizeMode === ResizeModes.YESINBROWSER){
-      this.dz.options.resizeWidth = taskInfo.resizeSize;
-      this.dz.options.resizeQuality = 1.0;
-
-      this.setUploadState({resizing: true, editing: false});
-    }else{
-      this.setUploadState({uploading: true, editing: false});
-    }
+    this.setUploadState({uploading: true, editing: false});
 
     // Create task
     const formData = {
@@ -370,9 +310,6 @@ class ProjectListItem extends React.Component {
         auto_processing_node: taskInfo.selectedNode.key == "auto",
         partial: true
     };
-    if (taskInfo.resizeMode === ResizeModes.YES){
-        formData["resize_to"] = taskInfo.resizeSize
-    }
 
     $.ajax({
         url: `/api/projects/${this.state.data.id}/tasks/`,
@@ -382,7 +319,6 @@ class ProjectListItem extends React.Component {
         type: 'POST'
       }).done((task) => {
         if (task && task.id){
-            console.log(this.dz._taskInfo);
             this.dz._taskInfo.id = task.id;
             this.dz.options.url = `/api/projects/${this.state.data.id}/tasks/${task.id}/upload/`;
             this.dz.processQueue();
@@ -518,14 +454,7 @@ class ProjectListItem extends React.Component {
         <i className="drag-drop-icon fa fa-inbox"></i>
         <div className="row">
           {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload}/> : ""}
-          {this.state.upload.resizing ? 
-            <ProgressBar
-              current={this.state.upload.resizedImages}
-              total={this.state.upload.totalCount}
-              template={(info) => `Resized ${info.current} of ${info.total} images. Your browser might slow down during this process.`}
-            /> 
-          : ""}
-
+          
           {this.state.upload.error !== "" ? 
             <div className="alert alert-warning alert-dismissible">
                 <button type="button" className="close" aria-label="Close" onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>

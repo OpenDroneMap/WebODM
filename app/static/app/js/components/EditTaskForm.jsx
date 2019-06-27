@@ -160,6 +160,8 @@ class EditTaskForm extends React.Component {
             }else{
               this.selectNodeByKey(this.props.task.processing_node);
             }
+          }else if (this.props.selectedNode){
+            this.selectNodeByKey(this.props.selectedNode);
           }else{
             this.selectNodeByKey("auto");
           }
@@ -307,6 +309,10 @@ class EditTaskForm extends React.Component {
   selectNodeByKey(key){
     let node = this.state.processingNodes.find(node => node.key == key);
     if (node) this.setState({selectedNode: node});
+    else{
+        console.warn(`Node ${key} does not exist, selecting auto`);
+        this.selectNodeByKey("auto");
+    }
   }
 
   handleSelectNode(e){
