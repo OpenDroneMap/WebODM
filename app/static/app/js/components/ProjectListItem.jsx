@@ -11,6 +11,7 @@ import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
+import ResizeModes from '../classes/ResizeModes';
 import $ from 'jquery';
 
 class ProjectListItem extends React.Component {
@@ -106,7 +107,7 @@ class ProjectListItem extends React.Component {
       this.dz = new Dropzone(this.dropzone, {
           paramName: "images",
           url : 'TO_BE_CHANGED',
-          parallelUploads: 10,
+          parallelUploads: 6,
           uploadMultiple: false,
           acceptedFiles: "image/*,text/*",
           autoProcessQueue: false,
@@ -310,6 +311,10 @@ class ProjectListItem extends React.Component {
         auto_processing_node: taskInfo.selectedNode.key == "auto",
         partial: true
     };
+
+    if (taskInfo.resizeMode === ResizeModes.YES){
+        formData.resize_to = taskInfo.resizeSize;
+    }
 
     $.ajax({
         url: `/api/projects/${this.state.data.id}/tasks/`,
