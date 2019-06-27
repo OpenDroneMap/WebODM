@@ -72,6 +72,9 @@ body,
 a, a:hover, a:focus{
 	color: theme("tertiary");
 }
+.progress-bar-success{
+    background-color: theme("tertiary");
+}
 
 /* Button primary */
 #navbar-top .navbar-top-links,{

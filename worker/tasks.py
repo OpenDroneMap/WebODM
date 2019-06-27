@@ -124,10 +124,11 @@ def get_pending_tasks():
     # Or that need one assigned (via auto)
     # or tasks that need a status update
     # or tasks that have a pending action
-    return Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
+    # no partial tasks allowed
+    return Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True, partial=False) |
                                 Q(Q(status=None) | Q(status__in=[status_codes.QUEUED, status_codes.RUNNING]),
-                                  processing_node__isnull=False) |
-                                Q(pending_action__isnull=False))
+                                  processing_node__isnull=False, partial=False) |
+                                Q(pending_action__isnull=False, partial=False))
 
 @app.task
 def process_pending_tasks():

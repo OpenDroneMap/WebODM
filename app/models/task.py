@@ -156,6 +156,7 @@ class Task(models.Model):
                 'deferred_path': 'orthophoto_tiles.zip',
                 'deferred_compress_dir': 'orthophoto_tiles'
             },
+            'cameras.json': 'cameras.json',
     }
 
     STATUS_CODES = (
@@ -212,6 +213,7 @@ class Task(models.Model):
                                         blank=True)
     import_url = models.TextField(null=False, default="", blank=True, help_text="URL this task is imported from (only for imported tasks)")
     images_count = models.IntegerField(null=False, blank=True, default=0, help_text="Number of images associated with this task")
+    partial = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing.")
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -444,7 +446,6 @@ class Task(models.Model):
                         nonlocal last_update
 
                         time_has_elapsed = time.time() - last_update >= 2
-
                         if time_has_elapsed:
                             testWatch.manual_log_call("Task.process.callback")
                             self.check_if_canceled()
@@ -482,13 +483,11 @@ class Task(models.Model):
                         self.status = status_codes.CANCELED
                         self.pending_action = None
                         self.save()
-                    elif self.import_url:
-                        # Imported tasks need no special action
+                    else:
+                        # Tasks with no processing node or UUID need no special action
                         self.status = status_codes.CANCELED
                         self.pending_action = None
                         self.save()
-                    else:
-                        raise NodeServerError("Cannot cancel a task that has no processing node or UUID")
 
                 elif self.pending_action == pending_actions.RESTART:
                     logger.info("Restarting {}".format(self))

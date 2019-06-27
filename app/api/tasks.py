@@ -102,6 +102,7 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
 
         task.pending_action = pending_action
+        task.partial = False # Otherwise this will not be processed
         task.last_error = None
         task.save()
 
@@ -158,28 +159,84 @@ class TaskViewSet(viewsets.ViewSet):
         serializer = TaskSerializer(task)
         return Response(serializer.data)
 
-    def create(self, request, project_pk=None):
-        project = get_and_check_project(request, project_pk, ('change_project', ))
-        
+    @detail_route(methods=['post'])
+    def commit(self, request, pk=None, project_pk=None):
+        """
+        Commit a task after all images have been uploaded
+        """
+        get_and_check_project(request, project_pk, ('change_project', ))
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except (ObjectDoesNotExist, ValidationError):
+            raise exceptions.NotFound()
+
+        # TODO: check at least two images are present
+
+        task.partial = False
+        task.images_count = models.ImageUpload.objects.filter(task=task).count()
+
+        if task.images_count < 2:
+            raise exceptions.ValidationError(detail="You need to upload at least 2 images before commit")
+
+        task.save()
+        worker_tasks.process_task.delay(task.id)
+
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @detail_route(methods=['post'])
+    def upload(self, request, pk=None, project_pk=None):
+        """
+        Add images to a task
+        """
+        get_and_check_project(request, project_pk, ('change_project', ))
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except (ObjectDoesNotExist, ValidationError):
+            raise exceptions.NotFound()
+
         files = flatten_files(request.FILES)
 
-        if len(files) <= 1:
-            raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
+        if len(files) == 0:
+            raise exceptions.ValidationError(detail="No files uploaded")
 
         with transaction.atomic():
-            task = models.Task.objects.create(project=project,
-                                              pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
-
             for image in files:
                 models.ImageUpload.objects.create(task=task, image=image)
-            task.images_count = len(files)
 
-            # Update other parameters such as processing node, task name, etc.
+        return Response({'success': True}, status=status.HTTP_200_OK)
+
+    def create(self, request, project_pk=None):
+        project = get_and_check_project(request, project_pk, ('change_project', ))
+
+        # If this is a partial task, we're going to upload images later
+        # for now we just create a placeholder task.
+        if request.data.get('partial'):
+            task = models.Task.objects.create(project=project,
+                                              pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
             serializer = TaskSerializer(task, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+        else:
+            files = flatten_files(request.FILES)
 
-            worker_tasks.process_task.delay(task.id)
+            if len(files) <= 1:
+                raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
+
+            with transaction.atomic():
+                task = models.Task.objects.create(project=project,
+                                                  pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
+
+                for image in files:
+                    models.ImageUpload.objects.create(task=task, image=image)
+                task.images_count = len(files)
+
+                # Update other parameters such as processing node, task name, etc.
+                serializer = TaskSerializer(task, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+                worker_tasks.process_task.delay(task.id)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
