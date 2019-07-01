@@ -1,0 +1,24 @@
+.leaflet-control-elevationmap{
+  z-index: 999;
+
+  a.leaflet-control-elevationmap-button{
+    background: url(icon.png) no-repeat 0 0;
+    background-size: 26px 26px;
+    border-radius: 2px;
+  }
+
+  div.elevationmap-panel{ display: none; }
+  
+  .open{
+    a.leaflet-control-elevationmap-button{
+      display: none;
+    }
+
+    div.elevationmap-panel{
+      display: block;
+    }
+  }
+}
+.leaflet-touch .leaflet-control-elevationmap a {
+  background-position: 2px 2px;
+}

@@ -26,6 +26,7 @@ class Map extends React.Component {
     minzoom: 0,
     showBackground: false,
     opacity: 100,
+    opacityOnMap: true,
     mapType: "orthophoto",
     public: false
   };
@@ -36,6 +37,7 @@ class Map extends React.Component {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
     opacity: PropTypes.number,
+    opacityOnMap: PropTypes.bool,
     mapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
     public: PropTypes.bool
   };
@@ -263,6 +265,8 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       selectedOverlays: [],
       baseLayers: this.basemaps
     }).addTo(this.map);
+    
+    this.map.layerControl = this.autolayers;
 
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");
@@ -329,8 +333,21 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
   }
 
   componentDidUpdate(prevProps) {
+    let opacity = this.props.opacity / 100;
+    
+    Object.values(this.autolayers._layers)
+      .filter(layerContainer => layerContainer.overlay)
+      .map(layerContainer => layerContainer.layer)
+      .filter(layer => !this.imageryLayers.includes(layer))
+      .filter(layer => layer.setOpacity)
+      .forEach(layer => layer.setOpacity(opacity));
+    
+    
+    if (!this.props.opacityOnMap) {
+      opacity = 1;
+    }  
     this.imageryLayers.forEach(imageryLayer => {
-      imageryLayer.setOpacity(this.props.opacity / 100);
+      imageryLayer.setOpacity(opacity);
       this.updatePopupFor(imageryLayer);
     });
 

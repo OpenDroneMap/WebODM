@@ -1,0 +1,2 @@
+* Save the "ground" choice on the plugin panel
+* Consider fetching (or creating if it doesn't exist) a smaller version of the dsm/dtm. There is no need to work with a high resolution image in this case, and it should speed things up.

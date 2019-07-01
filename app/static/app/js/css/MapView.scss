@@ -13,10 +13,14 @@
         position: relative;
         top: 6px;
     }
+    
+    input[type="checkbox"]{
+      margin-left: 6px
+    }
 
     .opacity-slider{
         text-align: center;
-        width: 220px;
+        width: 225px;
         position: absolute;
         bottom: -32px;
         left: 50%;

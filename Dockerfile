@@ -18,11 +18,13 @@ RUN printf "deb     http://mirror.steadfast.net/debian/    stable main contrib n
 RUN printf "deb     http://mirror.steadfast.net/debian/    testing main contrib non-free\ndeb-src http://mirror.steadfast.net/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
 
 # Install Node.js GDAL, nginx, letsencrypt, psql
-RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx grass-core certbot && apt-get -qq install -y gettext-base cron postgresql-client-9.6
+RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev nginx certbot && apt-get -qq install -y gdal-bin grass-core libgdal-dev gettext-base cron postgresql-client-9.6
 
 # Install pip reqs
 ADD requirements.txt /webodm/
 RUN pip install -r requirements.txt
+ADD requirements3.txt /webodm/
+RUN pip3 install -r requirements3.txt
 
 ADD . /webodm/
 
