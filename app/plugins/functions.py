@@ -94,13 +94,9 @@ def build_plugins():
                     "Cannot generate webpack.config.js for {}, a path is missing: {}".format(plugin, ' '.join(build_paths)))
 
         # Check for webpack.config.js (if we need to build it)
-        if plugin.path_exists("public/webpack.config.js"):
-            if settings.DEV:
-                logger.info("Running webpack with watcher for {}".format(plugin.get_name()))
-                subprocess.Popen(['webpack-cli', '--watch'], cwd=plugin.get_path("public"))
-            elif not plugin.path_exists("public/build"):
-                logger.info("Running webpack for {}".format(plugin.get_name()))
-                subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
+        if plugin.path_exists("public/webpack.config.js") and not plugin.path_exists("public/build"):
+            logger.info("Running webpack for {}".format(plugin.get_name()))
+            subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
 
 
 def register_plugins():
