@@ -77,7 +77,7 @@ case $key in
     ;;
     --dev)
     export WO_DEBUG=YES
-		export WO_DEV=YES
+    export WO_DEV=YES
     dev_mode=true
     shift # past argument
     ;;
