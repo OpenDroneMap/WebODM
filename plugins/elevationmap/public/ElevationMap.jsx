@@ -8,7 +8,8 @@ import ElevationMapPanel from './ElevationMapPanel';
 class ElevationMapButton extends React.Component {
   static propTypes = {
     tasks: PropTypes.object.isRequired,
-    map: PropTypes.object.isRequired
+    map: PropTypes.object.isRequired,
+    layersControl: PropTypes.object.isRequired
   }
 
   constructor(props){
@@ -34,7 +35,7 @@ class ElevationMapButton extends React.Component {
         <a href="javascript:void(0);" 
             onClick={this.handleOpen} 
             className="leaflet-control-elevationmap-button leaflet-bar-part theme-secondary"></a>
-        <ElevationMapPanel map={this.props.map} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
+        <ElevationMapPanel map={this.props.map} layersControl={this.props.layersControl} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
     </div>);
   }
 }
@@ -47,7 +48,7 @@ export default L.Control.extend({
     onAdd: function (map) {
         var container = L.DomUtil.create('div', 'leaflet-control-elevationmap leaflet-bar leaflet-control');
         L.DomEvent.disableClickPropagation(container);
-        ReactDOM.render(<ElevationMapButton map={this.options.map} tasks={this.options.tasks} />, container);
+        ReactDOM.render(<ElevationMapButton map={this.options.map} layersControl={this.options.layersControl} tasks={this.options.tasks} />, container);
 
         return container;
     }

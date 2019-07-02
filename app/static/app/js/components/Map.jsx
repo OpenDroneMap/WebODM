@@ -206,11 +206,6 @@ class Map extends React.Component {
       zoomControl: false
     });
 
-    PluginsAPI.Map.triggerWillAddControls({
-      map: this.map,
-      tiles
-    });
-
     Leaflet.control.scale({
       maxWidth: 250,
     }).addTo(this.map);
@@ -264,7 +259,11 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       baseLayers: this.basemaps
     }).addTo(this.map);
     
-    this.map.layerControl = this.autolayers;
+    PluginsAPI.Map.triggerWillAddControls({
+      map: this.map,
+      layersControl: this.autolayers,
+      tiles
+    });
 
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");

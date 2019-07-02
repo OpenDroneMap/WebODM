@@ -14,7 +14,8 @@ export default class ElevationMapPanel extends React.Component {
     onClose: PropTypes.func.isRequired,
     tasks: PropTypes.object.isRequired,
     isShowed: PropTypes.bool.isRequired,
-    map: PropTypes.object.isRequired
+    map: PropTypes.object.isRequired,
+    layersControl: PropTypes.object.isRequired
   }
 
   constructor(props){
@@ -167,7 +168,7 @@ export default class ElevationMapPanel extends React.Component {
   }
 
   addGeoJSONFromURL = (url, cb) => {
-    const { map } = this.props;
+    const { map, layersControl } = this.props;
 
     $.getJSON(url)
      .done((geojson) => {
@@ -204,7 +205,7 @@ export default class ElevationMapPanel extends React.Component {
         
         this.setState({ previewLayer: featureGroup });
         this.state.previewLayer.addTo(map);
-        map.layerControl.addOverlay(this.state.previewLayer, "Elevation Map");
+        layersControl.addOverlay(this.state.previewLayer, "Elevation Map");
 
         cb();
       }catch(e){
@@ -215,11 +216,11 @@ export default class ElevationMapPanel extends React.Component {
   }
 
   removePreview = () => {
-    const { map } = this.props;
+    const { map, layersControl } = this.props;
 
     if (this.state.previewLayer){
       map.removeLayer(this.state.previewLayer);
-      map.layerControl.removeLayer(this.state.previewLayer);
+      layersControl.removeLayer(this.state.previewLayer);
       this.setState({previewLayer: null});
     }
   }
