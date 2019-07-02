@@ -35,6 +35,7 @@ export default class ElevationMapPanel extends React.Component {
         previewLoading: false,
         exportLoading: false,
         previewLayer: null,
+        opacity: 100,
     };
   }
 
@@ -188,21 +189,18 @@ export default class ElevationMapPanel extends React.Component {
               .bindPopup(`Altitude: Between ${bottom}m and ${top}m<BR>Area: ${areaInLevel}m2`)
               .on('popupopen', popup => {
                 // Make all other layers transparent and highlight the clicked one
-                featureGroup.getLayers().forEach(layer => layer.setStyle({ fillOpacity: 0.4 }));
-                popup.propagatedFrom.setStyle({ color: "black",  fillOpacity: 1 }).bringToFront()
+                featureGroup.getLayers().forEach(layer => layer.setStyle({ fillOpacity: 0.4 * this.state.opacity}));
+                popup.propagatedFrom.setStyle({ color: "black",  fillOpacity: this.state.opacity }).bringToFront()
               })
               .on('popupclose', popup => {
                 // Reset all layers to their original state
-                featureGroup.getLayers().forEach(layer => layer.bringToFront().setStyle({ fillOpacity: 1 }));
+                featureGroup.getLayers().forEach(layer => layer.bringToFront().setStyle({ fillOpacity: this.state.opacity }));
                 popup.propagatedFrom.setStyle({ color: rgbHex });
               });
           featureGroup.addLayer(geojsonForLevel);
         });
         
         featureGroup.geojson = geojson;
-        featureGroup.setOpacity = (opacity) => {
-          featureGroup.setStyle({ opacity: opacity, fillOpacity: opacity });
-        }
         
         this.setState({ previewLayer: featureGroup });
         this.state.previewLayer.addTo(map);
@@ -288,12 +286,19 @@ export default class ElevationMapPanel extends React.Component {
     data.format = "GeoJSON";
     this.generateElevationMap(data, 'previewLoading', true);
   }
+  
+  handleChangeOpacity = (evt) => {
+    const opacity = parseFloat(evt.target.value) / 100;
+    this.setState({opacity: opacity});
+    this.state.previewLayer.setStyle({ opacity: opacity, fillOpacity: opacity });
+    this.props.map.closePopup();
+  }
 
   render(){
     const { loading, task, references, error, permanentError, interval, reference, 
             epsg, customEpsg, exportLoading,
             noiseFilterSize, customNoiseFilterSize,
-            previewLoading, previewLayer } = this.state;
+            previewLoading, previewLayer, opacity} = this.state;
     const noiseFilterSizeValues = [{label: 'Do not filter noise', value: 0},
                             {label: 'Normal', value: 3},
                             {label: 'Aggressive', value: 5}];
@@ -359,6 +364,17 @@ export default class ElevationMapPanel extends React.Component {
             <label className="col-sm-3 control-label">EPSG:</label>
             <div className="col-sm-9 ">
               <input type="number" className="form-control custom-interval" value={customEpsg} onChange={this.handleChangeCustomEpsg} />
+            </div>
+          </div>
+        : ""}
+        
+        {previewLayer ? 
+          <div className="row form-group form-inline">
+            <label className="col-sm-3 control-label">Opacity:</label>
+            <div className="col-sm-9">
+              <input type="range" className="slider" step="1" value={opacity * 100} onChange={this.handleChangeOpacity} />
+              <p className="glyphicon glyphicon-info-sign help" data-tip="Control the opacity of the elevation map. You must generate a preview to be able to control the opacity." />
+              <ReactTooltip place="left" effect="solid" html={true}/>
             </div>
           </div>
         : ""}
