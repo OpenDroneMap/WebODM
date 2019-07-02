@@ -31,6 +31,7 @@ services:
       - WO_HOST
       - WO_DEBUG
       - WO_BROKER
+      - WO_DEV
     restart: on-failure:10
     oom_score_adj: 0
   broker:
