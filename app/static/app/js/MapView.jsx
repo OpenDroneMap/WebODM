@@ -24,13 +24,11 @@ class MapView extends React.Component {
 
     this.state = {
       opacity: 100,
-      opacityOnMap: true,
       selectedMapType: props.selectedMapType,
       tiles: this.getTilesByMapType(props.selectedMapType)
     };
 
     this.updateOpacity = this.updateOpacity.bind(this);
-    this.updateOpacityOnMap = this.updateOpacityOnMap.bind(this);
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
   }
@@ -66,15 +64,9 @@ class MapView extends React.Component {
       opacity: parseFloat(evt.target.value),
     });
   }
-  
-  updateOpacityOnMap(evt) {
-    this.setState({
-      opacityOnMap: evt.target.checked,
-    });
-  }
 
   render(){
-    const { opacity, opacityOnMap } = this.state;
+    const { opacity } = this.state;
     let mapTypeButtons = [
       {
         label: "Orthophoto",
@@ -111,12 +103,10 @@ class MapView extends React.Component {
           tiles={this.state.tiles} 
           showBackground={true} 
           opacity={opacity}
-          opacityOnMap={opacityOnMap}
           mapType={this.state.selectedMapType} 
           public={this.props.public} />
         <div className="opacity-slider theme-secondary hidden-xs">
           Opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
-          <input type="checkbox" checked={opacityOnMap ? "checked" : ""} title="When checked, the underlying map will be affected by the opacity slider." onChange={this.updateOpacityOnMap} />
         </div>
       </div>);
   }
