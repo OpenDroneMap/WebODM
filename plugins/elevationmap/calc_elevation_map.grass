@@ -4,6 +4,7 @@
 # noise_filter_size: Area in meters where we will clean up noise in the contours
 # epsg: target EPSG code
 # python_script_path: Path of the python script
+# python_path: Path to python modules
 # dtm: Optional text to include the GeoTIFF DTM
 #
 # ------
@@ -20,7 +21,7 @@ elif [ "${format}" = "ESRI Shapefile" ]; then
     ext="shp"
 fi
 
-${python_script_path} "${dsm_file}" ${interval} --epsg ${epsg} --noise_filter_size ${noise_filter_size} ${dtm} -o output.json
+PYTHONPATH="${python_path}" "${python_script_path}" "${dsm_file}" ${interval} --epsg ${epsg} --noise_filter_size ${noise_filter_size} ${dtm} -o output.json
 
 if [ $$ext != "json" ]; then
   ogr2ogr -f "${format}" output.$$ext output.json > /dev/null

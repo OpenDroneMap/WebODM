@@ -10,10 +10,12 @@ from app.plugins.views import TaskView
 from worker.tasks import execute_grass_script
 from app.plugins.grass_engine import grass, GrassEngineException, cleanup_grass_context
 from worker.celery import app as celery
+from app.plugins import get_current_plugin
 
 class TaskElevationMapGenerate(TaskView):
     def post(self, request, pk=None):
         task = self.get_and_check_task(request, pk)
+        plugin = get_current_plugin()
         
         if task.dsm_extent is None:
             return Response({'error': 'No DSM layer is available.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -41,6 +43,8 @@ class TaskElevationMapGenerate(TaskView):
             context.add_param('noise_filter_size', noise_filter_size)
             context.add_param('epsg', epsg)
             context.add_param('python_script_path', os.path.join(current_dir, "elevationmap.py"))
+            context.add_param('python_path', plugin.get_python_packages_path())
+
             if dtm != None:
                 context.add_param('dtm', '--dtm {}'.format(dtm))
             else:

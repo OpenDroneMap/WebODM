@@ -9,7 +9,7 @@ const leafletPreCheck = (options) => {
 };
 
 const layersControlPreCheck = (options) => {
-  assert(options.layersControl !== undefined);
+  assert(options.controls !== undefined);
   leafletPreCheck(options);
 }
 
@@ -17,8 +17,8 @@ export default {
   namespace: "Map",
 
   endpoints: [
-    ["willAddControls", layersControlPreCheck],
-    ["didAddControls", leafletPreCheck],
+    ["willAddControls", leafletPreCheck],
+    ["didAddControls", layersControlPreCheck],
 	["addActionButton", leafletPreCheck],
   ]
 };

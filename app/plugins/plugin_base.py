@@ -1,7 +1,12 @@
+import importlib
 import json
-import logging, os, sys
+import logging, os, sys, subprocess
 from abc import ABC
 from app.plugins import UserDataStore, GlobalDataStore
+from app.plugins.functions import get_plugins_persistent_path
+from contextlib import contextmanager
+
+from app.plugins.pyutils import requirements_installed, compute_file_md5
 
 logger = logging.getLogger('app.logger')
 
@@ -11,7 +16,64 @@ class PluginBase(ABC):
         self.manifest = None
 
     def register(self):
-        pass
+        self.check_requirements()
+
+
+    def check_requirements(self):
+        """
+        Check if Python requirements need to be installed
+        """
+        req_file = self.get_path("requirements.txt")
+        if os.path.exists(req_file):
+            reqs_installed =  requirements_installed(req_file, self.get_python_packages_path())
+
+            md5_file = self.get_python_packages_path("install_md5")
+            md5_mismatch = False
+            req_md5 = compute_file_md5(req_file)
+
+            if os.path.exists(md5_file):
+                with open(md5_file, 'r') as f:
+                    md5_mismatch = f.read().strip() != req_md5
+
+
+            if not reqs_installed or md5_mismatch:
+                logger.info("Installing requirements.txt for {}".format(self))
+
+                if not os.path.exists(self.get_python_packages_path()):
+                    os.makedirs(self.get_python_packages_path(), exist_ok=True)
+
+                p = subprocess.Popen(['pip', 'install', '-U', '-r', 'requirements.txt',
+                                  '--target', self.get_python_packages_path()],
+                                     cwd=self.get_path())
+                p.wait()
+
+                # Verify
+                if requirements_installed(self.get_path("requirements.txt"), self.get_python_packages_path()):
+                    logger.info("Installed requirements.txt for {}".format(self))
+
+                    # Write MD5
+                    if req_md5:
+                        with open(md5_file, 'w') as f:
+                            f.write(req_md5)
+                else:
+                    logger.warning("Failed to install requirements.txt for {}".format(self))
+
+    def get_persistent_path(self, *paths):
+        return get_plugins_persistent_path(self.name, *paths)
+
+    def get_python_packages_path(self, *paths):
+        return self.get_persistent_path("site-packages", *paths)
+
+    @contextmanager
+    def python_imports(self):
+        # Add python path
+        sys.path.insert(0, self.get_python_packages_path())
+        try:
+            yield
+        finally:
+            # Remove python path
+            sys.path.remove(self.get_python_packages_path())
+
 
     def get_path(self, *paths):
         """

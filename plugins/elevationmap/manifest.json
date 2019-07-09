@@ -1,6 +1,6 @@
 {
 	"name": "ElevationMap",
-	"webodmMinVersion": "1.1.0",
+	"webodmMinVersion": "1.1.1",
 	"description": "Calculate and draw an elevation map based on a task's DEMs",
 	"version": "1.0.0",
 	"author": "Nicolas Chamo",

@@ -206,12 +206,17 @@ class Map extends React.Component {
       zoomControl: false
     });
 
-    Leaflet.control.scale({
+    PluginsAPI.Map.triggerWillAddControls({
+        map: this.map,
+        tiles
+    });
+
+    let scaleControl = Leaflet.control.scale({
       maxWidth: 250,
     }).addTo(this.map);
 
     //add zoom control with your options
-    Leaflet.control.zoom({
+    let zoomControl = Leaflet.control.zoom({
          position:'bottomleft'
     }).addTo(this.map);
 
@@ -258,12 +263,6 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       selectedOverlays: [],
       baseLayers: this.basemaps
     }).addTo(this.map);
-    
-    PluginsAPI.Map.triggerWillAddControls({
-      map: this.map,
-      layersControl: this.autolayers,
-      tiles
-    });
 
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");
@@ -316,7 +315,12 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
 
     PluginsAPI.Map.triggerDidAddControls({
       map: this.map,
-      tiles: tiles
+      tiles: tiles,
+      controls:{
+        autolayers: this.autolayers,
+        scale: scaleControl,
+        zoom: zoomControl
+      }
     });
 
     PluginsAPI.Map.triggerAddActionButton({

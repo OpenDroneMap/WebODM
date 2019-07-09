@@ -4,7 +4,6 @@ from .api import TaskElevationMapGenerate
 from .api import TaskElevationMapCheck
 from .api import TaskElevationMapDownload
 
-
 class Plugin(PluginBase):
     def include_js_files(self):
         return ['main.js']
