@@ -23,8 +23,6 @@ RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev
 # Install pip reqs
 ADD requirements.txt /webodm/
 RUN pip install -r requirements.txt
-ADD requirements3.txt /webodm/
-RUN pip3 install -r requirements3.txt
 
 ADD . /webodm/
 

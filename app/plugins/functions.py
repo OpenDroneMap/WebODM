@@ -249,7 +249,7 @@ def get_current_plugin():
     parts = relp.split(os.sep)
     if len(parts) > 0:
         plugin_name = parts[0]
-        return get_plugin_by_name(plugin_name, only_active=False, refresh_cache_if_none=True)
+        return get_plugin_by_name(plugin_name, only_active=False)
 
     return None
 
