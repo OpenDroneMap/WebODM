@@ -52,13 +52,13 @@ def sync_plugin_db():
         # Plugins that have a "disabled" file are disabled
         disabled_path = plugin.get_path("disabled")
         disabled =  os.path.isfile(disabled_path)
-        if not disabled:
-            _, created = Plugin.objects.get_or_create(
-                name=plugin.get_name(),
-                defaults={'enabled': not disabled},
-            )
-            if created:
-                logger.info("Added [{}] plugin to database".format(plugin.get_name()))
+
+        _, created = Plugin.objects.get_or_create(
+            name=plugin.get_name(),
+            defaults={'enabled': not disabled},
+        )
+        if created:
+            logger.info("Added [{}] plugin to database".format(plugin.get_name()))
 
 
 def clear_plugins_cache():

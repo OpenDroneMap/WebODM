@@ -18,7 +18,6 @@ class PluginBase(ABC):
     def register(self):
         self.check_requirements()
 
-
     def check_requirements(self):
         """
         Check if Python requirements need to be installed
@@ -34,7 +33,8 @@ class PluginBase(ABC):
             if os.path.exists(md5_file):
                 with open(md5_file, 'r') as f:
                     md5_mismatch = f.read().strip() != req_md5
-
+            else:
+                reqs_installed = False
 
             if not reqs_installed or md5_mismatch:
                 logger.info("Installing requirements.txt for {}".format(self))
