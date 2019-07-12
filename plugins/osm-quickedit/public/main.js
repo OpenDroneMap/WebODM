@@ -82,6 +82,7 @@ PluginsAPI.Map.addActionButton(function(options){
 					bottom: options.map.getBounds().getSouth(),
 					right: options.map.getBounds().getEast(),
 					top: options.map.getBounds().getNorth(),
+					changeset_comment: "",
 					changeset_source: encodeURIComponent("WebODM - " + tile.meta.name),
 					new_layer: false
        	};
