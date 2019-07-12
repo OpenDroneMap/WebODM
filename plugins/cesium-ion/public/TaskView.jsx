@@ -120,8 +120,13 @@ export default class TaskView extends Component {
 			this.timeoutHandler = null;
 		}
 		if (this.cancelableFetch !== null) {
-			this.cancelableFetch.cancel();
-			this.cancelableFetch = null;
+			try {
+				this.cancelableFetch.cancel();
+				this.cancelableFetch = null;
+			} catch (exception) {
+				console.warning("Failed to clear dead requests");
+				console.warning(exception);
+			}
 		}
 
 		this.refreshAssets = null;
