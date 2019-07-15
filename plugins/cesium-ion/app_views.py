@@ -51,20 +51,21 @@ def HomeView(plugin):
 
 
 def LoadButtonView(plugin):
-    def load_buttons_callback(request):
-        if request.user.is_authenticated:
-            ds = plugin.get_user_data_store(request.user)
-            token = ds.get_string("token")
-            if len(token) <= 0:
-                return False
+    @login_required
+    def view(request):
+        ds = plugin.get_user_data_store(request.user)
+        token = ds.get_string("token")
 
-            return {
+        return render(
+            request,
+            plugin.template_path("load_buttons.js"),
+            {
                 "token": token,
                 "app_name": plugin.get_name(),
                 "api_url": plugin.public_url("").rstrip("/"),
                 "ion_url": ION_API_URL,
-            }
-        else:
-            return False
+            },
+            content_type="text/javascript",
+        )
 
-    return plugin.get_dynamic_script("templates/load_buttons.js", load_buttons_callback)
+    return view

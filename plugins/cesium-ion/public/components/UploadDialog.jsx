@@ -23,6 +23,7 @@ export default class UploadDialog extends Component {
 	static defaultProps = {
 		show: true,
 		asset: null,
+		loading: false,
 		initialValues: {
 			name: "",
 			description: "",
@@ -142,7 +143,13 @@ export default class UploadDialog extends Component {
 	}
 
 	render() {
-		const { initialValues, onHide, title, ...options } = this.props;
+		const {
+			initialValues,
+			onHide,
+			title,
+			loading: isLoading,
+			...options
+		} = this.props;
 
 		delete options["asset"];
 		delete options["onSubmit"];
@@ -191,13 +198,23 @@ export default class UploadDialog extends Component {
 
 							<Modal.Footer>
 								<Button onClick={onHide}>Close</Button>
-								<Button
-									bsStyle="primary"
-									onClick={handleSubmit}
-								>
-									<i className={"fa fa-upload"} />
-									Submit
-								</Button>
+								{isLoading && (
+									<Button bsStyle="primary" disabled>
+										<i
+											className={"fa fa-refresh fa-spin"}
+										/>
+										Submitting...
+									</Button>
+								)}
+								{!isLoading && (
+									<Button
+										bsStyle="primary"
+										onClick={handleSubmit}
+									>
+										<i className={"fa fa-upload"} />
+										Submit
+									</Button>
+								)}
 							</Modal.Footer>
 						</form>
 					)}

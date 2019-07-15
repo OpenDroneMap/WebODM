@@ -4,12 +4,14 @@ import logging
 import requests
 from os import path
 from enum import Enum
+from itertools import chain as iter_chain
 
 from app.plugins.views import TaskView
 from app.plugins.worker import task
 from app.plugins.data_store import GlobalDataStore
 from app.plugins import logger, signals as plugin_signals
 
+from worker.celery import app
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.fields import ChoiceField, CharField, JSONField
@@ -65,6 +67,33 @@ def get_asset_info(task_id, asset_type, default=None, ds=None):
     if ds is None:
         ds = GlobalDataStore(PROJECT_NAME)
     return ds.get_json(get_key_for(task_id, asset_type.value), default)
+
+
+def is_asset_task(asset_meta):
+    is_error = len(asset_meta["error"]) > 0
+    return asset_meta["upload"]["active"] or asset_meta["process"]["active"] or is_error
+
+
+def get_processing_assets(task_id):
+    ispc = app.control.inspect()
+    ion_tasks = set()
+    active = set()
+    from uuid import UUID
+
+    for wtask in iter_chain(*ispc.active().values(), *ispc.reserved().values()):
+        args = eval(wtask["args"])
+        if len(args) < 2:
+            continue
+        ion_tasks.add((str(args[0]), AssetType[args[1]]))
+
+    for asset_type in AssetType:
+        asset_info = get_asset_info(task_id, asset_type)
+        ion_task_id = (task_id, asset_type)
+        if not is_asset_task(asset_info) or ion_task_id in ion_tasks:
+            continue
+        active.add(asset_type)
+
+    return active
 
 
 ###                        ###
@@ -182,11 +211,7 @@ class ShareTaskView(TaskView):
             asset_info = get_asset_info(task.id, asset_type)
             ion_id = asset_info["id"]
             is_error = len(asset_info["error"]) > 0
-            is_task = (
-                asset_info["upload"]["active"]
-                or asset_info["process"]["active"]
-                or is_error
-            )
+            is_task = is_asset_task(asset_info)
             is_exported = asset_info["id"] is not None and not is_task
 
             assets.append(
@@ -217,21 +242,26 @@ class ShareTaskView(TaskView):
         )
         asset_path = task.get_asset_download_path(ASSET_TO_FILE[asset_type])
 
-        del_asset_info(task.id, asset_type)
-        asset_info = get_asset_info(task.id, asset_type)
-        asset_info["upload"]["active"] = True
-        set_asset_info(task.id, asset_type, asset_info)
+        # Skip already processing tasks
+        if asset_type not in get_processing_assets(task.id):
+            del_asset_info(task.id, asset_type)
+            asset_info = get_asset_info(task.id, asset_type)
+            asset_info["upload"]["active"] = True
+            set_asset_info(task.id, asset_type, asset_info)
 
-        upload_to_ion.delay(
-            task.id,
-            token,
-            asset_type,
-            asset_path,
-            name,
-            description,
-            attribution,
-            options,
-        )
+            upload_to_ion.delay(
+                task.id,
+                asset_type,
+                token,
+                asset_path,
+                name,
+                description,
+                attribution,
+                options,
+            )
+        else:
+            print(f"Ignore running ion task {task.id} {str(asset_type)}")
+
         return Response(status=status.HTTP_200_OK)
 
 
@@ -245,6 +275,7 @@ class RefreshIonTaskView(TaskView):
         headers = {"Authorization": f"Bearer {token}"}
 
         is_updated = False
+        # ion cleanup check
         for asset_type in AssetType:
             asset_info = get_asset_info(task.id, asset_type)
             ion_id = asset_info["id"]
@@ -254,6 +285,11 @@ class RefreshIonTaskView(TaskView):
             if res.status_code != 200:
                 del_asset_info(task.id, asset_type)
                 is_updated = True
+
+        # dead task cleanup
+        for asset_type in get_processing_assets(task.id):
+            del_asset_info(task.id, asset_type)
+            is_updated = True
 
         return Response({"updated": is_updated}, status=status.HTTP_200_OK)
 
@@ -274,7 +310,7 @@ class ClearErrorsTaskView(TaskView):
 #       CELERY TASK(S)       #
 ###                        ###
 class TaskUploadProgress(object):
-    def __init__(self, file_path, task_id, asset_type, logger=None):
+    def __init__(self, file_path, task_id, asset_type, logger=None, log_step_size=0.05):
         self._task_id = task_id
         self._asset_type = asset_type
         self._logger = logger
@@ -282,6 +318,9 @@ class TaskUploadProgress(object):
         self._uploaded_bytes = 0
         self._total_bytes = float(path.getsize(file_path))
         self._asset_info = get_asset_info(task_id, asset_type)
+
+        self._last_log = 0
+        self._log_step_size = log_step_size
 
     @property
     def asset_info(self):
@@ -294,17 +333,20 @@ class TaskUploadProgress(object):
             progress = 1
 
         self._asset_info["upload"]["progress"] = progress
-        if self._logger is not None:
+        if self._logger is not None and progress - self._last_log > self._log_step_size:
             self._logger.info(f"Upload progress: {progress * 100}%")
+            self._last_log = progress
 
         set_asset_info(self._task_id, self._asset_type, self._asset_info)
 
 
+# Arg order is very important for task deconstruction.
+# If order is changed make sure that the refresh API call is updated
 @task
 def upload_to_ion(
     task_id,
-    token,
     asset_type,
+    token,
     asset_path,
     name,
     description="",

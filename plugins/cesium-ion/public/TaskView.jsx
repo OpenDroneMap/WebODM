@@ -18,7 +18,8 @@ export default class TaskView extends Component {
 	state = {
 		error: "",
 		currentAsset: null,
-		isTasksDialog: false
+		isTasksDialog: false,
+		isUploadDialogLoading: false
 	};
 
 	cancelableFetch = null;
@@ -27,7 +28,8 @@ export default class TaskView extends Component {
 
 	onOpenUploadDialog = asset => this.setState({ currentAsset: asset });
 
-	onHideUploadDialog = () => this.setState({ currentAsset: null });
+	onHideUploadDialog = () =>
+		this.setState({ currentAsset: null, isUploadDialogLoading: false });
 
 	showTaskDialog = () => this.setState({ isTasksDialog: true });
 
@@ -46,6 +48,7 @@ export default class TaskView extends Component {
 		payload.token = token;
 		payload.asset_type = currentAsset;
 
+		this.setState({ isUploadDialogLoading: true });
 		this.cancelableFetch = fetchCancelable(
 			`/api${apiURL}/task/${task.id}/share`,
 			{
@@ -117,8 +120,13 @@ export default class TaskView extends Component {
 			this.timeoutHandler = null;
 		}
 		if (this.cancelableFetch !== null) {
-			this.cancelableFetch.cancel();
-			this.cancelableFetch = null;
+			try {
+				this.cancelableFetch.cancel();
+				this.cancelableFetch = null;
+			} catch (exception) {
+				console.warning("Failed to clear dead requests");
+				console.warning(exception);
+			}
 		}
 
 		this.refreshAssets = null;
@@ -126,7 +134,12 @@ export default class TaskView extends Component {
 
 	render() {
 		const { task, token } = this.props;
-		const { isTasksDialog, isRefreshTask, currentAsset } = this.state;
+		const {
+			isTasksDialog,
+			isUploadDialogLoading,
+			isRefreshTask,
+			currentAsset
+		} = this.state;
 		const isUploadDialog = currentAsset !== null;
 		const assetName = isUploadDialog ? AssetStyles[currentAsset].name : "";
 
@@ -219,7 +232,7 @@ export default class TaskView extends Component {
 					</TaskFetcher>
 				</div>
 
-				<APIFetcher path={"projects"} params={{ id: task.project }}>
+				<APIFetcher path={"projects/"} params={{ id: task.project }}>
 					{({ isLoading, isError, data }) => {
 						const initialValues = {};
 
@@ -234,6 +247,7 @@ export default class TaskView extends Component {
 								title={`Tile in Cesium ion — ${assetName}`}
 								initialValues={initialValues}
 								show={isUploadDialog}
+								loading={isUploadDialogLoading}
 								asset={currentAsset}
 								onHide={this.onHideUploadDialog}
 								onSubmit={this.onUploadAsset}
