@@ -21,6 +21,7 @@ from rest_framework import status
 from rest_framework import serializers
 
 from .globals import PROJECT_NAME, ION_API_URL
+from .texture_utils import get_texture_model_origin
 
 
 pluck = lambda dic, *keys: [dic[k] if k in dic else None for k in keys]
@@ -244,6 +245,15 @@ class ShareTaskView(TaskView):
 
         # Skip already processing tasks
         if asset_type not in get_processing_assets(task.id):
+            if asset_type == AssetType.TEXTURED_MODEL and "position" not in options:
+                try:
+                    options["position"] = list(get_texture_model_origin(task))
+                    print(options)
+                except Exception as e:
+                    print("Failed to find origin: {task}")
+                    print(e)
+                print(options["position"])
+
             del_asset_info(task.id, asset_type)
             asset_info = get_asset_info(task.id, asset_type)
             asset_info["upload"]["active"] = True
