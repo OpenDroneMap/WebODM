@@ -244,6 +244,19 @@ class ShareTaskView(TaskView):
 
         # Skip already processing tasks
         if asset_type not in get_processing_assets(task.id):
+            if asset_type == AssetType.TEXTURED_MODEL and "position" not in options:
+                extent = None
+                if task.dsm_extent is not None:
+                    extent = task.dsm_extent.extent
+                if task.dtm_extent is not None:
+                    extent = task.dtm_extent.extent
+                if extent is None:
+                    print(f"Unable to find task boundary: {task}")
+                else:
+                    lng, lat = extent[0], extent[1]
+                    # height is set to zero as model is already offset
+                    options["position"] = [lng, lat, 0]
+
             del_asset_info(task.id, asset_type)
             asset_info = get_asset_info(task.id, asset_type)
             asset_info["upload"]["active"] = True

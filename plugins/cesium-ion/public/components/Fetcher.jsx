@@ -52,14 +52,13 @@ export class Fetcher extends PureComponent {
 			.then(data => {
 				this.setState({ data, isLoading: false });
 				onLoad(data);
-				this.cancelableFetch = null;
 			})
 			.catch(out => {
 				if (out.isCanceled) return;
 				this.setState({ error: out, isLoading: false, isError: true });
 				onError(out);
-				this.cancelableFetch = null;
-			});
+			})
+			.finally(() => (this.cancelableFetch = null));
 	};
 
 	componentDidMount() {
