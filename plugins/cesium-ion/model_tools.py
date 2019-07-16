@@ -9,6 +9,10 @@ OBJ_FILE_EXTENSION = ".obj"
 MTL_FILE_EXTENSION = ".mtl"
 
 
+class IonInvalidZip(Exception):
+    pass
+
+
 def file_walk(directory):
     for root, _, file_names in walk(directory):
         for file_name in file_names:
@@ -41,8 +45,8 @@ def to_ion_texture_model(texture_model_path, dest_directory=None, minimize_space
         for file_name in file_walk(unzip_dir):
             if file_name.endswith(DELETE_EXTENSIONS):
                 files_to_delete.add(file_name)
-            if file_name.endswith(".obj"):
-                if "_geo" in file_name:
+            elif file_name.endswith(".obj"):
+                if "_geo" in path.basename(file_name):
                     found_geo = True
                 else:
                     file_name = path.splitext(file_name)[0]
@@ -50,7 +54,7 @@ def to_ion_texture_model(texture_model_path, dest_directory=None, minimize_space
                     files_to_delete.add(file_name + MTL_FILE_EXTENSION)
 
         if not found_geo:
-            raise Exception("Unable to find geo file")
+            raise IonInvalidZip("Unable to find geo file")
 
         for file_name in files_to_delete:
             if not path.isfile(file_name):

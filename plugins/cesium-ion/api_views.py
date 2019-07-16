@@ -22,7 +22,7 @@ from rest_framework import status
 from rest_framework import serializers
 
 from .globals import PROJECT_NAME, ION_API_URL
-from .model_tools import to_ion_texture_model
+from .model_tools import to_ion_texture_model, IonInvalidZip
 
 pluck = lambda dic, *keys: [dic[k] if k in dic else None for k in keys]
 
@@ -387,10 +387,11 @@ def upload_to_ion(
             try:
                 asset_path, del_directory = to_ion_texture_model(asset_path)
                 logger.info("Created ion texture model!")
+            except IonInvalidZip as e:
+                logger.info("Non geo-referenced texture model, using default file.")
             except Exception as e:
                 logger.warning("Failed to convert to ion texture model")
                 logger.warning(e)
-                pass
 
         headers = {"Authorization": f"Bearer {token}"}
         data = {
