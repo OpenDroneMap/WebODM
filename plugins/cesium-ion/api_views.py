@@ -4,6 +4,7 @@ import logging
 import requests
 from os import path
 from enum import Enum
+from shutil import rmtree
 from itertools import chain as iter_chain
 
 from app.plugins.views import TaskView
@@ -21,7 +22,7 @@ from rest_framework import status
 from rest_framework import serializers
 
 from .globals import PROJECT_NAME, ION_API_URL
-
+from .model_tools import to_ion_texture_model, IonInvalidZip
 
 pluck = lambda dic, *keys: [dic[k] if k in dic else None for k in keys]
 
@@ -369,6 +370,7 @@ def upload_to_ion(
     asset_logger = LoggerAdapter(prefix=f"Task {task_id} {asset_type}", logger=logger)
     asset_type = AssetType[asset_type]
     asset_info = get_asset_info(task_id, asset_type)
+    del_directory = None
 
     try:
         import boto3
@@ -380,6 +382,17 @@ def upload_to_ion(
         import boto3
 
     try:
+        # Update asset_path based off
+        if asset_type == AssetType.TEXTURED_MODEL:
+            try:
+                asset_path, del_directory = to_ion_texture_model(asset_path)
+                logger.info("Created ion texture model!")
+            except IonInvalidZip as e:
+                logger.info("Non geo-referenced texture model, using default file.")
+            except Exception as e:
+                logger.warning("Failed to convert to ion texture model")
+                logger.warning(e)
+
         headers = {"Authorization": f"Bearer {token}"}
         data = {
             "name": name,
@@ -466,5 +479,8 @@ def upload_to_ion(
     except Exception as e:
         asset_info["error"] = str(e)
         asset_logger.error(e)
+
+    if del_directory != None:
+        rmtree(del_directory)
 
     set_asset_info(task_id, asset_type, asset_info)
