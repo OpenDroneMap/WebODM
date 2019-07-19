@@ -56,7 +56,15 @@ module.exports = {
       {
         test: /\.s?css$/,
         use: ExtractTextPlugin.extract({
-          use: 'css-loader!sass-loader'
+          use: [
+            { loader: 'css-loader' },
+            {
+                loader: 'sass-loader',
+                options: {
+                    implementation: require("sass")
+                }
+            }
+          ]
         })
       },
       {
