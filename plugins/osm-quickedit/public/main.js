@@ -23,8 +23,26 @@ PluginsAPI.Map.addActionButton(function(options){
 					options.map.getCenter().lng +
 					"&background=custom:" + tileUrl;	
 				window.open(editUrl);
-			}
+			} 
 			else if (editor === 'josm'){
+				// .shareButton switches to btn-primary when the project is shared	
+				var private = $('.shareButton').hasClass('btn-secondary');
+				if(private){
+					// check with the user that it's okay to share the project
+					if(window.confirm("Sharing will be turned on for this project so that imagery can be loaded in JOSM.")){
+						if($('.sharePopup.top').is(':visible')){ 
+							// it is very unlikely, but possible that the sharePopup is open
+							// in which case we need to click the checkbox not the button
+							$('.shareButton div.checkbox input').click()
+						} else {
+							// otherwise we can just click the shareButton and it will turn on sharing
+							$('.shareButton').click()
+						}
+						prepareJOSM();
+					}
+				} else {
+					prepareJOSM();
+				}
 				
 				function formatUrlParams_(params){
 		      return "?" + Object
@@ -70,24 +88,27 @@ PluginsAPI.Map.addActionButton(function(options){
 										}
 								}, wait + JOSM_COMMAND_TIMEOUT);
 						});
-				}				
-				var imageryParams = {
-	        title: tile.meta.name,
-	        type: "tms",
-	        url: encodeURIComponent("tms[22]:" + tileUrl)
-        };
-				sendJOSMCmd('http://127.0.0.1:8111/imagery', imageryParams)				
-				var loadAndZoomParams = {
-					left: options.map.getBounds().getWest(),
-					bottom: options.map.getBounds().getSouth(),
-					right: options.map.getBounds().getEast(),
-					top: options.map.getBounds().getNorth(),
-					changeset_comment: "",
-					changeset_source: encodeURIComponent("WebODM - " + tile.meta.name),
-					new_layer: false
-       	};
-				sendJOSMCmd('http://127.0.0.1:8111/load_and_zoom', loadAndZoomParams);
+				}
 				
+				function prepareJOSM(){
+					var imageryParams = {
+		        title: tile.meta.name,
+		        type: "tms",
+		        url: encodeURIComponent("tms[22]:" + tileUrl)
+	        };
+					sendJOSMCmd('http://127.0.0.1:8111/imagery', imageryParams)				
+					var loadAndZoomParams = {
+						left: options.map.getBounds().getWest(),
+						bottom: options.map.getBounds().getSouth(),
+						right: options.map.getBounds().getEast(),
+						top: options.map.getBounds().getNorth(),
+						changeset_comment: "",
+						changeset_source: encodeURIComponent("WebODM - " + tile.meta.name),
+						new_layer: false
+	       	};
+					sendJOSMCmd('http://127.0.0.1:8111/load_and_zoom', loadAndZoomParams);
+				}				
+								
 			}
 		}
 		
