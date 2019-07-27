@@ -162,8 +162,6 @@ check_command(){
 environment_check(){
 	check_command "docker" "https://www.docker.com/"
 	check_command "git" "https://git-scm.com/downloads"
-	check_command "python" "https://www.python.org/downloads/"
-	check_command "pip" "Run \033[1msudo easy_install pip\033[0m" "easy_install pip"
 	check_command "docker-compose" "Run \033[1mpip install docker-compose\033[0m" "pip install docker-compose"
 }
 
