@@ -130,7 +130,7 @@ Note that existing task results will not be available after the change. Refer to
 
 ### Common Troubleshooting
 
-Sympthoms | Possible Solutions
+Symptoms | Possible Solutions
 --------- | ------------------
 While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
 While starting WebODM you get: `'WaitNamedPipe','The system cannot find the file specified.'` | 1. Make sure you have enabled VT-x virtualization in the BIOS.<br/>2. Try to downgrade your version of Python to 2.7
