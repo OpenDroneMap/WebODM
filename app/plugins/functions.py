@@ -14,7 +14,7 @@ from django.http import HttpResponse
 
 from app.models import Plugin
 from app.models import Setting
-from webodm import settings
+from django.conf import settings
 
 logger = logging.getLogger('app.logger')
 
