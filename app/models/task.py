@@ -561,7 +561,10 @@ class Task(models.Model):
                 # Need to update status (first time, queued or running?)
                 if self.uuid and self.status in [None, status_codes.QUEUED, status_codes.RUNNING]:
                     # Update task info from processing node
-                    current_lines_count = len(self.console_output.split("\n"))
+                    if not self.console_output:
+                        current_lines_count = 0
+                    else:
+                        current_lines_count = len(self.console_output.split("\n"))
 
                     info = self.processing_node.get_task_info(self.uuid, current_lines_count)
 

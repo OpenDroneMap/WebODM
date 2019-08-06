@@ -94,7 +94,7 @@ export default class TaskView extends Component {
 		}
 	};
 
-	onCleanStatus = ({ data: { updated = false } }) => {
+	onCleanStatus = ({ updated = false }) => {
 		if (!updated || this.refreshAssets == null) return;
 		this.refreshAssets();
 	};

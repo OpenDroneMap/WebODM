@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.6-stretch
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
