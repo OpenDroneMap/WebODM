@@ -20,6 +20,7 @@ fi
 
 load_default_node=true
 dev_mode=false
+debug_mode=false
 
 # Load default values
 source .env
@@ -73,12 +74,14 @@ case $key in
     ;;
     --debug)
     export WO_DEBUG=YES
+    debug_mode=true
     shift # past argument
     ;;
     --dev)
     export WO_DEBUG=YES
     export WO_DEV=YES
     dev_mode=true
+    debug_mode=true
     shift # past argument
     ;;
 	--broker)
@@ -244,7 +247,11 @@ start(){
 		echo "Will enable SSL ($method)"
 	fi
 
-	run "$command start || $command up"
+	if [[ $debug_mode = true ]]; then
+		run "$command start || $command up"
+	else
+		run "$command start || $command up -d"
+	fi
 }
 
 down(){
