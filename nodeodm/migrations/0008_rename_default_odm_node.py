@@ -13,7 +13,7 @@ def rename_default_node(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0028_task_partial'),
+        ('nodeodm', '0007_auto_20190520_1258'),
     ]
 
     operations = [
