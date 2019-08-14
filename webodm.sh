@@ -94,6 +94,10 @@ case $key in
     load_micmac_node=true
     shift # past argument
     ;;
+    --detached)
+    detached=true
+    shift # past argument
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -130,6 +134,7 @@ usage(){
   echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--dev	Enable development mode. In development mode you can make modifications to WebODM source files and changes will be reflected live. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
+  echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
   exit
 }
 
@@ -244,7 +249,13 @@ start(){
 		echo "Will enable SSL ($method)"
 	fi
 
-	run "$command start || $command up"
+	command="$command start || $command up"
+
+	if [[ $detached = true ]]; then
+		command+=" -d"
+	fi
+
+	run "$command"
 }
 
 down(){
