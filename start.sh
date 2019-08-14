@@ -58,7 +58,7 @@ echo Running migrations
 python manage.py migrate
 
 if [[ "$WO_DEFAULT_NODES" > 0 ]]; then
-   echo -e "from nodeodm.models import ProcessingNode\nfor node_index in map(str, range(1, $WO_DEFAULT_NODES + 1)):\n\t ProcessingNode.objects.update_or_create(hostname='webodm_node-odm_' + node_index, defaults={'hostname': 'webodm_node-odm_' + node_index, 'port': 3000})" | python manage.py shell
+   echo -e "from nodeodm.models import ProcessingNode\nfor node_index in map(str, range(1, $WO_DEFAULT_NODES + 1)):\n\t ProcessingNode.objects.update_or_create(hostname='webodm_node-odm_' + node_index, defaults={'hostname': 'webodm_node-odm_' + node_index, 'port': 3000, 'label': 'node-odm-' + node_index})" | python manage.py shell
 fi
 
 if [[ "$WO_CREATE_MICMAC_PNODE" = "YES" ]]; then

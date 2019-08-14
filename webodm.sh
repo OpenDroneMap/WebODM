@@ -88,6 +88,7 @@ case $key in
     ;;
     --no-default-node)
     default_nodes=0
+    echo "ATTENTION: --no-default-node is deprecated. Use --default-nodes instead."
     export WO_DEFAULT_NODES=0
     shift # past argument
     ;;
@@ -132,7 +133,6 @@ usage(){
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
-  echo "	--no-default-node	Do not create a default NodeODM node attached to WebODM on startup (default: disabled). DEPRECATED: please use the argument 'default-nodes'"
   echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: 1)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
@@ -201,6 +201,7 @@ start(){
 	echo "SSL certificate: $WO_SSL_CERT"
 	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
 	echo "Celery Broker: $WO_BROKER"
+	echo "Default Nodes: $WO_DEFAULT_NODES"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
