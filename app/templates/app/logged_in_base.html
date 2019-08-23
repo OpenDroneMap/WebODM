@@ -31,6 +31,12 @@
         </li>
         {% endfor %}
 
+        {% if user.is_superuser %}          
+            <li>
+                <a href="/admin/">Go to Admin Panel <i class="fa fa-arrow-right"></i></a>
+            </li>
+        {% endif %}
+
         <!-- /.dropdown-user -->
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
