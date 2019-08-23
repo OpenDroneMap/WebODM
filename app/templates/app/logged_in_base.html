@@ -4,6 +4,32 @@
 
 {% block navbar-top-links %}
     <ul class="nav navbar-top-links navbar-right">
+        <li>
+            <a style="color: white;" href="/dashboard/"><i class="fa fa-dashboard fa-fw"></i> {% trans 'Dashboard' %}</a>
+        </li>
+        {% load processingnode_extras plugins %}
+        {% can_view_processing_nodes as view_nodes %}
+        {% can_add_processing_nodes as add_nodes %}
+        {% get_visible_processing_nodes as nodes %}
+        
+        {% get_plugins_main_menus as plugin_menus %}
+        {% for menu in plugin_menus %}
+        <li>
+            <a href="{{menu.link}}" style="color: white;"><i class="{{menu.css_icon}}"></i> {{menu.label}}{% if menu.has_submenu %}<span
+                    class="fa arrow"></span>{% endif %}</a>
+        
+            {% if menu.has_submenu %}
+            <ul class="nav nav-second-level">
+                {% for menu in menu.submenu %}
+                <li>
+                    <a href="{{menu.link}}"><i class="{{menu.css_icon}}"></i> {{menu.label}}{% if menu.has_submenu %}<span
+                            class="fa arrow"></span>{% endif %}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
         <!--<li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
@@ -220,13 +246,13 @@
                     </span>
                     </div>
                 </li>-->
-                <li>
+                <!-- <li>
                     <a href="/dashboard/"><i class="fa fa-dashboard fa-fw"></i> {% trans 'Dashboard' %}</a>
-                </li>
+                </li> -->
                 <!--<li>
                     <a href="#"><i class="fa fa-plane fa-fw"></i> Mission Planner</a>
                 </li> -->
-                {% load processingnode_extras plugins %}
+                <!-- {% load processingnode_extras plugins %}
                 {% can_view_processing_nodes as view_nodes %}
                 {% can_add_processing_nodes as add_nodes %}
                 {% get_visible_processing_nodes as nodes %}
@@ -246,9 +272,9 @@
                             </ul>
                         {% endif %}
                     </li>
-                {% endfor %}
+                {% endfor %} -->
 
-                {% if view_nodes %}
+               <!--  {% if view_nodes %}
                 <li>
                     <a href="#"><i class="fa fa-wrench fa-fw"></i> Processing Nodes<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
@@ -264,12 +290,12 @@
                         </li>
                         {% endif %}
                     </ul>
-                    <!-- /.nav-second-level -->
+                     /.nav-second-level 
                 </li>
-                {% endif %}
+                {% endif %}  -->
 
-                {% if user.is_staff %}
-                <li>
+<!--                 {% if user.is_staff %}
+                 <li>
                     <a href="#"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
@@ -292,7 +318,7 @@
                         </li>
                     </ul>
                 </li>
-                {% endif %}
+                {% endif %} -->
             </ul>
         </div>
         <!-- /.sidebar-collapse -->
