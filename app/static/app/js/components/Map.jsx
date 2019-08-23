@@ -19,6 +19,7 @@ import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import update from 'immutability-helper';
+require('leaflet-easyprint');
 
 class Map extends React.Component {
   static defaultProps = {
@@ -213,6 +214,13 @@ class Map extends React.Component {
 
     Leaflet.control.scale({
       maxWidth: 250,
+    }).addTo(this.map);
+
+    //add print function to print a 2D view Geottif in PDF
+    L.easyPrint({
+      title: 'Print',
+      position: 'topright',
+      sizeModes: ['A4Portrait', 'A4Landscape']
     }).addTo(this.map);
 
     //add zoom control with your options
