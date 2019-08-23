@@ -112,8 +112,8 @@ class FirstUserForm(forms.ModelForm):
 
 
 def welcome(request):
-    if User.objects.filter(is_superuser=True).count() > 0:
-        return redirect('index')
+    """ if User.objects.filter(is_superuser=True).count() > 0:
+        return redirect('index') """
 
     fuf = FirstUserForm()
 
@@ -122,7 +122,7 @@ def welcome(request):
         if fuf.is_valid():
             admin_user = fuf.save(commit=False)
             admin_user.password = make_password(fuf.cleaned_data['password'])
-            admin_user.is_superuser = admin_user.is_staff = True
+            # admin_user.is_superuser = admin_user.is_staff = True
             admin_user.save()
 
             # Log-in automatically
