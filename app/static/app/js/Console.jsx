@@ -26,7 +26,6 @@ class Console extends React.Component {
     this.handleMouseOver = this.handleMouseOver.bind(this);
     this.handleMouseOut = this.handleMouseOut.bind(this);
     this.downloadTxt = this.downloadTxt.bind(this);
-    this.copyTxt = this.copyTxt.bind(this);
     this.enterFullscreen = this.enterFullscreen.bind(this);
     this.exitFullscreen = this.exitFullscreen.bind(this);
   }
@@ -69,17 +68,7 @@ class Console extends React.Component {
   }
 
   downloadTxt(filename="console.txt"){
-    Utils.saveAs(this.state.lines.join("\r\n"), filename);
-  }
-
-  copyTxt(){
-    const el = document.createElement('textarea');
-    el.value = this.state.lines.join("\r\n");
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    console.log("Output copied to clipboard");
+    Utils.saveAs(this.state.lines.join("\n"), filename);
   }
 
   enterFullscreen(){
@@ -171,9 +160,6 @@ class Console extends React.Component {
         items.push(<div key="buttons" className="console-buttons">
             <a href="javascript:void(0);" onClick={() => this.downloadTxt()} className="btn btn-sm btn-primary" title="Download To File">
                 <i className="fa fa-download"></i>
-            </a>
-            <a href="javascript:void(0);" onClick={this.copyTxt} className="btn btn-sm btn-primary" title="Copy To Clipboard">
-                <i className="fa fa-clipboard"></i>
             </a>
             <a href="javascript:void(0);" onClick={this.enterFullscreen} className="btn btn-sm btn-primary" title="Toggle Fullscreen">
                 <i className="fa fa-expand"></i>

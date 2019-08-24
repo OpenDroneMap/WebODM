@@ -36,6 +36,9 @@ class ProcessingNodeOption extends React.Component {
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.isEnumType = this.isEnumType.bind(this);
+    this.supportsFileAPI = this.supportsFileAPI.bind(this);
+    this.loadFile = this.loadFile.bind(this);
+    this.handleFileSelect = this.handleFileSelect.bind(this);
   }
 
   getValue(){
@@ -65,6 +68,37 @@ class ProcessingNodeOption extends React.Component {
 
   isEnumType(){
     return this.props.type === 'enum' && Array.isArray(this.props.domain);
+  }
+
+  supportsFileAPI(){
+    return window.File && window.FileReader && window.FileList && window.Blob;
+  }
+
+  loadFile(){
+    if (this.fileControl){
+      let evt = document.createEvent("MouseEvents");
+      evt.initEvent("click", true, false);
+      this.fileControl.dispatchEvent(evt);
+    }
+  }
+
+  handleFileSelect(evt){
+    const files = evt.target.files; // FileList object
+    if (files.length > 0){
+        let file = files[0];
+
+        const reader = new FileReader();
+        reader.onload =  (e) => {
+            try{
+                let value = JSON.stringify(JSON.parse(e.target.result));
+                this.setState({value});
+            }catch(e){
+                console.warn(`Cannot parse JSON: ${e.target.result}: ${e}`);
+            }
+            this.fileControl.value = '';
+        };
+        reader.readAsText(file);
+    }
   }
 
   render() {
@@ -108,10 +142,22 @@ class ProcessingNodeOption extends React.Component {
         );
     }
 
+    let loadFileControl = "";
+    if (this.supportsFileAPI() && this.props.domain === 'json'){
+        loadFileControl = ([
+            <button key="btn" type="file" className="btn glyphicon glyphicon-import btn-primary" data-toggle="tooltip" data-placement="left" title="Click to import a .JSON file" onClick={() => this.loadFile()}></button>,
+            <input key="file-ctrl" className="file-control" type="file" 
+                accept="text/*,application/json"
+                onChange={this.handleFileSelect}
+                ref={(domNode) => { this.fileControl = domNode}} />
+        ]);
+    }
+
     return (
       <div className="processing-node-option form-inline form-group form-horizontal" ref={this.setTooltips}>
         <label>{this.props.name} {(!this.isEnumType() && this.props.domain ? `(${this.props.domain})` : "")}</label><br/>
         {inputControl}
+        {loadFileControl}
         <button type="submit" className="btn glyphicon glyphicon-info-sign btn-primary" data-toggle="tooltip" data-placement="left" title={this.props.help} onClick={e => e.preventDefault()}></button>
         <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title="Reset to default" onClick={this.resetToDefault}></button>
       </div>

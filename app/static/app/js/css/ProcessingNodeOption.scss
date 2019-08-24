@@ -15,4 +15,9 @@
     select.form-control{
         min-width: 204px;
     }
+
+    .file-control{
+        position: absolute;
+        left: -99999px;
+    }
 }

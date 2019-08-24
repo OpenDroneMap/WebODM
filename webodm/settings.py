@@ -50,6 +50,7 @@ WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
 # SECURITY WARNING: don't run with debug turned on a public facing server!
 DEBUG = os.environ.get('WO_DEBUG', 'YES') == 'YES' or TESTING
+DEV = os.environ.get('WO_DEV', 'NO') == 'YES'
 SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = os.environ.get('WO_SSL', 'NO') == 'YES'
 INTERNAL_IPS = ['127.0.0.1']
 
@@ -182,6 +183,7 @@ STATICFILES_FINDERS = [
 
 # File Uploads
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4718592 # 4.5 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10 MB
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 FILE_UPLOAD_HANDLERS = [
@@ -248,6 +250,7 @@ LOGIN_URL = '/login/'
 # CORS (very relaxed settings, users might want to change this in production)
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SAMESITE = None
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')

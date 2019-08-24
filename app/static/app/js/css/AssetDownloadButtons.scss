@@ -2,5 +2,16 @@
     display: inline-block;
     button{
         margin-right: 0 !important;
+        i{
+            left: 2px;
+        }
+    }
+
+    &.btn-group{
+        button{
+            i{
+                left: auto;
+            }
+        }
     }
 }

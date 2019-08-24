@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
@@ -8,7 +9,7 @@ from guardian.admin import GuardedModelAdmin
 from app.models import PluginDatum
 from app.models import Preset
 from app.models import Plugin
-from app.plugins import get_plugin_by_name
+from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin
 from .models import Project, Task, ImageUpload, Setting, Theme
 from django import forms
 from codemirror2.widgets import CodeMirrorEditor
@@ -108,15 +109,19 @@ class PluginAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def plugin_enable(self, request, plugin_name, *args, **kwargs):
-        p = Plugin.objects.get(pk=plugin_name)
-        p.enabled = True
-        p.save()
+        try:
+            enable_plugin(plugin_name)
+        except Exception as e:
+            messages.warning(request, "Cannot enable plugin {}: {}".format(plugin_name, str(e)))
+
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
     def plugin_disable(self, request, plugin_name, *args, **kwargs):
-        p = Plugin.objects.get(pk=plugin_name)
-        p.enabled = False
-        p.save()
+        try:
+            disable_plugin(plugin_name)
+        except Exception as e:
+            messages.warning(request, "Cannot disable plugin {}: {}".format(plugin_name, str(e)))
+
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
     def plugin_actions(self, obj):

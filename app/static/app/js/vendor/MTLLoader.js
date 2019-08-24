@@ -3,7 +3,6 @@
  *
  * @author angelxuanchang
  */
-var THREE = require('./potree/js/three');
 function MTLLoader( manager ) {
 
   this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;

@@ -3,6 +3,7 @@ import shutil
 import traceback
 
 import time
+from threading import Event, Thread
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
@@ -17,7 +18,7 @@ from webodm import settings
 from .celery import app
 import redis
 
-logger = get_task_logger(__name__)
+logger = get_task_logger("app.logger")
 redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
 
 @app.task
@@ -58,19 +59,44 @@ def cleanup_tmp_directory():
             logger.info('Cleaned up: %s (%s)' % (f, modified))
 
 
+# Based on https://stackoverflow.com/questions/22498038/improve-current-implementation-of-a-setinterval-python/22498708#22498708
+def setInterval(interval, func, *args):
+    stopped = Event()
+    def loop():
+        while not stopped.wait(interval):
+            func(*args)
+    t = Thread(target=loop)
+    t.daemon = True
+    t.start()
+    return stopped.set
+
 @app.task
 def process_task(taskId):
-    try:
-        lock = redis_client.lock('task_lock_{}'.format(taskId))
-        have_lock = lock.acquire(blocking=False)
+    lock_id = 'task_lock_{}'.format(taskId)
+    cancel_monitor = None
+    delete_lock = True
 
-        if not have_lock:
-            return
+    try:
+        task_lock_last_update = redis_client.getset(lock_id, time.time())
+        if task_lock_last_update is not None:
+            # Check if lock has expired
+            if time.time() - float(task_lock_last_update) <= 30:
+                # Locked
+                delete_lock = False
+                return
+            else:
+                # Expired
+                logger.warning("Task {} has an expired lock! This could mean that WebODM is running out of memory. Check your server configuration.")
+
+        # Set lock
+        def update_lock():
+            redis_client.set(lock_id, time.time())
+        cancel_monitor = setInterval(5, update_lock)
 
         try:
             task = Task.objects.get(pk=taskId)
         except ObjectDoesNotExist:
-            logger.info("Task id {} has already been deleted.".format(taskId))
+            logger.info("Task {} has already been deleted.".format(taskId))
             return
 
         try:
@@ -81,22 +107,28 @@ def process_task(taskId):
                     e, traceback.format_exc()))
             if settings.TESTING: raise e
     finally:
-        try:
-            if have_lock:
-                lock.release()
-        except redis.exceptions.LockError:
-            # A lock could have expired
-            pass
+        if cancel_monitor is not None:
+            cancel_monitor()
+
+        if delete_lock:
+            try:
+                redis_client.delete(lock_id)
+            except redis.exceptions.RedisError:
+                # Ignore errors, the lock will expire at some point
+                pass
+
+
 
 def get_pending_tasks():
     # All tasks that have a processing node assigned
     # Or that need one assigned (via auto)
     # or tasks that need a status update
     # or tasks that have a pending action
-    return Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True) |
+    # no partial tasks allowed
+    return Task.objects.filter(Q(processing_node__isnull=True, auto_processing_node=True, partial=False) |
                                 Q(Q(status=None) | Q(status__in=[status_codes.QUEUED, status_codes.RUNNING]),
-                                  processing_node__isnull=False) |
-                                Q(pending_action__isnull=False))
+                                  processing_node__isnull=False, partial=False) |
+                                Q(pending_action__isnull=False, partial=False))
 
 @app.task
 def process_pending_tasks():
