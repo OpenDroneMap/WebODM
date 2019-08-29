@@ -24,7 +24,8 @@ class EditTaskForm extends React.Component {
       onFormLoaded: PropTypes.func,
       onFormChanged: PropTypes.func,
       inReview: PropTypes.bool,
-      task: PropTypes.object
+      task: PropTypes.object,
+      suggestedTaskName: PropTypes.string,
   };
 
   constructor(props){
@@ -37,7 +38,7 @@ class EditTaskForm extends React.Component {
       presetError: "",
       presetActionPerforming: false,
 
-      name: props.task !== null ? (props.task.name || "") : "",
+      name: props.suggestedTaskName ? props.suggestedTaskName : (props.task !== null ? (props.task.name || "") : ""),
       loadedProcessingNodes: false,
       loadedPresets: false,
 

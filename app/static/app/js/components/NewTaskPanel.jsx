@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
 import ResizeModes from '../classes/ResizeModes';
 import update from 'immutability-helper';
-import PluginsAPI from '../classes/plugins/API';
+// import PluginsAPI from '../classes/plugins/API';
 
 class NewTaskPanel extends React.Component {
   static defaultProps = {
@@ -18,7 +18,8 @@ class NewTaskPanel extends React.Component {
       onCancel: PropTypes.func,
       filesCount: PropTypes.number,
       showResize: PropTypes.bool,
-      getFiles: PropTypes.func
+      getFiles: PropTypes.func,
+      suggestedTaskName: PropTypes.string,
   };
 
   constructor(props){
@@ -42,13 +43,13 @@ class NewTaskPanel extends React.Component {
   }
 
   componentDidMount(){
-    PluginsAPI.Dashboard.triggerAddNewTaskPanelItem({}, (item) => {
-        if (!item) return;
-
-        this.setState(update(this.state, {
-            items: {$push: [item]}
-        }));
-    });
+    // PluginsAPI.Dashboard.triggerAddNewTaskPanelItem({}, (item) => {
+    //     if (!item) return;
+    // 
+    //     this.setState(update(this.state, {
+    //         items: {$push: [item]}
+    //     }));
+    // });
   }
 
   save(e){
@@ -131,10 +132,11 @@ class NewTaskPanel extends React.Component {
               onFormLoaded={this.handleFormTaskLoaded}
               onFormChanged={this.handleFormChanged}
               inReview={this.state.inReview}
+              suggestedTaskName={this.props.suggestedTaskName}
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
 
-            {this.state.editTaskFormLoaded ?
+            {this.state.editTaskFormLoaded && this.props.showResize ?
               <div>
                 <div className="form-group">
                   <label className="col-sm-2 control-label">Resize Images</label>

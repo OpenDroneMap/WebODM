@@ -1,0 +1,9 @@
+
+BEFORE MERGING TO MASTER
+* Add validation to the configuration for each platform extension
+* Fix error message popup
+
+
+* Allow image resizing
+* Allow potential pagination when calling APIs
+* Make platform extension have their own js somewhere, like WebODM plugins
