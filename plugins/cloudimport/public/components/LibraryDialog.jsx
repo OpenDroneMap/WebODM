@@ -21,7 +21,7 @@ export default class LibraryDialog extends Component {
 
     this.state = {
 				availableFolders: [],
-        selectedFolder: null,
+				selectedFolder: null,
 				loadingFolders: true,
 				error: "",
     };
@@ -29,7 +29,6 @@ export default class LibraryDialog extends Component {
 	
 	componentDidUpdate(){
     if (this.props.platform !== null && this.props.platform.type == "library" && this.state.loadingFolders){
-			// this.setState({loadingFolders: true});
 	    $.get(`${this.props.apiURL}/cloudlibrary/${this.props.platform.name}/listfolders`)
 	    .done(result => {
 	      result.folders.forEach(album => {

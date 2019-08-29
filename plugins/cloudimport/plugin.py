@@ -16,7 +16,7 @@ class Plugin(PluginBase):
         return ["load_buttons.js"]
 
     def include_css_files(self):
-        return ["font.css", "build/ImportView.css"]
+        return ["build/ImportView.css"]
 
     def build_jsx_components(self):
         return ["ImportView.jsx"]
@@ -24,6 +24,7 @@ class Plugin(PluginBase):
     def api_mount_points(self):
         api_views = [api_view for platform in get_all_extended_platforms() for api_view in platform.get_api_views()]
         mount_points = [MountPoint(path, view) for (path, view) in api_views]
+        # Add mount points for each extended platform that might require us to do so
         return mount_points + [
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/import", ImportFolderTaskView.as_view()),
             MountPoint("platforms/(?P<platform_name>[^/.]+)/verify", PlatformsVerifyTaskView.as_view()),

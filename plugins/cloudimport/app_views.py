@@ -11,6 +11,7 @@ from app.plugins import logger
 from .platform_helper import get_all_extended_platforms
 
 class DynamicForm(forms.Form):
+    """This dynamic form will go through all the extended platforms, and retrieve their fields"""
     def __init__(self, *args, **kwargs):
         ds = kwargs.pop('data_store')
         super(DynamicForm, self).__init__(*args, **kwargs)
