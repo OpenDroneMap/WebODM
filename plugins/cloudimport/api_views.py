@@ -14,56 +14,69 @@ from rest_framework import status
 
 from .platform_helper import get_all_platforms, get_platform_by_name
 
-platforms = None
 class ImportFolderTaskView(TaskView):
     def post(self, request, project_pk=None, pk=None):
         task = self.get_and_check_task(request, pk)
         
+        # Read form data
         folder_url = request.data.get('selectedFolderUrl', None)
         platform_name = request.data.get('platform', None)
         
+        # Make sure both values are set
         if folder_url == None or platform_name == None:
             return Response({'error': 'Folder URL and platform name must be set.'}, status=status.HTTP_400_BAD_REQUEST)
-            
+        
+        # Fetch the platform by name    
         platform = get_platform_by_name(platform_name)
         
+        # Make sure that the platform actually exists
         if platform == None:
             return Response({'error': 'Failed to find a platform with the name \'{}\''.format(platform_name)}, status=status.HTTP_400_BAD_REQUEST)
-            
+        
+        # Verify that the folder url is valid    
         if platform.verify_folder_url(folder_url) == None:
             return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
-            
+        
+        # Get the files from the folder
         files = platform.import_from_folder(folder_url)
         
-        task.console_output += "Importing images...\n"
+        # Update the task with the new information
+        task.console_output += "Importing {} images...\n".format(len(files))
         task.images_count = len(files)
-        task.pending_action=pending_actions.IMPORT
+        task.pending_action = pending_actions.IMPORT
         task.save()
         
+        # Start importing the files in the background
         serialized = [file.serialize() for file in files]
-        logger.error(serialized)
         import_files.delay(task.id, serialized)
         
         return Response({}, status=status.HTTP_200_OK)
 
 class PlatformsVerifyTaskView(TaskView):
     def get(self, request, platform_name):
+        # Read the form data
         folder_url = request.GET.get('folderUrl', None)
+        
+        # Fetch the platform by name
         platform = get_platform_by_name(platform_name)
+        
+        # Make sure that the platform actually exists
         
         if platform == None:
             return Response({'error': 'Failed to find a platform with the name \'{}\''.format(platform_name)}, status=status.HTTP_400_BAD_REQUEST)
-            
-        folder = platform.verify_folder_url(folder_url)
         
+        # Verify that the folder url is valid    
+        folder = platform.verify_folder_url(folder_url)
         if folder == None:
             return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # Return the folder
         return Response({'folder': folder.serialize()}, status=status.HTTP_200_OK)
 
 
 class PlatformsTaskView(TaskView):
     def get(self, request):
+        # Fetch and return all platforms
         platforms = get_all_platforms()
         return Response({'platforms': [platform.serialize(user = request.user) for platform in platforms]}, status=status.HTTP_200_OK)
 
