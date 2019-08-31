@@ -14,21 +14,21 @@ Current platforms supported:
 *None so far*
 
 #### Cloud Libraries
-A **cloud library** is an extension of a cloud platform that has images organized in a folders or albums. It differs from a cloud platform, in the way that it can also list all folders it contains, so that a user can choose to import a specific folder from a list, instead of a URL.
+A **cloud library** is an extension of a cloud platform that has images organized in folders or albums. It differs from a cloud platform, in the way that it can also list all folders it contains, so that a user can choose to import a specific folder from a list, instead of a URL.
 
-Cloud libraries can be used as cloud platorms, but if you happen to configure a server URL, then a list of all the folders in the server will be presented when trying to import to a new task.
+Cloud libraries can be used as cloud platforms, but if you happen to configure a server URL, then a list of all the folders in the server will be presented when trying to import to a new task.
 
 Current platforms supported:
 * [Piwigo](http://piwigo.com/ "Piwigo")
 
 ## Setup
-Some of the platforms described above might need some configuration. For example, you might set a server URL or a authentication token.  When that is the case, you can go to the *"Cloud Import"* tab on the left menu, and do all the configuring you need.
+Some of the platforms described above might need some configuration. For example, you might need to set a server URL or a authentication token.  When that is the case, you can go to the *"Cloud Import"* tab on the left menu, and do all the configuring you need.
 
 ## Contribute
 If you would like to add support for new platforms, please don't hesitate to do so! Here are a few simple guidelines that might help you in your quest.
 
 #### New Platforms
-If you simply need to add a new platform, then add your new Python script on `WebODM/plugins/cloudimport/platforms`. You can copy an already existing platform file, or you can check the file `WebODM/plugins/cloudimport/cloud_platform.py` to see what you need to implement.
+If you simply need to add a new platform, then add your new Python script to `WebODM/plugins/cloudimport/platforms`. You can copy an already existing platform file, or you can check the file `WebODM/plugins/cloudimport/cloud_platform.py` to see what you need to implement.
 
 #### New Extensions
 Now, if you want to add some more complex logic that requieres user configuration or something like that, you might need to write a **platform extension**. You will need to add your extension to `WebODM/plugins/cloudimport/extensions`. You can copy an already existing extension, or you can check the file `WebODM/plugins/cloudimport/platform_extension.py` to see what you need to implement.
@@ -40,4 +40,4 @@ Now, there are a few known gaps to the system that you might encounter or that y
 1. **Allow potential pagination when calling APIs**
 	Currently, the workflow doesn't support calling APIs that requiere pagination. 
 1. **Make platform extension have their own js, like WebODM plugins**
-	Currently, each platform extension that might require their own Javascript code will need to add it manually to the already existing code. It would be much easier if this was handed automatically, like the other parts of the add-on.
+	Currently, when a platform extension requires their own Javascript code, you will need to add this code manually to the already existing code. It would be much easier if this was handed automatically, like the other parts of the add-on.

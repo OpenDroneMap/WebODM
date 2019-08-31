@@ -7,7 +7,7 @@ VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 
 class CloudPlatform(ABC):
     """A Cloud Platform is an online platform that can store files. For example Piwigo, Dropbox, Google Drive.
-       Platforms have the concept of a folder or album, where files are store. We will use the platform's API to 
+       Platforms have the concept of a folder or album, where files are stored. We will use the platform's API to 
        retrieve all the images in those folders, and import them into WebODM"""
 
     def __init__(self, name, folder_url_example):
@@ -63,11 +63,11 @@ class CloudPlatform(ABC):
   
     @abstractmethod
     def build_list_files_in_folder_api_url(self, server_url, folder_id):
-        """Build the api url from the folder id and the server url"""
+        """Build the api url from the folder id and the server url. This API should list all the files in the folder"""
         
     @abstractmethod
     def build_folder_api_url(self, server_url, folder_id):
-        """Build the api url from the folder id and the server url"""    
+        """Build the api url from the folder id and the server url. This API should return the name (and maybe amount of files) for the folder"""    
   
     @abstractmethod
     def parse_payload_into_folder(self, payload):

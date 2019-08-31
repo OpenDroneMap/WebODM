@@ -80,7 +80,6 @@ class PlatformsVerifyTaskView(TaskView):
         platform = get_platform_by_name(platform_name)
         
         # Make sure that the platform actually exists
-        
         if platform == None:
             return Response({'error': 'Failed to find a platform with the name \'{}\''.format(platform_name)}, status=status.HTTP_400_BAD_REQUEST)
         

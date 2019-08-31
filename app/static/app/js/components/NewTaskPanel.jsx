@@ -45,7 +45,7 @@ class NewTaskPanel extends React.Component {
   componentDidMount(){
     PluginsAPI.Dashboard.triggerAddNewTaskPanelItem({}, (item) => {
         if (!item) return;
-    
+
         this.setState(update(this.state, {
             items: {$push: [item]}
         }));

@@ -8,7 +8,7 @@ from ..platform_helper import get_platform_by_name
 from ..platform_extension import PlatformExtension, StringField
     
 class CloudLibrary(PlatformExtension):
-    """A Cloud Library is an online platform that has images organized in a folders or albums.
+    """A Cloud Library is an online platform that has images organized in folders or albums.
        It differs from a Cloud Platform, in the way that it can also list all folders it contains, so that a user can
        choose to import a specific folder from a list, instead of a URL."""
 
@@ -26,12 +26,12 @@ class CloudLibrary(PlatformExtension):
         if kwargs['user'] != None:
             ds = get_current_plugin().get_user_data_store(kwargs['user'])
             server_url_field = self.get_server_url_field()
-            initial_value = server_url_field.get_stored_value(ds)
-            if initial_value != server_url_field.default_value:
+            stored_value = server_url_field.get_stored_value(ds)
+            if stored_value != server_url_field.default_value:
                 # If the user is set, and there is a server url set, then consider this platform as 
                 # a library. Otherwise, consider it a plain platform
                 base_payload['type'] = 'library'
-                base_payload[server_url_field.key] = initial_value
+                base_payload[server_url_field.key] = stored_value
                 return base_payload
                 
         base_payload['type'] = 'platform'        
