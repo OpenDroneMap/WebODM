@@ -1,12 +1,12 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from 'prop-types';
 
-import ErrorMessage from "webodm/components/ErrorMessage";
 import ResizeModes from 'webodm/classes/ResizeModes';
 
 import PlatformSelectButton from "./components/PlatformSelectButton";
 import PlatformDialog from "./components/PlatformDialog";
 import LibraryDialog from "./components/LibraryDialog";
+import ErrorDialog from "./components/ErrorDialog";
 import ConfigureNewTaskDialog from "./components/ConfigureNewTaskDialog";
 
 export default class TaskView extends Component {
@@ -90,7 +90,7 @@ export default class TaskView extends Component {
 		return (
 			<Fragment>
 			{error ?
-				<ErrorMessage bind={[this, "error"]} />
+				<ErrorDialog errorMessage={error} />
 			: ""}
 				<PlatformSelectButton
 					platforms={platforms}
