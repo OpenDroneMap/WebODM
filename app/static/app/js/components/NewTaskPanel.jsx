@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
 import ResizeModes from '../classes/ResizeModes';
 import update from 'immutability-helper';
-// import PluginsAPI from '../classes/plugins/API';
+import PluginsAPI from '../classes/plugins/API';
 
 class NewTaskPanel extends React.Component {
   static defaultProps = {
@@ -43,13 +43,13 @@ class NewTaskPanel extends React.Component {
   }
 
   componentDidMount(){
-    // PluginsAPI.Dashboard.triggerAddNewTaskPanelItem({}, (item) => {
-    //     if (!item) return;
-    // 
-    //     this.setState(update(this.state, {
-    //         items: {$push: [item]}
-    //     }));
-    // });
+    PluginsAPI.Dashboard.triggerAddNewTaskPanelItem({}, (item) => {
+        if (!item) return;
+    
+        this.setState(update(this.state, {
+            items: {$push: [item]}
+        }));
+    });
   }
 
   save(e){
