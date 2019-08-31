@@ -96,27 +96,32 @@ export default class TaskView extends Component {
 					platforms={platforms}
 					onSelect={this.onSelectPlatform}
 				/>
-				<PlatformDialog
-					show={selectedFolder === null}
-					platform={currentPlatform}
-					apiURL={this.props.apiURL}
-					onHide={this.onHideDialog}
-					onSubmit={this.onSelectFolder}
-				/>
-				<LibraryDialog
-				  show={selectedFolder === null}
-				  platform={currentPlatform}
-					apiURL={this.props.apiURL}
-				  onHide={this.onHideDialog}
-				  onSubmit={this.onSelectFolder}
-				/>
-				<ConfigureNewTaskDialog
-				  show={selectedFolder !== null}
-					folder={selectedFolder}
-				  platform={currentPlatform}
-				  onHide={this.onHideDialog}
-				  onSaveTask={this.onSaveTask}
-				/>
+				{selectedFolder === null ?
+					<Fragment>
+						<PlatformDialog
+							show={selectedFolder === null}
+							platform={currentPlatform}
+							apiURL={this.props.apiURL}
+							onHide={this.onHideDialog}
+							onSubmit={this.onSelectFolder}
+						/>
+						<LibraryDialog
+						  show={selectedFolder === null}
+						  platform={currentPlatform}
+							apiURL={this.props.apiURL}
+						  onHide={this.onHideDialog}
+						  onSubmit={this.onSelectFolder}
+						/>
+					</Fragment>
+				: 
+					<ConfigureNewTaskDialog
+					  show={selectedFolder !== null}
+						folder={selectedFolder}
+					  platform={currentPlatform}
+					  onHide={this.onHideDialog}
+					  onSaveTask={this.onSaveTask}
+					/>
+				}
 			</Fragment>
 		);
 	}

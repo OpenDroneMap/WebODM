@@ -5,7 +5,6 @@ import "./PlatformDialog.scss";
 
 export default class PlatformDialog extends Component {
 	static defaultProps = {
-		show: true,
 		platform: null,
 	};
 	static propTypes = {
@@ -56,11 +55,10 @@ export default class PlatformDialog extends Component {
 		const {
 			onHide,
 			platform,
-			show
 		} = this.props;
 
 		const title = "Import from " + (platform !== null ? platform.name : "Platform");
-		const isVisible = show && platform !== null && platform.type === "platform";
+		const isVisible = platform !== null && platform.type === "platform";
 		return (
 			<Modal className={"folder-select"} onHide={onHide} show={isVisible}>
 				<Modal.Header closeButton>

@@ -8,3 +8,13 @@ PluginsAPI.Dashboard.addNewTaskButton(
     });
 	}
 );
+
+PluginsAPI.Dashboard.addTaskActionButton(
+	["cloudimport/build/TaskView.js"],
+	function(args, ImportView) {
+    return React.createElement(ImportView, {
+			task: args.task,
+			apiURL: "{{ api_url }}",
+    });
+	}
+);

@@ -6,7 +6,7 @@ from os import path
 from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import task
-from app.plugins import logger
+from app.plugins import logger, get_current_plugin
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -46,11 +46,30 @@ class ImportFolderTaskView(TaskView):
         task.pending_action = pending_actions.IMPORT
         task.save()
         
+        # Associate the folder url with the project and task
+        combined_id = "{}_{}".format(project_pk, pk)
+        get_current_plugin().get_global_data_store().set_string(combined_id, folder_url)
+
         # Start importing the files in the background
         serialized = [file.serialize() for file in files]
         import_files.delay(task.id, serialized)
         
         return Response({}, status=status.HTTP_200_OK)
+
+class CheckUrlTaskView(TaskView):
+    def get(self, request, project_pk=None, pk=None):
+
+        # Assert that task exists
+        self.get_and_check_task(request, pk)
+
+        # Check if there is an imported url associated with the project and task
+        combined_id = "{}_{}".format(project_pk, pk)
+        folder_url = get_current_plugin().get_global_data_store().get_string(combined_id, default = None)
+
+        if folder_url == None:
+            return Response({}, status=status.HTTP_200_OK)
+        else:
+            return Response({'folder_url': folder_url}, status=status.HTTP_200_OK)
 
 class PlatformsVerifyTaskView(TaskView):
     def get(self, request, platform_name):

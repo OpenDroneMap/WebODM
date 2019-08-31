@@ -3,7 +3,7 @@ import requests
 from os import path
 from app.plugins import logger
 
-VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.bmp', '.png', '.jpeg', '.jpg', '.gif', '.svg']
+VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 
 class CloudPlatform(ABC):
     """A Cloud Platform is an online platform that can store files. For example Piwigo, Dropbox, Google Drive.

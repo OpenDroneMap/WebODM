@@ -7,7 +7,6 @@ import "./ConfigureNewTaskDialog.scss";
 
 export default class ConfigureNewTaskDialog extends Component {
 	static defaultProps = {
-		show: true,
 		platform: null,
 	};
 	static propTypes = {
@@ -23,12 +22,11 @@ export default class ConfigureNewTaskDialog extends Component {
 			onSaveTask,
 			platform,
 			folder,
-			show
 		} = this.props;
 
 		const title = "Import from " + (platform !== null ? platform.name : "Platform");
 		return (
-			<Modal className={"new-task"} onHide={onHide} show={show}>
+			<Modal className={"new-task"} onHide={onHide} show={true}>
 				<Modal.Header closeButton>
 					<Modal.Title>
 						{title}

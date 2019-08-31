@@ -6,7 +6,6 @@ import "./LibraryDialog.scss";
 
 export default class LibraryDialog extends Component {
 	static defaultProps = {
-		show: false,
 		platform: null,
 	};
 	static propTypes = {
@@ -53,11 +52,10 @@ export default class LibraryDialog extends Component {
 		const {
 			onHide,
 			platform,
-			show
 		} = this.props;
 
 		const title = "Import from " + (platform !== null ? platform.name : "Platform");
-		const isVisible = show && platform !== null && platform.type === "library";
+		const isVisible = platform !== null && platform.type === "library";
 		return (
 			<Modal className={"folder-select"} onHide={onHide} show={isVisible}>
 				<Modal.Header closeButton>

@@ -50,7 +50,7 @@ def HomeView(plugin):
     return view
 
 
-def LoadButtonView(plugin):
+def LoadButtonsView(plugin):
     @login_required
     def view(request):
 
