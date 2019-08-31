@@ -38,8 +38,8 @@ def HomeView(plugin):
                         form_field.save_value(ds, form)
                     
                 messages.success(request, "Configuration updated successfuly!")
-
-        form = DynamicForm(data_store = ds)
+        else:
+            form = DynamicForm(data_store = ds)
 
         return render(
             request,

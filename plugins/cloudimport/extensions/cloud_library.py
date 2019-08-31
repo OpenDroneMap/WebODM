@@ -2,7 +2,7 @@ from abc import abstractmethod
 from django import forms
 from rest_framework.response import Response
 from rest_framework import status
-from app.plugins import get_current_plugin
+from app.plugins import get_current_plugin, logger
 from app.plugins.views import TaskView
 from ..platform_helper import get_platform_by_name
 from ..platform_extension import PlatformExtension, StringField
@@ -40,6 +40,20 @@ class CloudLibrary(PlatformExtension):
     def get_server_url_field(self):
         return ServerURLField(self.name)
     
+    def verify_server_url(self, server_url):
+        try:
+            # Define the API url we will call to get all the folders in the server
+            folder_list_api_url = self.build_folder_list_api_url(server_url)
+            # Call the API
+            payload = self.call_api(folder_list_api_url)
+            # Parse the payload into File instances
+            self.parse_payload_into_folders(payload)
+            # If I could parse it, then everything is ok
+            return "OK"
+        except Exception as e:
+            logger.error(str(e))
+            return "Error. Invalid server URL."
+
     def list_folders_in_server(self, server_url):
         # Define the API url we will call to get all the folders in the server
         folder_list_api_url = self.build_folder_list_api_url(server_url)
@@ -67,6 +81,7 @@ class CloudLibrary(PlatformExtension):
 class ServerURLField(StringField):
     def __init__(self, platform_name):
         super().__init__('server_url', platform_name, '')
+        self.platform_name = platform_name
 
     def get_django_field(self, user_data_store):
         return forms.URLField(
@@ -75,7 +90,13 @@ class ServerURLField(StringField):
             required=False,
             max_length=1024,
             widget=forms.URLInput(attrs={"placeholder": "http://piwigo-server.com"}),
-            initial=self.get_stored_value(user_data_store))
+            initial=self.get_stored_value(user_data_store),
+            validators=[self.validate_server_url])
+
+    def validate_server_url(self, server_url_to_validate):
+        result = get_platform_by_name(self.platform_name).verify_server_url(server_url_to_validate)
+        if result != "OK":
+            raise forms.ValidationError(result)
 
 class GetAllFoldersTaskView(TaskView):
     def get(self, request, platform_name):

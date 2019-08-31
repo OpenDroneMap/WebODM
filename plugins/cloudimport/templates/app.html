@@ -19,8 +19,7 @@ You might need to set up a server URL, an authentication token or something else
 				{{ field|with_class:'form-control' }}
 				{% if field.errors %}
 						<span class='text-danger'>{{ field.errors|join:'<br />' }}</span>
-				{% endif %}
-				{% if field.help_text %}
+				{% elif field.help_text %}
 						<span class="help-block ">{{ field.help_text }}</span>
 				{% endif %}
 		</div>
