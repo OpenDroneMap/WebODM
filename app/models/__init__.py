@@ -5,4 +5,5 @@ from .preset import Preset
 from .theme import Theme
 from .setting import Setting
 from .plugin_datum import PluginDatum
+from .plugin import Plugin
 

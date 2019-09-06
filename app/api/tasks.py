@@ -3,8 +3,9 @@ from wsgiref.util import FileWrapper
 
 import mimetypes
 
-import datetime
+from shutil import copyfileobj
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.http import FileResponse
 from django.http import HttpResponse
@@ -76,11 +77,22 @@ class TaskViewSet(viewsets.ViewSet):
     """
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dsm_extent', 'dtm_extent', 'console_output', )
     
-    # We don't use object level permissions on tasks, relying on
-    # project's object permissions instead (but standard model permissions still apply)
-    permission_classes = (permissions.DjangoModelPermissions, )
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        We don't use object level permissions on tasks, relying on
+        project's object permissions instead (but standard model permissions still apply)
+        and with the exception of 'retrieve' (task GET) for public tasks access
+        """
+        if self.action == 'retrieve':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.DjangoModelPermissions, ]
+
+        return [permission() for permission in permission_classes]
 
     def set_pending_action(self, pending_action, request, pk=None, project_pk=None, perms=('change_project', )):
         get_and_check_project(request, project_pk, perms)
@@ -90,6 +102,7 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
 
         task.pending_action = pending_action
+        task.partial = False # Otherwise this will not be processed
         task.last_error = None
         task.save()
 
@@ -127,7 +140,6 @@ class TaskViewSet(viewsets.ViewSet):
         output = task.console_output or ""
         return Response('\n'.join(output.rstrip().split('\n')[line_num:]))
 
-
     def list(self, request, project_pk=None):
         get_and_check_project(request, project_pk)
         tasks = self.queryset.filter(project=project_pk)
@@ -136,37 +148,95 @@ class TaskViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, project_pk=None):
-        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
+        if not task.public:
+            get_and_check_project(request, task.project.id)
+
         serializer = TaskSerializer(task)
         return Response(serializer.data)
 
-    def create(self, request, project_pk=None):
-        project = get_and_check_project(request, project_pk, ('change_project', ))
-        
+    @detail_route(methods=['post'])
+    def commit(self, request, pk=None, project_pk=None):
+        """
+        Commit a task after all images have been uploaded
+        """
+        get_and_check_project(request, project_pk, ('change_project', ))
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except (ObjectDoesNotExist, ValidationError):
+            raise exceptions.NotFound()
+
+        # TODO: check at least two images are present
+
+        task.partial = False
+        task.images_count = models.ImageUpload.objects.filter(task=task).count()
+
+        if task.images_count < 2:
+            raise exceptions.ValidationError(detail="You need to upload at least 2 images before commit")
+
+        task.save()
+        worker_tasks.process_task.delay(task.id)
+
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @detail_route(methods=['post'])
+    def upload(self, request, pk=None, project_pk=None):
+        """
+        Add images to a task
+        """
+        get_and_check_project(request, project_pk, ('change_project', ))
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except (ObjectDoesNotExist, ValidationError):
+            raise exceptions.NotFound()
+
         files = flatten_files(request.FILES)
 
-        if len(files) <= 1:
-            raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
+        if len(files) == 0:
+            raise exceptions.ValidationError(detail="No files uploaded")
 
         with transaction.atomic():
-            task = models.Task.objects.create(project=project,
-                                              pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
-
             for image in files:
                 models.ImageUpload.objects.create(task=task, image=image)
-            task.images_count = len(files)
 
-            # Update other parameters such as processing node, task name, etc.
+        return Response({'success': True}, status=status.HTTP_200_OK)
+
+    def create(self, request, project_pk=None):
+        project = get_and_check_project(request, project_pk, ('change_project', ))
+
+        # If this is a partial task, we're going to upload images later
+        # for now we just create a placeholder task.
+        if request.data.get('partial'):
+            task = models.Task.objects.create(project=project,
+                                              pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
             serializer = TaskSerializer(task, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+        else:
+            files = flatten_files(request.FILES)
 
-            worker_tasks.process_task.delay(task.id)
+            if len(files) <= 1:
+                raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
+
+            with transaction.atomic():
+                task = models.Task.objects.create(project=project,
+                                                  pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
+
+                for image in files:
+                    models.ImageUpload.objects.create(task=task, image=image)
+                task.images_count = len(files)
+
+                # Update other parameters such as processing node, task name, etc.
+                serializer = TaskSerializer(task, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+                worker_tasks.process_task.delay(task.id)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -357,9 +427,14 @@ class TaskAssetsImport(APIView):
 
             if len(files) > 0:
                 destination_file = task.assets_path("all.zip")
+
                 with open(destination_file, 'wb+') as fd:
-                    for chunk in files[0].chunks():
-                        fd.write(chunk)
+                    if isinstance(files[0], InMemoryUploadedFile):
+                        for chunk in files[0].chunks():
+                            fd.write(chunk)
+                    else:
+                        with open(files[0].temporary_file_path(), 'rb') as file:
+                            copyfileobj(file, fd)
 
             worker_tasks.process_task.delay(task.id)
 

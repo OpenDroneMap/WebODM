@@ -1,8 +1,15 @@
+from django.conf.urls import url
 from django.contrib import admin
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils.html import format_html
 from guardian.admin import GuardedModelAdmin
 
 from app.models import PluginDatum
 from app.models import Preset
+from app.models import Plugin
+from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin
 from .models import Project, Task, ImageUpload, Setting, Theme
 from django import forms
 from codemirror2.widgets import CodeMirrorEditor
@@ -61,5 +68,74 @@ class ThemeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Theme, ThemeAdmin)
-
 admin.site.register(PluginDatum, admin.ModelAdmin)
+
+
+class PluginAdmin(admin.ModelAdmin):
+    list_display = ("name", "description", "version", "author", "enabled", "plugin_actions")
+    readonly_fields = ("name", )
+
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def description(self, obj):
+        manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
+        return manifest.get('description', '')
+
+    def version(self, obj):
+        manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
+        return manifest.get('version', '')
+
+    def author(self, obj):
+        manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
+        return manifest.get('author', '')
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            url(
+                r'^(?P<plugin_name>.+)/enable/$',
+                self.admin_site.admin_view(self.plugin_enable),
+                name='plugin-enable',
+            ),
+            url(
+                r'^(?P<plugin_name>.+)/disable/$',
+                self.admin_site.admin_view(self.plugin_disable),
+                name='plugin-disable',
+            ),
+        ]
+        return custom_urls + urls
+
+    def plugin_enable(self, request, plugin_name, *args, **kwargs):
+        try:
+            enable_plugin(plugin_name)
+        except Exception as e:
+            messages.warning(request, "Cannot enable plugin {}: {}".format(plugin_name, str(e)))
+
+        return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
+
+    def plugin_disable(self, request, plugin_name, *args, **kwargs):
+        try:
+            disable_plugin(plugin_name)
+        except Exception as e:
+            messages.warning(request, "Cannot disable plugin {}: {}".format(plugin_name, str(e)))
+
+        return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
+
+    def plugin_actions(self, obj):
+        return format_html(
+            '<a class="button" href="{}" {}>Disable</a>&nbsp;'
+            '<a class="button" href="{}" {}>Enable</a>',
+            reverse('admin:plugin-disable', args=[obj.pk]) if obj.enabled else '#',
+            'disabled' if not obj.enabled else '',
+            reverse('admin:plugin-enable', args=[obj.pk]) if not obj.enabled else '#',
+            'disabled' if obj.enabled else '',
+        )
+
+    plugin_actions.short_description = 'Actions'
+    plugin_actions.allow_tags = True
+
+
+admin.site.register(Plugin, PluginAdmin)

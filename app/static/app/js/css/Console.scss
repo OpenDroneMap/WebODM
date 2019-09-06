@@ -7,3 +7,16 @@
         margin-left: 4px;
     }
 }
+
+.console{
+    .exit-fullscreen{
+        display: none;
+    }
+}
+
+.console:fullscreen{
+    .exit-fullscreen{
+        display: block;
+        margin-bottom: 12px;
+    }
+}

@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 let path = require("path");
 let BundleTracker = require('webpack-bundle-tracker');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -25,6 +26,9 @@ module.exports = {
     new BundleTracker({filename: './webpack-stats.json'}),
     new ExtractTextPlugin('css/[name]-[hash].css', {
         allChunks: true
+    }),
+    new webpack.ProvidePlugin({
+        THREE: path.join(__dirname, './app/static/app/js/vendor/potree/three')
     })
   ],
 
@@ -52,7 +56,15 @@ module.exports = {
       {
         test: /\.s?css$/,
         use: ExtractTextPlugin.extract({
-          use: 'css-loader!sass-loader'
+          use: [
+            { loader: 'css-loader' },
+            {
+                loader: 'sass-loader',
+                options: {
+                    implementation: require("sass")
+                }
+            }
+          ]
         })
       },
       {

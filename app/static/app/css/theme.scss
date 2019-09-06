@@ -72,6 +72,9 @@ body,
 a, a:hover, a:focus{
 	color: theme("tertiary");
 }
+.progress-bar-success{
+    background-color: theme("tertiary");
+}
 
 /* Button primary */
 #navbar-top .navbar-top-links,{
@@ -81,7 +84,12 @@ a, a:hover, a:focus{
 	}
 }
 
-#navbar-top ul#side-menu a:hover, #navbar-top ul#side-menu a:focus{
+#navbar-top ul#side-menu a:focus{
+    background-color: inherit;
+    color: inherit;
+}
+
+#navbar-top ul#side-menu a:hover, #navbar-top ul#side-menu a.active:hover{
 	background-color: theme("button_primary");
 	color: theme("secondary");
 }

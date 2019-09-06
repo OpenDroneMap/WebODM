@@ -20,12 +20,14 @@ class Console extends React.Component {
     }
 
     this.autoscroll = props.autoscroll === true;
+    this.showFullscreenButton = props.showFullscreenButton === true;
 
     this.setRef = this.setRef.bind(this);
     this.handleMouseOver = this.handleMouseOver.bind(this);
     this.handleMouseOut = this.handleMouseOut.bind(this);
     this.downloadTxt = this.downloadTxt.bind(this);
-    this.copyTxt = this.copyTxt.bind(this);
+    this.enterFullscreen = this.enterFullscreen.bind(this);
+    this.exitFullscreen = this.exitFullscreen.bind(this);
   }
 
   componentDidMount(){
@@ -66,17 +68,20 @@ class Console extends React.Component {
   }
 
   downloadTxt(filename="console.txt"){
-    Utils.saveAs(this.state.lines.join("\r\n"), filename);
+    Utils.saveAs(this.state.lines.join("\n"), filename);
   }
 
-  copyTxt(){
-    const el = document.createElement('textarea');
-    el.value = this.state.lines.join("\r\n");
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    console.log("Output copied to clipboard");
+  enterFullscreen(){
+    const consoleElem = this.$console.get(0);
+    if (consoleElem.requestFullscreen) {
+        consoleElem.requestFullscreen();
+    }
+  }
+
+  exitFullscreen(){
+    if (document.exitFullscreen){
+        document.exitFullscreen();
+    }
   }
 
   tearDownDynamicSource(){
@@ -138,11 +143,17 @@ class Console extends React.Component {
             onMouseOver={this.handleMouseOver}
             onMouseOut={this.handleMouseOut}
             ref={this.setRef}
-            >{lines.map(line => {
+            ><a href="javascript:void(0);" onClick={this.exitFullscreen} className="exit-fullscreen btn btn-sm btn-primary" title="Toggle Fullscreen">
+                <i className="fa fa-expand"></i> Exit Fullscreen
+            </a>
+            {lines.map(line => {
             if (this.props.lang) return (<div key={i++} dangerouslySetInnerHTML={prettyLine(line)}></div>);
             else return line + "\n";
             })}
             {"\n"}
+            <a href="javascript:void(0);" onClick={this.exitFullscreen} className="exit-fullscreen btn btn-sm btn-primary" title="Toggle Fullscreen">
+                <i className="fa fa-expand"></i> Exit Fullscreen
+            </a>
         </pre>];
 
     if (this.props.showConsoleButtons){
@@ -150,8 +161,8 @@ class Console extends React.Component {
             <a href="javascript:void(0);" onClick={() => this.downloadTxt()} className="btn btn-sm btn-primary" title="Download To File">
                 <i className="fa fa-download"></i>
             </a>
-            <a href="javascript:void(0);" onClick={this.copyTxt} className="btn btn-sm btn-primary" title="Copy To Clipboard">
-                <i className="fa fa-clipboard"></i>
+            <a href="javascript:void(0);" onClick={this.enterFullscreen} className="btn btn-sm btn-primary" title="Toggle Fullscreen">
+                <i className="fa fa-expand"></i>
             </a>
         </div>);
     }

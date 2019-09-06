@@ -1,14 +1,19 @@
 import os
+import shutil
 
+import sys
 from django.contrib.auth.models import User
 from django.test import Client
 from rest_framework import status
 
+from app.models import Plugin
 from app.models import Project
 from app.models import Task
-from app.plugins import UserDataStore
+from app.plugins import UserDataStore, enable_plugin
 from app.plugins import get_plugin_by_name
+from app.plugins import sync_plugin_db, get_plugins_persistent_path
 from app.plugins.data_store import InvalidDataStoreValue
+from app.plugins.pyutils import parse_requirements, compute_file_md5, requirements_installed
 from .classes import BootTestCase
 from app.plugins.grass_engine import grass, GrassEngineException
 
@@ -32,6 +37,11 @@ class TestPlugins(BootTestCase):
         res = client.get('/plugins/test/app_mountpoint/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(res, 'plugins/test/templates/app.html')
+
+        # No python packages have been installed (plugin is disabled)
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
+
+        enable_plugin("test")
 
         # Form was rendered correctly
         self.assertContains(res, '<input type="text" name="testField" class="form-control" required id="id_testField" />', count=1, status_code=200, html=True)
@@ -86,13 +96,40 @@ class TestPlugins(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.content.decode('utf-8') == "console.log('Hello WebODM');")  # Empty
 
+        # Check that the plugins media dirs have been created
+        self.assertTrue(os.path.exists(get_plugins_persistent_path()))
+        self.assertTrue(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
+        self.assertEqual(get_plugins_persistent_path("test", "site-packages"), test_plugin.get_python_packages_path())
+
+        # Check MD5 install has been created
+        self.assertTrue(os.path.exists(test_plugin.get_python_packages_path("install_md5")))
+        with open(test_plugin.get_python_packages_path("install_md5"), "r") as f:
+            md5 = f.read().strip()
+            self.assertTrue(len(md5) > 20)
+            self.assertEqual(md5, compute_file_md5(test_plugin.get_path("requirements.txt")))
+
+        self.assertTrue(requirements_installed(test_plugin.get_path("requirements.txt"), test_plugin.get_python_packages_path()))
+
+        # Test python imports context
+        self.assertFalse(test_plugin.get_python_packages_path() in sys.path)
+        with test_plugin.python_imports():
+            self.assertTrue(test_plugin.get_python_packages_path() in sys.path)
+        self.assertFalse(test_plugin.get_python_packages_path() in sys.path)
+
+        # Parse requirements test
+        self.assertEqual(parse_requirements(test_plugin.get_path("requirements.txt"))[0], "pyodm")
+
+        # Current plugin test
+        self.assertEqual(test_plugin.get_current_plugin_test(), test_plugin)
+
+
 
     def test_grass_engine(self):
         cwd = os.path.dirname(os.path.realpath(__file__))
         grass_scripts_dir = os.path.join(cwd, "grass_scripts")
 
         ctx = grass.create_context()
-        ctx.add_file('test.geojson', """{
+        points = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -107,27 +144,51 @@ class TestPlugins(BootTestCase):
       }
     }
   ]
-}""")
+}"""
+        ctx.add_file('test.geojson', points)
         ctx.set_location("EPSG:4326")
 
-        output = execute_grass_script.delay(
-                os.path.join(grass_scripts_dir, "simple_test.grass"),
-                ctx.serialize()
-            ).get()
-        self.assertTrue("Number of points:       1" in output)
+        result = execute_grass_script.delay(
+            os.path.join(grass_scripts_dir, "simple_test.grass"),
+            ctx.serialize()
+        ).get()
+        self.assertTrue("Number of points:       1" in result.get('output'))
+
+        self.assertTrue(result.get('context') == ctx.serialize())
+
+        # Context dir has been cleaned up automatically
+        self.assertFalse(os.path.exists(ctx.get_cwd()))
 
         error = execute_grass_script.delay(
-                os.path.join(grass_scripts_dir, "nonexistant_script.grass"),
-                ctx.serialize()
-            ).get()
+            os.path.join(grass_scripts_dir, "nonexistant_script.grass"),
+            ctx.serialize()
+        ).get()
         self.assertIsInstance(error, dict)
         self.assertIsInstance(error['error'], str)
 
         with self.assertRaises(GrassEngineException):
             ctx.execute(os.path.join(grass_scripts_dir, "nonexistant_script.grass"))
 
+        ctx = grass.create_context({"auto_cleanup": False})
+        ctx.add_file('test.geojson', points)
+        ctx.set_location("EPSG:4326")
+
+        result = execute_grass_script.delay(
+            os.path.join(grass_scripts_dir, "simple_test.grass"),
+            ctx.serialize()
+        ).get()
+        self.assertTrue("Number of points:       1" in result.get('output'))
+
+        # Path still there
+        self.assertTrue(os.path.exists(ctx.get_cwd()))
+
+        ctx.cleanup()
+
+        # Cleanup worked
+        self.assertFalse(os.path.exists(ctx.get_cwd()))
 
     def test_plugin_datastore(self):
+        enable_plugin("test")
         test_plugin = get_plugin_by_name("test")
         user = User.objects.get(username='testuser')
         other_user = User.objects.get(username='testuser2')
@@ -184,4 +245,62 @@ class TestPlugins(BootTestCase):
 
         # Invalid types
         self.assertRaises(InvalidDataStoreValue, uds.set_bool, 'invalidbool', 5)
+
+    def test_toggle_plugins(self):
+        c = Client()
+        c.login(username='testuser', password='test1234')
+
+        # Cannot toggle plugins as normal user
+        res = c.get('/admin/app/plugin/test/disable/', follow=True)
+        self.assertRedirects(res, '/admin/login/?next=/admin/app/plugin/test/disable/')
+
+        c.login(username='testsuperuser', password='test1234')
+
+        enable_plugin("test")
+
+        # Test plugin is enabled
+        res = c.get('/admin/app/plugin/')
+        self.assertContains(res, '<a class="button" href="#" disabled>Enable</a>')
+        self.assertContains(res, "<script src='/plugins/test/test.js'></script>")
+
+        # Disable
+        res = c.get('/admin/app/plugin/test/disable/', follow=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Test active vs. non-active flag for get_plugin_by_name
+        self.assertTrue(get_plugin_by_name("test") is None)
+        self.assertFalse(get_plugin_by_name("test", only_active=False) is None)
+
+        # Test plugin has been disabled
+        self.assertContains(res, '<a class="button" href="#" disabled>Disable</a>')
+        self.assertNotContains(res, "<script src='/plugins/test/test.js'></script>")
+
+        # Re-enable
+        res = c.get('/admin/app/plugin/test/enable/', follow=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+
+    def test_plugin_functions(self):
+        # Check db/fs syncing
+        if os.path.exists('plugins/test_copy'):
+            print("Removing plugins/test_copy")
+            shutil.rmtree('plugins/test_copy')
+
+        sync_plugin_db()
+        self.assertTrue(Plugin.objects.filter(pk='test_copy').count() == 0)
+
+        shutil.copytree('plugins/test', 'plugins/test_copy')
+
+        sync_plugin_db()
+        self.assertTrue(Plugin.objects.filter(pk='test_copy').count() == 1)
+
+        shutil.rmtree('plugins/test_copy')
+        sync_plugin_db()
+        self.assertTrue(Plugin.objects.filter(pk='test_copy').count() == 0)
+
+        # Get manifest works and parses JSON
+        p = get_plugin_by_name("test", only_active=False)
+        self.assertEqual(p.get_manifest()['author'], "Piero Toffanin")
+
+
 

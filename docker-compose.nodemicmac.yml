@@ -1,0 +1,18 @@
+# Chaining this file to the main docker-compose file adds
+# a default processing node instance. This is best for users
+# who are just getting started with WebODM.
+
+version: '2.1'
+services:
+  webapp:
+    depends_on:
+      - node-micmac-1
+    environment:
+      - WO_CREATE_MICMAC_PNODE=YES
+  node-micmac-1:
+    image: dronemapper/node-micmac
+    container_name: node-micmac-1
+    ports:
+      - "3000"
+    restart: on-failure:10
+    oom_score_adj: 500

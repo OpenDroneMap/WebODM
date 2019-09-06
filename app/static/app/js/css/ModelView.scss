@@ -1,5 +1,6 @@
-@import '../vendor/potree/js/potree.css';
-@import '../vendor/potree/js/jquery-ui.css';
+@import '../vendor/potree/build/potree.css';
+@import '../vendor/potree/libs/jquery-ui.css';
+@import '../vendor/potree/libs/themes/mixed/style.css';
 
 .model-view{
     position: relative;
@@ -51,10 +52,6 @@
             color: #7a8184;
         }
 
-        .switchModeButton{
-            position: initial;
-        }
-
         .asset-download-buttons{
             margin-right: 8px;
             &.open{
@@ -64,13 +61,25 @@
             }
         }
 
-        .action-buttons-row{
-            margin-top: 12px;
+    }
+    .model-action-buttons{
+        position: absolute;
+        z-index: 1;
+        bottom: 12px;
+        right: 6px;
 
-            & > *{
-                display: inline-block;
-                margin-right: 8px;
+        .switchModeButton{
+            position: initial;
+        }
+        .asset-download-buttons{
+            .dropdown-menu{
+                left: -100%;
             }
+        }
+
+        & > *{
+            display: inline-block;
+            margin-right: 8px;
         }
     }
     
@@ -83,6 +92,27 @@
         width: 400px; 
         height: 400px;
         display: none
+    }
+
+    #potree_menu{
+        input{
+            color: buttontext;
+        }
+        legend{
+            display: initial !important;
+            width: initial !important;
+            padding: initial !important;
+            margin-bottom: initial !important;
+            font-size: inherit !important;
+            line-height: initial !important;
+            color: inherit !important;
+            border: initial !important;
+            border-bottom: initial !important;
+        }
+
+        #show_2d_profile{
+            color: initial !important;
+        }
     }
 
     #potree_map_header{

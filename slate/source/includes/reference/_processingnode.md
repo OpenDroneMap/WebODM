@@ -9,6 +9,8 @@
     "hostname": "nodeodm.masseranolabs.com",
     "port": 80,
     "api_version": "1.0.1",
+    "engine_version": "0.6.0",
+    "engine": "odm",
     "last_refreshed": "2017-03-01T21:14:49.918276Z",
     "queue_count": 0,
     "max_images": null,
@@ -34,7 +36,8 @@ online | bool | Whether the processing node could be reached in the last 5 minut
 hostname | string | Hostname/IP address
 port | int | Port
 api_version | string | Version of NodeODM currently running
-odm_version | string | Version of ODM currently being used
+engine_version | string | Version of processing engine currently being used
+engine | string | Lowercase identifier of processing engine
 last_refreshed | string | Date and time this node was last seen online. This value is typically refreshed every 15-30 seconds and is used to decide whether a node is offline or not
 queue_count | int | Number of [Task](#task) items currently being processed/queued on this node.
 max_images | int | Optional maximum number of images this processing node can accept. null indicates no limit.
@@ -89,6 +92,8 @@ port | | "" | Filter by port
 api_version | | "" | Filter by API version
 queue_count | | "" | Filter by queue count
 max_images | | "" | Filter by max images
+engine_version | | "" | Filter by engine version
+engine | | "" | Filter by engine identifier
 ordering | | "" | Ordering field to sort results by
 has_available_options | | "" | Return only processing nodes that have a valid set of processing options (check that the `available_options` field is populated). Either `true` or `false`.
 

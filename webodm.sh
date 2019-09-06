@@ -18,17 +18,7 @@ if [[ $platform = "Windows" ]]; then
 	export COMPOSE_CONVERT_WINDOWS_PATHS=1
 fi
 
-# Plugin commands require us to mount a docker volume
-# but older version of Windows and certain macOS directory locations
-# require user interaction. We will add better support for these in the near future.
-plugins_volume=false
-if [[ $platform = "Linux" ]]; then
-    plugins_volume=true
-elif [[ $platform = "MacOS / OSX" ]] && [[ $(pwd) == /Users* ]]; then
-    plugins_volume=true
-fi
-
-load_default_node=true
+default_nodes=1
 dev_mode=false
 
 # Load default values
@@ -87,6 +77,7 @@ case $key in
     ;;
     --dev)
     export WO_DEBUG=YES
+    export WO_DEV=YES
     dev_mode=true
     shift # past argument
     ;;
@@ -95,13 +86,25 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --mount-plugins-volume)
-    plugins_volume=true
+    --no-default-node)
+    default_nodes=0
+    echo "ATTENTION: --no-default-node is deprecated. Use --default-nodes instead."
+    export WO_DEFAULT_NODES=0
     shift # past argument
     ;;
-    --no-default-node)
-    load_default_node=false
+    --with-micmac)
+    load_micmac_node=true
     shift # past argument
+    ;;
+    --detached)
+    detached=true
+    shift # past argument
+    ;;
+    --default-nodes)
+    default_nodes="$2"
+    export WO_DEFAULT_NODES="$2"
+    shift # past argument
+    shift # past value
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -125,19 +128,13 @@ usage(){
   echo "	checkenv		Do an environment check and install missing components"
   echo "	test			Run the unit test suite (developers only)"
   echo "	resetadminpassword <new password>	Reset the administrator's password to a new one. WebODM must be running when executing this command."
-  if [[ $plugins_volume = true ]]; then
-    echo ""
-    echo "	plugin enable <plugin name>	Enable a plugin"
-    echo "	plugin disable <plugin name>	Disable a plugin"
-    echo "	plugin list		List all available plugins"
-    echo "	plugin cleanup		Cleanup plugins build directories"
-  fi
   echo ""
   echo "Options:"
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
-  echo "	--no-default-node	Do not create a default NodeODM node attached to WebODM on startup (default: disabled)"
+  echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: 1)"
+  echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
   echo "	--ssl-cert	<path>	Manually specify a path to the certificate file (.pem) to use with nginx to enable SSL (default: None)"
@@ -145,9 +142,7 @@ usage(){
   echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--dev	Enable development mode. In development mode you can make modifications to WebODM source files and changes will be reflected live. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
-  if [[ $plugins_volume = false ]]; then
-    echo "	--mount-plugins-volume	Always mount the ./plugins volume, even on unsupported platforms (developers only) (default: disabled)"
-  fi
+  echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
   exit
 }
 
@@ -180,8 +175,6 @@ check_command(){
 environment_check(){
 	check_command "docker" "https://www.docker.com/"
 	check_command "git" "https://git-scm.com/downloads"
-	check_command "python" "https://www.python.org/downloads/"
-	check_command "pip" "Run \033[1msudo easy_install pip\033[0m" "easy_install pip"
 	check_command "docker-compose" "Run \033[1mpip install docker-compose\033[0m" "pip install docker-compose"
 }
 
@@ -208,14 +201,19 @@ start(){
 	echo "SSL certificate: $WO_SSL_CERT"
 	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
 	echo "Celery Broker: $WO_BROKER"
+	echo "Default Nodes: $WO_DEFAULT_NODES"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
 
 	command="docker-compose -f docker-compose.yml"
 
-    if [[ $load_default_node = true ]]; then
+    if [[ $default_nodes > 0 ]]; then
         command+=" -f docker-compose.nodeodm.yml"
+    fi
+
+    if [[ $load_micmac_node = true ]]; then
+        command+=" -f docker-compose.nodemicmac.yml"
     fi
 
     if [[ $dev_mode = true ]]; then
@@ -260,87 +258,30 @@ start(){
 		echo "Will enable SSL ($method)"
 	fi
 
-    if [[ $plugins_volume = true ]]; then
-        command+=" -f docker-compose.plugins.yml"
-    fi
+	command="$command start || $command up"
 
-	run "$command start || $command up"
+	if [[ $detached = true ]]; then
+		command+=" -d"
+	fi
+
+	if [[ $default_nodes > 0 ]]; then
+		command+=" --scale node-odm=$default_nodes"
+	fi
+
+	run "$command"
 }
 
 down(){
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml down --remove-orphans"
+	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml -f docker-compose.nodemicmac.yml down --remove-orphans"
 }
 
 rebuild(){
 	run "docker-compose down --remove-orphans"
-	plugin_cleanup
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
 	run "rm -fr nodeodm/external/NodeODM || sudo rm -fr nodeodm/external/NodeODM"
 	run "docker-compose -f docker-compose.yml -f docker-compose.build.yml build --no-cache"
 	#run "docker images --no-trunc -aqf \"dangling=true\" | xargs docker rmi"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
-}
-
-plugin_cleanup(){
-    # Delete all node_modules and build directories within plugins' public/ folders
-    find plugins/ -type d \( -name build -o -name node_modules \) -path 'plugins/*/public/*' -exec rm -frv '{}' \;
-}
-
-plugin_list(){
-    plugins=$(ls plugins/ --hide test)
-    for plugin in $plugins; do
-        if [ -e "plugins/$plugin/disabled" ]; then
-            echo "$plugin [disabled]"
-        else
-            echo "$plugin"
-        fi
-    done
-}
-
-plugin_check(){
-    plugin_name="$1"
-    if [ ! -e "plugins/$plugin_name" ]; then
-        echo "Plugin $plugin_name does not exist."
-        exit 1
-    fi
-}
-
-plugin_volume_check(){
-    if [[ $plugins_volume = false ]]; then
-        path=$(realpath ./plugins)
-        echo "================"
-        echo "WARNING: Your platform does not support automatic volume mounting. If you want to enable/disable/develop plugins you need to:"
-        echo "1. Make sure docker can mount [$path] by modifying the docker File Sharing options"
-        echo "2. Pass the --mount-plugins-volume option to ./webodm.sh commands"
-        echo "================"
-        echo
-    fi
-}
-
-plugin_enable(){
-    plugin_name="$1"
-    plugin_check $plugin_name
-    plugin_volume_check
-
-    if [ -e "plugins/$plugin_name/disabled" ]; then
-        rm "plugins/$plugin_name/disabled"
-        echo "Plugin enabled. Run ./webodm.sh restart to apply the changes."
-    else
-        echo "Plugin already enabled."
-    fi
-}
-
-plugin_disable(){
-    plugin_name="$1"
-    plugin_check $plugin_name
-    plugin_volume_check
-    
-    if [ ! -e "plugins/$plugin_name/disabled" ]; then
-        touch "plugins/$plugin_name/disabled"
-        echo "Plugin disabled. Run ./webodm.sh restart to apply the changes."
-    else
-        echo "Plugin already disabled."
-    fi
 }
 
 run_tests(){
@@ -389,7 +330,7 @@ if [[ $1 = "start" ]]; then
 elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml stop"
+	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml -f docker-compose.nodemicmac.yml stop"
 elif [[ $1 = "restart" ]]; then
 	environment_check
 	echo "Restarting WebODM..."
@@ -407,9 +348,19 @@ elif [[ $1 = "update" ]]; then
 	down
 	echo "Updating WebODM..."
 	run "git pull origin master"
-	run "docker pull opendronemap/nodeodm"
-	run "docker pull opendronemap/webodm_db"
-	run "docker pull opendronemap/webodm_webapp"
+
+	command="docker-compose -f docker-compose.yml"
+
+	if [[ $default_nodes > 0 ]]; then
+		command+=" -f docker-compose.nodeodm.yml"
+	fi
+
+	if [[ $load_micmac_node = true ]]; then
+		command+=" -f docker-compose.nodemicmac.yml"
+	fi
+
+	command+=" pull"
+	run "$command"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 elif [[ $1 = "checkenv" ]]; then
 	environment_check
@@ -417,26 +368,6 @@ elif [[ $1 = "test" ]]; then
 	run_tests
 elif [[ $1 = "resetadminpassword" ]]; then
 	resetpassword $2
-elif [[ $1 = "plugin" ]]; then
-    if [[ $2 = "cleanup" ]]; then
-        plugin_cleanup
-    elif [[ $2 = "list" ]]; then
-        plugin_list
-    elif [[ $2 = "enable" ]]; then
-        if [[ ! -z "$3" ]]; then
-            plugin_enable $3
-        else
-            usage
-        fi
-    elif [[ $2 = "disable" ]]; then
-        if [[ ! -z "$3" ]]; then
-            plugin_disable $3
-        else
-            usage
-        fi
-    else
-        usage
-    fi
 else
 	usage
 fi

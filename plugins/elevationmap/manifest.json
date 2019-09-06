@@ -1,0 +1,13 @@
+{
+	"name": "ElevationMap",
+	"webodmMinVersion": "1.1.1",
+	"description": "Calculate and draw an elevation map based on a task's DEMs",
+	"version": "1.0.0",
+	"author": "Nicolas Chamo",
+	"email": "nicolas@chamo.com.ar",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["contours", "elevationmap", "dsm", "dem", "dtm"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 
-from app.plugins import PluginBase, Menu, MountPoint
+from app.plugins import PluginBase, Menu, MountPoint, get_current_plugin
 from app.plugins.views import TaskView
 from django.shortcuts import render
 from django import forms
@@ -47,4 +47,5 @@ class Plugin(PluginBase):
             MountPoint('/app_dynamic_script.js$', self.get_dynamic_script('dynamic.js', dynamic_cb))
         ]
 
-
+    def get_current_plugin_test(self):
+        return get_current_plugin()

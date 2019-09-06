@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "webodm-posm-gcpi": "git+https://github.com/pierotofy/webodm-posm-gcpi.git"
+    "webodm-posm-gcpi": "^1.0.0"
   }
 }

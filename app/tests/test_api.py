@@ -11,6 +11,7 @@ from app import pending_actions
 from app.models import Project, Task
 from app.plugins.signals import processing_node_removed
 from app.tests.utils import catch_signal
+from nodeodm import status_codes
 from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
 from .classes import BootTestCase
 
@@ -185,8 +186,9 @@ class TestApi(BootTestCase):
         self.assertTrue(res.data["success"])
         task.refresh_from_db()
 
-        # Task should have failed to be canceled
-        self.assertTrue("has no processing node or UUID" in task.last_error)
+        # Task should have been canceled
+        self.assertTrue(task.last_error is None)
+        self.assertEqual(task.status, status_codes.CANCELED)
 
         res = client.post('/api/projects/{}/tasks/{}/restart/'.format(project.id, task.id))
         self.assertTrue(res.data["success"])
@@ -355,8 +357,11 @@ class TestApi(BootTestCase):
         # Verify max images field
         self.assertTrue("max_images" in res.data)
 
-        # Verify odm version
-        self.assertTrue("odm_version" in res.data)
+        # Verify engine version
+        self.assertTrue("engine_version" in res.data)
+
+        # Verify engine
+        self.assertTrue("engine" in res.data)
 
         # label should be hostname:port (since no label is set)
         self.assertEqual(res.data['label'], pnode.hostname + ":" + str(pnode.port))

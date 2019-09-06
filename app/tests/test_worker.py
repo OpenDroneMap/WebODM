@@ -1,8 +1,12 @@
+import os
+from stat import ST_ATIME, ST_MTIME
+
 import worker
 from app import pending_actions
 from app.models import Project
 from app.models import Task
 from nodeodm.models import ProcessingNode
+from webodm import settings
 from .classes import BootTestCase
 from .utils import start_processing_node
 from worker.tasks import redis_client
@@ -55,3 +59,27 @@ class TestWorker(BootTestCase):
         self.assertFalse(Project.objects.filter(pk=project.id).exists())
 
         pnserver.terminate()
+
+        tmpdir = os.path.join(settings.MEDIA_TMP, 'test')
+        os.mkdir(tmpdir)
+
+        # Dir is new and should not be removed
+        worker.tasks.cleanup_tmp_directory()
+        self.assertTrue(os.path.exists(tmpdir))
+
+        st = os.stat(tmpdir)
+        atime = st[ST_ATIME]  # access time
+        mtime = st[ST_MTIME]  # modification time
+        new_mtime = mtime - (23 * 3600)  # new modification time
+        os.utime(tmpdir, (atime, new_mtime))
+
+        # 23 hours in it should still be there
+        worker.tasks.cleanup_tmp_directory()
+        self.assertTrue(os.path.exists(tmpdir))
+
+        new_mtime = mtime - (24 * 3600 + 100)  # new modification time
+        os.utime(tmpdir, (atime, new_mtime))
+
+        # After 24 hours it should get removed
+        worker.tasks.cleanup_tmp_directory()
+        self.assertFalse(os.path.exists(tmpdir))

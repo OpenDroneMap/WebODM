@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.6-stretch
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -20,7 +20,6 @@ RUN printf "deb     http://mirror.steadfast.net/debian/    testing main contrib 
 # Install Node.js GDAL, nginx, letsencrypt, psql
 RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx grass-core certbot && apt-get -qq install -y gettext-base cron postgresql-client-9.6
 
-
 # Install pip reqs
 ADD requirements.txt /webodm/
 RUN pip install -r requirements.txt
@@ -38,7 +37,7 @@ RUN npm install --quiet
 WORKDIR /webodm
 RUN npm install --quiet -g webpack && npm install --quiet -g webpack-cli && npm install --quiet && webpack --mode production
 RUN python manage.py collectstatic --noinput
-#RUN echo "from app.plugins import register_plugins; register_plugins()" | python manage.py shell
+RUN bash app/scripts/plugin_cleanup.sh && echo "from app.plugins import build_plugins;build_plugins()" | python manage.py shell
 
 RUN rm /webodm/webodm/secret_key.py
 

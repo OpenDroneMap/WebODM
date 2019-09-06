@@ -158,6 +158,9 @@ class TestApp(BootTestCase):
         admin_menu_items = ['/admin/app/setting/{}/change/'.format(settingId),
                             '/admin/app/theme/{}/change/'.format(themeId),
                             '/admin/',
+                            '/admin/app/plugin/',
+                            '/admin/auth/user/',
+                            '/admin/auth/group/',
                             ]
 
         for url in admin_menu_items:

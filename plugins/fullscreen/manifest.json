@@ -1,0 +1,13 @@
+{
+	"name": "Fullscreen Button",
+	"webodmMinVersion": "0.5.0",
+	"description": "Add a fullscreen button to the 2D map view",
+	"version": "1.0.0",
+	"author": "Piero Toffanin",
+	"email": "pt@masseranolabs.com",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["fullscreen"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

@@ -13,6 +13,7 @@ class EditTaskForm extends React.Component {
     selectedNode: null,
     task: null,
     onFormChanged: () => {},
+    inReview: false
   };
 
   static propTypes = {
@@ -22,6 +23,7 @@ class EditTaskForm extends React.Component {
       ]),
       onFormLoaded: PropTypes.func,
       onFormChanged: PropTypes.func,
+      inReview: PropTypes.bool,
       task: PropTypes.object
   };
 
@@ -158,6 +160,8 @@ class EditTaskForm extends React.Component {
             }else{
               this.selectNodeByKey(this.props.task.processing_node);
             }
+          }else if (this.props.selectedNode){
+            this.selectNodeByKey(this.props.selectedNode);
           }else{
             this.selectNodeByKey("auto");
           }
@@ -305,6 +309,10 @@ class EditTaskForm extends React.Component {
   selectNodeByKey(key){
     let node = this.state.processingNodes.find(node => node.key == key);
     if (node) this.setState({selectedNode: node});
+    else{
+        console.warn(`Node ${key} does not exist, selecting auto`);
+        this.selectNodeByKey("auto");
+    }
   }
 
   handleSelectNode(e){
@@ -323,7 +331,9 @@ class EditTaskForm extends React.Component {
 
   getAvailableOptionsOnlyText(options, availableOptions){
     const opts = this.getAvailableOptionsOnly(options, availableOptions);
-    return opts.map(opt => `${opt.name}:${opt.value}`).join(", ");
+    let res = opts.map(opt => `${opt.name}:${opt.value}`).join(", ");
+    if (!res) res = "Default";
+    return res;
   }
 
   saveLastPresetToStorage(){
@@ -479,6 +489,49 @@ class EditTaskForm extends React.Component {
     let taskOptions = "";
     if (this.formReady()){
 
+      const optionsSelector = (<div>
+        <select 
+            title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
+            className="form-control" 
+            value={this.state.selectedPreset.id} 
+            onChange={this.handleSelectPreset}>
+        {this.state.presets.map(preset => 
+            <option value={preset.id} key={preset.id} className={preset.system ? "system-preset" : ""}>{preset.name}</option>
+        )}
+        </select>
+
+        {!this.state.presetActionPerforming ?
+        <div className="btn-group presets-dropdown">
+            <button type="button" className="btn btn-default" onClick={this.handleEditPreset}>
+            <i className="fa fa-sliders"></i>
+            </button>
+            <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <span className="caret"></span>
+            </button>
+            <ul className="dropdown-menu">
+            <li>
+                <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders"></i> Edit</a>
+            </li>
+            <li className="divider"></li>
+
+            {this.state.selectedPreset.id !== -1 ?
+                <li>
+                <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-copy"></i> Duplicate</a>
+                </li>
+            :
+                <li>
+                <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-save"></i> Save</a>
+                </li>
+            }
+            <li className={this.state.selectedPreset.system ? "disabled" : ""}>
+                <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash-o"></i> Delete</a>
+            </li>
+            </ul>
+        </div>
+        : <i className="preset-performing-action-icon fa fa-cog fa-spin fa-fw"></i>}
+        <ErrorMessage className="preset-error" bind={[this, 'presetError']} />
+      </div>);
+
       taskOptions = (
         <div>
           <div className="form-group">
@@ -494,46 +547,10 @@ class EditTaskForm extends React.Component {
           <div className="form-group form-inline">
             <label className="col-sm-2 control-label">Options</label>
             <div className="col-sm-10">
-              <select 
-                  title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
-                  className="form-control" 
-                  value={this.state.selectedPreset.id} 
-                  onChange={this.handleSelectPreset}>
-                {this.state.presets.map(preset => 
-                  <option value={preset.id} key={preset.id} className={preset.system ? "system-preset" : ""}>{preset.name}</option>
-                )}
-              </select>
-
-              {!this.state.presetActionPerforming ?
-                <div className="btn-group presets-dropdown">
-                  <button type="button" className="btn btn-default" onClick={this.handleEditPreset}>
-                    <i className="fa fa-sliders"></i>
-                  </button>
-                  <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                        <span className="caret"></span>
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders"></i> Edit</a>
-                    </li>
-                    <li className="divider"></li>
-
-                    {this.state.selectedPreset.id !== -1 ?
-                      <li>
-                        <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-copy"></i> Duplicate</a>
-                      </li>
-                    :
-                      <li>
-                        <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-save"></i> Save</a>
-                      </li>
-                    }
-                    <li className={this.state.selectedPreset.system ? "disabled" : ""}>
-                      <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash-o"></i> Delete</a>
-                    </li>
-                  </ul>
-                </div>
-              : <i className="preset-performing-action-icon fa fa-cog fa-spin fa-fw"></i>}
-              <ErrorMessage className="preset-error" bind={[this, 'presetError']} />
+              {!this.props.inReview ? optionsSelector : 
+               <div className="review-options">
+                {this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
+               </div>}
             </div>
           </div>
 

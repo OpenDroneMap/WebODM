@@ -1,13 +1,22 @@
-import sys
 from django.conf.urls import url, include
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 
 from .views import app as app_views, public as public_views
 from .plugins import get_app_url_patterns
 
 from app.boot import boot
 from webodm import settings
+from app.plugins import sync_plugin_db
+
+# Test cases call boot() independently
+# Also don't execute boot with celery workers
+if not settings.WORKER_RUNNING and not settings.TESTING:
+    boot()
+
+# During testing, boot() is not called (see above)
+# but we need to know which plugins are available to mount the proper
+# routes via urlpatterns.
+if settings.TESTING:
+    sync_plugin_db()
 
 urlpatterns = [
     url(r'^$', app_views.index, name='index'),
@@ -28,14 +37,9 @@ urlpatterns = [
     url(r'^api/', include("app.api.urls")),
 ]
 
-# TODO: is there a way to place plugins /public directories
-# into the static build directories and let nginx serve them?
-urlpatterns += get_app_url_patterns()
-
 handler404 = app_views.handler404
 handler500 = app_views.handler500
 
-# Test cases call boot() independently
-# Also don't execute boot with celery workers
-if not settings.WORKER_RUNNING and not settings.TESTING:
-    boot()
+# TODO: is there a way to place plugins /public directories
+# into the static build directories and let nginx serve them?
+urlpatterns += get_app_url_patterns()

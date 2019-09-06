@@ -1,15 +1,16 @@
 <img alt="WebODM" src="https://user-images.githubusercontent.com/1951843/34074943-8f057c3c-e287-11e7-924d-3ccafa60c43a.png" width="180">
 
-[![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM) [![Join Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/OpenDroneMap/web-development) [![GitHub version](https://badge.fury.io/gh/OpenDroneMap%2FWebODM.svg)](https://badge.fury.io/gh/OpenDroneMap%2FWebODM)
+[![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM) [![GitHub version](https://badge.fury.io/gh/OpenDroneMap%2FWebODM.svg)](https://badge.fury.io/gh/OpenDroneMap%2FWebODM)
 
-A free, user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It uses [ODM](https://github.com/OpenDroneMap/ODM) for processing.
+A user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It supports multiple engines for processing, currently [ODM](https://github.com/OpenDroneMap/ODM) and [MicMac](https://github.com/dronemapper-io/NodeMICMAC/) (experimental).
 
 
-![image](https://user-images.githubusercontent.com/1951843/33631371-5c55cc2c-d9d8-11e7-8609-b9032d4bbbb6.png)
+![image](https://user-images.githubusercontent.com/1951843/55430260-9b748380-555b-11e9-99b5-dc25f7e79132.png)
 
 
 * [Getting Started](#getting-started)
     * [Manage Processing Nodes](#manage-processing-nodes)
+    * [Enable MicMac](#enable-micmac)
     * [Enable SSL](#enable-ssl)
     * [Where Are My Files Stored?](#where-are-my-files-stored)
     * [Common Troubleshooting](#common-troubleshooting)
@@ -39,8 +40,6 @@ A free, user-friendly, extendable application and [API](http://docs.webodm.org) 
 
 * Install the following applications (if they are not installed already):
  - [Docker](https://www.docker.com/)
- - [Python](https://www.python.org/downloads/)
- - [Pip](https://pypi.python.org/pypi/pip/)
  - [Git](https://git-scm.com/downloads)
 
 * Windows users have a choice between Docker Toolbox (Windows 10 Home or older) and Docker for Windows (Windows 10 Pro or newer). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes). 
@@ -83,17 +82,25 @@ You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendrone
 
 ### Manage Processing Nodes
 
-WebODM can be linked to one or more processing nodes running [NodeODM](https://github.com/OpenDroneMap/NodeODM). The default configuration already includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
+WebODM can be linked to one or more processing nodes that speak the [NodeODM API](https://github.com/OpenDroneMap/NodeODM/blob/master/docs/index.adoc), such as [NodeODM](https://github.com/OpenDroneMap/NodeODM), [NodeMICMAC](https://github.com/dronemapper-io/NodeMICMAC/) or [ClusterODM](https://github.com/OpenDroneMap/ClusterODM). The default configuration includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
 
-Adding more processing nodes will allow you to run multiple jobs in parallel. 
+Adding more processing nodes will allow you to run multiple jobs in parallel.
 
-You **will not be able to distribute a single job across multiple processing nodes**. We are actively working to bring this feature to reality, but we're not there yet. 
+You can also setup a [ClusterODM](https://github.com/OpenDroneMap/ClusterODM) node to run a single task across multiple machines with [distributed split-merge](https://docs.opendronemap.org/large.html#distributed-split-merge) and process dozen of thousands of images more quickly, with less memory.
 
 If you don't need the default "node-odm-1" node, simply pass the `--no-default-node` flag when starting WebODM:
 
 `./webodm.sh restart --no-default-node`. 
 
 Then from the web interface simply manually remove the "node-odm-1" node.
+
+### Enable MicMac
+
+WebODM can use [MicMac](https://github.com/micmacIGN/micmac) as a processing engine via [NodeMICMAC](https://github.com/dronemapper-io/NodeMICMAC/). To add MicMac, simply run:
+
+`./webodm.sh restart --with-micmac`
+
+This will create a "node-micmac-1" processing node on the same machine running WebODM. Please note that NodeMICMAC is in active development and is currently experimental. If you find issues, please [report them](https://github.com/dronemapper-io/NodeMICMAC/issues) on the NodeMICMAC repository.
 
 ### Enable SSL
 
@@ -123,14 +130,14 @@ Note that existing task results will not be available after the change. Refer to
 
 ### Common Troubleshooting
 
-Sympthoms | Possible Solutions
+Symptoms | Possible Solutions
 --------- | ------------------
 While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
 While starting WebODM you get: `'WaitNamedPipe','The system cannot find the file specified.'` | 1. Make sure you have enabled VT-x virtualization in the BIOS.<br/>2. Try to downgrade your version of Python to 2.7
 While Accessing the WebODM interface you get: `OperationalError at / could not translate host name “db” to address: Name or service not known` or `ProgrammingError at / relation “auth_user” does not exist` | Try restarting your computer, then type: `./webodm.sh restart`
 Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
 After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` | Try to remove your WebODM folder and start from a fresh git clone
-Task fails with `Process exited with code null`, no task console output - OR - console output shows `Illegal Instruction` - OR - console output shows `Child returned 132` | If the computer running NodeODM is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup NodeODM natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher.
+Task fails with `Process exited with code null`, no task console output - OR - console output shows `Illegal Instruction` - OR - console output shows `Child returned 132` | If the computer running NodeODM is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup NodeODM natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2 and POPCNT instruction set support or higher.
 On Windows, docker-compose fails with `Failed to execute the script docker-compose` | Make sure you have enabled VT-x virtualization in the BIOS
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
@@ -173,23 +180,7 @@ The password will be reset to `newpass`. The command will also tell you what use
 
 ### Manage Plugins
 
-To list all available plugins type:
-
-```bash
-./webodm.sh plugin list
-```
-
-To enable/disable a plugin type:
-
-```bash
-./webodm.sh plugin enable <plugin name>
-./webodm.sh plugin disable <plugin name>
-./webodm.sh restart
-```
-
-On some platforms (eg. Windows), if you want to manage plugins, you will need to make sure that the `./plugins` directory can be mounted as a docker volume and then pass the `--mount-plugins-volume` flag to `webodm.sh`. Check the docker documentation.
-
-If you are running WebODM natively, you'll need to restart your web server and gunicorn services.
+Plugins can be enabled and disabled from the user interface. Simply go to Administration -- Plugins.
 
 ### Update
 
@@ -289,7 +280,7 @@ There are many ways to contribute back to the project:
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
  - ⭐️ us on GitHub.
  - Spread the word about WebODM and OpenDroneMap on social media.
- - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [premium support package](https://webodm.org/services#premium-support).
+ - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [book](https://odmbook.com/).
  - Become a contributor 🤘
 
 ## Become a Contributor
