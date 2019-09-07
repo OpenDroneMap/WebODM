@@ -31,7 +31,8 @@ class NewTaskPanel extends React.Component {
       resizeSize: parseInt(Storage.getItem('resize_size')) || 2048,
       items: [], // Coming from plugins,
       taskInfo: {},
-      inReview: false
+      inReview: false,
+      loading: false,
     };
 
     this.save = this.save.bind(this);
@@ -56,7 +57,7 @@ class NewTaskPanel extends React.Component {
     if (!this.state.inReview){
       this.setState({inReview: true});
     }else{
-      this.setState({inReview: false});
+      this.setState({inReview: false, loading: true});
       e.preventDefault();
       this.taskForm.saveLastPresetToStorage();
       Storage.setItem('resize_size', this.state.resizeSize);
@@ -181,7 +182,11 @@ class NewTaskPanel extends React.Component {
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10 text-right">
                 {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{marginRight: 4}}><i className="glyphicon glyphicon-remove-circle"></i> Cancel</button>}
-                <button type="submit" className="btn btn-primary" onClick={this.save} disabled={this.props.filesCount <= 1}><i className="glyphicon glyphicon-saved"></i> {!this.state.inReview ? "Review" : "Start Processing"}</button>
+                {this.state.loading ?
+                  <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-o-notch fa-spin fa-fw"></i>Loading...</button>
+                  :
+                  <button type="submit" className="btn btn-primary" onClick={this.save} disabled={this.props.filesCount <= 1}><i className="glyphicon glyphicon-saved"></i> {!this.state.inReview ? "Review" : "Start Processing"}</button>
+                }
               </div>
             </div>
             : ""}
