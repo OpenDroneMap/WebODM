@@ -7,7 +7,7 @@ export default class TaskView extends Component {
 	static propTypes = {
 		task: PropTypes.object.isRequired,
 		apiURL: PropTypes.string.isRequired,
-  }
+    }
 	
 	state = {
 		folderUrl: null,
