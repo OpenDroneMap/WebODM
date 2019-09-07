@@ -162,7 +162,7 @@ Your backup files will be stored in the newly created `backup` directory. Transf
 
 ```bash
 ls backup # --> appmedia.tar  dbdata.tar
-./webodm.sh start && ./webodm.sh down # Create volumes
+./webodm.sh down # Make sure WebODM is down
 docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/dbdata.tar"
 docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/appmedia.tar"
 ./webodm.sh start
