@@ -251,6 +251,7 @@ class ProjectListItem extends React.Component {
     
     PluginsAPI.Dashboard.triggerAddNewTaskButton({projectId: this.state.data.id, onNewTaskAdded: this.newTaskAdded}, (button) => {
         if (!button) return;
+
         this.setState(update(this.state, {
             buttons: {$push: [button]}
         }));
@@ -427,7 +428,7 @@ class ProjectListItem extends React.Component {
                       onClick={this.handleImportTask}>
                   <i className="glyphicon glyphicon-import"></i> Import
                 </button>
-                {this.state.buttons.map((button, i) => button)}
+                {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
               </div>
             : ""}
 
