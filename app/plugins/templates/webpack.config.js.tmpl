@@ -4,7 +4,6 @@ require("module").Module._initPaths();
 
 let path = require("path");
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
-let LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   mode: 'production',
@@ -19,7 +18,6 @@ module.exports = {
   },
 
   plugins: [
-    new LiveReloadPlugin(),
     new ExtractTextPlugin('[name].css', {
         allChunks: true
     })
@@ -84,5 +82,11 @@ module.exports = {
     "leaflet": "leaflet",
     "ReactDOM": "ReactDOM",
     "React": "React"
+  },
+
+  watchOptions: {
+    ignored: /node_modules/,
+    aggregateTimeout: 300,
+    poll: 1000
   }
 }

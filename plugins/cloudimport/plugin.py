@@ -25,6 +25,7 @@ class Plugin(PluginBase):
         api_views = [api_view for platform in get_all_extended_platforms() for api_view in platform.get_api_views()]
         mount_points = [MountPoint(path, view) for (path, view) in api_views]
         # Add mount points for each extended platform that might require us to do so
+
         return mount_points + [
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/import", ImportFolderTaskView.as_view()),
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/checkforurl", CheckUrlTaskView.as_view()),
