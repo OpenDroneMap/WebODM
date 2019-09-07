@@ -13,7 +13,7 @@ PluginsAPI.Dashboard.addTaskActionButton(
 	["cloudimport/build/TaskView.js"],
 	function(args, ImportView) {
 		$.ajax({
-			url: `{{ api_url }}/projects/${args.task.project}/tasks/${args.task.id}/checkforurl`,
+			url: "{{ api_url }}/projects/" + args.task.project + "/tasks/" + args.task.id + "/checkforurl",
 			dataType: 'json',
 			async: false,
 			success: function(data) {
