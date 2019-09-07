@@ -12,9 +12,17 @@ PluginsAPI.Dashboard.addNewTaskButton(
 PluginsAPI.Dashboard.addTaskActionButton(
 	["cloudimport/build/TaskView.js"],
 	function(args, ImportView) {
-        return React.createElement(ImportView, {
-                task: args.task,
-                apiURL: "{{ api_url }}",
-        });
+		$.ajax({
+			url: `{{ api_url }}/projects/${args.task.project}/tasks/${args.task.id}/checkforurl`,
+			dataType: 'json',
+			async: false,
+			success: function(data) {
+				if (data.folder_url) {
+					return React.createElement(ImportView, {
+						folderUrl: data.folder_url,
+					});
+				}
+			}
+		});
 	}
 );
