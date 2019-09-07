@@ -23,7 +23,8 @@ if (!window.PluginsAPI){
       'jQuery': { loader: 'globals-loader', exports: '$' },
       'leaflet': { loader: 'globals-loader', exports: 'L' },
       'ReactDOM': { loader: 'globals-loader', exports: 'ReactDOM' },
-      'React': { loader: 'globals-loader', exports: 'React' }
+      'React': { loader: 'globals-loader', exports: 'React' },
+      'SystemJS': { loader: 'globals-loader', exports: 'SystemJS' },
     }
   });
 

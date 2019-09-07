@@ -32,7 +32,8 @@ class ProjectListItem extends React.Component {
       error: "",
       data: props.data,
       refreshing: false,
-      importing: false
+      importing: false,
+      buttons: []
     };
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
@@ -247,6 +248,14 @@ class ProjectListItem extends React.Component {
           }
         });
     }
+    
+    PluginsAPI.Dashboard.triggerAddNewTaskButton({projectId: this.state.data.id, onNewTaskAdded: this.newTaskAdded}, (button) => {
+        if (!button) return;
+
+        this.setState(update(this.state, {
+            buttons: {$push: [button]}
+        }));
+    });
   }
 
   newTaskAdded = () => {
@@ -419,6 +428,7 @@ class ProjectListItem extends React.Component {
                       onClick={this.handleImportTask}>
                   <i className="glyphicon glyphicon-import"></i> Import
                 </button>
+                {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
               </div>
             : ""}
 

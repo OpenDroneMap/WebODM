@@ -90,5 +90,11 @@ module.exports = {
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
     "React": "React"
+  },
+
+  watchOptions: {
+    ignored: /node_modules/,
+    aggregateTimeout: 300,
+    poll: 1000
   }
 }
