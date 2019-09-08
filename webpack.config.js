@@ -22,7 +22,7 @@ module.exports = {
   },
 
   plugins: [
-    new LiveReloadPlugin(),
+    new LiveReloadPlugin({appendScriptTag: true}),
     new BundleTracker({filename: './webpack-stats.json'}),
     new ExtractTextPlugin('css/[name]-[hash].css', {
         allChunks: true
