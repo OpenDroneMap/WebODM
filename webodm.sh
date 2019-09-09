@@ -22,7 +22,7 @@ default_nodes=1
 dev_mode=false
 
 # Load default values
-source .env
+source ${__dirname}/.env
 DEFAULT_PORT="$WO_PORT"
 DEFAULT_HOST="$WO_HOST"
 DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
