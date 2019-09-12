@@ -5,6 +5,7 @@ from app.plugins import get_api_url_patterns
 from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskTiles, TaskTilesJson, TaskDownloads, TaskAssets, TaskAssetsImport
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
+from .admin import UserViewSet, GroupViewSet
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
 
@@ -17,11 +18,16 @@ router.register(r'presets', PresetViewSet, base_name='presets')
 tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
 tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')
 
+admin_router = routers.DefaultRouter()
+admin_router.register(r'admin/users', UserViewSet, basename='user')
+admin_router.register(r'admin/groups', GroupViewSet, basename='group')
+
 urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
 
     url(r'^', include(router.urls)),
     url(r'^', include(tasks_router.urls)),
+    url(r'^', include(admin_router.urls)),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.png$', TaskTiles.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles\.json$', TaskTilesJson.as_view()),
