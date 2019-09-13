@@ -14,8 +14,8 @@ RUN apt-get -qq install -y nodejs
 # Configure use of testing branch of Debian
 RUN printf "Package: *\nPin: release a=stable\nPin-Priority: 900\n" > /etc/apt/preferences.d/stable.pref
 RUN printf "Package: *\nPin: release a=testing\nPin-Priority: 750\n" > /etc/apt/preferences.d/testing.pref
-RUN printf "deb     http://mirror.steadfast.net/debian/    stable main contrib non-free\ndeb-src http://mirror.steadfast.net/debian/    stable main contrib non-free" > /etc/apt/sources.list.d/stable.list
-RUN printf "deb     http://mirror.steadfast.net/debian/    testing main contrib non-free\ndeb-src http://mirror.steadfast.net/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
+RUN printf "deb     https://mirror.steadfast.net/debian/    stable main contrib non-free\ndeb-src https://mirror.steadfast.net/debian/    stable main contrib non-free" > /etc/apt/sources.list.d/stable.list
+RUN printf "deb     https://mirror.steadfast.net/debian/    testing main contrib non-free\ndeb-src https://mirror.steadfast.net/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
 
 # Install Node.js GDAL, nginx, letsencrypt, psql
 RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx grass-core certbot && apt-get -qq install -y gettext-base cron postgresql-client-9.6
