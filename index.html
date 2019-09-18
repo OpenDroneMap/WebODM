@@ -913,9 +913,12 @@ These paths could change in future versions of WebODM. If the asset you need can
     </span><span class="s2">"hostname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w">
     </span><span class="s2">"api_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"engine_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.6.0"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"engine"</span><span class="p">:</span><span class="w"> </span><span class="s2">"odm"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"last_refreshed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-03-01T21:14:49.918276Z"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"queue_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
     </span><span class="s2">"max_images"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com:80"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"available_options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
             </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
@@ -962,6 +965,16 @@ take care of processing input images. Processing nodes are computers or virtual 
 <td>Version of NodeODM currently running</td>
 </tr>
 <tr>
+<td>engine_version</td>
+<td>string</td>
+<td>Version of processing engine currently being used</td>
+</tr>
+<tr>
+<td>engine</td>
+<td>string</td>
+<td>Lowercase identifier of processing engine</td>
+</tr>
+<tr>
 <td>last_refreshed</td>
 <td>string</td>
 <td>Date and time this node was last seen online. This value is typically refreshed every 15-30 seconds and is used to decide whether a node is offline or not</td>
@@ -975,6 +988,11 @@ take care of processing input images. Processing nodes are computers or virtual 
 <td>max_images</td>
 <td>int</td>
 <td>Optional maximum number of images this processing node can accept. null indicates no limit.</td>
+</tr>
+<tr>
+<td>label</td>
+<td>string</td>
+<td>Label for the node</td>
 </tr>
 <tr>
 <td>available_options</td>
@@ -1102,6 +1120,18 @@ take care of processing input images. Processing nodes are computers or virtual 
 <td>Filter by max images</td>
 </tr>
 <tr>
+<td>engine_version</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by engine version</td>
+</tr>
+<tr>
+<td>engine</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Filter by engine identifier</td>
+</tr>
+<tr>
 <td>ordering</td>
 <td></td>
 <td>&ldquo;&rdquo;</td>
@@ -1195,6 +1225,341 @@ model-wise (can a user add a project? can a user view projects?).</p>
 </tr>
 </tbody></table>
 
+          <h2 id="admin-users">Admin/Users</h2>
+
+<blockquote>
+<p>Example User</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pbkdf2_sha256$120000$vkzUnKJwwaNl$95nqgBjqZ3/8Plk5soe2SjUPEF5fFNjBDfIapOXCy/Y="</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"last_login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-09-12T01:45:05Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"is_superuser"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin@example.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"is_staff"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"is_active"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"date_joined"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-09-12T01:44:18Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="mi">1</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="s2">"user_permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="mi">9</span><span class="p">,</span><span class="w">
+        </span><span class="mi">10</span><span class="p">,</span><span class="w">
+        </span><span class="mi">11</span><span class="p">,</span><span class="w">
+        </span><span class="mi">12</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>This API can only be used by admin users.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td>password</td>
+<td>string</td>
+<td>Password</td>
+</tr>
+<tr>
+<td>last_login</td>
+<td>string</td>
+<td>Last login date and time</td>
+</tr>
+<tr>
+<td>is_superuser</td>
+<td>bool</td>
+<td>If user is superuser then true</td>
+</tr>
+<tr>
+<td>username</td>
+<td>string</td>
+<td>User name</td>
+</tr>
+<tr>
+<td>first_name</td>
+<td>string</td>
+<td>User first name</td>
+</tr>
+<tr>
+<td>last_name</td>
+<td>string</td>
+<td>User last name</td>
+</tr>
+<tr>
+<td>email</td>
+<td>string</td>
+<td>User email</td>
+</tr>
+<tr>
+<td>is_staff</td>
+<td>bool</td>
+<td>If user is staff then true</td>
+</tr>
+<tr>
+<td>is_active</td>
+<td>bool</td>
+<td>If user is active then true</td>
+</tr>
+<tr>
+<td>date_joined</td>
+<td>string</td>
+<td>Join date and time</td>
+</tr>
+<tr>
+<td>groups</td>
+<td>int[]</td>
+<td>List of groups to which the user belongs</td>
+</tr>
+<tr>
+<td>user_permissions</td>
+<td>int[]</td>
+<td>List of permissions to which the user has</td>
+</tr>
+</tbody></table>
+
+<h3 id="create-a-user">Create a user</h3>
+
+<p><code class="prettyprint">POST /api/admin/users/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>password</td>
+<td>*</td>
+<td>&ldquo;&rdquo;</td>
+<td>Password</td>
+</tr>
+<tr>
+<td>is_superuser</td>
+<td></td>
+<td>false</td>
+<td>If user is superuser then true</td>
+</tr>
+<tr>
+<td>username</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>User name</td>
+</tr>
+<tr>
+<td>first_name</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>User first name</td>
+</tr>
+<tr>
+<td>last_name</td>
+<td>*</td>
+<td>&ldquo;&rdquo;</td>
+<td>User last name</td>
+</tr>
+<tr>
+<td>email</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>User email</td>
+</tr>
+<tr>
+<td>is_staff</td>
+<td></td>
+<td>false</td>
+<td>If user is staff then true</td>
+</tr>
+<tr>
+<td>is_active</td>
+<td></td>
+<td>false</td>
+<td>If user is active then true</td>
+</tr>
+<tr>
+<td>groups</td>
+<td>int[]</td>
+<td>[]</td>
+<td>List of groups to which the user belongs</td>
+</tr>
+<tr>
+<td>user_permissions</td>
+<td>int[]</td>
+<td>[]</td>
+<td>List of permissions to which the user has</td>
+</tr>
+</tbody></table>
+
+<h3 id="update-a-user">Update a user</h3>
+
+<p><code class="prettyprint">POST /api/admin/users/{id}/</code></p>
+
+<p>Parameters are the same as above.</p>
+
+<h3 id="delete-a-user">Delete a user</h3>
+
+<p><code class="prettyprint">DELETE /api/admin/users/{id}/</code></p>
+
+<h3 id="get-a-user">Get a user</h3>
+
+<p><code class="prettyprint">GET /api/admin/users/{id}/</code></p>
+
+<h3 id="get-list-of-users">Get list of users</h3>
+
+<p><code class="prettyprint">GET /api/admin/users/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>email</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>User email</td>
+</tr>
+</tbody></table>
+
+<h4 id="example-filtering-by-email">Example: Filtering by email</h4>
+
+<p><code class="prettyprint">GET /api/admin/users/?email=user@example.com</code></p>
+
+<p>Retrieves projects that have a email of &ldquo;user@example.com&rdquo;.</p>
+
+<h2 id="admin-groups">Admin/Groups</h2>
+
+<blockquote>
+<p>Example Group</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Xyz"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="mi">53</span><span class="p">,</span><span class="w">
+        </span><span class="mi">54</span><span class="p">,</span><span class="w">
+        </span><span class="mi">55</span><span class="p">,</span><span class="w">
+        </span><span class="mi">56</span><span class="p">,</span><span class="w">
+        </span><span class="mi">37</span><span class="p">,</span><span class="w">
+        </span><span class="mi">38</span><span class="p">,</span><span class="w">
+        </span><span class="mi">39</span><span class="p">,</span><span class="w">
+        </span><span class="mi">40</span><span class="p">,</span><span class="w">
+        </span><span class="mi">49</span><span class="p">,</span><span class="w">
+        </span><span class="mi">50</span><span class="p">,</span><span class="w">
+        </span><span class="mi">51</span><span class="p">,</span><span class="w">
+        </span><span class="mi">52</span><span class="p">,</span><span class="w">
+        </span><span class="mi">76</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>This API can only be used by admin users.</p>
+
+<table><thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>Group name</td>
+</tr>
+<tr>
+<td>permissions</td>
+<td>int[]</td>
+<td>List of permissions to which the group belongs</td>
+</tr>
+</tbody></table>
+
+<h3 id="create-a-group">Create a group</h3>
+
+<p><code class="prettyprint">POST /api/admin/groups/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>name</td>
+<td>*</td>
+<td>&ldquo;&rdquo;</td>
+<td>Group name</td>
+</tr>
+<tr>
+<td>permissions</td>
+<td>int[]</td>
+<td>[]</td>
+<td>List of permissions to which the group belongs</td>
+</tr>
+</tbody></table>
+
+<h3 id="update-a-group">Update a group</h3>
+
+<p><code class="prettyprint">POST /api/admin/groups/{id}/</code></p>
+
+<p>Parameters are the same as above.</p>
+
+<h3 id="delete-a-group">Delete a group</h3>
+
+<p><code class="prettyprint">DELETE /api/admin/groups/{id}/</code></p>
+
+<h3 id="get-a-group">Get a group</h3>
+
+<p><code class="prettyprint">GET /api/admin/groups/{id}/</code></p>
+
+<h3 id="get-list-of-group">Get list of group</h3>
+
+<p><code class="prettyprint">GET /api/admin/groups/</code></p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>name</td>
+<td></td>
+<td>&ldquo;&rdquo;</td>
+<td>Group name</td>
+</tr>
+</tbody></table>
+
+<h4 id="example-filtering-by-email">Example: Filtering by email</h4>
+
+<p><code class="prettyprint">GET /api/admin/groups/?name=Xyz</code></p>
+
+<p>Retrieves projects that have a name of &ldquo;Xyz&rdquo;.</p>
+
           <h2 id="handling-errors">Handling Errors</h2>
 
 <p>All API calls use the status codes as described in the <a href="http://www.django-rest-framework.org/api-guide/status-codes/">Django REST Framework&rsquo;s Status Code Guide</a>, but generally you only need to check for success status codes (<code class="prettyprint">200</code> or <code class="prettyprint">204</code>), handle the special case of <a href="#token-expiration">Token Expiration</a> (<code class="prettyprint">403</code>) and report an error otherwise.</p>
@@ -1255,7 +1620,7 @@ model-wise (can a user add a project? can a user view projects?).</p>
 
 <p>Follow the <a href="https://github.com/OpenDroneMap/WebODM#getting-started">Getting Started</a> instructions, then run:</p>
 
-<p><code class="prettyprint">./devenv.sh start</code></p>
+<p><code class="prettyprint">./webodm.sh start --dev</code></p>
 
 <p>That&rsquo;s it! You can modify any of the files, including SASS and React.js files. Changes will be reflected in the running WebODM instance automatically. </p>
 
@@ -1269,7 +1634,7 @@ model-wise (can a user add a project? can a user view projects?).</p>
 
 <p>To run the unit tests, simply type:</p>
 
-<p><code class="prettyprint">./devenv.sh runtests</code></p>
+<p><code class="prettyprint">./webodm.sh test</code></p>
 
 <h2 id="project-overview">Project Overview</h2>
 
