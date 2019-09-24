@@ -66,7 +66,7 @@ user_permissions | int[] | [] | List of permissions to which the user has
 
 ### Update a user
 
-`POST /api/admin/users/{id}/`
+`PUT /api/admin/users/{id}/`
 
 Parameters are the same as above.
 
@@ -145,7 +145,7 @@ permissions | int[] | [] | List of permissions to which the group belongs
 
 ### Update a group
 
-`POST /api/admin/groups/{id}/`
+`PUT /api/admin/groups/{id}/`
 
 Parameters are the same as above.
 
