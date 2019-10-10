@@ -31,7 +31,7 @@ http {
   server {
       server_name $WO_HOST;
       listen 8080;
-      return 301 https://$WO_HOST:$WO_PORT$request_uri;
+      return 301 https://$WO_HOST$request_uri;
   }
 
   server {
