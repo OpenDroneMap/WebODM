@@ -280,7 +280,7 @@ There are many ways to contribute back to the project:
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
  - ⭐️ us on GitHub.
  - Spread the word about WebODM and OpenDroneMap on social media.
- - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [book](https://odmbook.com/).
+ - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
  - Become a contributor 🤘
 
 ## Become a Contributor
