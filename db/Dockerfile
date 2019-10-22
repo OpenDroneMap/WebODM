@@ -3,7 +3,7 @@ MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV POSTGIS_MAJOR 2.3
 
-RUN source /etc/os-release \
+RUN . /etc/os-release \
       && echo "deb http://deb.debian.org/debian "$VERSION_CODENAME"-backports main" >> /etc/apt/sources.list \
 	  && apt-get update \
       && apt-get install -y --no-install-recommends \
