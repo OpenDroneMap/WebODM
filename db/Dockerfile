@@ -3,7 +3,8 @@ MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV POSTGIS_MAJOR 2.3
 
-RUN echo "deb http://deb.debian.org/debian "$(lsb_release --codename | cut -f2)"-backports main" >> /etc/apt/sources.list \
+RUN . /etc/os-release \
+      && echo "deb http://deb.debian.org/debian "$VERSION_CODENAME"-backports main" >> /etc/apt/sources.list \
 	  && apt-get update \
       && apt-get install -y --no-install-recommends \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
