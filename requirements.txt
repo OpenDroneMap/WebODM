@@ -53,3 +53,5 @@ tzlocal==1.3
 uritemplate==3.0.0
 vine==1.1.4
 webcolors==1.5
+rasterio==1.1.0
+rio-tiler==1.3.0

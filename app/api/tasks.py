@@ -19,7 +19,7 @@ from app import models, pending_actions
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
-from .common import get_and_check_project, get_tile_json, path_traversal_check
+from .common import get_and_check_project, path_traversal_check
 
 
 def flatten_files(request_files):
@@ -298,33 +298,6 @@ class TaskTiles(TaskNestedView):
             return HttpResponse(FileWrapper(tile), content_type="image/png")
         else:
             raise exceptions.NotFound()
-
-
-class TaskTilesJson(TaskNestedView):
-    def get(self, request, pk=None, project_pk=None, tile_type=""):
-        """
-        Get tile.json for this tasks's asset type
-        """
-        task = self.get_and_check_task(request, pk)
-
-        extent_map = {
-            'orthophoto': task.orthophoto_extent,
-            'dsm': task.dsm_extent,
-            'dtm': task.dtm_extent,
-        }
-
-        if not tile_type in extent_map:
-            raise exceptions.ValidationError("Type {} is not a valid tile type".format(tile_type))
-
-        extent = extent_map[tile_type]
-
-        if extent is None:
-            raise exceptions.ValidationError("A {} has not been processed for this task. Tiles are not available.".format(tile_type))
-
-        json = get_tile_json(task.name, [
-                '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
-            ], extent.extent)
-        return Response(json)
 
 
 def download_file_response(request, filePath, content_disposition):
