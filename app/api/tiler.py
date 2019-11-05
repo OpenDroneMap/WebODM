@@ -139,6 +139,12 @@ class Tiles(TaskNestedView):
             if rescale is None:
                 rescale = '157.0500,164.850'
 
+        if tile_type == 'orthophoto':
+            expr = '(b2-b1)/(b2+b1-b3)'
+            rescale = "0.02,0.1"
+            #color_formula = 'b1'
+            color_map = 'rdylgn'
+
         if nodata is not None:
             nodata = numpy.nan if nodata == "nan" else float(nodata)
         tilesize = scale * 256
@@ -162,7 +168,10 @@ class Tiles(TaskNestedView):
         )
 
         if color_map:
-            color_map = get_colormap(color_map, format="gdal")
+            try:
+                color_map = get_colormap(color_map, format="gdal")
+            except FileNotFoundError:
+                raise exceptions.ValidationError("Not a valid color_map value")
 
         options = img_profiles.get(driver, {})
         return HttpResponse(
