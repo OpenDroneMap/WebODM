@@ -93,7 +93,7 @@ module.exports = {
   },
 
   watchOptions: {
-    ignored: /node_modules/,
+    ignored: ['node_modules', './**/*.py'],
     aggregateTimeout: 300,
     poll: 1000
   }

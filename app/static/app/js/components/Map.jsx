@@ -22,8 +22,6 @@ import update from 'immutability-helper';
 
 class Map extends React.Component {
   static defaultProps = {
-    maxzoom: 18,
-    minzoom: 0,
     showBackground: false,
     opacity: 100,
     mapType: "orthophoto",
@@ -31,8 +29,6 @@ class Map extends React.Component {
   };
 
   static propTypes = {
-    maxzoom: PropTypes.number,
-    minzoom: PropTypes.number,
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
     opacity: PropTypes.number,
@@ -97,9 +93,9 @@ class Map extends React.Component {
               );
             const layer = Leaflet.tileLayer(info.tiles[0], {
                   bounds,
-                  minZoom: info.minzoom,
-                  maxZoom: L.Browser.retina ? (info.maxzoom + 1) : info.maxzoom,
-                  maxNativeZoom: L.Browser.retina ? (info.maxzoom - 1) : info.maxzoom,
+                  minZoom: 0,
+                  maxZoom: info.maxzoom + 4,
+                  maxNativeZoom: info.maxzoom,
                   tms: info.scheme === 'tms',
                   opacity: this.props.opacity / 100,
                   detectRetina: true
@@ -203,7 +199,9 @@ class Map extends React.Component {
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
       positionControl: true,
-      zoomControl: false
+      zoomControl: false,
+      minZoom: 0,
+      maxZoom: 24
     });
 
     PluginsAPI.Map.triggerWillAddControls({
@@ -247,7 +245,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
         if (url){
           customLayer.clearLayers();
           const l = L.tileLayer(url, {
-            maxZoom: 21,
+            maxZoom: 24,
             minZoom: 0
           });
           customLayer.addLayer(l);

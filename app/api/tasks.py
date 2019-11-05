@@ -286,18 +286,18 @@ class TaskNestedView(APIView):
         return task
 
 
-class TaskTiles(TaskNestedView):
-    def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y=""):
-        """
-        Get a tile image
-        """
-        task = self.get_and_check_task(request, pk)
-        tile_path = task.get_tile_path(tile_type, z, x, y)
-        if os.path.isfile(tile_path):
-            tile = open(tile_path, "rb")
-            return HttpResponse(FileWrapper(tile), content_type="image/png")
-        else:
-            raise exceptions.NotFound()
+# class TaskTiles(TaskNestedView):
+#     def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y=""):
+#         """
+#         Get a tile image
+#         """
+#         task = self.get_and_check_task(request, pk)
+#         tile_path = task.get_tile_path(tile_type, z, x, y)
+#         if os.path.isfile(tile_path):
+#             tile = open(tile_path, "rb")
+#             return HttpResponse(FileWrapper(tile), content_type="image/png")
+#         else:
+#             raise exceptions.NotFound()
 
 
 def download_file_response(request, filePath, content_disposition):

@@ -55,3 +55,4 @@ vine==1.1.4
 webcolors==1.5
 rasterio==1.1.0
 rio-tiler==1.3.0
+rio-color==1.0.0
