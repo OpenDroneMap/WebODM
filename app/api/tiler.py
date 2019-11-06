@@ -142,7 +142,6 @@ class Tiles(TaskNestedView):
         if tile_type == 'orthophoto':
             expr = '(b2-b1)/(b2+b1-b3)'
             rescale = "0.02,0.1"
-            #color_formula = 'b1'
             color_map = 'rdylgn'
 
         if nodata is not None:
