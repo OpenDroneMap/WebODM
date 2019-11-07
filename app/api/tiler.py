@@ -1,4 +1,5 @@
 import rasterio
+import os
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
@@ -109,7 +110,11 @@ class Metadata(TaskNestedView):
 
         raster_path = get_raster_path(task, tile_type)
         info = main.metadata(raster_path, pmin=2.0, pmax=98.0)
-        info['address'] = get_tile_url(task, tile_type)
+        info['address'] = os.path.basename(info['address'])
+        info['name'] = task.name
+        info['scheme'] = 'xyz'
+        info['tiles'] = [get_tile_url(task, tile_type)]
+
         return Response(info)
 
 class Tiles(TaskNestedView):

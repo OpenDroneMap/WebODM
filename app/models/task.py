@@ -703,17 +703,22 @@ class Task(models.Model):
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
 
-    def get_tile_json_url(self, tile_type):
-        return "/api/projects/{}/tasks/{}/{}/tiles.json".format(self.project.id, self.id, tile_type)
+    def get_tile_base_url(self, tile_type):
+        # plant is just a special case of orthophoto
+        if tile_type == 'plant':
+            tile_type = 'orthophoto'
+
+        return "/api/projects/{}/tasks/{}/{}/".format(self.project.id, self.id, tile_type)
 
     def get_map_items(self):
         types = []
         if 'orthophoto.tif' in self.available_assets: types.append('orthophoto')
+        if 'orthophoto.tif' in self.available_assets: types.append('plant')
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
 
         return {
-            'tiles': [{'url': self.get_tile_json_url(t), 'type': t} for t in types],
+            'tiles': [{'url': self.get_tile_base_url(t), 'type': t} for t in types],
             'meta': {
                 'task': {
                     'id': str(self.id),

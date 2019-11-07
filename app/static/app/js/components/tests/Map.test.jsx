@@ -8,7 +8,7 @@ sinon.useFakeXMLHttpRequest();
 describe('<Map />', () => {
   it('renders without exploding', () => {
     const wrapper = mount(<Map 
-    	tiles={['/tiles.json']} />);
+    	tiles={['/']} />);
 
     expect(wrapper.exists()).toBe(true);
   })

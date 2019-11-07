@@ -23,12 +23,10 @@ class MapView extends React.Component {
     super(props);
 
     this.state = {
-      opacity: 100,
       selectedMapType: props.selectedMapType,
       tiles: this.getTilesByMapType(props.selectedMapType)
     };
 
-    this.updateOpacity = this.updateOpacity.bind(this);
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
   }
@@ -44,13 +42,6 @@ class MapView extends React.Component {
           url: tile.url,
           meta: mapItem.meta
         });
-
-        // Special case for plant
-        // if (tile.type === 'orthophoto') tiles.push({
-        //     url: tile.url + "?expr=(b2-b1)/(b2+b1-b3)&rescale=0,1&color_map=rdylgn",
-        //     meta: mapItem.meta
-        // });
-        console.log(mapItem.meta);
       });
     });
 
@@ -66,14 +57,7 @@ class MapView extends React.Component {
     };
   }
 
-  updateOpacity(evt) {
-    this.setState({
-      opacity: parseFloat(evt.target.value),
-    });
-  }
-
   render(){
-    const { opacity } = this.state;
     let mapTypeButtons = [
       {
         label: "Orthophoto",
@@ -113,15 +97,14 @@ class MapView extends React.Component {
         {this.props.title ? 
           <h3><i className="fa fa-globe"></i> {this.props.title}</h3>
         : ""}
-  
-        <Map 
-          tiles={this.state.tiles} 
-          showBackground={true} 
-          opacity={opacity}
-          mapType={this.state.selectedMapType} 
-          public={this.props.public} />
-        <div className="opacity-slider theme-secondary hidden-xs">
-          Opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
+
+        <div className="map-container">
+            <Map 
+                tiles={this.state.tiles} 
+                showBackground={true} 
+                mapType={this.state.selectedMapType} 
+                public={this.props.public}
+            />
         </div>
       </div>);
   }

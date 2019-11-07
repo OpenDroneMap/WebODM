@@ -1,6 +1,18 @@
 .map{
     position: relative; 
 
+    .opacity-slider{
+        border-radius: 4px;
+        text-align: center;
+        width: 220px;
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        margin-left: -100px;
+        z-index: 999;
+        padding-bottom: 6px;
+    }
+
     .leaflet-popup-content{
         .title{
             font-weight: bold;

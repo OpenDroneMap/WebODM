@@ -23,7 +23,6 @@ import update from 'immutability-helper';
 class Map extends React.Component {
   static defaultProps = {
     showBackground: false,
-    opacity: 100,
     mapType: "orthophoto",
     public: false
   };
@@ -31,7 +30,6 @@ class Map extends React.Component {
   static propTypes = {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
-    opacity: PropTypes.number,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool
   };
@@ -43,7 +41,8 @@ class Map extends React.Component {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
       pluginActionButtons: [],
-      showLoading: false
+      showLoading: false, // for drag&drop of files
+      opacity: 100
     };
 
     this.imageryLayers = [];
@@ -54,6 +53,12 @@ class Map extends React.Component {
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
+  }
+
+  updateOpacity = (evt) => {
+    this.setState({
+      opacity: parseFloat(evt.target.value),
+    });
   }
 
   updatePopupFor(layer){
@@ -86,23 +91,25 @@ class Map extends React.Component {
       async.each(tiles, (tile, done) => {
         const { url, meta } = tile;
 
-        this.tileJsonRequests.push($.getJSON(url)
-          .done(info => {
+        this.tileJsonRequests.push($.getJSON(url + "metadata")
+          .done(mres => {
+            const { scheme, name, maxzoom } = mres;
+
             const bounds = Leaflet.latLngBounds(
-                [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()]
+                [mres.bounds.value.slice(0, 2).reverse(), mres.bounds.value.slice(2, 4).reverse()]
               );
-            const layer = Leaflet.tileLayer(info.tiles[0], {
+            const layer = Leaflet.tileLayer(mres.tiles[0], {
                   bounds,
                   minZoom: 0,
-                  maxZoom: info.maxzoom + 4,
-                  maxNativeZoom: info.maxzoom,
-                  tms: info.scheme === 'tms',
-                  opacity: this.props.opacity / 100,
+                  maxZoom: maxzoom + 4,
+                  maxNativeZoom: maxzoom,
+                  tms: scheme === 'tms',
+                  opacity: this.state.opacity / 100,
                   detectRetina: true
                 });
             
             // Associate metadata with this layer
-            meta.name = info.name;
+            meta.name = name;
             layer[Symbol.for("meta")] = meta;
 
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
@@ -127,7 +134,7 @@ class Map extends React.Component {
             var popup = L.DomUtil.create('div', 'infoWindow');
 
             popup.innerHTML = `<div class="title">
-                                    ${info.name}
+                                    ${name}
                                 </div>
                                 <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
@@ -155,7 +162,7 @@ class Map extends React.Component {
             this.mapBounds = mapBounds;
 
             // Add layer to layers control
-            this.autolayers.addOverlay(layer, info.name);
+            this.autolayers.addOverlay(layer, name);
 
             done();
           })
@@ -333,7 +340,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
 
   componentDidUpdate(prevProps) {
     this.imageryLayers.forEach(imageryLayer => {
-      imageryLayer.setOpacity(this.props.opacity / 100);
+      imageryLayer.setOpacity(this.state.opacity / 100);
       this.updatePopupFor(imageryLayer);
     });
 
@@ -360,6 +367,10 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
+        <div className="opacity-slider theme-secondary hidden-xs">
+            Opacity: <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+        </div>
+
         <Standby 
             message="Loading..."
             show={this.state.showLoading}
