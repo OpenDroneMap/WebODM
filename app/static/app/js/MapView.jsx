@@ -14,7 +14,7 @@ class MapView extends React.Component {
 
   static propTypes = {
       mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
-      selectedMapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
+      selectedMapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
       title: PropTypes.string,
       public: PropTypes.bool
   };
@@ -44,6 +44,13 @@ class MapView extends React.Component {
           url: tile.url,
           meta: mapItem.meta
         });
+
+        // Special case for plant
+        // if (tile.type === 'orthophoto') tiles.push({
+        //     url: tile.url + "?expr=(b2-b1)/(b2+b1-b3)&rescale=0,1&color_map=rdylgn",
+        //     meta: mapItem.meta
+        // });
+        console.log(mapItem.meta);
       });
     });
 
@@ -70,15 +77,23 @@ class MapView extends React.Component {
     let mapTypeButtons = [
       {
         label: "Orthophoto",
-        type: "orthophoto"
+        type: "orthophoto",
+        icon: "far fa-image"
+      },
+      {
+        label: "Plant Health",
+        type: "plant",
+        icon: "fa fa-seedling"
       },
       {
         label: "Surface Model",
-        type: "dsm"
+        type: "dsm",
+        icon: "fa fa-chart-area"
       },
       {
         label: "Terrain Model",
-        type: "dtm"
+        type: "dtm",
+        icon: "fa fa-chart-area"
       }
     ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0 );
 
@@ -91,7 +106,7 @@ class MapView extends React.Component {
             <button 
               key={mapType.type}
               onClick={this.handleMapTypeButton(mapType.type)}
-              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}>{mapType.label}</button>
+              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i> {mapType.label}</button>
           )}
         </div>
 

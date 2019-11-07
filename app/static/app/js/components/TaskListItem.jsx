@@ -599,10 +599,10 @@ class TaskListItem extends React.Component {
             <i onClick={this.toggleExpanded} className={"clickable fa " + (this.state.expanded ? "fa-minus-square-o" : " fa-plus-square-o")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
           </div>
           <div className="col-sm-1 details">
-            <i className="fa fa-image"></i> {task.images_count}
+            <i className="far fa-image"></i> {task.images_count}
           </div>
           <div className="col-sm-2 details">
-            <i className="fa fa-clock-o"></i> {this.hoursMinutesSecs(this.state.time)}
+            <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
           <div className="col-sm-3">
             {showEditLink ?

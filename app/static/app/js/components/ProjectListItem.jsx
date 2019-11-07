@@ -404,7 +404,7 @@ class ProjectListItem extends React.Component {
           title="Edit Project"
           saveLabel="Save Changes"
           savingLabel="Saving changes..."
-          saveIcon="fa fa-edit"
+          saveIcon="far fa-edit"
           projectName={data.name}
           projectDescr={data.description}
           saveAction={this.updateProject}
@@ -461,7 +461,7 @@ class ProjectListItem extends React.Component {
               </span>
               : ""}
 
-            <i className='fa fa-edit'>
+            <i className='far fa-edit'>
             </i> <a href="javascript:void(0);" onClick={this.handleEditProject}> Edit
             </a>
           </div>

@@ -91,7 +91,7 @@ class EditPresetDialog extends React.Component {
                     reset={() => {}}
                     show={true}
                     onShow={this.onShow}
-                    saveIcon="fa fa-edit"
+                    saveIcon="far fa-edit"
                     title="Edit Options"
                     saveAction={this.props.saveAction}
                     deleteWarning={false}

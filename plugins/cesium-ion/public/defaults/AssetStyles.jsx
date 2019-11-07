@@ -3,23 +3,23 @@ import AssetType from "./AssetType";
 const AssetStyles = {
 	[AssetType.ORTHOPHOTO]: {
 		name: "Orthophoto",
-		icon: "fa-map-o"
+		icon: "far fa-image"
 	},
 	[AssetType.TERRAIN_MODEL]: {
 		name: "Terrain Model",
-		icon: "fa-area-chart"
+		icon: "fa fa-chart-area"
 	},
 	[AssetType.SURFACE_MODEL]: {
 		name: "Surface Model",
-		icon: "fa-area-chart"
+		icon: "fa fa-chart-area"
 	},
 	[AssetType.POINTCLOUD]: {
 		name: "Pointcloud",
-		icon: "fa-cube"
+		icon: "fa fa-cube"
 	},
 	[AssetType.TEXTURED_MODEL]: {
 		name: "Texture Model",
-		icon: "fa-connectdevelop"
+		icon: "fab fa-connectdevelop"
 	}
 };
 

@@ -32,7 +32,7 @@ class Map extends React.Component {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
     opacity: PropTypes.number,
-    mapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
+    mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool
   };
 

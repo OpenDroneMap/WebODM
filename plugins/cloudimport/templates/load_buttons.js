@@ -10,7 +10,7 @@ PluginsAPI.Dashboard.addNewTaskButton(
 );
 
 PluginsAPI.Dashboard.addTaskActionButton(
-	["cloudimport/build/TaskView.js"],
+    ["cloudimport/build/TaskView.js", "cloudimport/build/TaskView.css"],
 	function(args, TaskView) {
 		var reactElement;
 		$.ajax({

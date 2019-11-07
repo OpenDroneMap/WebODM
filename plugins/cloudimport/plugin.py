@@ -10,7 +10,7 @@ class Plugin(PluginBase):
         super().__init__(*args, **kwargs)
 
     def main_menu(self):
-        return [Menu("Cloud Import", self.public_url(""), "fa-cloud-download fa fa-fw")]
+        return [Menu("Cloud Import", self.public_url(""), "fa-cloud-download-alt fa fa-fw")]
 
     def include_js_files(self):
         return ["load_buttons.js"]
