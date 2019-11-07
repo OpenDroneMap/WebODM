@@ -13,6 +13,11 @@
         padding-bottom: 6px;
     }
 
+    .leaflet-control-layers-toggle{
+        border-radius: 1px;
+        background: url(../icons/basemap.svg) 5px 5px no-repeat;
+    }
+
     .leaflet-popup-content{
         .title{
             font-weight: bold;

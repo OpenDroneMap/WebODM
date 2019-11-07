@@ -201,7 +201,7 @@ export default class UploadDialog extends Component {
 								{isLoading && (
 									<Button bsStyle="primary" disabled>
 										<i
-											className={"fa fa-refresh fa-spin"}
+											className={"fa fa-sync fa-spin"}
 										/>
 										Submitting...
 									</Button>

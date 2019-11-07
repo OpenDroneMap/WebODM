@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
+import LayersControl from './LayersControl';
 import update from 'immutability-helper';
 
 class Map extends React.Component {
@@ -139,7 +140,7 @@ class Map extends React.Component {
                                 <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
                                 <ul class="asset-links loading">
-                                    <li><i class="fa fa-spin fa-refresh fa-spin fa-fw"></i></li>
+                                    <li><i class="fa fa-spin fa-sync fa-spin fa-fw"></i></li>
                                 </ul>
 
                                 <button
@@ -162,7 +163,7 @@ class Map extends React.Component {
             this.mapBounds = mapBounds;
 
             // Add layer to layers control
-            this.autolayers.addOverlay(layer, name);
+            // this.autolayers.addOverlay(layer, name);
 
             done();
           })
@@ -263,11 +264,15 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       this.basemaps["None"] = L.layerGroup();
     }
 
+    this.layersControl = new LayersControl({
+    }).addTo(this.map);
+    
     this.autolayers = Leaflet.control.autolayers({
       overlays: {},
       selectedOverlays: [],
       baseLayers: this.basemaps
     }).addTo(this.map);
+
 
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");

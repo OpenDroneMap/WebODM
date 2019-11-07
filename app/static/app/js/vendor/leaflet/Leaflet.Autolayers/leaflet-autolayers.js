@@ -39,6 +39,7 @@ L.Control.AutoLayers = L.Control.extend({
 	selectedBasemap: null,
 	layersToAdd: {},
 
+
 	countZIndexBase: function(layers) {
 		for (var i = 0; i < layers.length; i++) {
 			var layer = layers[i];
@@ -127,7 +128,7 @@ L.Control.AutoLayers = L.Control.extend({
 
 			var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
 			link.href = '#';
-			link.title = 'Layers';
+			link.title = 'Base Maps';
 
 			if (L.Browser.touch) {
 				L.DomEvent
@@ -165,9 +166,14 @@ L.Control.AutoLayers = L.Control.extend({
 		//overlays are done here
 		var overlaysLayersDiv = this._overlaysDiv = L.DomUtil.create('div',
 			'leaflet-control-layers-tab', form);
+
+		// We hide the overlays
+		overlaysLayersDiv.style.display = 'none'; 
+		
 		this._overlaysLayersTitle = L.DomUtil.create('div', 'leaflet-control-autolayers-title',
 			overlaysLayersDiv);
-		this._overlaysLayersTitle.innerHTML = 'Tasks';
+		this._overlaysLayersTitle.innerHTML = 'Overlays';
+
 		var overlaysLayersBox = this._overlaysLayersBox = L.DomUtil.create('div', 'map-filter',
 			overlaysLayersDiv);
 		var overlaysLayersFilter = this._overlaysLayersFilter = L.DomUtil.create('input',
@@ -241,64 +247,67 @@ L.Control.AutoLayers = L.Control.extend({
 
 		//open and close setup
 		var titles = this._form.getElementsByClassName('leaflet-control-autolayers-title');
+		var onTitleClick = function(e) {
+			var overlayOrBase;
+			if (e.currentTarget.innerText === 'Overlays') {
+				overlayOrBase = 'overlays';
+			}
+			if (e.currentTarget.innerText === 'Base Maps') {
+				overlayOrBase = 'base';
+			}
+
+			var allTabs = this.parentNode.parentNode.getElementsByClassName(
+				'leaflet-control-layers-tab');
+			for (var i = 0; i < allTabs.length; i++) {
+				var tab = allTabs[i].getElementsByTagName('div');
+
+				for (var m = 0; m < tab.length; m++) {
+					var tabContent = tab[m];
+					if (tabContent.className === "leaflet-control-layers-item-container") continue;
+
+					if (tabContent.className !== 'leaflet-control-autolayers-title') {
+						tabContent.style.display = 'none';
+
+					}
+				}
+			}
+
+			var thisTab = this.parentNode.children;
+			for (var i = 0; i < thisTab.length; i++) {
+				thisTab[i].style.display = 'block';
+				var filter = thisTab[i].getElementsByClassName('map-filter-box-' + overlayOrBase);
+				if (filter.length > 0) {
+					filter[0].style.display = 'block';
+				}
+			}
+
+			if (e.currentTarget.innerText === 'Overlays' || e.currentTarget
+				.innerText === 'Base Maps') {
+				var filterBoxValue = this.parentNode.getElementsByClassName('map-filter')[0].children[0].value
+					.toLowerCase();
+				var displayLayers = this.parentNode.getElementsByClassName('leaflet-control-layers-' +
+					overlayOrBase)[0].getElementsByTagName('label');
+				if (filterBoxValue.length > 2) {
+					for (var i = 0; i < displayLayers.length; i++) {
+						if (displayLayers[i].innerText.toLowerCase().indexOf(
+								filterBoxValue) > -1) {
+							displayLayers[i].style.display = 'block';
+						} else {
+							displayLayers[i].style.display = 'none';
+						}
+					}
+				}
+			} else {
+				//	for (var i = 0; i < displayLayers.length; i++) {
+				//		displayLayers[i].style.display = 'block';
+				//	}
+			}
+		};
+
 		for (var t = 0; t < titles.length; t++) {
-			L.DomEvent.addListener(titles[t], 'click', function(e) {
-				var overlayOrBase;
-				if (e.currentTarget.innerText === 'Overlays') {
-					overlayOrBase = 'overlays';
-				}
-				if (e.currentTarget.innerText === 'Base Maps') {
-					overlayOrBase = 'base';
-				}
-
-				var allTabs = this.parentNode.parentNode.getElementsByClassName(
-					'leaflet-control-layers-tab');
-				for (var i = 0; i < allTabs.length; i++) {
-					var tab = allTabs[i].getElementsByTagName('div');
-
-					for (var m = 0; m < tab.length; m++) {
-						var tabContent = tab[m];
-						if (tabContent.className === "leaflet-control-layers-item-container") continue;
-
-						if (tabContent.className !== 'leaflet-control-autolayers-title') {
-							tabContent.style.display = 'none';
-
-						}
-					}
-				}
-
-				var thisTab = this.parentNode.children;
-				for (var i = 0; i < thisTab.length; i++) {
-					thisTab[i].style.display = 'block';
-					var filter = thisTab[i].getElementsByClassName('map-filter-box-' + overlayOrBase);
-					if (filter.length > 0) {
-						filter[0].style.display = 'block';
-					}
-				}
-
-				if (e.currentTarget.innerText === 'Overlays' || e.currentTarget
-					.innerText === 'Base Maps') {
-					var filterBoxValue = this.parentNode.getElementsByClassName('map-filter')[0].children[0].value
-						.toLowerCase();
-					var displayLayers = this.parentNode.getElementsByClassName('leaflet-control-layers-' +
-						overlayOrBase)[0].getElementsByTagName('label');
-					if (filterBoxValue.length > 2) {
-						for (var i = 0; i < displayLayers.length; i++) {
-							if (displayLayers[i].innerText.toLowerCase().indexOf(
-									filterBoxValue) > -1) {
-								displayLayers[i].style.display = 'block';
-							} else {
-								displayLayers[i].style.display = 'none';
-							}
-						}
-					}
-				} else {
-					//	for (var i = 0; i < displayLayers.length; i++) {
-					//		displayLayers[i].style.display = 'block';
-					//	}
-				}
-			});
+			L.DomEvent.addListener(titles[t], 'click', onTitleClick);
 		}
+
 
 		//x in the corner to close
 		var closeControl = this._baseLayersClose;
@@ -324,6 +333,8 @@ L.Control.AutoLayers = L.Control.extend({
 
 		//make sure we collapse the control on mapclick
 		this._map.on('click', this._collapse, this);
+
+		onTitleClick.call(titles[0], {currentTarget: {innerText: "Base Maps"}});
 
 	},
 

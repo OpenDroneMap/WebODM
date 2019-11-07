@@ -521,7 +521,7 @@ class TaskListItem extends React.Component {
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
                   "Process exited with code 1" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the <a href="javascript:void(0);" onClick={this.startEditing}>Task Options</a> and sometimes it might be a bug!
                   If you need help, upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making
-                  sure to include a <a href="javascript:void(0);" onClick={this.setView("console")}>copy of your task's output</a>. Our awesome contributors will try to help you! <i className="fa fa-smile-o"></i>
+                  sure to include a <a href="javascript:void(0);" onClick={this.setView("console")}>copy of your task's output</a>. Our awesome contributors will try to help you! <i className="far fa-smile"></i>
                 </div>
               </div>
               : ""}
@@ -596,7 +596,7 @@ class TaskListItem extends React.Component {
       <div className="task-list-item">
         <div className="row">
           <div className="col-sm-5 name">
-            <i onClick={this.toggleExpanded} className={"clickable fa " + (this.state.expanded ? "fa-minus-square-o" : " fa-plus-square-o")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
+            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
           </div>
           <div className="col-sm-1 details">
             <i className="far fa-image"></i> {task.images_count}
