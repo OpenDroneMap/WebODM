@@ -1,5 +1,7 @@
 .leaflet-touch .leaflet-control-layers-control{
     .layers-control-layer{
+        clear: both;
+        
         .layer-label{
             width: auto;
             white-space: nowrap;

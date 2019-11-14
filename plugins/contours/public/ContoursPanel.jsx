@@ -351,7 +351,7 @@ export default class ContoursPanel extends React.Component {
                 </li>
                 <li>
                   <a href="javascript:void(0);" onClick={this.handleExport("DXF")}>
-                    <i className="fa fa-file fa-fw"></i> AutoCAD (.DXF)
+                    <i className="far fa-file fa-fw"></i> AutoCAD (.DXF)
                   </a>
                 </li>
                 <li>
@@ -361,7 +361,7 @@ export default class ContoursPanel extends React.Component {
                 </li>
                 <li>
                   <a href="javascript:void(0);" onClick={this.handleExport("ESRI Shapefile")}>
-                    <i className="fa fa-file-archive fa-fw"></i> ShapeFile (.SHP)
+                    <i className="far fa-file-archive fa-fw"></i> ShapeFile (.SHP)
                   </a>
                 </li>
               </ul>
