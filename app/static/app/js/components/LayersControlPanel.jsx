@@ -20,7 +20,7 @@ export default class LayersControlPanel extends React.Component {
 
   render(){
     let content = "";
-    if (!this.props.layers.length) content = (<span><i className="fa fa-circle-notch fa-spin"></i> Loading...</span>);
+    if (!this.props.layers.length) content = (<span><i className="loading fa fa-circle-notch fa-spin"></i> Loading...</span>);
     else{
       content = (<div>
         {this.props.layers.map((layer, i) => <LayersControlLayer layer={layer} key={i} />)}
@@ -40,7 +40,7 @@ export default class LayersControlPanel extends React.Component {
 
     return (<div className="layers-control-panel">
       <span className="close-button" onClick={this.props.onClose}/>
-      <div className="title">Layers Control</div>
+      <div className="title">Layers</div>
       <hr/>
       {content}
     </div>);

@@ -1,6 +1,7 @@
 import rasterio
-import os
+import urllib
 from django.http import HttpResponse
+from rasterio import MemoryFile
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
 from rio_tiler import main
@@ -10,14 +11,25 @@ from rio_color.utils import scale_dtype, to_math_type
 from rio_tiler.profiles import img_profiles
 
 import numpy
+import mercantile
 
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
 
 
-def get_tile_url(task, tile_type):
-    return '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
+def get_tile_url(task, tile_type, query_params):
+    url = '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
+    params = {}
+
+    for k in ['expr', 'rescale', 'color_map']:
+        if query_params.get(k):
+            params[k] = query_params.get(k)
+
+    if len(params) > 0:
+        url = url + '?' + urllib.parse.urlencode(params)
+
+    return url
 
 def get_extent(task, tile_type):
     extent_map = {
@@ -35,7 +47,7 @@ def get_extent(task, tile_type):
         raise exceptions.ValidationError(
             "A {} has not been processed for this task. Tiles are not available.".format(tile_type))
 
-    return extent.extent
+    return extent
 
 def get_raster_path(task, tile_type):
     return task.get_asset_download_path(tile_type + ".tif")
@@ -83,10 +95,10 @@ class TileJson(TaskNestedView):
             'name': task.name,
             'version': '1.0.0',
             'scheme': 'xyz',
-            'tiles': [get_tile_url(task, tile_type)],
+            'tiles': [get_tile_url(task, tile_type, self.request.query_params)],
             'minzoom': minzoom,
             'maxzoom': maxzoom,
-            'bounds': get_extent(task, tile_type)
+            'bounds': get_extent(task, tile_type).extent
         })
 
 class Bounds(TaskNestedView):
@@ -97,8 +109,8 @@ class Bounds(TaskNestedView):
         task = self.get_and_check_task(request, pk)
 
         return Response({
-            'url': get_tile_url(task, tile_type),
-            'bounds': get_extent(task, tile_type)
+            'url': get_tile_url(task, tile_type, self.request.query_params),
+            'bounds': get_extent(task, tile_type).extent
         })
 
 class Metadata(TaskNestedView):
@@ -108,12 +120,54 @@ class Metadata(TaskNestedView):
         """
         task = self.get_and_check_task(request, pk)
 
+        expr = self.request.query_params.get('expr')
+        rescale = self.request.query_params.get('rescale', "0,1")
+        color_map = self.request.query_params.get('color_map')
+
+        pmin, pmax = 2.0, 98.0
+
         raster_path = get_raster_path(task, tile_type)
-        info = main.metadata(raster_path, pmin=2.0, pmax=98.0)
-        info['address'] = os.path.basename(info['address'])
+
+        if expr is not None:
+            with rasterio.open(raster_path) as src:
+                minzoom, maxzoom = get_zooms(src)
+                centroid = get_extent(task, tile_type).centroid
+                coords = mercantile.tile(centroid.x, centroid.y, minzoom)
+
+                tile, mask = expression(
+                    raster_path, coords.x, coords.y, coords.z, expr=expr, tilesize=256, nodata=None
+                )
+
+                rtile, rmask = postprocess(tile, mask, rescale=rescale)
+                del tile
+                del mask
+
+                with MemoryFile() as memfile:
+                    profile = src.profile
+                    profile['count'] = rtile.shape[0]
+                    profile.update()
+
+                    with memfile.open(**profile) as dataset:
+                        dataset.write(rtile)
+                        dataset.write_mask(rmask)
+                        del rtile
+
+                    with memfile.open() as dataset:  # Reopen as DatasetReader
+                        info = main.metadata(dataset, pmin=pmin, pmax=pmax)
+        else:
+            info = main.metadata(raster_path, pmin=pmin, pmax=pmax)
+
+        del info['address']
         info['name'] = task.name
         info['scheme'] = 'xyz'
-        info['tiles'] = [get_tile_url(task, tile_type)]
+        info['tiles'] = [get_tile_url(task, tile_type, self.request.query_params)]
+
+        if color_map:
+            try:
+                color_map = get_colormap(color_map, format="gdal")
+                info['color_map'] = color_map
+            except FileNotFoundError:
+                raise exceptions.ValidationError("Not a valid color_map value")
 
         return Response(info)
 
@@ -131,23 +185,23 @@ class Tiles(TaskNestedView):
         ext = "png"
         driver = "jpeg" if ext == "jpg" else ext
 
-        indexes = self.request.query_params.get('indexes')
+        #indexes = self.request.query_params.get('indexes')
+        # color_formula = self.request.query_params.get('color_formula')
+        #nodata = self.request.query_params.get('nodata')
+
+        indexes = None
+        color_formula = None
+        nodata = None
+
         expr = self.request.query_params.get('expr')
         rescale = self.request.query_params.get('rescale')
-        color_formula = self.request.query_params.get('color_formula')
         color_map = self.request.query_params.get('color_map')
-        nodata = self.request.query_params.get('nodata')
+
+        # TODO: disable color_map
+        # TODO: server-side expressions
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
-            #raise exceptions.ValidationError("Cannot get tiles without rescale parameter. Add ?rescale=min,max to the URL.")
-
-            if rescale is None:
-                rescale = '157.0500,164.850'
-
-        if tile_type == 'orthophoto':
-            expr = '(b2-b1)/(b2+b1-b3)'
-            rescale = "0.02,0.1"
-            color_map = 'rdylgn'
+            raise exceptions.ValidationError("Cannot get tiles without rescale parameter. Add ?rescale=min,max to the URL.")
 
         if nodata is not None:
             nodata = numpy.nan if nodata == "nan" else float(nodata)
@@ -167,13 +221,15 @@ class Tiles(TaskNestedView):
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
 
-        # Use alpha channel
+        # Use alpha channel for transparency, don't use the mask if one is provided (redundant)
         if tile.shape[0] == 4:
             mask = None
 
         rtile, rmask = postprocess(
             tile, mask, rescale=rescale, color_formula=color_formula
         )
+        del tile
+        del mask
 
         if color_map:
             try:

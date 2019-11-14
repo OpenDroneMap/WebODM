@@ -1,9 +1,21 @@
 .leaflet-touch .leaflet-control-layers-control{
     .layers-control-layer{
         .layer-label{
-            width: 100%;
+            width: auto;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: block;
             text-align: left;
-            padding-left: 52px;
+            padding-left: 4px;
+            margin-left: 50px;
+            height: 22px;
+            line-height: 22px;
+            padding-top: 1px;
+        }
+
+        .layer-expanded{
+            clear: both;
         }
       
         .toggle{
@@ -11,9 +23,7 @@
           width: 22px;
           i{
               font-size: 18px;
-              padding-top: 5px;
-        
-            }
+          }
           &:hover{
               background-color: inherit !important;
               border-width: 0;

@@ -90,9 +90,12 @@ class Map extends React.Component {
       this.tileJsonRequests = [];
 
       async.each(tiles, (tile, done) => {
-        const { url, meta } = tile;
+        const { url, meta, type } = tile;
+        
+        let metaUrl = url + "metadata";
+        if (type == "plant") metaUrl += "?expr=" + encodeURIComponent("(b2-b1)/(b2+b1-b3)") + "&rescale=0.02,0.1&color_map=rdylgn"
 
-        this.tileJsonRequests.push($.getJSON(url + "metadata")
+        this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
             const { scheme, name, maxzoom } = mres;
 

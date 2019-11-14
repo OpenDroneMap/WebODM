@@ -40,7 +40,8 @@ class MapView extends React.Component {
       mapItem.tiles.forEach(tile => {
         if (tile.type === type) tiles.push({
           url: tile.url,
-          meta: mapItem.meta
+          meta: mapItem.meta,
+          type: tile.type
         });
       });
     });
