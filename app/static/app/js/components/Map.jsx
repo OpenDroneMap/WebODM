@@ -43,10 +43,10 @@ class Map extends React.Component {
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
       pluginActionButtons: [],
       showLoading: false, // for drag&drop of files
-      opacity: 100
+      opacity: 100,
+      imageryLayers: []
     };
 
-    this.imageryLayers = [];
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
@@ -78,12 +78,12 @@ class Map extends React.Component {
     // and keep track of which ones were selected
     const prevSelectedLayers = [];
 
-    this.imageryLayers.forEach(layer => {
+    this.state.imageryLayers.forEach(layer => {
       this.autolayers.removeLayer(layer);
       if (this.map.hasLayer(layer)) prevSelectedLayers.push(layerId(layer));
       layer.remove();
     });
-    this.imageryLayers = [];
+    this.setState({imageryLayers: []});
 
     // Request new tiles
     return new Promise((resolve, reject) => {
@@ -112,6 +112,7 @@ class Map extends React.Component {
             // Associate metadata with this layer
             meta.name = name;
             layer[Symbol.for("meta")] = meta;
+            layer[Symbol.for("tile-meta")] = mres;
 
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
               layer.addTo(this.map);
@@ -156,7 +157,9 @@ class Map extends React.Component {
                 layer.setOpacity($('#layerOpacity', popup).val());
             });
             
-            this.imageryLayers.push(layer);
+            this.setState(update(this.state, {
+                imageryLayers: {$push: [layer]}
+            }));
 
             let mapBounds = this.mapBounds || Leaflet.latLngBounds();
             mapBounds.extend(bounds);
@@ -265,8 +268,9 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     }
 
     this.layersControl = new LayersControl({
+        layers: this.state.imageryLayers
     }).addTo(this.map);
-    
+
     this.autolayers = Leaflet.control.autolayers({
       overlays: {},
       selectedOverlays: [],
@@ -282,7 +286,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
 
         this.map.on('click', e => {
           // Find first tile layer at the selected coordinates 
-          for (let layer of this.imageryLayers){
+          for (let layer of this.state.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
               this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
@@ -343,14 +347,18 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     });
   }
 
-  componentDidUpdate(prevProps) {
-    this.imageryLayers.forEach(imageryLayer => {
+  componentDidUpdate(prevProps, prevState) {
+    this.state.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.state.opacity / 100);
       this.updatePopupFor(imageryLayer);
     });
 
     if (prevProps.tiles !== this.props.tiles){
       this.loadImageryLayers();
+    }
+
+    if (this.layersControl && prevState.imageryLayers !== this.state.imageryLayers){
+        this.layersControl.update(this.state.imageryLayers);
     }
   }
 

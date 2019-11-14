@@ -1,0 +1,24 @@
+.leaflet-touch .leaflet-control-layers-control{
+    .layers-control-layer{
+        .layer-label{
+            width: 100%;
+            text-align: left;
+            padding-left: 52px;
+        }
+      
+        .toggle{
+          float: left;
+          width: 22px;
+          i{
+              font-size: 18px;
+              padding-top: 5px;
+        
+            }
+          &:hover{
+              background-color: inherit !important;
+              border-width: 0;
+          }
+        }
+
+    }
+}

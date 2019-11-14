@@ -7,7 +7,7 @@ import LayersControlPanel from './LayersControlPanel';
 
 class LayersControlButton extends React.Component {
   static propTypes = {
-    tasks: PropTypes.object.isRequired,
+    layers: PropTypes.array.isRequired,
     map: PropTypes.object.isRequired
   }
 
@@ -34,7 +34,7 @@ class LayersControlButton extends React.Component {
         <a href="javascript:void(0);" 
             onClick={this.handleOpen} 
             className="leaflet-control-layers-control-button leaflet-bar-part theme-secondary"></a>
-        <LayersControlPanel map={this.props.map} tasks={this.props.tasks} onClose={this.handleClose} />
+        <LayersControlPanel map={this.props.map} layers={this.props.layers} onClose={this.handleClose} />
     </div>);
   }
 }
@@ -45,11 +45,17 @@ export default L.Control.extend({
     },
 
     onAdd: function (map) {
-        var container = L.DomUtil.create('div', 'leaflet-control-layers-control leaflet-bar leaflet-control');
-        L.DomEvent.disableClickPropagation(container);
-        ReactDOM.render(<LayersControlButton map={this.options.map} tasks={this.options.tasks} />, container);
+        this.container = L.DomUtil.create('div', 'leaflet-control-layers-control leaflet-bar leaflet-control');
+        this.map = map;
 
-        return container;
+        L.DomEvent.disableClickPropagation(this.container);
+        this.update(this.options.layers);
+
+        return this.container;
+    },
+
+    update: function(layers){
+        ReactDOM.render(<LayersControlButton map={this.map} layers={layers} />, this.container);
     }
 });
 

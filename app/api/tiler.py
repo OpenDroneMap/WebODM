@@ -144,10 +144,10 @@ class Tiles(TaskNestedView):
             if rescale is None:
                 rescale = '157.0500,164.850'
 
-        # if tile_type == 'orthophoto':
-        #     expr = '(b2-b1)/(b2+b1-b3)'
-        #     rescale = "0.02,0.1"
-        #     color_map = 'rdylgn'
+        if tile_type == 'orthophoto':
+            expr = '(b2-b1)/(b2+b1-b3)'
+            rescale = "0.02,0.1"
+            color_map = 'rdylgn'
 
         if nodata is not None:
             nodata = numpy.nan if nodata == "nan" else float(nodata)
