@@ -93,8 +93,10 @@ class Map extends React.Component {
         const { url, meta, type } = tile;
         
         let metaUrl = url + "metadata";
-        if (type == "plant") metaUrl += "?expr=" + encodeURIComponent("(b2-b1)/(b2+b1-b3)") + "&rescale=0.02,0.1&color_map=rdylgn"
+        if (type == "plant") metaUrl += "?expr=" + encodeURIComponent("(b2-b1)/(b2+b1-b3)") + "&rescale=0.02,0.1&color_map=rdylgn";
+        if (type == "dsm") metaUrl += "?rescale=140%2C170&hillshade=1";
 
+        console.log(type, metaUrl);
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
             const { scheme, name, maxzoom } = mres;

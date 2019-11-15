@@ -5,13 +5,12 @@ from rasterio import MemoryFile
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
 from rio_tiler import main
-from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks
-from rio_color.operations import parse_operations
-from rio_color.utils import scale_dtype, to_math_type
+from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap
 from rio_tiler.profiles import img_profiles
 
 import numpy
 import mercantile
+from matplotlib.colors import LightSource
 
 from .tasks import TaskNestedView
 from rest_framework import exceptions
@@ -22,7 +21,7 @@ def get_tile_url(task, tile_type, query_params):
     url = '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
     params = {}
 
-    for k in ['expr', 'rescale', 'color_map']:
+    for k in ['expr', 'rescale', 'color_map', 'hillshade']:
         if query_params.get(k):
             params[k] = query_params.get(k)
 
@@ -53,7 +52,7 @@ def get_raster_path(task, tile_type):
     return task.get_asset_download_path(tile_type + ".tif")
 
 
-def postprocess(tile, mask, rescale = None, color_formula = None):
+def rescale_tile(tile, mask, rescale = None):
     if rescale:
         rescale_arr = list(map(float, rescale.split(",")))
         rescale_arr = list(_chunks(rescale_arr, 2))
@@ -69,15 +68,16 @@ def postprocess(tile, mask, rescale = None, color_formula = None):
             )
         tile = tile.astype(numpy.uint8)
 
-    if color_formula:
-        # make sure one last time we don't have
-        # negative value before applying color formula
-        tile[tile < 0] = 0
-        for ops in parse_operations(color_formula):
-            tile = scale_dtype(ops(to_math_type(tile)), numpy.uint8)
-
     return tile, mask
 
+
+def apply_colormap(tile, color_map = None):
+    if color_map is not None and isinstance(color_map, dict):
+        tile = _apply_discrete_colormap(tile, color_map)
+    elif color_map is not None:
+        tile = numpy.transpose(color_map[tile][0], [2, 0, 1]).astype(numpy.uint8)
+
+    return tile
 
 class TileJson(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, tile_type=""):
@@ -138,7 +138,7 @@ class Metadata(TaskNestedView):
                     raster_path, coords.x, coords.y, coords.z, expr=expr, tilesize=256, nodata=None
                 )
 
-                rtile, rmask = postprocess(tile, mask, rescale=rescale)
+                rtile, rmask = rescale_tile(tile, mask, rescale)
                 del tile
                 del mask
 
@@ -190,12 +190,12 @@ class Tiles(TaskNestedView):
         #nodata = self.request.query_params.get('nodata')
 
         indexes = None
-        color_formula = None
         nodata = None
 
         expr = self.request.query_params.get('expr')
         rescale = self.request.query_params.get('rescale')
         color_map = self.request.query_params.get('color_map')
+        hillshade = self.request.query_params.get('hillshade') is not None
 
         # TODO: disable color_map
         # TODO: server-side expressions
@@ -225,20 +225,45 @@ class Tiles(TaskNestedView):
         if tile.shape[0] == 4:
             mask = None
 
-        rtile, rmask = postprocess(
-            tile, mask, rescale=rescale, color_formula=color_formula
-        )
-        del tile
-        del mask
-
         if color_map:
             try:
                 color_map = get_colormap(color_map, format="gdal")
             except FileNotFoundError:
                 raise exceptions.ValidationError("Not a valid color_map value")
 
+        rtile, rmask = rescale_tile(tile, mask, rescale=rescale)
+
+        if hillshade:
+            if tile.shape[0] != 1:
+                raise exceptions.ValidationError("Cannot compute hillshade of non-elevation raster (multiple bands found)")
+
+            with rasterio.open(url) as src:
+                dx = src.meta["transform"][0]
+                dy = -src.meta["transform"][4]
+
+            ls = LightSource()
+            elevation = tile[0] # First band
+            rgb = apply_colormap(rtile, color_map)
+
+            # BxMxN (0..255) --> MxNxB (0..1)
+            rgb = rtile.reshape(rgb.shape[1], rgb.shape[2], rgb.shape[0]) / 255.0
+
+            rtile = ls.shade_rgb(rgb,
+                                 elevation,
+                                 vert_exag=1,
+                                 dx=dx,
+                                 dy=dy,
+                                 blend_mode="overlay"
+                              )
+            del rgb
+
+            # MxNxB (0..1) --> BxMxN (0..255)
+            rtile = (255.0 * rtile).astype(numpy.uint8).reshape(rtile.shape[2], rtile.shape[0], rtile.shape[1])
+        else:
+            rtile = apply_colormap(rtile, color_map)
+
         options = img_profiles.get(driver, {})
         return HttpResponse(
-            array_to_image(rtile, rmask, img_format=driver, color_map=color_map, **options),
+            array_to_image(rtile, rmask, img_format=driver, **options),
             content_type="image/{}".format(ext)
         )
