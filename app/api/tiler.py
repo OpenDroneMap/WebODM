@@ -8,7 +8,7 @@ from rio_tiler import main
 from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap
 from rio_tiler.profiles import img_profiles
 
-import numpy
+import numpy as np
 import mercantile
 from matplotlib.colors import LightSource
 
@@ -59,14 +59,14 @@ def rescale_tile(tile, mask, rescale = None):
         if len(rescale_arr) != tile.shape[0]:
             rescale_arr = ((rescale_arr[0]),) * tile.shape[0]
         for bdx in range(tile.shape[0]):
-            tile[bdx] = numpy.where(
+            tile[bdx] = np.where(
                 mask,
                 linear_rescale(
                     tile[bdx], in_range=rescale_arr[bdx], out_range=[0, 255]
                 ),
                 0,
             )
-        tile = tile.astype(numpy.uint8)
+        tile = tile.astype(np.uint8)
 
     return tile, mask
 
@@ -75,7 +75,7 @@ def apply_colormap(tile, color_map = None):
     if color_map is not None and isinstance(color_map, dict):
         tile = _apply_discrete_colormap(tile, color_map)
     elif color_map is not None:
-        tile = numpy.transpose(color_map[tile][0], [2, 0, 1]).astype(numpy.uint8)
+        tile = np.transpose(color_map[tile][0], [2, 0, 1]).astype(np.uint8)
 
     return tile
 
@@ -171,6 +171,39 @@ class Metadata(TaskNestedView):
 
         return Response(info)
 
+
+def extend_elevation(elevation, url, x, y, z, tilesize, nodata):
+    tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
+
+    try:
+        left, _ = main.tile(url, x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        tile[tilesize:tilesize*2,0:tilesize] = left
+    except TileOutsideBounds:
+        pass
+
+    try:
+        right, _ = main.tile(url, x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        tile[tilesize:tilesize*2,tilesize*2:tilesize*3] = right
+    except TileOutsideBounds:
+        pass
+
+    try:
+        bottom, _ = main.tile(url, x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        tile[tilesize*2:tilesize*3,tilesize:tilesize*2] = bottom
+    except TileOutsideBounds:
+        pass
+
+    try:
+        top, _ = main.tile(url, x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        tile[0:tilesize,tilesize:tilesize*2] = top
+    except TileOutsideBounds:
+        pass
+
+    tile[tilesize:tilesize*2,tilesize:tilesize*2] = elevation
+
+    return tile
+
+
 class Tiles(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y="", scale=1):
         """
@@ -204,7 +237,7 @@ class Tiles(TaskNestedView):
             raise exceptions.ValidationError("Cannot get tiles without rescale parameter. Add ?rescale=min,max to the URL.")
 
         if nodata is not None:
-            nodata = numpy.nan if nodata == "nan" else float(nodata)
+            nodata = np.nan if nodata == "nan" else float(nodata)
         tilesize = scale * 256
 
         url = get_raster_path(task, tile_type)
@@ -231,35 +264,47 @@ class Tiles(TaskNestedView):
             except FileNotFoundError:
                 raise exceptions.ValidationError("Not a valid color_map value")
 
-        rtile, rmask = rescale_tile(tile, mask, rescale=rescale)
 
         if hillshade:
             if tile.shape[0] != 1:
                 raise exceptions.ValidationError("Cannot compute hillshade of non-elevation raster (multiple bands found)")
 
             with rasterio.open(url) as src:
-                dx = src.meta["transform"][0]
-                dy = -src.meta["transform"][4]
+                minzoom, maxzoom = get_zooms(src)
+                z_value = min(maxzoom, max(z, minzoom))
+                delta_scale = (maxzoom + 1 - z_value) * 4
+                dx = src.meta["transform"][0] * delta_scale
+                dy = -src.meta["transform"][4] * delta_scale
 
             ls = LightSource()
             elevation = tile[0] # First band
-            rgb = apply_colormap(rtile, color_map)
 
-            # BxMxN (0..255) --> MxNxB (0..1)
-            rgb = rtile.reshape(rgb.shape[1], rgb.shape[2], rgb.shape[0]) / 255.0
+            elevation = extend_elevation(elevation, url, x, y, z, tilesize, nodata)
 
-            rtile = ls.shade_rgb(rgb,
-                                 elevation,
-                                 vert_exag=1,
-                                 dx=dx,
-                                 dy=dy,
-                                 blend_mode="overlay"
-                              )
-            del rgb
+            rtile = ls.hillshade(elevation, dx=dx, dy=dy)
+            rmask = None
+            rtile = (255.0 * rtile).astype(np.uint8)
+            #rtile =  linear_rescale(elevation, in_range=(140,170), out_range=(0,255)).astype(np.uint8)
+            rtile = rtile[tilesize:tilesize*2,tilesize:tilesize*2]
 
-            # MxNxB (0..1) --> BxMxN (0..255)
-            rtile = (255.0 * rtile).astype(numpy.uint8).reshape(rtile.shape[2], rtile.shape[0], rtile.shape[1])
+            # rgb = apply_colormap(rtile, color_map)
+            #
+            # # BxMxN (0..255) --> MxNxB (0..1)
+            # rgb = rtile.reshape(rgb.shape[1], rgb.shape[2], rgb.shape[0]) / 255.0
+            #
+            # rtile = ls.shade_rgb(rgb,
+            #                      elevation,
+            #                      vert_exag=1,
+            #                      dx=dx,
+            #                      dy=dy,
+            #                      blend_mode="overlay"
+            #                   )
+            # del rgb
+            #
+            # # MxNxB (0..1) --> BxMxN (0..255)
+            # rtile = (255.0 * rtile).astype(np.uint8).reshape(rtile.shape[2], rtile.shape[0], rtile.shape[1])
         else:
+            rtile, rmask = rescale_tile(tile, mask, rescale=rescale)
             rtile = apply_colormap(rtile, color_map)
 
         options = img_profiles.get(driver, {})
