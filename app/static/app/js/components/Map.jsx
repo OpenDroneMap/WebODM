@@ -94,7 +94,7 @@ class Map extends React.Component {
         
         let metaUrl = url + "metadata";
         if (type == "plant") metaUrl += "?expr=" + encodeURIComponent("(b2-b1)/(b2+b1-b3)") + "&rescale=0.02,0.1&color_map=rdylgn";
-        if (type == "dsm") metaUrl += "?rescale=140%2C170&hillshade=1";
+        if (type == "dsm") metaUrl += "?rescale=156%2C165&hillshade=3&color_map=jet_r";
 
         console.log(type, metaUrl);
         this.tileJsonRequests.push($.getJSON(metaUrl)
@@ -107,7 +107,7 @@ class Map extends React.Component {
             const layer = Leaflet.tileLayer(mres.tiles[0], {
                   bounds,
                   minZoom: 0,
-                  maxZoom: maxzoom + 4,
+                  maxZoom: maxzoom + 99,
                   maxNativeZoom: maxzoom,
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,

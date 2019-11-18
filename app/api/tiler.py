@@ -171,7 +171,7 @@ class Metadata(TaskNestedView):
 
         return Response(info)
 
-
+# TODO: refactor
 def extend_elevation(elevation, url, x, y, z, tilesize, nodata):
     tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
 
@@ -204,6 +204,88 @@ def extend_elevation(elevation, url, x, y, z, tilesize, nodata):
     return tile
 
 
+# TODO: remove matplotlib
+# TODO: refactor ( move to module? )
+
+
+# =============================================================================
+# rgb_to_hsv()
+#
+# rgb comes in as [r,g,b] with values in the range [0,255].  The returned
+# hsv values will be with hue and saturation in the range [0,1] and value
+# in the range [0,255]
+#
+def rgb_to_hsv( r,g,b ):
+
+    maxc = np.maximum(r,np.maximum(g,b))
+    minc = np.minimum(r,np.minimum(g,b))
+
+    v = maxc
+
+    minc_eq_maxc = np.equal(minc,maxc)
+
+    # compute the difference, but reset zeros to ones to avoid divide by zeros later.
+    ones = np.ones((r.shape[0],r.shape[1]))
+    maxc_minus_minc = np.choose( minc_eq_maxc, (maxc-minc,ones) )
+
+    s = (maxc-minc) / np.maximum(ones,maxc)
+    rc = (maxc-r) / maxc_minus_minc
+    gc = (maxc-g) / maxc_minus_minc
+    bc = (maxc-b) / maxc_minus_minc
+
+    maxc_is_r = np.equal(maxc,r)
+    maxc_is_g = np.equal(maxc,g)
+    maxc_is_b = np.equal(maxc,b)
+
+    h = np.zeros((r.shape[0],r.shape[1]))
+    h = np.choose( maxc_is_b, (h,4.0+gc-rc) )
+    h = np.choose( maxc_is_g, (h,2.0+rc-bc) )
+    h = np.choose( maxc_is_r, (h,bc-gc) )
+
+    h = np.mod(h/6.0,1.0)
+
+    hsv = np.asarray([h,s,v])
+
+    return hsv
+
+# =============================================================================
+# hsv_to_rgb()
+#
+# hsv comes in as [h,s,v] with hue and saturation in the range [0,1],
+# but value in the range [0,255].
+
+def hsv_to_rgb( hsv ):
+
+    h = hsv[0]
+    s = hsv[1]
+    v = hsv[2]
+
+    #if s == 0.0: return v, v, v
+    i = (h*6.0).astype(int)
+    f = (h*6.0) - i
+    p = v*(1.0 - s)
+    q = v*(1.0 - s*f)
+    t = v*(1.0 - s*(1.0-f))
+
+    r = i.choose( v, q, p, p, t, v )
+    g = i.choose( t, v, v, q, p, p )
+    b = i.choose( p, p, t, v, v, q )
+
+    rgb = np.asarray([r,g,b]).astype(np.uint8)
+
+    return rgb
+
+
+def hsv_blend(rgb, intensity):
+    hsv = rgb_to_hsv(rgb[0], rgb[1], rgb[2])
+
+    #replace v with hillshade
+    hsv_adjusted = np.asarray( [hsv[0], hsv[1], intensity] )
+
+    #convert back to RGB
+    return hsv_to_rgb( hsv_adjusted )
+
+
 class Tiles(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y="", scale=1):
         """
@@ -228,13 +310,16 @@ class Tiles(TaskNestedView):
         expr = self.request.query_params.get('expr')
         rescale = self.request.query_params.get('rescale')
         color_map = self.request.query_params.get('color_map')
-        hillshade = self.request.query_params.get('hillshade') is not None
+        hillshade = self.request.query_params.get('hillshade')
 
         # TODO: disable color_map
         # TODO: server-side expressions
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
             raise exceptions.ValidationError("Cannot get tiles without rescale parameter. Add ?rescale=min,max to the URL.")
+
+        if tile_type in ['dsm', 'dtm'] and color_map is None:
+            color_map = "gray"
 
         if nodata is not None:
             nodata = np.nan if nodata == "nan" else float(nodata)
@@ -264,8 +349,16 @@ class Tiles(TaskNestedView):
             except FileNotFoundError:
                 raise exceptions.ValidationError("Not a valid color_map value")
 
+        intensity = None
 
-        if hillshade:
+        if hillshade is not None:
+            try:
+                hillshade = float(hillshade)
+                if hillshade <= 0:
+                    hillshade = 1.0
+            except ValueError:
+                hillshade = 1.0
+
             if tile.shape[0] != 1:
                 raise exceptions.ValidationError("Cannot compute hillshade of non-elevation raster (multiple bands found)")
 
@@ -276,39 +369,29 @@ class Tiles(TaskNestedView):
                 dx = src.meta["transform"][0] * delta_scale
                 dy = -src.meta["transform"][4] * delta_scale
 
-            ls = LightSource()
+            ls = LightSource(azdeg=315, altdeg=45)
             elevation = tile[0] # First band
 
             elevation = extend_elevation(elevation, url, x, y, z, tilesize, nodata)
 
-            rtile = ls.hillshade(elevation, dx=dx, dy=dy)
-            rmask = None
-            rtile = (255.0 * rtile).astype(np.uint8)
-            #rtile =  linear_rescale(elevation, in_range=(140,170), out_range=(0,255)).astype(np.uint8)
-            rtile = rtile[tilesize:tilesize*2,tilesize:tilesize*2]
+            intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
+            intensity = intensity[tilesize:tilesize*2,tilesize:tilesize*2]
 
-            # rgb = apply_colormap(rtile, color_map)
-            #
-            # # BxMxN (0..255) --> MxNxB (0..1)
-            # rgb = rtile.reshape(rgb.shape[1], rgb.shape[2], rgb.shape[0]) / 255.0
-            #
-            # rtile = ls.shade_rgb(rgb,
-            #                      elevation,
-            #                      vert_exag=1,
-            #                      dx=dx,
-            #                      dy=dy,
-            #                      blend_mode="overlay"
-            #                   )
-            # del rgb
-            #
-            # # MxNxB (0..1) --> BxMxN (0..255)
-            # rtile = (255.0 * rtile).astype(np.uint8).reshape(rtile.shape[2], rtile.shape[0], rtile.shape[1])
-        else:
-            rtile, rmask = rescale_tile(tile, mask, rescale=rescale)
-            rtile = apply_colormap(rtile, color_map)
+
+        rgb, rmask = rescale_tile(tile, mask, rescale=rescale)
+        rgb = apply_colormap(rgb, color_map)
+
+        if intensity is not None:
+            # Quick check
+            if rgb.shape[0] != 3:
+                raise exceptions.ValidationError("Cannot process tile: intensity image provided, but no RGB data was computed.")
+
+            intensity = intensity * 255.0
+            rgb = hsv_blend(rgb, intensity)
+
 
         options = img_profiles.get(driver, {})
         return HttpResponse(
-            array_to_image(rtile, rmask, img_format=driver, **options),
+            array_to_image(rgb, rmask, img_format=driver, **options),
             content_type="image/{}".format(ext)
         )
