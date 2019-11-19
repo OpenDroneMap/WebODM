@@ -7,34 +7,68 @@ from functools import lru_cache
 # https://numexpr.readthedocs.io/en/latest/user_guide.html#supported-operators
 algos = {
     'VARI': {
-        'bands': 'RGB',
         'expr': '(G - R) / (G + R - B)',
         'help': 'Visual Atmospheric Resistance Index shows the areas of vegetation.'
     },
     'NDVI': {
-        'bands': 'RGN',
         'expr': '(N - R) / (N + R)',
         'help': 'Normalized Difference Vegetation Index shows the amount of green vegetation.'
     },
     'BAI': {
-        'bands': 'RGN',
         'expr': '1.0 / (((0.1 - R) ** 2) + ((0.06 - N) ** 2))',
         'help': 'Burn Area Index hightlights burned land in the red to near-infrared spectrum.'
     },
     'GLI': {
-        'bands': 'RGB',
         'expr': '((G * 2) - R - B) / ((G * 2) + R + B)',
         'help': 'Green Leaf Index shows greens leaves and stems.'
     },
     'GNDVI':{
-        'bands': 'RGN',
         'expr': '(N - G) / (N + G)',
         'help': 'Green Normalized Difference Vegetation Index is similar to NDVI, but measures the green spectrum instead of red.'
     },
+    'GRVI':{
+        'expr': 'N / G',
+        'help': 'Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests.'
+    },
+    'SAVI':{
+        'expr': '(1.5 * (N - R)) / (N + R + 0.5)',
+        'help': 'Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the effects of soil areas using an adjustment factor (0.5).'
+    },
+    'MNLI':{
+        'expr': '((N ** 2 - R) * 1.5) / (N ** 2 + R + 0.5)',
+        'help': 'Modified Non-Linear Index improves the Non-Linear Index algorithm to account for soil areas.'
+    },
+    'MSR': {
+        'expr': '((N / R) - 1) / (sqrt(N / R) + 1)',
+        'help': 'Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be more sensitive to vegetation.'
+    },
+    'RDVI': {
+        'expr': '(N - R) / sqrt(N + R)',
+        'help': 'Renormalized Difference Vegetation Index uses the difference between near-IR and red, plus NDVI to show areas of healthy vegetation.'
+    },
+    'TDVI': {
+        'expr': '1.5 * ((N - R) / sqrt(N ** 2 + R + 0.5))',
+        'help': 'Transformed Difference Vegetation Index highlights vegetation cover in urban environments.'
+    },
+    'OSAVI': {
+        'expr': '(N - R) / (N + R + 0.16)',
+        'help': 'Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work better in areas with little vegetation where soil is visible.'
+    },
+    'LAI': {
+        'expr': '3.618 * (2.5 * (N - R) / (N + 6*R - 7.5*B + 1)) * 0.118',
+        'help': 'Leaf Area Index estimates foliage areas and predicts crop yields.'
+    },
+    'EVI': {
+        'expr': '2.5 * (N - R) / (N + 6*R - 7.5*B + 1)',
+        'help': 'Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'
+    },
 
     '_TESTRB': {
-        'bands': 'RGB',
-        'expr': 'B+R'
+        'expr': 'R + B'
+    },
+
+    '_TESTFUNC': {
+        'expr': 'R + (sqrt(B) )'
     }
 }
 
@@ -47,14 +81,14 @@ def lookup_formula(algo, band_order = 'RGB'):
 
     if algo not in algos:
         raise ValueError("Cannot find algorithm " + algo)
-    if not band_order in band_map:
-        raise ValueError("Cannot find band order " + band_order)
 
-    input_bands = band_map[band_order]
-    algo_bands = re.findall("[A-Z]+?[a-z]*", algos[algo]['bands'])
+    input_bands = tuple(band_order)
 
     def repl(matches):
         b = matches.group(1)
-        return 'b' + str(input_bands.index(algo_bands.index(b)) + 1)
+        try:
+            return 'b' + str(input_bands.index(b) + 1)
+        except ValueError:
+            raise ValueError("Cannot find band \"" + b + "\" from \"" + band_order + "\". Choose a proper band order.")
 
     return re.sub("([A-Z]+?[a-z]*)", repl, re.sub("\s+", "", algos[algo]['expr']))
