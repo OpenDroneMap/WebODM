@@ -94,7 +94,7 @@ class Map extends React.Component {
         const { url, meta, type } = tile;
         
         let metaUrl = url + "metadata";
-        if (type == "plant") metaUrl += "?formula=vari&bands=RGB&rescale=0.02,0.1&color_map=rdylgn";
+        if (type == "plant") metaUrl += "?formula=GLI&bands=RGB&rescale=-1,1&color_map=rdylgn";
         if (type == "dsm") metaUrl += "?rescale=156%2C165&hillshade=3&color_map=jet_r";
 
         console.log(type, metaUrl);
