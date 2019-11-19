@@ -10,8 +10,10 @@ from rio_tiler.profiles import img_profiles
 
 import numpy as np
 import mercantile
-from matplotlib.colors import LightSource
 
+from .hsvblend import hsv_blend
+from .hillshade import LightSource
+from .formulas import lookup_formula
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
@@ -21,7 +23,7 @@ def get_tile_url(task, tile_type, query_params):
     url = '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
     params = {}
 
-    for k in ['expr', 'rescale', 'color_map', 'hillshade']:
+    for k in ['formula', 'bands', 'rescale', 'color_map', 'hillshade']:
         if query_params.get(k):
             params[k] = query_params.get(k)
 
@@ -120,7 +122,7 @@ class Metadata(TaskNestedView):
         """
         task = self.get_and_check_task(request, pk)
 
-        expr = self.request.query_params.get('expr')
+        expr = lookup_formula(self.request.query_params.get('formula'), self.request.query_params.get('bands'))
         rescale = self.request.query_params.get('rescale', "0,1")
         color_map = self.request.query_params.get('color_map')
 
@@ -171,8 +173,7 @@ class Metadata(TaskNestedView):
 
         return Response(info)
 
-# TODO: refactor
-def extend_elevation(elevation, url, x, y, z, tilesize, nodata):
+def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata):
     tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
 
     try:
@@ -204,88 +205,6 @@ def extend_elevation(elevation, url, x, y, z, tilesize, nodata):
     return tile
 
 
-# TODO: remove matplotlib
-# TODO: refactor ( move to module? )
-
-
-# =============================================================================
-# rgb_to_hsv()
-#
-# rgb comes in as [r,g,b] with values in the range [0,255].  The returned
-# hsv values will be with hue and saturation in the range [0,1] and value
-# in the range [0,255]
-#
-def rgb_to_hsv( r,g,b ):
-
-    maxc = np.maximum(r,np.maximum(g,b))
-    minc = np.minimum(r,np.minimum(g,b))
-
-    v = maxc
-
-    minc_eq_maxc = np.equal(minc,maxc)
-
-    # compute the difference, but reset zeros to ones to avoid divide by zeros later.
-    ones = np.ones((r.shape[0],r.shape[1]))
-    maxc_minus_minc = np.choose( minc_eq_maxc, (maxc-minc,ones) )
-
-    s = (maxc-minc) / np.maximum(ones,maxc)
-    rc = (maxc-r) / maxc_minus_minc
-    gc = (maxc-g) / maxc_minus_minc
-    bc = (maxc-b) / maxc_minus_minc
-
-    maxc_is_r = np.equal(maxc,r)
-    maxc_is_g = np.equal(maxc,g)
-    maxc_is_b = np.equal(maxc,b)
-
-    h = np.zeros((r.shape[0],r.shape[1]))
-    h = np.choose( maxc_is_b, (h,4.0+gc-rc) )
-    h = np.choose( maxc_is_g, (h,2.0+rc-bc) )
-    h = np.choose( maxc_is_r, (h,bc-gc) )
-
-    h = np.mod(h/6.0,1.0)
-
-    hsv = np.asarray([h,s,v])
-
-    return hsv
-
-# =============================================================================
-# hsv_to_rgb()
-#
-# hsv comes in as [h,s,v] with hue and saturation in the range [0,1],
-# but value in the range [0,255].
-
-def hsv_to_rgb( hsv ):
-
-    h = hsv[0]
-    s = hsv[1]
-    v = hsv[2]
-
-    #if s == 0.0: return v, v, v
-    i = (h*6.0).astype(int)
-    f = (h*6.0) - i
-    p = v*(1.0 - s)
-    q = v*(1.0 - s*f)
-    t = v*(1.0 - s*(1.0-f))
-
-    r = i.choose( v, q, p, p, t, v )
-    g = i.choose( t, v, v, q, p, p )
-    b = i.choose( p, p, t, v, v, q )
-
-    rgb = np.asarray([r,g,b]).astype(np.uint8)
-
-    return rgb
-
-
-def hsv_blend(rgb, intensity):
-    hsv = rgb_to_hsv(rgb[0], rgb[1], rgb[2])
-
-    #replace v with hillshade
-    hsv_adjusted = np.asarray( [hsv[0], hsv[1], intensity] )
-
-    #convert back to RGB
-    return hsv_to_rgb( hsv_adjusted )
-
-
 class Tiles(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y="", scale=1):
         """
@@ -300,19 +219,14 @@ class Tiles(TaskNestedView):
         ext = "png"
         driver = "jpeg" if ext == "jpg" else ext
 
-        #indexes = self.request.query_params.get('indexes')
-        # color_formula = self.request.query_params.get('color_formula')
-        #nodata = self.request.query_params.get('nodata')
-
         indexes = None
         nodata = None
 
-        expr = self.request.query_params.get('expr')
+        expr = lookup_formula(self.request.query_params.get('formula'), self.request.query_params.get('bands'))
         rescale = self.request.query_params.get('rescale')
         color_map = self.request.query_params.get('color_map')
         hillshade = self.request.query_params.get('hillshade')
 
-        # TODO: disable color_map
         # TODO: server-side expressions
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
@@ -370,10 +284,10 @@ class Tiles(TaskNestedView):
                 dy = -src.meta["transform"][4] * delta_scale
 
             ls = LightSource(azdeg=315, altdeg=45)
-            elevation = tile[0] # First band
 
-            elevation = extend_elevation(elevation, url, x, y, z, tilesize, nodata)
-
+            # Hillshading is not a local tile operation and
+            # requires neighbor tiles to be rendered seamlessly
+            elevation = get_elevation_tiles(tile[0], url, x, y, z, tilesize, nodata)
             intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
             intensity = intensity[tilesize:tilesize*2,tilesize:tilesize*2]
 
@@ -388,7 +302,6 @@ class Tiles(TaskNestedView):
 
             intensity = intensity * 255.0
             rgb = hsv_blend(rgb, intensity)
-
 
         options = img_profiles.get(driver, {})
         return HttpResponse(

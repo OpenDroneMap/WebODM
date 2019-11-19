@@ -7,6 +7,7 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+import '../vendor/leaflet/L.TileLayer.NoGap';
 import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
@@ -93,7 +94,7 @@ class Map extends React.Component {
         const { url, meta, type } = tile;
         
         let metaUrl = url + "metadata";
-        if (type == "plant") metaUrl += "?expr=" + encodeURIComponent("(b2-b1)/(b2+b1-b3)") + "&rescale=0.02,0.1&color_map=rdylgn";
+        if (type == "plant") metaUrl += "?formula=vari&bands=RGB&rescale=0.02,0.1&color_map=rdylgn";
         if (type == "dsm") metaUrl += "?rescale=156%2C165&hillshade=3&color_map=jet_r";
 
         console.log(type, metaUrl);
