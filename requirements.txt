@@ -42,8 +42,8 @@ pyparsing==2.1.10
 pytz==2018.3
 rcssmin==1.0.6
 redis==2.10.6
-requests-toolbelt==0.8.0
-requests==2.20.0
+requests-toolbelt==0.9.1
+requests==2.21.0
 rfc3987==1.3.7
 rjsmin==1.0.12
 simplejson==3.10.0
