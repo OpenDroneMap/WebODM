@@ -1,5 +1,5 @@
 from django.test import TestCase
-from app.api.formulas import lookup_formula
+from app.api.formulas import lookup_formula, get_algorithm_list, get_camera_filters_list
 
 class TestFormulas(TestCase):
     def setUp(self):
@@ -23,3 +23,12 @@ class TestFormulas(TestCase):
         self.assertTrue(lookup_formula("_TESTFUNC", "RGB") == "b1+(sqrt(b3))")
 
 
+    def test_algo_list(self):
+        list = get_algorithm_list()
+
+        # Do not show test algos
+        for i in list:
+            self.assertFalse(i['algorithm'].startswith("_"))
+
+        # Can call get_filters_list
+        self.assertTrue(len(get_camera_filters_list()) > 0)

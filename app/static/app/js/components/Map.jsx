@@ -21,6 +21,7 @@ import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
 import update from 'immutability-helper';
+import Utils from '../classes/Utils';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -94,18 +95,38 @@ class Map extends React.Component {
         const { url, meta, type } = tile;
         
         let metaUrl = url + "metadata";
-        if (type == "plant") metaUrl += "?formula=GLI&bands=RGB&rescale=-1,1&color_map=rdylgn";
-        if (type == "dsm") metaUrl += "?rescale=156%2C165&hillshade=3&color_map=jet_r";
 
-        console.log(type, metaUrl);
+        if (type == "plant") metaUrl += "?formula=VARI&bands=RGB&color_map=rdylgn";
+        if (type == "dsm") metaUrl += "?hillshade=1&color_map=jet_r";
+
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
-            const { scheme, name, maxzoom } = mres;
+            const { scheme, name, maxzoom, statistics } = mres;
 
             const bounds = Leaflet.latLngBounds(
                 [mres.bounds.value.slice(0, 2).reverse(), mres.bounds.value.slice(2, 4).reverse()]
               );
-            const layer = Leaflet.tileLayer(mres.tiles[0], {
+
+            // Build URL
+            let tileUrl = mres.tiles[0];
+
+            // Certain types need the rescale parameter
+            if (["plant", "dsm", "dtm"].indexOf(type) !== -1 && statistics){
+                const params = Utils.queryParams({search: tileUrl.slice(tileUrl.indexOf("?"))});
+                console.log(statistics);
+                if (statistics["1"]){
+                    // Add rescale
+                    params["rescale"] = encodeURIComponent(`${statistics["1"]["min"]},${statistics["1"]["max"]}`);              
+                }else{
+                    console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
+                    params["rescale"] = encodeURIComponent("-1,1");
+                }
+                
+                tileUrl = tileUrl.slice(0, tileUrl.indexOf("?")) + Utils.toSearchQuery(params);
+            }
+            console.log(tileUrl);
+
+            const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,
                   minZoom: 0,
                   maxZoom: maxzoom + 99,

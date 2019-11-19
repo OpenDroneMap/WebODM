@@ -13,7 +13,7 @@ import mercantile
 
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
-from .formulas import lookup_formula
+from .formulas import lookup_formula, get_algorithm_list, get_camera_filters_list
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
@@ -123,7 +123,6 @@ class Metadata(TaskNestedView):
         task = self.get_and_check_task(request, pk)
 
         expr = lookup_formula(self.request.query_params.get('formula'), self.request.query_params.get('bands'))
-        rescale = self.request.query_params.get('rescale', "0,1")
         color_map = self.request.query_params.get('color_map')
 
         pmin, pmax = 2.0, 98.0
@@ -140,24 +139,29 @@ class Metadata(TaskNestedView):
                     raster_path, coords.x, coords.y, coords.z, expr=expr, tilesize=256, nodata=None
                 )
 
-                rtile, rmask = rescale_tile(tile, mask, rescale)
-                del tile
-                del mask
+                # Convert to uint
+                print(tile.min())
+                print(tile.max())
+                tile = (tile * 255.0).astype(np.uint8)
 
                 with MemoryFile() as memfile:
                     profile = src.profile
-                    profile['count'] = rtile.shape[0]
+                    profile['count'] = tile.shape[0]
                     profile.update()
 
                     with memfile.open(**profile) as dataset:
-                        dataset.write(rtile)
-                        dataset.write_mask(rmask)
-                        del rtile
+                        dataset.write(tile)
+                        dataset.write_mask(mask)
+                        del tile
 
                     with memfile.open() as dataset:  # Reopen as DatasetReader
-                        info = main.metadata(dataset, pmin=pmin, pmax=pmax)
+                        info = main.metadata(dataset, pmin=pmin, pmax=pmax, histogram_bins=64)
         else:
-            info = main.metadata(raster_path, pmin=pmin, pmax=pmax)
+            info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=64)
+
+        if tile_type == 'plant':
+            info['algorithms'] = get_algorithm_list(),
+            info['filters'] = get_camera_filters_list()
 
         del info['address']
         info['name'] = task.name

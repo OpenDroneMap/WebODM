@@ -1,10 +1,13 @@
 # Algos from https://github.com/dirceup/tiled-vegetation-indices/blob/master/app/lib/vegetation_index.rb
-import re
-from functools import lru_cache
-
-
 # Functions can use all of the supported functions and operators from
 # https://numexpr.readthedocs.io/en/latest/user_guide.html#supported-operators
+
+import re
+from functools import lru_cache
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 algos = {
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
@@ -63,6 +66,8 @@ algos = {
         'help': 'Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'
     },
 
+    # more?
+
     '_TESTRB': {
         'expr': 'R + B'
     },
@@ -72,7 +77,15 @@ algos = {
     }
 }
 
-#@lru_cache(max_size=20)
+camera_filters = [
+    'RGB',
+    'NRG',
+    'NGB',
+    'RGN',
+    # more?
+]
+
+@lru_cache(maxsize=20)
 def lookup_formula(algo, band_order = 'RGB'):
     if algo is None:
         return None
@@ -92,3 +105,10 @@ def lookup_formula(algo, band_order = 'RGB'):
             raise ValueError("Cannot find band \"" + b + "\" from \"" + band_order + "\". Choose a proper band order.")
 
     return re.sub("([A-Z]+?[a-z]*)", repl, re.sub("\s+", "", algos[algo]['expr']))
+
+def get_algorithm_list():
+    return [{'id': k, **algos[k]} for k in algos if not k.startswith("_")]
+
+def get_camera_filters_list():
+    return camera_filters
+
