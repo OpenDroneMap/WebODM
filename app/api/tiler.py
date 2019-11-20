@@ -1,7 +1,6 @@
 import rasterio
 import urllib
 from django.http import HttpResponse
-from rasterio import MemoryFile
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
 from rio_tiler import main
@@ -9,7 +8,6 @@ from rio_tiler.utils import array_to_image, get_colormap, expression, linear_res
 from rio_tiler.profiles import img_profiles
 
 import numpy as np
-import mercantile
 
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
@@ -126,38 +124,9 @@ class Metadata(TaskNestedView):
         color_map = self.request.query_params.get('color_map')
 
         pmin, pmax = 2.0, 98.0
-
         raster_path = get_raster_path(task, tile_type)
+        info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=64, expr=expr)
 
-        if expr is not None:
-            with rasterio.open(raster_path) as src:
-                minzoom, maxzoom = get_zooms(src)
-                centroid = get_extent(task, tile_type).centroid
-                coords = mercantile.tile(centroid.x, centroid.y, minzoom)
-
-                tile, mask = expression(
-                    raster_path, coords.x, coords.y, coords.z, expr=expr, tilesize=256, nodata=None
-                )
-
-                # Convert to uint
-                print(tile.min())
-                print(tile.max())
-                tile = (tile * 255.0).astype(np.uint8)
-
-                with MemoryFile() as memfile:
-                    profile = src.profile
-                    profile['count'] = tile.shape[0]
-                    profile.update()
-
-                    with memfile.open(**profile) as dataset:
-                        dataset.write(tile)
-                        dataset.write_mask(mask)
-                        del tile
-
-                    with memfile.open() as dataset:  # Reopen as DatasetReader
-                        info = main.metadata(dataset, pmin=pmin, pmax=pmax, histogram_bins=64)
-        else:
-            info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=64)
 
         if tile_type == 'plant':
             info['algorithms'] = get_algorithm_list(),
