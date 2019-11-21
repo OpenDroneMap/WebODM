@@ -1,11 +1,10 @@
 .leaflet-control-layers-control .layers-control-panel{
   padding: 6px 10px 6px 6px;
   background: #fff;
-  min-width: 250px; 
-  max-width: 300px;
+  width: 300px;
   min-height: 74px;
   overflow-y: auto;
-  
+
   .loading{
       margin-top: 6px;
       margin-left: 4px;

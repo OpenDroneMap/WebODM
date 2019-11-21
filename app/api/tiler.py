@@ -125,7 +125,7 @@ class Metadata(TaskNestedView):
 
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
-        info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=64, expr=expr)
+        info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, expr=expr)
 
 
         if tile_type == 'plant':
