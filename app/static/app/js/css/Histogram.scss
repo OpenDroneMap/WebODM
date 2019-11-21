@@ -1,3 +1,17 @@
 .histogram{
-    
+    .axis {
+        shape-rendering: crispEdges;
+      }
+      
+      .x.axis line {
+        display: none;
+      }
+      
+      .x.axis .minor {
+        stroke-opacity: .5;
+      }
+      
+      .x.axis path {
+        display: none;
+      }
 }

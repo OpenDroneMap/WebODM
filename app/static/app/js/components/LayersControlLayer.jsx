@@ -6,10 +6,12 @@ import { Checkbox, ExpandButton } from './Toggle';
 
 export default class LayersControlLayer extends React.Component {
   static defaultProps = {
-      layer: null
+      layer: null,
+      expanded: false
   };
   static propTypes = {
-    layer: PropTypes.object.isRequired
+    layer: PropTypes.object.isRequired,
+    expanded: PropTypes.bool
   }
 
   constructor(props){
@@ -17,7 +19,7 @@ export default class LayersControlLayer extends React.Component {
 
     this.state = {
         visible: true,
-        expanded: false
+        expanded: props.expanded
     };
 
     this.map = props.layer._map;

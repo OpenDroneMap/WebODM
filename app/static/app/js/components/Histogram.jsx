@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/Histogram.scss';
 import d3 from 'd3';
+import Css from '../classes/Css';
 
 export default class Histogram extends React.Component {
   static defaultProps = {
@@ -18,10 +19,12 @@ export default class Histogram extends React.Component {
     super(props);
 
     this.state = {};
+
+    this.primaryColor = Css.getValue('theme-primary', 'color');
   }
 
   componentDidMount(){
-    let margin = {top: 5, right: 5, bottom: 30, left: 5},
+    let margin = {top: 5, right: 10, bottom: 30, left: 10},
         width = this.props.width - margin.left - margin.right,
         height = 100 - margin.top - margin.bottom;
 
@@ -46,16 +49,15 @@ export default class Histogram extends React.Component {
         maxY = Math.max(maxY, Math.max(...band.histogram[0]));
     }
 
-    console.log(minX, maxX, minY, maxY);
-
     // add the x Axis
     let x = d3.scale.linear()
                 .domain([minX, maxX])
                 .range([0, width]);
 
     svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.svg.axis().scale(x).orient("bottom"));
+        .attr("class", "x axis theme-fill-primary")
+        .attr("transform", "translate(0," + (height - 5) + ")")
+        .call(d3.svg.axis().scale(x).tickValues([minX, maxX]).orient("bottom"));
     
     // add the y Axis
     let y = d3.scale.linear()
@@ -72,15 +74,12 @@ export default class Histogram extends React.Component {
         let curve = svg
             .append('g')
             .append("path")
-            .attr("class", "mypath")
             .datum(data)
             .attr("fill", "#69b3a2")
             .attr("opacity", ".8")
-            .attr("stroke", "#000")
-            .attr("stroke-width", 0)
             .attr("d",  d3.svg.line()
-                .x(function(d) { return x(d[0]); })
-                .y(function(d) { return y(d[1]); })
+                                .x(function(d) { return x(d[0]); })
+                                .y(function(d) { return y(d[1]); })
             );
     }
     

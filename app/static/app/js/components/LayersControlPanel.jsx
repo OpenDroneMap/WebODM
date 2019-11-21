@@ -23,7 +23,7 @@ export default class LayersControlPanel extends React.Component {
     if (!this.props.layers.length) content = (<span><i className="loading fa fa-circle-notch fa-spin"></i> Loading...</span>);
     else{
       content = (<div>
-        {this.props.layers.map((layer, i) => <LayersControlLayer layer={layer} key={i} />)}
+        {this.props.layers.map((layer, i) => <LayersControlLayer expanded={this.props.layers.length == 1} layer={layer} key={i} />)}
       </div>);
 
       /*

@@ -21,6 +21,9 @@ ul#side-menu.nav a,
 	&.bottom .tooltip-arrow{ border-bottom-color: theme("primary"); }
 	&.right .tooltip-arrow{ border-right-color: theme("primary"); }
 }
+.theme-fill-primary{
+    fill: theme("primary");
+}
 
 /* Secondary */
 body,
