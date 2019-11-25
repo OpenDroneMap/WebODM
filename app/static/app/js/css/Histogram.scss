@@ -1,4 +1,23 @@
 .histogram{
+    user-select: none;
+    
+    .histogram-container{
+        &:hover{
+            cursor: pointer;
+        }
+    }
+    
+    select, input{
+        height: auto;
+        padding: 4px;
+    }
+
+    .min-max{
+        display: inline;
+        width: 100px;
+        margin-right: 12px;
+    }
+
     .axis {
         shape-rendering: crispEdges;
       }
@@ -14,4 +33,12 @@
       .x.axis path {
         display: none;
       }
+
+    .slider-line{
+        stroke-width: 4;
+        opacity: 0.4;
+        &:hover{
+            cursor: ew-resize;
+        }
+    }
 }

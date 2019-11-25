@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/Histogram.scss';
 import d3 from 'd3';
-import Css from '../classes/Css';
 
 export default class Histogram extends React.Component {
   static defaultProps = {
@@ -18,25 +17,6 @@ export default class Histogram extends React.Component {
   constructor(props){
     super(props);
 
-    this.state = {};
-
-    this.primaryColor = Css.getValue('theme-primary', 'color');
-  }
-
-  componentDidMount(){
-    let margin = {top: 5, right: 10, bottom: 30, left: 10},
-        width = this.props.width - margin.left - margin.right,
-        height = 100 - margin.top - margin.bottom;
-
-    // append the svg object to the body of the page
-    let svg = d3.select(this.hgContainer)
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
-
     const minY = 0;
     let maxY = 0;
     let minX = 2147483647;
@@ -49,19 +29,74 @@ export default class Histogram extends React.Component {
         maxY = Math.max(maxY, Math.max(...band.histogram[0]));
     }
 
+    this.rangeX = [minX, maxX];
+    this.rangeY = [minY, maxY];
+
+    this.state = {
+        min: minX.toFixed(3),
+        max: maxX.toFixed(3)
+    };
+
+    // Colors in absence of a color map
+    this.defaultBandColors = [
+        '#ff0000',
+        '#00ff00',
+        '#0000ff',
+        '#ff8000',
+        '#ffff00',
+        '#00ff80',
+        '#00ffff',
+        '#0080ff',
+    ];
+  }
+
+  redraw = () => {
+    let margin = {top: 5, right: 10, bottom: 20, left: 10},
+    width = this.props.width - margin.left - margin.right,
+    height = 90 - margin.top - margin.bottom;
+
+    if (this.hgContainer.firstElementChild){
+        this.hgContainer.removeChild(this.hgContainer.firstElementChild);
+    }
+
+    const svgContainer = d3.select(this.hgContainer)
+        .append("svg")
+        .attr('class', 'histogram-container')
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
+
+    if (this.props.colorMap){
+        const colorMapElem = svgContainer.append("defs")
+                    .append("linearGradient")
+                    .attr('id', 'linear')
+                    .attr('x1', '0%')
+                    .attr('y1', '0%')
+                    .attr('x2', '100%')
+                    .attr('y2', '0%');
+        this.props.colorMap.forEach((color, i) => {
+            colorMapElem.append("stop")
+                        .attr('offset', `${(i / (this.props.colorMap.length - 1)) * 100.0}%`)
+                        .attr('stop-color', `rgb(${color.join(",")})`);
+        });
+    }
+
+    let svg = svgContainer.append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
     // add the x Axis
     let x = d3.scale.linear()
-                .domain([minX, maxX])
+                .domain(this.rangeX)
                 .range([0, width]);
 
     svg.append("g")
         .attr("class", "x axis theme-fill-primary")
         .attr("transform", "translate(0," + (height - 5) + ")")
-        .call(d3.svg.axis().scale(x).tickValues([minX, maxX]).orient("bottom"));
-    
+        .call(d3.svg.axis().scale(x).tickValues(this.rangeX).orient("bottom"));
+
     // add the y Axis
     let y = d3.scale.linear()
-            .domain([minY, maxY])
+            .domain(this.rangeY)
             .range([height, 0]);
 
     for (let i in this.props.statistics){
@@ -71,79 +106,124 @@ export default class Histogram extends React.Component {
         });
 
         // Plot the area
-        let curve = svg
-            .append('g')
-            .append("path")
-            .datum(data)
-            .attr("fill", "#69b3a2")
-            .attr("opacity", ".8")
-            .attr("d",  d3.svg.line()
-                                .x(function(d) { return x(d[0]); })
-                                .y(function(d) { return y(d[1]); })
-            );
+        svg.append('g')
+           .append("path")
+           .datum(data)
+           .attr("fill", !this.props.colorMap ? this.defaultBandColors[i - 1] : 'url(#linear)')
+           .attr("opacity", 1 / Object.keys(this.props.statistics).length)
+           .attr("d",  d3.svg.line()
+                               .x(function(d) { return x(d[0]); })
+                               .y(function(d) { return y(d[1]); })
+           );
     }
-    
+
+    // Add sliders
+    this.maxDown = false;
+    let minDown = false;
+    let maxPosX = null;
+    let minPosX = null;
+
+    const minLine = svg.append('g')
+       .append('line')
+       .attr('x1', 0)
+       .attr('y1', 0)
+       .attr('x2', 0)
+       .attr('y2', height)
+       .attr('class', 'theme-stroke-primary slider-line min')
+       .on("mousedown", () => { minDown = true; })[0][0];
+       
+
+    const maxXStart = ((this.state.max - this.rangeX[0]) / (this.rangeX[1] - this.rangeX[0])) * width;
+    const maxLine = svg.append('g')
+       .append('line')
+       .attr('x1', maxXStart)
+       .attr('y1', 0)
+       .attr('x2', maxXStart)
+       .attr('y2', height)
+       .attr('class', 'theme-stroke-primary slider-line max')
+       .on("mousedown", function(){ self.maxDown = true; })[0][0];
+
+    const handleLeave = () => {
+        this.maxDown = this.minDown = false;
+        maxPosX = null;
+    };
+
+    const self = this;
+
+    const handleMoveMax = function(){
+        if (self.maxDown){
+            const mouseX = (d3.mouse(this))[0];
+            if (!maxPosX) maxPosX = mouseX;
+
+            const deltaX = mouseX - maxPosX;
+            const prevX = parseInt(maxLine.getAttribute('x1'));
+            const newX = Math.max(Math.min(width, prevX + deltaX), parseInt(minLine.getAttribute('x1')));
+            maxPosX = mouseX;
+            maxLine.setAttribute('x1', newX);
+            maxLine.setAttribute('x2', newX);
+
+            if (prevX !== newX){
+                self.setState({max: (self.rangeX[0] + ((self.rangeX[1] - self.rangeX[0]) / width) * newX).toFixed(3)});
+            }
+        }
+    }
+
+    svgContainer
+        .on("mousemove", handleMoveMax)
+        .on("mouseup", handleLeave)
+        .on("mouseleave", handleLeave)
+        .on("click", function(){
+            const mouseX = (d3.mouse(this))[0];
+            const maxBarX = parseInt(maxLine.getAttribute('x1')) + margin.right;
+            const minBarX = parseInt(minLine.getAttribute('x1')) + margin.left;
+
+            // Move bar closest to click
+            if (Math.abs(mouseX - maxBarX) - (width - maxBarX) <
+                Math.abs(mouseX - minBarX) - minBarX){
+                self.maxDown = true;
+                maxPosX = parseInt(maxLine.getAttribute('x1')) + margin.right;
+                handleMoveMax.apply(this);
+                self.maxDown = false;
+            }else{
+                // ... TODO
+            }
+        })
+       
+  }
+
+  componentDidMount(){
+    this.redraw();
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if (prevState.min !== this.state.min || 
+        prevState.max !== this.state.max){
+            if (!this.maxDown && !this.minDown) this.redraw();
+        }
+  }
+
+  handleChangeMax = (e) => {
+    const val = parseFloat(e.target.value);
+
+    if (val >= this.state.min && val <= this.rangeX[1]){
+        this.setState({max: val})
+    }
+  }
+
+  handleChangeMin = (e) => {
+    const val = parseFloat(e.target.value);
+
+    if (val <= this.state.max && val >= this.rangeX[0]){
+        this.setState({min: val})
+    }
   }
 
   render(){
     return (<div className="histogram">
         <div ref={(domNode) => { this.hgContainer = domNode; }}>
         </div>
+        Min: <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.min} />
+        Max: <input onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.max} />
     </div>);
   }
 }
-
-
-
-
-
-
-
-  // Compute kernel density estimation
-//   var kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(40))
-//   var density =  kde( data.map(function(d){  return d.price; }) )
-
-
-
-//   // A function that update the chart when slider is moved?
-//   function updateChart(binNumber) {
-//     // recompute density estimation
-//     kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(binNumber))
-//     density =  kde( data.map(function(d){  return d.price; }) )
-//     console.log(binNumber)
-//     console.log(density)
-
-//     // update the chart
-//     curve
-//       .datum(density)
-//       .transition()
-//       .duration(1000)
-//       .attr("d",  d3.line()
-//         .curve(d3.curveLinear)
-//           .x(function(d) { return x(d[0]); })
-//           .y(function(d) { return y(d[1]); })
-//       );
-//   }
-
-//   // Listen to the slider?
-//   d3.select("#mySlider").on("change", function(d){
-//     selectedValue = this.value
-//     updateChart(selectedValue)
-//   })
-
-// });
-
-
-// // Function to compute density
-// function kernelDensityEstimator(kernel, X) {
-//   return function(V) {
-//     return X.map(function(x) {
-//       return [x, d3.mean(V, function(v) { return kernel(x - v); })];
-//     });
-//   };
-// }
-// function kernelEpanechnikov(k) {
-//   return function(v) {
-//     return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
-//   };
-// }
