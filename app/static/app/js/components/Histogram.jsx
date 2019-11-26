@@ -6,12 +6,14 @@ import d3 from 'd3';
 export default class Histogram extends React.Component {
   static defaultProps = {
       width: 280,
-      colorMap: null
+      colorMap: null,
+      onUpdate: null
   };
   static propTypes = {
       statistics: PropTypes.object.isRequired,
       colorMap: PropTypes.array,
-      width: PropTypes.number
+      width: PropTypes.number,
+      onUpdate: PropTypes.func
   }
 
   constructor(props){
@@ -132,7 +134,7 @@ export default class Histogram extends React.Component {
        .attr('x2', minXStart)
        .attr('y2', height)
        .attr('class', 'theme-stroke-primary slider-line min')
-       .on("mousedown", function(){ self.minDown = true; })[0][0];
+       .on("mousedown", function(){ self.maxDown = false; self.minDown = true; })[0][0];
        
 
     const maxXStart = ((this.state.max - this.rangeX[0]) / (this.rangeX[1] - this.rangeX[0])) * width;
@@ -143,7 +145,7 @@ export default class Histogram extends React.Component {
        .attr('x2', maxXStart)
        .attr('y2', height)
        .attr('class', 'theme-stroke-primary slider-line max')
-       .on("mousedown", function(){ self.maxDown = true; })[0][0];
+       .on("mousedown", function(){ self.minDown = false; self.maxDown = true; })[0][0];
 
     const handleLeave = () => {
         this.maxDown = this.minDown = false;
@@ -224,10 +226,14 @@ export default class Histogram extends React.Component {
           prevState.max !== this.state.max){
           if (!this.maxDown && !this.minDown) this.redraw();
           this.updateColorMap();
+          
+          if (this.props.onUpdate !== undefined) this.props.onUpdate({min: this.state.min, max: this.state.max});
       }
   }
     
   updateColorMap = () => {
+    if (!this.colorMapElem) return;
+
     const { min, max } = this.state;
 
     const minPerc = Math.abs(min - this.rangeX[0]) / (this.rangeX[1] - this.rangeX[0]) * 100.0;

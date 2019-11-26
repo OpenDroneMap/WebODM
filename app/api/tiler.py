@@ -59,13 +59,18 @@ def rescale_tile(tile, mask, rescale = None):
         if len(rescale_arr) != tile.shape[0]:
             rescale_arr = ((rescale_arr[0]),) * tile.shape[0]
         for bdx in range(tile.shape[0]):
-            tile[bdx] = np.where(
-                mask,
-                linear_rescale(
+            if mask is not None:
+                tile[bdx] = np.where(
+                    mask,
+                    linear_rescale(
+                        tile[bdx], in_range=rescale_arr[bdx], out_range=[0, 255]
+                    ),
+                    0,
+                )
+            else:
+                tile[bdx] = linear_rescale(
                     tile[bdx], in_range=rescale_arr[bdx], out_range=[0, 255]
-                ),
-                0,
-            )
+                )
         tile = tile.astype(np.uint8)
 
     return tile, mask
@@ -120,13 +125,19 @@ class Metadata(TaskNestedView):
         """
         task = self.get_and_check_task(request, pk)
 
-        expr = lookup_formula(self.request.query_params.get('formula'), self.request.query_params.get('bands'))
+        formula = self.request.query_params.get('formula')
+        bands = self.request.query_params.get('bands')
         color_map = self.request.query_params.get('color_map')
+
+        if formula == '': formula = None
+        if bands == '': bands = None
+        if color_map == '': color_map = None
+
+        expr = lookup_formula(formula, bands)
 
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
         info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, expr=expr)
-
 
         if tile_type == 'plant':
             info['algorithms'] = get_algorithm_list(),
@@ -195,12 +206,19 @@ class Tiles(TaskNestedView):
         indexes = None
         nodata = None
 
-        expr = lookup_formula(self.request.query_params.get('formula'), self.request.query_params.get('bands'))
+        formula = self.request.query_params.get('formula')
+        bands = self.request.query_params.get('bands')
         rescale = self.request.query_params.get('rescale')
         color_map = self.request.query_params.get('color_map')
         hillshade = self.request.query_params.get('hillshade')
 
-        # TODO: server-side expressions
+        if formula == '': formula = None
+        if bands == '': bands = None
+        if rescale == '': rescale = None
+        if color_map == '': color_map = None
+        if hillshade == '': hillshade = None
+
+        expr = lookup_formula(formula, bands)
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
             raise exceptions.ValidationError("Cannot get tiles without rescale parameter. Add ?rescale=min,max to the URL.")
