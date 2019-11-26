@@ -51,9 +51,9 @@ export default class Histogram extends React.Component {
   }
 
   redraw = () => {
-    let margin = {top: 5, right: 10, bottom: 20, left: 10},
+    let margin = {top: 5, right: 10, bottom: 15, left: 10},
     width = this.props.width - margin.left - margin.right,
-    height = 90 - margin.top - margin.bottom;
+    height = 85 - margin.top - margin.bottom;
 
     if (this.hgContainer.firstElementChild){
         this.hgContainer.removeChild(this.hgContainer.firstElementChild);
@@ -66,7 +66,7 @@ export default class Histogram extends React.Component {
         .attr("height", height + margin.top + margin.bottom);
 
     if (this.props.colorMap){
-        const colorMapElem = svgContainer.append("defs")
+        this.colorMapElem = svgContainer.append("defs")
                     .append("linearGradient")
                     .attr('id', 'linear')
                     .attr('x1', '0%')
@@ -74,10 +74,11 @@ export default class Histogram extends React.Component {
                     .attr('x2', '100%')
                     .attr('y2', '0%');
         this.props.colorMap.forEach((color, i) => {
-            colorMapElem.append("stop")
+            this.colorMapElem.append("stop")
                         .attr('offset', `${(i / (this.props.colorMap.length - 1)) * 100.0}%`)
                         .attr('stop-color', `rgb(${color.join(",")})`);
         });
+        this.updateColorMap();
     }
 
     let svg = svgContainer.append("g")
@@ -109,7 +110,7 @@ export default class Histogram extends React.Component {
         svg.append('g')
            .append("path")
            .datum(data)
-           .attr("fill", !this.props.colorMap ? this.defaultBandColors[i - 1] : 'url(#linear)')
+           .attr("fill", !this.colorMapElem ? this.defaultBandColors[i - 1] : 'url(#linear)')
            .attr("opacity", 1 / Object.keys(this.props.statistics).length)
            .attr("d",  d3.svg.line()
                                .x(function(d) { return x(d[0]); })
@@ -119,18 +120,19 @@ export default class Histogram extends React.Component {
 
     // Add sliders
     this.maxDown = false;
-    let minDown = false;
+    this.minDown = false;
     let maxPosX = null;
     let minPosX = null;
 
+    const minXStart = ((this.state.min - this.rangeX[0]) / (this.rangeX[1] - this.rangeX[0])) * width;
     const minLine = svg.append('g')
        .append('line')
-       .attr('x1', 0)
+       .attr('x1', minXStart)
        .attr('y1', 0)
-       .attr('x2', 0)
+       .attr('x2', minXStart)
        .attr('y2', height)
        .attr('class', 'theme-stroke-primary slider-line min')
-       .on("mousedown", () => { minDown = true; })[0][0];
+       .on("mousedown", function(){ self.minDown = true; })[0][0];
        
 
     const maxXStart = ((this.state.max - this.rangeX[0]) / (this.rangeX[1] - this.rangeX[0])) * width;
@@ -146,6 +148,7 @@ export default class Histogram extends React.Component {
     const handleLeave = () => {
         this.maxDown = this.minDown = false;
         maxPosX = null;
+        minPosX = null;
     };
 
     const self = this;
@@ -166,47 +169,79 @@ export default class Histogram extends React.Component {
                 self.setState({max: (self.rangeX[0] + ((self.rangeX[1] - self.rangeX[0]) / width) * newX).toFixed(3)});
             }
         }
-    }
+    };
+
+    const handleMoveMin = function(){
+        if (self.minDown){
+            const mouseX = (d3.mouse(this))[0];
+            if (!minPosX) minPosX = mouseX;
+
+            const deltaX = mouseX - minPosX;
+            const prevX = parseInt(minLine.getAttribute('x1'));
+            const newX = Math.max(0, Math.min(prevX + deltaX, parseInt(maxLine.getAttribute('x1'))));
+            minPosX = mouseX;
+            minLine.setAttribute('x1', newX);
+            minLine.setAttribute('x2', newX);
+
+            if (prevX !== newX){
+                self.setState({min: (self.rangeX[0] + ((self.rangeX[1] - self.rangeX[0]) / width) * newX).toFixed(3)});
+            }
+        }
+    };
 
     svgContainer
-        .on("mousemove", handleMoveMax)
+        .on("mousemove", function(){
+            handleMoveMax.apply(this);
+            handleMoveMin.apply(this);
+        })
         .on("mouseup", handleLeave)
         .on("mouseleave", handleLeave)
-        .on("click", function(){
+        .on("mousedown", function(){
             const mouseX = (d3.mouse(this))[0];
             const maxBarX = parseInt(maxLine.getAttribute('x1')) + margin.right;
-            const minBarX = parseInt(minLine.getAttribute('x1')) + margin.left;
+            const minBarX = parseInt(minLine.getAttribute('x1')) + margin.right;
 
             // Move bar closest to click
-            if (Math.abs(mouseX - maxBarX) - (width - maxBarX) <
-                Math.abs(mouseX - minBarX) - minBarX){
+            if (Math.abs(mouseX - maxBarX) < Math.abs(mouseX - minBarX)){
                 self.maxDown = true;
                 maxPosX = parseInt(maxLine.getAttribute('x1')) + margin.right;
                 handleMoveMax.apply(this);
-                self.maxDown = false;
             }else{
-                // ... TODO
+                self.minDown = true;
+                minPosX = parseInt(minLine.getAttribute('x1')) + margin.right;
+                handleMoveMin.apply(this);
             }
-        })
-       
+        });
   }
 
+  
   componentDidMount(){
     this.redraw();
   }
-
+    
   componentDidUpdate(prevProps, prevState){
-    if (prevState.min !== this.state.min || 
-        prevState.max !== this.state.max){
-            if (!this.maxDown && !this.minDown) this.redraw();
-        }
+      if (prevState.min !== this.state.min || 
+          prevState.max !== this.state.max){
+          if (!this.maxDown && !this.minDown) this.redraw();
+          this.updateColorMap();
+      }
   }
+    
+  updateColorMap = () => {
+    const { min, max } = this.state;
 
+    const minPerc = Math.abs(min - this.rangeX[0]) / (this.rangeX[1] - this.rangeX[0]) * 100.0;
+    const maxPerc = Math.abs(max - this.rangeX[0]) / (this.rangeX[1] - this.rangeX[0]) * 100.0;
+
+    this.colorMapElem.attr('x1',`${minPerc}%`)
+                     .attr('x2', `${maxPerc}%`);
+  }
+        
   handleChangeMax = (e) => {
     const val = parseFloat(e.target.value);
 
     if (val >= this.state.min && val <= this.rangeX[1]){
-        this.setState({max: val})
+        this.setState({max: val});
     }
   }
 
@@ -214,7 +249,7 @@ export default class Histogram extends React.Component {
     const val = parseFloat(e.target.value);
 
     if (val <= this.state.max && val >= this.rangeX[0]){
-        this.setState({min: val})
+        this.setState({min: val});
     }
   }
 
@@ -222,8 +257,8 @@ export default class Histogram extends React.Component {
     return (<div className="histogram">
         <div ref={(domNode) => { this.hgContainer = domNode; }}>
         </div>
-        Min: <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.min} />
-        Max: <input onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.max} />
+        <label>Min:</label> <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.min} />
+        <label>Max:</label> <input onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.max} />
     </div>);
   }
 }

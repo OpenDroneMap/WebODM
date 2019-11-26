@@ -1,7 +1,7 @@
 .leaflet-touch .leaflet-control-layers-control{
     .layers-control-layer{
         clear: both;
-        
+
         .layer-label{
             width: auto;
             white-space: nowrap;
@@ -18,6 +18,20 @@
 
         .layer-expanded{
             clear: both;
+        }
+
+        select, input{
+            height: auto;
+            padding: 4px;
+        }
+
+        label{
+            padding-top: 5px;
+        }
+
+        .row.form-group.form-inline{
+            margin-bottom: 8px;
+            margin-right: 0;
         }
       
         .toggle{

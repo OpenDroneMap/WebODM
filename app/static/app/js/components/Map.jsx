@@ -113,7 +113,6 @@ class Map extends React.Component {
             // Certain types need the rescale parameter
             if (["plant", "dsm", "dtm"].indexOf(type) !== -1 && statistics){
                 const params = Utils.queryParams({search: tileUrl.slice(tileUrl.indexOf("?"))});
-                console.log(statistics);
                 if (statistics["1"]){
                     // Add rescale
                     params["rescale"] = encodeURIComponent(`${statistics["1"]["min"]},${statistics["1"]["max"]}`);              
