@@ -138,18 +138,21 @@ class Metadata(TaskNestedView):
         info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, expr=expr)
 
         cmap_labels = {
-            'jet_r': 'Jet',
+            "jet_r": "Jet",
             "terrain_r": "Terrain",
-            "rdylgn": "Index",
-            "spectral_r": "Spectral",
+            "gist_earth_r": "Earth",
+            "rdylgn": "RdYlGn",
+            "rdylgn_r": "RdYlGn (Reverse)",
+            "spectral": "Spectral",
+            "spectral_r": "Spectral (Reverse)",
             "pastel1_r": "Pastel",
         }
 
         colormaps = []
         if tile_type in ['dsm', 'dtm']:
-            colormaps = ['jet_r', 'terrain_r', 'spectral_r', 'pastel1_r']
+            colormaps = ['jet_r', 'terrain_r', 'gist_earth_r', 'pastel1_r']
         elif formula and bands:
-            colormaps = ['rdylgn']
+            colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r']
             info['algorithms'] = get_algorithm_list(),
             info['filters'] = get_camera_filters_list()
 
@@ -231,7 +234,7 @@ class Tiles(TaskNestedView):
         if bands == '': bands = None
         if rescale == '': rescale = None
         if color_map == '': color_map = None
-        if hillshade == '': hillshade = None
+        if hillshade == '' or hillshade == '0': hillshade = None
 
         expr = lookup_formula(formula, bands)
 

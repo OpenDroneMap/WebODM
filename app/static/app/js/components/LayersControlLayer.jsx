@@ -35,7 +35,7 @@ export default class LayersControlLayer extends React.Component {
         hillshade: params.hillshade || "",
     };
 
-    this.rescale = "";
+    this.rescale = params.rescale || "";
   }
 
   getLayerUrl = () => {
@@ -52,6 +52,10 @@ export default class LayersControlLayer extends React.Component {
             this.map.removeLayer(layer);
         }
     }
+
+    if (prevState.hillshade !== this.state.hillshade){
+        this.updateLayer();
+    }
   }
 
   handleLayerClick = () => {
@@ -63,6 +67,10 @@ export default class LayersControlLayer extends React.Component {
     this.setState({colorMap: e.target.value});
   }
 
+  handleSelectHillshade = e => {
+    this.setState({hillshade: e.target.value});
+  }
+  
   updateLayer = () => {
       if (this.updateTimer){
           clearTimeout(this.updateTimer);
@@ -81,7 +89,7 @@ export default class LayersControlLayer extends React.Component {
             formula,
             bands,
             hillshade,
-            rescale: encodeURIComponent(this.rescale)
+            rescale: this.rescale
         });
 
         const { layer } = this.props;
@@ -102,7 +110,7 @@ export default class LayersControlLayer extends React.Component {
   }
 
   render(){
-    const { colorMap } = this.state;
+    const { colorMap, hillshade } = this.state;
     const { meta, tmeta } = this;
     const { color_maps } = tmeta;
 
@@ -128,6 +136,18 @@ export default class LayersControlLayer extends React.Component {
                 <div className="col-sm-9 ">
                     <select className="form-control" value={colorMap} onChange={this.handleSelectColor}>
                         {color_maps.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+                    </select>
+                </div>
+            </div> : ""}
+
+            {hillshade !== "" ? 
+            <div className="row form-group form-inline">
+                <label className="col-sm-3 control-label">Shading:</label>
+                <div className="col-sm-9 ">
+                    <select className="form-control" value={hillshade} onChange={this.handleSelectHillshade}>
+                        <option value="0">None</option>
+                        <option value="1">Normal</option>
+                        <option value="3">Extruded</option>
                     </select>
                 </div>
             </div> : ""}
