@@ -131,29 +131,35 @@ class Metadata(TaskNestedView):
         if formula == '': formula = None
         if bands == '': bands = None
 
-        expr = lookup_formula(formula, bands)
+        expr, hrange = lookup_formula(formula, bands)
 
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
-        info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, expr=expr)
+        info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
+
+        # Override min/max
+        if hrange:
+            for b in info['statistics']:
+                info['statistics'][b]['min'] = hrange[0]
+                info['statistics'][b]['max'] = hrange[1]
 
         cmap_labels = {
             "jet_r": "Jet",
-            "terrain_r": "Terrain",
-            "gist_earth_r": "Earth",
+            "terrain": "Terrain",
+            "gist_earth": "Earth",
             "rdylgn": "RdYlGn",
             "rdylgn_r": "RdYlGn (Reverse)",
             "spectral": "Spectral",
             "spectral_r": "Spectral (Reverse)",
-            "pastel1_r": "Pastel",
+            "pastel1": "Pastel",
         }
 
         colormaps = []
         if tile_type in ['dsm', 'dtm']:
-            colormaps = ['jet_r', 'terrain_r', 'gist_earth_r', 'pastel1_r']
+            colormaps = ['jet_r', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r']
-            info['algorithms'] = get_algorithm_list(),
+            info['algorithms'] = *get_algorithm_list(),
             info['filters'] = get_camera_filters_list()
 
         info['color_maps'] = []
@@ -236,7 +242,7 @@ class Tiles(TaskNestedView):
         if color_map == '': color_map = None
         if hillshade == '' or hillshade == '0': hillshade = None
 
-        expr = lookup_formula(formula, bands)
+        expr, _ = lookup_formula(formula, bands)
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
             raise exceptions.ValidationError("Cannot get tiles without rescale parameter. Add ?rescale=min,max to the URL.")

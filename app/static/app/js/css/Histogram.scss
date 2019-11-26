@@ -1,6 +1,11 @@
 .histogram{
     user-select: none;
     margin-bottom: 8px;
+
+    &.disabled{
+        opacity: 0.5;
+        pointer-events: none;
+    }
     
     .histogram-container{
         &:hover{
@@ -15,7 +20,7 @@
 
     .min-max{
         display: inline;
-        width: 100px;
+        width: 94px;
         margin-right: 12px;
     }
 

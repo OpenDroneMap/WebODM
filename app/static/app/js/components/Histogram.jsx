@@ -7,13 +7,15 @@ export default class Histogram extends React.Component {
   static defaultProps = {
       width: 280,
       colorMap: null,
-      onUpdate: null
+      onUpdate: null,
+      loading: false,
   };
   static propTypes = {
       statistics: PropTypes.object.isRequired,
       colorMap: PropTypes.array,
       width: PropTypes.number,
-      onUpdate: PropTypes.func
+      onUpdate: PropTypes.func,
+      loading: PropTypes.bool
   }
 
   constructor(props){
@@ -266,7 +268,7 @@ export default class Histogram extends React.Component {
   }
 
   render(){
-    return (<div className="histogram">
+    return (<div className={"histogram " + (this.props.loading ? "disabled" : "")}>
         <div ref={(domNode) => { this.hgContainer = domNode; }}>
         </div>
         <label>Min:</label> <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.min} />

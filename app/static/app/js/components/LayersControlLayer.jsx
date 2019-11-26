@@ -4,6 +4,7 @@ import '../css/LayersControlLayer.scss';
 import Histogram from './Histogram';
 import { Checkbox, ExpandButton } from './Toggle';
 import Utils from '../classes/Utils';
+import $ from 'jquery';
 
 export default class LayersControlLayer extends React.Component {
   static defaultProps = {
@@ -33,6 +34,7 @@ export default class LayersControlLayer extends React.Component {
         formula: params.formula || "",
         bands: params.bands || "",
         hillshade: params.hillshade || "",
+        histogramLoading: false
     };
 
     this.rescale = params.rescale || "";
@@ -56,6 +58,17 @@ export default class LayersControlLayer extends React.Component {
     if (prevState.hillshade !== this.state.hillshade){
         this.updateLayer();
     }
+
+    if (prevState.formula !== this.state.formula){
+        this.updateHistogram();
+    }
+  }
+
+  componentWillUnmount(){
+    if (this.updateHistogramReq){
+        this.updateHistogramReq.abort();
+        this.updateHistogramReq = null;
+    }
   }
 
   handleLayerClick = () => {
@@ -70,6 +83,50 @@ export default class LayersControlLayer extends React.Component {
   handleSelectHillshade = e => {
     this.setState({hillshade: e.target.value});
   }
+
+  handleSelectFormula = e => {
+    this.setState({formula: e.target.value});
+  }
+
+  updateHistogram = () => {
+    if (this.updateHistogramReq){
+        this.updateHistogramReq.abort();
+        this.updateHistogramReq = null;
+    }
+
+    this.setState({histogramLoading: true});
+    this.updateHistogramReq = $.getJSON(Utils.buildUrlWithQuery(this.meta.metaUrl, this.getLayerParams()))
+        .done(mres => {
+            this.tmeta = this.props.layer[Symbol.for("tile-meta")] = mres;
+            
+            // Update rescale values
+            const { statistics } = this.tmeta;
+            if (statistics && statistics["1"]){
+                this.rescale = `${statistics["1"]["min"]},${statistics["1"]["max"]}`;
+            }
+
+            this.updateLayer();
+        })
+        .fail(err => console.error)
+        .always(() => {
+            this.setState({histogramLoading: false});
+        });
+  }
+
+  getLayerParams = () => {
+    const { colorMap,
+        formula,
+        bands,
+        hillshade } = this.state;
+    
+    return {
+        color_map: colorMap,
+        formula,
+        bands,
+        hillshade,
+        rescale: this.rescale
+    };
+  }
   
   updateLayer = () => {
       if (this.updateTimer){
@@ -79,20 +136,8 @@ export default class LayersControlLayer extends React.Component {
 
       this.updateTimer = setTimeout(() => {
         const url = this.getLayerUrl();
-        const { colorMap,
-                formula,
-                bands,
-                hillshade } = this.state;
-
-        const newUrl = (url.indexOf("?") !== -1 ? url.slice(0, url.indexOf("?")) : url) + Utils.toSearchQuery({
-            color_map: colorMap,
-            formula,
-            bands,
-            hillshade,
-            rescale: this.rescale
-        });
-
         const { layer } = this.props;
+        const newUrl = Utils.buildUrlWithQuery(url, this.getLayerParams());
 
         layer.setUrl(newUrl, true);
             
@@ -110,9 +155,9 @@ export default class LayersControlLayer extends React.Component {
   }
 
   render(){
-    const { colorMap, hillshade } = this.state;
+    const { colorMap, hillshade, formula, histogramLoading } = this.state;
     const { meta, tmeta } = this;
-    const { color_maps } = tmeta;
+    const { color_maps, algorithms } = tmeta;
 
     let cmapValues = null;
     if (colorMap){
@@ -120,15 +165,28 @@ export default class LayersControlLayer extends React.Component {
     }
 
     return (<div className="layers-control-layer">
-        <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']}/> 
+        <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']}/>
         <a className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
 
         {this.state.expanded ? 
         <div className="layer-expanded">
-            <Histogram width={280} 
+            <Histogram width={280}
+                        loading={histogramLoading}
                         statistics={tmeta.statistics} 
                         colorMap={cmapValues}
                         onUpdate={this.handleHistogramUpdate} />
+
+            {formula !== "" && algorithms ? 
+            <div className="row form-group form-inline">
+                <label className="col-sm-3 control-label">Algorithm:</label>
+                <div className="col-sm-9 ">
+                    {histogramLoading ? 
+                    <i className="fa fa-circle-notch fa-spin fa-fw" /> :
+                    <select className="form-control" value={formula} onChange={this.handleSelectFormula}>
+                        {algorithms.map(c => <option key={c.id} value={c.id}>{c.id}</option>)}
+                    </select>}
+                </div>
+            </div> : ""}
 
             {colorMap && color_maps.length ? 
             <div className="row form-group form-inline">
@@ -151,8 +209,7 @@ export default class LayersControlLayer extends React.Component {
                     </select>
                 </div>
             </div> : ""}
-        </div>
-        : ""}
+        </div> : ""}
     </div>);
                 
   }

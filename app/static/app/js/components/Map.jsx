@@ -136,6 +136,7 @@ class Map extends React.Component {
             
             // Associate metadata with this layer
             meta.name = name;
+            meta.metaUrl = metaUrl;
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 

@@ -8,7 +8,8 @@ from functools import lru_cache
 algos = {
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
-        'help': 'Visual Atmospheric Resistance Index shows the areas of vegetation.'
+        'help': 'Visual Atmospheric Resistance Index shows the areas of vegetation.',
+        'range': (-1, 1)
     },
     'NDVI': {
         'expr': '(N - R) / (N + R)',
@@ -20,7 +21,8 @@ algos = {
     },
     'GLI': {
         'expr': '((G * 2) - R - B) / ((G * 2) + R + B)',
-        'help': 'Green Leaf Index shows greens leaves and stems.'
+        'help': 'Green Leaf Index shows greens leaves and stems.',
+        'range': (-1, 1)
     },
     'GNDVI':{
         'expr': '(N - G) / (N + G)',
@@ -66,7 +68,8 @@ algos = {
     # more?
 
     '_TESTRB': {
-        'expr': 'R + B'
+        'expr': 'R + B',
+        'range': (0,1)
     },
 
     '_TESTFUNC': {
@@ -85,7 +88,7 @@ camera_filters = [
 @lru_cache(maxsize=20)
 def lookup_formula(algo, band_order = 'RGB'):
     if algo is None:
-        return None
+        return None, None
     if band_order is None:
         band_order = 'RGB'
 
@@ -101,7 +104,10 @@ def lookup_formula(algo, band_order = 'RGB'):
         except ValueError:
             raise ValueError("Cannot find band \"" + b + "\" from \"" + band_order + "\". Choose a proper band order.")
 
-    return re.sub("([A-Z]+?[a-z]*)", repl, re.sub("\s+", "", algos[algo]['expr']))
+    expr = re.sub("([A-Z]+?[a-z]*)", repl, re.sub("\s+", "", algos[algo]['expr']))
+    hrange = algos[algo].get('range', None)
+
+    return expr, hrange
 
 def get_algorithm_list():
     return [{'id': k, **algos[k]} for k in algos if not k.startswith("_")]
