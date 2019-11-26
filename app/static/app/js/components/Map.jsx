@@ -123,7 +123,6 @@ class Map extends React.Component {
                 
                 tileUrl = tileUrl.slice(0, tileUrl.indexOf("?")) + Utils.toSearchQuery(params);
             }
-            console.log(tileUrl);
 
             const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,

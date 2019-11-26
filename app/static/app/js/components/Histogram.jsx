@@ -75,12 +75,7 @@ export default class Histogram extends React.Component {
                     .attr('y1', '0%')
                     .attr('x2', '100%')
                     .attr('y2', '0%');
-        this.props.colorMap.forEach((color, i) => {
-            this.colorMapElem.append("stop")
-                        .attr('offset', `${(i / (this.props.colorMap.length - 1)) * 100.0}%`)
-                        .attr('stop-color', `rgb(${color.join(",")})`);
-        });
-        this.updateColorMap();
+        this.updateColorMap(true);
     }
 
     let svg = svgContainer.append("g")
@@ -223,16 +218,27 @@ export default class Histogram extends React.Component {
     
   componentDidUpdate(prevProps, prevState){
       if (prevState.min !== this.state.min || 
-          prevState.max !== this.state.max){
+          prevState.max !== this.state.max ||
+          prevProps.colorMap !== this.props.colorMap){
           if (!this.maxDown && !this.minDown) this.redraw();
-          this.updateColorMap();
+          this.updateColorMap(prevProps.colorMap !== this.props.colorMap);
           
           if (this.props.onUpdate !== undefined) this.props.onUpdate({min: this.state.min, max: this.state.max});
       }
   }
     
-  updateColorMap = () => {
+  updateColorMap = (recreate) => {
     if (!this.colorMapElem) return;
+
+    if (recreate){
+        this.colorMapElem.select("stop").remove();
+
+        this.props.colorMap.forEach((color, i) => {
+            this.colorMapElem.append("stop")
+                        .attr('offset', `${(i / (this.props.colorMap.length - 1)) * 100.0}%`)
+                        .attr('stop-color', `rgb(${color.join(",")})`);
+        });
+    }
 
     const { min, max } = this.state;
 

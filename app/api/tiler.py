@@ -127,11 +127,9 @@ class Metadata(TaskNestedView):
 
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
-        color_map = self.request.query_params.get('color_map')
 
         if formula == '': formula = None
         if bands == '': bands = None
-        if color_map == '': color_map = None
 
         expr = lookup_formula(formula, bands)
 
@@ -139,21 +137,38 @@ class Metadata(TaskNestedView):
         raster_path = get_raster_path(task, tile_type)
         info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, expr=expr)
 
-        if tile_type == 'plant':
+        cmap_labels = {
+            'jet_r': 'Jet',
+            "terrain_r": "Terrain",
+            "rdylgn": "Index",
+            "spectral_r": "Spectral",
+            "pastel1_r": "Pastel",
+        }
+
+        colormaps = []
+        if tile_type in ['dsm', 'dtm']:
+            colormaps = ['jet_r', 'terrain_r', 'spectral_r', 'pastel1_r']
+        elif formula and bands:
+            colormaps = ['rdylgn']
             info['algorithms'] = get_algorithm_list(),
             info['filters'] = get_camera_filters_list()
+
+        info['color_maps'] = []
+        if colormaps:
+            for cmap in colormaps:
+                try:
+                    info['color_maps'].append({
+                        'key': cmap,
+                        'color_map': get_colormap(cmap, format="gdal"),
+                        'label': cmap_labels.get(cmap, cmap)
+                    })
+                except FileNotFoundError:
+                    raise exceptions.ValidationError("Not a valid color_map value: %s" % cmap)
 
         del info['address']
         info['name'] = task.name
         info['scheme'] = 'xyz'
         info['tiles'] = [get_tile_url(task, tile_type, self.request.query_params)]
-
-        if color_map:
-            try:
-                color_map = get_colormap(color_map, format="gdal")
-                info['color_map'] = color_map
-            except FileNotFoundError:
-                raise exceptions.ValidationError("Not a valid color_map value")
 
         return Response(info)
 

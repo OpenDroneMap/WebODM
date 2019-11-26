@@ -23,24 +23,16 @@ export default class LayersControlLayer extends React.Component {
     const url = this.getLayerUrl();
     const params = Utils.queryParams({search: url.slice(url.indexOf("?"))});
 
-    this.colorMaps = [
-        {key: "jet_r", label: "Jet"},
-        {key: "terrain_r", label: "Terrain"},
-        {key: "rdylgn", label: "RYG"},
-        {key: "spectral_r", label: "Spectral"},
-        {key: "pastel1_r", label: "Pastel"},
-        {key: "reds_r", label: "Red"},
-        {key: "greens_r", label: "Greens"},
-        {key: "blues_r", label: "Blue"}
-    ];
+    this.meta = props.layer[Symbol.for("meta")];
+    this.tmeta = props.layer[Symbol.for("tile-meta")];
 
     this.state = {
         visible: true,
         expanded: props.expanded,
-        color_map: params.color_map || "",
+        colorMap: params.color_map || "",
         formula: params.formula || "",
         bands: params.bands || "",
-        hillshade: params.hillshade || ""
+        hillshade: params.hillshade || "",
     };
 
     this.rescale = "";
@@ -68,7 +60,7 @@ export default class LayersControlLayer extends React.Component {
   }
 
   handleSelectColor = e => {
-    this.setState({color_map: e.target.value});
+    this.setState({colorMap: e.target.value});
   }
 
   updateLayer = () => {
@@ -79,13 +71,13 @@ export default class LayersControlLayer extends React.Component {
 
       this.updateTimer = setTimeout(() => {
         const url = this.getLayerUrl();
-        const { color_map,
+        const { colorMap,
                 formula,
                 bands,
                 hillshade } = this.state;
 
         const newUrl = (url.indexOf("?") !== -1 ? url.slice(0, url.indexOf("?")) : url) + Utils.toSearchQuery({
-            color_map,
+            color_map: colorMap,
             formula,
             bands,
             hillshade,
@@ -110,11 +102,14 @@ export default class LayersControlLayer extends React.Component {
   }
 
   render(){
-    const { layer } = this.props;
-    const { color_map } = this.state;
+    const { colorMap } = this.state;
+    const { meta, tmeta } = this;
+    const { color_maps } = tmeta;
 
-    const tmeta = layer[Symbol.for("tile-meta")];
-    const meta = layer[Symbol.for("meta")];
+    let cmapValues = null;
+    if (colorMap){
+        cmapValues = (color_maps.find(c => c.key === colorMap) || {}).color_map;
+    }
 
     return (<div className="layers-control-layer">
         <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']}/> 
@@ -124,15 +119,15 @@ export default class LayersControlLayer extends React.Component {
         <div className="layer-expanded">
             <Histogram width={280} 
                         statistics={tmeta.statistics} 
-                        colorMap={tmeta.color_map}
+                        colorMap={cmapValues}
                         onUpdate={this.handleHistogramUpdate} />
 
-            {this.state.color_map ? 
+            {colorMap && color_maps.length ? 
             <div className="row form-group form-inline">
                 <label className="col-sm-3 control-label">Color:</label>
                 <div className="col-sm-9 ">
-                    <select className="form-control" value={color_map} onChange={this.handleSelectColor}>
-                        {this.colorMaps.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+                    <select className="form-control" value={colorMap} onChange={this.handleSelectColor}>
+                        {color_maps.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
                     </select>
                 </div>
             </div> : ""}
