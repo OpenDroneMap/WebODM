@@ -81,6 +81,18 @@ export default {
         }
     },
 
+    // https://stackoverflow.com/questions/11688692/how-to-create-a-list-of-unique-items-in-javascript
+    unique: function(arr){
+        let u = {}, a = [];
+        for(let i = 0, l = arr.length; i < l; ++i){
+            if(!u.hasOwnProperty(arr[i])) {
+                a.push(arr[i]);
+                u[arr[i]] = 1;
+            }
+        }
+        return a;
+    },
+
     getCurrentScriptDir: function(){
       let scripts= document.getElementsByTagName('script');
       let path= scripts[scripts.length-1].src.split('?')[0];      // remove any ?query

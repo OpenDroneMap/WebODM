@@ -21,6 +21,22 @@ export default class Histogram extends React.Component {
   constructor(props){
     super(props);
 
+    // Colors in absence of a color map
+    this.defaultBandColors = [
+        '#ff0000',
+        '#00ff00',
+        '#0000ff',
+        '#ff8000',
+        '#ffff00',
+        '#00ff80',
+        '#00ffff',
+        '#0080ff',
+    ];
+
+    this.reset();
+  }
+
+  reset = () => {
     const minY = 0;
     let maxY = 0;
     let minX = 2147483647;
@@ -36,22 +52,16 @@ export default class Histogram extends React.Component {
     this.rangeX = [minX, maxX];
     this.rangeY = [minY, maxY];
 
-    this.state = {
+    const st = {
         min: minX.toFixed(3),
         max: maxX.toFixed(3)
     };
 
-    // Colors in absence of a color map
-    this.defaultBandColors = [
-        '#ff0000',
-        '#00ff00',
-        '#0000ff',
-        '#ff8000',
-        '#ffff00',
-        '#00ff80',
-        '#00ffff',
-        '#0080ff',
-    ];
+    if (!this.state){
+        this.state = st;
+    }else{
+        this.setState(st);
+    }    
   }
 
   redraw = () => {
@@ -221,7 +231,10 @@ export default class Histogram extends React.Component {
   componentDidUpdate(prevProps, prevState){
       if (prevState.min !== this.state.min || 
           prevState.max !== this.state.max ||
-          prevProps.colorMap !== this.props.colorMap){
+          prevProps.colorMap !== this.props.colorMap ||
+          prevProps.statistics !== this.props.statistics){
+
+          if (prevProps.statistics !== this.props.statistics) this.reset();
           if (!this.maxDown && !this.minDown) this.redraw();
           this.updateColorMap(prevProps.colorMap !== this.props.colorMap);
           

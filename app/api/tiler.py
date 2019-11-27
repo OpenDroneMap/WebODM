@@ -11,7 +11,7 @@ import numpy as np
 
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
-from .formulas import lookup_formula, get_algorithm_list, get_camera_filters_list
+from .formulas import lookup_formula, get_algorithm_list
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
@@ -160,7 +160,6 @@ class Metadata(TaskNestedView):
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r']
             info['algorithms'] = *get_algorithm_list(),
-            info['filters'] = get_camera_filters_list()
 
         info['color_maps'] = []
         if colormaps:

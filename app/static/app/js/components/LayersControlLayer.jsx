@@ -59,7 +59,8 @@ export default class LayersControlLayer extends React.Component {
         this.updateLayer();
     }
 
-    if (prevState.formula !== this.state.formula){
+    if (prevState.formula !== this.state.formula ||
+        prevState.bands !== this.state.bands){
         this.updateHistogram();
     }
   }
@@ -85,7 +86,30 @@ export default class LayersControlLayer extends React.Component {
   }
 
   handleSelectFormula = e => {
-    this.setState({formula: e.target.value});
+    let bands = this.state.bands;
+
+    // Check if bands need to be switched
+    const algo = this.getAlgorithm(e.target.value);
+    if (algo && algo['filters'].indexOf(bands) === -1) bands = algo['filters'][0]; // Pick first
+
+    this.setState({formula: e.target.value, bands});
+  }
+
+  getAlgorithm = id => {
+    const { algorithms } = this.tmeta;
+    if (!id) return null;
+    if (!algorithms) return null;
+
+    for (let i in algorithms){
+        const algo = algorithms[i];
+        if (algo['id'] === id){
+            return algo;
+        }
+    }
+  }
+
+  handleSelectBands = e => {
+      this.setState({bands: e.target.value});
   }
 
   updateHistogram = () => {
@@ -155,9 +179,10 @@ export default class LayersControlLayer extends React.Component {
   }
 
   render(){
-    const { colorMap, hillshade, formula, histogramLoading } = this.state;
+    const { colorMap, bands, hillshade, formula, histogramLoading } = this.state;
     const { meta, tmeta } = this;
     const { color_maps, algorithms } = tmeta;
+    const algo = this.getAlgorithm(formula);
 
     let cmapValues = null;
     if (colorMap){
@@ -182,8 +207,20 @@ export default class LayersControlLayer extends React.Component {
                 <div className="col-sm-9 ">
                     {histogramLoading ? 
                     <i className="fa fa-circle-notch fa-spin fa-fw" /> :
-                    <select className="form-control" value={formula} onChange={this.handleSelectFormula}>
-                        {algorithms.map(c => <option key={c.id} value={c.id}>{c.id}</option>)}
+                    <select title={algo.help + '\n' + algo.expr} className="form-control" value={formula} onChange={this.handleSelectFormula}>
+                        {algorithms.map(a => <option key={a.id} value={a.id} title={a.help + "\n" + a.expr}>{a.id}</option>)}
+                    </select>}
+                </div>
+            </div> : ""}
+
+            {bands !== "" && algo ? 
+            <div className="row form-group form-inline">
+                <label className="col-sm-3 control-label">Filter:</label>
+                <div className="col-sm-9 ">
+                    {histogramLoading ? 
+                    <i className="fa fa-circle-notch fa-spin fa-fw" /> :
+                    <select className="form-control" value={bands} onChange={this.handleSelectBands}>
+                        {algo.filters.map(f => <option key={f} value={f}>{f}</option>)}
                     </select>}
                 </div>
             </div> : ""}
@@ -192,9 +229,11 @@ export default class LayersControlLayer extends React.Component {
             <div className="row form-group form-inline">
                 <label className="col-sm-3 control-label">Color:</label>
                 <div className="col-sm-9 ">
+                    {histogramLoading ? 
+                    <i className="fa fa-circle-notch fa-spin fa-fw" /> :
                     <select className="form-control" value={colorMap} onChange={this.handleSelectColor}>
                         {color_maps.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
-                    </select>
+                    </select>}
                 </div>
             </div> : ""}
 
@@ -204,8 +243,8 @@ export default class LayersControlLayer extends React.Component {
                 <div className="col-sm-9 ">
                     <select className="form-control" value={hillshade} onChange={this.handleSelectHillshade}>
                         <option value="0">None</option>
-                        <option value="1">Normal</option>
-                        <option value="3">Extruded</option>
+                        <option value="3">Normal</option>
+                        <option value="6">Extruded</option>
                     </select>
                 </div>
             </div> : ""}

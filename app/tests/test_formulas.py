@@ -1,5 +1,5 @@
 from django.test import TestCase
-from app.api.formulas import lookup_formula, get_algorithm_list, get_camera_filters_list
+from app.api.formulas import lookup_formula, get_algorithm_list, get_camera_filters_for, algos
 
 class TestFormulas(TestCase):
     def setUp(self):
@@ -31,5 +31,4 @@ class TestFormulas(TestCase):
         for i in list:
             self.assertFalse(i['id'].startswith("_"))
 
-        # Can call get_filters_list
-        self.assertTrue(len(get_camera_filters_list()) > 0)
+        self.assertTrue(get_camera_filters_for(algos['VARI']) == ['RGB'])

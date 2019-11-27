@@ -6,14 +6,14 @@ import re
 from functools import lru_cache
 
 algos = {
+    'NDVI': {
+        'expr': '(N - R) / (N + R)',
+        'help': 'Normalized Difference Vegetation Index shows the amount of green vegetation.'
+    },
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
         'help': 'Visual Atmospheric Resistance Index shows the areas of vegetation.',
         'range': (-1, 1)
-    },
-    'NDVI': {
-        'expr': '(N - R) / (N + R)',
-        'help': 'Normalized Difference Vegetation Index shows the amount of green vegetation.'
     },
     'BAI': {
         'expr': '1.0 / (((0.1 - R) ** 2) + ((0.06 - N) ** 2))',
@@ -79,10 +79,13 @@ algos = {
 
 camera_filters = [
     'RGB',
+    'RGN',
     'NRG',
     'NGB',
-    'RGN',
+    'NRB',
+
     # more?
+    # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
 ]
 
 @lru_cache(maxsize=20)
@@ -109,9 +112,24 @@ def lookup_formula(algo, band_order = 'RGB'):
 
     return expr, hrange
 
+@lru_cache(maxsize=2)
 def get_algorithm_list():
-    return [{'id': k, **algos[k]} for k in algos if not k.startswith("_")]
+    return [{'id': k, 'filters': get_camera_filters_for(algos[k]), **algos[k]} for k in algos if not k.startswith("_")]
 
-def get_camera_filters_list():
-    return camera_filters
+def get_camera_filters_for(algo):
+    result = []
+    expr = algo['expr']
+    bands = list(set(re.findall("([A-Z]+?[a-z]*)", expr)))
+    for f in camera_filters:
+        # Count bands that show up in the filter
+        count = 0
+        for b in f:
+            if b in bands:
+                count += 1
+
+        # If all bands are accounted for, this is a valid filter for this algo
+        if count >= len(bands):
+            result.append(f)
+
+    return result
 
