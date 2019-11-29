@@ -25,17 +25,6 @@ export default class LayersControlPanel extends React.Component {
       content = (<div>
         {this.props.layers.map((layer, i) => <LayersControlLayer expanded={this.props.layers.length == 1} layer={layer} key={i} />)}
       </div>);
-
-      /*
-      <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">Filter:</label>
-          <div className="col-sm-9 ">
-            <select className="form-control" value={interval} onChange={this.handleSelectInterval}>
-              {intervalValues.map(iv => <option value={iv}>{iv} meter</option>)}
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-        </div>*/
     }
 
     return (<div className="layers-control-panel">

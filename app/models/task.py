@@ -29,6 +29,7 @@ from urllib3.exceptions import ReadTimeoutError
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
 
+from app.cogeo import assure_cogeo
 from app.testwatch import testWatch
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
@@ -650,7 +651,7 @@ class Task(models.Model):
 
     def extract_assets_and_complete(self):
         """
-        Extracts assets/all.zip and populates task fields where required.
+        Extracts assets/all.zip, populates task fields where required and assure COGs
         It will raise a zipfile.BadZipFile exception is the archive is corrupted.
         :return:
         """
@@ -675,6 +676,13 @@ class Task(models.Model):
 
         for raster_path, field in extent_fields:
             if os.path.exists(raster_path):
+                # Make sure this is a Cloud Optimized GeoTIFF
+                # if not, it will be created
+                try:
+                    assure_cogeo(raster_path)
+                except IOError as e:
+                    logger.warning("Cannot create Cloud Optimized GeoTIFF for %s (%s). This will result in degraded visualization performance." % (raster_path, str(e)))
+
                 # Read extent and SRID
                 raster = GDALRaster(raster_path)
                 extent = OGRGeometry.from_bbox(raster.extent)
