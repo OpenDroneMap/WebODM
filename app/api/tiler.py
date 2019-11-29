@@ -135,7 +135,12 @@ class Metadata(TaskNestedView):
 
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
-        info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
+
+        try:
+            info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
+        except IndexError as e:
+            # Caught when trying to get an invalid raster metadata
+            raise exceptions.ValidationError("Cannot retrieve raster metadata: %s" % str(e))
 
         # Override min/max
         if hrange:
@@ -222,6 +227,10 @@ class Tiles(TaskNestedView):
         z = int(z)
         x = int(x)
         y = int(y)
+
+        if x == 0 and y == 0 and z == 0:
+            raise exceptions.NotFound()
+
         scale = int(scale)
         ext = "png"
         driver = "jpeg" if ext == "jpg" else ext

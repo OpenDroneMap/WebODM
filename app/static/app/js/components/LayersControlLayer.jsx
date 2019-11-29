@@ -9,26 +9,30 @@ import $ from 'jquery';
 export default class LayersControlLayer extends React.Component {
   static defaultProps = {
       layer: null,
-      expanded: false
+      expanded: false,
+      map: null,
+      overlay: false,
   };
   static propTypes = {
     layer: PropTypes.object.isRequired,
-    expanded: PropTypes.bool
+    expanded: PropTypes.bool,
+    map: PropTypes.object.isRequired,
+    overlay: PropTypes.bool
   }
 
   constructor(props){
     super(props);
 
-    this.map = props.layer._map;
-
+    this.map = props.map;
+    
     const url = this.getLayerUrl();
     const params = Utils.queryParams({search: url.slice(url.indexOf("?"))});
 
-    this.meta = props.layer[Symbol.for("meta")];
-    this.tmeta = props.layer[Symbol.for("tile-meta")];
+    this.meta = props.layer[Symbol.for("meta")] || {};
+    this.tmeta = props.layer[Symbol.for("tile-meta")] || {};
 
     this.state = {
-        visible: true,
+        visible: this.map.hasLayer(props.layer),
         expanded: props.expanded,
         colorMap: params.color_map || "",
         formula: params.formula || "",
@@ -41,7 +45,7 @@ export default class LayersControlLayer extends React.Component {
   }
 
   getLayerUrl = () => {
-      return this.props.layer._url;
+      return this.props.layer._url || "";
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -62,6 +66,10 @@ export default class LayersControlLayer extends React.Component {
     if (prevState.formula !== this.state.formula ||
         prevState.bands !== this.state.bands){
         this.updateHistogram();
+    }
+
+    if (prevProps.expanded !== this.props.expanded){
+        this.state.expanded = this.props.expanded;
     }
   }
 
@@ -190,7 +198,7 @@ export default class LayersControlLayer extends React.Component {
     }
 
     return (<div className="layers-control-layer">
-        <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']}/>
+        {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : ""}<Checkbox bind={[this, 'visible']}/>
         <a className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
 
         {this.state.expanded ? 

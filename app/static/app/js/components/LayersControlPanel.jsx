@@ -5,25 +5,36 @@ import LayersControlLayer from './LayersControlLayer';
 
 export default class LayersControlPanel extends React.Component {
   static defaultProps = {
-      layers: []
+      layers: [],
+      overlays: [],
   };
   static propTypes = {
     onClose: PropTypes.func.isRequired,
     layers: PropTypes.array.isRequired,
+    overlays: PropTypes.array,
     map: PropTypes.object.isRequired
   }
 
   constructor(props){
     super(props);
-
   }
 
   render(){
     let content = "";
+
     if (!this.props.layers.length) content = (<span><i className="loading fa fa-circle-notch fa-spin"></i> Loading...</span>);
     else{
       content = (<div>
-        {this.props.layers.map((layer, i) => <LayersControlLayer expanded={this.props.layers.length == 1} layer={layer} key={i} />)}
+        {this.props.overlays.length ? 
+            <div className="overlays theme-border-primary">
+                {this.props.overlays.map((layer, i) => <LayersControlLayer map={this.props.map} expanded={false} overlay={true} layer={layer} key={i} />)}
+            </div>
+        : ""}
+        {this.props.layers.sort((a, b) => {
+            const m_a = a[Symbol.for("meta")] || {};
+            const m_b = b[Symbol.for("meta")] || {};
+            return m_a.name > m_b.name ? -1 : 1;
+        }).map((layer, i) => <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} key={i} />)}
       </div>);
     }
 

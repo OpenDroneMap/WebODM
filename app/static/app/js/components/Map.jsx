@@ -46,7 +46,8 @@ class Map extends React.Component {
       pluginActionButtons: [],
       showLoading: false, // for drag&drop of files
       opacity: 100,
-      imageryLayers: []
+      imageryLayers: [],
+      overlays: []
     };
 
     this.basemaps = {};
@@ -81,7 +82,6 @@ class Map extends React.Component {
     const prevSelectedLayers = [];
 
     this.state.imageryLayers.forEach(layer => {
-      this.autolayers.removeLayer(layer);
       if (this.map.hasLayer(layer)) prevSelectedLayers.push(layerId(layer));
       layer.remove();
     });
@@ -191,9 +191,6 @@ class Map extends React.Component {
             mapBounds.extend(bounds);
             this.mapBounds = mapBounds;
 
-            // Add layer to layers control
-            // this.autolayers.addOverlay(layer, name);
-
             done();
           })
           .fail((_, __, err) => done(err))
@@ -201,36 +198,13 @@ class Map extends React.Component {
       }, err => {
         if (err){
           this.setState({error: err.message || JSON.stringify(err)});
-          reject(err);
-        }else{
-          resolve();
         }
+        resolve();
       });
     });
   }
 
   componentDidMount() {
-    var mapTempLayerDrop = new Dropzone(this.container, {url : "/", clickable : false});
-    mapTempLayerDrop.on("addedfile", (file) => {
-      this.setState({showLoading: true});
-      addTempLayer(file, (err, tempLayer, filename) => {
-        if (!err){
-          tempLayer.addTo(this.map);
-          //add layer to layer switcher with file name
-          this.autolayers.addOverlay(tempLayer, filename);
-          //zoom to all features
-          this.map.fitBounds(tempLayer.getBounds());
-        }else{
-          this.setState({ error: err.message || JSON.stringify(err) });
-        }
-
-        this.setState({showLoading: false});
-      });
-    });
-    mapTempLayerDrop.on("error", function(file) {
-      mapTempLayerDrop.removeFile(file);
-    });
-    
     const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
@@ -294,7 +268,8 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     }
 
     this.layersControl = new LayersControl({
-        layers: this.state.imageryLayers
+        layers: this.state.imageryLayers,
+        overlays: this.state.overlays
     }).addTo(this.map);
 
     this.autolayers = Leaflet.control.autolayers({
@@ -303,6 +278,52 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       baseLayers: this.basemaps
     }).addTo(this.map);
 
+    // Drag & Drop overlays
+    const addDnDZone = (container, opts) => {
+        const mapTempLayerDrop = new Dropzone(container, opts);
+        mapTempLayerDrop.on("addedfile", (file) => {
+          this.setState({showLoading: true});
+          addTempLayer(file, (err, tempLayer, filename) => {
+            if (!err){
+              tempLayer.addTo(this.map);
+              tempLayer[Symbol.for("meta")] = {name: filename};
+              this.setState(update(this.state, {
+                 overlays: {$push: [tempLayer]}
+              }));
+              //zoom to all features
+              this.map.fitBounds(tempLayer.getBounds());
+            }else{
+              this.setState({ error: err.message || JSON.stringify(err) });
+            }
+    
+            this.setState({showLoading: false});
+          });
+        });
+        mapTempLayerDrop.on("error", (file) => {
+          mapTempLayerDrop.removeFile(file);
+        });
+    };
+
+    addDnDZone(this.container, {url : "/", clickable : false});
+
+    const AddOverlayCtrl = Leaflet.Control.extend({
+        options: {
+            position: 'topright'
+        },
+    
+        onAdd: function () {
+            this.container = Leaflet.DomUtil.create('div', 'leaflet-control-add-overlay leaflet-bar leaflet-control');
+            Leaflet.DomEvent.disableClickPropagation(this.container);
+            const btn = Leaflet.DomUtil.create('a', 'leaflet-control-add-overlay-button');
+            btn.setAttribute("title", "Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay");
+            
+            this.container.append(btn);
+            addDnDZone(btn, {url: "/", clickable: true});
+            
+            return this.container;
+        }
+    });
+    new AddOverlayCtrl().addTo(this.map);
 
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");
@@ -383,8 +404,9 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       this.loadImageryLayers();
     }
 
-    if (this.layersControl && prevState.imageryLayers !== this.state.imageryLayers){
-        this.layersControl.update(this.state.imageryLayers);
+    if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
+                               prevState.overlays !== this.state.overlays)){
+        this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
   }
 
@@ -392,7 +414,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     this.map.remove();
 
     if (this.tileJsonRequests) {
-      this.tileJsonRequests.forEach(tileJsonRequest => this.tileJsonRequest.abort());
+      this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
       this.tileJsonRequests = [];
     }
   }

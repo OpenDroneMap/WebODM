@@ -77,4 +77,21 @@
     .standby{
         z-index: 1000;
     }
+
+    .leaflet-control-add-overlay{
+        z-index: 999;
+      
+        a.leaflet-control-add-overlay-button{
+          background: url(../icons/dragndrop-add.svg) 0 0 no-repeat;
+          background-size: 26px 26px;
+          border-radius: 2px;
+          &:hover{
+              cursor: pointer;
+          }
+        }
+      
+    }
+    .leaflet-touch .leaflet-control-add-overlay a {
+        background-position: 2px 2px;
+    }
 }

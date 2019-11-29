@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg12"
+   version="1.1"
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   sodipodi:docname="dragndrop-add.svg"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1005"
+     id="namedview4629"
+     showgrid="false"
+     inkscape:zoom="2.2965599"
+     inkscape:cx="-92.853815"
+     inkscape:cy="27.530982"
+     inkscape:window-x="0"
+     inkscape:window-y="37"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g10" />
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs16" />
+  <g
+     id="g10"
+     transform="matrix(0.64922356,0,0,0.64922356,-12.698384,-608.22712)">
+    <g
+       id="g5331"
+       transform="matrix(1.1681947,0,0,1.1681947,-6.1472773,-168.0254)">
+      <path
+         id="circle4"
+         transform="matrix(1.5403015,0,0,1.5403015,19.559339,936.85312)"
+         d="M 28.980469,12.279297 A 20.922528,20.922528 0 0 0 8.0585938,33.201172 20.922528,20.922528 0 0 0 28.980469,54.123047 20.922528,20.922528 0 0 0 49.902344,33.201172 20.922528,20.922528 0 0 0 28.980469,12.279297 Z m -2.429688,7.808594 h 4.859375 v 10.703125 h 10.66211 v 4.820312 H 31.410156 V 46.314453 H 26.550781 V 35.611328 H 15.888672 v -4.820312 h 10.662109 z"
+         style="fill:#191919;fill-opacity:1;stroke-width:0.64922357"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

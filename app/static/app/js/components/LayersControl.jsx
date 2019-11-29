@@ -8,6 +8,7 @@ import LayersControlPanel from './LayersControlPanel';
 class LayersControlButton extends React.Component {
   static propTypes = {
     layers: PropTypes.array.isRequired,
+    overlays: PropTypes.array.isRequired,
     map: PropTypes.object.isRequired
   }
 
@@ -32,9 +33,10 @@ class LayersControlButton extends React.Component {
 
     return (<div className={showPanel ? "open" : ""}>
         <a href="javascript:void(0);" 
+            title="Layers"
             onClick={this.handleOpen} 
             className="leaflet-control-layers-control-button leaflet-bar-part theme-secondary"></a>
-        <LayersControlPanel map={this.props.map} layers={this.props.layers} onClose={this.handleClose} />
+        <LayersControlPanel map={this.props.map} layers={this.props.layers} overlays={this.props.overlays} onClose={this.handleClose} />
     </div>);
   }
 }
@@ -49,13 +51,13 @@ export default L.Control.extend({
         this.map = map;
 
         L.DomEvent.disableClickPropagation(this.container);
-        this.update(this.options.layers);
+        this.update(this.options.layers, []);
 
         return this.container;
     },
 
-    update: function(layers){
-        ReactDOM.render(<LayersControlButton map={this.map} layers={layers} />, this.container);
+    update: function(layers, overlays){
+        ReactDOM.render(<LayersControlButton map={this.map} layers={layers} overlays={overlays}/>, this.container);
     }
 });
 

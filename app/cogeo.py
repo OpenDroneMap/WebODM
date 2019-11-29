@@ -203,9 +203,14 @@ def assure_cogeo(src_path):
     swapfile = tempfile.mktemp('_cogeo_swap.tif', dir=settings.MEDIA_TMP)
 
     with rasterio.open(src_path) as dst:
-        output_profile = dst.profile
-        output_profile.update(dict(blockxsize="256"))
-        output_profile.update(dict(blockysize="256"))
+        output_profile = dict(
+            blockxsize=256,
+            blockysize=256,
+            driver='GTiff',
+            tiled=True,
+            compress=dst.profile.get('compress', 'deflate'),
+            interleave='pixel'
+        )
 
         # Dataset Open option (see gdalwarp `-oo` option)
         config = dict(
