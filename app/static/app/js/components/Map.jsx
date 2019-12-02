@@ -97,7 +97,7 @@ class Map extends React.Component {
         let metaUrl = url + "metadata";
 
         if (type == "plant") metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
-        if (type == "dsm") metaUrl += "?hillshade=3&color_map=jet_r";
+        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=3&color_map=jet_r";
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
@@ -121,7 +121,7 @@ class Map extends React.Component {
                     params["rescale"] = encodeURIComponent("-1,1");
                 }
                 
-                tileUrl = tileUrl.slice(0, tileUrl.indexOf("?")) + Utils.toSearchQuery(params);
+                tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
 
             const layer = Leaflet.tileLayer(tileUrl, {

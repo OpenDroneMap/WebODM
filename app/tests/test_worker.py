@@ -29,36 +29,33 @@ class TestWorker(BootTestCase):
         pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
         self.assertTrue(pnode.api_version is None)
 
-        pnserver = start_processing_node()
+        with start_processing_node():
+            worker.tasks.update_nodes_info()
 
-        worker.tasks.update_nodes_info()
+            pnode.refresh_from_db()
+            self.assertTrue(pnode.api_version is not None)
 
-        pnode.refresh_from_db()
-        self.assertTrue(pnode.api_version is not None)
+            # Create task
+            task = Task.objects.create(project=project)
 
-        # Create task
-        task = Task.objects.create(project=project)
+            # Delete project
+            project.deleting = True
+            project.save()
 
-        # Delete project
-        project.deleting = True
-        project.save()
+            worker.tasks.cleanup_projects()
 
-        worker.tasks.cleanup_projects()
+            # Task and project should still be here (since task still exists)
+            self.assertTrue(Task.objects.filter(pk=task.id).exists())
+            self.assertTrue(Project.objects.filter(pk=project.id).exists())
 
-        # Task and project should still be here (since task still exists)
-        self.assertTrue(Task.objects.filter(pk=task.id).exists())
-        self.assertTrue(Project.objects.filter(pk=project.id).exists())
+            # Remove task
+            task.delete()
 
-        # Remove task
-        task.delete()
+            worker.tasks.cleanup_projects()
 
-        worker.tasks.cleanup_projects()
-
-        # Task and project should have been removed (now that task count is zero)
-        self.assertFalse(Task.objects.filter(pk=task.id).exists())
-        self.assertFalse(Project.objects.filter(pk=project.id).exists())
-
-        pnserver.terminate()
+            # Task and project should have been removed (now that task count is zero)
+            self.assertFalse(Task.objects.filter(pk=task.id).exists())
+            self.assertFalse(Project.objects.filter(pk=project.id).exists())
 
         tmpdir = os.path.join(settings.MEDIA_TMP, 'test')
         os.mkdir(tmpdir)

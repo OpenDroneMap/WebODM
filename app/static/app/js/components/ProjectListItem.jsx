@@ -235,7 +235,7 @@ class ProjectListItem extends React.Component {
                 this.setUploadState({
                     totalCount: this.state.upload.totalCount - remainingFilesCount,
                     uploading: false,
-                    error: `${remainingFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .png) and GCP files (.txt) can be uploaded. Try again.`
+                    error: `${remainingFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .tif, .png) and GCP files (.txt) can be uploaded. Try again.`
                 });
             }
         })

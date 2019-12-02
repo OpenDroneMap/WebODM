@@ -1,5 +1,6 @@
 import rasterio
 import urllib
+import os
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
@@ -92,6 +93,9 @@ class TileJson(TaskNestedView):
         task = self.get_and_check_task(request, pk)
 
         raster_path = get_raster_path(task, tile_type)
+        if not os.path.isfile(raster_path):
+            raise exceptions.NotFound()
+
         with rasterio.open(raster_path) as src_dst:
             minzoom, maxzoom = get_zooms(src_dst)
 
@@ -135,6 +139,9 @@ class Metadata(TaskNestedView):
 
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
+
+        if not os.path.isfile(raster_path):
+            raise exceptions.NotFound()
 
         try:
             info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
@@ -253,7 +260,7 @@ class Tiles(TaskNestedView):
         expr, _ = lookup_formula(formula, bands)
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
-            raise exceptions.ValidationError("Cannot get tiles without rescale parameter. Add ?rescale=min,max to the URL.")
+            rescale = "0,1000"
 
         if tile_type in ['dsm', 'dtm'] and color_map is None:
             color_map = "gray"
@@ -263,6 +270,8 @@ class Tiles(TaskNestedView):
         tilesize = scale * 256
 
         url = get_raster_path(task, tile_type)
+        if not os.path.isfile(url):
+            raise exceptions.NotFound()
 
         try:
             if expr is not None:

@@ -15,12 +15,15 @@ from webodm import settings
 
 logger = logging.getLogger('app.logger')
 
+@contextmanager
 def start_processing_node(*args):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     node_odm = subprocess.Popen(['node', 'index.js', '--port', '11223', '--test'] + list(args), shell=False,
                                 cwd=os.path.join(current_dir, "..", "..", "nodeodm", "external", "NodeODM"))
     time.sleep(2)  # Wait for the server to launch
-    return node_odm
+    yield node_odm
+    node_odm.terminate()
+    time.sleep(1)  # Wait for the server to stop
 
 # We need to clear previous media_root content
 # This points to the test directory, but just in case

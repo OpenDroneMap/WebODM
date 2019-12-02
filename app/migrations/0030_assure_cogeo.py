@@ -8,19 +8,17 @@ import os
 from webodm import settings
 
 def find_and_assure_cogeo(apps, schema_editor):
-    print("===============================================")
-    print("Optimizing TIFFs: this is going to take a while!")
-    print("===============================================")
+    print("=====================================================================")
+    print("Migrating TIFFs to Cloud Optimized GeoTIFFs, this might take a while!")
+    print("=====================================================================")
 
     for asset_filename in ["odm_orthophoto.tif", "dsm.tif", "dtm.tif"]:
-        for asset in glob.glob(os.path.join(settings.MEDIA_ROOT, "**", asset_filename), recursive=True):
+        for asset in glob.glob(os.path.join(settings.MEDIA_ROOT, "project", "**", asset_filename), recursive=True):
             try:
                 print("Optimizing %s" % asset)
                 assure_cogeo(asset)
             except Exception as e:
                 print("WARNING: cannot check/optimize %s (%s), skipping..." % (asset, str(e)))
-
-    print("Done optimizing TIFFs!")
 
 
 class Migration(migrations.Migration):
