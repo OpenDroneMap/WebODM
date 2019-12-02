@@ -441,9 +441,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}
           onMouseDown={this.handleMapMouseDown}
-          >
-        </div>
-        
+        />
 
         <div className="actionButtons">
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}

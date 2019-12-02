@@ -413,6 +413,12 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(len(metadata['algorithms']) > 0)
             self.assertTrue(len(metadata['color_maps']) > 0)
 
+            # Algorithms have valid keys
+            for k in ['id', 'filters', 'expr', 'help']:
+                for a in metadata['algorithms']:
+                    self.assertTrue(k in a)
+                    self.assertTrue(len(a['filters']) > 0)
+
             # Colormap is for algorithms
             self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'rdylgn']), 1)
             self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet_r']), 0)
@@ -471,6 +477,9 @@ class TestApiTask(BootTransactionTestCase):
                 with Image.open(io.BytesIO(res.content)) as i:
                     self.assertEqual(i.width, 512)
                     self.assertEqual(i.height, 512)
+
+            # TODO: Test hillshade
+
 
             # Another user does not have access to the resources
             other_client = APIClient()
