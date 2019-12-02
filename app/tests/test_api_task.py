@@ -391,9 +391,10 @@ class TestApiTask(BootTransactionTestCase):
             # Histogram stats are available (3 bands for orthophoto)
             self.assertTrue(len(metadata['statistics']) == 3)
             for b in ['1', '2', '3']:
-                self.assertEqual(len(metadata['statistics'][b]['histogram']), 255)  # bins
-                self.assertEqual(metadata['statistics'][b]['min'], 0)
-                self.assertEqual(metadata['statistics'][b]['max'], 255)
+                self.assertEqual(len(metadata['statistics'][b]['histogram']), 2)
+                self.assertEqual(len(metadata['statistics'][b]['histogram'][0]), 255)
+                self.assertTrue('max' in metadata['statistics'][b])
+                self.assertTrue('min' in metadata['statistics'][b])
 
             # Metadata with invalid formula
             res = client.get("/api/projects/{}/tasks/{}/orthophoto/metadata?formula=INVALID".format(project.id, task.id))
@@ -413,8 +414,8 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(len(metadata['color_maps']) > 0)
 
             # Colormap is for algorithms
-            self.assertTrue('rdylgn' in metadata['color_maps'])
-            self.assertFalse('jet_r' in metadata['color_maps'])
+            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'rdylgn']), 1)
+            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet_r']), 0)
 
             # Formula parameters are copied to tile URL
             self.assertTrue(metadata['tiles'][0].endswith('?formula=NDVI&bands=RGN'))
@@ -442,23 +443,23 @@ class TestApiTask(BootTransactionTestCase):
                 self.assertTrue(len(metadata['color_maps']) > 0)
 
                 # Colormaps are for elevation
-                self.assertTrue('jet_r' in metadata['color_maps'])
-                self.assertFalse('rdylgn' in metadata['color_maps'])
+                self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'rdylgn']), 0)
+                self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet_r']), 1)
 
                 # Algorithms are empty
                 self.assertEqual(len(metadata['algorithms']), 0)
 
                 # Min/max values are what we expect them to be
                 self.assertEqual(len(metadata['statistics']), 1)
-                self.assertEqual(round(metadata['statistics']['1']['min'], 2), 156.91)
-                self.assertEqual(round(metadata['statistics']['1']['max'], 2), 164.94)
+                self.assertEqual(round(metadata['statistics']['1']['min'], 2), 156.92)
+                self.assertEqual(round(metadata['statistics']['1']['max'], 2), 164.88)
 
             # Can access individual tiles
             for tile_type in tile_types:
                 res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png".format(project.id, task.id, tile_type))
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-                with Image.open(io.BytesIO(res.data)) as i:
+                with Image.open(io.BytesIO(res.content)) as i:
                     self.assertEqual(i.width, 256)
                     self.assertEqual(i.height, 256)
 
@@ -467,7 +468,7 @@ class TestApiTask(BootTransactionTestCase):
                 res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185@2x.png".format(project.id, task.id, tile_type))
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-                with Image.open(io.BytesIO(res.data)) as i:
+                with Image.open(io.BytesIO(res.content)) as i:
                     self.assertEqual(i.width, 512)
                     self.assertEqual(i.height, 512)
 

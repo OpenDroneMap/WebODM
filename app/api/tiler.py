@@ -39,13 +39,12 @@ def get_extent(task, tile_type):
     }
 
     if not tile_type in extent_map:
-        raise exceptions.ValidationError("Type {} is not a valid tile type".format(tile_type))
+        raise exceptions.NotFound()
 
     extent = extent_map[tile_type]
 
     if extent is None:
-        raise exceptions.ValidationError(
-            "A {} has not been processed for this task. Tiles are not available.".format(tile_type))
+        raise exceptions.NotFound()
 
     return extent
 
