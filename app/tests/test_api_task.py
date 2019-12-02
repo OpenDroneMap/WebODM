@@ -1,3 +1,4 @@
+import io
 import os
 import time
 
@@ -16,6 +17,7 @@ import worker
 from django.utils import timezone
 
 from app import pending_actions
+from app.api.formulas import algos
 from app.models import Project, Task, ImageUpload
 from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
 from app.plugins.signals import task_completed, task_removed, task_removing
@@ -235,11 +237,13 @@ class TestApiTask(BootTransactionTestCase):
             # No processing node is set
             self.assertTrue(task.processing_node is None)
 
-            # tiles.json should not be accessible at this point
+            # tiles.json, bounds, metadata should not be accessible at this point
             tile_types = ['orthophoto', 'dsm', 'dtm']
-            for tile_type in tile_types:
-                res = client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
-                self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+            endpoints = ['tiles.json', 'bounds', 'metadata']
+            for ep in endpoints:
+                for tile_type in tile_types:
+                    res = client.get("/api/projects/{}/tasks/{}/{}/{}".format(project.id, task.id, tile_type, ep))
+                    self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
             # Neither should an individual tile
             # Z/X/Y coords are chosen based on node-odm test dataset for orthophoto_tiles/
@@ -345,21 +349,127 @@ class TestApiTask(BootTransactionTestCase):
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
-            # Can access tiles.json
-            for tile_type in tile_types:
-                res = client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
-                self.assertTrue(res.status_code == status.HTTP_200_OK)
+            # Can access tiles.json, bounds and metadata
+            for ep in endpoints:
+                for tile_type in tile_types:
+                    res = client.get("/api/projects/{}/tasks/{}/{}/{}".format(project.id, task.id, tile_type, ep))
+                    self.assertTrue(res.status_code == status.HTTP_200_OK)
 
             # Bounds are what we expect them to be
             # (4 coords in lat/lon)
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles.json".format(project.id, task.id))
             tiles = json.loads(res.content.decode("utf-8"))
             self.assertTrue(len(tiles['bounds']) == 4)
             self.assertTrue(round(tiles['bounds'][0], 7) == -91.9945132)
+
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/bounds".format(project.id, task.id))
+            bounds = json.loads(res.content.decode("utf-8"))
+            self.assertTrue(len(bounds['bounds']) == 4)
+            self.assertTrue(round(bounds['bounds'][0], 7) == -91.9945132)
+
+            # Metadata checks for orthophoto
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/metadata".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            metadata = json.loads(res.content.decode("utf-8"))
+            fields = ['bounds', 'minzoom', 'maxzoom', 'statistics', 'algorithms', 'color_maps', 'tiles', 'scheme', 'name']
+            for f in fields:
+                self.assertTrue(f in metadata)
+
+            # Colormaps and algorithms should be empty lists
+            self.assertEqual(metadata['algorithms'], [])
+            self.assertEqual(metadata['color_maps'], [])
+
+            # Address key is removed
+            self.assertFalse('address' in metadata)
+
+            # Scheme is xyz
+            self.assertEqual(metadata['scheme'], 'xyz')
+
+            # Tiles URL has no extra params
+            self.assertTrue(metadata['tiles'][0].endswith('.png'))
+
+            # Histogram stats are available (3 bands for orthophoto)
+            self.assertTrue(len(metadata['statistics']) == 3)
+            for b in ['1', '2', '3']:
+                self.assertEqual(len(metadata['statistics'][b]['histogram']), 255)  # bins
+                self.assertEqual(metadata['statistics'][b]['min'], 0)
+                self.assertEqual(metadata['statistics'][b]['max'], 255)
+
+            # Metadata with invalid formula
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/metadata?formula=INVALID".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Metadata with a valid formula but invalid bands
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/metadata?formula=NDVI&bands=ABC".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Medatata with valid formula and bands
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/metadata?formula=NDVI&bands=RGN".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            metadata = json.loads(res.content.decode("utf-8"))
+
+            # Colormaps and algorithms are populated
+            self.assertTrue(len(metadata['algorithms']) > 0)
+            self.assertTrue(len(metadata['color_maps']) > 0)
+
+            # Colormap is for algorithms
+            self.assertTrue('rdylgn' in metadata['color_maps'])
+            self.assertFalse('jet_r' in metadata['color_maps'])
+
+            # Formula parameters are copied to tile URL
+            self.assertTrue(metadata['tiles'][0].endswith('?formula=NDVI&bands=RGN'))
+
+            # Histogram stats are available (1 band)
+            self.assertTrue(len(metadata['statistics']) == 1)
+
+            # Medatata with valid formula and bands that specifies a scale range
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/metadata?formula=VARI".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            metadata = json.loads(res.content.decode("utf-8"))
+            self.assertTrue(len(metadata['statistics']) == 1)
+
+            # Min/max values have been replaced
+            self.assertEqual(metadata['statistics']['1']['min'], algos['VARI']['range'][0])
+            self.assertEqual(metadata['statistics']['1']['max'], algos['VARI']['range'][1])
+
+            # Metadata for DSM/DTM
+            for tile_type in ['dsm', 'dtm']:
+                res = client.get("/api/projects/{}/tasks/{}/{}/metadata".format(project.id, task.id, tile_type))
+                self.assertEqual(res.status_code, status.HTTP_200_OK)
+                metadata = json.loads(res.content.decode("utf-8"))
+
+                # Colormaps are populated
+                self.assertTrue(len(metadata['color_maps']) > 0)
+
+                # Colormaps are for elevation
+                self.assertTrue('jet_r' in metadata['color_maps'])
+                self.assertFalse('rdylgn' in metadata['color_maps'])
+
+                # Algorithms are empty
+                self.assertEqual(len(metadata['algorithms']), 0)
+
+                # Min/max values are what we expect them to be
+                self.assertEqual(len(metadata['statistics']), 1)
+                self.assertEqual(round(metadata['statistics']['1']['min'], 2), 156.91)
+                self.assertEqual(round(metadata['statistics']['1']['max'], 2), 164.94)
 
             # Can access individual tiles
             for tile_type in tile_types:
                 res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png".format(project.id, task.id, tile_type))
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+                with Image.open(io.BytesIO(res.data)) as i:
+                    self.assertEqual(i.width, 256)
+                    self.assertEqual(i.height, 256)
+
+            # Can access retina tiles
+            for tile_type in tile_types:
+                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185@2x.png".format(project.id, task.id, tile_type))
+                self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+                with Image.open(io.BytesIO(res.data)) as i:
+                    self.assertEqual(i.width, 512)
+                    self.assertEqual(i.height, 512)
 
             # Another user does not have access to the resources
             other_client = APIClient()

@@ -135,7 +135,10 @@ class Metadata(TaskNestedView):
         if formula == '': formula = None
         if bands == '': bands = None
 
-        expr, hrange = lookup_formula(formula, bands)
+        try:
+            expr, hrange = lookup_formula(formula, bands)
+        except ValueError as e:
+            raise exceptions.ValidationError(str(e))
 
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
@@ -167,13 +170,16 @@ class Metadata(TaskNestedView):
         }
 
         colormaps = []
+        algorithms = []
         if tile_type in ['dsm', 'dtm']:
             colormaps = ['jet_r', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r']
-            info['algorithms'] = *get_algorithm_list(),
+            algorithms = *get_algorithm_list(),
 
         info['color_maps'] = []
+        info['algorithms'] = algorithms
+
         if colormaps:
             for cmap in colormaps:
                 try:
@@ -257,7 +263,10 @@ class Tiles(TaskNestedView):
         if color_map == '': color_map = None
         if hillshade == '' or hillshade == '0': hillshade = None
 
-        expr, _ = lookup_formula(formula, bands)
+        try:
+            expr, _ = lookup_formula(formula, bands)
+        except ValueError as e:
+            raise exceptions.ValidationError(str(e))
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
             rescale = "0,1000"
