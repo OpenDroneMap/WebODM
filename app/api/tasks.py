@@ -170,8 +170,6 @@ class TaskViewSet(viewsets.ViewSet):
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
-        # TODO: check at least two images are present
-
         task.partial = False
         task.images_count = models.ImageUpload.objects.filter(task=task).count()
 
@@ -284,20 +282,6 @@ class TaskNestedView(APIView):
             get_and_check_project(request, task.project.id)
 
         return task
-
-
-# class TaskTiles(TaskNestedView):
-#     def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y=""):
-#         """
-#         Get a tile image
-#         """
-#         task = self.get_and_check_task(request, pk)
-#         tile_path = task.get_tile_path(tile_type, z, x, y)
-#         if os.path.isfile(tile_path):
-#             tile = open(tile_path, "rb")
-#             return HttpResponse(FileWrapper(tile), content_type="image/png")
-#         else:
-#             raise exceptions.NotFound()
 
 
 def download_file_response(request, filePath, content_disposition):

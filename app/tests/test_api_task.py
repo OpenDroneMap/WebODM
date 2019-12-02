@@ -359,7 +359,7 @@ class TestApiTask(BootTransactionTestCase):
             # Can access individual tiles
             for tile_type in tile_types:
                 res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png".format(project.id, task.id, tile_type))
-                self.assertEqual(res.status_code == status.HTTP_200_OK)
+                self.assertEqual(res.status_code, status.HTTP_200_OK)
 
             # Another user does not have access to the resources
             other_client = APIClient()
@@ -368,13 +368,13 @@ class TestApiTask(BootTransactionTestCase):
             def accessResources(expectedStatus):
                 for tile_type in tile_types:
                     res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
-                    self.assertTrue(res.status_code == expectedStatus)
+                    self.assertEqual(res.status_code, expectedStatus)
 
-                res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles/16/16020/42443.png".format(project.id, task.id, tile_type))
-                self.assertTrue(res.status_code == expectedStatus)
+                res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png".format(project.id, task.id, tile_type))
+                self.assertEqual(res.status_code, expectedStatus)
 
                 res = other_client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
-                self.assertTrue(res.status_code == expectedStatus)
+                self.assertEqual(res.status_code, expectedStatus)
 
             accessResources(status.HTTP_404_NOT_FOUND)
 
@@ -576,11 +576,11 @@ class TestApiTask(BootTransactionTestCase):
 
             # Can access only tiles of available assets
             res = client.get("/api/projects/{}/tasks/{}/dsm/tiles.json".format(project.id, task.id))
-            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
             res = client.get("/api/projects/{}/tasks/{}/dtm/tiles.json".format(project.id, task.id))
-            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
             res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles.json".format(project.id, task.id))
-            self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
             # Available assets should be missing orthophoto.tif type
             # but others such as textured_model.zip should be available
