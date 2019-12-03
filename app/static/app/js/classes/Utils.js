@@ -53,6 +53,10 @@ export default {
       return this.toSearchQuery(q);
     },
 
+    buildUrlWithQuery: function(url, params){
+        return (url.indexOf("?") !== -1 ? url.slice(0, url.indexOf("?")) : url) + this.toSearchQuery(params);
+    },
+
     clone: function(obj){
       return JSON.parse(JSON.stringify(obj));
     },

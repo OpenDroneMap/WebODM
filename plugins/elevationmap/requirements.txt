@@ -1,3 +1,2 @@
 geojson==2.4.1
 opencv-python==4.1.0.25
-rasterio==1.0.23

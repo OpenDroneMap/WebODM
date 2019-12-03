@@ -80,12 +80,12 @@ module.exports = {
     "SystemJS": "SystemJS",
     "PluginsAPI": "PluginsAPI",
     "leaflet": "leaflet",
-    "ReactDOM": "ReactDOM",
-    "React": "React"
+    "react-dom": "ReactDOM",
+    "react": "React"
   },
 
   watchOptions: {
-    ignored: /node_modules/,
+    ignored: ['node_modules', './**/*.py'],
     aggregateTimeout: 300,
     poll: 1000
   }

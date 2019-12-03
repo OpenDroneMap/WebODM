@@ -89,11 +89,12 @@ module.exports = {
     //  on the global let jQuery
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
-    "React": "React"
+    "react": "React",
+    "react-dom": "ReactDOM"
   },
 
   watchOptions: {
-    ignored: /node_modules/,
+    ignored: ['node_modules', './**/*.py'],
     aggregateTimeout: 300,
     poll: 1000
   }

@@ -5,12 +5,14 @@ import PropTypes from 'prop-types';
 class Standby extends React.Component {
   static defaultProps = {
       message: "",
-      show: false
+      show: false,
+      opacity: 0.5
   };
 
   static propTypes = {
     message: PropTypes.string,
-    show: PropTypes.bool
+    show: PropTypes.bool,
+    opacity: PropTypes.number
   };
 
   constructor(props){
@@ -41,7 +43,7 @@ class Standby extends React.Component {
     return (
       <div className="standby"
            style={{display: this.state.show ? "block" : "none"}}>
-        <div className="cover">&nbsp;</div>
+        <div className="cover" style={{opacity: this.props.opacity}}>&nbsp;</div>
         <div className="content">
           <i className="fa fa-spinner fa-spin fa-2x fa-fw"></i>
           <p>{this.state.message}</p>

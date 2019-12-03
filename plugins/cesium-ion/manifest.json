@@ -1,5 +1,5 @@
 {
-	"name": "Cesium ion",
+	"name": "Cesium Ion",
 	"webodmMinVersion": "0.6.0",
 	"description": "Upload and tile ODM assets with Cesium ion.",
 	"version": "1.2.1",

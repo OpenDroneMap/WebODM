@@ -29,8 +29,6 @@ class TaskPluginActionButtons extends React.Component {
         }, (button) => {
             if (!button) return;
 
-            console.log(button);
-
             this.setState(update(this.state, {
                 buttons: {$push: [button]}
             }));

@@ -198,7 +198,7 @@
                     <span class="email">{{ user.email }}</span>
                 </li>
                 <li class="divider"></li>
-                <li><a href="/logout/"><i class="fa fa-sign-out fa-fw"></i> {% trans 'Logout' %}</a>
+                <li><a href="/logout/"><i class="fa fa-sign-out-alt fa-fw"></i> {% trans 'Logout' %}</a>
                 </li>
             </ul>
             <!-- /.dropdown-user -->
@@ -221,7 +221,7 @@
                     </div>
                 </li>-->
                 <li>
-                    <a href="/dashboard/"><i class="fa fa-dashboard fa-fw"></i> {% trans 'Dashboard' %}</a>
+                    <a href="/dashboard/"><i class="fa fa-tachometer-alt fa-fw"></i> {% trans 'Dashboard' %}</a>
                 </li>
                 <!--<li>
                     <a href="#"><i class="fa fa-plane fa-fw"></i> Mission Planner</a>
@@ -270,13 +270,13 @@
 
                 {% if user.is_staff %}
                 <li>
-                    <a href="#"><i class="fa fa-gears fa-fw"></i> {% trans 'Administration' %}<span class="fa arrow"></span></a>
+                    <a href="#"><i class="fa fa-cogs fa-fw"></i> {% trans 'Administration' %}<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
                             <a href="/admin/auth/user/"><i class="fa fa-user fa-fw"></i> {% trans 'Accounts' %}</a>
                         </li>
                         <li>
-                            <a href="/admin/auth/group/"><i class="fa fa-group fa-fw"></i> {% trans 'Groups' %}</a>
+                            <a href="/admin/auth/group/"><i class="fa fa-users fa-fw"></i> {% trans 'Groups' %}</a>
                         </li>
                         <li>
                             <a href="{% url 'admin:app_setting_change' SETTINGS.id %}"><i class="fa fa-magic fa-fw"></i> {% trans 'Brand' %}</a>
@@ -288,7 +288,7 @@
                             <a href="/admin/app/plugin/"><i class="fa fa-plug fa-fw"></i> {% trans 'Plugins' %}</a>
                         </li>
                         <li>
-                            <a href="/admin/app/"><i class="fa fa-gear fa-fw"></i> {% trans 'Application' %}</a>
+                            <a href="/admin/app/"><i class="fa fa-cog fa-fw"></i> {% trans 'Application' %}</a>
                         </li>
                     </ul>
                 </li>

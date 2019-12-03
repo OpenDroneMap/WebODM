@@ -34,7 +34,7 @@ export default class PlatformSelectButton extends PureComponent {
 
 		const title = (
 			<Fragment>
-				<i className={"fa fa-cloud-download fa-cloud-import"} />
+				<i className={"fa fa-cloud-download-alt fa-cloud-import"} />
 				Cloud Import
 			</Fragment>
 		

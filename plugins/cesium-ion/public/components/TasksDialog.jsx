@@ -97,7 +97,7 @@ export default class TaskDialog extends Component {
 			<Modal className={"ion-tasks"} onHide={onHide} {...options}>
 				<Modal.Header closeButton>
 					<Modal.Title>
-						<i className={"fa fa-cesium"} /> Cesium ion Tasks
+						<i className={"fa fa-cesium"} /> Cesium Ion Tasks
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>

@@ -100,12 +100,28 @@ def build_plugins():
 
         # Check for webpack.config.js (if we need to build it)
         if plugin.path_exists("public/webpack.config.js"):
-            if settings.DEV:
+            if settings.DEV and webpack_watch_process_count() <= 2:
                 logger.info("Running webpack with watcher for {}".format(plugin.get_name()))
                 subprocess.Popen(['webpack-cli', '--watch'], cwd=plugin.get_path("public"))
             elif not plugin.path_exists("public/build"):
                 logger.info("Running webpack for {}".format(plugin.get_name()))
                 subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
+
+
+def webpack_watch_process_count():
+    count = 0
+    try:
+        pids = [pid for pid in os.listdir('/proc') if pid.isdigit()]
+        for pid in pids:
+            try:
+                if "/usr/bin/webpack-cli" in open(os.path.join('/proc', pid, 'cmdline'), 'r').read().split('\0'):
+                    count += 1
+            except IOError:  # proc has already terminated
+                continue
+    except:
+        logger.warning("webpack_watch_process_count is not supported on this platform.")
+
+    return count
 
 
 def register_plugins():

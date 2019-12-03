@@ -235,7 +235,7 @@ class ProjectListItem extends React.Component {
                 this.setUploadState({
                     totalCount: this.state.upload.totalCount - remainingFilesCount,
                     uploading: false,
-                    error: `${remainingFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .png) and GCP files (.txt) can be uploaded. Try again.`
+                    error: `${remainingFilesCount} files cannot be uploaded. As a reminder, only images (.jpg, .tif, .png) and GCP files (.txt) can be uploaded. Try again.`
                 });
             }
         })
@@ -404,7 +404,7 @@ class ProjectListItem extends React.Component {
           title="Edit Project"
           saveLabel="Save Changes"
           savingLabel="Saving changes..."
-          saveIcon="fa fa-edit"
+          saveIcon="far fa-edit"
           projectName={data.name}
           projectDescr={data.description}
           saveAction={this.updateProject}
@@ -461,7 +461,7 @@ class ProjectListItem extends React.Component {
               </span>
               : ""}
 
-            <i className='fa fa-edit'>
+            <i className='far fa-edit'>
             </i> <a href="javascript:void(0);" onClick={this.handleEditProject}> Edit
             </a>
           </div>
