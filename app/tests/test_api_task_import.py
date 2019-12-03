@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 import worker
+from app.cogeo import valid_cogeo
 from app.models import Project
 from app.models import Task
 from app.tests.classes import BootTransactionTestCase
@@ -114,6 +115,10 @@ class TestApiTask(BootTransactionTestCase):
             # Can access assets
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, file_import_task.id))
             self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+            self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["orthophoto.tif"])))
+            self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["dsm.tif"])))
+            self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["dtm.tif"])))
 
             # Set task public so we can download from it without auth
             file_import_task.public = True

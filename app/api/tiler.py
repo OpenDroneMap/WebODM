@@ -54,7 +54,11 @@ def get_raster_path(task, tile_type):
 
 def rescale_tile(tile, mask, rescale = None):
     if rescale:
-        rescale_arr = list(map(float, rescale.split(",")))
+        try:
+            rescale_arr = list(map(float, rescale.split(",")))
+        except ValueError:
+            raise exceptions.ValidationError("Invalid rescale value")
+
         rescale_arr = list(_chunks(rescale_arr, 2))
         if len(rescale_arr) != tile.shape[0]:
             rescale_arr = ((rescale_arr[0]),) * tile.shape[0]
@@ -273,6 +277,12 @@ class Tiles(TaskNestedView):
         if tile_type in ['dsm', 'dtm'] and color_map is None:
             color_map = "gray"
 
+        if tile_type == 'orthophoto' and formula is not None:
+            if color_map is None:
+                color_map = "gray"
+            if rescale is None:
+                rescale = "-1,1"
+
         if nodata is not None:
             nodata = np.nan if nodata == "nan" else float(nodata)
         tilesize = scale * 256
@@ -310,8 +320,9 @@ class Tiles(TaskNestedView):
                 hillshade = float(hillshade)
                 if hillshade <= 0:
                     hillshade = 1.0
+                print(hillshade)
             except ValueError:
-                hillshade = 1.0
+                raise exceptions.ValidationError("Invalid hillshade value")
 
             if tile.shape[0] != 1:
                 raise exceptions.ValidationError("Cannot compute hillshade of non-elevation raster (multiple bands found)")

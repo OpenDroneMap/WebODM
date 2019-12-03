@@ -17,7 +17,8 @@ import worker
 from django.utils import timezone
 
 from app import pending_actions
-from app.api.formulas import algos
+from app.api.formulas import algos, get_camera_filters_for
+from app.cogeo import valid_cogeo
 from app.models import Project, Task, ImageUpload
 from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
 from app.plugins.signals import task_completed, task_removed, task_removing
@@ -71,6 +72,8 @@ class TestApiTask(BootTransactionTestCase):
             # task creation via file upload
             image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
             image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
+            multispec_image = open("app/fixtures/tiny_drone_image_multispec.tif", 'rb')
+
 
             img1 = Image.open("app/fixtures/tiny_drone_image.jpg")
 
@@ -135,7 +138,7 @@ class TestApiTask(BootTransactionTestCase):
             testWatch.clear()
             gcp = open("app/fixtures/gcp.txt", 'r')
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
-                'images': [image1, image2, gcp],
+                'images': [image1, image2, multispec_image, gcp],
                 'name': 'test_task',
                 'processing_node': pnode.id,
                 'resize_to': img1.size[0] / 2.0
@@ -145,10 +148,15 @@ class TestApiTask(BootTransactionTestCase):
             image1.seek(0)
             image2.seek(0)
             gcp.seek(0)
+            multispec_image.seek(0)
 
             # Uploaded images should have been resized
             with Image.open(resized_task.task_path("tiny_drone_image.jpg")) as im:
                 self.assertTrue(im.size[0] == img1.size[0] / 2.0)
+
+            # Except the multispectral image
+            with Image.open(resized_task.task_path("tiny_drone_image_multispec.tif")) as im:
+                self.assertTrue(im.size[0] == img1.size[0])
 
             # GCP should have been scaled
             with open(resized_task.task_path("gcp.txt")) as f:
@@ -337,6 +345,11 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(res.status_code == status.HTTP_200_OK)
             self.assertTrue(res.has_header('_stream'))
 
+            # The tif files are valid Cloud Optimized GeoTIFF
+            self.assertTrue(valid_cogeo(task.assets_path(task.ASSETS_MAP["orthophoto.tif"])))
+            self.assertTrue(valid_cogeo(task.assets_path(task.ASSETS_MAP["dsm.tif"])))
+            self.assertTrue(valid_cogeo(task.assets_path(task.ASSETS_MAP["dtm.tif"])))
+
             # A textured mesh archive file should exist
             self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
 
@@ -478,8 +491,48 @@ class TestApiTask(BootTransactionTestCase):
                     self.assertEqual(i.width, 512)
                     self.assertEqual(i.height, 512)
 
-            # TODO: Test hillshade
+            # Cannot access tile 0/0/0
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/0/0/0.png".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
+            # Can access hillshade, formulas, bands, rescale, color_map
+            params = [
+                ("dsm", "color_map=jet_r&hillshade=3&rescale=150,170", status.HTTP_200_OK),
+                ("dsm", "color_map=jet_r&hillshade=0&rescale=150,170", status.HTTP_200_OK),
+                ("dsm", "color_map=invalid&rescale=150,170", status.HTTP_400_BAD_REQUEST),
+                ("dsm", "color_map=jet_r&rescale=invalid", status.HTTP_400_BAD_REQUEST),
+                ("dsm", "color_map=jet_r&rescale=150,170&hillshade=invalid", status.HTTP_400_BAD_REQUEST),
+
+                ("dtm", "hillshade=3", status.HTTP_200_OK),
+                ("dtm", "hillshade=99999999999999999999999999999999999", status.HTTP_200_OK),
+                ("dtm", "hillshade=-9999999999999999999999999999999999", status.HTTP_200_OK),
+                ("dtm", "hillshade=0", status.HTTP_200_OK),
+
+                ("orthophoto", "hillshade=3", status.HTTP_400_BAD_REQUEST),
+
+                ("orthophoto", "formula=NDVI&bands=RGN", status.HTTP_200_OK),
+                ("orthophoto", "formula=VARI&bands=RGN", status.HTTP_400_BAD_REQUEST),
+                ("orthophoto", "formula=VARI&bands=RGB", status.HTTP_200_OK),
+                ("orthophoto", "formula=VARI&bands=invalid", status.HTTP_400_BAD_REQUEST),
+                ("orthophoto", "formula=invalid&bands=RGB", status.HTTP_400_BAD_REQUEST),
+
+                ("orthophoto", "formula=NDVI&bands=RGN&color_map=rdylgn&rescale=-1,1", status.HTTP_200_OK),
+                ("orthophoto", "formula=NDVI&bands=RGN&color_map=rdylgn&rescale=1,-1", status.HTTP_200_OK),
+
+                ("orthophoto", "formula=NDVI&bands=RGN&color_map=invalid", status.HTTP_400_BAD_REQUEST),
+            ]
+
+            for k in algos:
+                a = algos[k]
+                filters = get_camera_filters_for(a)
+                self.assertTrue(len(filters) > 0, "%s has filters" % k)
+
+                for f in filters:
+                    params.append(("orthophoto", "formula={}&bands={}&color_map=rdylgn".format(k, f), status.HTTP_200_OK))
+
+            for tile_type, url, sc in params:
+                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png?{}".format(project.id, task.id, tile_type, url))
+                self.assertEqual(res.status_code, sc)
 
             # Another user does not have access to the resources
             other_client = APIClient()
@@ -709,9 +762,10 @@ class TestApiTask(BootTransactionTestCase):
             self.assertFalse('orthophoto_tiles.zip' in res.data['available_assets'])
             self.assertTrue('textured_model.zip' in res.data['available_assets'])
 
-            image1.close()
-            image2.close()
-            gcp.close()
+        image1.close()
+        image2.close()
+        multispec_image.close()
+        gcp.close()
 
     def test_task_auto_processing_node(self):
         project = Project.objects.get(name="User Test Project")
