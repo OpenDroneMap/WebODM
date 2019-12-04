@@ -4,8 +4,8 @@ import 'leaflet-measure-ex/dist/leaflet-measure';
 import 'leaflet-measure-ex/dist/leaflet-measure.css';
 import MeasurePopup from './MeasurePopup';
 import Utils from 'webodm/classes/Utils';
-import ReactDOM from 'react-dom';
-import React from 'react';
+import ReactDOM from 'ReactDOM';
+import React from 'React';
 import $ from 'jquery';
 
 export default class App{
