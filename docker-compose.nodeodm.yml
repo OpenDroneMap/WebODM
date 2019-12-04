@@ -13,5 +13,5 @@ services:
     image: opendronemap/nodeodm
     ports:
       - "3000"
-    restart: on-failure:10
+    restart: unless-stopped
     oom_score_adj: 500

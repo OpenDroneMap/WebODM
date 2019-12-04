@@ -12,7 +12,7 @@ services:
       - "5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
-    restart: on-failure:10
+    restart: unless-stopped
     oom_score_adj: -100
   webapp:
     image: opendronemap/webodm_webapp
@@ -32,12 +32,12 @@ services:
       - WO_DEBUG
       - WO_BROKER
       - WO_DEV
-    restart: on-failure:10
+    restart: unless-stopped
     oom_score_adj: 0
   broker:
     image: redis
     container_name: broker
-    restart: on-failure:10
+    restart: unless-stopped
     oom_score_adj: -500
   worker:
     image: opendronemap/webodm_webapp
@@ -51,5 +51,5 @@ services:
     environment:
       - WO_BROKER
       - WO_DEBUG
-    restart: on-failure:10
+    restart: unless-stopped
     oom_score_adj: 250
