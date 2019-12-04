@@ -89,8 +89,8 @@ module.exports = {
     //  on the global let jQuery
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
-    "react": "React",
-    "react-dom": "ReactDOM"
+    "React": "React",
+    "ReactDOM": "ReactDOM"
   },
 
   watchOptions: {
