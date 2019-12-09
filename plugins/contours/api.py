@@ -61,12 +61,12 @@ class TaskContoursCheck(TaskView):
         else:
             result = res.get()
             if result.get('error', None) is not None:
-                #cleanup_grass_context(result['context'])
+                cleanup_grass_context(result['context'])
                 return Response({'ready': True, 'error': result['error']})
 
             contours_file = result.get('output')
             if not contours_file or not os.path.exists(contours_file):
-                #cleanup_grass_context(result['context'])
+                cleanup_grass_context(result['context'])
                 return Response({'ready': True, 'error': 'Contours file could not be generated. This might be a bug.'})
 
             request.session['contours_' + celery_task_id] = contours_file
