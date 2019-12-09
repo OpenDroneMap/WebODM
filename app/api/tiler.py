@@ -17,6 +17,11 @@ from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
 
+def get_zoom_safe(src_dst):
+    minzoom, maxzoom = get_zooms(src_dst)
+    if maxzoom < minzoom:
+        maxzoom = minzoom
+    return minzoom, maxzoom
 
 def get_tile_url(task, tile_type, query_params):
     url = '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
@@ -100,7 +105,7 @@ class TileJson(TaskNestedView):
             raise exceptions.NotFound()
 
         with rasterio.open(raster_path) as src_dst:
-            minzoom, maxzoom = get_zooms(src_dst)
+            minzoom, maxzoom = get_zoom_safe(src_dst)
 
         return Response({
             'tilejson': '2.1.0',
@@ -199,6 +204,9 @@ class Metadata(TaskNestedView):
         info['scheme'] = 'xyz'
         info['tiles'] = [get_tile_url(task, tile_type, self.request.query_params)]
 
+        if info['maxzoom'] < info['minzoom']:
+            info['maxzoom'] = info['minzoom']
+
         return Response(info)
 
 def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata):
@@ -244,9 +252,6 @@ class Tiles(TaskNestedView):
         x = int(x)
         y = int(y)
 
-        if x == 0 and y == 0 and z == 0:
-            raise exceptions.NotFound()
-
         scale = int(scale)
         ext = "png"
         driver = "jpeg" if ext == "jpg" else ext
@@ -288,8 +293,14 @@ class Tiles(TaskNestedView):
         tilesize = scale * 256
 
         url = get_raster_path(task, tile_type)
+
         if not os.path.isfile(url):
             raise exceptions.NotFound()
+
+        with rasterio.open(url) as src:
+            minzoom, maxzoom = get_zoom_safe(src)
+            if z < minzoom or z > maxzoom:
+                raise exceptions.NotFound()
 
         try:
             if expr is not None:
@@ -320,19 +331,16 @@ class Tiles(TaskNestedView):
                 hillshade = float(hillshade)
                 if hillshade <= 0:
                     hillshade = 1.0
-                print(hillshade)
             except ValueError:
                 raise exceptions.ValidationError("Invalid hillshade value")
 
             if tile.shape[0] != 1:
                 raise exceptions.ValidationError("Cannot compute hillshade of non-elevation raster (multiple bands found)")
 
-            with rasterio.open(url) as src:
-                minzoom, maxzoom = get_zooms(src)
-                z_value = min(maxzoom, max(z, minzoom))
-                delta_scale = (maxzoom + 1 - z_value) * 4
-                dx = src.meta["transform"][0] * delta_scale
-                dy = -src.meta["transform"][4] * delta_scale
+            z_value = min(maxzoom, max(z, minzoom))
+            delta_scale = (maxzoom + 1 - z_value) * 4
+            dx = src.meta["transform"][0] * delta_scale
+            dy = -src.meta["transform"][4] * delta_scale
 
             ls = LightSource(azdeg=315, altdeg=45)
 

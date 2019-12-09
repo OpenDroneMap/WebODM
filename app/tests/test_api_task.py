@@ -388,6 +388,9 @@ class TestApiTask(BootTransactionTestCase):
             for f in fields:
                 self.assertTrue(f in metadata)
 
+            self.assertEqual(metadata['minzoom'], 17)
+            self.assertEqual(metadata['maxzoom'], 17)
+
             # Colormaps and algorithms should be empty lists
             self.assertEqual(metadata['algorithms'], [])
             self.assertEqual(metadata['color_maps'], [])
@@ -452,6 +455,12 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(metadata['statistics']['1']['min'], algos['VARI']['range'][0])
             self.assertEqual(metadata['statistics']['1']['max'], algos['VARI']['range'][1])
 
+            tile_path = {
+                'orthophoto': '17/32042/46185',
+                'dsm': '18/64083/92370',
+                'dtm': '18/64083/92370'
+            }
+
             # Metadata for DSM/DTM
             for tile_type in ['dsm', 'dtm']:
                 res = client.get("/api/projects/{}/tasks/{}/{}/metadata".format(project.id, task.id, tile_type))
@@ -475,7 +484,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Can access individual tiles
             for tile_type in tile_types:
-                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png".format(project.id, task.id, tile_type))
+                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/{}.png".format(project.id, task.id, tile_type, tile_path[tile_type]))
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
 
                 with Image.open(io.BytesIO(res.content)) as i:
@@ -484,7 +493,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Can access retina tiles
             for tile_type in tile_types:
-                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185@2x.png".format(project.id, task.id, tile_type))
+                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/{}@2x.png".format(project.id, task.id, tile_type, tile_path[tile_type]))
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
 
                 with Image.open(io.BytesIO(res.content)) as i:
@@ -493,6 +502,12 @@ class TestApiTask(BootTransactionTestCase):
 
             # Cannot access tile 0/0/0
             res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/0/0/0.png".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+            # Cannot access zoom levels outside of the allowed zoom levels
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/32042/46185.png".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/18/32042/46185.png".format(project.id, task.id))
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
             # Can access hillshade, formulas, bands, rescale, color_map
@@ -531,7 +546,7 @@ class TestApiTask(BootTransactionTestCase):
                     params.append(("orthophoto", "formula={}&bands={}&color_map=rdylgn".format(k, f), status.HTTP_200_OK))
 
             for tile_type, url, sc in params:
-                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png?{}".format(project.id, task.id, tile_type, url))
+                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/{}.png?{}".format(project.id, task.id, tile_type, tile_path[tile_type], url))
                 self.assertEqual(res.status_code, sc)
 
             # Another user does not have access to the resources
@@ -543,7 +558,7 @@ class TestApiTask(BootTransactionTestCase):
                     res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles.json".format(project.id, task.id, tile_type))
                     self.assertEqual(res.status_code, expectedStatus)
 
-                res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles/17/32042/46185.png".format(project.id, task.id, tile_type))
+                res = other_client.get("/api/projects/{}/tasks/{}/{}/tiles/{}.png".format(project.id, task.id, tile_type, tile_path[tile_type]))
                 self.assertEqual(res.status_code, expectedStatus)
 
                 res = other_client.get("/api/projects/{}/tasks/{}/".format(project.id, task.id))
