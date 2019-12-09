@@ -24,6 +24,7 @@ fi
 MIN_CONTOUR_LENGTH=5
 
 r.external input="${dem_file}" output=dem --overwrite
+g.region raster=dem
 r.contour input=dem output=contours step=${interval} --overwrite
 v.generalize --overwrite input=contours output=contours_smooth method=douglas threshold=${simplify}
 v.generalize --overwrite input=contours_smooth output=contours_simplified method=chaiken threshold=1

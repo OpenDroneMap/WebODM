@@ -143,4 +143,4 @@ def execute_grass_script(script, serialized_context = {}):
         ctx = grass.create_context(serialized_context)
         return {'output': ctx.execute(script), 'context': ctx.serialize()}
     except GrassEngineException as e:
-        return {'error': str(e)}
+        return {'error': str(e), 'context': ctx.serialize()}

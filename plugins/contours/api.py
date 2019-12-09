@@ -29,7 +29,7 @@ class TaskContoursGenerate(TaskView):
             else:
                 raise GrassEngineException('{} is not a valid layer.'.format(layer))
 
-            context = grass.create_context({'auto_cleanup' : False})
+            context = grass.create_context({'auto_cleanup' : False, 'location': 'epsg:3857'})
             epsg = int(request.data.get('epsg', '3857'))
             interval = float(request.data.get('interval', 1))
             format = request.data.get('format', 'GPKG')
@@ -43,8 +43,6 @@ class TaskContoursGenerate(TaskView):
             context.add_param('format', format)
             context.add_param('simplify', simplify)
             context.add_param('epsg', epsg)
-            #context.set_location('epsg:' + str(epsg))
-            context.set_location(dem)
 
             celery_task_id = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
@@ -63,12 +61,12 @@ class TaskContoursCheck(TaskView):
         else:
             result = res.get()
             if result.get('error', None) is not None:
-                cleanup_grass_context(result['context'])
+                #cleanup_grass_context(result['context'])
                 return Response({'ready': True, 'error': result['error']})
 
             contours_file = result.get('output')
             if not contours_file or not os.path.exists(contours_file):
-                cleanup_grass_context(result['context'])
+                #cleanup_grass_context(result['context'])
                 return Response({'ready': True, 'error': 'Contours file could not be generated. This might be a bug.'})
 
             request.session['contours_' + celery_task_id] = contours_file
