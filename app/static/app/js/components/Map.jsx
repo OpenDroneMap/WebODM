@@ -7,7 +7,6 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
-import '../vendor/leaflet/L.TileLayer.NoGap';
 import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
