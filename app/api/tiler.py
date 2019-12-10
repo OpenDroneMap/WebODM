@@ -17,10 +17,13 @@ from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
 
+ZOOM_EXTRA_LEVELS = 2
+
 def get_zoom_safe(src_dst):
     minzoom, maxzoom = get_zooms(src_dst)
     if maxzoom < minzoom:
         maxzoom = minzoom
+
     return minzoom, maxzoom
 
 def get_tile_url(task, tile_type, query_params):
@@ -113,8 +116,8 @@ class TileJson(TaskNestedView):
             'version': '1.0.0',
             'scheme': 'xyz',
             'tiles': [get_tile_url(task, tile_type, self.request.query_params)],
-            'minzoom': minzoom,
-            'maxzoom': maxzoom,
+            'minzoom': minzoom - ZOOM_EXTRA_LEVELS,
+            'maxzoom': maxzoom + ZOOM_EXTRA_LEVELS,
             'bounds': get_extent(task, tile_type).extent
         })
 
@@ -206,32 +209,34 @@ class Metadata(TaskNestedView):
 
         if info['maxzoom'] < info['minzoom']:
             info['maxzoom'] = info['minzoom']
+        info['maxzoom'] += ZOOM_EXTRA_LEVELS
+        info['minzoom'] -= ZOOM_EXTRA_LEVELS
 
         return Response(info)
 
-def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata):
+def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata, resampling_method):
     tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
 
     try:
-        left, _ = main.tile(url, x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        left, _ = main.tile(url, x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata, resampling_method=resampling_method)
         tile[tilesize:tilesize*2,0:tilesize] = left
     except TileOutsideBounds:
         pass
 
     try:
-        right, _ = main.tile(url, x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        right, _ = main.tile(url, x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata, resampling_method=resampling_method)
         tile[tilesize:tilesize*2,tilesize*2:tilesize*3] = right
     except TileOutsideBounds:
         pass
 
     try:
-        bottom, _ = main.tile(url, x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        bottom, _ = main.tile(url, x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata, resampling_method=resampling_method)
         tile[tilesize*2:tilesize*3,tilesize:tilesize*2] = bottom
     except TileOutsideBounds:
         pass
 
     try:
-        top, _ = main.tile(url, x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata)
+        top, _ = main.tile(url, x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata, resampling_method=resampling_method)
         tile[0:tilesize,tilesize:tilesize*2] = top
     except TileOutsideBounds:
         pass
@@ -276,6 +281,10 @@ class Tiles(TaskNestedView):
         except ValueError as e:
             raise exceptions.ValidationError(str(e))
 
+        resampling = "nearest"
+        if tile_type in ['dsm', 'dtm']:
+            resampling = "bilinear"
+
         if tile_type in ['dsm', 'dtm'] and rescale is None:
             rescale = "0,1000"
 
@@ -299,17 +308,17 @@ class Tiles(TaskNestedView):
 
         with rasterio.open(url) as src:
             minzoom, maxzoom = get_zoom_safe(src)
-            if z < minzoom or z > maxzoom:
+            if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
 
         try:
             if expr is not None:
                 tile, mask = expression(
-                    url, x, y, z, expr=expr, tilesize=tilesize, nodata=nodata
+                    url, x, y, z, expr=expr, tilesize=tilesize, nodata=nodata, resampling_method=resampling
                 )
             else:
                 tile, mask = main.tile(
-                    url, x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata
+                    url, x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata, resampling_method=resampling
                 )
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
@@ -346,7 +355,7 @@ class Tiles(TaskNestedView):
 
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
-            elevation = get_elevation_tiles(tile[0], url, x, y, z, tilesize, nodata)
+            elevation = get_elevation_tiles(tile[0], url, x, y, z, tilesize, nodata, resampling)
             intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
             intensity = intensity[tilesize:tilesize*2,tilesize:tilesize*2]
 

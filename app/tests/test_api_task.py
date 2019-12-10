@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from app import pending_actions
 from app.api.formulas import algos, get_camera_filters_for
+from app.api.tiler import ZOOM_EXTRA_LEVELS
 from app.cogeo import valid_cogeo
 from app.models import Project, Task, ImageUpload
 from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
@@ -388,8 +389,8 @@ class TestApiTask(BootTransactionTestCase):
             for f in fields:
                 self.assertTrue(f in metadata)
 
-            self.assertEqual(metadata['minzoom'], 17)
-            self.assertEqual(metadata['maxzoom'], 17)
+            self.assertEqual(metadata['minzoom'], 17 - ZOOM_EXTRA_LEVELS)
+            self.assertEqual(metadata['maxzoom'], 17 + ZOOM_EXTRA_LEVELS)
 
             # Colormaps and algorithms should be empty lists
             self.assertEqual(metadata['algorithms'], [])
@@ -505,9 +506,9 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
             # Cannot access zoom levels outside of the allowed zoom levels
-            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/32042/46185.png".format(project.id, task.id))
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/14/32042/46185.png".format(project.id, task.id))
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
-            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/18/32042/46185.png".format(project.id, task.id))
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/20/32042/46185.png".format(project.id, task.id))
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
             # Can access hillshade, formulas, bands, rescale, color_map
