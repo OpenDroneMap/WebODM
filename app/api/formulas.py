@@ -58,11 +58,13 @@ algos = {
     },
     'LAI': {
         'expr': '3.618 * (2.5 * (N - R) / (N + 6*R - 7.5*B + 1)) * 0.118',
-        'help': 'Leaf Area Index estimates foliage areas and predicts crop yields.'
+        'help': 'Leaf Area Index estimates foliage areas and predicts crop yields.',
+        'range': (-1, 1)
     },
     'EVI': {
         'expr': '2.5 * (N - R) / (N + 6*R - 7.5*B + 1)',
-        'help': 'Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'
+        'help': 'Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.',
+        'range': (-1, 1)
     },
 
     # more?

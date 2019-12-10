@@ -7,6 +7,7 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+// import '../vendor/leaflet/L.TileLayer.NoGap';
 import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
@@ -96,7 +97,7 @@ class Map extends React.Component {
         let metaUrl = url + "metadata";
 
         if (type == "plant") metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
-        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=3&color_map=jet_r";
+        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=3&color_map=jet";
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
@@ -233,7 +234,10 @@ class Map extends React.Component {
       
       Basemaps.forEach((src, idx) => {
         const { url, ...props } = src;
-        const layer = L.tileLayer(url, props);
+        const tileProps = Utils.clone(props);
+        tileProps.maxNativeZoom = tileProps.maxZoom;
+        tileProps.maxZoom = tileProps.maxZoom + 99;
+        const layer = L.tileLayer(url, tileProps);
 
         if (idx === 0) {
           layer.addTo(this.map);
@@ -255,7 +259,8 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
         if (url){
           customLayer.clearLayers();
           const l = L.tileLayer(url, {
-            maxZoom: 24,
+            maxNativeZoom: 24,
+            maxZoom: 99,
             minZoom: 0
           });
           customLayer.addLayer(l);

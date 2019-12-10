@@ -115,6 +115,11 @@ export default class Histogram extends React.Component {
             return [band.histogram[1][i], e];
         });
 
+        // Make sure histogram starts and ends at 0
+        // to prevent oblique looking charts
+        data.unshift([data[0][0], 0]);
+        data.push([data[data.length - 1][0], 0]);
+
         // Plot the area
         svg.append('g')
            .append("path")
