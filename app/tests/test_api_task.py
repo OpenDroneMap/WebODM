@@ -438,7 +438,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Colormap is for algorithms
             self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'rdylgn']), 1)
-            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet_r']), 0)
+            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet']), 0)
 
             # Formula parameters are copied to tile URL
             self.assertTrue(metadata['tiles'][0].endswith('?formula=NDVI&bands=RGN'))
@@ -473,7 +473,7 @@ class TestApiTask(BootTransactionTestCase):
 
                 # Colormaps are for elevation
                 self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'rdylgn']), 0)
-                self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet_r']), 1)
+                self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet']), 1)
 
                 # Algorithms are empty
                 self.assertEqual(len(metadata['algorithms']), 0)
@@ -513,11 +513,11 @@ class TestApiTask(BootTransactionTestCase):
 
             # Can access hillshade, formulas, bands, rescale, color_map
             params = [
-                ("dsm", "color_map=jet_r&hillshade=3&rescale=150,170", status.HTTP_200_OK),
-                ("dsm", "color_map=jet_r&hillshade=0&rescale=150,170", status.HTTP_200_OK),
+                ("dsm", "color_map=jet&hillshade=3&rescale=150,170", status.HTTP_200_OK),
+                ("dsm", "color_map=jet&hillshade=0&rescale=150,170", status.HTTP_200_OK),
                 ("dsm", "color_map=invalid&rescale=150,170", status.HTTP_400_BAD_REQUEST),
-                ("dsm", "color_map=jet_r&rescale=invalid", status.HTTP_400_BAD_REQUEST),
-                ("dsm", "color_map=jet_r&rescale=150,170&hillshade=invalid", status.HTTP_400_BAD_REQUEST),
+                ("dsm", "color_map=jet&rescale=invalid", status.HTTP_400_BAD_REQUEST),
+                ("dsm", "color_map=jet&rescale=150,170&hillshade=invalid", status.HTTP_400_BAD_REQUEST),
 
                 ("dtm", "hillshade=3", status.HTTP_200_OK),
                 ("dtm", "hillshade=99999999999999999999999999999999999", status.HTTP_200_OK),

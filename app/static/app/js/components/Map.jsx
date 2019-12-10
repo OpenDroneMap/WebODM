@@ -97,7 +97,7 @@ class Map extends React.Component {
         let metaUrl = url + "metadata";
 
         if (type == "plant") metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
-        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=3&color_map=jet_r";
+        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=3&color_map=jet";
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
