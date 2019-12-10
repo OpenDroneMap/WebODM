@@ -11,7 +11,7 @@ v.buffer -s --overwrite input=polygon_area type=area output=region distance=1 mi
 r.external input=${dsm_file} output=dsm --overwrite
 
 # Set Grass region to vector bbox
-g.region vector=region
+g.region vector=region res=0.01
 
 # Create a mask to speed up computation
 r.mask vect=region
@@ -26,7 +26,7 @@ v.surf.rst --overwrite input=polygon_points zcolumn=height elevation=dsm_below_p
 r.mapcalc expression='pile_height_above_dsm=dsm-dsm_below_pile' --overwrite
 
 # Set region to polygon area to calculate volume
-g.region vect=polygon_area
+g.region vect=polygon_area res=0.01
 
 # Volume output from difference
 r.volume -f input=pile_height_above_dsm
