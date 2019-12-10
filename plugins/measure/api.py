@@ -50,7 +50,7 @@ class TaskVolume(TaskView):
                 # Correct scale measurement for web mercator
                 # https://gis.stackexchange.com/questions/93332/calculating-distance-scale-factor-by-latitude-for-mercator#93335
                 latitude = task.dsm_extent.centroid[1]
-                scale_factor = (math.cos(math.radians(latitude))) ** 2
+                scale_factor = math.cos(math.radians(latitude)) ** 2
 
                 volume = abs(float(cols[6]) * scale_factor)
                 return Response({'volume': str(volume)}, status=status.HTTP_200_OK)
