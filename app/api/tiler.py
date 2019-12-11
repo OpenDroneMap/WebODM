@@ -214,13 +214,7 @@ class Metadata(TaskNestedView):
 
         return Response(info)
 
-def get_elevation_tiles(url, x, y, z, indexes, tilesize, nodata):
-    resampling = "bilinear"
-    padding = 16
-
-    elevation, _ = main.tile(url, x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata,
-                            resampling_method=resampling, tile_edge_padding=padding)
-
+def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata, resampling, padding):
     tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
 
     try:
@@ -317,14 +311,20 @@ class Tiles(TaskNestedView):
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
 
+        resampling="nearest"
+        padding=0
+        if tile_type in ["dsm", "dtm"]:
+            resampling="bilinear"
+            padding=16
+
         try:
             if expr is not None:
                 tile, mask = expression(
-                    url, x, y, z, expr=expr, tilesize=tilesize, nodata=nodata, tile_edge_padding=0, resampling_method="nearest"
+                    url, x, y, z, expr=expr, tilesize=tilesize, nodata=nodata, tile_edge_padding=padding, resampling_method=resampling
                 )
             else:
                 tile, mask = main.tile(
-                    url, x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata, tile_edge_padding=0, resampling_method="nearest"
+                    url, x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata, tile_edge_padding=padding, resampling_method=resampling
                 )
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
@@ -360,7 +360,7 @@ class Tiles(TaskNestedView):
 
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
-            elevation = get_elevation_tiles(url, x, y, z, indexes, tilesize, nodata)
+            elevation = get_elevation_tiles(tile[0], url, x, y, z, tilesize, nodata, resampling, padding)
             intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
             intensity = intensity[tilesize:tilesize*2,tilesize:tilesize*2]
 
