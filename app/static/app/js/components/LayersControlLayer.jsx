@@ -251,8 +251,8 @@ export default class LayersControlLayer extends React.Component {
                 <div className="col-sm-9 ">
                     <select className="form-control" value={hillshade} onChange={this.handleSelectHillshade}>
                         <option value="0">None</option>
-                        <option value="3">Normal</option>
-                        <option value="6">Extruded</option>
+                        <option value="6">Normal</option>
+                        <option value="18">Extruded</option>
                     </select>
                 </div>
             </div> : ""}
