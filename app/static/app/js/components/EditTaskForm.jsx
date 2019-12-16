@@ -504,14 +504,14 @@ class EditTaskForm extends React.Component {
         {!this.state.presetActionPerforming ?
         <div className="btn-group presets-dropdown">
             <button type="button" className="btn btn-default" onClick={this.handleEditPreset}>
-            <i className="fa fa-sliders"></i>
+            <i className="fa fa-sliders-h"></i>
             </button>
             <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
                 <span className="caret"></span>
             </button>
             <ul className="dropdown-menu">
             <li>
-                <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders"></i> Edit</a>
+                <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders-h"></i> Edit</a>
             </li>
             <li className="divider"></li>
 
