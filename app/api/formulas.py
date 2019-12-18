@@ -10,6 +10,14 @@ algos = {
         'expr': '(N - R) / (N + R)',
         'help': 'Normalized Difference Vegetation Index shows the amount of green vegetation.'
     },
+    'NDVI (Blue)': {
+        'expr': '(N - B) / (N + B)',
+        'help': 'Normalized Difference Vegetation Index shows the amount of green vegetation.'
+    },
+    'ENDVI':{
+        'expr': '((N + G) - (2 * B)) / ((N + G) + (2 * B))',
+        'help': 'Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue and Green bands instead of only Red to isolate plant health.'
+    },
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
         'help': 'Visual Atmospheric Resistance Index shows the areas of vegetation.',
@@ -82,8 +90,8 @@ algos = {
 camera_filters = [
     'RGB',
     'RGN',
-    'NRG',
     'NGB',
+    'NRG',
     'NRB',
 
     # more?
