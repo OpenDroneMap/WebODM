@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, "/webodm/tmp/rio-tiler")
-
 import rasterio
 from rasterio.enums import ColorInterp
 import urllib
