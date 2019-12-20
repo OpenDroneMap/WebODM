@@ -163,7 +163,6 @@ class Metadata(TaskNestedView):
                 band_count = src.meta['count']
                 if has_alpha_band(src):
                     band_count -= 1
-                print(band_count)
 
                 info = main.metadata(src, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
         except IndexError as e:
