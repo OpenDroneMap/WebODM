@@ -1,11 +1,15 @@
+import sys
+sys.path.insert(0, "/webodm/tmp/rio-tiler")
+
 import rasterio
+from rasterio.enums import ColorInterp
 import urllib
 import os
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
 from rio_tiler import main
-from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap
+from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap, has_alpha_band
 from rio_tiler.profiles import img_profiles
 
 import numpy as np
@@ -158,7 +162,13 @@ class Metadata(TaskNestedView):
             raise exceptions.NotFound()
 
         try:
-            info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
+            with rasterio.open(raster_path, "r") as src:
+                band_count = src.meta['count']
+                if has_alpha_band(src):
+                    band_count -= 1
+                print(band_count)
+
+                info = main.metadata(src, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata
             raise exceptions.ValidationError("Cannot retrieve raster metadata: %s" % str(e))
@@ -186,7 +196,7 @@ class Metadata(TaskNestedView):
             colormaps = ['jet', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r']
-            algorithms = *get_algorithm_list(),
+            algorithms = *get_algorithm_list(band_count),
 
         info['color_maps'] = []
         info['algorithms'] = algorithms
@@ -308,8 +318,28 @@ class Tiles(TaskNestedView):
 
         with rasterio.open(url) as src:
             minzoom, maxzoom = get_zoom_safe(src)
+            has_alpha = has_alpha_band(src)
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
+
+            # Handle N-bands datasets
+            if tile_type == 'orthophoto':
+                ci = src.colorinterp
+
+                # More than 4 bands?
+                if len(ci) > 4:
+                    # Try to find RGBA band order
+                    if ColorInterp.red in ci and \
+                        ColorInterp.green in ci and \
+                        ColorInterp.blue in ci: # and ColorInterp.alpha in ci:
+                        indexes = (ci.index(ColorInterp.red) + 1,
+                                   ci.index(ColorInterp.green) + 1,
+                                   ci.index(ColorInterp.blue) + 1,)
+                        # TODO: adding alpha band should fix black backgrounds
+                        # but the tiles disappear. Probable bug in rasterio/GDAL
+                    else:
+                        # Fallback to first four
+                        indexes = (1, 2, 3, ) # , 4, )
 
         resampling="nearest"
         padding=0
@@ -330,7 +360,7 @@ class Tiles(TaskNestedView):
             raise exceptions.NotFound("Outside of bounds")
 
         # Use alpha channel for transparency, don't use the mask if one is provided (redundant)
-        if tile.shape[0] == 4:
+        if has_alpha and expr is None:
             mask = None
 
         if color_map:
