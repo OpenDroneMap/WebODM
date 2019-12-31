@@ -1,6 +1,6 @@
 import os
-
 import json
+import math
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
@@ -47,7 +47,13 @@ class TaskVolume(TaskView):
             output = result.get('output', '')
             cols = output.split(':')
             if len(cols) == 7:
-                return Response({'volume': str(abs(float(cols[6])))}, status=status.HTTP_200_OK)
+                # Correct scale measurement for web mercator
+                # https://gis.stackexchange.com/questions/93332/calculating-distance-scale-factor-by-latitude-for-mercator#93335
+                latitude = task.dsm_extent.centroid[1]
+                scale_factor = math.cos(math.radians(latitude)) ** 2
+
+                volume = abs(float(cols[6]) * scale_factor)
+                return Response({'volume': str(volume)}, status=status.HTTP_200_OK)
             else:
                 raise GrassEngineException(output)
         except GrassEngineException as e:

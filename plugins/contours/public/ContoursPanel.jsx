@@ -257,7 +257,7 @@ export default class ContoursPanel extends React.Component {
                       (simplify === "custom" && !customSimplify);
 
     let content = "";
-    if (loading) content = (<span><i className="fa fa-circle-o-notch fa-spin"></i> Loading...</span>);
+    if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> Loading...</span>);
     else if (permanentError) content = (<div className="alert alert-warning">{permanentError}</div>);
     else{
       content = (<div>
@@ -335,12 +335,12 @@ export default class ContoursPanel extends React.Component {
           <div className="col-sm-9 text-right">
             <button onClick={this.handleShowPreview}
                     disabled={disabled || previewLoading} type="button" className="btn btn-sm btn-primary btn-preview">
-              {previewLoading ? <i className="fa fa-spin fa-circle-o-notch"/> : <i className="glyphicon glyphicon-eye-open"/>} Preview
+              {previewLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-eye-open"/>} Preview
             </button>
 
             <div className="btn-group">
               <button disabled={disabled || exportLoading} type="button" className="btn btn-sm btn-primary" data-toggle="dropdown">
-                {exportLoading ? <i className="fa fa-spin fa-circle-o-notch"/> : <i className="glyphicon glyphicon-download" />} Export
+                {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-download" />} Export
               </button>
               <button disabled={disabled|| exportLoading} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
               <ul className="dropdown-menu  pull-right">
@@ -351,7 +351,7 @@ export default class ContoursPanel extends React.Component {
                 </li>
                 <li>
                   <a href="javascript:void(0);" onClick={this.handleExport("DXF")}>
-                    <i className="fa fa-file-o fa-fw"></i> AutoCAD (.DXF)
+                    <i className="far fa-file fa-fw"></i> AutoCAD (.DXF)
                   </a>
                 </li>
                 <li>
@@ -361,7 +361,7 @@ export default class ContoursPanel extends React.Component {
                 </li>
                 <li>
                   <a href="javascript:void(0);" onClick={this.handleExport("ESRI Shapefile")}>
-                    <i className="fa fa-file-zip-o fa-fw"></i> ShapeFile (.SHP)
+                    <i className="far fa-file-archive fa-fw"></i> ShapeFile (.SHP)
                   </a>
                 </li>
               </ul>

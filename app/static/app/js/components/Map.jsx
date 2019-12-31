@@ -7,6 +7,7 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+// import '../vendor/leaflet/L.TileLayer.NoGap';
 import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
@@ -18,25 +19,21 @@ import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
+import LayersControl from './LayersControl';
 import update from 'immutability-helper';
+import Utils from '../classes/Utils';
 
 class Map extends React.Component {
   static defaultProps = {
-    maxzoom: 18,
-    minzoom: 0,
     showBackground: false,
-    opacity: 100,
     mapType: "orthophoto",
     public: false
   };
 
   static propTypes = {
-    maxzoom: PropTypes.number,
-    minzoom: PropTypes.number,
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
-    opacity: PropTypes.number,
-    mapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
+    mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool
   };
 
@@ -47,10 +44,12 @@ class Map extends React.Component {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
       pluginActionButtons: [],
-      showLoading: false
+      showLoading: false, // for drag&drop of files
+      opacity: 100,
+      imageryLayers: [],
+      overlays: []
     };
 
-    this.imageryLayers = [];
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
@@ -58,6 +57,12 @@ class Map extends React.Component {
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
+  }
+
+  updateOpacity = (evt) => {
+    this.setState({
+      opacity: parseFloat(evt.target.value),
+    });
   }
 
   updatePopupFor(layer){
@@ -76,38 +81,64 @@ class Map extends React.Component {
     // and keep track of which ones were selected
     const prevSelectedLayers = [];
 
-    this.imageryLayers.forEach(layer => {
-      this.autolayers.removeLayer(layer);
+    this.state.imageryLayers.forEach(layer => {
       if (this.map.hasLayer(layer)) prevSelectedLayers.push(layerId(layer));
       layer.remove();
     });
-    this.imageryLayers = [];
+    this.setState({imageryLayers: []});
 
     // Request new tiles
     return new Promise((resolve, reject) => {
       this.tileJsonRequests = [];
 
       async.each(tiles, (tile, done) => {
-        const { url, meta } = tile;
+        const { url, meta, type } = tile;
+        
+        let metaUrl = url + "metadata";
 
-        this.tileJsonRequests.push($.getJSON(url)
-          .done(info => {
+        if (type == "plant") metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
+        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=6&color_map=jet";
+
+        this.tileJsonRequests.push($.getJSON(metaUrl)
+          .done(mres => {
+            const { scheme, name, maxzoom, statistics } = mres;
+
             const bounds = Leaflet.latLngBounds(
-                [info.bounds.slice(0, 2).reverse(), info.bounds.slice(2, 4).reverse()]
+                [mres.bounds.value.slice(0, 2).reverse(), mres.bounds.value.slice(2, 4).reverse()]
               );
-            const layer = Leaflet.tileLayer(info.tiles[0], {
+
+            // Build URL
+            let tileUrl = mres.tiles[0];
+
+            // Certain types need the rescale parameter
+            if (["plant", "dsm", "dtm"].indexOf(type) !== -1 && statistics){
+                const params = Utils.queryParams({search: tileUrl.slice(tileUrl.indexOf("?"))});
+                if (statistics["1"]){
+                    // Add rescale
+                    params["rescale"] = encodeURIComponent(`${statistics["1"]["min"]},${statistics["1"]["max"]}`);              
+                }else{
+                    console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
+                    params["rescale"] = encodeURIComponent("-1,1");
+                }
+                
+                tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
+            }
+
+            const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,
-                  minZoom: info.minzoom,
-                  maxZoom: L.Browser.retina ? (info.maxzoom + 1) : info.maxzoom,
-                  maxNativeZoom: L.Browser.retina ? (info.maxzoom - 1) : info.maxzoom,
-                  tms: info.scheme === 'tms',
-                  opacity: this.props.opacity / 100,
+                  minZoom: 0,
+                  maxZoom: maxzoom + 99,
+                  maxNativeZoom: maxzoom,
+                  tms: scheme === 'tms',
+                  opacity: this.state.opacity / 100,
                   detectRetina: true
                 });
             
             // Associate metadata with this layer
-            meta.name = info.name;
+            meta.name = name;
+            meta.metaUrl = metaUrl;
             layer[Symbol.for("meta")] = meta;
+            layer[Symbol.for("tile-meta")] = mres;
 
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
               layer.addTo(this.map);
@@ -131,12 +162,12 @@ class Map extends React.Component {
             var popup = L.DomUtil.create('div', 'infoWindow');
 
             popup.innerHTML = `<div class="title">
-                                    ${info.name}
+                                    ${name}
                                 </div>
                                 <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
                                 <ul class="asset-links loading">
-                                    <li><i class="fa fa-spin fa-refresh fa-spin fa-fw"></i></li>
+                                    <li><i class="fa fa-spin fa-sync fa-spin fa-fw"></i></li>
                                 </ul>
 
                                 <button
@@ -152,14 +183,13 @@ class Map extends React.Component {
                 layer.setOpacity($('#layerOpacity', popup).val());
             });
             
-            this.imageryLayers.push(layer);
+            this.setState(update(this.state, {
+                imageryLayers: {$push: [layer]}
+            }));
 
             let mapBounds = this.mapBounds || Leaflet.latLngBounds();
             mapBounds.extend(bounds);
             this.mapBounds = mapBounds;
-
-            // Add layer to layers control
-            this.autolayers.addOverlay(layer, info.name);
 
             done();
           })
@@ -168,42 +198,21 @@ class Map extends React.Component {
       }, err => {
         if (err){
           this.setState({error: err.message || JSON.stringify(err)});
-          reject(err);
-        }else{
-          resolve();
         }
+        resolve();
       });
     });
   }
 
   componentDidMount() {
-    var mapTempLayerDrop = new Dropzone(this.container, {url : "/", clickable : false});
-    mapTempLayerDrop.on("addedfile", (file) => {
-      this.setState({showLoading: true});
-      addTempLayer(file, (err, tempLayer, filename) => {
-        if (!err){
-          tempLayer.addTo(this.map);
-          //add layer to layer switcher with file name
-          this.autolayers.addOverlay(tempLayer, filename);
-          //zoom to all features
-          this.map.fitBounds(tempLayer.getBounds());
-        }else{
-          this.setState({ error: err.message || JSON.stringify(err) });
-        }
-
-        this.setState({showLoading: false});
-      });
-    });
-    mapTempLayerDrop.on("error", function(file) {
-      mapTempLayerDrop.removeFile(file);
-    });
-    
     const { showBackground, tiles } = this.props;
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
       positionControl: true,
-      zoomControl: false
+      zoomControl: false,
+      minZoom: 0,
+      maxZoom: 24
     });
 
     PluginsAPI.Map.triggerWillAddControls({
@@ -225,7 +234,10 @@ class Map extends React.Component {
       
       Basemaps.forEach((src, idx) => {
         const { url, ...props } = src;
-        const layer = L.tileLayer(url, props);
+        const tileProps = Utils.clone(props);
+        tileProps.maxNativeZoom = tileProps.maxZoom;
+        tileProps.maxZoom = tileProps.maxZoom + 99;
+        const layer = L.tileLayer(url, tileProps);
 
         if (idx === 0) {
           layer.addTo(this.map);
@@ -247,7 +259,8 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
         if (url){
           customLayer.clearLayers();
           const l = L.tileLayer(url, {
-            maxZoom: 21,
+            maxNativeZoom: 24,
+            maxZoom: 99,
             minZoom: 0
           });
           customLayer.addLayer(l);
@@ -258,11 +271,63 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       this.basemaps["None"] = L.layerGroup();
     }
 
+    this.layersControl = new LayersControl({
+        layers: this.state.imageryLayers,
+        overlays: this.state.overlays
+    }).addTo(this.map);
+
     this.autolayers = Leaflet.control.autolayers({
       overlays: {},
       selectedOverlays: [],
       baseLayers: this.basemaps
     }).addTo(this.map);
+
+    // Drag & Drop overlays
+    const addDnDZone = (container, opts) => {
+        const mapTempLayerDrop = new Dropzone(container, opts);
+        mapTempLayerDrop.on("addedfile", (file) => {
+          this.setState({showLoading: true});
+          addTempLayer(file, (err, tempLayer, filename) => {
+            if (!err){
+              tempLayer.addTo(this.map);
+              tempLayer[Symbol.for("meta")] = {name: filename};
+              this.setState(update(this.state, {
+                 overlays: {$push: [tempLayer]}
+              }));
+              //zoom to all features
+              this.map.fitBounds(tempLayer.getBounds());
+            }else{
+              this.setState({ error: err.message || JSON.stringify(err) });
+            }
+    
+            this.setState({showLoading: false});
+          });
+        });
+        mapTempLayerDrop.on("error", (file) => {
+          mapTempLayerDrop.removeFile(file);
+        });
+    };
+
+    addDnDZone(this.container, {url : "/", clickable : false});
+
+    const AddOverlayCtrl = Leaflet.Control.extend({
+        options: {
+            position: 'topright'
+        },
+    
+        onAdd: function () {
+            this.container = Leaflet.DomUtil.create('div', 'leaflet-control-add-overlay leaflet-bar leaflet-control');
+            Leaflet.DomEvent.disableClickPropagation(this.container);
+            const btn = Leaflet.DomUtil.create('a', 'leaflet-control-add-overlay-button');
+            btn.setAttribute("title", "Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay");
+            
+            this.container.append(btn);
+            addDnDZone(btn, {url: "/", clickable: true});
+            
+            return this.container;
+        }
+    });
+    new AddOverlayCtrl().addTo(this.map);
 
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");
@@ -272,7 +337,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
 
         this.map.on('click', e => {
           // Find first tile layer at the selected coordinates 
-          for (let layer of this.imageryLayers){
+          for (let layer of this.state.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
               this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
@@ -333,14 +398,19 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     });
   }
 
-  componentDidUpdate(prevProps) {
-    this.imageryLayers.forEach(imageryLayer => {
-      imageryLayer.setOpacity(this.props.opacity / 100);
+  componentDidUpdate(prevProps, prevState) {
+    this.state.imageryLayers.forEach(imageryLayer => {
+      imageryLayer.setOpacity(this.state.opacity / 100);
       this.updatePopupFor(imageryLayer);
     });
 
     if (prevProps.tiles !== this.props.tiles){
       this.loadImageryLayers();
+    }
+
+    if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
+                               prevState.overlays !== this.state.overlays)){
+        this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
   }
 
@@ -348,7 +418,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     this.map.remove();
 
     if (this.tileJsonRequests) {
-      this.tileJsonRequests.forEach(tileJsonRequest => this.tileJsonRequest.abort());
+      this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
       this.tileJsonRequests = [];
     }
   }
@@ -362,6 +432,10 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
+        <div className="opacity-slider theme-secondary hidden-xs">
+            Opacity: <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+        </div>
+
         <Standby 
             message="Loading..."
             show={this.state.showLoading}
@@ -371,9 +445,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}
           onMouseDown={this.handleMapMouseDown}
-          >
-        </div>
-        
+        />
 
         <div className="actionButtons">
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}

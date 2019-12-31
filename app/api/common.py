@@ -32,18 +32,6 @@ def get_and_check_project(request, project_pk, perms=('view_project',)):
     return project
 
 
-def get_tile_json(name, tiles, bounds):
-    return {
-        'tilejson': '2.1.0',
-        'name': name,
-        'version': '1.0.0',
-        'scheme': 'tms',
-        'tiles': tiles,
-        'minzoom': 0,
-        'maxzoom': 21,
-        'bounds': bounds
-    }
-
 def path_traversal_check(unsafe_path, known_safe_path):
     known_safe_path = os.path.abspath(known_safe_path)
     unsafe_path = os.path.abspath(unsafe_path)

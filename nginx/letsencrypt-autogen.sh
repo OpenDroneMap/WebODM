@@ -28,7 +28,7 @@ if [ $? -eq 0 ]; then
 fi
 
 # Generate/update certificate
-certbot certonly --tls-sni-01-port 8000 --http-01-port 8080 --work-dir ./letsencrypt --config-dir ./letsencrypt --logs-dir ./letsencrypt --standalone -d $DOMAIN --register-unsafely-without-email --agree-tos --keep
+certbot certonly --http-01-port 8080 --work-dir ./letsencrypt --config-dir ./letsencrypt --logs-dir ./letsencrypt --standalone -d $DOMAIN --register-unsafely-without-email --agree-tos --keep
 
 # Create ssl dir if necessary
 if [ ! -e ssl/ ]; then

@@ -88,7 +88,7 @@ class SharePopup extends React.Component{
 
             <label onClick={this.handleEnableSharing}>
               {this.state.togglingShare ? 
-                <i className="fa fa-refresh fa-spin fa-fw"></i>
+                <i className="fa fa-sync fa-spin fa-fw"></i>
               : ""}
 
               <input 

@@ -34,7 +34,7 @@ class TexturedModelMenu extends React.Component{
         return (<label><input 
                             type="checkbox" 
                             checked={this.state.showTexturedModel}
-                            onClick={this.handleClick}
+                            onChange={this.handleClick}
                         /> Show Model</label>);
     }
 }

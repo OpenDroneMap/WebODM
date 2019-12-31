@@ -14,7 +14,7 @@ class Plugin(PluginBase):
         self.name = PROJECT_NAME
 
     def main_menu(self):
-        return [Menu("Cesium ion", self.public_url(""), "fa-cesium fa fa-fw")]
+        return [Menu("Cesium Ion", self.public_url(""), "fa-cesium fa fa-fw")]
 
     def include_js_files(self):
         return ["load_buttons.js"]

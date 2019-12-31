@@ -75,7 +75,7 @@ class EditTaskPanel extends React.Component {
                     <button type="button" className="btn btn-sm btn-primary save" onClick={this.handleSave} disabled={this.state.saving || !this.state.editTaskFormLoaded}>
                         {this.state.saving ? 
                             <span>
-                                <i className="fa fa-circle-o-notch fa-spin"></i> Saving...
+                                <i className="fa fa-circle-notch fa-spin"></i> Saving...
                             </span>
                         :   <span>
                                 <i className="fa fa-edit"></i> Save

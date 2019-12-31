@@ -1,3 +1,6 @@
 # These are supported funding model platforms
 
-custom: https://www.opendronemap.org/webodm/download/
+github: pierotofy
+custom: 
+ - https://www.opendronemap.org/webodm/download/
+ - https://odmbook.com

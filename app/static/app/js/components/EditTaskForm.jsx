@@ -24,7 +24,8 @@ class EditTaskForm extends React.Component {
       onFormLoaded: PropTypes.func,
       onFormChanged: PropTypes.func,
       inReview: PropTypes.bool,
-      task: PropTypes.object
+      task: PropTypes.object,
+      suggestedTaskName: PropTypes.string,
   };
 
   constructor(props){
@@ -37,7 +38,7 @@ class EditTaskForm extends React.Component {
       presetError: "",
       presetActionPerforming: false,
 
-      name: props.task !== null ? (props.task.name || "") : "",
+      name: props.suggestedTaskName ? props.suggestedTaskName : (props.task !== null ? (props.task.name || "") : ""),
       loadedProcessingNodes: false,
       loadedPresets: false,
 
@@ -503,14 +504,14 @@ class EditTaskForm extends React.Component {
         {!this.state.presetActionPerforming ?
         <div className="btn-group presets-dropdown">
             <button type="button" className="btn btn-default" onClick={this.handleEditPreset}>
-            <i className="fa fa-sliders"></i>
+            <i className="fa fa-sliders-h"></i>
             </button>
             <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
                 <span className="caret"></span>
             </button>
             <ul className="dropdown-menu">
             <li>
-                <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders"></i> Edit</a>
+                <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders-h"></i> Edit</a>
             </li>
             <li className="divider"></li>
 
@@ -524,7 +525,7 @@ class EditTaskForm extends React.Component {
                 </li>
             }
             <li className={this.state.selectedPreset.system ? "disabled" : ""}>
-                <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash-o"></i> Delete</a>
+                <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash"></i> Delete</a>
             </li>
             </ul>
         </div>
@@ -569,7 +570,7 @@ class EditTaskForm extends React.Component {
         );
     }else{
       taskOptions = (<div className="form-group">
-          <div className="col-sm-offset-2 col-sm-10">Loading processing nodes and presets... <i className="fa fa-refresh fa-spin fa-fw"></i></div>
+          <div className="col-sm-offset-2 col-sm-10">Loading processing nodes and presets... <i className="fa fa-sync fa-spin fa-fw"></i></div>
         </div>);
     }
 

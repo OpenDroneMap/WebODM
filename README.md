@@ -39,8 +39,11 @@ A user-friendly, extendable application and [API](http://docs.webodm.org) for dr
 ## Getting Started
 
 * Install the following applications (if they are not installed already):
- - [Docker](https://www.docker.com/)
- - [Git](https://git-scm.com/downloads)
+  - [Git](https://git-scm.com/downloads)
+  - [Docker](https://www.docker.com/)
+  - [Docker-compose](https://docs.docker.com/compose/install/)
+  - Python
+  - Pip
 
 * Windows users have a choice between Docker Toolbox (Windows 10 Home or older) and Docker for Windows (Windows 10 Pro or newer). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes). 
 
@@ -88,9 +91,9 @@ Adding more processing nodes will allow you to run multiple jobs in parallel.
 
 You can also setup a [ClusterODM](https://github.com/OpenDroneMap/ClusterODM) node to run a single task across multiple machines with [distributed split-merge](https://docs.opendronemap.org/large.html#distributed-split-merge) and process dozen of thousands of images more quickly, with less memory.
 
-If you don't need the default "node-odm-1" node, simply pass the `--no-default-node` flag when starting WebODM:
+If you don't need the default "node-odm-1" node, simply pass `--default-nodes 0` flag when starting WebODM:
 
-`./webodm.sh restart --no-default-node`. 
+`./webodm.sh restart --default-nodes 0`. 
 
 Then from the web interface simply manually remove the "node-odm-1" node.
 
@@ -162,7 +165,7 @@ Your backup files will be stored in the newly created `backup` directory. Transf
 
 ```bash
 ls backup # --> appmedia.tar  dbdata.tar
-./webodm.sh start && ./webodm.sh down # Create volumes
+./webodm.sh down # Make sure WebODM is down
 docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/dbdata.tar"
 docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/appmedia.tar"
 ./webodm.sh start
@@ -280,7 +283,7 @@ There are many ways to contribute back to the project:
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
  - ⭐️ us on GitHub.
  - Spread the word about WebODM and OpenDroneMap on social media.
- - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer) or a [book](https://odmbook.com/).
+ - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
  - Become a contributor 🤘
 
 ## Become a Contributor

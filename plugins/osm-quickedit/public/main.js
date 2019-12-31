@@ -19,7 +19,7 @@ PluginsAPI.Map.addActionButton(function(options){
 					window.location.href = "https://www.openstreetmap.org/edit?editor=id#map=" + mapLocation + 
 											"&background=custom:" + url;
 				}
-			}, React.createElement("i", {className: "fa fa-map"}, ""), 
+			}, React.createElement("i", {className: "far fa-map"}, ""), 
 				" OSM Digitize");
 	}
 

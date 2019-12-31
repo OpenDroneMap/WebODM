@@ -24,7 +24,7 @@ export default {
             {
                 action: "mvs_texturing",
                 label: "Texturing",
-                icon: "fa fa-connectdevelop",
+                icon: "fab fa-connectdevelop",
                 beginsWith: "Running MVS Texturing Cell",
                 endsWith: "Running ODM Texturing Cell - Finished"
             },
@@ -38,14 +38,14 @@ export default {
             {
                 action: "odm_dem",
                 label: "DEM",
-                icon: "fa fa-area-chart",
+                icon: "fa fa-chart-area",
                 beginsWith: "Running ODM DEM Cell",
                 endsWith: "Running ODM DEM Cell - Finished"
             },
             {
                 action: "odm_orthophoto",
                 label: "Orthophoto",
-                icon: "fa fa-map-o",
+                icon: "far fa-image",
                 beginsWith: "Running ODM Orthophoto Cell",
                 endsWith: "Running ODM OrthoPhoto Cell - Finished"
             }

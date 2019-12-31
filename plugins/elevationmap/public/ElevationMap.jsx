@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import ReactDOM from 'ReactDOM';
-import React from 'react';
+import React from 'React';
 import PropTypes from 'prop-types';
 import './ElevationMap.scss';
 import ElevationMapPanel from './ElevationMapPanel';

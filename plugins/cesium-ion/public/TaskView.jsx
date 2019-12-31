@@ -182,7 +182,7 @@ export default class TaskView extends Component {
 											assets={available}
 											onSelect={this.onOpenUploadDialog}
 										>
-											Tile in Cesium ion
+											Tile in Cesium Ion
 										</IonAssetButton>
 									)}
 
@@ -193,7 +193,7 @@ export default class TaskView extends Component {
 												data
 											)}
 										>
-											View in Cesium ion
+											View in Cesium Ion
 										</IonAssetButton>
 									)}
 									{items.length <= 0 && (

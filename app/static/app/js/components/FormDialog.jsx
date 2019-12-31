@@ -151,7 +151,7 @@ class FormDialog extends React.Component {
                         <button type="button" className="btn btn-primary save" onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
                                 <span>
-                                    <i className="fa fa-circle-o-notch fa-spin"></i> {this.props.savingLabel}
+                                    <i className="fa fa-circle-notch fa-spin"></i> {this.props.savingLabel}
                                 </span>
                             :   <span>
                                     <i className={this.props.saveIcon}></i> {this.props.saveLabel}
@@ -166,7 +166,7 @@ class FormDialog extends React.Component {
                                 onClick={this.handleDelete}>
                                 {this.state.deleting ? 
                                     <span>
-                                        <i className="fa fa-circle-o-notch fa-spin"></i> Deleting...
+                                        <i className="fa fa-circle-notch fa-spin"></i> Deleting...
                                     </span>
                                 :   <span>
                                         <i className="glyphicon glyphicon-trash"></i> Delete

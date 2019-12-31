@@ -87,7 +87,7 @@ class ProjectList extends Paginated {
 
     render() {
         if (this.state.loading){
-            return (<div className="project-list">Loading projects... <i className="fa fa-refresh fa-spin fa-fw"></i></div>);
+            return (<div className="project-list">Loading projects... <i className="fa fa-sync fa-spin fa-fw"></i></div>);
         }else{
             return (<div className="project-list">
                 <ErrorMessage bind={[this, 'error']} />

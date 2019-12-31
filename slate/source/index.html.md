@@ -19,6 +19,7 @@ includes:
  - reference/task
  - reference/processingnode
  - reference/permissions
+ - reference/admin
  - reference/handlingerrors
  - fordevelopers
 

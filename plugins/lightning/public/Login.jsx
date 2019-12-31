@@ -105,7 +105,7 @@ export default class Login extends React.Component {
                     </div>
                     <p><button className="btn btn-primary" onClick={this.handleLogin} disabled={this.state.loggingIn}>
                         {this.state.loggingIn ? 
-                        <span><i className="fa fa-spin fa-circle-o-notch"></i></span> : 
+                        <span><i className="fa fa-spin fa-circle-notch"></i></span> : 
                         <span><i className="fa fa-lock"></i> Login and Sync</span>}
                     </button></p>
                 </div>

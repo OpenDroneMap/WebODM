@@ -1,6 +1,23 @@
 .map{
     position: relative; 
 
+    .opacity-slider{
+        border-radius: 4px;
+        text-align: center;
+        width: 220px;
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        margin-left: -100px;
+        z-index: 999;
+        padding-bottom: 6px;
+    }
+
+    .leaflet-control-layers-toggle{
+        border-radius: 1px;
+        background: url(../icons/basemap.svg) 5px 5px no-repeat;
+    }
+
     .leaflet-popup-content{
         .title{
             font-weight: bold;
@@ -59,5 +76,22 @@
 
     .standby{
         z-index: 1000;
+    }
+
+    .leaflet-control-add-overlay{
+        z-index: 999;
+      
+        a.leaflet-control-add-overlay-button{
+          background: url(../icons/dragndrop-add.svg) 0 0 no-repeat;
+          background-size: 26px 26px;
+          border-radius: 2px;
+          &:hover{
+              cursor: pointer;
+          }
+        }
+      
+    }
+    .leaflet-touch .leaflet-control-add-overlay a {
+        background-position: 2px 2px;
     }
 }
