@@ -38,6 +38,8 @@ A user-friendly, extendable application and [API](http://docs.webodm.org) for dr
 
 ## Getting Started
 
+**Notice:** Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer). This is not required, but it helps fund the project and makes the installation process easier.
+
 * Install the following applications (if they are not installed already):
   - [Git](https://git-scm.com/downloads)
   - [Docker](https://www.docker.com/)
@@ -78,8 +80,6 @@ To update WebODM to the latest version use:
 ```
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
-
-For Windows and macOS users an [installer](https://www.webodm.org/installer) is also available.
 
 You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
 
