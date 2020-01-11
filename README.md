@@ -347,11 +347,9 @@ sudo systemctl status webodm-gunicorn
 
 ## Run it natively
 
-WebODM can run natively on Windows, MacOS and Linux.
+WebODM can run natively on Windows, MacOS and Linux. We don't recommend to run WebODM natively (using docker is easier), but it's possible.
 
 Ubuntu 16.04 LTS users can refer to [this community script](/contrib/ubuntu_1604_install.sh) to install WebODM natively on a new machine.
-
-A commercial installer with technical support [is also available](https://webodm.org/server).
 
 To run WebODM, you will need to install:
  * PostgreSQL (>= 9.5)
