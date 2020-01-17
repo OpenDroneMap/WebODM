@@ -13,7 +13,7 @@ from wsgiref.util import FileWrapper
 class CheckTask(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def get(self, request, celery_task_id=None):
+    def get(self, request, celery_task_id=None, **kwargs):
         res = celery.AsyncResult(celery_task_id)
         if not res.ready():
             return Response({'ready': False}, status=status.HTTP_200_OK)
@@ -36,10 +36,13 @@ class CheckTask(APIView):
     def error_check(self, result):
         pass
 
+class TaskResultOutputError(Exception):
+    pass
+
 class GetTaskResult(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def get(self, request, celery_task_id=None):
+    def get(self, request, celery_task_id=None, **kwargs):
         res = celery.AsyncResult(celery_task_id)
         if res.ready():
             result = res.get()
@@ -69,6 +72,14 @@ class GetTaskResult(APIView):
 
             return response
         elif output is not None:
+            try:
+                output = self.handle_output(output, result, **kwargs)
+            except TaskResultOutputError as e:
+                return Response({'error': str(e)})
+
             return Response({'output': output})
         else:
             return Response({'error': 'Invalid task output (cannot find valid key)'})
+
+    def handle_output(self, output, result, **kwargs):
+        return output
