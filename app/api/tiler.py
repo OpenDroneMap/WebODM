@@ -11,6 +11,7 @@ from rio_tiler.profiles import img_profiles
 
 import numpy as np
 
+from app.raster_utils import export_raster_index
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list
@@ -407,3 +408,46 @@ class Tiles(TaskNestedView):
             array_to_image(rgb, rmask, img_format=driver, **options),
             content_type="image/{}".format(ext)
         )
+
+class Export(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Export an orthophoto after applying a formula
+        """
+        task = self.get_and_check_task(request, pk)
+
+        nodata = None
+
+        formula = self.request.query_params.get('formula')
+        bands = self.request.query_params.get('bands')
+        rescale = self.request.query_params.get('rescale')
+
+        if formula == '': formula = None
+        if bands == '': bands = None
+        if rescale == '': rescale = None
+
+        if not formula:
+            raise exceptions.ValidationError("You need to specify a formula parameter")
+
+        if not bands:
+            raise exceptions.ValidationError("You need to specify a bands parameter")
+
+        try:
+            expr, _ = lookup_formula(formula, bands)
+        except ValueError as e:
+            raise exceptions.ValidationError(str(e))
+
+        if formula is not None and rescale is None:
+            rescale = "-1,1"
+
+        if nodata is not None:
+            nodata = np.nan if nodata == "nan" else float(nodata)
+
+        url = get_raster_path(task, "orthophoto")
+
+        if not os.path.isfile(url):
+            raise exceptions.NotFound()
+
+        export_raster_index(url, expr, "/webodm/app/media/project/2/task/5392337b-cd3f-42ef-879d-b36149ef442f/assets/odm_orthophoto/export.tif")
+
+        return HttpResponse("OK")

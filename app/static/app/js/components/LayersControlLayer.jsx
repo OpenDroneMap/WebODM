@@ -38,7 +38,8 @@ export default class LayersControlLayer extends React.Component {
         formula: params.formula || "",
         bands: params.bands || "",
         hillshade: params.hillshade || "",
-        histogramLoading: false
+        histogramLoading: false,
+        exportLoading: false
     };
 
     this.rescale = params.rescale || "";
@@ -186,8 +187,14 @@ export default class LayersControlLayer extends React.Component {
     this.updateLayer();
   }
 
+  handleExport = e => {
+      this.setState({exportLoading: true});
+
+      
+  }
+
   render(){
-    const { colorMap, bands, hillshade, formula, histogramLoading } = this.state;
+    const { colorMap, bands, hillshade, formula, histogramLoading, exportLoading } = this.state;
     const { meta, tmeta } = this;
     const { color_maps, algorithms } = tmeta;
     const algo = this.getAlgorithm(formula);
@@ -256,6 +263,17 @@ export default class LayersControlLayer extends React.Component {
                     </select>
                 </div>
             </div> : ""}
+
+            {formula !== "" && algorithms ? 
+            <div className="row form-group form-inline">
+                <label className="col-sm-3 control-label">Export: </label>
+                <div className="col-sm-9">
+                    <button onClick={this.handleExport} disabled={exportLoading} type="button" className="btn btn-sm btn-default">
+                        {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="far fa-image fa-fw" />} GeoTIFF
+                    </button>
+                </div>
+            </div>
+            : ""}
         </div> : ""}
     </div>);
                 

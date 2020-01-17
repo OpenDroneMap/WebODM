@@ -1,5 +1,6 @@
 import os
 import shutil
+import tempfile
 import traceback
 
 import time
@@ -16,6 +17,7 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
 from .celery import app
+from app.raster_utils import export_raster_index as export_raster_index_sync
 import redis
 
 logger = get_task_logger("app.logger")
@@ -138,9 +140,19 @@ def process_pending_tasks():
 
 
 @app.task
-def execute_grass_script(script, serialized_context = {}):
+def execute_grass_script(script, serialized_context = {}, out_key='output'):
     try:
         ctx = grass.create_context(serialized_context)
-        return {'output': ctx.execute(script), 'context': ctx.serialize()}
+        return {out_key: ctx.execute(script), 'context': ctx.serialize()}
     except GrassEngineException as e:
         return {'error': str(e), 'context': ctx.serialize()}
+
+
+@app.task
+def export_raster_index(input, expression):
+    try:
+        tmpfile = tempfile.mktemp('_raster_index.tif', dir=settings.MEDIA_TMP)
+        export_raster_index_sync(input, expression, tmpfile)
+        return {'file': tmpfile}
+    except Exception as e:
+        return {'error': str(e)}
