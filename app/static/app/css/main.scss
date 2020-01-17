@@ -81,10 +81,6 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
 
         li{
             word-break: break-word;
-            &:first-child{
-                border-top-width: 1px;
-                border-top-style: solid;
-            }
         }
     }
 
