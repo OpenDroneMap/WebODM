@@ -108,6 +108,14 @@ export default class Dashboard extends React.Component {
   render(){
     const { loading, loadingMessage, user, syncingNodes, nodes } = this.state;
 
+    let balance = "";
+    if (user){
+        balance = (<span><strong>{ user.balance }</strong> credits</span>);
+        if (user.plan !== null){
+            balance = (<span><strong>Unlimited</strong></span>);
+        }
+    }
+
     return (<div className="lightning-dashboard">
         <ErrorMessage bind={[this, "error"]} />
 
@@ -117,7 +125,7 @@ export default class Dashboard extends React.Component {
             { user ? 
             <div>
                 <div className="balance">
-                    Balance: <strong>{ user.balance }</strong> credits 
+                    Balance: { balance } 
                     <button className="btn btn-primary btn-sm" onClick={this.handleBuyCredits}><i className="fa fa-shopping-cart"></i> Buy Credits</button>
                     <button className="btn btn-primary btn-sm" onClick={this.handleRefresh}><i className="fa fa-sync"></i> Refresh Balance</button>
                 </div>
