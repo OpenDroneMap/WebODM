@@ -18,6 +18,7 @@ from .formulas import lookup_formula, get_algorithm_list
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
+from worker.tasks import export_raster_index
 
 ZOOM_EXTRA_LEVELS = 2
 
@@ -410,21 +411,19 @@ class Tiles(TaskNestedView):
         )
 
 class Export(TaskNestedView):
-    def get(self, request, pk=None, project_pk=None):
+    def post(self, request, pk=None, project_pk=None):
         """
         Export an orthophoto after applying a formula
         """
         task = self.get_and_check_task(request, pk)
 
-        nodata = None
-
-        formula = self.request.query_params.get('formula')
-        bands = self.request.query_params.get('bands')
-        rescale = self.request.query_params.get('rescale')
+        formula = request.data.get('formula')
+        bands = request.data.get('bands')
+        # rescale = request.data.get('rescale')
 
         if formula == '': formula = None
         if bands == '': bands = None
-        if rescale == '': rescale = None
+        # if rescale == '': rescale = None
 
         if not formula:
             raise exceptions.ValidationError("You need to specify a formula parameter")
@@ -437,17 +436,13 @@ class Export(TaskNestedView):
         except ValueError as e:
             raise exceptions.ValidationError(str(e))
 
-        if formula is not None and rescale is None:
-            rescale = "-1,1"
-
-        if nodata is not None:
-            nodata = np.nan if nodata == "nan" else float(nodata)
+        # if formula is not None and rescale is None:
+        #     rescale = "-1,1"
 
         url = get_raster_path(task, "orthophoto")
 
         if not os.path.isfile(url):
             raise exceptions.NotFound()
 
-        export_raster_index(url, expr, "/webodm/app/media/project/2/task/5392337b-cd3f-42ef-879d-b36149ef442f/assets/odm_orthophoto/export.tif")
-
-        return HttpResponse("OK")
+        celery_task_id = export_raster_index.delay(url, expr).task_id
+        return Response({'celery_task_id': celery_task_id})

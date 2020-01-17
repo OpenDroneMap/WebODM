@@ -151,6 +151,7 @@ def execute_grass_script(script, serialized_context = {}, out_key='output'):
 @app.task
 def export_raster_index(input, expression):
     try:
+        logger.info("Exporting raster index {} with expression: {}".format(input, expression))
         tmpfile = tempfile.mktemp('_raster_index.tif', dir=settings.MEDIA_TMP)
         export_raster_index_sync(input, expression, tmpfile)
         return {'file': tmpfile}

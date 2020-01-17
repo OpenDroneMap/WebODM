@@ -49,7 +49,7 @@ class GetTaskResult(APIView):
             return Response({'error': 'Task not ready'})
 
         if file is not None:
-            filename = os.path.basename(file)
+            filename = request.query_params.get('filename', os.path.basename(file))
             filesize = os.stat(file).st_size
 
             f = open(file, "rb")

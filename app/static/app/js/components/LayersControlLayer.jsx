@@ -4,6 +4,8 @@ import '../css/LayersControlLayer.scss';
 import Histogram from './Histogram';
 import { Checkbox, ExpandButton } from './Toggle';
 import Utils from '../classes/Utils';
+import Workers from '../classes/Workers';
+import ErrorMessage from './ErrorMessage';
 import $ from 'jquery';
 
 export default class LayersControlLayer extends React.Component {
@@ -39,7 +41,8 @@ export default class LayersControlLayer extends React.Component {
         bands: params.bands || "",
         hillshade: params.hillshade || "",
         histogramLoading: false,
-        exportLoading: false
+        exportLoading: false,
+        error: ""
     };
 
     this.rescale = params.rescale || "";
@@ -78,6 +81,11 @@ export default class LayersControlLayer extends React.Component {
     if (this.updateHistogramReq){
         this.updateHistogramReq.abort();
         this.updateHistogramReq = null;
+    }
+
+    if (this.exportReq){
+        this.exportReq.abort();
+        this.exportReq = null;
     }
   }
 
@@ -188,9 +196,29 @@ export default class LayersControlLayer extends React.Component {
   }
 
   handleExport = e => {
-      this.setState({exportLoading: true});
-
-      
+      this.setState({exportLoading: true, error: ""});
+    
+      this.exportReq = $.ajax({
+            type: 'POST',
+            url: `/api/projects/${this.meta.task.project}/tasks/${this.meta.task.id}/orthophoto/export`,
+            data: this.getLayerParams()
+        }).done(result => {
+            if (result.celery_task_id){
+                Workers.waitForCompletion(result.celery_task_id, error => {
+                    if (error) this.setState({exportLoading: false, error});
+                    else{
+                        this.setState({exportLoading: false});
+                        Workers.downloadFile(result.celery_task_id, "odm_orthophoto_" + encodeURIComponent(this.state.formula) + ".tif");
+                    }
+                });
+            }else if (result.error){
+                this.setState({exportLoading: false, error: result.error});
+            }else{
+                this.setState({exportLoading: false, error: "Invalid response: " + result});
+            }
+        }).fail(error => {
+            this.setState({exportLoading: false, error: JSON.stringify(error)});
+        });
   }
 
   render(){
@@ -215,6 +243,8 @@ export default class LayersControlLayer extends React.Component {
                         statistics={tmeta.statistics} 
                         colorMap={cmapValues}
                         onUpdate={this.handleHistogramUpdate} />
+
+            <ErrorMessage bind={[this, "error"]} />
 
             {formula !== "" && algorithms ? 
             <div className="row form-group form-inline">
