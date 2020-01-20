@@ -45,7 +45,6 @@ export default class LayersControlLayer extends React.Component {
     if (mUrl){
         for (let d of mUrlToDownload){
             const idx = mUrl.lastIndexOf(d.url);
-            console.log(mUrl);
             if (idx !== -1){
                 this.downloadFileUrl = mUrl.substr(0, idx) + "download/" + d.download;
                 break;
