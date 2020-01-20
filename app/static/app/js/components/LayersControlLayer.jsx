@@ -33,6 +33,26 @@ export default class LayersControlLayer extends React.Component {
     this.meta = props.layer[Symbol.for("meta")] || {};
     this.tmeta = props.layer[Symbol.for("tile-meta")] || {};
 
+    // Compute download URL from metadata
+    // (not ideal, but works)
+    const mUrl = this.meta.metaUrl;
+    const mUrlToDownload = [
+        {url: "orthophoto/metadata", download: "orthophoto.tif"},
+        {url: "dsm/metadata", download: "dsm.tif"},
+        {url: "dtm/metadata", download: "dtm.tif"}
+    ];
+
+    if (mUrl){
+        for (let d of mUrlToDownload){
+            const idx = mUrl.lastIndexOf(d.url);
+            console.log(mUrl);
+            if (idx !== -1){
+                this.downloadFileUrl = mUrl.substr(0, idx) + "download/" + d.download;
+                break;
+            }
+        }
+    }
+
     this.state = {
         visible: this.map.hasLayer(props.layer),
         expanded: props.expanded,
@@ -196,29 +216,39 @@ export default class LayersControlLayer extends React.Component {
   }
 
   handleExport = e => {
-      this.setState({exportLoading: true, error: ""});
-    
-      this.exportReq = $.ajax({
-            type: 'POST',
-            url: `/api/projects/${this.meta.task.project}/tasks/${this.meta.task.id}/orthophoto/export`,
-            data: this.getLayerParams()
-        }).done(result => {
-            if (result.celery_task_id){
-                Workers.waitForCompletion(result.celery_task_id, error => {
-                    if (error) this.setState({exportLoading: false, error});
-                    else{
-                        this.setState({exportLoading: false});
-                        Workers.downloadFile(result.celery_task_id, "odm_orthophoto_" + encodeURIComponent(this.state.formula) + ".tif");
-                    }
-                });
-            }else if (result.error){
-                this.setState({exportLoading: false, error: result.error});
-            }else{
-                this.setState({exportLoading: false, error: "Invalid response: " + result});
-            }
-        }).fail(error => {
-            this.setState({exportLoading: false, error: JSON.stringify(error)});
-        });
+      const { formula } = this.state;
+      const { tmeta } = this;
+      const { algorithms } = tmeta;
+      
+      // Plant health needs to be exported
+      if (formula !== "" && algorithms){
+        this.setState({exportLoading: true, error: ""});
+        
+        this.exportReq = $.ajax({
+                type: 'POST',
+                url: `/api/projects/${this.meta.task.project}/tasks/${this.meta.task.id}/orthophoto/export`,
+                data: this.getLayerParams()
+            }).done(result => {
+                if (result.celery_task_id){
+                    Workers.waitForCompletion(result.celery_task_id, error => {
+                        if (error) this.setState({exportLoading: false, error});
+                        else{
+                            this.setState({exportLoading: false});
+                            Workers.downloadFile(result.celery_task_id, "odm_orthophoto_" + encodeURIComponent(this.state.formula) + ".tif");
+                        }
+                    });
+                }else if (result.error){
+                    this.setState({exportLoading: false, error: result.error});
+                }else{
+                    this.setState({exportLoading: false, error: "Invalid response: " + result});
+                }
+            }).fail(error => {
+                this.setState({exportLoading: false, error: JSON.stringify(error)});
+            });
+      }else{
+          // Simple download
+          window.location.href = this.downloadFileUrl;
+      }
   }
 
   render(){
@@ -294,7 +324,6 @@ export default class LayersControlLayer extends React.Component {
                 </div>
             </div> : ""}
 
-            {formula !== "" && algorithms ? 
             <div className="row form-group form-inline">
                 <label className="col-sm-3 control-label">Export: </label>
                 <div className="col-sm-9">
@@ -303,7 +332,6 @@ export default class LayersControlLayer extends React.Component {
                     </button>
                 </div>
             </div>
-            : ""}
         </div> : ""}
     </div>);
                 
