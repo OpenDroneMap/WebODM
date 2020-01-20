@@ -8,7 +8,8 @@ from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
 from .admin import UserViewSet, GroupViewSet
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
-from .tiler import TileJson, Bounds, Metadata, Tiles
+from .tiler import TileJson, Bounds, Metadata, Tiles, Export
+from .workers import CheckTask, GetTaskResult
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet)
@@ -37,10 +38,14 @@ urlpatterns = [
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/metadata$', Metadata.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.png$', Tiles.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)@(?P<scale>[\d]+)x\.png$', Tiles.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/orthophoto/export$', Export.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/download/(?P<asset>.+)$', TaskDownloads.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/assets/(?P<unsafe_asset_path>.+)$', TaskAssets.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/import$', TaskAssetsImport.as_view()),
+
+    url(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
+    url(r'workers/get/(?P<celery_task_id>.+)', GetTaskResult.as_view()),
 
     url(r'^auth/', include('rest_framework.urls')),
     url(r'^token-auth/', obtain_jwt_token),

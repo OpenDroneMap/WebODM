@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './MeasurePopup.scss';
 import Utils from 'webodm/classes/Utils';
+import Workers from 'webodm/classes/Workers';
+
 import $ from 'jquery';
 import L from 'leaflet';
 
@@ -86,8 +88,16 @@ export default class MeasurePopup extends React.Component {
                 data: JSON.stringify({'area': this.props.resultFeature.toGeoJSON()}),
                 contentType: "application/json"
             }).done(result => {
-                if (result.volume){
-                    this.setState({volume: parseFloat(result.volume)});
+                if (result.celery_task_id){
+                    Workers.waitForCompletion(result.celery_task_id, error => {
+                      if (error) this.setState({error});
+                      else{
+                          Workers.getOutput(result.celery_task_id, (error, volume) => {
+                              if (error) this.setState({error});
+                              else this.setState({volume: parseFloat(volume)});
+                          }, `/api/plugins/measure/task/${task.id}/volume/get/`);
+                      }
+                    }, `/api/plugins/measure/task/${task.id}/volume/check/`);
                 }else if (result.error){
                     this.setState({error: result.error});
                 }else{

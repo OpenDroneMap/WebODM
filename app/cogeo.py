@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import rasterio
 from rio_cogeo.cogeo import cog_validate, cog_translate
+from rio_tiler.utils import has_alpha_band
 from webodm import settings
 
 logger = logging.getLogger('app.logger')
@@ -55,7 +56,11 @@ def assure_cogeo(src_path):
             GDAL_TIFF_OVR_BLOCKSIZE="128",
         )
 
-        cog_translate(dst, tmpfile, output_profile,
+        nodata = None
+        if has_alpha_band(dst) and dst.meta['dtype'] == 'uint16':
+            nodata = 0.0 # Hack to workaround https://github.com/cogeotiff/rio-cogeo/issues/112
+
+        cog_translate(dst, tmpfile, output_profile, nodata=nodata,
                       config=config, in_memory=False,
                       quiet=True, web_optimized=True)
 

@@ -1,3 +1,4 @@
+import re
 from django.test import TestCase
 from app.api.formulas import lookup_formula, get_algorithm_list, get_camera_filters_for, algos
 
@@ -25,10 +26,26 @@ class TestFormulas(TestCase):
         self.assertTrue(lookup_formula("_TESTFUNC", "RGB")[1] == None)
 
     def test_algo_list(self):
-        list = get_algorithm_list()
+        al = get_algorithm_list()
 
-        # Do not show test algos
-        for i in list:
+        pattern = re.compile("([A-Z]+?[a-z]*)")
+        for i in al:
+            # Do not show test algos
             self.assertFalse(i['id'].startswith("_"))
 
+            # Filters are less than 3 bands
+            for f in i['filters']:
+                bands = list(set(re.findall(pattern, f)))
+                self.assertTrue(len(bands) <= 3)
+
         self.assertTrue(get_camera_filters_for(algos['VARI']) == ['RGB'])
+
+        # Request algorithms with more band filters
+        al = get_algorithm_list(max_bands=5)
+
+        pattern = re.compile("([A-Z]+?[a-z]*)")
+        for i in al:
+            # Filters are less than 5 bands
+            for f in i['filters']:
+                bands = list(set(re.findall(pattern, f)))
+                self.assertTrue(len(bands) <= 5)
