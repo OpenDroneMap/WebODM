@@ -56,4 +56,4 @@ webcolors==1.5
 rasterio==1.1.0
 -e git://github.com/OpenDroneMap/rio-tiler.git#egg=rio-tiler
 rio-color==1.0.0
-rio-cogeo==1.1.7
+rio-cogeo==1.1.8
