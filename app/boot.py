@@ -128,6 +128,10 @@ def add_default_presets():
                                                               {'name': 'dem-resolution', 'value': "2.0"},
                                                               {'name': 'orthophoto-resolution', 'value': "2.0"},
                                                               ]})
+        Preset.objects.update_or_create(name='Multispectral', system=True,
+                                        defaults={'options': [{'name': 'texturing-skip-global-seam-leveling', 'value': True},
+                                                              {'name': 'texturing-data-term', 'value': 'area'},
+                                                              ]})
         Preset.objects.update_or_create(name='Default', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True}]})
 
