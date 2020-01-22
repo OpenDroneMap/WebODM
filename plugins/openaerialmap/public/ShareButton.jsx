@@ -31,7 +31,7 @@ export default class ShareButton extends React.Component{
     }
 
     updateTaskInfo = (showErrors) => {
-        const { task } = this.props; 
+        const { task } = this.props;
         return $.ajax({
                 type: 'GET',
                 url: `/api/plugins/openaerialmap/task/${task.id}/info`,
@@ -49,7 +49,7 @@ export default class ShareButton extends React.Component{
                 this.setState({taskInfo, loading: false});
                 if (taskInfo.error && showErrors) this.setState({error: taskInfo.error});
             }).fail(error => {
-                this.setState({error, loading: false});
+                this.setState({error: error.statusText, loading: false});
             });
     }
 
@@ -108,17 +108,19 @@ export default class ShareButton extends React.Component{
     }
 
     render(){
-        const { loading, taskInfo } = this.state;
+        const { loading, taskInfo, error } = this.state;
 
         const getButtonIcon = () => {
             if (loading || taskInfo.sharing) return "fa fa-circle-notch fa-spin fa-fw";
-            else return "oam-icon fa";
+            else if (error) return "fa fa-exclamation-triangle";
+            else return "fa oam-icon";
         };
 
         const getButtonLabel = () => {
             if (loading) return "";
             else if (taskInfo.sharing) return " Sharing...";
             else if (taskInfo.shared) return " View In OAM";
+            else if (error) return " OAM Plugin Error";
             else return " Share To OAM";
         }
 
@@ -126,13 +128,13 @@ export default class ShareButton extends React.Component{
                 <ErrorMessage bind={[this, "error"]} />,
                 <button
                 onClick={this.handleClick}
-                disabled={loading || taskInfo.sharing}
+                disabled={loading || taskInfo.sharing || error}
                 className="btn btn-sm btn-primary">
                     {[<i className={getButtonIcon()}></i>, getButtonLabel()]}
                 </button>];
 
         if (taskInfo.sensor !== undefined){
-            result.unshift(<ShareDialog 
+            result.unshift(<ShareDialog
                   ref={(domNode) => { this.shareDialog = domNode; }}
                   task={this.props.task}
                   taskInfo={taskInfo}
