@@ -33,7 +33,9 @@ export default {
       let paramsRaw = (location.search.replace("?", "").match(/([^&=]+)=?([^&]*)/g) || []);
       for (let i in paramsRaw){
         let parts = paramsRaw[i].split("=");
-        params[parts[0]] = parts[1];
+        if (parts[1] !== undefined){
+            params[parts[0]] = parts[1];
+        }
       }
       return params;
     },
