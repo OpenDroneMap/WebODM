@@ -331,16 +331,14 @@ class Tiles(TaskNestedView):
                     # Try to find RGBA band order
                     if ColorInterp.red in ci and \
                         ColorInterp.green in ci and \
-                        ColorInterp.blue in ci: # and ColorInterp.alpha in ci:
+                        ColorInterp.blue in ci:
                         indexes = (ci.index(ColorInterp.red) + 1,
                                    ci.index(ColorInterp.green) + 1,
                                    ci.index(ColorInterp.blue) + 1,)
-                        # TODO: adding alpha band should fix black backgrounds
-                        # but the tiles disappear. Probable bug in rasterio/GDAL
-
                     else:
-                        # Fallback to first four
-                        indexes = (1, 2, 3, ) # , 4, )
+                        # Fallback to first three
+                        indexes = (1, 2, 3, )
+
                 elif has_alpha:
                     indexes = non_alpha_indexes(src)
 
