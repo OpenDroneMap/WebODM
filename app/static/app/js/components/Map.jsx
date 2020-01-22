@@ -109,9 +109,9 @@ class Map extends React.Component {
 
             // Build URL
             let tileUrl = mres.tiles[0];
-
-            // Certain types need the rescale parameter
-            if (["plant", "dsm", "dtm"].indexOf(type) !== -1 && statistics){
+            
+            // Set rescale
+            if (statistics){
                 const params = Utils.queryParams({search: tileUrl.slice(tileUrl.indexOf("?"))});
                 if (statistics["1"]){
                     // Add rescale

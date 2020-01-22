@@ -9,6 +9,6 @@ services:
 
 install:
   - docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d
-  - sleep 50
+  - while sleep 5; do docker ps -a; if [[ -n "`docker ps | grep webapp | grep ' Up '`" ]]; then break; fi; done
 
 script: docker-compose exec webapp /bin/bash -c "/webodm/webodm.sh test"

@@ -9,7 +9,7 @@ ENV PROJ_LIB=/usr/share/proj
 RUN mkdir /webodm
 WORKDIR /webodm
 
-RUN curl --silent --location https://deb.nodesource.com/setup_8.x | bash -
+RUN curl --silent --location https://deb.nodesource.com/setup_10.x | bash -
 RUN apt-get -qq install -y nodejs
 
 # Configure use of testing branch of Debian

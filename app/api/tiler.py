@@ -6,7 +6,8 @@ from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
 from rio_tiler import main
-from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap, has_alpha_band
+from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap, has_alpha_band, \
+    non_alpha_indexes
 from rio_tiler.profiles import img_profiles
 
 import numpy as np
@@ -73,6 +74,7 @@ def rescale_tile(tile, mask, rescale = None):
         rescale_arr = list(_chunks(rescale_arr, 2))
         if len(rescale_arr) != tile.shape[0]:
             rescale_arr = ((rescale_arr[0]),) * tile.shape[0]
+
         for bdx in range(tile.shape[0]):
             if mask is not None:
                 tile[bdx] = np.where(
@@ -320,8 +322,8 @@ class Tiles(TaskNestedView):
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
 
-            # Handle N-bands datasets
-            if tile_type == 'orthophoto':
+            # Handle N-bands datasets for orthophotos (not plant health)
+            if tile_type == 'orthophoto' and expr is None:
                 ci = src.colorinterp
 
                 # More than 4 bands?
@@ -329,15 +331,16 @@ class Tiles(TaskNestedView):
                     # Try to find RGBA band order
                     if ColorInterp.red in ci and \
                         ColorInterp.green in ci and \
-                        ColorInterp.blue in ci: # and ColorInterp.alpha in ci:
+                        ColorInterp.blue in ci:
                         indexes = (ci.index(ColorInterp.red) + 1,
                                    ci.index(ColorInterp.green) + 1,
                                    ci.index(ColorInterp.blue) + 1,)
-                        # TODO: adding alpha band should fix black backgrounds
-                        # but the tiles disappear. Probable bug in rasterio/GDAL
                     else:
-                        # Fallback to first four
-                        indexes = (1, 2, 3, ) # , 4, )
+                        # Fallback to first three
+                        indexes = (1, 2, 3, )
+
+                elif has_alpha:
+                    indexes = non_alpha_indexes(src)
 
         resampling="nearest"
         padding=0
@@ -356,10 +359,6 @@ class Tiles(TaskNestedView):
                 )
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
-
-        # Use alpha channel for transparency, don't use the mask if one is provided (redundant)
-        if has_alpha and expr is None:
-            mask = None
 
         if color_map:
             try:
