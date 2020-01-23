@@ -38,8 +38,6 @@ A user-friendly, extendable application and [API](http://docs.webodm.org) for dr
 
 ## Getting Started
 
-**Notice:** Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer). This is not required, but it helps fund the project and makes the installation process easier.
-
 * Install the following applications (if they are not installed already):
   - [Git](https://git-scm.com/downloads)
   - [Docker](https://www.docker.com/)
@@ -49,7 +47,7 @@ A user-friendly, extendable application and [API](http://docs.webodm.org) for dr
 
 * Windows users have a choice between Docker Toolbox (Windows 10 Home or older) and Docker for Windows (Windows 10 Pro or newer). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes). 
 
-* From the Docker Quickstart Terminal or Powershell (Windows), or from the command line (Mac / Linux), type:
+* From the Docker Quickstart Terminal or Git Bash (Windows), or from the command line (Mac / Linux), type:
 ```bash
 git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
 cd WebODM
@@ -80,6 +78,8 @@ To update WebODM to the latest version use:
 ```
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
+
+Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
 
 You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
 
