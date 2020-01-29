@@ -62,7 +62,9 @@ def assure_cogeo(src_path):
 
         cog_translate(dst, tmpfile, output_profile, nodata=nodata,
                       config=config, in_memory=False,
-                      quiet=True, web_optimized=True)
+                      quiet=True, web_optimized=False)
+        # web_optimized reduces the dimension of the raster, as well as reprojecting to EPSG:3857
+        # we want to keep resolution and projection at the tradeoff of slightly slower tile render speed
 
     if os.path.isfile(tmpfile):
         shutil.move(src_path, swapfile) # Move to swap location

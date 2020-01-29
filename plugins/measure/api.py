@@ -4,6 +4,7 @@ import math
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
+import rasterio
 
 from app.api.workers import GetTaskResult, TaskResultOutputError, CheckTask
 from app.models import Task
@@ -61,10 +62,16 @@ class TaskVolumeResult(GetTaskResult):
 
         cols = output.split(':')
         if len(cols) == 7:
+            # Legacy: we had rasters in EPSG:3857 for a while
+            # This could be removed at some point in the future
             # Correct scale measurement for web mercator
             # https://gis.stackexchange.com/questions/93332/calculating-distance-scale-factor-by-latitude-for-mercator#93335
-            latitude = task.dsm_extent.centroid[1]
-            scale_factor = math.cos(math.radians(latitude)) ** 2
+            scale_factor = 1.0
+            dsm = os.path.abspath(task.get_asset_download_path("dsm.tif"))
+            with rasterio.open(dsm) as dst:
+                if str(dst.crs) == 'EPSG:3857':
+                    latitude = task.dsm_extent.centroid[1]
+                    scale_factor = math.cos(math.radians(latitude)) ** 2
 
             volume = abs(float(cols[6]) * scale_factor)
             return str(volume)
