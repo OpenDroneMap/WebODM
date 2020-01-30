@@ -24,7 +24,7 @@ class TaskContoursGenerate(TaskView):
             else:
                 raise GrassEngineException('{} is not a valid layer.'.format(layer))
 
-            context = grass.create_context({'auto_cleanup' : False, 'location': 'epsg:3857'})
+            context = grass.create_context({'auto_cleanup' : False})
             epsg = int(request.data.get('epsg', '3857'))
             interval = float(request.data.get('interval', 1))
             format = request.data.get('format', 'GPKG')
@@ -38,6 +38,7 @@ class TaskContoursGenerate(TaskView):
             context.add_param('format', format)
             context.add_param('simplify', simplify)
             context.add_param('epsg', epsg)
+            context.set_location(dem)
 
             celery_task_id = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
