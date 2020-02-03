@@ -4,9 +4,7 @@
 
 A user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It supports multiple engines for processing, currently [ODM](https://github.com/OpenDroneMap/ODM) and [MicMac](https://github.com/dronemapper-io/NodeMICMAC/) (experimental).
 
-
-![image](https://user-images.githubusercontent.com/1951843/73680559-70caee00-468a-11ea-8d30-83667efc9c31.png)
-
+![image](https://user-images.githubusercontent.com/1951843/73680798-efc02680-468a-11ea-9ae5-55e51427c6f1.png)
 
 * [Getting Started](#getting-started)
     * [Manage Processing Nodes](#manage-processing-nodes)
