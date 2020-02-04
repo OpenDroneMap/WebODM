@@ -106,12 +106,18 @@ class ModelView extends React.Component {
     return this.props.task.available_assets.indexOf('textured_model.zip') !== -1;
   }
 
-  objFilePath(){
-    let file =  this.hasGeoreferencedAssets() ?
-                'odm_textured_model_geo.obj' : 
-                'odm_textured_model.obj';
+  objFilePath(cb){
+    const geoUrl = this.texturedModelDirectoryPath() + 'odm_textured_model_geo.obj';
+    const nongeoUrl = this.texturedModelDirectoryPath() + 'odm_textured_model.obj';
 
-    return this.texturedModelDirectoryPath() + file; 
+    $.ajax({
+        type: "HEAD",
+        url: geoUrl
+    }).done(() => {
+        cb(geoUrl);
+    }).fail(() => {
+        cb(nongeoUrl);
+    });
   }
 
   mtlFilename(){
@@ -187,35 +193,37 @@ class ModelView extends React.Component {
 
             const objLoader = new THREE.OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.load(this.objFilePath(), (object) => {
-                const bboxWorld = this.pointCloud.getBoundingBoxWorld();
-                const pcCenter = new THREE.Vector3();
-                bboxWorld.getCenter(pcCenter);
-
-                object.position.set(pcCenter.x, pcCenter.y, pcCenter.z);
-
-                // Bring the model close to center
-                if (object.children.length > 0){
-                  const geom = object.children[0].geometry;
-
-                  // Compute center
-                  geom.computeBoundingBox();
-
-                  let center = new THREE.Vector3();
-                  geom.boundingBox.getCenter(center);
-
-                  object.translateX(-center.x);
-                  object.translateY(-center.y);
-                  object.translateZ(-center.z);
-                } 
-
-                viewer.scene.scene.add(object);
-
-                this.modelReference = object;
-                this.setPointCloudsVisible(false);
-
-                this.setState({
-                  initializingModel: false,
+            this.objFilePath(filePath => {
+                objLoader.load(filePath, (object) => {
+                    const bboxWorld = this.pointCloud.getBoundingBoxWorld();
+                    const pcCenter = new THREE.Vector3();
+                    bboxWorld.getCenter(pcCenter);
+    
+                    object.position.set(pcCenter.x, pcCenter.y, pcCenter.z);
+    
+                    // Bring the model close to center
+                    if (object.children.length > 0){
+                      const geom = object.children[0].geometry;
+    
+                      // Compute center
+                      geom.computeBoundingBox();
+    
+                      let center = new THREE.Vector3();
+                      geom.boundingBox.getCenter(center);
+    
+                      object.translateX(-center.x);
+                      object.translateY(-center.y);
+                      object.translateZ(-center.z);
+                    } 
+    
+                    viewer.scene.scene.add(object);
+    
+                    this.modelReference = object;
+                    this.setPointCloudsVisible(false);
+    
+                    this.setState({
+                      initializingModel: false,
+                    });
                 });
             });
         });
@@ -232,8 +240,6 @@ class ModelView extends React.Component {
 
   // React render
   render(){
-    const showSwitchModeButton = this.hasGeoreferencedAssets();
-
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
           <div className="container potree_container" 
@@ -257,11 +263,10 @@ class ModelView extends React.Component {
                 linksTarget="3d"
             />
             : ""}
-            {showSwitchModeButton ? 
             <SwitchModeButton 
                 public={this.props.public}
                 task={this.props.task}
-                type="modelToMap" /> : ""}
+                type="modelToMap" />
         </div>
 
           <Standby 
