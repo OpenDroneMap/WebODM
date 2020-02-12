@@ -14,8 +14,10 @@
     }
 
     .leaflet-control-layers-toggle{
-        border-radius: 1px;
-        background: url(../icons/basemap.svg) 5px 5px no-repeat;
+        background: no-repeat center/90% url(../icons/basemap.svg);
+        border-radius: 2px;
+        width: 26px;
+        height: 26px;
     }
 
     .leaflet-popup-content{
@@ -56,7 +58,7 @@
     .leaflet-touch .leaflet-control-layers-toggle{
         width: 30px;
         height: 30px;
-        background-size: 20px;
+        background-size: 22px;
     }
 
     .popup-opacity-slider{
