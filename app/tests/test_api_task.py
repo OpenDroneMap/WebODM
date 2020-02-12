@@ -2,7 +2,9 @@ import io
 import os
 import time
 
+import threading
 
+from worker.celery import app as celery
 import logging
 from datetime import timedelta
 
@@ -41,6 +43,8 @@ DELAY = 2  # time to sleep for during process launch, background processing, etc
 class TestApiTask(BootTransactionTestCase):
     def setUp(self):
         super().setUp()
+
+    def tearDown(self):
         clear_test_media_root()
 
     def test_task(self):
@@ -282,6 +286,13 @@ class TestApiTask(BootTransactionTestCase):
             })
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
+            # Cannot export orthophoto
+            res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
+                'formula': 'NDVI',
+                'bands': 'RGN'
+            })
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
             # No UUID at this point
             self.assertTrue(len(task.uuid) == 0)
 
@@ -315,6 +326,8 @@ class TestApiTask(BootTransactionTestCase):
 
                 # Progress is 100%
                 self.assertTrue(task.running_progress == 1.0)
+
+                time.sleep(0.5)
 
                 handler.assert_any_call(
                     sender=Task,
@@ -362,6 +375,40 @@ class TestApiTask(BootTransactionTestCase):
             # Can download raw assets
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
+
+            # Can export orthophoto (when formula and bands are specified)
+            res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
+                'formula': 'NDVI'
+            })
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+            res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
+                'bands': 'RGN'
+            })
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+            res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
+                'formula': 'NDVI',
+                'bands': 'RGN'
+            })
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            reply = json.loads(res.content.decode("utf-8"))
+            self.assertTrue("celery_task_id" in reply)
+            celery_task_id = reply["celery_task_id"]
+
+            # Check export status
+            res = client.get("/api/workers/check/{}".format(celery_task_id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            reply = json.loads(res.content.decode("utf-8"))
+            self.assertTrue("ready" in reply)
+            self.assertEqual(reply["ready"], True)
+
+            # Can download exported orthophoto
+            res = client.get("/api/workers/get/{}?filename=odm_orthophoto_NDVI.tif".format(celery_task_id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertEquals(res.get('Content-Disposition'), "attachment; filename=odm_orthophoto_NDVI.tif")
+            with Image.open(io.BytesIO(res.content)) as i:
+                self.assertEqual(i.width, 212)
+                self.assertEqual(i.height, 212)
 
             # Can access tiles.json, bounds and metadata
             for ep in endpoints:

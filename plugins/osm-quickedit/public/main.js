@@ -7,7 +7,7 @@ PluginsAPI.Map.addActionButton(function(options){
 		var tile = options.tiles[0];
 		var url = window.location.protocol + "//" + 
 					window.location.host +
-					tile.url.replace(/tiles\.json$/, "tiles/{zoom}/{x}/{ty}.png");
+					tile.url + "tiles/{zoom}/{x}/{y}.png";
 
 		return React.createElement("button", {
 				type: "button",

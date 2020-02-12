@@ -4,6 +4,7 @@ import Storage from 'webodm/classes/Storage';
 import L from 'leaflet';
 import './ContoursPanel.scss';
 import ErrorMessage from 'webodm/components/ErrorMessage';
+import Workers from 'webodm/classes/Workers';
 
 export default class ContoursPanel extends React.Component {
   static defaultProps = {
@@ -115,32 +116,6 @@ export default class ContoursPanel extends React.Component {
     };
   }
 
-  waitForCompletion = (taskId, celery_task_id, cb) => {
-    let errorCount = 0;
-
-    const check = () => {
-      $.ajax({
-          type: 'GET',
-          url: `/api/plugins/contours/task/${taskId}/contours/check/${celery_task_id}`
-      }).done(result => {
-          if (result.error){
-            cb(result.error);
-          }else if (result.ready){
-            cb();
-          }else{
-            // Retry
-            setTimeout(() => check(), 2000);
-          }
-      }).fail(error => {
-          console.warn(error);
-          if (errorCount++ < 10) setTimeout(() => check(), 2000);
-          else cb(JSON.stringify(error));
-      });
-    };
-
-    check();
-  }
-
   addGeoJSONFromURL = (url, cb) => {
     const { map } = this.props;
 
@@ -197,7 +172,7 @@ export default class ContoursPanel extends React.Component {
         data: data
     }).done(result => {
         if (result.celery_task_id){
-          this.waitForCompletion(taskId, result.celery_task_id, error => {
+          Workers.waitForCompletion(result.celery_task_id, error => {
             if (error) this.setState({[loadingProp]: false, error});
             else{
               const fileUrl = `/api/plugins/contours/task/${taskId}/contours/download/${result.celery_task_id}`;
@@ -214,7 +189,7 @@ export default class ContoursPanel extends React.Component {
                 this.setState({[loadingProp]: false});
               }
             }
-          });
+          }, `/api/plugins/contours/task/${taskId}/contours/check/`);
         }else if (result.error){
             this.setState({[loadingProp]: false, error: result.error});
         }else{

@@ -4,12 +4,15 @@ import math
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
+import rasterio
 
+from app.api.workers import GetTaskResult, TaskResultOutputError, CheckTask
+from app.models import Task
 from app.plugins.views import TaskView
 
 from worker.tasks import execute_grass_script
 
-from app.plugins.grass_engine import grass, GrassEngineException
+from app.plugins.grass_engine import grass, GrassEngineException, cleanup_grass_context
 from geojson import Feature, Point, FeatureCollection
 
 class GeoJSONSerializer(serializers.Serializer):
@@ -30,35 +33,48 @@ class TaskVolume(TaskView):
         dsm = os.path.abspath(task.get_asset_download_path("dsm.tif"))
 
         try:
-            context = grass.create_context()
+            context = grass.create_context({'auto_cleanup': False})
             context.add_file('area_file.geojson', json.dumps(area))
             context.add_file('points_file.geojson', str(points))
             context.add_param('dsm_file', dsm)
             context.set_location(dsm)
 
-            result = execute_grass_script.delay(os.path.join(
+            celery_task_id = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
                 "calc_volume.grass"
-            ), context.serialize()).get()
+            ), context.serialize()).task_id
 
-            if not isinstance(result, dict): raise GrassEngineException("Unexpected output from GRASS (expected dict)")
-            if 'error' in result: raise GrassEngineException(result['error'])
-
-            output = result.get('output', '')
-            cols = output.split(':')
-            if len(cols) == 7:
-                # Correct scale measurement for web mercator
-                # https://gis.stackexchange.com/questions/93332/calculating-distance-scale-factor-by-latitude-for-mercator#93335
-                latitude = task.dsm_extent.centroid[1]
-                scale_factor = math.cos(math.radians(latitude)) ** 2
-
-                volume = abs(float(cols[6]) * scale_factor)
-                return Response({'volume': str(volume)}, status=status.HTTP_200_OK)
-            else:
-                raise GrassEngineException(output)
+            return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
         except GrassEngineException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
 
+class TaskVolumeCheck(CheckTask):
+    def on_error(self, result):
+        cleanup_grass_context(result['context'])
 
+class TaskVolumeResult(GetTaskResult):
+    def get(self, request, pk=None, celery_task_id=None):
+        task = Task.objects.only('dsm_extent').get(pk=pk)
+        return super().get(request, celery_task_id, task=task)
 
+    def handle_output(self, output, result, task):
+        cleanup_grass_context(result['context'])
+
+        cols = output.split(':')
+        if len(cols) == 7:
+            # Legacy: we had rasters in EPSG:3857 for a while
+            # This could be removed at some point in the future
+            # Correct scale measurement for web mercator
+            # https://gis.stackexchange.com/questions/93332/calculating-distance-scale-factor-by-latitude-for-mercator#93335
+            scale_factor = 1.0
+            dsm = os.path.abspath(task.get_asset_download_path("dsm.tif"))
+            with rasterio.open(dsm) as dst:
+                if str(dst.crs) == 'EPSG:3857':
+                    latitude = task.dsm_extent.centroid[1]
+                    scale_factor = math.cos(math.radians(latitude)) ** 2
+
+            volume = abs(float(cols[6]) * scale_factor)
+            return str(volume)
+        else:
+            raise TaskResultOutputError(output)
 

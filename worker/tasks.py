@@ -1,5 +1,6 @@
 import os
 import shutil
+import tempfile
 import traceback
 
 import time
@@ -15,11 +16,16 @@ from app.plugins.grass_engine import grass, GrassEngineException
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
+import worker
 from .celery import app
+from app.raster_utils import export_raster_index as export_raster_index_sync
 import redis
 
 logger = get_task_logger("app.logger")
 redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
+
+# What class to use for async results, since during testing we need to mock it
+TestSafeAsyncResult = worker.celery.MockAsyncResult if settings.TESTING else app.AsyncResult
 
 @app.task
 def update_nodes_info():
@@ -138,9 +144,27 @@ def process_pending_tasks():
 
 
 @app.task
-def execute_grass_script(script, serialized_context = {}):
+def execute_grass_script(script, serialized_context = {}, out_key='output'):
     try:
         ctx = grass.create_context(serialized_context)
-        return {'output': ctx.execute(script), 'context': ctx.serialize()}
+        return {out_key: ctx.execute(script), 'context': ctx.serialize()}
     except GrassEngineException as e:
+        logger.error(str(e))
         return {'error': str(e), 'context': ctx.serialize()}
+
+
+@app.task(bind=True)
+def export_raster_index(self, input, expression):
+    try:
+        logger.info("Exporting raster index {} with expression: {}".format(input, expression))
+        tmpfile = tempfile.mktemp('_raster_index.tif', dir=settings.MEDIA_TMP)
+        export_raster_index_sync(input, expression, tmpfile)
+        result = {'file': tmpfile}
+
+        if settings.TESTING:
+            TestSafeAsyncResult.set(self.request.id, result)
+
+        return result
+    except Exception as e:
+        logger.error(str(e))
+        return {'error': str(e)}

@@ -1,4 +1,4 @@
-.leaflet-touch .leaflet-control-layers-control{
+.leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control{
     .layers-control-layer{
         clear: both;
 
@@ -37,6 +37,10 @@
                 margin-top: 8px;
                 margin-bottom: 8px;
             }
+        }
+
+        .btn{
+            padding: 0px 9px;
         }
       
         .toggle{

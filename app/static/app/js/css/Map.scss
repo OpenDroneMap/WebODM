@@ -13,9 +13,12 @@
         padding-bottom: 6px;
     }
 
-    .leaflet-control-layers-toggle{
-        border-radius: 1px;
-        background: url(../icons/basemap.svg) 5px 5px no-repeat;
+    .leaflet-touch .leaflet-control-layers-toggle, .leaflet-control-layers-toggle{
+        background: no-repeat center/90% url(../icons/basemap.svg);
+        border-radius: 2px;
+        width: 30px;
+        height: 30px;
+        background-size: 22px;
     }
 
     .leaflet-popup-content{
@@ -53,12 +56,6 @@
         margin-right: 12px;
     }
 
-    .leaflet-touch .leaflet-control-layers-toggle{
-        width: 30px;
-        height: 30px;
-        background-size: 20px;
-    }
-
     .popup-opacity-slider{
         margin-bottom: 6px;
     }
@@ -91,7 +88,7 @@
         }
       
     }
-    .leaflet-touch .leaflet-control-add-overlay a {
+    .leaflet-touch .leaflet-control-add-overlay a, .leaflet-control-add-overlay a {
         background-position: 2px 2px;
     }
 }

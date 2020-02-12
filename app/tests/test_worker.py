@@ -1,8 +1,9 @@
 import os
 from stat import ST_ATIME, ST_MTIME
 
+import json
+
 import worker
-from app import pending_actions
 from app.models import Project
 from app.models import Task
 from nodeodm.models import ProcessingNode
@@ -10,6 +11,8 @@ from webodm import settings
 from .classes import BootTestCase
 from .utils import start_processing_node
 from worker.tasks import redis_client
+from rest_framework.test import APIClient
+from rest_framework import status
 
 class TestWorker(BootTestCase):
     def setUp(self):
@@ -80,3 +83,19 @@ class TestWorker(BootTestCase):
         # After 24 hours it should get removed
         worker.tasks.cleanup_tmp_directory()
         self.assertFalse(os.path.exists(tmpdir))
+
+    def test_workers_api(self):
+        client = APIClient()
+
+        # Can check bogus worker task status
+        res = client.get("/api/workers/check/bogus")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        reply = json.loads(res.content.decode("utf-8"))
+        self.assertEqual(reply["ready"], False)
+
+        # Can get bogus worker task status
+        res = client.get("/api/workers/get/bogus")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        reply = json.loads(res.content.decode("utf-8"))
+        self.assertEqual(reply["error"], "Task not ready")
+

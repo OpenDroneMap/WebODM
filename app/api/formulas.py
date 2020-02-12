@@ -94,6 +94,13 @@ camera_filters = [
     'NRG',
     'NRB',
 
+    'RGBN',
+
+    'BGRNRe',
+    'BGRReN',
+    'RGBNRe',
+    'RGBReN',
+
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
 ]
@@ -123,22 +130,25 @@ def lookup_formula(algo, band_order = 'RGB'):
     return expr, hrange
 
 @lru_cache(maxsize=2)
-def get_algorithm_list():
-    return [{'id': k, 'filters': get_camera_filters_for(algos[k]), **algos[k]} for k in algos if not k.startswith("_")]
+def get_algorithm_list(max_bands=3):
+    return [{'id': k, 'filters': get_camera_filters_for(algos[k], max_bands), **algos[k]} for k in algos if not k.startswith("_")]
 
-def get_camera_filters_for(algo):
+def get_camera_filters_for(algo, max_bands=3):
     result = []
     expr = algo['expr']
-    bands = list(set(re.findall("([A-Z]+?[a-z]*)", expr)))
+    pattern = re.compile("([A-Z]+?[a-z]*)")
+    bands = list(set(re.findall(pattern, expr)))
     for f in camera_filters:
         # Count bands that show up in the filter
         count = 0
-        for b in f:
+        fbands = list(set(re.findall(pattern, f)))
+
+        for b in fbands:
             if b in bands:
                 count += 1
 
         # If all bands are accounted for, this is a valid filter for this algo
-        if count >= len(bands):
+        if count >= len(bands) and len(fbands) <= max_bands:
             result.append(f)
 
     return result

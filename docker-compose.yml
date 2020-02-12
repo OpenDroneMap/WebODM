@@ -11,7 +11,7 @@ services:
     ports:
       - "5432"
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - dbdata:/var/lib/postgresql/data:Z
     restart: unless-stopped
     oom_score_adj: -100
   webapp:
@@ -19,7 +19,7 @@ services:
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
     volumes:
-      - ${WO_MEDIA_DIR}:/webodm/app/media
+      - ${WO_MEDIA_DIR}:/webodm/app/media:z
     ports:
       - "${WO_PORT}:8000"
     depends_on:
@@ -44,7 +44,7 @@ services:
     container_name: worker
     entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/wait-for-it.sh -t 0 webapp:8000 -- /webodm/worker.sh start"
     volumes:
-      - ${WO_MEDIA_DIR}:/webodm/app/media
+      - ${WO_MEDIA_DIR}:/webodm/app/media:z
     depends_on:
       - db
       - broker

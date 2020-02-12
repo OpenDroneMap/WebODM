@@ -1,21 +1,25 @@
 import rasterio
+from rasterio.enums import ColorInterp
 import urllib
 import os
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.mercator import get_zooms
 from rio_tiler import main
-from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap
+from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap, has_alpha_band, \
+    non_alpha_indexes
 from rio_tiler.profiles import img_profiles
 
 import numpy as np
 
+from app.raster_utils import export_raster_index
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
+from worker.tasks import export_raster_index
 
 ZOOM_EXTRA_LEVELS = 2
 
@@ -70,6 +74,7 @@ def rescale_tile(tile, mask, rescale = None):
         rescale_arr = list(_chunks(rescale_arr, 2))
         if len(rescale_arr) != tile.shape[0]:
             rescale_arr = ((rescale_arr[0]),) * tile.shape[0]
+
         for bdx in range(tile.shape[0]):
             if mask is not None:
                 tile[bdx] = np.where(
@@ -158,7 +163,12 @@ class Metadata(TaskNestedView):
             raise exceptions.NotFound()
 
         try:
-            info = main.metadata(raster_path, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
+            with rasterio.open(raster_path, "r") as src:
+                band_count = src.meta['count']
+                if has_alpha_band(src):
+                    band_count -= 1
+
+                info = main.metadata(src, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata
             raise exceptions.ValidationError("Cannot retrieve raster metadata: %s" % str(e))
@@ -186,7 +196,7 @@ class Metadata(TaskNestedView):
             colormaps = ['jet', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r']
-            algorithms = *get_algorithm_list(),
+            algorithms = *get_algorithm_list(band_count),
 
         info['color_maps'] = []
         info['algorithms'] = algorithms
@@ -308,8 +318,29 @@ class Tiles(TaskNestedView):
 
         with rasterio.open(url) as src:
             minzoom, maxzoom = get_zoom_safe(src)
+            has_alpha = has_alpha_band(src)
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
+
+            # Handle N-bands datasets for orthophotos (not plant health)
+            if tile_type == 'orthophoto' and expr is None:
+                ci = src.colorinterp
+
+                # More than 4 bands?
+                if len(ci) > 4:
+                    # Try to find RGBA band order
+                    if ColorInterp.red in ci and \
+                        ColorInterp.green in ci and \
+                        ColorInterp.blue in ci:
+                        indexes = (ci.index(ColorInterp.red) + 1,
+                                   ci.index(ColorInterp.green) + 1,
+                                   ci.index(ColorInterp.blue) + 1,)
+                    else:
+                        # Fallback to first three
+                        indexes = (1, 2, 3, )
+
+                elif has_alpha:
+                    indexes = non_alpha_indexes(src)
 
         resampling="nearest"
         padding=0
@@ -328,10 +359,6 @@ class Tiles(TaskNestedView):
                 )
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
-
-        # Use alpha channel for transparency, don't use the mask if one is provided (redundant)
-        if tile.shape[0] == 4:
-            mask = None
 
         if color_map:
             try:
@@ -381,3 +408,40 @@ class Tiles(TaskNestedView):
             array_to_image(rgb, rmask, img_format=driver, **options),
             content_type="image/{}".format(ext)
         )
+
+class Export(TaskNestedView):
+    def post(self, request, pk=None, project_pk=None):
+        """
+        Export an orthophoto after applying a formula
+        """
+        task = self.get_and_check_task(request, pk)
+
+        formula = request.data.get('formula')
+        bands = request.data.get('bands')
+        # rescale = request.data.get('rescale')
+
+        if formula == '': formula = None
+        if bands == '': bands = None
+        # if rescale == '': rescale = None
+
+        if not formula:
+            raise exceptions.ValidationError("You need to specify a formula parameter")
+
+        if not bands:
+            raise exceptions.ValidationError("You need to specify a bands parameter")
+
+        try:
+            expr, _ = lookup_formula(formula, bands)
+        except ValueError as e:
+            raise exceptions.ValidationError(str(e))
+
+        # if formula is not None and rescale is None:
+        #     rescale = "-1,1"
+
+        url = get_raster_path(task, "orthophoto")
+
+        if not os.path.isfile(url):
+            raise exceptions.NotFound()
+
+        celery_task_id = export_raster_index.delay(url, expr).task_id
+        return Response({'celery_task_id': celery_task_id})

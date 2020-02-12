@@ -2,7 +2,7 @@
 	"name": "OpenAerialMap",
 	"webodmMinVersion": "0.6.0",
 	"description": "A plugin to upload orthophotos to OpenAerialMap",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"author": "Piero Toffanin",
 	"email": "pt@masseranolabs.com",
 	"repository": "https://github.com/OpenDroneMap/WebODM",
