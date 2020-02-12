@@ -1,10 +1,11 @@
-.leaflet-control-layers-control{
+.leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control{
   z-index: 999;
-
+  
   a.leaflet-control-layers-control-button{
     background: url(../icons/layers.svg) 0 0 no-repeat;
     background-size: 26px 26px;
     border-radius: 2px;
+    background-position: 2px 2px;
   }
 
   div.layers-control-panel{ display: none; }
@@ -18,7 +19,4 @@
       display: block;
     }
   }
-}
-.leaflet-touch .leaflet-control-layers-control a {
-  background-position: 2px 2px;
 }
