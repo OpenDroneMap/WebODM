@@ -24,7 +24,7 @@ def export_raster_index(input, expression, output):
             except ValueError:
                 pass
 
-        bands_names = ["b{}".format(b) for b in tuple(set(re.findall(r"b(?P<bands>[0-9]{1,2})", expression)))]
+        bands_names = ["b{}".format(b) for b in tuple(sorted(set(re.findall(r"b(?P<bands>[0-9]{1,2})", expression))))]
         rgb = expression.split(",")
 
         arr = dict(zip(bands_names, data))
