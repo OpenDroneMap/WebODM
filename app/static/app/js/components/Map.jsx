@@ -71,6 +71,12 @@ class Map extends React.Component {
   }
 
   loadImageryLayers(forceAddLayers = false){
+    // Cancel previous requests
+    if (this.tileJsonRequests) {
+        this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
+        this.tileJsonRequests = [];
+    }
+
     const { tiles } = this.props,
           layerId = layer => {
             const meta = layer[Symbol.for("meta")];
@@ -197,9 +203,11 @@ class Map extends React.Component {
         );
       }, err => {
         if (err){
-          this.setState({error: err.message || JSON.stringify(err)});
-        }
-        resolve();
+          if (err !== "abort"){
+              this.setState({error: err.message || JSON.stringify(err)});
+          }
+          reject();
+        }else resolve();
       });
     });
   }
@@ -409,11 +417,11 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     });
 
     if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers();
+      this.loadImageryLayers(true);
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
-                               prevState.overlays !== this.state.overlays)){
+                            prevState.overlays !== this.state.overlays)){
         this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
   }
