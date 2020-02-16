@@ -23,7 +23,7 @@ def export_raster_index(input, expression, output):
         alpha_index = None
         if has_alpha_band(src):
             try:
-                alpha_index = src.colorinterp.index(ColorInterp.alpha)
+                alpha_index = src.colorinterp.index(ColorInterp.alpha) + 1
                 indexes += (alpha_index, )
             except ValueError:
                 pass
