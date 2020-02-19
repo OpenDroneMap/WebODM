@@ -23,6 +23,13 @@ algos = {
         'help': 'Visual Atmospheric Resistance Index shows the areas of vegetation.',
         'range': (-1, 1)
     },
+    ‘ExcessGreen’: {
+        ‘expr’: '(2*G)-(R+B),
+        ‘help’: ‘Excess Green Index emphasizes the greenness of leafy crops such as potatoes.’,
+        ‘range’: (-50,150)
+    },
+    
+    
     'BAI': {
         'expr': '1.0 / (((0.1 - R) ** 2) + ((0.06 - N) ** 2))',
         'help': 'Burn Area Index hightlights burned land in the red to near-infrared spectrum.'
