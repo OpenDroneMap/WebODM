@@ -141,11 +141,13 @@ class ProjectListItem extends React.Component {
         .on("uploadprogress", (file, progress, bytesSent) => {
             const now = new Date().getTime();
 
-            if (now - this.state.upload.lastUpdated > 500){
-                file.deltaBytesSent = bytesSent - file.deltaBytesSent;
-                file.trackedBytesSent += file.deltaBytesSent;
+            if (bytesSent > file.size) bytesSent = file.size;
+            
+            if (progress === 100 || now - this.state.upload.lastUpdated > 500){
+                const deltaBytesSent = bytesSent - file.deltaBytesSent;
+                file.trackedBytesSent += deltaBytesSent;
 
-                const totalBytesSent = this.state.upload.totalBytesSent + file.deltaBytesSent;
+                const totalBytesSent = this.state.upload.totalBytesSent + deltaBytesSent;
                 const progress = totalBytesSent / this.state.upload.totalBytes * 100;
 
                 this.setUploadState({
@@ -153,6 +155,8 @@ class ProjectListItem extends React.Component {
                     totalBytesSent,
                     lastUpdated: now
                 });
+
+                file.deltaBytesSent = bytesSent;
             }
         })
         .on("complete", (file) => {
