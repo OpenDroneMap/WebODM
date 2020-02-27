@@ -72,7 +72,12 @@ def build_plugins():
         # and run npm install if needed
         if plugin.path_exists("public/package.json") and not plugin.path_exists("public/node_modules"):
             logger.info("Running npm install for {}".format(plugin))
-            subprocess.call(['npm', 'install'], cwd=plugin.get_path("public"))
+
+            try:
+                subprocess.call(['npm', 'install'], cwd=plugin.get_path("public"))
+            except FileNotFoundError:
+                logger.warn("npm is not installed, will skip this plugin")
+                continue
 
         # Check if we need to generate a webpack.config.js
         if len(plugin.build_jsx_components()) > 0 and plugin.path_exists('public'):
@@ -105,8 +110,11 @@ def build_plugins():
                 subprocess.Popen(['webpack-cli', '--watch'], cwd=plugin.get_path("public"))
             elif not plugin.path_exists("public/build"):
                 logger.info("Running webpack for {}".format(plugin.get_name()))
-                subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
 
+                try:
+                    subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
+                except FileNotFoundError:
+                    logger.warn("webpack-cli is not installed, plugin will not work")
 
 def webpack_watch_process_count():
     count = 0
