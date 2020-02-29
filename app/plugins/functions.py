@@ -3,6 +3,7 @@ import logging
 import importlib
 import subprocess
 import traceback
+import platform
 
 import django
 import json
@@ -74,7 +75,10 @@ def build_plugins():
             logger.info("Running npm install for {}".format(plugin))
 
             try:
-                subprocess.call(['npm', 'install'], cwd=plugin.get_path("public"))
+                npm = "npm"
+                if platform.system() == "Windows":
+                    npm = "npm.cmd"
+                subprocess.call([npm, 'install'], cwd=plugin.get_path("public"))
             except FileNotFoundError:
                 logger.warn("npm is not installed, will skip this plugin")
                 continue
@@ -112,7 +116,11 @@ def build_plugins():
                 logger.info("Running webpack for {}".format(plugin.get_name()))
 
                 try:
-                    subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
+                    webpack = "webpack-cli"
+                    if platform.system() == "Windows":
+                        webpack = "webpack-cli.cmd"
+
+                    subprocess.call([webpack], cwd=plugin.get_path("public"))
                 except FileNotFoundError:
                     logger.warn("webpack-cli is not installed, plugin will not work")
 
