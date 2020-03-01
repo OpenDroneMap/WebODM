@@ -35,7 +35,7 @@ def main():
     Module("r.external", input=opts['dsm_file'], output="dsm", overwrite=True)
 
     # Set Grass region to vector bbox
-    Module("g.region", vector="region")
+    Module("g.region", vector="region", res="dsm")
 
     # Create a mask to speed up computation
     Module("r.mask", vector="region")
