@@ -34,7 +34,7 @@ def main():
     Module("v.buffer", input="polygon_area", s=True, type="area", output="region", distance=1, minordistance=1, overwrite=True)
     Module("r.external", input=opts['dsm_file'], output="dsm", overwrite=True)
 
-    # Set Grass region to vector bbox
+    # Set Grass region to vector bbox and resolution to DSM
     Module("g.region", vector="region", res="dsm")
 
     # Create a mask to speed up computation
