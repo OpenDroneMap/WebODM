@@ -4,8 +4,6 @@ import tempfile
 import subprocess
 import os
 
-from string import Template
-
 from webodm import settings
 
 logger = logging.getLogger('app.logger')
@@ -30,12 +28,12 @@ class GrassEngine:
 
 
 class GrassContext:
-    def __init__(self, grass_binary, tmpdir = None, template_args = {}, location = None, auto_cleanup=True):
+    def __init__(self, grass_binary, tmpdir = None, script_opts = {}, location = None, auto_cleanup=True):
         self.grass_binary = grass_binary
         if tmpdir is None:
             tmpdir = os.path.basename(tempfile.mkdtemp('_grass_engine', dir=settings.MEDIA_TMP))
         self.tmpdir = tmpdir
-        self.template_args = template_args
+        self.script_opts = script_opts
         self.location = location
         self.auto_cleanup = auto_cleanup
 
@@ -48,15 +46,15 @@ class GrassContext:
         dst_path = os.path.abspath(os.path.join(self.get_cwd(), filename))
         with open(dst_path, 'w') as f:
             f.write(source)
-        self.template_args[param] = dst_path
+        self.script_opts[param] = dst_path
 
         if use_as_location:
-            self.set_location(self.template_args[param])
+            self.set_location(self.script_opts[param])
 
         return dst_path
 
     def add_param(self, param, value):
-        self.template_args[param] = value
+        self.script_opts[param] = value
 
     def set_location(self, location):
         """
@@ -75,25 +73,12 @@ class GrassContext:
 
         script = os.path.abspath(script)
 
-        # Create grass script via template substitution
-        try:
-            with open(script) as f:
-                script_content = f.read()
-        except FileNotFoundError:
-            raise GrassEngineException("Script does not exist: {}".format(script))
-
-        tmpl = Template(script_content)
-
-        # Write script to disk
-        if not os.path.exists(self.get_cwd()):
-            os.mkdir(self.get_cwd())
-
-        with open(os.path.join(self.get_cwd(), 'script.sh'), 'w') as f:
-            f.write(tmpl.substitute(self.template_args))
+        # Create param list
+        params = ["{}={}".format(opt,value) for opt,value in self.script_opts.items()]
 
         # Execute it
-        logger.info("Executing grass script from {}: {} -c {} location --exec sh script.sh".format(self.get_cwd(), self.grass_binary, self.location))
-        p = subprocess.Popen([self.grass_binary, '-c', self.location, 'location', '--exec', 'sh', 'script.sh'],
+        logger.info("Executing grass script from {}: {} -c {} location --exec python {} {}".format(self.get_cwd(), self.grass_binary, self.location, script, " ".join(params)))
+        p = subprocess.Popen([self.grass_binary, '-c', self.location, 'location', '--exec', 'python', script] + params,
                              cwd=self.get_cwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
 
@@ -108,14 +93,15 @@ class GrassContext:
     def serialize(self):
         return {
             'tmpdir': self.tmpdir,
-            'template_args': self.template_args,
+            'script_opts': self.script_opts,
             'location': self.location,
             'auto_cleanup': self.auto_cleanup
         }
 
     def cleanup(self):
-        if os.path.exists(self.get_cwd()):
-            shutil.rmtree(self.get_cwd())
+        pass
+        # if os.path.exists(self.get_cwd()):
+        #     shutil.rmtree(self.get_cwd())
 
     def __del__(self):
         if self.auto_cleanup:
