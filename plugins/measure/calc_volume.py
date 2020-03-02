@@ -60,30 +60,3 @@ def main():
 if __name__ == "__main__":
     opts, _ = grass.parser()
     sys.exit(main())
-
-#Import raster and vector
-# v.import input=${area_file} output=polygon_area --overwrite
-# v.import input=${points_file} output=polygon_points --overwrite
-# v.buffer -s --overwrite input=polygon_area type=area output=region distance=1 minordistance=1
-# r.external input=${dsm_file} output=dsm --overwrite
-#
-# # Set Grass region to vector bbox
-# g.region vector=region
-#
-# # Create a mask to speed up computation
-# r.mask vect=region
-#
-# # Transfer dsm raster data to vector
-# v.what.rast map=polygon_points raster=dsm column=height
-#
-# # Decimate DSM and generate interpolation of new terrain
-# v.surf.rst --overwrite input=polygon_points zcolumn=height elevation=dsm_below_pile
-#
-# # Compute difference between dsm and new dsm
-# r.mapcalc expression='pile_height_above_dsm=dsm-dsm_below_pile' --overwrite
-#
-# # Set region to polygon area to calculate volume
-# g.region vect=polygon_area
-#
-# # Volume output from difference
-# r.volume -f input=pile_height_above_dsm
