@@ -149,10 +149,11 @@ class TestPlugins(BootTestCase):
         ctx.set_location("EPSG:4326")
 
         result = execute_grass_script.delay(
-            os.path.join(grass_scripts_dir, "simple_test.grass"),
+            os.path.join(grass_scripts_dir, "simple_test.py"),
             ctx.serialize()
         ).get()
-        self.assertTrue("Number of points:       1" in result.get('output'))
+
+        self.assertEqual("Number of points: 1", result.get('output'))
 
         self.assertTrue(result.get('context') == ctx.serialize())
 
@@ -160,24 +161,24 @@ class TestPlugins(BootTestCase):
         self.assertFalse(os.path.exists(ctx.get_cwd()))
 
         error = execute_grass_script.delay(
-            os.path.join(grass_scripts_dir, "nonexistant_script.grass"),
+            os.path.join(grass_scripts_dir, "nonexistant_script.py"),
             ctx.serialize()
         ).get()
         self.assertIsInstance(error, dict)
         self.assertIsInstance(error['error'], str)
 
         with self.assertRaises(GrassEngineException):
-            ctx.execute(os.path.join(grass_scripts_dir, "nonexistant_script.grass"))
+            ctx.execute(os.path.join(grass_scripts_dir, "nonexistant_script.py"))
 
         ctx = grass.create_context({"auto_cleanup": False})
         ctx.add_file('test.geojson', points)
         ctx.set_location("EPSG:4326")
 
         result = execute_grass_script.delay(
-            os.path.join(grass_scripts_dir, "simple_test.grass"),
+            os.path.join(grass_scripts_dir, "simple_test.py"),
             ctx.serialize()
         ).get()
-        self.assertTrue("Number of points:       1" in result.get('output'))
+        self.assertEqual("Number of points: 1", result.get('output'))
 
         # Path still there
         self.assertTrue(os.path.exists(ctx.get_cwd()))
