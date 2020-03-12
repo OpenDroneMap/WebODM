@@ -1,23 +1,84 @@
-#!/usr/bin/env python3
+#%module
+#% description: This script takes a GeoTIFF file, calculates its heighmap, and outputs it as a GeoJSON
+#%end
+#%option
+#% key: dsm
+#% type: string
+#% required: yes
+#% multiple: no
+#% description: The path for the dsm file
+#%end
+#%option
+#% key: intervals
+#% type: double
+#% required: yes
+#% multiple: no
+#% description: The intervals used to generate the diferent elevation levels
+#%end
+#%option
+#% key: format
+#% type: string
+#% required: yes
+#% multiple: no
+#% description: OGR output format
+#%end
+#%option
+#% key: dtm
+#% type: string
+#% required: no
+#% multiple: no
+#% description: The path for the dtm file
+#%end
+#%option
+#% key: epsg
+#% type: string
+#% required: yes
+#% multiple: no
+#% description: The epsg code that will be used for output
+#%end
+#%option
+#% key: noise_filter_size
+#% type: double
+#% required: yes
+#% multiple: no
+#% description: Area in meters where we will clean up noise in the contours
+#%end
+
 
 import cv2, math, argparse
 import numpy as np
 import rasterio as rio
 from rasterio import warp, transform
-from geojson import Feature, FeatureCollection, MultiPolygon, dumps 
+from geojson import Feature, FeatureCollection, MultiPolygon, dumps
+import subprocess
+import os
+import glob
+import shutil
+import sys
+import grass.script as grass
 
-def main(args):
+def main():
+    ext = ""
+    if opts['format'] == "GeoJSON":
+        ext = "json"
+    elif opts['format'] == "GPKG":
+        ext = "gpkg"
+    elif opts['format'] == "DXF":
+        ext = "dxf"
+    elif opts['format'] == "ESRI Shapefile":
+        ext = "shp"
+
     # Open dsm
-    dsm = rio.open(args.dsm)
+    dsm = rio.open(opts['dsm'])
     # Read the tiff as an numpy masked array
     dsm_array = dsm.read(1, masked = True)
     # Create a kernel based on the parameter 'noise_filter_size' and the tiff resolution
-    kernel = get_kernel(args.noise_filter_size, dsm)
+    kernel = get_kernel(float(opts['noise_filter_size']), dsm)
     
     # Check if we want to use the dtm also
-    if args.dtm != None:
+    if opts['dtm'] != '':
         # Open the dtm
-        dtm = rio.open(args.dtm)
+        dtm = rio.open(opts['dtm'])
         # Assert that the dtm and dsm have the same bounds and resolution
         assert_same_bounds_and_resolution(dsm, dtm)
         # Calculate the different between the dsm and dtm
@@ -26,7 +87,7 @@ def main(args):
         array = dsm_array    
     
     # Calculate the ranges based on the parameter 'intervals' and the elevation array
-    ranges = calculate_ranges(args.intervals, array)   
+    ranges = calculate_ranges(opts['intervals'], array)
         
     features = []
     
@@ -40,15 +101,32 @@ def main(args):
         # Check if we found something
         if len(contours) > 0:
             # Transform contours from pixels to coordinates
-            mapped_contours = [map_pixels_to_coordinates(dsm, args.epsg, to_pixel_format(contour)) for contour in contours]
+            mapped_contours = [map_pixels_to_coordinates(dsm, opts['epsg'], to_pixel_format(contour)) for contour in contours]
             # Build the MultiPolygon for based on the contours and their hierarchy
             built_multi_polygon = LevelBuilder(bottom, top, mapped_contours, hierarchy[0]).build_multi_polygon()
             features.append(built_multi_polygon)
     
     # Write the GeoJSON to a file
     dump = dumps(FeatureCollection(features))
-    with open(args.output, 'w+') as output:
-        output.write(dump)   
+    with open("output.json", 'w+') as output:
+        output.write(dump)
+
+    if ext != "json":
+        subprocess.check_call(["ogr2ogr", "-f", opts['format'], "output.%s" % ext, "output.json"], stdout=subprocess.DEVNULL)
+
+    if os.path.isfile("output.%s" % ext):
+        if opts['format'] == "ESRI Shapefile":
+            ext="zip"
+            os.makedirs("contours")
+            contour_files = glob.glob("output.*")
+            for cf in contour_files:
+                shutil.move(cf, os.path.join("contours", os.path.basename(cf)))
+
+            shutil.make_archive('output', 'zip', 'contours/')
+
+        print(os.path.join(os.getcwd(), "output.%s" % ext))
+    else:
+        print("error")
 
 def get_kernel(noise_filter_size, dsm):
     """Generate a kernel for noise filtering. Will return none if the noise_filter_size isn't positive"""
@@ -151,18 +229,7 @@ class LevelBuilder:
         multi_polygon = MultiPolygon(polygons)
         return Feature(geometry = multi_polygon, properties = { 'bottom': int(self.bottom), 'top': int(self.top) })  
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'This script takes a GeoTIFF file, calculates its heighmap, and outputs it as a GeoJSON')
-    parser.add_argument('dsm', type = str, help = 'The path for the dsm file')
-    parser.add_argument('intervals', type = str, help = 'The intervals used to generate the diferent elevation levels')
-    parser.add_argument('-d', '--dtm', type = str, help = 'The path for the dtm file')
-    parser.add_argument('-e', '--epsg', type = int, help = 'The epsg code that will be used for output', default = 4326)
-    parser.add_argument('-k', '--noise_filter_size', type = float, help = 'Area in meters where we will clean up noise in the contours', default = 2)
-    parser.add_argument('-o', '--output', type = str, help = 'The path for the output file', default = "output.json")
-    
-    args = parser.parse_args()
-    try:
-        main(args)
-    except Exception as e:
-        with open('error.txt', 'w+') as output:
-            output.write(str(e))
+
+if __name__ == "__main__":
+    opts, _ = grass.parser()
+    sys.exit(main())
