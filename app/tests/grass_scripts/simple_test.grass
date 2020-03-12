@@ -1,6 +1,0 @@
-# test: Geospatial test file
-# ------
-# output: greets the user and prints the information of a spatial file
-
-v.in.ogr input=${test} layer=test output=test --overwrite
-v.info map=test

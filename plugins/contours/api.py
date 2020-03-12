@@ -42,7 +42,7 @@ class TaskContoursGenerate(TaskView):
 
             celery_task_id = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                "calc_contours.grass"
+                "calc_contours.py"
             ), context.serialize(), 'file').task_id
 
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
