@@ -41,7 +41,7 @@ class TaskVolume(TaskView):
 
             celery_task_id = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                "calc_volume.grass"
+                "calc_volume.py"
             ), context.serialize()).task_id
 
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
