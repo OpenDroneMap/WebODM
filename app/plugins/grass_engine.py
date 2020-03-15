@@ -73,6 +73,10 @@ class GrassContext:
 
         script = os.path.abspath(script)
 
+        # Make sure working directory exists
+        if not os.path.exists(self.get_cwd()):
+            os.mkdir(self.get_cwd())
+
         # Create param list
         params = ["{}={}".format(opt,value) for opt,value in self.script_opts.items()]
 
@@ -99,9 +103,8 @@ class GrassContext:
         }
 
     def cleanup(self):
-        pass
-        # if os.path.exists(self.get_cwd()):
-        #     shutil.rmtree(self.get_cwd())
+        if os.path.exists(self.get_cwd()):
+            shutil.rmtree(self.get_cwd())
 
     def __del__(self):
         if self.auto_cleanup:

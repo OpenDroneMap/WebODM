@@ -37,21 +37,18 @@ class TaskElevationMapGenerate(TaskView):
             noise_filter_size = float(request.data.get('noise_filter_size', 2))
 
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            context.add_param('dsm_file', dsm)
+            context.add_param('dsm', dsm)
             context.add_param('interval', interval)
             context.add_param('format', format)
             context.add_param('noise_filter_size', noise_filter_size)
             context.add_param('epsg', epsg)
-            context.add_param('python_script_path', os.path.join(current_dir, "elevationmap.py"))
-            context.add_param('python_path', plugin.get_python_packages_path())
 
             if dtm != None:
-                context.add_param('dtm', '--dtm {}'.format(dtm))
-            else:
-                context.add_param('dtm', '')    
+                context.add_param('dtm', dtm)
+
             context.set_location(dsm)
 
-            celery_task_id = execute_grass_script.delay(os.path.join(current_dir, "calc_elevation_map.grass"), context.serialize()).task_id
+            celery_task_id = execute_grass_script.delay(os.path.join(current_dir, "elevationmap.py"), context.serialize()).task_id
 
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
         except GrassEngineException as e:
