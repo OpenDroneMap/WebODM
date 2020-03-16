@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os, sys, json, platform
+import os, sys, json
 
 import datetime
 
@@ -335,10 +335,6 @@ CELERY_INCLUDE=['worker.tasks']
 CELERY_WORKER_REDIRECT_STDOUTS = False
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
-if platform.system() == "Windows":
-    GDAL_LIBRARY_PATH = ".venv/Lib/site-packages/osgeo/gdal300"
-    GEOS_LIBRARY_PATH = ".venv/Lib/site-packages/shapely/DLLs/geos_c"
-    
 if TESTING:
     CELERY_TASK_ALWAYS_EAGER = True
 
