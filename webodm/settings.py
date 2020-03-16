@@ -338,6 +338,7 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 if platform.system() == "Windows":
     GDAL_LIBRARY_PATH = ".venv/Lib/site-packages/osgeo/gdal300"
     GEOS_LIBRARY_PATH = ".venv/Lib/site-packages/shapely/DLLs/geos_c"
+    
 if TESTING:
     CELERY_TASK_ALWAYS_EAGER = True
 
