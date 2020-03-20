@@ -67,6 +67,9 @@ SINGLE_USER_MODE = False
 # URL to redirect to if there are no processing nodes when visiting the dashboard
 PROCESSING_NODES_ONBOARDING = None
 
+# Default CSS to add to theme
+DEFAULT_THEME_CSS = ''
+
 # Application definition
 
 INSTALLED_APPS = [

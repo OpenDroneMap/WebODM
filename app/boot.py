@@ -71,6 +71,10 @@ def boot():
         if created:
             logger.info("Created default theme")
 
+            if settings.DEFAULT_THEME_CSS:
+                default_theme.css = settings.DEFAULT_THEME_CSS
+                default_theme.save()
+
         if Setting.objects.all().count() == 0:
             s = Setting.objects.create(
                     app_name=settings.APP_NAME,
