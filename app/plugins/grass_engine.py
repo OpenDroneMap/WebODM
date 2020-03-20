@@ -3,6 +3,7 @@ import shutil
 import tempfile
 import subprocess
 import os
+import platform
 
 from webodm import settings
 
@@ -80,16 +81,33 @@ class GrassContext:
         # Create param list
         params = ["{}={}".format(opt,value) for opt,value in self.script_opts.items()]
 
+        # Track success, output
+        success = False
+        out = ""
+        err = ""
+
         # Execute it
         logger.info("Executing grass script from {}: {} -c {} location --exec python {} {}".format(self.get_cwd(), self.grass_binary, self.location, script, " ".join(params)))
-        p = subprocess.Popen([self.grass_binary, '-c', self.location, 'location', '--exec', 'python', script] + params,
-                             cwd=self.get_cwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = p.communicate()
+        
+        command = [self.grass_binary, '-c', self.location, 'location', '--exec', 'python', script] + params
+        if platform.system() == "Windows":
+            # communicate() hangs on Windows so we use check_output instead
+            try:
+                out = subprocess.check_output(command, cwd=self.get_cwd()).decode('utf-8').strip()
+                success = True
+            except subprocess.CalledProcessError:
+                success = False
+                err = out
+        else:
+            p = subprocess.Popen(command, cwd=self.get_cwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            out, err = p.communicate()
 
-        out = out.decode('utf-8').strip()
-        err = err.decode('utf-8').strip()
+            out = out.decode('utf-8').strip()
+            err = err.decode('utf-8').strip()
+            success = p.returncode == 0
 
-        if p.returncode == 0:
+        if success:
             return out
         else:
             raise GrassEngineException("Could not execute GRASS script {} from {}: {}".format(script, self.get_cwd(), err))
