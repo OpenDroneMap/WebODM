@@ -1,8 +1,10 @@
 {% extends "app/base.html" %}
-{% load i18n static %}
-
+{% load i18n static settings %}
 
 {% block navbar-top-links %}
+    {% is_single_user_mode as single_user %}
+
+    {% if not single_user %}
     <ul class="nav navbar-top-links navbar-right">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -21,6 +23,7 @@
         </li>
         <!-- /.dropdown -->
     </ul>
+    {% endif %}
 {% endblock %}
 {% block navbar-sidebar %}
     <div class="navbar-default sidebar" role="navigation">
@@ -75,12 +78,16 @@
                 <li>
                     <a href="#"><i class="fa fa-cogs fa-fw"></i> {% trans 'Administration' %}<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
+                        {% is_single_user_mode as hide_users %}
+                        {% if not hide_users %}
                         <li>
                             <a href="/admin/auth/user/"><i class="fa fa-user fa-fw"></i> {% trans 'Accounts' %}</a>
                         </li>
                         <li>
                             <a href="/admin/auth/group/"><i class="fa fa-users fa-fw"></i> {% trans 'Groups' %}</a>
                         </li>
+                        {% endif %}
+
                         <li>
                             <a href="{% url 'admin:app_setting_change' SETTINGS.id %}"><i class="fa fa-magic fa-fw"></i> {% trans 'Brand' %}</a>
                         </li>

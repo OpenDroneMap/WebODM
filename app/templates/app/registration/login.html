@@ -1,5 +1,6 @@
 {% extends 'registration/registration_base.html' %}
 {% load i18n %}
+{% load settings %}
 
 {% block registration_content %}
     {% if form.errors %}
@@ -7,6 +8,12 @@
             <p><strong>{% trans "Invalid credentials." %}</strong> {% trans "Note that both fields are case-sensitive." %}</p>
         </div>
     {% endif %}
+
+    {% is_single_user_mode as autologin %}
+
+    {% if autologin %}
+        <script>location.href='/';</script>
+    {% else %}
     <form action="{% url 'login' %}" method="post" class="form-horizontal" role="form">{% csrf_token %}
         {% for field in form %}
             {% include 'registration/form_field.html' %}
@@ -27,4 +34,5 @@
             </div>
         </div>
     </form>
+    {% endif %}
 {% endblock %}
