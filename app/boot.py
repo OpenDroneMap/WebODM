@@ -72,12 +72,10 @@ def boot():
             logger.info("Created default theme")
 
         if Setting.objects.all().count() == 0:
-            default_logo = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
-
             s = Setting.objects.create(
-                    app_name='WebODM',
+                    app_name=settings.APP_NAME,
                     theme=default_theme)
-            s.app_logo.save(os.path.basename(default_logo), File(open(default_logo, 'rb')))
+            s.app_logo.save(os.path.basename(settings.APP_DEFAULT_LOGO), File(open(settings.APP_DEFAULT_LOGO, 'rb')))
 
             logger.info("Created settings")
 
