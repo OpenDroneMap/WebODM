@@ -34,6 +34,9 @@ def index(request):
 @login_required
 def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
+    if no_processingnodes and settings.PROCESSING_NODES_ONBOARDING is not None:
+        return redirect(settings.PROCESSING_NODES_ONBOARDING)
+
     no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
 
     # Create first project automatically

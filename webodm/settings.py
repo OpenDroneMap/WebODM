@@ -64,6 +64,9 @@ APP_DEFAULT_LOGO = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
 # used so that no login windows are displayed
 SINGLE_USER_MODE = False
 
+# URL to redirect to if there are no processing nodes when visiting the dashboard
+PROCESSING_NODES_ONBOARDING = None
+
 # Application definition
 
 INSTALLED_APPS = [
