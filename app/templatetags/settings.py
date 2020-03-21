@@ -2,9 +2,14 @@ import datetime
 
 import logging
 from django import template
+from webodm import settings
 
 register = template.Library()
 logger = logging.getLogger('app.logger')
+
+@register.simple_tag
+def is_single_user_mode():
+    return settings.SINGLE_USER_MODE
 
 
 @register.simple_tag(takes_context=True)

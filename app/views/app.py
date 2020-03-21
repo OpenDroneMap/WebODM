@@ -13,19 +13,30 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django import forms
+from webodm import settings
 
 def index(request):
-    # Check first access where the user is expected to
-    # create an admin account
+    # Check first access
     if User.objects.filter(is_superuser=True).count() == 0:
-        return redirect('welcome')
+        if settings.SINGLE_USER_MODE:
+            # Automatically create a default account
+            User.objects.create_superuser('admin', 'admin@localhost', 'admin')
+        else:
+            # the user is expected to create an admin account
+            return redirect('welcome')
 
-    return redirect('dashboard' if request.user.is_authenticated
-                    else 'login')
+    if settings.SINGLE_USER_MODE and not request.user.is_authenticated:
+        login(request, User.objects.get(username="admin"), 'django.contrib.auth.backends.ModelBackend')
+
+    return redirect(settings.LOGIN_REDIRECT_URL if request.user.is_authenticated
+                    else settings.LOGIN_URL)
 
 @login_required
 def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
+    if no_processingnodes and settings.PROCESSING_NODES_ONBOARDING is not None:
+        return redirect(settings.PROCESSING_NODES_ONBOARDING)
+
     no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
 
     # Create first project automatically

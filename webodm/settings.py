@@ -56,6 +56,19 @@ INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
 
+# Branding
+APP_NAME = "WebODM"
+APP_DEFAULT_LOGO = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
+
+# In single user mode, a default admin account is created and automatically
+# used so that no login windows are displayed
+SINGLE_USER_MODE = False
+
+# URL to redirect to if there are no processing nodes when visiting the dashboard
+PROCESSING_NODES_ONBOARDING = None
+
+# Default CSS to add to theme
+DEFAULT_THEME_CSS = ''
 
 # Application definition
 
