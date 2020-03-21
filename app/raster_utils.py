@@ -42,5 +42,8 @@ def export_raster_index(input, expression, output):
         index_band[index_band>1e+30] = -9999
         index_band[index_band<-1e+30] = -9999
 
+        # Make sure this is float32
+        arr = arr.astype(np.float32)
+
         with rasterio.open(output, 'w', **profile) as dst:
             dst.write(arr)
