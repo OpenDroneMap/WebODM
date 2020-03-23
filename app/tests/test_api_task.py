@@ -795,7 +795,7 @@ class TestApiTask(BootTransactionTestCase):
             worker.tasks.process_pending_tasks()
 
             task = Task.objects.get(pk=res.data['id'])
-            self.assertTrue(task.status == status_codes.COMPLETED)
+            self.assertEqual(task.status, status_codes.COMPLETED)
 
             # Orthophoto files/directories should be missing
             self.assertFalse(os.path.exists(task.assets_path("odm_orthophoto", "odm_orthophoto.tif")))

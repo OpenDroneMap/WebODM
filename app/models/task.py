@@ -897,7 +897,9 @@ class Task(models.Model):
 
         try:
             gcpFile = GCPFile(gcp_path)
-            return gcpFile.create_resized_copy(gcp_path, image_ratios)
+            gcpFile.create_resized_copy(gcp_path, image_ratios)
+            logger.info("Resized GCP file {}".format(gcp_path))
+            return gcp_path
         except Exception as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
 

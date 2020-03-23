@@ -58,9 +58,6 @@ class GCPFile:
         :param image_ratios dictionary with "imagename" --> "resize_ratio" values
         :return path to new GCP file
         """
-        if os.path.exists(gcp_file_output):
-            os.remove(gcp_file_output)
-
         output = [self.raw_srs]
 
         for entry in self.iter_entries():
