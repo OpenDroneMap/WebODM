@@ -64,8 +64,8 @@ class GCPFile:
         output = [self.raw_srs]
 
         for entry in self.iter_entries():
-            entry.px *= image_ratios.get(entry.filename, 1.0)
-            entry.py *= image_ratios.get(entry.filename, 1.0)
+            entry.px *= image_ratios.get(entry.filename.lower(), 1.0)
+            entry.py *= image_ratios.get(entry.filename.lower(), 1.0)
             output.append(str(entry))
 
         with open(gcp_file_output, 'w') as f:

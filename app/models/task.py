@@ -893,7 +893,7 @@ class Task(models.Model):
 
         image_ratios = {}
         for ri in resized_images:
-            image_ratios[os.path.basename(ri['path'])] = ri['resize_ratio']
+            image_ratios[os.path.basename(ri['path']).lower()] = ri['resize_ratio']
 
         try:
             gcpFile = GCPFile(gcp_path)
