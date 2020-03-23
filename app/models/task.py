@@ -35,6 +35,7 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
 from webodm import settings
+from app.classes.gcp import GCPFile
 from .project import Project
 
 from functools import partial
@@ -889,21 +890,17 @@ class Task(models.Model):
 
         # Assume we only have a single GCP file per task
         gcp_path = gcp_path[0]
-        resize_script_path = os.path.join(settings.BASE_DIR, 'app', 'scripts', 'resize_gcp.js')
 
-        dict = {}
+        image_ratios = {}
         for ri in resized_images:
-            dict[os.path.basename(ri['path'])] = ri['resize_ratio']
+            image_ratios[os.path.basename(ri['path'])] = ri['resize_ratio']
 
         try:
-            new_gcp_content = subprocess.check_output("node {} {} '{}'".format(quote(resize_script_path), quote(gcp_path), json.dumps(dict)), shell=True)
-            with open(gcp_path, 'w') as f:
-                f.write(new_gcp_content.decode('utf-8'))
-            logger.info("Resized GCP file {}".format(gcp_path))
-            return gcp_path
-        except subprocess.CalledProcessError as e:
+            gcpFile = GCPFile(gcp_path)
+            return gcpFile.create_resized_copy(gcp_path, image_ratios)
+        except Exception as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
-            return None
+
 
     def create_task_directories(self):
         """
