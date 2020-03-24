@@ -35,6 +35,7 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
 from webodm import settings
+from app.classes.gcp import GCPFile
 from .project import Project
 
 from functools import partial
@@ -628,7 +629,7 @@ class Task(models.Model):
                             os.makedirs(assets_dir)
 
                             # Download and try to extract results up to 4 times
-                            # (~95% of the times, on large downloads, the archive could be corrupted)
+                            # (~5% of the times, on large downloads, the archive could be corrupted)
                             retry_num = 0
                             extracted = False
                             last_update = 0
@@ -648,7 +649,7 @@ class Task(models.Model):
                                 logger.info("Downloading all.zip for {}".format(self))
 
                                 # Download all assets
-                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
+                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback, parallel_downloads=max(1, int(16 / (2 ** retry_num))))
 
                                 # Rename to all.zip
                                 all_zip_path = self.assets_path("all.zip")
@@ -660,7 +661,7 @@ class Task(models.Model):
                                     self.extract_assets_and_complete()
                                     extracted = True
                                 except zipfile.BadZipFile:
-                                    if retry_num < 4:
+                                    if retry_num < 5:
                                         logger.warning("{} seems corrupted. Retrying...".format(all_zip_path))
                                         retry_num += 1
                                         os.remove(all_zip_path)
@@ -889,21 +890,19 @@ class Task(models.Model):
 
         # Assume we only have a single GCP file per task
         gcp_path = gcp_path[0]
-        resize_script_path = os.path.join(settings.BASE_DIR, 'app', 'scripts', 'resize_gcp.js')
 
-        dict = {}
+        image_ratios = {}
         for ri in resized_images:
-            dict[os.path.basename(ri['path'])] = ri['resize_ratio']
+            image_ratios[os.path.basename(ri['path']).lower()] = ri['resize_ratio']
 
         try:
-            new_gcp_content = subprocess.check_output("node {} {} '{}'".format(quote(resize_script_path), quote(gcp_path), json.dumps(dict)), shell=True)
-            with open(gcp_path, 'w') as f:
-                f.write(new_gcp_content.decode('utf-8'))
+            gcpFile = GCPFile(gcp_path)
+            gcpFile.create_resized_copy(gcp_path, image_ratios)
             logger.info("Resized GCP file {}".format(gcp_path))
             return gcp_path
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
-            return None
+
 
     def create_task_directories(self):
         """

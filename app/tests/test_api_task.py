@@ -169,14 +169,14 @@ class TestApiTask(BootTransactionTestCase):
 
                 [x, y, z, px, py, imagename, *extras] = lines[1].split(' ')
                 self.assertTrue(imagename == "tiny_drone_image.JPG") # case insensitive
-                self.assertTrue(float(px) == 2.0) # scaled by half
-                self.assertTrue(float(py) == 3.0) # scaled by half
-                self.assertTrue(float(x) == 576529.22) # Didn't change
+                self.assertEqual(float(px), 2.0) # scaled by half
+                self.assertEqual(float(py), 3.0) # scaled by half
+                self.assertEqual(float(x), 576529.22) # Didn't change
 
                 [x, y, z, px, py, imagename, *extras] = lines[5].split(' ')
-                self.assertTrue(imagename == "missing_image.jpg")
-                self.assertTrue(float(px) == 8.0)  # Didn't change
-                self.assertTrue(float(py) == 8.0)  # Didn't change
+                self.assertEqual(imagename, "missing_image.jpg")
+                self.assertEqual(float(px), 8.0)  # Didn't change
+                self.assertEqual(float(py), 8.0)  # Didn't change
 
             # Resize progress is 100%
             resized_task.refresh_from_db()
@@ -795,7 +795,7 @@ class TestApiTask(BootTransactionTestCase):
             worker.tasks.process_pending_tasks()
 
             task = Task.objects.get(pk=res.data['id'])
-            self.assertTrue(task.status == status_codes.COMPLETED)
+            self.assertEqual(task.status, status_codes.COMPLETED)
 
             # Orthophoto files/directories should be missing
             self.assertFalse(os.path.exists(task.assets_path("odm_orthophoto", "odm_orthophoto.tif")))
