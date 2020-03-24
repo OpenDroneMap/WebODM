@@ -70,6 +70,11 @@ PROCESSING_NODES_ONBOARDING = None
 # Default CSS to add to theme
 DEFAULT_THEME_CSS = ''
 
+# Plugins never to load
+PLUGINS_BLACKLIST = [
+    #'measure',
+]
+
 # Application definition
 
 INSTALLED_APPS = [
