@@ -629,7 +629,7 @@ class Task(models.Model):
                             os.makedirs(assets_dir)
 
                             # Download and try to extract results up to 4 times
-                            # (~95% of the times, on large downloads, the archive could be corrupted)
+                            # (~5% of the times, on large downloads, the archive could be corrupted)
                             retry_num = 0
                             extracted = False
                             last_update = 0
@@ -649,7 +649,7 @@ class Task(models.Model):
                                 logger.info("Downloading all.zip for {}".format(self))
 
                                 # Download all assets
-                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
+                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback, parallel_downloads=max(1, int(16 / (2 ** retry_num))))
 
                                 # Rename to all.zip
                                 all_zip_path = self.assets_path("all.zip")
@@ -661,7 +661,7 @@ class Task(models.Model):
                                     self.extract_assets_and_complete()
                                     extracted = True
                                 except zipfile.BadZipFile:
-                                    if retry_num < 4:
+                                    if retry_num < 5:
                                         logger.warning("{} seems corrupted. Retrying...".format(all_zip_path))
                                         retry_num += 1
                                         os.remove(all_zip_path)

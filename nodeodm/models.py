@@ -160,13 +160,13 @@ class ProcessingNode(models.Model):
         task = api_client.get_task(uuid)
         return task.remove()
 
-    def download_task_assets(self, uuid, destination, progress_callback):
+    def download_task_assets(self, uuid, destination, progress_callback, parallel_downloads=16):
         """
         Downloads a task asset
         """
         api_client = self.api_client()
         task = api_client.get_task(uuid)
-        return task.download_zip(destination, progress_callback)
+        return task.download_zip(destination, progress_callback, parallel_downloads=parallel_downloads)
 
     def restart_task(self, uuid, options = None):
         """
