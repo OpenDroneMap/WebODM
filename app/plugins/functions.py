@@ -231,6 +231,10 @@ def get_plugins():
                             manifest_path, min_version, settings.VERSION))
                     continue
 
+            # Skip plugins in blacklist
+            if plugin.get_name() in settings.PLUGINS_BLACKLIST:
+                continue
+
             plugins.append(plugin)
         except Exception as e:
             logger.warning("Failed to instantiate plugin {}: {}".format(dir, e))
