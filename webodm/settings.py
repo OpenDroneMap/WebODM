@@ -45,6 +45,7 @@ with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
     VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
+FLUSHING = sys.argv[1:2] == ['flush']
 MIGRATING = sys.argv[1:2] == ['migrate']
 WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
@@ -356,7 +357,7 @@ CELERY_INCLUDE=['worker.tasks']
 CELERY_WORKER_REDIRECT_STDOUTS = False
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
-if TESTING:
+if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
 
 try:
