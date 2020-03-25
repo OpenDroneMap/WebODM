@@ -75,6 +75,9 @@ PLUGINS_BLACKLIST = [
     #'measure',
 ]
 
+# Serve media static files URLs even in production
+FORCE_MEDIA_STATICFILES = False
+
 # Application definition
 
 INSTALLED_APPS = [
