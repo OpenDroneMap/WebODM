@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
 
-if settings.DEBUG:
+if settings.DEBUG or settings.FORCE_MEDIA_STATICFILES:
     urlpatterns += [
         # Expose imagekit generated files and settings file uploads
         url(r'^media/CACHE/(?P<path>.*)$', serve, {
