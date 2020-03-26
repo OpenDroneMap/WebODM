@@ -80,6 +80,8 @@ Windows and macOS users can purchase an automated [installer](https://www.opendr
 
 You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
 
+Windows users looking for a UI-only native installation should also check [webodm.net](https://webodm.net).
+
 ### Manage Processing Nodes
 
 WebODM can be linked to one or more processing nodes that speak the [NodeODM API](https://github.com/OpenDroneMap/NodeODM/blob/master/docs/index.adoc), such as [NodeODM](https://github.com/OpenDroneMap/NodeODM), [NodeMICMAC](https://github.com/dronemapper-io/NodeMICMAC/) or [ClusterODM](https://github.com/OpenDroneMap/ClusterODM). The default configuration includes a "node-odm-1" processing node which runs on the same machine as WebODM, just to help you get started. As you become more familiar with WebODM, you might want to install processing nodes on separate machines.
@@ -354,8 +356,9 @@ To run WebODM, you will need to install:
  * Python 3.5
  * GDAL (>= 2.1)
  * Node.js (>= 6.0)
- * Nginx (Linux/MacOS) - OR - Apache + mod_wsgi (Windows)
+ * Nginx (Linux/MacOS) - OR - Apache + mod_wsgi or Waitress (Windows)
  * Redis (>= 2.6)
+ * GRASS GIS (>= 7.6)
 
 On Linux, make sure you have:
 
