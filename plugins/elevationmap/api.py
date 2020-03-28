@@ -25,7 +25,7 @@ class TaskElevationMapGenerate(TaskView):
             return Response({'error': 'No DTM layer is available. You need one to set the ground as reference.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            context = grass.create_context({'auto_cleanup' : False, 'location': 'epsg:3857'})
+            context = grass.create_context({'auto_cleanup' : False, 'location': 'epsg:3857', 'python_path': plugin.get_python_packages_path()})
             dsm = os.path.abspath(task.get_asset_download_path("dsm.tif"))
             dtm = os.path.abspath(task.get_asset_download_path("dtm.tif")) if reference.lower() == 'ground' else None
             epsg = int(request.data.get('epsg', '3857'))

@@ -35,7 +35,7 @@ class GrassEngine:
 
 
 class GrassContext:
-    def __init__(self, grass_binary, tmpdir = None, script_opts = {}, location = None, auto_cleanup=True):
+    def __init__(self, grass_binary, tmpdir = None, script_opts = {}, location = None, auto_cleanup=True, python_path=None):
         self.grass_binary = grass_binary
         if tmpdir is None:
             tmpdir = os.path.basename(tempfile.mkdtemp('_grass_engine', dir=settings.MEDIA_TMP))
@@ -43,6 +43,7 @@ class GrassContext:
         self.script_opts = script_opts.copy()
         self.location = location
         self.auto_cleanup = auto_cleanup
+        self.python_path = python_path
 
     def get_cwd(self):
         return os.path.join(settings.MEDIA_TMP, self.tmpdir)
@@ -92,6 +93,13 @@ class GrassContext:
         out = ""
         err = ""
 
+        # Setup env
+        env = None
+        if self.python_path:
+            env = os.environ.copy()
+            sep = ";" if platform.system() == "Windows" else ":"
+            env["PYTHONPATH"] = "%s%s%s" % (self.python_path, sep, env.get("PYTHONPATH", ""))
+
         # Execute it
         logger.info("Executing grass script from {}: {} -c {} location --exec python {} {}".format(self.get_cwd(), self.grass_binary, self.location, script, " ".join(params)))
         
@@ -99,13 +107,13 @@ class GrassContext:
         if platform.system() == "Windows":
             # communicate() hangs on Windows so we use check_output instead
             try:
-                out = subprocess.check_output(command, cwd=self.get_cwd()).decode('utf-8').strip()
+                out = subprocess.check_output(command, cwd=self.get_cwd(), env=env).decode('utf-8').strip()
                 success = True
             except:
                 success = False
                 err = out
         else:
-            p = subprocess.Popen(command, cwd=self.get_cwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(command, cwd=self.get_cwd(), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             
             out, err = p.communicate()
 
@@ -123,7 +131,8 @@ class GrassContext:
             'tmpdir': self.tmpdir,
             'script_opts': self.script_opts,
             'location': self.location,
-            'auto_cleanup': self.auto_cleanup
+            'auto_cleanup': self.auto_cleanup,
+            'python_path': self.python_path,
         }
 
     def cleanup(self):
