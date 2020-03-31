@@ -74,6 +74,7 @@ admin.site.register(PluginDatum, admin.ModelAdmin)
 class PluginAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "version", "author", "enabled", "plugin_actions")
     readonly_fields = ("name", )
+    change_list_template = "admin/change_list_plugin.html"
 
     def has_add_permission(self, request):
         return False
@@ -110,6 +111,11 @@ class PluginAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.plugin_delete),
                 name='plugin-delete',
             ),
+            url(
+                r'^actions/upload/$',
+                self.admin_site.admin_view(self.plugin_upload),
+                name='plugin-upload',
+            ),
         ]
         return custom_urls + urls
 
@@ -137,6 +143,11 @@ class PluginAdmin(admin.ModelAdmin):
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
+    def plugin_upload(self, request, *args, **kwargs):
+        messages.info(request, "YAY")
+        # TODO
+        return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
+
 
     def plugin_actions(self, obj):
         plugin = get_plugin_by_name(obj.name, only_active=False)
@@ -150,7 +161,6 @@ class PluginAdmin(admin.ModelAdmin):
             reverse('admin:plugin-enable', args=[obj.pk]) if not obj.enabled else '#',
             'disabled' if obj.enabled else '',
 
-            # TODO
             reverse('admin:plugin-delete', args=[obj.pk]),
             obj.name
         )
