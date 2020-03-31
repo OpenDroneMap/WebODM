@@ -9,7 +9,7 @@ from guardian.admin import GuardedModelAdmin
 from app.models import PluginDatum
 from app.models import Preset
 from app.models import Plugin
-from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin
+from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin, delete_plugin
 from .models import Project, Task, ImageUpload, Setting, Theme
 from django import forms
 from codemirror2.widgets import CodeMirrorEditor
@@ -105,6 +105,11 @@ class PluginAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.plugin_disable),
                 name='plugin-disable',
             ),
+            url(
+                r'^(?P<plugin_name>.+)/delete/$',
+                self.admin_site.admin_view(self.plugin_delete),
+                name='plugin-delete',
+            ),
         ]
         return custom_urls + urls
 
@@ -124,14 +129,30 @@ class PluginAdmin(admin.ModelAdmin):
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
+    def plugin_delete(self, request, plugin_name, *args, **kwargs):
+        try:
+            delete_plugin(plugin_name)
+        except Exception as e:
+            messages.warning(request, "Cannot delete plugin {}: {}".format(plugin_name, str(e)))
+
+        return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
+
+
     def plugin_actions(self, obj):
+        plugin = get_plugin_by_name(obj.name, only_active=False)
         return format_html(
             '<a class="button" href="{}" {}>Disable</a>&nbsp;'
-            '<a class="button" href="{}" {}>Enable</a>',
+            '<a class="button" href="{}" {}>Enable</a>'
+            + ('&nbsp;<a class="button" href="{}" onclick="return confirm(\'Are you sure you want to delete {}?\')"><i class="fa fa-trash"></i></a>' if not plugin.is_persistent() else '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+            ,
             reverse('admin:plugin-disable', args=[obj.pk]) if obj.enabled else '#',
             'disabled' if not obj.enabled else '',
             reverse('admin:plugin-enable', args=[obj.pk]) if not obj.enabled else '#',
             'disabled' if obj.enabled else '',
+
+            # TODO
+            reverse('admin:plugin-delete', args=[obj.pk]),
+            obj.name
         )
 
     plugin_actions.short_description = 'Actions'
