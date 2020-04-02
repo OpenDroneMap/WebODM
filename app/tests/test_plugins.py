@@ -29,6 +29,22 @@ class TestPlugins(BootTestCase):
     def test_core_plugins(self):
         client = Client()
 
+        # We cannot access public files core plugins (plugin is disabled)
+        res = client.get('/plugins/test/file.txt')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Cannot access mount point (plugin is disabled)
+        res = client.get('/plugins/test/app_mountpoint/')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # No python packages have been installed (plugin is disabled)
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
+
+        enable_plugin("test")
+
+        # Python packages have been installed
+        self.assertTrue(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
+
         # We can access public files core plugins (without auth)
         res = client.get('/plugins/test/file.txt')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -38,13 +54,10 @@ class TestPlugins(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(res, 'plugins/test/templates/app.html')
 
-        # No python packages have been installed (plugin is disabled)
-        self.assertFalse(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
-
-        enable_plugin("test")
-
         # Form was rendered correctly
-        self.assertContains(res, '<input type="text" name="testField" class="form-control" required id="id_testField" />', count=1, status_code=200, html=True)
+        self.assertContains(res,
+                            '<input type="text" name="testField" class="form-control" required id="id_testField" />',
+                            count=1, status_code=200, html=True)
 
         # It uses regex properly
         res = client.get('/plugins/test/app_mountpoint/a')

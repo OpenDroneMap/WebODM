@@ -8,10 +8,12 @@ from django.http import HttpResponse, Http404
 from .functions import get_plugin_by_name
 from django.conf.urls import url
 from django.views.static import serve
+from urllib.parse import urlparse
 
 
 def try_resolve_url(request, url):
-    res = url.resolve(request.get_full_path())
+    o = urlparse(request.get_full_path())
+    res = url.resolve(o.path)
     if res:
         return res
     else:
@@ -28,12 +30,11 @@ def app_view_handler(request, plugin_name=None):
                                                  mount_point.view,
                                                  *mount_point.args,
                                                  **mount_point.kwargs))
-
         if view:
             return view(request, *args, **kwargs)
 
     # Try public assets
-    if os.path.exists(plugin.get_path("public")):
+    if os.path.exists(plugin.get_path("public")) and plugin.serve_public_assets(request):
         view, args, kwargs = try_resolve_url(request, url('^/plugins/{}/(.*)'.format(plugin_name),
                                                             serve,
                                                             {'document_root': plugin.get_path("public")}))

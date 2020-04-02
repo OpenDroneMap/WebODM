@@ -188,6 +188,16 @@ class PluginBase(ABC):
         """
         return []
 
+    def serve_public_assets(self, request):
+        """
+        Should be overriden by plugins that want to control which users
+        have access to the public assets. By default anyone can access them,
+        including anonymous users.
+        :param request: HTTP request
+        :return: boolean (whether the plugin's public assets should be exposed for this request)
+        """
+        return True
+
     def get_dynamic_script(self, script_path, callback = None, **template_args):
         """
         Retrieves a view handler that serves a dynamic script from

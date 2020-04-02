@@ -7,6 +7,8 @@ import platform
 
 import django
 import json
+
+import shutil
 from django.conf.urls import url
 from functools import reduce
 from string import Template
@@ -149,6 +151,10 @@ def register_plugins():
             disable_plugin(plugin.get_name())
             logger.warning("Cannot register {}: {}".format(plugin, str(e)))
 
+def valid_plugin(plugin_path):
+    pluginpy_path = os.path.join(plugin_path, "plugin.py")
+    manifest_path = os.path.join(plugin_path, "manifest.json")
+    return os.path.isfile(manifest_path) and os.path.isfile(pluginpy_path)
 
 plugins = None
 def get_plugins():
@@ -163,14 +169,15 @@ def get_plugins():
     plugins = []
 
     for plugins_path in plugins_paths:
-        for dir in [d for d in os.listdir(plugins_path) if os.path.isdir(plugins_path)]:
+        if not os.path.isdir(plugins_path):
+            continue
+
+        for dir in os.listdir(plugins_path):
             # Each plugin must have a manifest.json and a plugin.py
             plugin_path = os.path.join(plugins_path, dir)
-            pluginpy_path = os.path.join(plugin_path, "plugin.py")
-            manifest_path = os.path.join(plugin_path, "manifest.json")
 
             # Do not load test plugin unless we're in test mode
-            if os.path.basename(plugin_path) == 'test' and not settings.TESTING:
+            if os.path.basename(plugin_path).endswith('test') and not settings.TESTING:
                 continue
 
             # Ignore .gitignore
@@ -178,7 +185,7 @@ def get_plugins():
                 continue
 
             # Check plugin required files
-            if not os.path.isfile(manifest_path) or not os.path.isfile(pluginpy_path):
+            if not valid_plugin(plugin_path):
                 continue
 
             # Instantiate the plugin
@@ -194,6 +201,7 @@ def get_plugins():
                 manifest = plugin.get_manifest()
                 if 'webodmMinVersion' in manifest:
                     min_version = manifest['webodmMinVersion']
+                    manifest_path = os.path.join(plugin_path, "manifest.json")
 
                     if versionToInt(min_version) > versionToInt(settings.VERSION):
                         logger.warning(
@@ -305,7 +313,10 @@ def disable_plugin(plugin_name):
     Plugin.objects.get(pk=plugin_name).disable()
 
 def delete_plugin(plugin_name):
-    Plugin.objects.get(pk=plugin_name).disable()
+    Plugin.objects.get(pk=plugin_name).delete()
+    if os.path.exists(get_plugins_persistent_path(plugin_name)):
+        shutil.rmtree(get_plugins_persistent_path(plugin_name))
+    clear_plugins_cache()
 
 def get_site_settings():
     return Setting.objects.first()
