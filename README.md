@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/OpenDroneMap/WebODM.svg?branch=master)](https://travis-ci.org/OpenDroneMap/WebODM) [![GitHub version](https://badge.fury.io/gh/OpenDroneMap%2FWebODM.svg)](https://badge.fury.io/gh/OpenDroneMap%2FWebODM)
 
-A user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It supports multiple engines for processing, currently [ODM](https://github.com/OpenDroneMap/ODM) and [MicMac](https://github.com/dronemapper-io/NodeMICMAC/) (experimental).
+A user-friendly, extendable application and [API](http://docs.webodm.org) for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It supports multiple engines for processing, currently [ODM](https://github.com/OpenDroneMap/ODM) and [MicMac](https://github.com/dronemapper-io/NodeMICMAC/).
 
 ![image](https://user-images.githubusercontent.com/1951843/73680798-efc02680-468a-11ea-9ae5-55e51427c6f1.png)
 
@@ -34,6 +34,14 @@ A user-friendly, extendable application and [API](http://docs.webodm.org) for dr
 ![image](https://user-images.githubusercontent.com/1951843/73680632-97892480-468a-11ea-83a3-74139bf270cc.png)
 
 ## Getting Started
+
+Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
+
+You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
+
+Windows users looking for a UI-only native installation should also check [webodm.net](https://webodm.net).
+
+To install WebODM manually, these steps should get you up and running:
 
 * Install the following applications (if they are not installed already):
   - [Git](https://git-scm.com/downloads)
@@ -75,12 +83,6 @@ To update WebODM to the latest version use:
 ```
 
 We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
-
-Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
-
-You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
-
-Windows users looking for a UI-only native installation should also check [webodm.net](https://webodm.net).
 
 ### Manage Processing Nodes
 
