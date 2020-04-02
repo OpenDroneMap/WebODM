@@ -152,7 +152,6 @@ class PluginAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
     def plugin_upload(self, request, *args, **kwargs):
-        # messages.info(request, "YAY")
         file = request.FILES.get('file')
         if file is not None:
             # Save to tmp dir

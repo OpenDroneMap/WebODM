@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation
 from rest_framework import exceptions
-import os, zipfile
+import os
 
 from app import models
 

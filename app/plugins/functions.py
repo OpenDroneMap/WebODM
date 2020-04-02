@@ -18,6 +18,7 @@ from django.http import HttpResponse
 from app.models import Plugin
 from app.models import Setting
 from django.conf import settings
+from app.security import path_traversal_check
 
 logger = logging.getLogger('app.logger')
 
@@ -152,9 +153,10 @@ def register_plugins():
             logger.warning("Cannot register {}: {}".format(plugin, str(e)))
 
 def valid_plugin(plugin_path):
+    initpy_path = os.path.join(plugin_path, "__init__.py")
     pluginpy_path = os.path.join(plugin_path, "plugin.py")
     manifest_path = os.path.join(plugin_path, "manifest.json")
-    return os.path.isfile(manifest_path) and os.path.isfile(pluginpy_path)
+    return os.path.isfile(initpy_path) and os.path.isfile(manifest_path) and os.path.isfile(pluginpy_path)
 
 plugins = None
 def get_plugins():
@@ -191,9 +193,13 @@ def get_plugins():
             # Instantiate the plugin
             try:
                 try:
-                    module = importlib.import_module("app.media.plugins.{}".format(dir))
+                    if settings.TESTING:
+                        module = importlib.import_module("app.media_test.plugins.{}".format(dir))
+                    else:
+                        module = importlib.import_module("app.media.plugins.{}".format(dir))
+
                     plugin = (getattr(module, "Plugin"))()
-                except (ModuleNotFoundError, AttributeError):
+                except (ModuleNotFoundError, AttributeError) as e:
                     module = importlib.import_module("plugins.{}".format(dir))
                     plugin = (getattr(module, "Plugin"))()
 
@@ -284,7 +290,7 @@ def get_plugins_paths():
     ]
 
 def get_plugins_persistent_path(*paths):
-    return os.path.join(settings.MEDIA_ROOT, "plugins", *paths)
+    return path_traversal_check(os.path.join(settings.MEDIA_ROOT, "plugins", *paths), os.path.join(settings.MEDIA_ROOT, "plugins"))
 
 def get_dynamic_script_handler(script_path, callback=None, **kwargs):
     def handleRequest(request):
