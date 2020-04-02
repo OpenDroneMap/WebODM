@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 
 from app.api.presets import PresetViewSet
-from app.plugins import get_api_url_patterns
+from app.plugins.views import api_view_handler
 from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskDownloads, TaskAssets, TaskAssetsImport
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
@@ -49,6 +49,6 @@ urlpatterns = [
 
     url(r'^auth/', include('rest_framework.urls')),
     url(r'^token-auth/', obtain_jwt_token),
-]
 
-urlpatterns += get_api_url_patterns()
+    url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler)
+]

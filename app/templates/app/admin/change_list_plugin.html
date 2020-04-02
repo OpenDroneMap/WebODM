@@ -1,0 +1,29 @@
+{% extends "admin/change_list.html" %}
+
+{% block content_title %}
+<style type="text/css">
+.plugin-upload{
+    float: right;
+    margin-left: 8px;
+    margin-bottom: 12px;
+}
+.plugin-upload input[type="file"]{
+    display: none;
+}
+</style>
+<div class="plugin-upload">
+  <form name="form" enctype="multipart/form-data"
+        action="actions/upload/" id="plugin-upload-form" method = "POST" >{% csrf_token %}
+    <input type="file"
+           name="file"
+           id="plugin-upload-file"
+           onchange="document.getElementById('plugin-upload-form').submit();"
+           accept=".zip"/>
+    <button type="submit" class="btn btn-sm btn-primary" onclick="document.getElementById('plugin-upload-file').click(); return false;">
+      <i class="glyphicon glyphicon-upload"></i> Load Plugin (.zip)
+    </button>
+  </form>
+</div>
+<h1>Manage Plugins</h1>
+<div style="clear: both;"></div>
+{% endblock %}

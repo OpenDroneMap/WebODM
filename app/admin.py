@@ -1,3 +1,8 @@
+import os
+import tempfile
+import zipfile
+import shutil
+
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib import messages
@@ -9,10 +14,13 @@ from guardian.admin import GuardedModelAdmin
 from app.models import PluginDatum
 from app.models import Preset
 from app.models import Plugin
-from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin
+from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin, delete_plugin, valid_plugin, \
+    get_plugins_persistent_path, clear_plugins_cache, init_plugins
 from .models import Project, Task, ImageUpload, Setting, Theme
 from django import forms
 from codemirror2.widgets import CodeMirrorEditor
+from webodm import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 admin.site.register(Project, GuardedModelAdmin)
 
@@ -74,6 +82,7 @@ admin.site.register(PluginDatum, admin.ModelAdmin)
 class PluginAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "version", "author", "enabled", "plugin_actions")
     readonly_fields = ("name", )
+    change_list_template = "admin/change_list_plugin.html"
 
     def has_add_permission(self, request):
         return False
@@ -105,6 +114,16 @@ class PluginAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.plugin_disable),
                 name='plugin-disable',
             ),
+            url(
+                r'^(?P<plugin_name>.+)/delete/$',
+                self.admin_site.admin_view(self.plugin_delete),
+                name='plugin-delete',
+            ),
+            url(
+                r'^actions/upload/$',
+                self.admin_site.admin_view(self.plugin_upload),
+                name='plugin-upload',
+            ),
         ]
         return custom_urls + urls
 
@@ -124,14 +143,81 @@ class PluginAdmin(admin.ModelAdmin):
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
+    def plugin_delete(self, request, plugin_name, *args, **kwargs):
+        try:
+            delete_plugin(plugin_name)
+        except Exception as e:
+            messages.warning(request, "Cannot delete plugin {}: {}".format(plugin_name, str(e)))
+
+        return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
+
+    def plugin_upload(self, request, *args, **kwargs):
+        file = request.FILES.get('file')
+        if file is not None:
+            # Save to tmp dir
+            tmp_zip_path = tempfile.mktemp('plugin.zip', dir=settings.MEDIA_TMP)
+            tmp_extract_path = tempfile.mkdtemp('plugin', dir=settings.MEDIA_TMP)
+
+            try:
+                with open(tmp_zip_path, 'wb+') as fd:
+                    if isinstance(file, InMemoryUploadedFile):
+                        for chunk in file.chunks():
+                            fd.write(chunk)
+                    else:
+                        with open(file.temporary_file_path(), 'rb') as f:
+                            shutil.copyfileobj(f, fd)
+
+                # Extract
+                with zipfile.ZipFile(tmp_zip_path, "r") as zip_h:
+                    zip_h.extractall(tmp_extract_path)
+
+                # Validate
+                folders = os.listdir(tmp_extract_path)
+                if len(folders) != 1:
+                    raise ValueError("The plugin has more than 1 root directory (it should have only one)")
+
+                plugin_name = folders[0]
+                plugin_path = os.path.join(tmp_extract_path, plugin_name)
+                if not valid_plugin(plugin_path):
+                    raise ValueError("This doesn't look like a plugin. Are plugin.py and manifest.json in the proper place?")
+
+                if os.path.exists(get_plugins_persistent_path(plugin_name)):
+                    raise ValueError("A plugin with the name {} already exist. Please remove it before uploading one with the same name.".format(plugin_name))
+
+                # Move
+                shutil.move(plugin_path, get_plugins_persistent_path())
+
+                # Initialize
+                clear_plugins_cache()
+                init_plugins()
+
+                messages.info(request, "Plugin added successfully")
+            except Exception as e:
+                messages.warning(request, "Cannot load plugin: {}".format(str(e)))
+                if os.path.exists(tmp_zip_path):
+                    os.remove(tmp_zip_path)
+                if os.path.exists(tmp_extract_path):
+                    shutil.rmtree(tmp_extract_path)
+        else:
+            messages.error(request, "You need to upload a zip file")
+
+        return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
+
+
     def plugin_actions(self, obj):
+        plugin = get_plugin_by_name(obj.name, only_active=False)
         return format_html(
             '<a class="button" href="{}" {}>Disable</a>&nbsp;'
-            '<a class="button" href="{}" {}>Enable</a>',
+            '<a class="button" href="{}" {}>Enable</a>'
+            + ('&nbsp;<a class="button" href="{}" onclick="return confirm(\'Are you sure you want to delete {}?\')"><i class="fa fa-trash"></i></a>' if not plugin.is_persistent() else '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+            ,
             reverse('admin:plugin-disable', args=[obj.pk]) if obj.enabled else '#',
             'disabled' if not obj.enabled else '',
             reverse('admin:plugin-enable', args=[obj.pk]) if not obj.enabled else '#',
             'disabled' if obj.enabled else '',
+
+            reverse('admin:plugin-delete', args=[obj.pk]),
+            obj.name
         )
 
     plugin_actions.short_description = 'Actions'

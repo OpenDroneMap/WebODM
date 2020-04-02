@@ -19,7 +19,8 @@ from app import models, pending_actions
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
-from .common import get_and_check_project, path_traversal_check
+from .common import get_and_check_project
+from app.security import path_traversal_check
 
 
 def flatten_files(request_files):
