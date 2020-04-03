@@ -5,11 +5,9 @@ import subprocess
 import traceback
 import platform
 
-import django
 import json
 
 import shutil
-from django.conf.urls import url
 from functools import reduce
 from string import Template
 
@@ -199,7 +197,7 @@ def get_plugins():
                         module = importlib.import_module("app.media.plugins.{}".format(dir))
 
                     plugin = (getattr(module, "Plugin"))()
-                except (ModuleNotFoundError, AttributeError) as e:
+                except (ImportError, AttributeError):
                     module = importlib.import_module("plugins.{}".format(dir))
                     plugin = (getattr(module, "Plugin"))()
 
