@@ -1,0 +1,13 @@
+{
+	"name": "Cloud Import",
+	"webodmMinVersion": "1.1.2",
+	"description": "Import images from external sources directly",
+	"version": "1.0.1",
+	"author": "Nicolas Chamo",
+	"email": "nicolas@chamo.com.ar",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["import", "cloud"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

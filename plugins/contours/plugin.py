@@ -15,6 +15,6 @@ class Plugin(PluginBase):
     def api_mount_points(self):
         return [
             MountPoint('task/(?P<pk>[^/.]+)/contours/generate', TaskContoursGenerate.as_view()),
-            MountPoint('task/(?P<pk>[^/.]+)/contours/check/(?P<celery_task_id>.+)', TaskContoursCheck.as_view()),
-            MountPoint('task/(?P<pk>[^/.]+)/contours/download/(?P<celery_task_id>.+)', TaskContoursDownload.as_view()),
+            MountPoint('task/[^/.]+/contours/check/(?P<celery_task_id>.+)', TaskContoursCheck.as_view()),
+            MountPoint('task/[^/.]+/contours/download/(?P<celery_task_id>.+)', TaskContoursDownload.as_view()),
         ]

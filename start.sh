@@ -28,7 +28,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Check GDAL version
-python -c "import sys;import re;import subprocess;version = subprocess.Popen([\"gdalinfo\", \"--version\"], stdout=subprocess.PIPE).communicate()[0].decode().rstrip();ret = 0 if re.compile('^GDAL [2-9]\.[1-9]+').match(version) else 1; print('Checking GDAL version... ' + ('{}, excellent!'.format(version) if ret == 0 else version));sys.exit(ret);"
+python -c "import sys;import re;import subprocess;version = subprocess.Popen([\"gdalinfo\", \"--version\"], stdout=subprocess.PIPE).communicate()[0].decode().rstrip();ret = 0 if re.compile('^GDAL [2-9]\.[0-9]+').match(version) else 1; print('Checking GDAL version... ' + ('{}, excellent!'.format(version) if ret == 0 else version));sys.exit(ret);"
 if [ $? -ne 0 ]; then
 	almost_there
     echo -e "\033[33mYour system is currently using a version of GDAL that is too old, or GDAL is not installed. You need to install or configure your system to use GDAL 2.1 or higher. If you have installed multiple versions of GDAL, make sure the newer one takes priority in your PATH environment variable.\033[39m"
@@ -57,8 +57,8 @@ fi
 echo Running migrations
 python manage.py migrate
 
-if [[ "$WO_CREATE_DEFAULT_PNODE" = "YES" ]]; then
-   echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-odm-1', defaults={'hostname': 'node-odm-1', 'port': 3000})" | python manage.py shell
+if [[ "$WO_DEFAULT_NODES" > 0 ]]; then
+   echo -e "from nodeodm.models import ProcessingNode\nfor node_index in map(str, range(1, $WO_DEFAULT_NODES + 1)):\n\t ProcessingNode.objects.update_or_create(hostname='webodm_node-odm_' + node_index, defaults={'hostname': 'webodm_node-odm_' + node_index, 'port': 3000, 'label': 'node-odm-' + node_index})" | python manage.py shell
 fi
 
 if [[ "$WO_CREATE_MICMAC_PNODE" = "YES" ]]; then

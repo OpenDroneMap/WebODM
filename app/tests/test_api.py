@@ -470,5 +470,3 @@ class TestApi(BootTestCase):
         client = APIClient(HTTP_AUTHORIZATION="{0} {1}".format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         res = client.get('/api/processingnodes/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-
-

@@ -6,13 +6,12 @@ version: '2.1'
 services:
   webapp:
     depends_on:
-      - node-odm-1
+      - node-odm
     environment:
-      - WO_CREATE_DEFAULT_PNODE=YES
-  node-odm-1:
+      - WO_DEFAULT_NODES
+  node-odm:
     image: opendronemap/nodeodm
-    container_name: node-odm-1
     ports:
       - "3000"
-    restart: on-failure:10
+    restart: unless-stopped
     oom_score_adj: 500

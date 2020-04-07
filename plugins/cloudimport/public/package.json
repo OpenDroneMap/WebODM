@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"react-bootstrap": "^0.32.4",
+		"react-select": "^3.0.4"
+	}
+}

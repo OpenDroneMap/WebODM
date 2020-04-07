@@ -4,7 +4,7 @@ from django.shortcuts import render
 class Plugin(PluginBase):
 
     def main_menu(self):
-        return [Menu("GCP Interface", self.public_url(""), "fa fa-map-marker fa-fw")]
+        return [Menu("GCP Interface", self.public_url(""), "fa fa-map-marker-alt fa-fw")]
 
     def app_mount_points(self):
         return [

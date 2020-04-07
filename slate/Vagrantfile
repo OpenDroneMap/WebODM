@@ -4,11 +4,21 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "bootstrap",
     type: "shell",
+    privileged: false,
     inline: <<-SHELL
       sudo apt-get update
-      sudo apt-get install -yq ruby2.0 ruby2.0-dev pkg-config build-essential nodejs git libxml2-dev libxslt-dev
+      sudo apt-get install -yq git gcc build-essential libreadline-dev zlib1g-dev pkg-config nodejs libxml2-dev libxslt-dev
+      sudo apt-get install -yq libssl-dev
       sudo apt-get autoremove -yq
-      gem2.0 install --no-ri --no-rdoc bundler
+      git clone https://github.com/sstephenson/rbenv.git /home/vagrant/.rbenv
+      echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> /home/vagrant/.bash_profile
+      echo 'eval "$(rbenv init -)"' >> /home/vagrant/.bash_profile
+      source /home/vagrant/.bash_profile
+      git clone https://github.com/sstephenson/ruby-build.git /home/vagrant/.rbenv/plugins/ruby-build
+      cd /home/vagrant
+      rbenv install 2.4.7
+      rbenv global 2.4.7
+      gem install --no-ri --no-rdoc bundler
     SHELL
 
   # add the local user git config to the vm

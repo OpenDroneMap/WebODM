@@ -33,7 +33,9 @@ export default {
       let paramsRaw = (location.search.replace("?", "").match(/([^&=]+)=?([^&]*)/g) || []);
       for (let i in paramsRaw){
         let parts = paramsRaw[i].split("=");
-        params[parts[0]] = parts[1];
+        if (parts[1] !== undefined){
+            params[parts[0]] = parts[1];
+        }
       }
       return params;
     },
@@ -51,6 +53,10 @@ export default {
       let q = this.queryParams(location);
       q[param] = value;
       return this.toSearchQuery(q);
+    },
+
+    buildUrlWithQuery: function(url, params){
+        return (url.indexOf("?") !== -1 ? url.slice(0, url.indexOf("?")) : url) + this.toSearchQuery(params);
     },
 
     clone: function(obj){

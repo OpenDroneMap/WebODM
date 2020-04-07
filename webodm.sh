@@ -18,11 +18,11 @@ if [[ $platform = "Windows" ]]; then
 	export COMPOSE_CONVERT_WINDOWS_PATHS=1
 fi
 
-load_default_node=true
+default_nodes=1
 dev_mode=false
 
 # Load default values
-source .env
+source "${__dirname}/.env"
 DEFAULT_PORT="$WO_PORT"
 DEFAULT_HOST="$WO_HOST"
 DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
@@ -87,12 +87,24 @@ case $key in
     shift # past value
     ;;
     --no-default-node)
-    load_default_node=false
+    default_nodes=0
+    echo "ATTENTION: --no-default-node is deprecated. Use --default-nodes instead."
+    export WO_DEFAULT_NODES=0
     shift # past argument
     ;;
     --with-micmac)
     load_micmac_node=true
     shift # past argument
+    ;;
+    --detached)
+    detached=true
+    shift # past argument
+    ;;
+    --default-nodes)
+    default_nodes="$2"
+    export WO_DEFAULT_NODES="$2"
+    shift # past argument
+    shift # past value
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -121,7 +133,7 @@ usage(){
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
-  echo "	--no-default-node	Do not create a default NodeODM node attached to WebODM on startup (default: disabled)"
+  echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: 1)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
@@ -130,6 +142,7 @@ usage(){
   echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--dev	Enable development mode. In development mode you can make modifications to WebODM source files and changes will be reflected live. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
+  echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
   exit
 }
 
@@ -188,13 +201,14 @@ start(){
 	echo "SSL certificate: $WO_SSL_CERT"
 	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
 	echo "Celery Broker: $WO_BROKER"
+	echo "Default Nodes: $WO_DEFAULT_NODES"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
 
 	command="docker-compose -f docker-compose.yml"
 
-    if [[ $load_default_node = true ]]; then
+    if [[ $default_nodes > 0 ]]; then
         command+=" -f docker-compose.nodeodm.yml"
     fi
 
@@ -244,7 +258,17 @@ start(){
 		echo "Will enable SSL ($method)"
 	fi
 
-	run "$command start || $command up"
+	command="$command start || $command up"
+
+	if [[ $detached = true ]]; then
+		command+=" -d"
+	fi
+
+	if [[ $default_nodes > 0 ]]; then
+		command+=" --scale node-odm=$default_nodes"
+	fi
+
+	run "$command"
 }
 
 down(){
@@ -327,7 +351,7 @@ elif [[ $1 = "update" ]]; then
 
 	command="docker-compose -f docker-compose.yml"
 
-	if [[ $load_default_node = true ]]; then
+	if [[ $default_nodes > 0 ]]; then
 		command+=" -f docker-compose.nodeodm.yml"
 	fi
 

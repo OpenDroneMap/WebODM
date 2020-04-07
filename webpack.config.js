@@ -22,7 +22,7 @@ module.exports = {
   },
 
   plugins: [
-    new LiveReloadPlugin(),
+    new LiveReloadPlugin({appendScriptTag: true}),
     new BundleTracker({filename: './webpack-stats.json'}),
     new ExtractTextPlugin('css/[name]-[hash].css', {
         allChunks: true
@@ -89,6 +89,13 @@ module.exports = {
     //  on the global let jQuery
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
-    "React": "React"
+    "React": "React",
+    "ReactDOM": "ReactDOM"
+  },
+
+  watchOptions: {
+    ignored: ['node_modules', './**/*.py'],
+    aggregateTimeout: 300,
+    poll: 1000
   }
 }

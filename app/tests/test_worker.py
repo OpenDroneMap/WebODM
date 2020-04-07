@@ -1,8 +1,9 @@
 import os
 from stat import ST_ATIME, ST_MTIME
 
+import json
+
 import worker
-from app import pending_actions
 from app.models import Project
 from app.models import Task
 from nodeodm.models import ProcessingNode
@@ -10,6 +11,8 @@ from webodm import settings
 from .classes import BootTestCase
 from .utils import start_processing_node
 from worker.tasks import redis_client
+from rest_framework.test import APIClient
+from rest_framework import status
 
 class TestWorker(BootTestCase):
     def setUp(self):
@@ -29,36 +32,33 @@ class TestWorker(BootTestCase):
         pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
         self.assertTrue(pnode.api_version is None)
 
-        pnserver = start_processing_node()
+        with start_processing_node():
+            worker.tasks.update_nodes_info()
 
-        worker.tasks.update_nodes_info()
+            pnode.refresh_from_db()
+            self.assertTrue(pnode.api_version is not None)
 
-        pnode.refresh_from_db()
-        self.assertTrue(pnode.api_version is not None)
+            # Create task
+            task = Task.objects.create(project=project)
 
-        # Create task
-        task = Task.objects.create(project=project)
+            # Delete project
+            project.deleting = True
+            project.save()
 
-        # Delete project
-        project.deleting = True
-        project.save()
+            worker.tasks.cleanup_projects()
 
-        worker.tasks.cleanup_projects()
+            # Task and project should still be here (since task still exists)
+            self.assertTrue(Task.objects.filter(pk=task.id).exists())
+            self.assertTrue(Project.objects.filter(pk=project.id).exists())
 
-        # Task and project should still be here (since task still exists)
-        self.assertTrue(Task.objects.filter(pk=task.id).exists())
-        self.assertTrue(Project.objects.filter(pk=project.id).exists())
+            # Remove task
+            task.delete()
 
-        # Remove task
-        task.delete()
+            worker.tasks.cleanup_projects()
 
-        worker.tasks.cleanup_projects()
-
-        # Task and project should have been removed (now that task count is zero)
-        self.assertFalse(Task.objects.filter(pk=task.id).exists())
-        self.assertFalse(Project.objects.filter(pk=project.id).exists())
-
-        pnserver.terminate()
+            # Task and project should have been removed (now that task count is zero)
+            self.assertFalse(Task.objects.filter(pk=task.id).exists())
+            self.assertFalse(Project.objects.filter(pk=project.id).exists())
 
         tmpdir = os.path.join(settings.MEDIA_TMP, 'test')
         os.mkdir(tmpdir)
@@ -83,3 +83,19 @@ class TestWorker(BootTestCase):
         # After 24 hours it should get removed
         worker.tasks.cleanup_tmp_directory()
         self.assertFalse(os.path.exists(tmpdir))
+
+    def test_workers_api(self):
+        client = APIClient()
+
+        # Can check bogus worker task status
+        res = client.get("/api/workers/check/bogus")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        reply = json.loads(res.content.decode("utf-8"))
+        self.assertEqual(reply["ready"], False)
+
+        # Can get bogus worker task status
+        res = client.get("/api/workers/get/bogus")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        reply = json.loads(res.content.decode("utf-8"))
+        self.assertEqual(reply["error"], "Task not ready")
+

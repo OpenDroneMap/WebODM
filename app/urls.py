@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 
 from .views import app as app_views, public as public_views
-from .plugins import get_app_url_patterns
+from .plugins.views import app_view_handler
 
 from app.boot import boot
 from webodm import settings
@@ -35,11 +35,10 @@ urlpatterns = [
     url(r'^processingnode/([\d]+)/$', app_views.processing_node, name='processing_node'),
 
     url(r'^api/', include("app.api.urls")),
+
+    url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', app_view_handler)
 ]
 
 handler404 = app_views.handler404
 handler500 = app_views.handler500
 
-# TODO: is there a way to place plugins /public directories
-# into the static build directories and let nginx serve them?
-urlpatterns += get_app_url_patterns()

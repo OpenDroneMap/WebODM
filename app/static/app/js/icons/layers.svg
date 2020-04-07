@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg6"
+   viewBox="0 0 64 64"
+   height="64"
+   width="64"
+   version="1.1">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>stack</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <title
+     id="title2">stack</title>
+  <path
+     style="fill:#292929;fill-opacity:1;stroke-width:0.83820438"
+     id="path828"
+     d="M 58.82254,21.941547 32,8.5302773 5.1774597,21.941547 32,35.352818 Z" />
+  <path
+     style="fill:none;fill-opacity:1;stroke-width:0.83820438"
+     id="path826"
+     d="M 32,12.981981 49.919972,21.941547 32,30.901114 14.080028,21.941547 Z" />
+  <path
+     style="fill:#212121;fill-opacity:1;stroke-width:0.83820438"
+     id="path824"
+     d="M 53.44965,29.313555 58.82254,32 32,45.41127 5.1774597,32 10.55035,29.313555 32,40.03838 Z" />
+  <path
+     style="fill:#191919;fill-opacity:1;stroke-width:0.83820438"
+     id="path4"
+     d="M 53.44965,39.372008 58.82254,42.058453 32,55.469723 5.1774597,42.058453 10.55035,39.372008 32,50.096833 Z" />
+</svg>

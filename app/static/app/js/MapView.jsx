@@ -14,7 +14,7 @@ class MapView extends React.Component {
 
   static propTypes = {
       mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
-      selectedMapType: PropTypes.oneOf(['orthophoto', 'dsm', 'dtm']),
+      selectedMapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
       title: PropTypes.string,
       public: PropTypes.bool
   };
@@ -23,12 +23,10 @@ class MapView extends React.Component {
     super(props);
 
     this.state = {
-      opacity: 100,
       selectedMapType: props.selectedMapType,
       tiles: this.getTilesByMapType(props.selectedMapType)
     };
 
-    this.updateOpacity = this.updateOpacity.bind(this);
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
   }
@@ -42,7 +40,8 @@ class MapView extends React.Component {
       mapItem.tiles.forEach(tile => {
         if (tile.type === type) tiles.push({
           url: tile.url,
-          meta: mapItem.meta
+          meta: mapItem.meta,
+          type: tile.type
         });
       });
     });
@@ -59,26 +58,27 @@ class MapView extends React.Component {
     };
   }
 
-  updateOpacity(evt) {
-    this.setState({
-      opacity: parseFloat(evt.target.value),
-    });
-  }
-
   render(){
-    const { opacity } = this.state;
     let mapTypeButtons = [
       {
         label: "Orthophoto",
-        type: "orthophoto"
+        type: "orthophoto",
+        icon: "far fa-image"
+      },
+      {
+        label: "Plant Health",
+        type: "plant",
+        icon: "fa fa-seedling"
       },
       {
         label: "Surface Model",
-        type: "dsm"
+        type: "dsm",
+        icon: "fa fa-chart-area"
       },
       {
         label: "Terrain Model",
-        type: "dtm"
+        type: "dtm",
+        icon: "fa fa-chart-area"
       }
     ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0 );
 
@@ -91,22 +91,21 @@ class MapView extends React.Component {
             <button 
               key={mapType.type}
               onClick={this.handleMapTypeButton(mapType.type)}
-              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}>{mapType.label}</button>
+              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i> {mapType.label}</button>
           )}
         </div>
 
         {this.props.title ? 
           <h3><i className="fa fa-globe"></i> {this.props.title}</h3>
         : ""}
-  
-        <Map 
-          tiles={this.state.tiles} 
-          showBackground={true} 
-          opacity={opacity}
-          mapType={this.state.selectedMapType} 
-          public={this.props.public} />
-        <div className="opacity-slider theme-secondary hidden-xs">
-          Opacity: <input type="range" step="1" value={opacity} onChange={this.updateOpacity} />
+
+        <div className="map-container">
+            <Map 
+                tiles={this.state.tiles} 
+                showBackground={true} 
+                mapType={this.state.selectedMapType} 
+                public={this.props.public}
+            />
         </div>
       </div>);
   }

@@ -29,11 +29,13 @@ from urllib3.exceptions import ReadTimeoutError
 from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
 
+from app.cogeo import assure_cogeo
 from app.testwatch import testWatch
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
 from webodm import settings
+from app.classes.gcp import GCPFile
 from .project import Project
 
 from functools import partial
@@ -84,6 +86,35 @@ def resize_image(image_path, resize_to, done=None):
     :return: path and resize ratio
     """
     try:
+        can_resize = False
+
+        # Check if this image can be resized
+        # There's no easy way to resize multispectral 16bit images
+        # (Support should be added to PIL)
+        is_jpeg = re.match(r'.*\.jpe?g$', image_path, re.IGNORECASE)
+
+        if is_jpeg:
+            # We can always resize these
+            can_resize = True
+        else:
+            try:
+                bps = piexif.load(image_path)['0th'][piexif.ImageIFD.BitsPerSample]
+                if isinstance(bps, int):
+                    # Always resize single band images
+                    can_resize = True
+                elif isinstance(bps, tuple) and len(bps) > 1:
+                    # Only resize multiband images if depth is 8bit
+                    can_resize = bps == (8, ) * len(bps)
+                else:
+                    logger.warning("Cannot determine if image %s can be resized, hoping for the best!" % image_path)
+                    can_resize = True
+            except KeyError:
+                logger.warning("Cannot find BitsPerSample tag for %s" % image_path)
+
+        if not can_resize:
+            logger.warning("Cannot resize %s" % image_path)
+            return {'path': image_path, 'resize_ratio': 1}
+
         im = Image.open(image_path)
         path, ext = os.path.splitext(image_path)
         resized_image_path = os.path.join(path + '.resized' + ext)
@@ -99,15 +130,18 @@ def resize_image(image_path, resize_to, done=None):
         resized_width = int(width * ratio)
         resized_height = int(height * ratio)
 
-        im.thumbnail((resized_width, resized_height), Image.LANCZOS)
+        im = im.resize((resized_width, resized_height), Image.BILINEAR)
+        params = {}
+        if is_jpeg:
+            params['quality'] = 100
 
         if 'exif' in im.info:
             exif_dict = piexif.load(im.info['exif'])
             exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
             exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
-            im.save(resized_image_path, "JPEG", exif=piexif.dump(exif_dict), quality=100)
+            im.save(resized_image_path, exif=piexif.dump(exif_dict), **params)
         else:
-            im.save(resized_image_path, "JPEG", quality=100)
+            im.save(resized_image_path, **params)
 
         im.close()
 
@@ -595,7 +629,7 @@ class Task(models.Model):
                             os.makedirs(assets_dir)
 
                             # Download and try to extract results up to 4 times
-                            # (~95% of the times, on large downloads, the archive could be corrupted)
+                            # (~5% of the times, on large downloads, the archive could be corrupted)
                             retry_num = 0
                             extracted = False
                             last_update = 0
@@ -615,7 +649,7 @@ class Task(models.Model):
                                 logger.info("Downloading all.zip for {}".format(self))
 
                                 # Download all assets
-                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
+                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback, parallel_downloads=max(1, int(16 / (2 ** retry_num))))
 
                                 # Rename to all.zip
                                 all_zip_path = self.assets_path("all.zip")
@@ -627,7 +661,7 @@ class Task(models.Model):
                                     self.extract_assets_and_complete()
                                     extracted = True
                                 except zipfile.BadZipFile:
-                                    if retry_num < 4:
+                                    if retry_num < 5:
                                         logger.warning("{} seems corrupted. Retrying...".format(all_zip_path))
                                         retry_num += 1
                                         os.remove(all_zip_path)
@@ -650,7 +684,7 @@ class Task(models.Model):
 
     def extract_assets_and_complete(self):
         """
-        Extracts assets/all.zip and populates task fields where required.
+        Extracts assets/all.zip, populates task fields where required and assure COGs
         It will raise a zipfile.BadZipFile exception is the archive is corrupted.
         :return:
         """
@@ -675,6 +709,13 @@ class Task(models.Model):
 
         for raster_path, field in extent_fields:
             if os.path.exists(raster_path):
+                # Make sure this is a Cloud Optimized GeoTIFF
+                # if not, it will be created
+                try:
+                    assure_cogeo(raster_path)
+                except IOError as e:
+                    logger.warning("Cannot create Cloud Optimized GeoTIFF for %s (%s). This will result in degraded visualization performance." % (raster_path, str(e)))
+
                 # Read extent and SRID
                 raster = GDALRaster(raster_path)
                 extent = OGRGeometry.from_bbox(raster.extent)
@@ -703,17 +744,22 @@ class Task(models.Model):
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
 
-    def get_tile_json_url(self, tile_type):
-        return "/api/projects/{}/tasks/{}/{}/tiles.json".format(self.project.id, self.id, tile_type)
+    def get_tile_base_url(self, tile_type):
+        # plant is just a special case of orthophoto
+        if tile_type == 'plant':
+            tile_type = 'orthophoto'
+
+        return "/api/projects/{}/tasks/{}/{}/".format(self.project.id, self.id, tile_type)
 
     def get_map_items(self):
         types = []
         if 'orthophoto.tif' in self.available_assets: types.append('orthophoto')
+        if 'orthophoto.tif' in self.available_assets: types.append('plant')
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
 
         return {
-            'tiles': [{'url': self.get_tile_json_url(t), 'type': t} for t in types],
+            'tiles': [{'url': self.get_tile_base_url(t), 'type': t} for t in types],
             'meta': {
                 'task': {
                     'id': str(self.id),
@@ -808,7 +854,7 @@ class Task(models.Model):
             logger.warning("We were asked to resize images to {}, this might be an error.".format(self.resize_to))
             return []
 
-        images_path = self.find_all_files_matching(r'.*\.jpe?g$')
+        images_path = self.find_all_files_matching(r'.*\.(jpe?g|tiff?)$')
         total_images = len(images_path)
         resized_images_count = 0
         last_update = 0
@@ -844,21 +890,19 @@ class Task(models.Model):
 
         # Assume we only have a single GCP file per task
         gcp_path = gcp_path[0]
-        resize_script_path = os.path.join(settings.BASE_DIR, 'app', 'scripts', 'resize_gcp.js')
 
-        dict = {}
+        image_ratios = {}
         for ri in resized_images:
-            dict[os.path.basename(ri['path'])] = ri['resize_ratio']
+            image_ratios[os.path.basename(ri['path']).lower()] = ri['resize_ratio']
 
         try:
-            new_gcp_content = subprocess.check_output("node {} {} '{}'".format(quote(resize_script_path), quote(gcp_path), json.dumps(dict)), shell=True)
-            with open(gcp_path, 'w') as f:
-                f.write(new_gcp_content.decode('utf-8'))
+            gcpFile = GCPFile(gcp_path)
+            gcpFile.create_resized_copy(gcp_path, image_ratios)
             logger.info("Resized GCP file {}".format(gcp_path))
             return gcp_path
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
-            return None
+
 
     def create_task_directories(self):
         """

@@ -138,7 +138,7 @@ export default class CostEstimateItem extends React.Component {
             <label className="col-sm-2 control-label">Credits Estimate</label>
             <div className="col-sm-10 num-credits">
                 {loading ?
-                 <i className="fa fa-circle-o-notch fa-spin"></i> :
+                 <i className="fa fa-circle-notch fa-spin"></i> :
                  <div>
                      { credits }
                  </div>}

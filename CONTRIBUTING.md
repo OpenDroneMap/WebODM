@@ -6,7 +6,7 @@
 
 WebODM contributors are expected to follow the [Collective Code of Construction Contract (C4)](https://rfc.zeromq.org/spec:42/C4/). You should read the document before making a pull request.
 
-[Chat with us on Gitter](https://gitter.im/OpenDroneMap/OpenDroneMap) to find out how you can help, or take a look at the list of [open issues](https://github.com/OpenDroneMap/WebODM/issues).
+Take a look at the list of [open issues](https://github.com/OpenDroneMap/WebODM/issues) to find out how you can help.
 
 ## Code of Conduct
 

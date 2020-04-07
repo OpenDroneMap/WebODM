@@ -1,7 +1,7 @@
 {
   "name": "WebODM",
-  "version": "1.1.2",
-  "description": "Open Source Drone Image Processing",
+  "version": "1.3.6",
+  "description": "User-friendly, extendable application and API for processing aerial imagery.",
   "main": "index.js",
   "scripts": {
     "test": "python manage.py test app.tests.test_generate_ui_mocks && jest",
@@ -14,7 +14,7 @@
   "keywords": [
     "opendronemap"
   ],
-  "author": "",
+  "author": "Piero Toffanin",
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/OpenDroneMap/WebODM/issues"
@@ -35,7 +35,7 @@
     "css-loader": "^0.25.0",
     "d3": "^3.5.5",
     "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme-adapter-react-16": "^1.15.1",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "fbemitter": "^2.1.1",
     "file-loader": "^0.9.0",

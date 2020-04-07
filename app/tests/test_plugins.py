@@ -2,6 +2,7 @@ import os
 import shutil
 
 import sys
+
 from django.contrib.auth.models import User
 from django.test import Client
 from rest_framework import status
@@ -29,6 +30,22 @@ class TestPlugins(BootTestCase):
     def test_core_plugins(self):
         client = Client()
 
+        # We cannot access public files core plugins (plugin is disabled)
+        res = client.get('/plugins/test/file.txt')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Cannot access mount point (plugin is disabled)
+        res = client.get('/plugins/test/app_mountpoint/')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # No python packages have been installed (plugin is disabled)
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
+
+        enable_plugin("test")
+
+        # Python packages have been installed
+        self.assertTrue(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
+
         # We can access public files core plugins (without auth)
         res = client.get('/plugins/test/file.txt')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -38,13 +55,10 @@ class TestPlugins(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(res, 'plugins/test/templates/app.html')
 
-        # No python packages have been installed (plugin is disabled)
-        self.assertFalse(os.path.exists(get_plugins_persistent_path("test", "site-packages")))
-
-        enable_plugin("test")
-
         # Form was rendered correctly
-        self.assertContains(res, '<input type="text" name="testField" class="form-control" required id="id_testField" />', count=1, status_code=200, html=True)
+        self.assertContains(res,
+                            '<input type="text" name="testField" class="form-control" required id="id_testField" />',
+                            count=1, status_code=200, html=True)
 
         # It uses regex properly
         res = client.get('/plugins/test/app_mountpoint/a')
@@ -65,6 +79,9 @@ class TestPlugins(BootTestCase):
         # because we have a package.json in the public director
         test_plugin = get_plugin_by_name("test")
         self.assertTrue(os.path.exists(test_plugin.get_path("public/node_modules")))
+
+        # This is a persistent plugin
+        self.assertTrue(test_plugin.is_persistent())
 
         # A webpack file and build directory have been created as a
         # result of the build_jsx_components directive
@@ -149,10 +166,11 @@ class TestPlugins(BootTestCase):
         ctx.set_location("EPSG:4326")
 
         result = execute_grass_script.delay(
-            os.path.join(grass_scripts_dir, "simple_test.grass"),
+            os.path.join(grass_scripts_dir, "simple_test.py"),
             ctx.serialize()
         ).get()
-        self.assertTrue("Number of points:       1" in result.get('output'))
+
+        self.assertEqual("Number of points: 1", result.get('output'))
 
         self.assertTrue(result.get('context') == ctx.serialize())
 
@@ -160,24 +178,24 @@ class TestPlugins(BootTestCase):
         self.assertFalse(os.path.exists(ctx.get_cwd()))
 
         error = execute_grass_script.delay(
-            os.path.join(grass_scripts_dir, "nonexistant_script.grass"),
+            os.path.join(grass_scripts_dir, "nonexistant_script.py"),
             ctx.serialize()
         ).get()
         self.assertIsInstance(error, dict)
         self.assertIsInstance(error['error'], str)
 
         with self.assertRaises(GrassEngineException):
-            ctx.execute(os.path.join(grass_scripts_dir, "nonexistant_script.grass"))
+            ctx.execute(os.path.join(grass_scripts_dir, "nonexistant_script.py"))
 
         ctx = grass.create_context({"auto_cleanup": False})
         ctx.add_file('test.geojson', points)
         ctx.set_location("EPSG:4326")
 
         result = execute_grass_script.delay(
-            os.path.join(grass_scripts_dir, "simple_test.grass"),
+            os.path.join(grass_scripts_dir, "simple_test.py"),
             ctx.serialize()
         ).get()
-        self.assertTrue("Number of points:       1" in result.get('output'))
+        self.assertEqual("Number of points: 1", result.get('output'))
 
         # Path still there
         self.assertTrue(os.path.exists(ctx.get_cwd()))
@@ -303,4 +321,112 @@ class TestPlugins(BootTestCase):
         self.assertEqual(p.get_manifest()['author'], "Piero Toffanin")
 
 
+    def test_plugin_loading(self):
+        c = Client()
+
+        plugin_file = open("app/fixtures/testabc_plugin.zip", 'rb')
+        bad_dir_plugin_file = open("app/fixtures/bad_dir_plugin.zip", 'rb')
+        missing_manifest_plugin_file = open("app/fixtures/missing_manifest_plugin.zip", 'rb')
+
+        # Cannot upload new plugins anonymously
+        res = c.post('/admin/app/plugin/actions/upload/', {'file': plugin_file}, follow=True)
+        self.assertRedirects(res, '/admin/login/?next=/admin/app/plugin/actions/upload/')
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("testabc")))
+        plugin_file.seek(0)
+
+        # Cannot upload plugins as a normal user
+        c.login(username='testuser', password='test1234')
+        res = c.post('/admin/app/plugin/actions/upload/', {'file': plugin_file}, follow=True)
+        self.assertRedirects(res, '/admin/login/?next=/admin/app/plugin/actions/upload/')
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("testabc")))
+        self.assertEqual(Plugin.objects.filter(pk='testabc').count(), 0)
+        plugin_file.seek(0)
+
+        # Can upload plugin as an admin
+        c.login(username='testsuperuser', password='test1234')
+        res = c.post('/admin/app/plugin/actions/upload/', {'file': plugin_file}, follow=True)
+        self.assertRedirects(res, '/admin/app/plugin/')
+        messages = list(res.context['messages'])
+        self.assertTrue('Plugin added successfully' in str(messages[0]))
+        self.assertTrue(os.path.exists(get_plugins_persistent_path("testabc")))
+        plugin_file.seek(0)
+
+        # Plugin has been added to db
+        self.assertEqual(Plugin.objects.filter(pk='testabc').count(), 1)
+
+        # This is not a persistent plugin
+        self.assertFalse(get_plugin_by_name('testabc').is_persistent())
+
+        # Cannot upload the same plugin again (same name)
+        res = c.post('/admin/app/plugin/actions/upload/', {'file': plugin_file}, follow=True)
+        self.assertRedirects(res, '/admin/app/plugin/')
+        messages = list(res.context['messages'])
+        self.assertTrue('already exist' in str(messages[0]))
+        plugin_file.seek(0)
+
+        # Can access paths (while being logged in)
+        res = c.get('/plugins/testabc/hello/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = c.get('/api/plugins/testabc/hello/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Can access public paths as logged-in, (per plugin directive)
+        res = c.get('/plugins/testabc/file.txt')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        c.logout()
+
+        # Can still access the paths as anonymous
+        res = c.get('/plugins/testabc/hello/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = c.get('/api/plugins/testabc/hello/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # But not the public paths as anonymous (per plugin directive)
+        res = c.get('/plugins/testabc/file.txt')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Cannot delete plugin as normal user
+        c.login(username='testuser', password='test1234')
+        res = c.get('/admin/app/plugin/testabc/delete/', follow=True)
+        self.assertRedirects(res, '/admin/login/?next=/admin/app/plugin/testabc/delete/')
+
+        # Can delete plugin as admin
+        c.login(username='testsuperuser', password='test1234')
+        res = c.get('/admin/app/plugin/testabc/delete/', follow=True)
+        self.assertRedirects(res, '/admin/app/plugin/')
+        messages = list(res.context['messages'])
+
+        # No errors
+        self.assertEqual(len(messages), 0)
+
+        # Directories have been removed
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("testabc")))
+
+        # Cannot access the paths as anonymous
+        res = c.get('/plugins/testabc/hello/')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = c.get('/api/plugins/testabc/hello/')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = c.get('/plugins/testabc/file.txt')
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Try to add malformed plugins files
+        res = c.post('/admin/app/plugin/actions/upload/', {'file': missing_manifest_plugin_file}, follow=True)
+        self.assertRedirects(res, '/admin/app/plugin/')
+        messages = list(res.context['messages'])
+        self.assertTrue('Cannot load plugin' in str(messages[0]))
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("test123")))
+        self.assertEqual(Plugin.objects.filter(pk='test123').count(), 0)
+        missing_manifest_plugin_file.seek(0)
+
+        res = c.post('/admin/app/plugin/actions/upload/', {'file': bad_dir_plugin_file}, follow=True)
+        self.assertRedirects(res, '/admin/app/plugin/')
+        messages = list(res.context['messages'])
+        self.assertTrue('Cannot load plugin' in str(messages[0]))
+        missing_manifest_plugin_file.seek(0)
+
+        plugin_file.close()
+        missing_manifest_plugin_file.close()
+        bad_dir_plugin_file.close()
 

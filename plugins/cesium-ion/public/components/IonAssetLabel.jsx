@@ -3,7 +3,7 @@ import { AssetStyles } from "../defaults";
 
 const IonAssetLabel = ({ asset, showIcon = false, ...options }) => (
 	<Fragment>
-		{showIcon && <i className={`fa ${AssetStyles[asset].icon}`} />}
+		{showIcon && <i className={`${AssetStyles[asset].icon}`} />}
 		{"  "}
 		{AssetStyles[asset].name}
 	</Fragment>

@@ -44,7 +44,7 @@ def HomeView(plugin):
         return render(
             request,
             plugin.template_path("app.html"),
-            {"title": "Cesium ion", "form": form},
+            {"title": "Cesium Ion", "form": form},
         )
 
     return view

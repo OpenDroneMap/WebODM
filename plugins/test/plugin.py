@@ -22,10 +22,10 @@ class Plugin(PluginBase):
         return [Menu("Test", self.public_url("menu_url/"), "test-icon")]
 
     def include_js_files(self):
-    	return ['test.js']
+        return ['test.js']
 
     def include_css_files(self):
-    	return ['test.css']
+        return ['test.css']
 
     def build_jsx_components(self):
         return ['component.jsx']

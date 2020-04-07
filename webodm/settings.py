@@ -45,6 +45,7 @@ with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
     VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
+FLUSHING = sys.argv[1:2] == ['flush']
 MIGRATING = sys.argv[1:2] == ['migrate']
 WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
@@ -56,6 +57,27 @@ INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
 
+# Branding
+APP_NAME = "WebODM"
+APP_DEFAULT_LOGO = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
+
+# In single user mode, a default admin account is created and automatically
+# used so that no login windows are displayed
+SINGLE_USER_MODE = False
+
+# URL to redirect to if there are no processing nodes when visiting the dashboard
+PROCESSING_NODES_ONBOARDING = None
+
+# Default CSS to add to theme
+DEFAULT_THEME_CSS = ''
+
+# Plugins never to load
+PLUGINS_BLACKLIST = [
+    #'measure',
+]
+
+# Serve media static files URLs even in production
+FORCE_MEDIA_STATICFILES = False
 
 # Application definition
 
@@ -258,6 +280,8 @@ if TESTING:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 MEDIA_TMP = os.path.join(MEDIA_ROOT, 'tmp')
 
+FILE_UPLOAD_TEMP_DIR = MEDIA_TMP
+
 # Store flash messages in cookies
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 MESSAGE_TAGS = {
@@ -333,7 +357,7 @@ CELERY_INCLUDE=['worker.tasks']
 CELERY_WORKER_REDIRECT_STDOUTS = False
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
-if TESTING:
+if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
 
 try:

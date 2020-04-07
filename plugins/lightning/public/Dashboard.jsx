@@ -108,39 +108,47 @@ export default class Dashboard extends React.Component {
   render(){
     const { loading, loadingMessage, user, syncingNodes, nodes } = this.state;
 
+    let balance = "";
+    if (user){
+        balance = (<span><strong>{ user.balance }</strong> credits</span>);
+        if (user.plan !== null){
+            balance = (<span><strong>Unlimited</strong></span>);
+        }
+    }
+
     return (<div className="lightning-dashboard">
         <ErrorMessage bind={[this, "error"]} />
 
         { loading ? 
-        <div className="text-center loading">{ loadingMessage } <i className="fa fa-spin fa-circle-o-notch"></i></div> :
+        <div className="text-center loading">{ loadingMessage } <i className="fa fa-spin fa-circle-notch"></i></div> :
         <div>
             { user ? 
             <div>
                 <div className="balance">
-                    Balance: <strong>{ user.balance }</strong> credits 
+                    Balance: { balance } 
                     <button className="btn btn-primary btn-sm" onClick={this.handleBuyCredits}><i className="fa fa-shopping-cart"></i> Buy Credits</button>
-                    <button className="btn btn-primary btn-sm" onClick={this.handleRefresh}><i className="fa fa-refresh"></i> Refresh Balance</button>
+                    <button className="btn btn-primary btn-sm" onClick={this.handleRefresh}><i className="fa fa-sync"></i> Refresh Balance</button>
                 </div>
                 
                 <h4>Hello, <a href="javascript:void(0)" onClick={this.handleOpenDashboard}>{ user.email }</a></h4>
 
                 <div className="lightning-nodes">
                     <h5>Synced Nodes</h5>
-                    { syncingNodes ? <i className="fa fa-spin fa-refresh"></i> :
+                    { syncingNodes ? <i className="fa fa-spin fa-sync"></i> :
                     <div>
                         <ul>
                             {nodes.map(n => 
                                 <li key={n.id}><i className="fa fa-laptop"></i> <a href={`/processingnode/${n.id}/`}>{n.label}</a></li>
                             )}
                         </ul>
-                        <button className="btn btn-sm btn-default" onClick={this.handleSyncProcessingNode}><i className="fa fa-refresh"></i> Resync</button>
+                        <button className="btn btn-sm btn-default" onClick={this.handleSyncProcessingNode}><i className="fa fa-sync"></i> Resync</button>
                     </div> }
                 </div>
 
                 {nodes.length > 0 ? 
                 <div>
                     <hr/>
-                    <i className="fa fa-thumbs-o-up"></i> You are all set! When creating a new task from the <a href="/dashboard">Dashboard</a>, select <strong>{nodes[0].label}</strong> from the <strong>Processing Node</strong> drop-down instead of Auto.
+                    <i className="far fa-thumbs-up"></i> You are all set! When creating a new task from the <a href="/dashboard">Dashboard</a>, select <strong>{nodes[0].label}</strong> from the <strong>Processing Node</strong> drop-down instead of Auto.
                 </div> : ""}
 
                 <div className="buttons text-right">
