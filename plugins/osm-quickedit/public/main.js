@@ -3,10 +3,9 @@
 // and covered by a BSD 2-Clause License
 
 PluginsAPI.Map.addActionButton(function(options){
-	if (options.tiles.length > 0){
-		// TODO: pick the topmost layer instead
-		// of the first on the list, to support
-		// maps that display multiple tasks.
+	if (options.tiles.length === 1 ){
+		// maps that display multiple tasks don't have a share option on the page
+		// and so we can't set things up to edit them
 
 		var tile = options.tiles[0];
 		var tileUrl = window.location.protocol + "//" + 
