@@ -11,11 +11,28 @@ PluginsAPI.Map.addActionButton(function(options){
 		var tile = options.tiles[0];
 		var tileUrl = window.location.protocol + "//" + 
 					window.location.host +
-					tile.url.replace(/tiles\.json$/, "tiles/{zoom}/{x}/{-y}.png");
+					tile.url + "tiles/{z}/{x}/{y}.png";
 		var JOSM_COMMAND_TIMEOUT = 1000;
 		var josmLastCommand = 0;
 		
 		var startEditor = function(editor){
+			// to load our imagery in an editor, we need to share it
+			// .shareButton switches to btn-primary when the project is shared	
+			var private = $('.shareButton').hasClass('btn-secondary');
+			if(private){
+				// check with the user that it's okay to share the project
+				if(window.confirm("Sharing will be turned on for this project so that imagery can be loaded in the editor.")){
+					if($('.sharePopup.top').is(':visible')){ 
+						// it is very unlikely, but possible that the sharePopup is open
+						// in which case we need to click the checkbox not the button
+						$('.shareButton div.checkbox input').click()
+					} else {
+						// otherwise we can just click the shareButton and it will turn on sharing
+						$('.shareButton').click()
+					}
+				}
+			}
+			
 			if (editor === 'ideditor'){
 				var editUrl = "https://www.openstreetmap.org/edit?editor=id#map=" +
 					options.map.getZoom() + "/" + 
@@ -25,24 +42,6 @@ PluginsAPI.Map.addActionButton(function(options){
 				window.open(editUrl);
 			} 
 			else if (editor === 'josm'){
-				// .shareButton switches to btn-primary when the project is shared	
-				var private = $('.shareButton').hasClass('btn-secondary');
-				if(private){
-					// check with the user that it's okay to share the project
-					if(window.confirm("Sharing will be turned on for this project so that imagery can be loaded in JOSM.")){
-						if($('.sharePopup.top').is(':visible')){ 
-							// it is very unlikely, but possible that the sharePopup is open
-							// in which case we need to click the checkbox not the button
-							$('.shareButton div.checkbox input').click()
-						} else {
-							// otherwise we can just click the shareButton and it will turn on sharing
-							$('.shareButton').click()
-						}
-						prepareJOSM();
-					}
-				} else {
-					prepareJOSM();
-				}
 				
 				function formatUrlParams_(params){
 		      return "?" + Object
@@ -107,7 +106,9 @@ PluginsAPI.Map.addActionButton(function(options){
 						new_layer: false
 	       	};
 					sendJOSMCmd('http://127.0.0.1:8111/load_and_zoom', loadAndZoomParams);
-				}				
+				}
+				
+				prepareJOSM();				
 								
 			}
 		}
