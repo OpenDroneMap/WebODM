@@ -73,15 +73,15 @@ PluginsAPI.Map.addActionButton(function(options){
 														resolve();
 														iframe.parentElement.removeChild(iframe);
 												}
-										});
+                                        });
 										iframe.setAttribute('src', url);
 										document.body.appendChild(iframe);
 								}, wait);
 
 								setTimeout(function(){
 										if(loaded === undefined){
-												loaded = false;
-												reject();
+                                                loaded = false;
+                                                reject();
 												iframe.parentElement.removeChild(iframe);
 										}
 								}, wait + JOSM_COMMAND_TIMEOUT);
@@ -94,7 +94,9 @@ PluginsAPI.Map.addActionButton(function(options){
 		        type: "tms",
 		        url: encodeURIComponent("tms[22]:" + tileUrl)
 	        };
-					sendJOSMCmd('http://127.0.0.1:8111/imagery', imageryParams)				
+					sendJOSMCmd('http://127.0.0.1:8111/imagery', imageryParams).catch(function(){
+                        alert("Cannot communicate with JOSM. Is it open and running on http://127.0.0.1:8111 ?");
+                    });
 					var loadAndZoomParams = {
 						left: options.map.getBounds().getWest(),
 						bottom: options.map.getBounds().getSouth(),
