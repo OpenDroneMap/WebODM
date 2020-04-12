@@ -19,7 +19,6 @@ A user-friendly, extendable application and [API](http://docs.webodm.org) for dr
  * [Recommended Machine Specs](#recommended-machine-specs)
  * [Customizing and Extending](#customizing-and-extending)
  * [API Docs](#api-docs)
- * [ODM, NodeODM, WebODM... what?](#odm-nodeodm-webodm-what)
  * [Roadmap](#roadmap)
  * [Getting Help](#getting-help)
  * [Support the Project](#support-the-project)
@@ -237,27 +236,6 @@ To create a plugin simply copy the `plugins/test` plugin into a new directory (f
 
 See the [API documentation page](http://docs.webodm.org).
 
-## ODM, NodeODM, WebODM... what?
-
-The [OpenDroneMap project](https://github.com/OpenDroneMap/) is composed of several components.
-
-- [ODM](https://github.com/OpenDroneMap/ODM) is a command line toolkit that processes aerial images. Users comfortable with the command line are probably OK using this component alone.
-- [NodeODM](https://github.com/OpenDroneMap/NodeODM) is a lightweight interface and API (Application Program Interface) built directly on top of [ODM](https://github.com/OpenDroneMap/ODM). Users not comfortable with the command line can use this interface to process aerial images and developers can use the API to build applications. Features such as user authentication, map displays, etc. are not provided.
-- [WebODM](https://github.com/OpenDroneMap/WebODM) adds more features such as user authentication, map displays, 3D displays, a higher level API and the ability to orchestrate multiple processing nodes (run jobs in parallel). Processing nodes are simply servers running [NodeODM](https://github.com/OpenDroneMap/NodeODM).
-
-![webodm](https://cloud.githubusercontent.com/assets/1951843/25567386/5aeec7aa-2dba-11e7-9169-aca97b70db79.png)
-
-In general, follow these guidelines to find out what you should use:
-
-I am a... | Best choice
---------- | -----------
-End user, I'm not really comfortable with the command line | [WebODM](https://github.com/OpenDroneMap/WebODM)
-End user, I like shell commands, I need to process images for myself. I use other software to display processing results |  [ODM](https://github.com/OpenDroneMap/ODM)
-End user, I can work with the command line, but I'd rather not. I use other software to display processing results  |  [NodeODM](https://github.com/OpenDroneMap/NodeODM)
-End user, I need a drone mapping application for my organization that everyone can use. | [WebODM](https://github.com/OpenDroneMap/WebODM)
-Developer, I'm looking to build an app that displays map results and takes care of things like permissions | [WebODM](https://github.com/OpenDroneMap/WebODM)
-Developer, I'm looking to build an app that will stay behind a firewall and just needs raw results | [NodeODM](https://github.com/OpenDroneMap/NodeODM)
-
 ## Roadmap
 
 We follow a bottom-up approach to decide what new features are added to WebODM. User feedback guides us in the decision making process and we collect such feedback via [improvement requests](https://github.com/OpenDroneMap/WebODM/issues?q=is%3Aopen+is%3Aissue+label%3Aimprovements).
@@ -300,6 +278,14 @@ To make a contribution, you will need to open a pull request ([here's how](https
 If you have questions visit us on the [forum](http://community.opendronemap.org/c/webodm) and we'll be happy to help you out with your first contribution.
 
 ## Architecture Overview
+
+The [OpenDroneMap project](https://github.com/OpenDroneMap/) is composed of several components.
+
+- [ODM](https://github.com/OpenDroneMap/ODM) is a command line toolkit that processes aerial images. Users comfortable with the command line are probably OK using this component alone.
+- [NodeODM](https://github.com/OpenDroneMap/NodeODM) is a lightweight interface and API (Application Program Interface) built directly on top of [ODM](https://github.com/OpenDroneMap/ODM). Users not comfortable with the command line can use this interface to process aerial images and developers can use the API to build applications. Features such as user authentication, map displays, etc. are not provided.
+- [WebODM](https://github.com/OpenDroneMap/WebODM) adds more features such as user authentication, map displays, 3D displays, a higher level API and the ability to orchestrate multiple processing nodes (run jobs in parallel). Processing nodes are simply servers running [NodeODM](https://github.com/OpenDroneMap/NodeODM).
+
+![webodm](https://cloud.githubusercontent.com/assets/1951843/25567386/5aeec7aa-2dba-11e7-9169-aca97b70db79.png)
 
 WebODM is built with scalability and performance in mind. While the default setup places all databases and applications on the same machine, users can separate its components for increased performance (ex. place a Celery worker on a separate machine for running background tasks).
 
