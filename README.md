@@ -38,7 +38,7 @@ Windows and macOS users can purchase an automated [installer](https://www.opendr
 
 You can also run WebODM from a Live USB/DVD. See [LiveODM](https://www.opendronemap.org/liveodm/).
 
-Windows users looking for a UI-only native installation should also check [webodm.net](https://webodm.net).
+Windows users looking for a UI-only native installation can also download the "Desktop App" available from [webodm.net](https://webodm.net).
 
 To install WebODM manually, these steps should get you up and running:
 
