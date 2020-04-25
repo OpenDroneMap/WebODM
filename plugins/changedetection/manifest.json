@@ -1,0 +1,13 @@
+{
+	"name": "ChangeDetection",
+	"webodmMinVersion": "1.1.1",
+	"description": "Detect changes between two different tasks in the same project.",
+	"version": "1.0.0",
+	"author": "Nicolas Chamo",
+	"email": "nicolas@chamo.com.ar",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["change", "detection", "dsm", "dem", "dtm"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

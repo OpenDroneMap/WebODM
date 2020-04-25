@@ -1,0 +1,87 @@
+.leaflet-control-changedetection .changedetection-panel{
+  padding: 6px 10px 6px 6px;
+  background: #fff;
+  min-width: 250px;
+  max-width: 300px;
+
+  .close-button{
+    display: inline-block;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQAAAD8x0bcAAAAkUlEQVR4AZWRxQGDUBAFJ9pMflNIP/iVSkIb2wgccXd7g7O+3JXCQUgqBAfFSl8CMooJGQHfuUlEwZpoahZQ7ODTSXWJQkxyioock7BL2tXmdF4moJNX6IDZfbUBQNrX7qfeXfPuqwBAQjEz60w64htGJ+luFH48gt+NYe6v5b/cnr9asM+HlRQ2Qlwh2CjuqQQ9vKsKTwhQ1wAAAABJRU5ErkJggg==);
+    height: 18px;
+    width: 18px;
+    margin-right: 0;
+    float: right;
+    vertical-align: middle;
+    text-align: right;
+    margin-top: 0px;
+    margin-left: 16px;
+    position: relative;
+    left: 2px;
+
+    &:hover{
+      opacity: 0.7;
+      cursor: pointer;
+    }
+  }
+
+  .title{
+    font-size: 120%;
+    margin-right: 60px;
+  }
+
+  hr{
+    clear: both;
+    margin: 6px 0px;
+    border-color: #ddd;
+  }
+
+  label{
+    padding-top: 5px;
+  }
+
+  select, input{
+    height: auto;
+    padding: 4px;
+  }
+
+  input.custom-interval{
+    width: 80px;
+  }
+
+  *{
+    font-size: 12px;
+  }
+
+  .row.form-group.form-inline{
+    margin-bottom: 8px;
+  }
+
+  .dropdown-menu{
+    a{
+      width: 100%;
+      text-align: left;
+      display: block;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  .btn-preview{
+    margin-right: 8px;
+  }
+
+  .action-buttons{
+    margin-top: 12px;
+  }
+
+  .help {
+    margin-left: 4px;
+    top: 4px;
+    font-size: 14px;
+  }
+
+  .slider {
+    padding: 0px;
+    margin-right: 4px;
+  }
+}
