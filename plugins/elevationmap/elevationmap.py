@@ -134,7 +134,7 @@ def get_kernel(noise_filter_size, dsm):
         return None
     if dsm.crs.linear_units != 'metre':
         noise_filter_size *= 3.2808333333465 # Convert meter to feets
-    return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (round(noise_filter_size / dsm.res[0]), round(noise_filter_size / dsm.res[1])))    
+    return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(round(noise_filter_size / dsm.res[0])), int(round(noise_filter_size / dsm.res[1]))))
 
 def assert_same_bounds_and_resolution(dsm, dtm):
     if dtm.bounds != dsm.bounds or dtm.res != dsm.res:

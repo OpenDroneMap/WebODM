@@ -31,7 +31,7 @@ export default class ChangeDetectionPanel extends React.Component {
         minArea: Storage.getItem("last_changedetection_min_area") || 40,
         minHeight: Storage.getItem("last_changedetection_min_height") || 5,
         role: Storage.getItem("last_changedetection_role") || 'reference',
-        align: this.props.alignSupported ? (Storage.getItem("last_changedetection_align") || false) : false,
+        align: this.props.alignSupported ? (Storage.getItem("last_changedetection_align") === 'true') : false,
         other: "",
         otherTasksInProject: new Map(),
         loading: true,
