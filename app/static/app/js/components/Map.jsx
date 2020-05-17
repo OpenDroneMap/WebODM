@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'ReactDOM';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
@@ -11,6 +12,7 @@ import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
 import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
+import ImagePopup from './ImagePopup';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
@@ -22,6 +24,8 @@ import Standby from './Standby';
 import LayersControl from './LayersControl';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
+import '../vendor/leaflet/Leaflet.Ajax';
+import '../vendor/leaflet/Leaflet.Awesome-markers';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -53,6 +57,7 @@ class Map extends React.Component {
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
+    this.addedCameraShots = false;
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
@@ -68,6 +73,20 @@ class Map extends React.Component {
   updatePopupFor(layer){
     const popup = layer.getPopup();
     $('#layerOpacity', popup.getContent()).val(layer.options.opacity);
+  }
+
+  typeToHuman = (type) => {
+      switch(type){
+          case "orthophoto":
+              return "Orthophoto";
+          case "plant":
+              return "Plant Health";
+          case "dsm":
+              return "DSM";
+          case "dtm":
+              return "DTM";
+      }
+      return "";
   }
 
   loadImageryLayers(forceAddLayers = false){
@@ -141,7 +160,7 @@ class Map extends React.Component {
                 });
             
             // Associate metadata with this layer
-            meta.name = name;
+            meta.name = name + ` (${this.typeToHuman(type)})`;
             meta.metaUrl = metaUrl;
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
@@ -196,6 +215,54 @@ class Map extends React.Component {
             let mapBounds = this.mapBounds || Leaflet.latLngBounds();
             mapBounds.extend(bounds);
             this.mapBounds = mapBounds;
+
+            // Add camera shots layer if available
+            if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
+                const cameraMarker = L.AwesomeMarkers.icon({
+                    icon: 'camera',
+                    markerColor: 'blue',
+                    prefix: 'fa'
+                });
+
+                const shotsLayer = new L.GeoJSON.AJAX(meta.task.camera_shots, {
+                    style: function (feature) {
+                      return {
+                        opacity: 1,
+                        fillOpacity: 0.7,
+                        color: "#000000"
+                      }
+                    },
+                    pointToLayer: function (feature, latlng) {
+                      return L.marker(latlng, {
+                        icon: cameraMarker
+                      });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties && feature.properties.filename) {
+                            let root = null;
+                            const lazyrender = () => {
+                                if (!root) root = document.createElement("div");
+                                ReactDOM.render(<ImagePopup task={meta.task} feature={feature}/>, root);
+                                return root;
+                            }
+
+                            layer.bindPopup(L.popup(
+                                {
+                                    lazyrender,
+                                    maxHeight: 450,
+                                    minWidth: 320
+                                }));
+                        }
+                    }
+                });
+                shotsLayer[Symbol.for("meta")] = {name: name + " (Cameras)", icon: "fa fa-camera fa-fw"};
+
+                this.setState(update(this.state, {
+                    overlays: {$push: [shotsLayer]}
+                }));
+
+                this.addedCameraShots = true;
+            }
 
             done();
           })
@@ -359,7 +426,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
           }
         }).on('popupopen', e => {
             // Load task assets links in popup
-            if (e.popup && e.popup._source && e.popup._content){
+            if (e.popup && e.popup._source && e.popup._content && !e.popup.options.lazyrender){
                 const infoWindow = e.popup._content;
                 if (typeof infoWindow === 'string') return;
 
@@ -386,6 +453,10 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
                             $assetLinks.removeClass('loading');
                         });
                 }
+            }
+
+            if (e.popup && e.popup.options.lazyrender){
+                e.popup.setContent(e.popup.options.lazyrender());
             }
         });
     });
