@@ -55,5 +55,15 @@
           }
         }
 
+        .overlayIcon{
+            float: left;
+            width: 22px;
+
+            i{
+                font-size: 16px;
+                margin-top: 4px;
+                margin-left: 1px;
+            }
+        }
     }
 }

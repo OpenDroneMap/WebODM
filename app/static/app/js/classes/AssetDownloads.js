@@ -44,7 +44,9 @@ const api = {
       new AssetDownload("Point Cloud (PLY)","georeferenced_model.ply","fa fa-cube"),
       new AssetDownload("Point Cloud (CSV)","georeferenced_model.csv","fa fa-cube"),
       new AssetDownload("Textured Model","textured_model.zip","fab fa-connectdevelop"),
-      new AssetDownload("Camera Parameters","cameras.json","fa fa-camera-retro"),
+      new AssetDownload("Camera Parameters","cameras.json","fa fa-camera"),
+      new AssetDownload("Camera Shots (GeoJSON)","shots.geojson","fa fa-camera"),
+      
       new AssetDownloadSeparator(),
       new AssetDownload("All Assets","all.zip","far fa-file-archive")
     ];

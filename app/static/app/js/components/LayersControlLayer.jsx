@@ -14,12 +14,14 @@ export default class LayersControlLayer extends React.Component {
       expanded: false,
       map: null,
       overlay: false,
+      overlayIcon: "fa fa-vector-square fa-fw"
   };
   static propTypes = {
     layer: PropTypes.object.isRequired,
     expanded: PropTypes.bool,
     map: PropTypes.object.isRequired,
-    overlay: PropTypes.bool
+    overlay: PropTypes.bool,
+    overlayIcon: PropTypes.string
   }
 
   constructor(props){
@@ -262,7 +264,7 @@ export default class LayersControlLayer extends React.Component {
     }
 
     return (<div className="layers-control-layer">
-        {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : ""}<Checkbox bind={[this, 'visible']}/>
+        {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="overlayIcon"><i className={this.props.overlayIcon}></i></div>}<Checkbox bind={[this, 'visible']}/>
         <a className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
 
         {this.state.expanded ? 

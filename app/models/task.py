@@ -192,6 +192,7 @@ class Task(models.Model):
                 'deferred_compress_dir': 'orthophoto_tiles'
             },
             'cameras.json': 'cameras.json',
+            'shots.geojson': os.path.join('odm_report', 'shots.geojson'),
     }
 
     STATUS_CODES = (
