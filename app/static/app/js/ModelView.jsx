@@ -6,11 +6,14 @@ import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import PropTypes from 'prop-types';
+import proj4 from 'proj4';
+import epsg from 'epsg';
 import $ from 'jquery';
 
 window.Potree = require('./vendor/potree');
 require('./vendor/OBJLoader');
 THREE.MTLLoader = require('./vendor/MTLLoader');
+require('./vendor/ColladaLoader');
 
 class TexturedModelMenu extends React.Component{
     static propTypes = {
@@ -163,10 +166,73 @@ class ModelView extends React.Component {
           material.size = 1;
           material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
           material.pointColorType = Potree.PointColorType.RGB;
+
+          this.loadCameras();
          
           viewer.fitToScreen();
         });     
     });
+  }
+
+  loadCameras(){
+    const { task } = this.props;
+
+    if (task.available_assets.indexOf('shots.geojson') !== -1){
+        const colladaLoader = new THREE.ColladaLoader();
+        const fileloader = new THREE.FileLoader();
+        
+        colladaLoader.load('/static/app/models/camera.dae', ( collada ) => {
+            const dae = collada.scene;
+
+            fileloader.load(`/api/projects/${task.project}/tasks/${task.id}/download/shots.geojson`,  ( data ) => {
+                const geojson = JSON.parse(data);
+                const gjproj = proj4.defs("EPSG:4326");
+
+                let pcproj = this.pointCloud.projection;
+
+                if (pcproj){
+                    if (pcproj.toLowerCase().startsWith("epsg")){
+                        pcproj = epsg[pcproj];
+                    }
+                }else{
+                    console.log("NO PROJ!!!");
+                    // TODO ?
+                }
+
+                const toScene = proj4(gjproj, pcproj);
+                const cameraObj = dae.children[0];
+
+                // const cameraMesh = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
+                // const dummy = new THREE.Object3D();
+                
+                // let i = 0;
+                // geojson.features.forEach(feat => {
+                //     const coords = feat.geometry.coordinates;
+
+                //     const utm = toScene.forward([coords[0], coords[1]]);
+                //     utm.push(coords[2]); // z in meters doesn't change
+
+                //     dummy.position.set(utm[0], utm[1], utm[2]);
+                //     // TODO: rotation
+
+                //     dummy.updateMatrix();
+
+                //     cameraMesh.setMatrixAt(i, dummy.matrix);
+
+                //     console.log(i);
+
+                //     i++;
+                // });
+
+                // dae.position.set(utm[0], utm[1], utm[2]);
+                // dae.scale.x = 1;
+                // dae.scale.y = 1;
+                // dae.scale.z = 1;
+
+                // viewer.scene.scene.add(cameraMesh);
+            }, undefined, console.error);
+        });
+    }
   }
 
   setPointCloudsVisible = (flag) => {

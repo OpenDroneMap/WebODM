@@ -13,15 +13,20 @@ class ImagePopup extends React.Component {
 
         this.state = {
             error: "",
+            loading: true,
         }
     }
 
     imageOnError = () => {
-        this.setState({error: "Image is missing"});
+        this.setState({error: "Image is missing", loading: false});
+    }
+
+    imageOnLoad = () => {
+        this.setState({loading: false});
     }
 
     render(){
-        const { error } = this.state;
+        const { error, loading } = this.state;
         const { feature, task } = this.props;
 
         const downloadImageLink = `/api/projects/${task.project}/tasks/${task.id}/images/download/${feature.properties.filename}`;
@@ -32,10 +37,12 @@ class ImagePopup extends React.Component {
 
         return (<div>
             <strong>{feature.properties.filename}</strong>
+            {loading ? <div style={{marginTop: "8px"}}><i className="fa fa-circle-notch fa-spin fa-fw"></i></div>
+            : ""}
             {error !== "" ? <div style={{marginTop: "8px"}}>{error}</div>
             : [
                 <div key="image" style={{marginTop: "8px"}}>
-                    <a href={downloadImageLink} title={feature.properties.filename}><img style={{borderRadius: "4px"}} src={thumbUrl} onError={this.imageOnError} /></a>
+                    <a href={downloadImageLink} title={feature.properties.filename}><img style={{borderRadius: "4px"}} src={thumbUrl} onLoad={this.imageOnLoad} onError={this.imageOnError} /></a>
                 </div>,
                 <div key="download-image" style={{marginTop: "8px"}}>
                     <a href={downloadImageLink}><i className="fa fa-image"></i> Download Image</a>
