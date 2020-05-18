@@ -1,7 +1,3 @@
-@import '../vendor/potree/build/potree.css';
-@import '../vendor/potree/libs/jquery-ui.css';
-@import '../vendor/potree/libs/themes/mixed/style.css';
-
 .model-view{
     position: relative;
     height: 100%;
@@ -180,7 +176,12 @@
         }
     }
 
+    
     #potree_download_profile_ortho_link, #potree_download_profile_link{
         color: black;
     }
+}
+
+#profile_window{
+    z-index: 999999999999 !important;
 }

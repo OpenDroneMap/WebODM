@@ -6,13 +6,20 @@ import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import PropTypes from 'prop-types';
-import proj4 from 'proj4';
 import epsg from 'epsg';
 import $ from 'jquery';
 
-window.Potree = require('./vendor/potree');
+// Add more proj definitions
+const defs = [];
+for (let k in epsg){
+    if (epsg[k]){
+        defs.push([k, epsg[k]]);
+    }
+}
+window.proj4.defs(defs);
+
 require('./vendor/OBJLoader');
-THREE.MTLLoader = require('./vendor/MTLLoader');
+require('./vendor/MTLLoader');
 require('./vendor/ColladaLoader');
 
 class TexturedModelMenu extends React.Component{
@@ -151,6 +158,8 @@ class ModelView extends React.Component {
       }
     });
 
+    viewer.scene.scene.add( new THREE.AmbientLight( 0xcccccc, 1.0 ) );
+
     this.pointCloudFilePath(pointCloudPath => {
         Potree.loadPointCloud(pointCloudPath, "Point Cloud", e => {
           if (e.type == "loading_failed"){
@@ -164,10 +173,10 @@ class ModelView extends React.Component {
     
           let material = e.pointcloud.material;
           material.size = 1;
-          material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-          material.pointColorType = Potree.PointColorType.RGB;
 
           this.loadCameras();
+
+        window.scene = viewer.scene.scene;
          
           viewer.fitToScreen();
         });     
@@ -176,6 +185,18 @@ class ModelView extends React.Component {
 
   loadCameras(){
     const { task } = this.props;
+
+    function rotate(vector, angleaxis) {
+        var v = new THREE.Vector3(vector[0], vector[1], vector[2]);
+        var axis = new THREE.Vector3(angleaxis[0],
+                                     angleaxis[1],
+                                     angleaxis[2]);
+        var angle = axis.length();
+        axis.normalize();
+        var matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
+        v.applyMatrix4(matrix);
+        return v;
+    }
 
     if (task.available_assets.indexOf('shots.geojson') !== -1){
         const colladaLoader = new THREE.ColladaLoader();
@@ -190,46 +211,48 @@ class ModelView extends React.Component {
 
                 let pcproj = this.pointCloud.projection;
 
-                if (pcproj){
-                    if (pcproj.toLowerCase().startsWith("epsg")){
-                        pcproj = epsg[pcproj];
-                    }
-                }else{
+                if (!pcproj){
                     console.log("NO PROJ!!!");
                     // TODO ?
                 }
 
                 const toScene = proj4(gjproj, pcproj);
                 const cameraObj = dae.children[0];
+                console.log(cameraObj);
 
-                // const cameraMesh = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
+                // TODO: instancing doesn't seem to work :/
+                // const cameraMeshes = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
                 // const dummy = new THREE.Object3D();
-                
-                // let i = 0;
-                // geojson.features.forEach(feat => {
-                //     const coords = feat.geometry.coordinates;
 
-                //     const utm = toScene.forward([coords[0], coords[1]]);
-                //     utm.push(coords[2]); // z in meters doesn't change
+                let i = 0;
+                geojson.features.forEach(feat => {
+                    const coords = feat.geometry.coordinates;
 
-                //     dummy.position.set(utm[0], utm[1], utm[2]);
-                //     // TODO: rotation
+                    const utm = toScene.forward([coords[0], coords[1]]);
+                    utm.push(coords[2]); // z in meters doesn't change
 
-                //     dummy.updateMatrix();
+                    const rotation = rotate([0, 0, 1], feat.properties.rotation);
+                    
+                    // dummy.rotation.set(
+                        //     Math.random() * Math.PI,
+                        //     Math.random() * Math.PI,
+                        //     Math.random() * Math.PI
+                        // );
+                        
+                    // dummy.position.set(utm[0], utm[1], utm[2]);
+                    // dummy.rotation.set(...)
+                    // dummy.updateMatrix();
+                    // cameraMeshes.setMatrixAt(i, dummy.matrix);
 
-                //     cameraMesh.setMatrixAt(i, dummy.matrix);
+                    const cameraMesh = new THREE.Mesh(cameraObj.geometry, cameraObj.material);
+                    cameraMesh.position.set(utm[0], utm[1], utm[2]);
+                    cameraMesh.rotation.set(rotation.x, rotation.y, rotation.z);
+                    viewer.scene.scene.add(cameraMesh);
 
-                //     console.log(i);
+                    i++;
+                });
 
-                //     i++;
-                // });
-
-                // dae.position.set(utm[0], utm[1], utm[2]);
-                // dae.scale.x = 1;
-                // dae.scale.y = 1;
-                // dae.scale.z = 1;
-
-                // viewer.scene.scene.add(cameraMesh);
+                // viewer.scene.scene.add(cameraMeshes);
             }, undefined, console.error);
         });
     }
@@ -251,7 +274,6 @@ class ModelView extends React.Component {
         this.setState({initializingModel: true});
 
         const mtlLoader = new THREE.MTLLoader();
-        mtlLoader.setTexturePath(this.texturedModelDirectoryPath());
         mtlLoader.setPath(this.texturedModelDirectoryPath());
 
         mtlLoader.load(this.mtlFilename(), (materials) => {
@@ -264,7 +286,6 @@ class ModelView extends React.Component {
                     const bboxWorld = this.pointCloud.getBoundingBoxWorld();
                     const pcCenter = new THREE.Vector3();
                     bboxWorld.getCenter(pcCenter);
-    
                     object.position.set(pcCenter.x, pcCenter.y, pcCenter.z);
     
                     // Bring the model close to center
@@ -283,6 +304,7 @@ class ModelView extends React.Component {
                     } 
     
                     viewer.scene.scene.add(object);
+                    window.object = object; // TODO REMOVE
     
                     this.modelReference = object;
                     this.setPointCloudsVisible(false);
