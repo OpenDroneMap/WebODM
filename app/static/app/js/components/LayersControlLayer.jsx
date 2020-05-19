@@ -109,8 +109,14 @@ export default class LayersControlLayer extends React.Component {
   }
 
   handleLayerClick = () => {
-    this.map.fitBounds(this.props.layer.options.bounds);
-    this.props.layer.openPopup();
+    const { layer } = this.props;
+
+    const bounds = layer.options.bounds !== undefined ? 
+                   layer.options.bounds :
+                   layer.getBounds();
+    this.map.fitBounds(bounds);
+
+    if (layer.getPopup()) layer.openPopup();
   }
 
   handleSelectColor = e => {

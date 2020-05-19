@@ -48,6 +48,13 @@ export default {
                 icon: "far fa-image",
                 beginsWith: "Running ODM Orthophoto Cell",
                 endsWith: "Running ODM OrthoPhoto Cell - Finished"
+            },
+            {
+                action: "odm_report",
+                label: "Report",
+                icon: "far fa-file-alt",
+                beginsWith: "Running ODM Report Cell",
+                endsWith: "Running ODM Report Cell - Finished"
             }
         ];
     }

@@ -4,6 +4,8 @@
 
         .layer-label{
             width: auto;
+            position: relative;
+            top: 1px;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;

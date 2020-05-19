@@ -186,16 +186,15 @@ class ModelView extends React.Component {
   loadCameras(){
     const { task } = this.props;
 
-    function rotate(vector, angleaxis) {
-        var v = new THREE.Vector3(vector[0], vector[1], vector[2]);
-        var axis = new THREE.Vector3(angleaxis[0],
-                                     angleaxis[1],
-                                     angleaxis[2]);
+    function getMatrix(translation, rotation) {
+        var axis = new THREE.Vector3(-rotation[0],
+                                    -rotation[1],
+                                    -rotation[2]);
         var angle = axis.length();
         axis.normalize();
         var matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
-        v.applyMatrix4(matrix);
-        return v;
+        matrix.setPosition(new THREE.Vector3(translation[0], translation[1], translation[2]));
+        return matrix.transpose();
     }
 
     if (task.available_assets.indexOf('shots.geojson') !== -1){
@@ -218,11 +217,13 @@ class ModelView extends React.Component {
 
                 const toScene = proj4(gjproj, pcproj);
                 const cameraObj = dae.children[0];
-                console.log(cameraObj);
+                // const cameraObj = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
 
                 // TODO: instancing doesn't seem to work :/
                 // const cameraMeshes = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
                 // const dummy = new THREE.Object3D();
+
+                window.meshes = [];
 
                 let i = 0;
                 geojson.features.forEach(feat => {
@@ -231,26 +232,26 @@ class ModelView extends React.Component {
                     const utm = toScene.forward([coords[0], coords[1]]);
                     utm.push(coords[2]); // z in meters doesn't change
 
-                    const rotation = rotate([0, 0, 1], feat.properties.rotation);
-                    
-                    // dummy.rotation.set(
-                        //     Math.random() * Math.PI,
-                        //     Math.random() * Math.PI,
-                        //     Math.random() * Math.PI
-                        // );
-                        
-                    // dummy.position.set(utm[0], utm[1], utm[2]);
-                    // dummy.rotation.set(...)
-                    // dummy.updateMatrix();
-                    // cameraMeshes.setMatrixAt(i, dummy.matrix);
-
                     const cameraMesh = new THREE.Mesh(cameraObj.geometry, cameraObj.material);
-                    cameraMesh.position.set(utm[0], utm[1], utm[2]);
-                    cameraMesh.rotation.set(rotation.x, rotation.y, rotation.z);
+                    cameraMesh.matrixAutoUpdate = false;
+                    cameraMesh.matrix.set(...getMatrix(utm, feat.properties.rotation).elements);
                     viewer.scene.scene.add(cameraMesh);
+
+                    cameraMesh._feat = feat;
+                    window.meshes.push(cameraMesh);
 
                     i++;
                 });
+
+                window.rotate = (arr) => {
+                    window.meshes.forEach(m => {
+                        const rotation = rotate(arr, m._feat.properties.rotation);
+                        m.rotation.x = rotation.x;
+                        m.rotation.y = rotation.y;
+                        m.rotation.z = rotation.z;
+                        
+                    })
+                }
 
                 // viewer.scene.scene.add(cameraMeshes);
             }, undefined, console.error);
