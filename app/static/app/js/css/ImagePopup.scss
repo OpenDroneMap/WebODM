@@ -1,0 +1,22 @@
+.image-popup{
+    div{
+        margin-top: 8px;
+    }
+
+    div.image{
+        a{
+            cursor: zoom-in;
+        }
+        &.fullscreen{
+            display: flex;
+            align-items: center;
+            a{
+                cursor: zoom-out;
+            }
+            img{
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+    }   
+}

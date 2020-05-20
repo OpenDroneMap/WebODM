@@ -158,7 +158,13 @@ class ModelView extends React.Component {
       }
     });
 
-    viewer.scene.scene.add( new THREE.AmbientLight( 0xcccccc, 1.0 ) );
+    viewer.scene.scene.add( new THREE.AmbientLight( 0x404040, 2.0 ) ); // soft white light );
+    viewer.scene.scene.add( new THREE.DirectionalLight( 0xcccccc, 0.5 ) );
+
+    const directional = new THREE.DirectionalLight( 0xcccccc, 0.5 );
+    directional.position.z = 99999999999;
+    viewer.scene.scene.add( directional );
+    
 
     this.pointCloudFilePath(pointCloudPath => {
         Potree.loadPointCloud(pointCloudPath, "Point Cloud", e => {
