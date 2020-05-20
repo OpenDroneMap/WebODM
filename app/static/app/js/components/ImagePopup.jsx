@@ -51,7 +51,7 @@ class ImagePopup extends React.Component {
 
         if (!expandThumb){
             this.image.requestFullscreen();
-            this.setState({ expandThumb: true});
+            this.setState({ loading: true, expandThumb: true});
         }else{
             document.exitFullscreen();
             this.setState({ expandThumb: false });
@@ -74,6 +74,7 @@ class ImagePopup extends React.Component {
             {error !== "" ? <div style={{marginTop: "8px"}}>{error}</div>
             : [
                 <div key="image" className={`image ${expandThumb ? "fullscreen" : ""}`} style={{marginTop: "8px"}}  ref={(domNode) => { this.image = domNode;}}>
+                    {loading && expandThumb ? <div><i className="fa fa-circle-notch fa-spin fa-fw"></i></div> : ""}
                     <a onClick={this.onImgClick} href="javascript:void(0);" title={feature.properties.filename}><img style={{borderRadius: "4px"}} src={imageUrl} onLoad={this.imageOnLoad} onError={this.imageOnError} /></a>
                 </div>,
                 <div key="download-image">

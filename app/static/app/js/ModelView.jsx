@@ -73,6 +73,8 @@ class ModelView extends React.Component {
     this.modelReference = null;
 
     this.toggleTexturedModel = this.toggleTexturedModel.bind(this);
+
+    this.cameraMeshes = [];
   }
 
   assetsPath(){
@@ -187,6 +189,35 @@ class ModelView extends React.Component {
           viewer.fitToScreen();
         });     
     });
+
+    viewer.renderer.domElement.addEventListener( 'mousedown', this.handleRenderClick );
+  }
+
+  componentWillUnmount(){
+    viewer.renderer.domElement.removeEventListener( 'mousedown', this.handleRenderClick );
+  }
+
+  handleRenderClick = (evt) => {
+    const raycaster = new THREE.Raycaster();
+    const rect = viewer.renderer.domElement.getBoundingClientRect();
+    const [x, y] = [evt.clientX, evt.clientY];
+    const array = [ 
+        ( x - rect.left ) / rect.width, 
+        ( y - rect.top ) / rect.height 
+    ];
+    const onClickPosition = new THREE.Vector2(...array);
+    const camera = viewer.scene.getActiveCamera();
+    const mouse = new THREE.Vector3(
+        + ( onClickPosition.x * 2 ) - 1, 
+        - ( onClickPosition.y * 2 ) + 1 );
+    raycaster.setFromCamera( mouse, camera );
+    const intersects = raycaster.intersectObjects( this.cameraMeshes );
+
+    if ( intersects.length > 0){
+        //console.log(intersects);
+        const intersection = intersects[0];
+        console.log(intersection);
+    }
   }
 
   loadCameras(){
@@ -229,7 +260,6 @@ class ModelView extends React.Component {
                 // const cameraMeshes = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
                 // const dummy = new THREE.Object3D();
 
-                window.meshes = [];
 
                 let i = 0;
                 geojson.features.forEach(feat => {
@@ -244,22 +274,10 @@ class ModelView extends React.Component {
                     viewer.scene.scene.add(cameraMesh);
 
                     cameraMesh._feat = feat;
-                    window.meshes.push(cameraMesh);
+                    this.cameraMeshes.push(cameraMesh);
 
                     i++;
                 });
-
-                window.rotate = (arr) => {
-                    window.meshes.forEach(m => {
-                        const rotation = rotate(arr, m._feat.properties.rotation);
-                        m.rotation.x = rotation.x;
-                        m.rotation.y = rotation.y;
-                        m.rotation.z = rotation.z;
-                        
-                    })
-                }
-
-                // viewer.scene.scene.add(cameraMeshes);
             }, undefined, console.error);
         });
     }
@@ -338,9 +356,10 @@ class ModelView extends React.Component {
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
           <div className="container potree_container" 
-             style={{height: "100%", width: "100%", position: "relative"}} 
+             style={{height: "100%", width: "100%", position: "relative"}}
              onContextMenu={(e) => {e.preventDefault();}}>
-                <div id="potree_render_area" ref={(domNode) => { this.container = domNode; }}></div>
+                <div id="potree_render_area" 
+                    ref={(domNode) => { this.container = domNode; }}></div>
                 <div id="potree_sidebar_container"> </div>
           </div>
 
