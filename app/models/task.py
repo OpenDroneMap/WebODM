@@ -192,6 +192,7 @@ class Task(models.Model):
                 'deferred_compress_dir': 'orthophoto_tiles'
             },
             'cameras.json': 'cameras.json',
+            'shots.geojson': os.path.join('odm_report', 'shots.geojson'),
     }
 
     STATUS_CODES = (
@@ -759,13 +760,17 @@ class Task(models.Model):
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
 
+        camera_shots = ''
+        if 'shots.geojson' in self.available_assets: camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)
+
         return {
             'tiles': [{'url': self.get_tile_base_url(t), 'type': t} for t in types],
             'meta': {
                 'task': {
                     'id': str(self.id),
                     'project': self.project.id,
-                    'public': self.public
+                    'public': self.public,
+                    'camera_shots': camera_shots
                 }
             }
         }

@@ -5,12 +5,14 @@ import SwitchModeButton from './components/SwitchModeButton';
 import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
+import ImagePopup from './components/ImagePopup';
+import epsg from 'epsg';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
 
-window.Potree = require('./vendor/potree');
 require('./vendor/OBJLoader');
-THREE.MTLLoader = require('./vendor/MTLLoader');
+require('./vendor/MTLLoader');
+require('./vendor/ColladaLoader');
 
 class TexturedModelMenu extends React.Component{
     static propTypes = {
@@ -39,6 +41,33 @@ class TexturedModelMenu extends React.Component{
     }
 }
 
+class CamerasMenu extends React.Component{
+    static propTypes = {
+        toggleCameras: PropTypes.func.isRequired
+    }
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+            showCameras: false
+        }
+    }
+
+    handleClick = (e) => {
+        this.setState({showCameras: e.target.checked});
+        this.props.toggleCameras(e);
+    }
+
+    render(){
+        return (<label><input 
+                            type="checkbox" 
+                            checked={this.state.showCameras}
+                            onChange={this.handleClick}
+                        /> Show Cameras</label>);
+    }
+}
+
 class ModelView extends React.Component {
   static defaultProps = {
     task: null,
@@ -56,13 +85,18 @@ class ModelView extends React.Component {
     this.state = {
       error: "",
       showTexturedModel: false,
-      initializingModel: false
+      initializingModel: false,
+      selectedCamera: null,
     };
 
     this.pointCloud = null;
     this.modelReference = null;
 
     this.toggleTexturedModel = this.toggleTexturedModel.bind(this);
+    this.toggleCameras = this.toggleCameras.bind(this);
+    
+
+    this.cameraMeshes = [];
   }
 
   assetsPath(){
@@ -78,6 +112,27 @@ class ModelView extends React.Component {
         },
         success: () => {
             cb(true);
+        }
+    });
+  }
+
+  loadGeoreferencingOffset = (cb) => {
+    $.ajax({
+        url: `${this.assetsPath()}/odm_georeferencing/odm_georeferencing_model_geo.txt`,
+        type: 'GET',
+        error: () => {
+            console.warn("Cannot find odm_georeferencing_model_geo.txt (not georeferenced?)")
+            cb({x: 0, y: 0});
+        },
+        success: (data) => {
+            const lines = data.split("\n");
+            if (lines.length >= 2){
+                const [ x, y ] = lines[1].split(" ").map(parseFloat);
+                cb({x, y});
+            }else{
+                console.warn(`Malformed odm_georeferencing_model_geo.txt: ${data}`);
+                cb({x: 0, y: 0});
+            }
         }
     });
   }
@@ -104,6 +159,10 @@ class ModelView extends React.Component {
 
   hasTexturedModel(){
     return this.props.task.available_assets.indexOf('textured_model.zip') !== -1;
+  }
+
+  hasCameras(){
+    return this.props.task.available_assets.indexOf('shots.geojson') !== -1;
   }
 
   objFilePath(cb){
@@ -146,7 +205,21 @@ class ModelView extends React.Component {
           $("#textured_model").hide();
           $("#textured_model_container").hide();
       }
+
+      if (this.hasCameras()){
+          window.ReactDOM.render(<CamerasMenu toggleCameras={this.toggleCameras}/>, $("#cameras_button").get(0));
+      }else{
+          $("#cameras").hide();
+          $("#cameras_container").hide();
+      }
     });
+
+    viewer.scene.scene.add( new THREE.AmbientLight( 0x404040, 2.0 ) ); // soft white light );
+    viewer.scene.scene.add( new THREE.DirectionalLight( 0xcccccc, 0.5 ) );
+
+    const directional = new THREE.DirectionalLight( 0xcccccc, 0.5 );
+    directional.position.z = 99999999999;
+    viewer.scene.scene.add( directional );
 
     this.pointCloudFilePath(pointCloudPath => {
         Potree.loadPointCloud(pointCloudPath, "Point Cloud", e => {
@@ -161,18 +234,159 @@ class ModelView extends React.Component {
     
           let material = e.pointcloud.material;
           material.size = 1;
-          material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-          material.pointColorType = Potree.PointColorType.RGB;
-         
+
           viewer.fitToScreen();
         });     
     });
+
+    viewer.renderer.domElement.addEventListener( 'mousedown', this.handleRenderMouseClick );
+    viewer.renderer.domElement.addEventListener( 'mousemove', this.handleRenderMouseMove );
+    
+  }
+
+  componentWillUnmount(){
+    viewer.renderer.domElement.removeEventListener( 'mousedown', this.handleRenderMouseClick );
+    viewer.renderer.domElement.removeEventListener( 'mousemove', this.handleRenderMouseMove );
+    
+  }
+
+  getCameraUnderCursor = (evt) => {
+    const raycaster = new THREE.Raycaster();
+    const rect = viewer.renderer.domElement.getBoundingClientRect();
+    const [x, y] = [evt.clientX, evt.clientY];
+    const array = [ 
+        ( x - rect.left ) / rect.width, 
+        ( y - rect.top ) / rect.height 
+    ];
+    const onClickPosition = new THREE.Vector2(...array);
+    const camera = viewer.scene.getActiveCamera();
+    const mouse = new THREE.Vector3(
+        + ( onClickPosition.x * 2 ) - 1, 
+        - ( onClickPosition.y * 2 ) + 1 );
+    raycaster.setFromCamera( mouse, camera );
+    const intersects = raycaster.intersectObjects( this.cameraMeshes );
+
+    if ( intersects.length > 0){
+        const intersection = intersects[0];
+        return intersection.object;
+    }
+  }
+
+  setCameraOpacity(camera, opacity){
+    camera.material.forEach(m => {
+        m.opacity = opacity;
+    });
+  }
+
+  handleRenderMouseMove = (evt) => {
+    if (this._prevCamera && this._prevCamera !== this.state.selectedCamera) {
+        this.setCameraOpacity(this._prevCamera, 0.7);
+    }
+
+    const camera = this.getCameraUnderCursor(evt);
+    if (camera){
+        viewer.renderer.domElement.classList.add("pointer-cursor");
+        this.setCameraOpacity(camera, 1);
+    }else{
+        viewer.renderer.domElement.classList.remove("pointer-cursor");
+    }
+    this._prevCamera = camera;
+  }
+
+  handleRenderMouseClick = (evt) => {
+    let camera = this.getCameraUnderCursor(evt);
+    // Deselect
+    if (camera === this.state.selectedCamera){
+        this.setState({selectedCamera: null});
+    }else if (camera){
+        if (this.state.selectedCamera){
+            this.setCameraOpacity(this.state.selectedCamera, 0.7);
+        }
+        this.setState({selectedCamera: camera});
+    }
+  }
+
+  closeThumb = (e) => {
+    e.stopPropagation();
+    this.setState({selectedCamera: null});
+  }
+
+  loadCameras(){
+    const { task } = this.props;
+
+    function getMatrix(translation, rotation, scale) {
+        var axis = new THREE.Vector3(-rotation[0],
+                                    -rotation[1],
+                                    -rotation[2]);
+        var angle = axis.length();
+        axis.normalize();
+        var matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
+        matrix.setPosition(new THREE.Vector3(translation[0], translation[1], translation[2]));
+        
+        if (scale != 1.0){
+            matrix.scale(new THREE.Vector3(scale, scale, scale));
+        }
+
+        return matrix.transpose();
+    }
+
+    if (this.hasCameras()){
+        const colladaLoader = new THREE.ColladaLoader();
+        const fileloader = new THREE.FileLoader();
+        
+        colladaLoader.load('/static/app/models/camera.dae', ( collada ) => {
+            const dae = collada.scene;
+
+            fileloader.load(`/api/projects/${task.project}/tasks/${task.id}/download/shots.geojson`,  ( data ) => {
+                const geojson = JSON.parse(data);
+                const cameraObj = dae.children[0];
+                cameraObj.material.forEach(m => {
+                    m.transparent = true; 
+                    m.opacity = 0.7;
+                });
+                
+                // const cameraObj = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
+
+                // TODO: instancing doesn't seem to work :/
+                // const cameraMeshes = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
+                // const dummy = new THREE.Object3D();
+
+                let i = 0;
+                geojson.features.forEach(feat => {
+                    const material = cameraObj.material.map(m => m.clone());
+                    const cameraMesh = new THREE.Mesh(cameraObj.geometry, material);
+                    cameraMesh.matrixAutoUpdate = false;
+                    let scale = 1.0;
+                    if (!this.pointCloud.projection) scale = 0.1;
+
+                    cameraMesh.matrix.set(...getMatrix(feat.properties.translation, feat.properties.rotation, scale).elements);
+                    
+                    viewer.scene.scene.add(cameraMesh);
+
+                    cameraMesh._feat = feat;
+                    this.cameraMeshes.push(cameraMesh);
+
+                    i++;
+                });
+            }, undefined, console.error);
+        });
+    }
   }
 
   setPointCloudsVisible = (flag) => {
     for(let pointcloud of viewer.scene.pointclouds){
         pointcloud.visible = flag;
     }
+  }
+
+  toggleCameras(e){
+    if (this.cameraMeshes.length === 0){
+        this.loadCameras();
+        if (this.cameraMeshes.length === 0) return;
+    }
+
+    const isVisible = this.cameraMeshes[0].visible;
+    this.cameraMeshes.forEach(cam => cam.visible = !isVisible);
   }
 
   toggleTexturedModel(e){
@@ -185,7 +399,6 @@ class ModelView extends React.Component {
         this.setState({initializingModel: true});
 
         const mtlLoader = new THREE.MTLLoader();
-        mtlLoader.setTexturePath(this.texturedModelDirectoryPath());
         mtlLoader.setPath(this.texturedModelDirectoryPath());
 
         mtlLoader.load(this.mtlFilename(), (materials) => {
@@ -195,34 +408,18 @@ class ModelView extends React.Component {
             objLoader.setMaterials(materials);
             this.objFilePath(filePath => {
                 objLoader.load(filePath, (object) => {
-                    const bboxWorld = this.pointCloud.getBoundingBoxWorld();
-                    const pcCenter = new THREE.Vector3();
-                    bboxWorld.getCenter(pcCenter);
-    
-                    object.position.set(pcCenter.x, pcCenter.y, pcCenter.z);
-    
-                    // Bring the model close to center
-                    if (object.children.length > 0){
-                      const geom = object.children[0].geometry;
-    
-                      // Compute center
-                      geom.computeBoundingBox();
-    
-                      let center = new THREE.Vector3();
-                      geom.boundingBox.getCenter(center);
-    
-                      object.translateX(-center.x);
-                      object.translateY(-center.y);
-                      object.translateZ(-center.z);
-                    } 
-    
-                    viewer.scene.scene.add(object);
-    
-                    this.modelReference = object;
-                    this.setPointCloudsVisible(false);
-    
-                    this.setState({
-                      initializingModel: false,
+                    this.loadGeoreferencingOffset((offset) => {
+                        object.translateX(offset.x);
+                        object.translateY(offset.y);
+        
+                        viewer.scene.scene.add(object);
+        
+                        this.modelReference = object;
+                        this.setPointCloudsVisible(false);
+        
+                        this.setState({
+                            initializingModel: false,
+                        });
                     });
                 });
             });
@@ -240,12 +437,16 @@ class ModelView extends React.Component {
 
   // React render
   render(){
+    const { selectedCamera } = this.state;
+    const { task } = this.props;
+
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
           <div className="container potree_container" 
-             style={{height: "100%", width: "100%", position: "relative"}} 
+             style={{height: "100%", width: "100%", position: "relative"}}
              onContextMenu={(e) => {e.preventDefault();}}>
-                <div id="potree_render_area" ref={(domNode) => { this.container = domNode; }}></div>
+                <div id="potree_render_area" 
+                    ref={(domNode) => { this.container = domNode; }}></div>
                 <div id="potree_sidebar_container"> </div>
           </div>
 
@@ -269,6 +470,11 @@ class ModelView extends React.Component {
                 type="modelToMap" />
         </div>
 
+        {selectedCamera ? <div className="thumbnail">
+            <a className="close-thumb" href="javascript:void(0)" onClick={this.closeThumb}><i className="fa fa-window-close"></i></a>
+            <ImagePopup feature={selectedCamera._feat} task={task} />
+        </div> : ""}
+
           <Standby 
             message="Loading textured model..."
             show={this.state.initializingModel}
@@ -278,6 +484,15 @@ class ModelView extends React.Component {
 }
 
 $(function(){
+    // Add more proj definitions
+    const defs = [];
+    for (let k in epsg){
+        if (epsg[k]){
+            defs.push([k, epsg[k]]);
+        }
+    }
+    window.proj4.defs(defs);
+
     $("[data-modelview]").each(function(){
         let props = $(this).data();
         delete(props.modelview);

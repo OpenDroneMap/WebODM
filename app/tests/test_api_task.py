@@ -286,6 +286,12 @@ class TestApiTask(BootTransactionTestCase):
             })
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
+            # Cannot download/preview images for a task we have no access to
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg".format(other_project.id, other_task.id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+            res = client.get("/api/projects/{}/tasks/{}/images/download/tiny_drone_image.jpg".format(other_project.id, other_task.id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
             # Cannot export orthophoto
             res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
                 'formula': 'NDVI',
@@ -395,6 +401,35 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue("celery_task_id" in reply)
             celery_task_id = reply["celery_task_id"]
 
+            # Can access thumbnails
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg?size=4".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            with Image.open(io.BytesIO(res.content)) as i:
+                # Thumbnail has been resized
+                self.assertEqual(i.width, 4)
+                self.assertEqual(i.height, 3)
+
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg?size=9999999".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            with Image.open(io.BytesIO(res.content)) as i:
+                # Thumbnail has been resized to the max allowed (oringinal image size)
+                self.assertEqual(i.width, 48)
+                self.assertEqual(i.height, 36)
+
+            # Can download images
+            res = client.get("/api/projects/{}/tasks/{}/images/download/tiny_drone_image.jpg".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            with Image.open(io.BytesIO(res.content)) as i:
+                # Thumbnail has been resized
+                self.assertEqual(i.width, 48)
+                self.assertEqual(i.height, 36)
+
+            # Cannot get thumbnails/download images that don't exist
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/nonexistant.jpg".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+            res = client.get("/api/projects/{}/tasks/{}/images/download/nonexistant.jpg".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+            
             # Check export status
             res = client.get("/api/workers/check/{}".format(celery_task_id))
             self.assertEqual(res.status_code, status.HTTP_200_OK)

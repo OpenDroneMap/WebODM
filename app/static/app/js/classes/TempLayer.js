@@ -71,7 +71,7 @@ export function addTempLayer(file, cb) {
           if (feature.properties) {
             if (feature.properties) {
               layer.bindPopup(Object.keys(feature.properties).map(function (k) {
-                return k + ": " + feature.properties[k];
+                return "<strong>" + k + ":</strong> " + feature.properties[k];
               }).join("<br />"), {
                   maxHeight: 200
                 });

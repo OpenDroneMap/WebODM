@@ -121,6 +121,8 @@ That's it! The certificate will automatically renew when needed.
 
 If you want to specify your own key/certificate pair, simply pass the `--ssl-key` and `--ssl-cert` option to `./webodm.sh`. See `./webodm.sh --help` for more information.
 
+Note! You cannot pass an IP address to the hostname parameter! You need a DNS record setup.
+
 ### Where Are My Files Stored?
 
 When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. If you want to store your files on the host filesystem instead of a docker volume, you need to pass a path via the `--media-dir` option:

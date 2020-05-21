@@ -3,51 +3,42 @@ export default {
         return [{
                 action: "dataset",
                 label: "Load Dataset",
-                icon: "fa fa-database",
-                beginsWith: "Running ODM Load Dataset Cell",
-                endsWith: "Running ODM Load Dataset Cell - Finished"
+                icon: "fa fa-database"
             },
             {
                 action: "opensfm",
                 label: "Structure From Motion / MVS",
-                icon: "fa fa-camera",
-                beginsWith: "Running ODM OpenSfM Cell",
-                endsWith: "Running ODM Meshing Cell"
+                icon: "fa fa-camera"
             },
             {
                 action: "odm_meshing",
                 label: "Meshing",
-                icon: "fa fa-cube",
-                beginsWith: "Running ODM Meshing Cell",
-                endsWith: "Running ODM Meshing Cell - Finished"
+                icon: "fa fa-cube"
             },
             {
                 action: "mvs_texturing",
                 label: "Texturing",
-                icon: "fab fa-connectdevelop",
-                beginsWith: "Running MVS Texturing Cell",
-                endsWith: "Running ODM Texturing Cell - Finished"
+                icon: "fab fa-connectdevelop"
             },
             {
                 action: "odm_georeferencing",
                 label: "Georeferencing",
-                icon: "fa fa-globe",
-                beginsWith: "Running ODM Georeferencing Cell",
-                endsWith: "Running ODM Georeferencing Cell - Finished"
+                icon: "fa fa-globe"
             },
             {
                 action: "odm_dem",
                 label: "DEM",
-                icon: "fa fa-chart-area",
-                beginsWith: "Running ODM DEM Cell",
-                endsWith: "Running ODM DEM Cell - Finished"
+                icon: "fa fa-chart-area"
             },
             {
                 action: "odm_orthophoto",
                 label: "Orthophoto",
-                icon: "far fa-image",
-                beginsWith: "Running ODM Orthophoto Cell",
-                endsWith: "Running ODM OrthoPhoto Cell - Finished"
+                icon: "far fa-image"
+            },
+            {
+                action: "odm_report",
+                label: "Report",
+                icon: "far fa-file-alt"
             }
         ];
     }

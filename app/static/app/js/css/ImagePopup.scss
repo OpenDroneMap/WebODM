@@ -1,0 +1,38 @@
+.image-popup{
+    div{
+        margin-top: 8px;
+    }
+
+    div.title{
+        margin-top: 0;
+        font-weight: bold;
+        max-width: 300px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    div.image{
+        a{
+            cursor: zoom-in;
+        }
+        &.fullscreen{
+            display: flex;
+            align-items: center;
+            color: white;
+            i{
+                font-size: 200%;
+                position: absolute;
+                left: 50%;
+                top: 45%;
+            }
+            a{
+                cursor: zoom-out;
+            }
+            img{
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+    }   
+}

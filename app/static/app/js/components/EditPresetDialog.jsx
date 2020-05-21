@@ -92,7 +92,7 @@ class EditPresetDialog extends React.Component {
                     show={true}
                     onShow={this.onShow}
                     saveIcon="far fa-edit"
-                    title="Edit Options"
+                    title="Edit Task Options"
                     saveAction={this.props.saveAction}
                     deleteWarning={false}
                     deleteAction={(this.props.preset.id !== -1 && !this.props.preset.system) ? this.props.deleteAction : undefined}>
@@ -105,7 +105,7 @@ class EditPresetDialog extends React.Component {
                     </div>
                   : ""}
                   <div className="row">
-                    <label className="col-sm-2 control-label">Options</label>
+                    <label className="col-sm-2 control-label"></label>
                     <div className="col-sm-10">
                     {options.map(option =>
                         <ProcessingNodeOption {...option}

@@ -91,4 +91,10 @@
     .leaflet-touch .leaflet-control-add-overlay a, .leaflet-control-add-overlay a {
         background-position: 2px 2px;
     }
+    .leaflet-container{        
+        a.leaflet-popup-close-button{
+            top: 8px;
+            right: 8px;
+        }
+    }
 }
