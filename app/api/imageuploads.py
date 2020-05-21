@@ -9,6 +9,24 @@ from app.models.task import assets_directory_path
 from PIL import Image
 from django.http import HttpResponse
 from .tasks import download_file_response
+import numpy as np
+
+def normalize(img):
+    """
+    Linear normalization
+    http://en.wikipedia.org/wiki/Normalization_%28image_processing%29
+    """
+    arr = np.array(img)
+    # size = 2 ** (arr[0][0].dtype.itemsize * 8) - 1
+    arr = arr.astype('float')
+
+    # Do not touch the alpha channel
+    minval = arr.min()
+    maxval = arr.max()
+    if minval != maxval:
+        arr -= minval
+        arr *= (255.0/(maxval-minval))
+    return Image.fromarray(arr)
 
 class Thumbnail(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, image_filename=""):
@@ -38,6 +56,9 @@ class Thumbnail(TaskNestedView):
             raise exceptions.ValidationError("Invalid query parameters")
 
         with Image.open(image_path) as img:
+            if img.mode != 'RGB':
+                img = normalize(img)
+                img = img.convert('RGB')
             img.thumbnail((thumb_size, thumb_size))
             output = io.BytesIO()
             img.save(output, format='JPEG', quality=quality)

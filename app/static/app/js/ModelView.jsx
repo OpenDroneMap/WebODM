@@ -6,8 +6,8 @@ import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import ImagePopup from './components/ImagePopup';
-import PropTypes from 'prop-types';
 import epsg from 'epsg';
+import PropTypes from 'prop-types';
 import $ from 'jquery';
 
 require('./vendor/OBJLoader');
@@ -214,6 +214,8 @@ class ModelView extends React.Component {
           let material = e.pointcloud.material;
           material.size = 1;
 
+          this.loadCameras(); // TODO REMOVE
+
           viewer.fitToScreen();
         });     
     });
@@ -293,7 +295,7 @@ class ModelView extends React.Component {
   loadCameras(){
     const { task } = this.props;
 
-    function getMatrix(translation, rotation) {
+    function getMatrix(translation, rotation, scale) {
         var axis = new THREE.Vector3(-rotation[0],
                                     -rotation[1],
                                     -rotation[2]);
@@ -301,6 +303,11 @@ class ModelView extends React.Component {
         axis.normalize();
         var matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
         matrix.setPosition(new THREE.Vector3(translation[0], translation[1], translation[2]));
+        
+        if (scale != 1.0){
+            matrix.scale(new THREE.Vector3(scale, scale, scale));
+        }
+
         return matrix.transpose();
     }
 
@@ -313,22 +320,12 @@ class ModelView extends React.Component {
 
             fileloader.load(`/api/projects/${task.project}/tasks/${task.id}/download/shots.geojson`,  ( data ) => {
                 const geojson = JSON.parse(data);
-                const gjproj = proj4.defs("EPSG:4326");
-
-                let pcproj = this.pointCloud.projection;
-
-                if (!pcproj){
-                    console.log("NO PROJ!!!");
-                    // TODO ?
-                }
-
-                const toScene = proj4(gjproj, pcproj);
                 const cameraObj = dae.children[0];
                 cameraObj.material.forEach(m => {
                     m.transparent = true; 
                     m.opacity = 0.7;
                 });
-
+                
                 // const cameraObj = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
 
                 // TODO: instancing doesn't seem to work :/
@@ -337,15 +334,14 @@ class ModelView extends React.Component {
 
                 let i = 0;
                 geojson.features.forEach(feat => {
-                    const coords = feat.geometry.coordinates;
-
-                    const utm = toScene.forward([coords[0], coords[1]]);
-                    utm.push(coords[2]); // z in meters doesn't change
-
                     const material = cameraObj.material.map(m => m.clone());
                     const cameraMesh = new THREE.Mesh(cameraObj.geometry, material);
                     cameraMesh.matrixAutoUpdate = false;
-                    cameraMesh.matrix.set(...getMatrix(utm, feat.properties.rotation).elements);
+                    let scale = 1.0;
+                    if (!this.pointCloud.projection) scale = 0.05;
+
+                    cameraMesh.matrix.set(...getMatrix(feat.properties.translation, feat.properties.rotation, scale).elements);
+                    
                     viewer.scene.scene.add(cameraMesh);
 
                     cameraMesh._feat = feat;
