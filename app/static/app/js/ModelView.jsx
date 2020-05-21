@@ -116,6 +116,27 @@ class ModelView extends React.Component {
     });
   }
 
+  loadGeoreferencingOffset = (cb) => {
+    $.ajax({
+        url: `${this.assetsPath()}/odm_georeferencing/odm_georeferencing_model_geo.txt`,
+        type: 'GET',
+        error: () => {
+            console.warn("Cannot find odm_georeferencing_model_geo.txt (not georeferenced?)")
+            cb({x: 0, y: 0});
+        },
+        success: (data) => {
+            const lines = data.split("\n");
+            if (lines.length >= 2){
+                const [ x, y ] = lines[1].split(" ").map(parseFloat);
+                cb({x, y});
+            }else{
+                console.warn(`Malformed odm_georeferencing_model_geo.txt: ${data}`);
+                cb({x: 0, y: 0});
+            }
+        }
+    });
+  }
+
   pointCloudFilePath = (cb) => {
     // Check if entwine point cloud exists, 
     // otherwise fallback to potree point cloud binary format path
@@ -213,8 +234,6 @@ class ModelView extends React.Component {
     
           let material = e.pointcloud.material;
           material.size = 1;
-
-          this.loadCameras(); // TODO REMOVE
 
           viewer.fitToScreen();
         });     
@@ -338,7 +357,7 @@ class ModelView extends React.Component {
                     const cameraMesh = new THREE.Mesh(cameraObj.geometry, material);
                     cameraMesh.matrixAutoUpdate = false;
                     let scale = 1.0;
-                    if (!this.pointCloud.projection) scale = 0.05;
+                    if (!this.pointCloud.projection) scale = 0.1;
 
                     cameraMesh.matrix.set(...getMatrix(feat.properties.translation, feat.properties.rotation, scale).elements);
                     
@@ -389,34 +408,18 @@ class ModelView extends React.Component {
             objLoader.setMaterials(materials);
             this.objFilePath(filePath => {
                 objLoader.load(filePath, (object) => {
-                    const bboxWorld = this.pointCloud.getBoundingBoxWorld();
-                    const pcCenter = new THREE.Vector3();
-                    bboxWorld.getCenter(pcCenter);
-                    object.position.set(pcCenter.x, pcCenter.y, pcCenter.z);
-    
-                    // Bring the model close to center
-                    if (object.children.length > 0){
-                      const geom = object.children[0].geometry;
-    
-                      // Compute center
-                      geom.computeBoundingBox();
-    
-                      let center = new THREE.Vector3();
-                      geom.boundingBox.getCenter(center);
-    
-                      object.translateX(-center.x);
-                      object.translateY(-center.y);
-                      object.translateZ(-center.z);
-                    } 
-    
-                    viewer.scene.scene.add(object);
-                    window.object = object; // TODO REMOVE
-    
-                    this.modelReference = object;
-                    this.setPointCloudsVisible(false);
-    
-                    this.setState({
-                      initializingModel: false,
+                    this.loadGeoreferencingOffset((offset) => {
+                        object.translateX(offset.x);
+                        object.translateY(offset.y);
+        
+                        viewer.scene.scene.add(object);
+        
+                        this.modelReference = object;
+                        this.setPointCloudsVisible(false);
+        
+                        this.setState({
+                            initializingModel: false,
+                        });
                     });
                 });
             });
