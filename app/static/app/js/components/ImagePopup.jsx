@@ -17,11 +17,15 @@ class ImagePopup extends React.Component {
             loading: true,
             expandThumb: false,
         }
+    }
 
-        const { feature, task } = props;
-        const imageUrl = `/api/projects/${task.project}/tasks/${task.id}/images/thumbnail/${feature.properties.filename}`;
-        this.thumbUrl = `${imageUrl}?size=320`;
-        this.highresUrl = `${imageUrl}?size=9999999`;
+    getImageUrl(){
+        const { feature, task } = this.props;
+        return `/api/projects/${task.project}/tasks/${task.id}/images/thumbnail/${feature.properties.filename}`;
+    }
+
+    getThumbUrl(size){
+        return `${this.getImageUrl()}?size=${size}`;
     }
 
     componentDidMount(){
@@ -64,11 +68,11 @@ class ImagePopup extends React.Component {
 
         const downloadImageLink = `/api/projects/${task.project}/tasks/${task.id}/images/download/${feature.properties.filename}`;
         const downloadShotsLink =  `/api/projects/${task.project}/tasks/${task.id}/download/shots.geojson`;
-        const imageUrl = expandThumb ? this.highresUrl : this.thumbUrl;
+        const imageUrl = expandThumb ? this.getThumbUrl(999999999) : this.getThumbUrl(320);
         const assetDownload = AssetDownloads.only(["shots.geojson"])[0];
 
         return (<div className="image-popup">
-            <strong>{feature.properties.filename}</strong>
+            <div className="title" title={feature.properties.filename}>{feature.properties.filename}</div>
             {loading ? <div><i className="fa fa-circle-notch fa-spin fa-fw"></i></div>
             : ""}
             {error !== "" ? <div style={{marginTop: "8px"}}>{error}</div>

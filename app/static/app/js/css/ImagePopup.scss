@@ -3,6 +3,15 @@
         margin-top: 8px;
     }
 
+    div.title{
+        margin-top: 0;
+        font-weight: bold;
+        max-width: 300px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
     div.image{
         a{
             cursor: zoom-in;

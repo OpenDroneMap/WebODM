@@ -5,6 +5,10 @@
     #potree_render_area > canvas{
         width: 100% !important;
         height: 100% !important;
+
+        &.pointer-cursor{
+            cursor: pointer;
+        }
     }
 
     .container{
@@ -179,6 +183,25 @@
     
     #potree_download_profile_ortho_link, #potree_download_profile_link{
         color: black;
+    }
+
+    .thumbnail{
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 10;
+        background: #19282c;
+        border-color: #a6a9aa;
+        color: #ccccff;
+        .close-thumb{
+            opacity: 0.8;
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            &:hover{
+                opacity: 1;
+            }
+        }
     }
 }
 
