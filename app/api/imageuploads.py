@@ -16,16 +16,14 @@ def normalize(img):
     Linear normalization
     http://en.wikipedia.org/wiki/Normalization_%28image_processing%29
     """
-    arr = np.array(img)
-    # size = 2 ** (arr[0][0].dtype.itemsize * 8) - 1
-    arr = arr.astype('float')
+    arr = np.array(img).astype('float')
 
-    # Do not touch the alpha channel
     minval = arr.min()
     maxval = arr.max()
     if minval != maxval:
         arr -= minval
         arr *= (255.0/(maxval-minval))
+
     return Image.fromarray(arr)
 
 class Thumbnail(TaskNestedView):
