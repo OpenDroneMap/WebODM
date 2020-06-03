@@ -266,6 +266,7 @@ There are many ways to contribute back to the project:
  - ⭐️ us on GitHub.
  - Spread the word about WebODM and OpenDroneMap on social media.
  - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
+ - You can [pledge funds](https://fund.webodm.org) for getting new features built and bug fixed.
  - Become a contributor 🤘
 
 ## Become a Contributor
