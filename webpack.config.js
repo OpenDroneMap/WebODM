@@ -86,6 +86,7 @@ module.exports = {
     //  on the global let jQuery
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
+    "THREE": "THREE",
     "React": "React",
     "ReactDOM": "ReactDOM"
   },

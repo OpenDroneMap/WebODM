@@ -8,6 +8,7 @@ import ShareButton from './components/ShareButton';
 import ImagePopup from './components/ImagePopup';
 import epsg from 'epsg';
 import PropTypes from 'prop-types';
+import * as THREE from 'THREE';
 import $ from 'jquery';
 
 require('./vendor/OBJLoader');
@@ -192,6 +193,7 @@ class ModelView extends React.Component {
     viewer.setEDLEnabled(true);
     viewer.setFOV(60);
     viewer.setPointBudget(1*1000*1000);
+    viewer.setEDLEnabled(false); // Temporary fix: https://github.com/OpenDroneMap/WebODM/issues/873
     viewer.loadSettingsFromURL();
         
     viewer.loadGUI(() => {
