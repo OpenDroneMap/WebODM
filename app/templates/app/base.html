@@ -21,6 +21,8 @@
     <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/system.js' %}"></script>
 
+    {% block headers-before-bundle %}{% endblock %}
+
     {% load render_bundle from webpack_loader %}
     {% render_bundle 'main' %}
 
