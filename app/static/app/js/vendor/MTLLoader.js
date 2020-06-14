@@ -357,7 +357,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 				case 'ks':
 
 					// Specular color (color when light is reflected from shiny surface) using RGB values
-					params.specular = new THREE.Color().fromArray( value );
+					// params.specular = new THREE.Color().fromArray( value );
 
 					break;
 
@@ -421,7 +421,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// The specular exponent (defines the focus of the specular highlight)
 					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 
-					params.shininess = parseFloat( value );
+					// params.shininess = parseFloat( value );
 
 					break;
 
@@ -458,7 +458,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		}
 
-		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
+		this.materials[ materialName ] = new THREE.MeshBasicMaterial( params );
 		return this.materials[ materialName ];
 
 	},
