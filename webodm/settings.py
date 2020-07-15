@@ -150,7 +150,7 @@ DATABASES = {
         'USER': os.environ.get('WO_DATABASE_USER', 'postgres'),
         'PASSWORD': os.environ.get('WO_DATABASE_PASSWORD', 'postgres'),
         'HOST': os.environ.get('WO_DATABASE_HOST', 'db'),
-        'PORT': os.environ.get('WO_DATABASE_PORT', '5432'),,
+        'PORT': os.environ.get('WO_DATABASE_PORT', '5432'),
     }
 }
 
