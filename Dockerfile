@@ -1,4 +1,4 @@
-FROM python:3.6-stretch
+FROM python:3.8-stretch
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -9,7 +9,7 @@ ENV PROJ_LIB=/usr/share/proj
 RUN mkdir /webodm
 WORKDIR /webodm
 
-RUN curl --silent --location https://deb.nodesource.com/setup_10.x | bash -
+RUN curl --silent --location https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get -qq install -y nodejs
 
 # Configure use of testing branch of Debian
@@ -19,7 +19,7 @@ RUN printf "deb     http://ftp.us.debian.org/debian/    stable main contrib non-
 RUN printf "deb     http://ftp.us.debian.org/debian/    testing main contrib non-free\ndeb-src http://ftp.us.debian.org/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
 
 # Install Node.js GDAL, nginx, letsencrypt, psql
-RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin nginx certbot grass-core && apt-get -qq install -y gettext-base cron postgresql-client-9.6
+RUN apt-get -qq update && apt-get -qq install -t testing -y binutils libproj-dev gdal-bin python3-gdal nginx certbot grass-core && apt-get -qq install -y gettext-base cron postgresql-client-9.6
 
 # Install pip reqs
 ADD requirements.txt /webodm/

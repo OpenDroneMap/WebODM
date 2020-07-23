@@ -57,7 +57,7 @@ def assure_cogeo(src_path, use_legacy=False):
         # This shouldn't happen
         use_legacy = True
         
-    if use_legacy:
+    if True or use_legacy:
         logger.info("Using legacy implementation (GDAL >= 3.1 not found)")
         make_cogeo_legacy(src_path)
     else:
