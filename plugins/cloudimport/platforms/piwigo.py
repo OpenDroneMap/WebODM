@@ -14,8 +14,8 @@ class Platform(CloudLibrary):
         # So it might happen that if the File Uploader plugin is used for GCP files, that the files will need to be renamed to store multiple GCP files.
         # So basically we are taking any file that contains the string 'gcp_list' and has the extension '.txt' and rename it to 'gcp_list.txt'
         return [self._map_gcp_file_if_necessary(file) for file in files]
-  
-    def get_server_and_folder_id_from_url(self, url):
+
+    def parse_url(self, url):
         parse_result = urlparse(url)
         paths = parse_result.query.split('/')
         if not 'category' in paths or paths.index('category') >= len(paths) - 1:
@@ -28,17 +28,19 @@ class Platform(CloudLibrary):
             
             path = path[0:path.index('index.php')]
             server = parse_result.scheme + '://' + parse_result.netloc + '/' + path
-            return server, category_id
-  
-    def build_folder_api_url(self, server_url, folder_id):
+            return [server, category_id]
+
+    def build_folder_api_url(self, information):
+        [server_url, folder_id] = information
         return '{server_url}/ws.php?format=json&method=pwg.categories.getList&cat_id={folder_id}&recursive=false'.format(server_url = server_url, folder_id = folder_id)
-  
-    def parse_payload_into_folder(self, payload):
+
+    def parse_payload_into_folder(self, original_url, payload):
         result = payload['result']['categories'][0]
         return Folder(result['name'], result['url'], result['nb_images'])
-  
-    def build_list_files_in_folder_api_url(self, server_url, folder_id):
+
+    def build_list_files_in_folder_api_url(self, information):
         # ToDo: add pagination
+        [server_url, folder_id] = information
         return '{server_url}/ws.php?format=json&method=pwg.categories.getImages&cat_id={folder_id}&recursive=false&per_page=500'.format(server_url = server_url, folder_id = folder_id)
   
     def parse_payload_into_files(self, payload):
