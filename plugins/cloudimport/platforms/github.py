@@ -1,4 +1,4 @@
-# Check http://piwigo.com/
+# Check https://github.com/
 from urllib.parse import urlparse
 from os import path
 from plugins.cloudimport.cloud_platform import File, Folder, CloudPlatform
@@ -12,7 +12,7 @@ class Platform(CloudPlatform):
     def parse_url(self, url):
         parse_result = urlparse(url)
         path_split = parse_result.path.split('/')
-        if len(path_split) < 4:
+        if len(path_split) < 5:
             raise Exception('Wrong URL format')
         _, owner, repo, _, ref, *paths = path_split
         path = '/'.join(paths)
