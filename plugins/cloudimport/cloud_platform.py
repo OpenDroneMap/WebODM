@@ -98,7 +98,7 @@ class File:
     def is_valid(self):
         """Only keep files that are images, or that are named 'gcp_list.txt'"""
         _, file_extension = path.splitext(self.name)
-        return file_extension.lower() in VALID_IMAGE_EXTENSIONS or file_name == 'gcp_list.txt'
+        return file_extension.lower() in VALID_IMAGE_EXTENSIONS or self.name == 'gcp_list.txt'
     
     def serialize(self):
         return {'name': self.name, 'url': self.url}    
