@@ -353,7 +353,7 @@ CELERY_RESULT_BACKEND = os.environ.get('WO_BROKER', 'redis://localhost')
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_INCLUDE=['worker.tasks', 'plugins.cloudimport.api_views']
+CELERY_INCLUDE=['worker.tasks', 'app.plugins.worker']
 CELERY_WORKER_REDIRECT_STDOUTS = False
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
