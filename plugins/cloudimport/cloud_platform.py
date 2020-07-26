@@ -16,14 +16,14 @@ class CloudPlatform(ABC):
   
     def verify_folder_url(self, folder_url):
         try:
-            # Parse the url and get the id of the folder, and the server
-            server_url, folder_id = self.get_server_and_folder_id_from_url(folder_url)
+            # Parse the url and get all necessary information
+            information = self.parse_url(folder_url)
             # Define the API url we will call to assert that the folder exists and is valid
-            folder_api_url = self.build_folder_api_url(server_url, folder_id)
+            folder_api_url = self.build_folder_api_url(information)
             # Call the API
             payload = self.call_api(folder_api_url)
             # Parse payload into a Folder instance
-            return self.parse_payload_into_folder(payload)
+            return self.parse_payload_into_folder(folder_url, payload)
         except Exception as e:
             logger.error(str(e))
             return None
@@ -33,11 +33,11 @@ class CloudPlatform(ABC):
         # Verify the url
         if self.verify_folder_url(folder_url) == None:
             raise Exception('Invalid URL')
-        
-        # Parse the url and get the id of the folder, and the server
-        server_url, folder_id = self.get_server_and_folder_id_from_url(folder_url)
+
+        # Parse the url and get all necessary information
+        information = self.parse_url(folder_url)
         # Define the API url we will call to get all the files in the folder
-        folder_api_url = self.build_list_files_in_folder_api_url(server_url, folder_id)
+        folder_api_url = self.build_list_files_in_folder_api_url(information)
         # Call the API
         payload = self.call_api(folder_api_url)
         # Parse the payload into File instances
@@ -48,8 +48,10 @@ class CloudPlatform(ABC):
         return [file for file in files if file.is_valid()]
   
     def call_api(self, api_url):
-        return requests.get(api_url, timeout=10).json()
-  
+        response = requests.get(api_url, timeout=10)
+        response.raise_for_status()
+        return response.json()
+
     def platform_file_processing(self, files):
         """This method does nothing, but each platform might want to do some processing of the files and they can, by overriding this method"""
         return files
@@ -58,19 +60,19 @@ class CloudPlatform(ABC):
         return {'name': self.name, 'folder_url_example': self.folder_url_example, 'type': 'platform'} 
   
     @abstractmethod
-    def get_server_and_folder_id_from_url(self, url):
-        """Parse the given url and return the folder id, and the server url. Will throw an exception is the url is invalid"""
-  
+    def parse_url(self, url):
+        """Parse the given url and return necessary information to prepare the next requests"""
+
     @abstractmethod
-    def build_list_files_in_folder_api_url(self, server_url, folder_id):
-        """Build the api url from the folder id and the server url. This API should list all the files in the folder"""
-        
+    def build_list_files_in_folder_api_url(self, information):
+        """Build the api url from the parsed information. This API should list all the files in the folder"""
+
     @abstractmethod
-    def build_folder_api_url(self, server_url, folder_id):
-        """Build the api url from the folder id and the server url. This API should return the name (and maybe amount of files) for the folder"""    
-  
+    def build_folder_api_url(self, information):
+        """Build the api url from the parsed information. This API should return the name (and maybe amount of files) for the folder"""
+
     @abstractmethod
-    def parse_payload_into_folder(self, payload):
+    def parse_payload_into_folder(self, original_url, payload):
         """Parse the api payload and return a Folder instance"""
   
     @abstractmethod
@@ -96,7 +98,7 @@ class File:
     def is_valid(self):
         """Only keep files that are images, or that are named 'gcp_list.txt'"""
         _, file_extension = path.splitext(self.name)
-        return file_extension.lower() in VALID_IMAGE_EXTENSIONS or file_name == 'gcp_list.txt'
+        return file_extension.lower() in VALID_IMAGE_EXTENSIONS or self.name == 'gcp_list.txt'
     
     def serialize(self):
         return {'name': self.name, 'url': self.url}    
