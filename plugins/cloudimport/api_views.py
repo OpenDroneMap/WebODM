@@ -54,8 +54,6 @@ class ImportFolderTaskView(TaskView):
         serialized = [file.serialize() for file in files]
         run_function_async(import_files, task.id, serialized)
 
-        #import_files.delay(task.id, serialized)
-        
         return Response({}, status=status.HTTP_200_OK)
 
 class CheckUrlTaskView(TaskView):
