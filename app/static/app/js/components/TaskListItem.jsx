@@ -285,9 +285,21 @@ class TaskListItem extends React.Component {
       rfMap[rfParam].onClick = this.genRestartAction(rfParam);
     }
 
-    return task.can_rerun_from
+    let items = task.can_rerun_from
             .map(rf => rfMap[rf])
             .filter(rf => rf !== undefined);
+
+    if (items.length > 0 && [statusCodes.CANCELED, statusCodes.FAILED].indexOf(task.status) !== -1){
+        // Add resume "pseudo button" to help users understand
+        // how to resume a task that failed for memory/disk issues.
+        items.unshift({
+            label: "Resume Processing",
+            icon: "fa fa-bolt",
+            onClick: this.genRestartAction(task.can_rerun_from[task.can_rerun_from.length - 1])
+        });
+    }
+
+    return items;
   }
 
   genRestartAction(rerunFrom = null){
