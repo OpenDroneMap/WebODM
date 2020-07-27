@@ -5,6 +5,7 @@ import shutil
 import rasterio
 import re
 import subprocess
+from pipes import quote
 from rio_cogeo.cogeo import cog_validate, cog_translate
 from rio_tiler.utils import has_alpha_band
 from webodm import settings
@@ -17,16 +18,23 @@ def valid_cogeo(src_path):
     :param src_path: path to GeoTIFF
     :return: true if the GeoTIFF is a cogeo, false otherwise
     """
-    return cog_validate(src_path, strict=True)
+    try:
+        from app.vendor.validate_cloud_optimized_geotiff import validate
+        warnings, errors, details = validate(src_path, full_check=True)
+        return not errors and not warnings
+    except ModuleNotFoundError:
+        logger.warning("Using legacy cog_validate (osgeo.gdal package not found)")
+        # Legacy
+        return cog_validate(src_path, strict=True)
 
 
-def assure_cogeo(src_path, use_legacy=False):
+def assure_cogeo(src_path):
     """
     Guarantee that the .tif passed as an argument is a Cloud Optimized GeoTIFF (cogeo)
     If the path is not a cogeo, it is destructively converted into a cogeo.
     If the file cannot be converted, the function does not change the file
     :param src_path: path to GeoTIFF (cogeo or not)
-    :param use_legacy: whether to force the use of legacy implementation. By default the best implementation is used.
+    :param force_use_legacy: whether to force the use of legacy implementation. By default the best implementation is used.
     :return: None
     """
 
@@ -57,11 +65,11 @@ def assure_cogeo(src_path, use_legacy=False):
         # This shouldn't happen
         use_legacy = True
         
-    if True or use_legacy:
-        logger.info("Using legacy implementation (GDAL >= 3.1 not found)")
-        make_cogeo_legacy(src_path)
+    if use_legacy:
+        logger.warning("Using legacy implementation (GDAL >= 3.1 not found)")
+        return make_cogeo_legacy(src_path)
     else:
-        make_cogeo_gdal(src_path)
+        return make_cogeo_gdal(src_path)
 
 def get_gdal_version():
     # Bit of a hack without installing 
@@ -71,7 +79,7 @@ def get_gdal_version():
         return None
     
     # Get version
-    version_output = subprocess.check_output("%s --version" % gdal_translate)
+    version_output = subprocess.check_output([gdal_translate, "--version"]).decode('utf-8')
     
     m = re.match(r"GDAL\s+([\d+])\.([\d+])\.([\d+]),\s+released", version_output)
     if not m:
@@ -89,7 +97,33 @@ def make_cogeo_gdal(src_path):
     tmpfile = tempfile.mktemp('_cogeo.tif', dir=settings.MEDIA_TMP)
     swapfile = tempfile.mktemp('_cogeo_swap.tif', dir=settings.MEDIA_TMP)
 
-    # gdal_translate -of COG -co BLOCKSIZE=256 -co COMPRESS=deflate -co NUM_THREADS=4 -co BIGTIFF=IF_SAFER -co QUALITY=100 -co SPARSE_OK=ON --config GDAL_NUM_THREADS ALL_CPUS brighton.tif cog.tif
+    try:
+        subprocess.run(["gdal_translate", "-of", "COG",
+                        "-co", "BLOCKSIZE=256",
+                        "-co", "COMPRESS=deflate",
+                        "-co", "NUM_THREADS=ALL_CPUS",
+                        "-co", "BIGTIFF=IF_SAFER",
+                        "--config", "GDAL_NUM_THREADS", "ALL_CPUS",
+                        quote(src_path), quote(tmpfile)])
+    except Exception as e:
+        logger.warning("Cannot create Cloud Optimized GeoTIFF: %s" % str(e))
+
+    if os.path.isfile(tmpfile):
+        shutil.move(src_path, swapfile) # Move to swap location
+
+        try:
+            shutil.move(tmpfile, src_path)
+        except IOError as e:
+            logger.warning("Cannot move %s to %s: %s" % (tmpfile, src_path, str(e)))
+            shutil.move(swapfile, src_path) # Attempt to restore
+            raise e
+
+        if os.path.isfile(swapfile):
+            os.remove(swapfile)
+
+        return True
+    else:
+        return False
 
 def make_cogeo_legacy(src_path):
     """

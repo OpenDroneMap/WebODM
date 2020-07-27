@@ -9,6 +9,7 @@ ENV PROJ_LIB=/usr/share/proj
 RUN mkdir /webodm
 WORKDIR /webodm
 
+# Install Node.js
 RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget
 RUN wget --no-check-certificate https://deb.nodesource.com/setup_12.x -O /tmp/node.sh && bash /tmp/node.sh
 RUN apt-get -qq update && apt-get -qq install -y nodejs
@@ -19,7 +20,7 @@ RUN printf "Package: *\nPin: release a=testing\nPin-Priority: 750\n" > /etc/apt/
 RUN printf "deb     http://ftp.us.debian.org/debian/    stable main contrib non-free\ndeb-src http://ftp.us.debian.org/debian/    stable main contrib non-free" > /etc/apt/sources.list.d/stable.list
 RUN printf "deb     http://ftp.us.debian.org/debian/    testing main contrib non-free\ndeb-src http://ftp.us.debian.org/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
 
-# Install Python3, Node.js GDAL, nginx, letsencrypt, psql
+# Install Python3, GDAL, nginx, letsencrypt, psql
 RUN apt-get -qq update && apt-get -qq install -t testing -y --no-install-recommends python3 python3-pip git g++ python3-dev libpq-dev binutils libproj-dev gdal-bin python3-gdal nginx certbot grass-core && apt-get -qq install -y --no-install-recommends gettext-base cron postgresql-client-9.6
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
 
