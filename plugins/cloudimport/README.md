@@ -11,7 +11,7 @@ Currently, we support these kinds of sources:
 A **cloud platform** is an online platform that can store files, like [Dropbox](https://www.dropbox.com/ "Dropbox") or [Google Drive](https://www.google.com/drive/ "Google Drive"). Platforms have the concept of a folder or album, where files are stored. By entering the folder's URL, we will use each platform's API to retrieve all the images in those folders, and import them into WebODM.
 
 Current platforms supported:
-*None so far*
+* [GitHub](https://github.com/ "GitHub")
 
 #### Cloud Libraries
 A **cloud library** is an extension of a cloud platform that has images organized in folders or albums. It differs from a cloud platform, in the way that it can also list all folders it contains, so that a user can choose to import a specific folder from a list, instead of a URL.
@@ -38,6 +38,6 @@ Now, there are a few known gaps to the system that you might encounter or that y
 1. **Allow image resizing**:
 	Currently, when importing a folder, image resizing is not allowed. This might be a problem for users without a lot of disk space, so it might make sense to fix this.
 1. **Allow potential pagination when calling APIs**
-	Currently, the workflow doesn't support calling APIs that requiere pagination. 
-1. **Make platform extension have their own js, like WebODM plugins**
+	Currently, the workflow doesn't support calling APIs that requiere pagination.
+1. **Make platform extensions have their own js, like WebODM plugins**
 	Currently, when a platform extension requires their own Javascript code, you will need to add this code manually to the already existing code. It would be much easier if this was handed automatically, like the other parts of the add-on.
