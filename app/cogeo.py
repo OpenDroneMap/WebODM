@@ -34,7 +34,6 @@ def assure_cogeo(src_path):
     If the path is not a cogeo, it is destructively converted into a cogeo.
     If the file cannot be converted, the function does not change the file
     :param src_path: path to GeoTIFF (cogeo or not)
-    :param force_use_legacy: whether to force the use of legacy implementation. By default the best implementation is used.
     :return: None
     """
 
