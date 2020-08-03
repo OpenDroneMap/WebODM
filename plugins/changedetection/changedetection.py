@@ -110,6 +110,7 @@
 from os import path, makedirs, getcwd
 from compare import compare
 import sys
+import subprocess
 import grass.script as grass
 
 def main():
