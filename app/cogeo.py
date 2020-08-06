@@ -102,6 +102,7 @@ def make_cogeo_gdal(src_path):
                         "-co", "COMPRESS=deflate",
                         "-co", "NUM_THREADS=ALL_CPUS",
                         "-co", "BIGTIFF=IF_SAFER",
+                        "-co", "RESAMPLING=NEAREST",
                         "--config", "GDAL_NUM_THREADS", "ALL_CPUS",
                         quote(src_path), quote(tmpfile)])
     except Exception as e:
