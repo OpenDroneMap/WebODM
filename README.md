@@ -57,7 +57,7 @@ git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --
 cd WebODM
 ./webodm.sh start 
 ```
-if you face any issues at the last step on Linux based system you may want to use  
+* If you face any issues at the last step on Linux based system you may want to use  
 ```bash
 sudo ./webodm.sh start 
 ```
