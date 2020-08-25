@@ -57,11 +57,13 @@ git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --
 cd WebODM
 ./webodm.sh start 
 ```
-* If you face any issues at the last step on Linux based system you may want to use  
+* If you face any issues at the last step on Linux, make sure your user is part of the docker group:
 ```bash
-sudo ./webodm.sh start 
+sudo usermod -aG docker $USER
+exit
+(restart shell by logging out and then back-in)
+./webodm.sh start
 ```
-
 * Open a Web Browser to `http://localhost:8000` (unless you are on Windows using Docker Toolbox, see below)
 
 Docker Toolbox users need to find the IP of their docker machine by running this command from the Docker Quickstart Terminal:
