@@ -26,7 +26,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 &&
 
 # Install pip reqs
 ADD requirements.txt /webodm/
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 ADD . /webodm/
 
