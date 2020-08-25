@@ -55,7 +55,11 @@ To install WebODM manually, these steps should get you up and running:
 ```bash
 git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
 cd WebODM
-./webodm.sh start
+./webodm.sh start 
+```
+* If you face any issues at the last step on Linux based system you may want to use  
+```bash
+sudo ./webodm.sh start 
 ```
 
 * Open a Web Browser to `http://localhost:8000` (unless you are on Windows using Docker Toolbox, see below)
