@@ -168,10 +168,8 @@ class Metadata(TaskNestedView):
                 if has_alpha_band(src):
                     band_count -= 1
 
-                nodata = None
                 # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
-                if band_count > 4:
-                    nodata = 0
+                nodata = 0
 
                 info = main.metadata(src, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr, nodata=nodata)
         except IndexError as e:
@@ -347,7 +345,7 @@ class Tiles(TaskNestedView):
                     indexes = non_alpha_indexes(src)
             
             # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
-            if nodata is None and src.meta['count'] > 4:
+            if nodata is None:
                 nodata = 0
 
         resampling="nearest"
