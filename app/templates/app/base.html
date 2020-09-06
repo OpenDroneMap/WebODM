@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     {% load i18n static settings compress plugins %}
 
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="WebODM Contributors">
     <link rel="icon" type="image/png" href="{% settings_image_url 'app_logo_favicon' %}" sizes="32x32">
 
-    <link rel="stylesheet" type="text/css" href="{% static 'app/css/bootstrap.min.css' %}" />
-
-    <link href="{% static 'app/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
-    <link href="{% static 'app/css/metisMenu.min.css' %}" rel="stylesheet">
-    <link href="{% static 'app/css/sb-admin-2.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+        integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     {% block extra-headers %}{% endblock %}
 
     <script src="{% static 'app/js/vendor/modernizr-2.8.3.min.js' %}"></script>
@@ -36,51 +35,40 @@
     {% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'app/css/theme.scss' %}" />
     {% endcompress %}
-
-    <style type="text/css">
-        {{ SETTINGS.theme.css|safe }}
-    </style>
 </head>
+
 <body data-admin-utc-offset="{% now "Z" %}">
-{% block body %}
+    {% block body %}
     <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <!--
-            {% if request.user.is_authenticated %}
-                {% if user.is_superuser %}          
-                <li>
-                    <a class="page-scroll" href="/admin/">Admin Panel</a>
-                </li>
-                {% endif %}
-                <li>
-                    <a class="page-scroll" href="/logout/">Logout</a>
-                </li>
-            {% else %}
-                 <li>
-                    <a class="page-scroll" href="/login/">Login</a>
-                </li>
-            {% endif %}
-            </ul>
--->
     <div id="wrapper">
         {{ SETTINGS.theme.html_before_header|safe }}
 
-        <nav id="navbar-top" class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                {% block navbar-top-links %}{% endblock %}
-                <a class="navbar-brand" href="/"><img src="{% settings_image_url 'app_logo_36' %}" alt="{{ SETTINGS.app_name }}" /></a>
-                <a class="navbar-link" href="/"><p class="navbar-text">{{ SETTINGS.app_name }}</p></a>
-            </div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="/">
+                <img src="{% settings_image_url 'app_logo_30' %}" alt="{{ SETTINGS.app_name }}" width="30" height="30"
+                    loading="lazy" />
+                {{ SETTINGS.app_name }}
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-            {% block navbar-sidebar %}{% endblock %}
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- <form class="form-inline my-2 my-lg-0 mr-auto ml-auto">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+                </form> -->
+
+                {% block navbar-top-links %}{% endblock %}
+            </div>
         </nav>
+
+
+        {% block navbar-sidebar %}{% endblock %}
+
 
         {% block page-wrapper %}{{ SETTINGS.theme.html_after_header|safe }}{% endblock %}
     </div>
@@ -88,48 +76,16 @@
     {% autoescape off %}
     {% get_footer %}
     {% endautoescape %}
-{% endblock %}
+    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
 </body>
-<script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
-<script>
-$(function(){
-    $('#side-menu').metisMenu();
 
-    $(window).bind("load resize", function() {
-        var topOffset = 50;
-        var width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
-        if (width < 768) {
-            $('div.navbar-collapse').addClass('collapse');
-            topOffset = 100; // 2-row-menu
-        } else {
-            $('div.navbar-collapse').removeClass('collapse');
-        }
-
-        var height = ((this.window.innerHeight > 0) ? this.window.innerHeight : this.screen.height) - 1;
-        height = height - topOffset;
-        if (height < 1) height = 1;
-        if (height > topOffset) {
-            $("#page-wrapper").css("min-height", (height) + "px");
-        }
-    });
-
-    var url = window.location;
-    var element = $('ul.nav a').filter(function() {
-     return this.href == url;
-    }).addClass('active').parent();
-
-    while(true){
-        if (element.is('li')){
-            element = element.parent().addClass('in');
-        } else {
-            break;
-        }
-    }
-
-    if (element.parent().is('li')) element.parent().addClass('active');
-});
-
-</script>
-<script src="{% static 'app/js/vendor/bootstrap.min.js' %}"></script>
 {{ SETTINGS.theme.html_after_body|safe }}
+
 </html>

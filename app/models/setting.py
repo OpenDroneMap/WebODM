@@ -18,8 +18,8 @@ logger = logging.getLogger('app.logger')
 class Setting(models.Model):
     app_name = models.CharField(max_length=255, blank=False, null=False, help_text="The name of your application")
     app_logo = models.ImageField(upload_to="settings/", blank=False, null=False, help_text="A 512x512 logo of your application (.png or .jpeg)")
-    app_logo_36 = ImageSpecField(source='app_logo',
-                                      processors=[ResizeToFit(36, 36)],
+    app_logo_30 = ImageSpecField(source='app_logo',
+                                      processors=[ResizeToFit(30, 30)],
                                       format='PNG',
                                       options={'quality': 90})
     app_logo_favicon = ImageSpecField(source='app_logo',

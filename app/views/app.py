@@ -28,8 +28,7 @@ def index(request):
     if settings.SINGLE_USER_MODE and not request.user.is_authenticated:
         login(request, User.objects.get(username="admin"), 'django.contrib.auth.backends.ModelBackend')
 
-    return redirect(settings.LOGIN_REDIRECT_URL if request.user.is_authenticated
-                    else settings.LOGIN_URL)
+    return render(request, 'app/landing.html', {'title': 'Landing'})
 
 @login_required
 def dashboard(request):

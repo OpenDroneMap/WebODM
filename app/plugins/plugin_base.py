@@ -172,6 +172,9 @@ class PluginBase(ABC):
         """
         return []
 
+    def admin_menu(self):
+        return []
+
     def app_mount_points(self):
         """
         Should be overriden by plugins that want to connect
