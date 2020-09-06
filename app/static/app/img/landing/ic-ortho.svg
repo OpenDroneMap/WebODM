@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="68.521" height="60.781" viewBox="0 0 68.521 60.781">
+    <defs>
+        <linearGradient id="linear-gradient" x1=".5" x2=".5" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#009688"/>
+            <stop offset="1" stop-color="#103475"/>
+        </linearGradient>
+        <style>
+            .cls-1,.cls-2{fill:none;stroke:#0c9688;stroke-linecap:round;stroke-linejoin:round}.cls-1{stroke-width:4px}.cls-2{stroke-width:2px}
+        </style>
+    </defs>
+    <g id="ic-ortho" transform="translate(2.032 2)">
+        <g id="Group_2435" data-name="Group 2435">
+            <path id="Path_2247" d="M13.566 6.155L3 5.847l-.149 9.171" class="cls-1" data-name="Path 2247" transform="translate(-2.856 -5.847)"/>
+            <g id="Group_2432" data-name="Group 2432" transform="translate(53.748)">
+                <path id="Path_2248" d="M36.842 6.155L47.4 5.847l.149 9.171" class="cls-1" data-name="Path 2248" transform="translate(-36.842 -5.847)"/>
+            </g>
+            <g id="Group_2433" data-name="Group 2433" transform="translate(.003 46.04)">
+                <path id="Path_2249" d="M3.166 34.959l-.308 10.56 9.171.149" class="cls-1" data-name="Path 2249" transform="translate(-2.858 -34.959)"/>
+            </g>
+            <g id="Group_2434" data-name="Group 2434" transform="translate(55.285 46.04)">
+                <path id="Path_2250" d="M46.677 34.959l.308 10.56-9.171.149" class="cls-1" data-name="Path 2250" transform="translate(-37.814 -34.959)"/>
+            </g>
+        </g>
+        <g id="Group_2436" data-name="Group 2436" transform="translate(7.645 6.605)">
+            <path id="Rectangle_1979" d="M0 0H48.374V43.577H0z" class="cls-2" data-name="Rectangle 1979"/>
+        </g>
+        <g id="Group_2437" data-name="Group 2437" transform="translate(8.186 6.994)">
+            <path id="Line_837" d="M0 16.787L31.417 0" class="cls-2" data-name="Line 837" transform="translate(0 .356)"/>
+            <path id="Line_838" d="M0 21.678L46.412 0" class="cls-2" data-name="Line 838" transform="translate(.417 6.643)"/>
+            <path id="Path_2251" fill="url(#linear-gradient)" stroke="#0c9688" stroke-linecap="round" stroke-linejoin="round" stroke-width="2px" d="M7.917 49.017l11.846-12.554 5.19-5.654 10.4 9.861 7.725-17.784 9.252 5.67v20.46H7.917" data-name="Path 2251" transform="translate(-4.502 -6.174)"/>
+            <path id="Line_840" d="M0 0L4.769 17.114" class="cls-2" data-name="Line 840" transform="translate(34.051)"/>
+            <path id="Path_2252" d="M12.472 8.22l12.976 20.342 5.67 12.429" class="cls-2" data-name="Path 2252" transform="translate(-1.894 -8.22)"/>
+            <path id="Path_2253" d="M5.757 16.4l9.965 13.894 3.021 12.123" class="cls-2" data-name="Path 2253" transform="translate(-5.757 -9.947)"/>
+        </g>
+    </g>
+</svg>

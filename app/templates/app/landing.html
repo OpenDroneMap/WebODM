@@ -2,9 +2,186 @@
 {% load i18n %}
 
 {% block navbar-top-links %}
-<a class="nav-link btn btn-outline-light ml-auto my-2 my-sm-0" href="/dashboard/">Open Dashboard</a>
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="/docs">Documentation</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#examples">Examples</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/about">About</a>
+    </li>
+</ul>
+<a class="btn navbar-btn" href="/login">Sign In</a>
 {% endblock %}
 
 {% block page-wrapper %}
-<h1>Homepage</h1>
+<header class="masthead bg-header" style="background-image: url('/static/app/img/landing/bg-screen.jpeg')">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5 my-auto">
+                <div class="header-content mx-auto">
+                    <h1 class="mb-5">Dronebox</h1>
+                    <h4 class="mb-5">An easy-to-use platform for drone mapping</h4>
+                    <a href="/login" class="btn btn-fill btn-xl mb-3 mr-3">Sign In</a>
+                    <a href="/register" class="btn btn-outline btn-xl mb-3 mr-3">Create account</a>
+                </div>
+            </div>
+            <div class="col-lg-7 my-auto">
+                <img src="/static/app/img/landing/img-display.png" class="img-fluid" alt="">
+                <div class="button">
+                    <!-- You can hook the "home button" to some JavaScript events or just remove it -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</header>
+
+<section class="features" id="features">
+    <div class="container">
+        <div class="section-heading">
+            <div class="vertical-line"></div>
+            <h2>Features</h2>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="feature w-100 d-flex">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <img class="img-fluid" src="/static/app/img/landing/ic-ortho.svg" alt="">
+                    </div>
+                    <div class="text pl-4">
+                        <h4>Orthomosaics</h4>
+                        Stitched photos, orthorectified and georeferenced to make an accurate map.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="feature w-100 d-flex">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <img class="img-fluid" src="/static/app/img/landing/ic-eleva.svg" alt="">
+                    </div>
+                    <div class="text pl-4">
+                        <h4>Elevation Models</h4>
+                        Digital Elevation Model (DEM) is the digital representation of the land surface elevation
+                        with respect to any reference datum. Which consists of Digital Surface Model (DSM) and
+                        Digital Terrain Model (DTM)
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="feature w-100 d-flex">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <img class="img-fluid" src="/static/app/img/landing/ic-gis.svg" alt="">
+                    </div>
+                    <div class="text pl-4">
+                        <h4>GIS Compatible</h4>
+                        Support GIS capabilities to enable further analysis in GIS software.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="feature w-100 d-flex">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <img class="img-fluid" src="/static/app/img/landing/ic-3d.svg" alt="">
+                    </div>
+                    <div class="text pl-4">
+                        <h4>3D Models</h4>
+                        Auto-generated 3D Models and point clouds data.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="feature w-100 d-flex">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <img class="img-fluid" src="/static/app/img/landing/ic-measure.svg" alt="">
+                    </div>
+                    <div class="text pl-4">
+                        <h4>Measurement</h4>
+                        Measure distance, area, and volume on maps with 2D/3D control.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <div class="feature w-100 d-flex">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <img class="img-fluid" src="/static/app/img/landing/ic-drone.svg" alt="">
+                    </div>
+                    <div class="text pl-4">
+                        <h4>Drone flying guidance</h4>
+                        A recommendation for flying your drone to meet an ultimate map solution
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="examples-heading text-center" style="background: url('/static/app/img/landing/bg-exam.png') no-repeat center center" id="examples">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-9 mx-auto">
+                <h2>Examples</h2>
+                <p>An easy-to-use platform to process Drone image</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="examples" id="examples">
+    <div class="container">
+        <div class="row examples-content ">
+            <div id="first" class="col-lg-6 col-md-12 col-xs-12">
+                <div class="content-wrapper">
+                    <h2>Tha Pho</h2>
+                </div>
+                <div class="content">
+                    <p>
+                        Tha Pho Sub-District, Mueang Phitsanulok District, Phitsanulok, Thailand </p>
+                    <a href="https://drive.google.com/drive/folders/1RySANnG73QxhqDUgtQ3C6JktpgNUvEg3?usp=sharing"
+                        target="_blank" class="btn btn-download mt-3">Get It Free</a>
+                </div>
+            </div>
+            <div id="second" class="col-lg-6 col-md-12 col-xs-12">
+                <img class="img-fluid" src="/static/app/img/landing/img-exam1.jpg" alt="">
+            </div>
+        </div>
+        <div class="row examples-content">
+            <div class="col-lg-6 col-md-12 col-xs-12">
+                <img class="img-fluid" src="/static/app/img/landing/img-exam2.jpg" alt="">
+            </div>
+            <div class="col-lg-6 col-md-12 col-xs-12">
+                <div class="content-wrapper">
+                    <h2>Faculty of Science, Naresuan University</h2>
+                </div>
+                <div class="content">
+                    <p>
+                        Naresuan University, Mueang Phitsanulok District, Phitsanulok, Thailand </p>
+                    <a href="https://drive.google.com/drive/folders/1_IJiByUCGLEuzM1Ou0CM1J8lc98N56Dd?usp=sharing"
+                        target="_blank" class="btn btn-download mt-3">Get It Free</a>
+                </div>
+            </div>
+        </div>
+        <div class="row examples-content">
+            <div id="first" class="col-lg-6 col-md-12 col-xs-12">
+                <div class="content-wrapper">
+                    <h2>Suranari</h2>
+                </div>
+                <div class="content">
+                    <p>
+                        Mueang Nakhon Ratchasima District, Nakhon Ratchasima, Thailand </p>
+                    <a href="https://drive.google.com/drive/folders/1OHivb3arKV5vdQPcE-A-lLzFFzzzN6sD?usp=sharing"
+                        target="_blank" class="btn btn-download mt-3">Get It Free</a>
+                </div>
+            </div>
+            <div id="second" class="col-lg-6 col-md-12 col-xs-12">
+                <img class="img-fluid" src="/static/app/img/landing/img-exam3.jpg" alt="">
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

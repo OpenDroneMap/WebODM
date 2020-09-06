@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="62.104" height="56.591" viewBox="0 0 62.104 56.591">
+    <defs>
+        <linearGradient id="linear-gradient" x1=".5" x2=".5" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#009688" stop-opacity=".851"/>
+            <stop offset="1" stop-color="#103475"/>
+        </linearGradient>
+        <style>
+            .cls-3,.cls-4{stroke:#0c9688;stroke-linecap:round}.cls-3{stroke-linejoin:round;stroke-width:3px;fill:none}.cls-4{fill:none;stroke-width:2px}
+        </style>
+    </defs>
+    <g id="ic-measure" transform="translate(1.51 2.388)">
+        <path id="Subtraction_3" fill="rgba(0,0,0,0)" stroke="#0c9688" stroke-linecap="round" stroke-linejoin="round" stroke-width="3px" d="M8673.937 6845.293h-.753v-49.583h53.641l-52.887 49.584z" data-name="Subtraction 3" transform="translate(-8673.184 -6794.168)"/>
+        <path id="Exclusion_5" fill="url(#linear-gradient)" stroke="#0c9688" stroke-linejoin="round" stroke-width="3px" d="M8719.277 6836.335H8669l30.949-27.9 19.328-17.435v45.334zm-7.709-28.043l-8.864 8.209-14.2 13.146h23.062v-21.355z" data-name="Exclusion 5" transform="translate(-8660.184 -6783.632)"/>
+        <g id="Group_2439" data-name="Group 2439" transform="translate(-20.217 -15.645)">
+            <g id="Group_2424" data-name="Group 2424" transform="translate(20.475 14.629)">
+                <g id="Group_2423" data-name="Group 2423">
+                    <g id="Group_2439-2" data-name="Group 2439">
+                        <path id="Path_2221" d="M29.653.886L13.508 29.823" class="cls-3" data-name="Path 2221" transform="translate(-4.621 2.432)"/>
+                        <path id="Path_2222" d="M6.729 28.311l13.306 2.311" class="cls-3" data-name="Path 2222" transform="translate(-6.763 8.855)"/>
+                        <path id="Path_2223" d="M15.815 16.973l17.149.916" class="cls-3" data-name="Path 2223" transform="translate(-4.308 -9.891)"/>
+                        <path id="Line_810" d="M0 0L24 2.743" class="cls-3" data-name="Line 810" transform="translate(0 19.518)"/>
+                        <path id="Line_816" d="M0 11.62L6.055 0" class="cls-3" data-name="Line 816" transform="translate(7.298 2.815)"/>
+                        <path id="Path_2269" d="M3.859.285L.484 8.661" class="cls-3" data-name="Path 2269" transform="rotate(77 13.737 30.243)"/>
+                        <path id="Path_2270" d="M4.384 0L0 12.086" class="cls-3" data-name="Path 2270" transform="rotate(77 -4.799 27.198)"/>
+                        <path id="Path_2271" d="M7.351 0L2.835 16.156" class="cls-3" data-name="Path 2271" transform="rotate(21 15.867 85.61)"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+        <g id="Group_2440" data-name="Group 2440" transform="translate(-797.242 -1723.255)">
+            <path id="Line_841" d="M4 0L0 0" class="cls-4" data-name="Line 841" transform="translate(852.5 1741.5)"/>
+            <path id="Line_844" d="M4 0L0 0" class="cls-4" data-name="Line 844" transform="translate(852.5 1753.5)"/>
+            <path id="Line_846" d="M4 0L0 0" class="cls-4" data-name="Line 846" transform="translate(852.5 1765.5)"/>
+            <path id="Line_842" d="M4 0L0 0" class="cls-4" data-name="Line 842" transform="translate(852.5 1747.5)"/>
+            <path id="Line_843" d="M4 0L0 0" class="cls-4" data-name="Line 843" transform="translate(852.5 1759.5)"/>
+            <path id="Line_845" d="M4 0L0 0" class="cls-4" data-name="Line 845" transform="translate(852.5 1771.5)"/>
+        </g>
+    </g>
+</svg>

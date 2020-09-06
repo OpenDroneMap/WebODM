@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="74.961" height="59.931" viewBox="0 0 74.961 59.931">
+    <defs>
+        <linearGradient id="linear-gradient" x1=".5" x2=".5" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#009688" stop-opacity=".851"/>
+            <stop offset="1" stop-color="#103475"/>
+        </linearGradient>
+        <style>
+            .cls-1{fill:none;stroke:#0c9688;stroke-linecap:round;stroke-linejoin:round;stroke-width:2px}
+        </style>
+    </defs>
+    <g id="ic-3d" transform="translate(1.064 1)">
+        <path id="Path_2227" d="M75.578 29.709L56.8 26.84 40.128 49.491a.936.936 0 0 1-.912 0L3.766 29.709a.936.936 0 0 1 .007-1.639L28.565 8.02s11.276.618 11.554.771l35.45 19.279a.936.936 0 0 1 .009 1.639z" class="cls-1" data-name="Path 2227" transform="translate(-3.286 -8.02)"/>
+        <path id="Path_2228" d="M76.166 36.841L40.112 57.226a.936.936 0 0 1-.912 0l.456-16.265 17.133-22.71 19.377 2.264z" class="cls-1" data-name="Path 2228" transform="translate(-3.27 .569)"/>
+        <path id="Line_819" d="M0 0L0 16.382" class="cls-1" data-name="Line 819" transform="translate(36.386 41.531)"/>
+        <path id="Path_2229" d="M3.3 20.938l30.4-3.185 23.091.916" class="cls-1" data-name="Path 2229" transform="translate(-3.27 .151)"/>
+        <path id="Line_820" d="M0 0L5.503 23.567" class="cls-1" data-name="Line 820" transform="translate(30.427 17.904)"/>
+        <path id="Line_821" d="M0 4.525L16.044 0" class="cls-1" data-name="Line 821" transform="translate(45.037 13.958)"/>
+        <path id="Line_822" d="M37.392 0L0 13.984" class="cls-1" data-name="Line 822" transform="translate(7.645 6.308)"/>
+        <path id="Line_823" d="M0 0L16.167 6.763" class="cls-1" data-name="Line 823" transform="translate(34.586 10.216)"/>
+        <path id="Path_2230" fill="url(#linear-gradient)" stroke="#0c9688" stroke-linecap="round" stroke-linejoin="round" stroke-width="2px" d="M39.734 39.821l-.079.1L3.3 19.484v16.48l35.9 20.227a.92.92 0 0 0 .535.1z" data-name="Path 2230" transform="translate(-3.269 1.604)"/>
+    </g>
+</svg>
