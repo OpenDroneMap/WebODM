@@ -15,6 +15,7 @@ from django.utils.translation import ugettext as _
 from django import forms
 from webodm import settings
 
+
 def index(request):
     # Check first access
     if User.objects.filter(is_superuser=True).count() == 0:
@@ -26,9 +27,19 @@ def index(request):
             return redirect('welcome')
 
     if settings.SINGLE_USER_MODE and not request.user.is_authenticated:
-        login(request, User.objects.get(username="admin"), 'django.contrib.auth.backends.ModelBackend')
+        login(request, User.objects.get(username="admin"),
+              'django.contrib.auth.backends.ModelBackend')
 
-    return render(request, 'app/landing.html', {'title': 'Landing'})
+    return render(request, 'app/landing.html', {'title': 'Homepage'})
+
+
+def about(request):
+    return render(request, 'app/about.html', {'title': 'About'})
+
+
+def docs(request):
+    return render(request, 'app/docs.html', {'title': 'Documentation'})
+
 
 @login_required
 def dashboard(request):
@@ -42,10 +53,12 @@ def dashboard(request):
     if Project.objects.count() == 0:
         Project.objects.create(owner=request.user, name=_("First Project"))
 
-    return render(request, 'app/dashboard.html', {'title': 'Dashboard',
-        'no_processingnodes': no_processingnodes,
-        'no_tasks': no_tasks
-    })
+    return render(
+        request, 'app/dashboard.html', {
+            'title': 'Dashboard',
+            'no_processingnodes': no_processingnodes,
+            'no_tasks': no_tasks
+        })
 
 
 @login_required
@@ -56,16 +69,20 @@ def map(request, project_pk=None, task_pk=None):
         project = get_object_or_404(Project, pk=project_pk)
         if not request.user.has_perm('app.view_project', project):
             raise Http404()
-        
+
         if task_pk is not None:
-            task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
+            task = get_object_or_404(Task.objects.defer(
+                'orthophoto_extent', 'dsm_extent', 'dtm_extent'),
+                                     pk=task_pk,
+                                     project=project)
             title = task.name
             mapItems = [task.get_map_items()]
         else:
             title = project.name
             mapItems = project.get_map_items()
 
-    return render(request, 'app/map.html', {
+    return render(
+        request, 'app/map.html', {
             'title': title,
             'params': {
                 'map-items': json.dumps(mapItems),
@@ -85,12 +102,16 @@ def model_display(request, project_pk=None, task_pk=None):
             raise Http404()
 
         if task_pk is not None:
-            task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
+            task = get_object_or_404(Task.objects.defer(
+                'orthophoto_extent', 'dsm_extent', 'dtm_extent'),
+                                     pk=task_pk,
+                                     project=project)
             title = task.name
         else:
             raise Http404()
 
-    return render(request, 'app/3d_model_display.html', {
+    return render(
+        request, 'app/3d_model_display.html', {
             'title': title,
             'params': {
                 'task': json.dumps(task.get_model_display_params()),
@@ -103,19 +124,25 @@ def model_display(request, project_pk=None, task_pk=None):
 def processing_node(request, processing_node_id):
     pn = get_object_or_404(ProcessingNode, pk=processing_node_id)
     if not pn.update_node_info():
-        messages.add_message(request, messages.constants.WARNING, '{} seems to be offline.'.format(pn))
+        messages.add_message(request, messages.constants.WARNING,
+                             '{} seems to be offline.'.format(pn))
 
-    return render(request, 'app/processing_node.html', 
-            {
-                'title': 'Processing Node', 
-                'processing_node': pn,
-                'available_options_json': pn.get_available_options_json(pretty=True)
-            })
+    return render(
+        request, 'app/processing_node.html', {
+            'title': 'Processing Node',
+            'processing_node': pn,
+            'available_options_json':
+            pn.get_available_options_json(pretty=True)
+        })
+
 
 class FirstUserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('username', 'password', )
+        fields = (
+            'username',
+            'password',
+        )
         widgets = {
             'password': forms.PasswordInput(),
         }
@@ -136,18 +163,19 @@ def welcome(request):
             admin_user.save()
 
             # Log-in automatically
-            login(request, admin_user, 'django.contrib.auth.backends.ModelBackend')
+            login(request, admin_user,
+                  'django.contrib.auth.backends.ModelBackend')
             return redirect('dashboard')
 
-    return render(request, 'app/welcome.html',
-                  {
-                      'title': 'Welcome',
-                      'firstuserform': fuf
-                  })
+    return render(request, 'app/welcome.html', {
+        'title': 'Welcome',
+        'firstuserform': fuf
+    })
 
 
 def handler404(request):
     return render(request, '404.html', status=404)
+
 
 def handler500(request):
     return render(request, '500.html', status=500)
