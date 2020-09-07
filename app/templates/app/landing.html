@@ -1,20 +1,5 @@
-{% extends 'base.html' %}
+{% extends 'landing_base.html' %}
 {% load i18n %}
-
-{% block navbar-top-links %}
-<ul class="navbar-nav ml-auto">
-    <li class="nav-item">
-        <a class="nav-link" href="/docs">Documentation</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#examples">Examples</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/about">About</a>
-    </li>
-</ul>
-<a class="btn navbar-btn" href="/login">Sign In</a>
-{% endblock %}
 
 {% block page-wrapper %}
 <header class="masthead bg-header" style="background-image: url('/static/app/img/landing/bg-screen.jpeg')">

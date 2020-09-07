@@ -46,7 +46,7 @@
 
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
             <div class="container">
-                <a class="navbar-brand" href="#page-top">
+                <a class="navbar-brand" href="/#page-top">
                     <img src="/static/app/img/landing/logo-white.png" alt="Dronebox" class="d-inline-block" alt="" loading="lazy">
                 </a>
                 <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
@@ -67,69 +67,12 @@
     </div>
     {% endblock %}
 
-    <footer>
-        <div class="container text-md-left text-xs-left">
-            <div class="row">
-                <div class="footer-area col-lg-4 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                    <div class="mb-3"><img src="/static/app/img/landing/logo-white.png"></div>
-                    An easy-to-use platform for drone mapping
-                    <div class="social-icon mt-3">
-                        <a class="facebook">
-                            <i class="fab fa-facebook-f white-text mr-md-5 fa-2x"> </i>
-                        </a>
-                        <a class="instagram">
-                            <i class="fab fa-instagram white-text mr-md-5 fa-2x"> </i>
-                        </a>
-                        <a class="medium">
-                            <i class="fab fa-medium white-text mr-md-5 fa-2x"> </i>
-                        </a>
-                    </div>
-                </div>
-                <div class="footer-area col-lg-2 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                    <h5 class="mb-3">Quick Links</h5>
-                    <div class="quick-link">
-                        <div class="mb-3"><a href="#page-top">Home</a></div>
-                        <div class="mb-3"><a href="#examples">Examples</a></div>
-                        <div class="mb-3"><a href="about.html">About</a></div>
-                    </div>
-                </div>
-                <div class="footer-area col-lg-3 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                    <div class="map">
-                        <iframe frameborder="0" height="220"
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1910.3560425273229!2d100.19132409092454!3d16.74121159882652!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30dfbf90bb38d3e1%3A0xb965f2514b3ac6d2!2z4Lia4Lij4Li04Lip4Lix4LiXIOC5geC4oeC4nuC4nuC4tOC5gOC4lOC4teC4oiDguIjguLPguIHguLHguJQ!5e0!3m2!1sen!2sth!4v1582077454850!5m2!1sen!2sth"
-                            style="border:0;" width="100%"></iframe>
-                    </div>
-                </div>
-                <div class="footer-area col-lg-2 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                    <h5 class="mb-3">Contact</h5>
-                    <table>
-                        <tr>
-                            <td class="icon-col"><i class="fas fa-phone"></i></td>
-                            <td class="info-contact">093-036-3366</td>
-                        </tr>
-                        <tr>
-                            <td class="icon-col"><i class="fas fa-envelope"></i></td>
-                            <td class="info-contact">mapedia.com@gmail.com</td>
-                        </tr>
-                        <tr>
-                            <td class="icon-col"><i class="fas fa-map-marker"></i></td>
-                            <td class="info-contact">MAPEDIA Co., Ltd.</td>
-                        </tr>
-                        <tr>
-                            <td class="icon-col"></td>
-                            <td class="info-contact">3th Mahadhammaraja Building, Room TB-314, Naresuan University,
-                                Phitsanulok, Thailand 66000</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-    
-        <div class="footer-copyright text-center py-3">© 2020 Copyright by
-            <a href="https://www.mapedia.co.th/"> Mapedia</a>
-        </div>
-    
+    {% block footer %}
+    <footer class="small text-center py-2">
+        Built on <a href="https://github.com/OpenDroneMap/WebODM">WebODM</a> under MPL-2.0 License<br>
+        Website and content © 2020 Copyright by<a href="https://www.mapedia.co.th/"> Mapedia</a>
     </footer>
+    {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
         integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"

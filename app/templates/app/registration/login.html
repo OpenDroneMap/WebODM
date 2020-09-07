@@ -2,6 +2,16 @@
 {% load i18n %}
 {% load settings %}
 
+{% block extra-headers %}
+<style>
+    #mainNav.navbar {
+        border-color: transparent;
+        background-color: transparent;
+        background-image: none;
+    }
+</style>
+{% endblock %}
+
 {% block registration_content %}
     {% if form.errors %}
         <div class="alert alert-warning">
@@ -9,30 +19,50 @@
         </div>
     {% endif %}
 
-    {% is_single_user_mode as autologin %}
-
-    {% if autologin %}
-        <script>location.href='/';</script>
-    {% else %}
-    <form action="{% url 'login' %}" method="post" class="form-horizontal" role="form">{% csrf_token %}
-        {% for field in form %}
-            {% include 'registration/form_field.html' %}
-        {% endfor %}
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default">{% trans 'Log in' %}</button>
-            </div>
-            <div class="top-buffer col-sm-offset-2 col-sm-10">
-              <!--<p><a href="{% url 'password_reset' %}">{% trans "Reset My Password" %}</a></p>-->
-                <p><a href="javascript:toggleForgotPasswordHint();">Forgot your password?</a></p>
-                <script>function toggleForgotPasswordHint(){ $("#forgotPasswordHint").toggle(); }</script>
-                <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 4px;" class="theme-secondary">
-                    You can reset the administrator password by running the following command:
-                    <span class="theme-background-highlight" style="padding: 4px; margin: 8px 0; display: inline-block;">./webodm.sh resetadminpassword yournewpass</span><br/>
-                    If you used WebODM Manager to launch WebODM, find the "Reset Password" button within the maintenance panel or within one of WebODM Manager menus.
-                </div>
+    <div class="flex-parent flex-parent--column">
+        <div class="flex-parent flex-parent--column bg-header container-login" style="background-image: url('/static/app/img/landing/bg-screen.jpeg')">
+            <div class="wrap-login">
+                <form action="{% url 'login' %}" method="post" class="login-form">{% csrf_token %}
+                    <h3 class="login-form-title">
+                        {% trans 'Log in' %}
+                    </h3>
+                    <div class="text-center mb-3">
+                        Don’t have an account? <a href="signup.html" class="ml-3">Create your account.</a>
+                    </div>
+                    
+                    {% for field in form %}
+                        {% include 'registration/form_field.html' %}
+                    {% endfor %}
+    
+                    <div class="mb-3 text-right">
+                        <!--<p><a href="{% url 'password_reset' %}">{% trans "Reset My Password" %}</a></p>-->
+                        <a href="javascript:toggleForgotPasswordHint();">Forgot your password?</a>
+                        <script>function toggleForgotPasswordHint() { $("#forgotPasswordHint").toggle(); }</script>
+                        <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 4px;" class="theme-secondary">
+                            You can reset the administrator password by running the following command:
+                            <span class="theme-background-highlight" style="padding: 4px; margin: 8px 0; display: inline-block;">./webodm.sh
+                                resetadminpassword yournewpass</span><br />
+                            If you used WebODM Manager to launch WebODM, find the "Reset Password" button within the maintenance panel or within
+                            one of WebODM Manager menus.
+                        </div>
+                    </div>
+                    <div class="form-btn">
+                        <button class="btn btn-lg" type="submit">{% trans 'Log in' %}</button>
+                    </div>
+                    <div class="or-label">
+                        <hr> or connect with
+                    </div>
+    
+                    <div class="form-btn">
+                        <a class="btn btn-lg btn-google text-uppercase" href="#">
+                            <img src="https://img.icons8.com/color/16/000000/google-logo.png" class="mr-2"> Signin With
+                            Google
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
-    </form>
-    {% endif %}
+    </div>
 {% endblock %}
+
+{% block footer %}{% endblock %}

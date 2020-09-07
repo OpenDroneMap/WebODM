@@ -74,12 +74,6 @@ section h2 {
     letter-spacing: 1px;
     min-height: 80px;
 
-    &.navbar-top {
-        border-color: transparent;
-        background-color: transparent;
-        background-image: none;
-    }
-
     a.navbar-brand {
         font-size: 1.6em;
         >img {
@@ -350,34 +344,32 @@ section.examples .examples-content h2 {
 .feature {
     width: 100%;
     margin-bottom: 20px;
-}
 
-.feature .icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: rgba(0, 184, 168, 0.05);
-    -webkit-box-shadow: 0px 10px 30px -4px rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: 0px 10px 30px -4px rgba(0, 0, 0, 0.15);
-    box-shadow: 0px 3px 6px -4px rgba(0, 0, 0, 0.15);
-}
+    .icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(0, 184, 168, 0.05);
+        -webkit-box-shadow: 0px 10px 30px -4px rgba(0, 0, 0, 0.15);
+        -moz-box-shadow: 0px 10px 30px -4px rgba(0, 0, 0, 0.15);
+        box-shadow: 0px 3px 6px -4px rgba(0, 0, 0, 0.15);
 
-.feature .icon img {
-    width: 36px;
-}
+        img {
+            width: 36px;
+        }
+    }
 
-.feature .text {
-    width: calc(100% - 60px);
-}
-
-.feature .text h4 {
-    font-size: 20px;
-    font-weight: 400;
-}
-
-.feature .text p {
-    font-size: 16px;
-    font-weight: 200;
+    .text {
+        width: calc(100% - 60px);
+        h4 {
+            font-size: 20px;
+            font-weight: 400;
+        }
+        p {
+            font-size: 16px;
+            font-weight: 200;
+        }
+    }
 }
 
 .d-flex {
@@ -403,7 +395,12 @@ footer {
     font-size: 14px;
     text-align: center;
     color: white;
-    background-image: linear-gradient(123deg, rgba(0, 150, 136, 0.85) -26%, #103475 99%)
+    background-image: linear-gradient(123deg, rgba(0, 150, 136, 0.85) -26%, #103475 99%);
+
+    h5 {
+        font-weight: 400;
+        margin: 0px;
+    }
 }
 
 .footer-copyright {
@@ -413,11 +410,6 @@ footer {
 .footer-area {
     position: relative;
     padding-bottom: 30px;
-}
-
-footer h5 {
-    font-weight: 400;
-    margin: 0px;
 }
 
 .icon-col {
