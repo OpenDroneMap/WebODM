@@ -19,7 +19,7 @@ jobs:
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v1
         with:
-          username: ${{ github.actor }}
+          username: ${{ github.github_actor }}
           password: ${{ secrets.ASDC_PACKAGES }}
           registry: ghcr.io
           repository: auscalabledronecloud/asdc-webodm
