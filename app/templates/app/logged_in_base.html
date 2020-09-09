@@ -2,9 +2,6 @@
 {% load i18n static settings %}
 
 {% block navbar-top-links %}
-{% is_single_user_mode as single_user %}
-
-{% if not single_user %}
 <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
@@ -21,8 +18,8 @@
         </div>
     </li>
 </ul>
-{% endif %}
 {% endblock %}
+
 {% block navbar-sidebar %}
 <ul class="nav justify-content-center">
     <li class="nav-item">

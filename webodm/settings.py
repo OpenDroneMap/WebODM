@@ -20,7 +20,6 @@ from django.contrib.messages import constants as messages
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -36,7 +35,7 @@ except ImportError:
     secret = get_random_string(50, chars)
     with open(os.path.join(current_dir, 'secret_key.py'), 'w') as f:
         f.write("SECRET_KEY='{}'".format(secret))
-    SECRET_KEY=secret
+    SECRET_KEY = secret
 
     print("Generated secret key")
 
@@ -52,7 +51,8 @@ WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 # SECURITY WARNING: don't run with debug turned on a public facing server!
 DEBUG = os.environ.get('WO_DEBUG', 'YES') == 'YES' or TESTING
 DEV = os.environ.get('WO_DEV', 'NO') == 'YES'
-SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = os.environ.get('WO_SSL', 'NO') == 'YES'
+SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = os.environ.get('WO_SSL',
+                                                            'NO') == 'YES'
 INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
@@ -118,13 +118,14 @@ ROOT_URLCONF = 'webodm.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND':
+        'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'app', 'templates'),
-            os.path.join(BASE_DIR, 'app', 'templates', 'app'),
-            BASE_DIR
+            os.path.join(BASE_DIR, 'app', 'templates', 'app'), BASE_DIR
         ],
-        'APP_DIRS': True,
+        'APP_DIRS':
+        True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -139,43 +140,52 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'webodm.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('WO_DATABASE_ENGINE', 'django.contrib.gis.db.backends.postgis'),
-        'NAME': os.environ.get('WO_DATABASE_NAME', 'webodm_dev'),
-        'USER': os.environ.get('WO_DATABASE_USER', 'postgres'),
-        'PASSWORD': os.environ.get('WO_DATABASE_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('WO_DATABASE_HOST', 'db'),
-        'PORT': os.environ.get('WO_DATABASE_PORT', '5432'),
+        'ENGINE':
+        os.environ.get('WO_DATABASE_ENGINE',
+                       'django.contrib.gis.db.backends.postgis'),
+        'NAME':
+        os.environ.get('WO_DATABASE_NAME', 'webodm_dev'),
+        'USER':
+        os.environ.get('WO_DATABASE_USER', 'postgres'),
+        'PASSWORD':
+        os.environ.get('WO_DATABASE_PASSWORD', 'postgres'),
+        'HOST':
+        os.environ.get('WO_DATABASE_HOST', 'db'),
+        'PORT':
+        os.environ.get('WO_DATABASE_PORT', '5432'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-   {
-       'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-   },
-   {
-       'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-   },
-   {
-       'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-   },
-   {
-       'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-   },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 # Hook guardian
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend', # this is default
+    'django.contrib.auth.backends.ModelBackend',  # this is default
     'guardian.backends.ObjectPermissionBackend',
 )
 
@@ -187,7 +197,6 @@ TIME_ZONE = tzlocal.get_localzone().zone
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -204,13 +213,13 @@ STATICFILES_FINDERS = [
 ]
 
 # File Uploads
-FILE_UPLOAD_MAX_MEMORY_SIZE = 4718592 # 4.5 MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 4718592  # 4.5 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
-    'app.uploadhandler.TemporaryFileUploadHandler', # Ours doesn't keep file descriptors open by default
+    'app.uploadhandler.TemporaryFileUploadHandler',  # Ours doesn't keep file descriptors open by default
 ]
 
 # Webpack
@@ -221,14 +230,14 @@ WEBPACK_LOADER = {
     }
 }
 
-
 # Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format':
+            '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -264,10 +273,9 @@ LOGGING = {
     }
 }
 
-
 # Auth
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard'
+LOGIN_URL = '/login'
 
 # CORS (very relaxed settings, users might want to change this in production)
 CORS_ORIGIN_ALLOW_ALL = True
@@ -285,28 +293,30 @@ FILE_UPLOAD_TEMP_DIR = MEDIA_TMP
 # Store flash messages in cookies
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 MESSAGE_TAGS = {
-    messages.ERROR: 'danger' # Bootstrap 3 compatibility
+    messages.ERROR: 'danger'  # Bootstrap 3 compatibility
 }
 
 # REST setup
 # Use Django's standard django.contrib.auth permissions (no anonymous usage)
 REST_FRAMEWORK = {
-  'DEFAULT_PERMISSION_CLASSES': [
-    'rest_framework.permissions.DjangoObjectPermissions',
-  ],
-  'DEFAULT_FILTER_BACKENDS': [
-    'rest_framework.filters.DjangoObjectPermissionsFilter',
-    'django_filters.rest_framework.DjangoFilterBackend',
-    'rest_framework.filters.OrderingFilter',
-  ],
-  'DEFAULT_AUTHENTICATION_CLASSES': (
-    'rest_framework.authentication.SessionAuthentication',
-    'rest_framework.authentication.BasicAuthentication',
-    'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-    'app.api.authentication.JSONWebTokenAuthenticationQS',
-  ),
-  'PAGE_SIZE': 10,
-  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoObjectPermissions',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.DjangoObjectPermissionsFilter',
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'app.api.authentication.JSONWebTokenAuthenticationQS',
+    ),
+    'PAGE_SIZE':
+    10,
+    'DEFAULT_PAGINATION_CLASS':
+    'rest_framework.pagination.PageNumberPagination',
 }
 
 JWT_AUTH = {
@@ -314,9 +324,8 @@ JWT_AUTH = {
 }
 
 # Compressor
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
+COMPRESS_PRECOMPILERS = (('text/x-scss', 'django_libsass.SassCompiler'), )
+
 
 # Sass
 def theme(color):
@@ -353,7 +362,7 @@ CELERY_RESULT_BACKEND = os.environ.get('WO_BROKER', 'redis://localhost')
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_INCLUDE=['worker.tasks', 'app.plugins.worker']
+CELERY_INCLUDE = ['worker.tasks', 'app.plugins.worker']
 CELERY_WORKER_REDIRECT_STDOUTS = False
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 

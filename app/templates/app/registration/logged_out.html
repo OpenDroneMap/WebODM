@@ -2,6 +2,13 @@
 {% load i18n %}
 
 {% block registration_content %}
-    <h3>{% trans "You have been logged out." %}</h3>
-    <p><a href="{% url 'login' %}">{% trans 'Log In' %}</a></p>
+<div class="flex-parent flex-parent--column">
+    <div class="flex-parent flex-parent--column bg-header container-login"
+        style="background-image: url('/static/app/img/landing/bg-screen.jpeg')">
+        <div class="wrap-login">
+            <h3>{% trans "You have been logged out." %}</h3>
+            <p><a href="{% url 'login' %}">{% trans 'Log In' %}</a></p>
+        </div>
+    </div>
+</div>
 {% endblock %}

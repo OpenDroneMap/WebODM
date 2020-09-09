@@ -13,7 +13,13 @@
         <a class="nav-link" href="/about">About</a>
     </li>
 </ul>
-<a class="btn navbar-btn" href="/login">Sign In</a>
+<a class="btn navbar-btn" href="/dashboard">
+    {% if user.is_authenticated %}
+        Go to dashboard
+    {% else %}
+        Sign In
+    {% endif %}
+</a>
 {% endblock %}
 
 {% block extra-headers %}
