@@ -16,12 +16,9 @@ body {
 }
 
 a {
-    color: white;
-    transition: all .35s;
+    color: #009688;
 }
-
-a:hover,
-a:focus {
+a:hover, a:focus {
     color: #009688;
 }
 
@@ -73,6 +70,10 @@ section h2 {
     font-weight: 200;
     letter-spacing: 1px;
     min-height: 80px;
+
+    a {
+        color: white;
+    }
 
     a.navbar-brand {
         font-size: 1.6em;
@@ -400,6 +401,10 @@ footer {
     h5 {
         font-weight: 400;
         margin: 0px;
+    }
+
+    a, a:hover, a:focus {
+        color: white;
     }
 }
 
