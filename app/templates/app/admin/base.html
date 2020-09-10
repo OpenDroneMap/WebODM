@@ -9,8 +9,7 @@
 {% endblock %}
 
 {% block page-wrapper %}
-<div id="page-wrapper" class="admin-area">
-    <!-- Content -->
+<div id="page-wrapper" class="admin-area container">
     <section class="main">
         <div class="content {% block coltype %}colM{% endblock %}">
             {{ SETTINGS.theme.html_after_header|safe }}
@@ -40,8 +39,5 @@
             <br class="clear" />
         </div>
     </section>
-    <!-- END Content -->
-
-    {% block footer %}<div id="footer"></div>{% endblock %}
 </div>
 {% endblock %}

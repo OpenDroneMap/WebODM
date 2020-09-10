@@ -7,7 +7,7 @@
         style="background-image: url('/static/app/img/landing/bg-screen.jpeg')">
         <div class="wrap-login">
             <h3>{% trans "You have been logged out." %}</h3>
-            <p><a href="{% url 'login' %}">{% trans 'Log In' %}</a></p>
+            <p><a href="{% url 'login' %}">{% trans 'Log In' %}</a> {% trans 'or' %} <a href="{% url 'index' %}">{% trans 'Return to Homepage' %}</a></p>
         </div>
     </div>
 </div>
