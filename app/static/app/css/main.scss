@@ -1,3 +1,7 @@
+@import "./var.scss";
+@import "./button.scss";
+@import "./input.scss";
+
 :root {
     --input-padding-x: 1.5rem;
     --input-padding-y: .75rem;
@@ -844,4 +848,8 @@ footer {
 
 .floatfix{
     clear: both;
+}
+
+.w100 {
+    width: 100%;
 }

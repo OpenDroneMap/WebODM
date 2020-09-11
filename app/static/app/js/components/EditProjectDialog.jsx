@@ -76,6 +76,7 @@ class EditProjectDialog extends React.Component {
     }
 
     render(){
+        const formId = Math.random().toString(36).substring(2, 15)
         return (
             <FormDialog {...this.props} 
                 getFormData={this.getFormData} 
@@ -83,16 +84,24 @@ class EditProjectDialog extends React.Component {
                 onShow={this.onShow}
                 ref={(domNode) => { this.dialog = domNode; }}>
               <div className="form-group">
-                <label className="col-sm-2 control-label">Name</label>
-                <div className="col-sm-10">
-                  <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
-                </div>
+                <label className="control-label" htmlFor={`form-${formId}-project-name-input`}>Name</label>
+                <input
+                    id={`form-${formId}-project-name-input`}
+                    type="text"
+                    className="form-control db-input"
+                    ref={(domNode) => { this.nameInput = domNode; }}
+                    autoComplete="off"
+                    value={this.state.name}
+                    onChange={this.handleChange('name')} />
               </div>
               <div className="form-group">
-                <label className="col-sm-2 control-label">Description (optional)</label>
-                <div className="col-sm-10">
-                  <textarea className="form-control" rows="3" value={this.state.descr} onChange={this.handleChange('descr')} />
-                </div>
+                <label className="control-label" htmlFor={`form-${formId}-project-desc-input`}>Description&nbsp;<small>(Optional)</small></label>
+                <textarea
+                  id={`form-${formId}-project-desc-input`}
+                  className="form-control db-input none-resize"
+                  rows="3"
+                  value={this.state.descr}
+                  onChange={this.handleChange('descr')} />
               </div>
             </FormDialog>
         );

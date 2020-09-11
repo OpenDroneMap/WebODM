@@ -19,16 +19,8 @@ from webodm import settings
 def index(request):
     # Check first access
     if User.objects.filter(is_superuser=True).count() == 0:
-        if settings.SINGLE_USER_MODE:
-            # Automatically create a default account
-            User.objects.create_superuser('admin', 'admin@localhost', 'admin')
-        else:
-            # the user is expected to create an admin account
-            return redirect('welcome')
-
-    if settings.SINGLE_USER_MODE and not request.user.is_authenticated:
-        login(request, User.objects.get(username="admin"),
-              'django.contrib.auth.backends.ModelBackend')
+        # the user is expected to create an admin account
+        return redirect('welcome')
 
     return render(request, 'app/landing.html', {'title': 'Homepage'})
 

@@ -1,0 +1,44 @@
+
+/*------------ custom button ----------------*/
+
+button.db-btn {
+    &.primary {
+        color: #fff;
+        background-color: $color-primary;
+        border-color: $color-primary;
+
+        &:focus, &:focus {
+            box-shadow: 0 0 0 0.2rem rgba(0, 150, 136, 0.3);
+        }
+
+        &.outlined {
+            color: $color-primary ;
+            &:hover {
+                background-color: $color-primary;
+                border-color: $color-primary;
+                color: #fff;
+            }
+        }
+    }
+
+    &.rounded {
+        border-radius: 100px !important;
+    }
+
+    &.outlined {
+        background-color: transparent ;
+    }
+
+    &.small, &.btn-sm {
+        padding: .25rem .5rem;
+        font-size: 12px;
+        border-radius: 60px;
+    }
+
+}
+
+button.close.flat {
+    &:focus {
+        outline: unset; 
+    }
+}

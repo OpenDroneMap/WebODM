@@ -25,8 +25,6 @@ class ProjectList extends Paginated {
         }
 
         this.PROJECTS_PER_PAGE = 10;
-
-        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount(){
@@ -92,15 +90,15 @@ class ProjectList extends Paginated {
             return (<div className="project-list">
                 <ErrorMessage bind={[this, 'error']} />
                 <Paginator className="text-right" {...this.state.pagination} {...this.props}>
-                    <ul className={"list-group project-list " + (this.state.refreshing ? "refreshing" : "")}>
+                    <div className={"project-list " + (this.state.refreshing ? "refreshing" : "")}>
                         {this.state.projects.map(p => (
                             <ProjectListItem 
                                 key={p.id} 
                                 data={p} 
-                                onDelete={this.handleDelete} 
+                                onDelete={projectId => this.handleDelete(projectId)} 
                                 history={this.props.history} /> 
                         ))}
-                    </ul>
+                    </div>
                 </Paginator>
             </div>);
         }

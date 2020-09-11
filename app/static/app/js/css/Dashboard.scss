@@ -1,3 +1,4 @@
+
 #dashboard-app{
     .row{
         &.no-margin{
@@ -16,5 +17,34 @@
 
     .add-button, .list-group{
         margin-bottom: 8px;
+    }
+
+    .all-project {
+        font-weight: normal;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.46;
+        letter-spacing: normal;
+        text-align: left;
+        color: #63799b;
+        font-size: 24px;
+    }
+
+    .project-list-container {
+        .project-item-card {
+            margin-bottom: 8px;
+
+            .card-title {
+                font-size: 24px;
+            }
+
+            .card-subtitle {
+                font-size: 20px;
+            }
+
+            .project-task {
+                margin-top: 4px;
+            }
+        }
     }
 }

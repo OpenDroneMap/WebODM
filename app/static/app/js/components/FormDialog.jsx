@@ -130,14 +130,14 @@ class FormDialog extends React.Component {
     render(){
         return (
             <div ref={this.setModal}
-                className="modal form-dialog" tabIndex="-1"
+                className="modal form-dialog fade" tabIndex="-1"
                 data-backdrop="static"
             >
-              <div className="modal-dialog">
-                <div className="modal-content">
+              <div className="modal-dialog modal-dialog-centered modal-lg">
+                <div className="modal-content" style={{ borderRadius: 12 }}>
                   <div className="modal-header">
-                    <button type="button" className="close" onClick={this.hide}><span>&times;</span></button>
                     <h4 className="modal-title">{this.props.title}</h4>
+                    <button aria-label="Close" type="button" className="close flat" onClick={this.hide}><span>&times;</span></button>
                   </div>
                   <div className="modal-body">
                     <ErrorMessage bind={[this, "error"]} />
@@ -147,8 +147,8 @@ class FormDialog extends React.Component {
                   </div>
                   <div className="modal-footer">
                     <div className="pull-right">
-                        <button type="button" className="btn btn-default" onClick={this.hide} disabled={this.state.saving}>Cancel</button>
-                        <button type="button" className="btn btn-primary save" onClick={this.handleSave} disabled={this.state.saving}>
+                        <button type="button" className="btn btn-outline-secondary db-btn rounded  mr-2" onClick={this.hide} disabled={this.state.saving}>Cancel</button>
+                        <button type="button" className="btn rounded db-btn primary save" onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
                                 <span>
                                     <i className="fa fa-circle-notch fa-spin"></i> {this.props.savingLabel}
@@ -162,7 +162,7 @@ class FormDialog extends React.Component {
                         <div className="text-left">
                             <button 
                                 disabled={this.state.deleting}
-                                className="btn btn-danger" 
+                                className="btn btn-danger btn rounded db-btn" 
                                 onClick={this.handleDelete}>
                                 {this.state.deleting ? 
                                     <span>

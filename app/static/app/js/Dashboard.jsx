@@ -1,82 +1,99 @@
-import React from 'react';
-import './css/Dashboard.scss';
-import ProjectList from './components/ProjectList';
+import React from 'react'
+import './css/Dashboard.scss'
+import ProjectList from './components/ProjectList'
+import Utils from './classes/Utils'
 import EditProjectDialog from './components/EditProjectDialog';
-import Utils from './classes/Utils';
 import {
   BrowserRouter as Router,
   Route
-} from 'react-router-dom';
-import $ from 'jquery';
+} from 'react-router-dom'
+import $ from 'jquery'
+
 
 class Dashboard extends React.Component {
-  constructor(){
-    super();
-    
-    this.handleAddProject = this.handleAddProject.bind(this);
-    this.addNewProject = this.addNewProject.bind(this);
-  }
 
-  handleAddProject(){
-    this.projectDialog.show();
-  }
+	refProjectDialog = null
 
-  addNewProject(project){
-    if (!project.name) return (new $.Deferred()).reject("Name field is required");
+	constructor() {
+		super();
+		this.state = {
+			page: 1
+		}
+	}
 
-    return $.ajax({
-          url: `/api/projects/`,
-          type: 'POST',
-          data: {
-            name: project.name,
-            description: project.descr
-          }
-      }).done(() => {
-        this.projectList.refresh();
-      });
-  }
+	handleAddProject() {
+		if (this.refProjectDialog instanceof EditProjectDialog) {
+			this.refProjectDialog.show()
+		}
+	}
 
-  render() {
-    const projectList = ({ location, history }) => {
-      let q = Utils.queryParams(location),
-          page = parseInt(q.page !== undefined ? q.page : 1);
 
-      return <ProjectList
-                source={`/api/projects/?ordering=-created_at&page=${page}`}
-                ref={(domNode) => { this.projectList = domNode; }} 
-                currentPage={page}
-                history={history}
-                />;
-    };
+	addNewProject(project){
+		if (!project.name) return (new $.Deferred()).reject("Name field is required");
+	
+		return $.ajax({
+			  url: `/api/projects/`,
+			  type: 'POST',
+			  data: {
+				name: project.name,
+				description: project.descr
+			  }
+		  }).done(() => {
+			this.projectList.refresh();
+		  });
+	  }
 
-    return (
-      <Router basename="/dashboard">
-        <div>
-          <div className="text-right add-button">
-            <button type="button" 
-                    className="btn btn-primary btn-sm"
-                    onClick={this.handleAddProject}>
-              <i className="glyphicon glyphicon-plus"></i>
-              Add Project
-            </button>
-          </div>
+	/** -------------- Events -------------- */
 
-          <EditProjectDialog 
-            saveAction={this.addNewProject}
-            ref={(domNode) => { this.projectDialog = domNode; }}
-            />
-          <Route path="/" component={projectList} />
-        </div>
-      </Router>
-    );
-  }
+	render() {
+		const projectList = ({ location, history }) => {
+			let q = Utils.queryParams(location)
+			let page = parseInt(q.page !== undefined ? q.page : 1)
+
+			return <ProjectList
+						source={`/api/projects/?ordering=-created_at&page=${page}`}
+						ref={(domNode) => { this.projectList = domNode; }} 
+						currentPage={page}
+						history={history}
+					/>
+		};
+
+		return (
+		<Router basename="/dashboard">
+			<div className="dashboard-content-container">
+				{ this.renderControl }
+				<EditProjectDialog 
+					saveAction={p => this.addNewProject(p)}
+					ref={(domNode) => { this.refProjectDialog = domNode; }}
+				/>
+				<Route path="/" component={projectList} />
+			</div>
+		</Router>
+		);
+	}
+
+	/** ------------------ View ------------------- */
+
+	get renderControl() {
+		return (
+			<div className="w100 action-controller mb-3">
+				<div className="d-flex flex-row justify-content-between">
+					<div className="all-project align-items-center d-flex">
+						All Projects
+					</div>
+					<div className="action-container">
+						<button className="btn primary rounded outlined db-btn" onClick={() => this.handleAddProject()}>
+							<span className="btn-label">Add Project</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		)
+	}
 }
 
-$(function(){
-    $("[data-dashboard]").each(function(){
-        window.ReactDOM.render(<Dashboard/>, $(this).get(0));
-    });
-
+$(function() {
+	window.ReactDOM.render(<Dashboard />, document.querySelector("[data-dashboard]"))
 
     // Warn users if there's any sort of work in progress before
     // they press the back button on the browser

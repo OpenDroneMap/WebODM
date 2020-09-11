@@ -255,7 +255,6 @@ class ProjectListItem extends React.Component {
     
     PluginsAPI.Dashboard.triggerAddNewTaskButton({projectId: this.state.data.id, onNewTaskAdded: this.newTaskAdded}, (button) => {
         if (!button) return;
-
         this.setState(update(this.state, {
             buttons: {$push: [button]}
         }));
@@ -398,10 +397,24 @@ class ProjectListItem extends React.Component {
     const numTasks = data.tasks.length;
 
     return (
-      <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
-         href="javascript:void(0);"
-         ref={this.setRef("dropzone")}
-         >
+      <div className={"project-list-item project-card" + (refreshing ? "refreshing" : "")} ref={this.setRef("dropzone")} >
+
+        <div className="d-flex flex-row">
+          <div className="flex-grow-1 d-flex flex-row">
+            <div className="project-info">
+              <div className="project-name">{data.name}</div>
+              { data.description && <div className="project-description">{data.description}</div> }
+            </div>
+            <div className="action-section ml-3">
+              <button type="button" class="edit-project-btn btn btn-link btn-sm" onClick={this.handleEditProject}>
+              <i className='far fa-edit'></i>&nbsp;Edit
+              </button>
+            </div>
+          </div>
+          { this.renderActionButtons }
+        </div>
+
+        <hr/>
 
         <EditProjectDialog 
           ref={(domNode) => { this.editProjectDialog = domNode; }}
@@ -417,57 +430,23 @@ class ProjectListItem extends React.Component {
 
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
-          <div className="btn-group pull-right">
-            {this.hasPermission("add") ? 
-              <div className={"asset-download-buttons btn-group " + (this.state.upload.uploading ? "hide" : "")}>
-                <button type="button" 
-                      className="btn btn-primary btn-sm"
-                      onClick={this.handleUpload}
-                      ref={this.setRef("uploadButton")}>
-                  <i className="glyphicon glyphicon-upload"></i>
-                  Select Images and GCP
-                </button>
-                <button type="button" 
-                      className="btn btn-default btn-sm"
-                      onClick={this.handleImportTask}>
-                  <i className="glyphicon glyphicon-import"></i> Import
-                </button>
-                {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
-              </div>
-            : ""}
+          
 
-            <button disabled={this.state.upload.error !== ""} 
-                    type="button"
-                    className={"btn btn-danger btn-sm " + (!this.state.upload.uploading ? "hide" : "")} 
-                    onClick={this.cancelUpload}>
-              <i className="glyphicon glyphicon-remove-circle"></i>
-              Cancel Upload
-            </button> 
-
-            <button type="button" className="btn btn-default btn-sm" onClick={this.viewMap}>
-              <i className="fa fa-globe"></i> View Map
-            </button>
-          </div>
-
-          <span className="project-name">
-            {data.name}
-          </span>
-          <div className="project-description">
-            {data.description}
-          </div>
           <div className="row project-links">
-            {numTasks > 0 ? 
+            {/* {numTasks > 0 ? 
               <span>
                 <i className='fa fa-tasks'>
                 </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
                   {numTasks} Tasks <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
                 </a>
               </span>
-              : ""}
-
-            <i className='far fa-edit'>
-            </i> <a href="javascript:void(0);" onClick={this.handleEditProject}> Edit
-            </a>
+              : ""} */}
+              <div className="task-toggle d-flex flex-row align-items-center">
+                <i className='fa fa-tasks'></i> 
+                <div onClick={this.toggleTaskList}>
+                 <span>Tasks ({numTasks})</span>&nbsp;<i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                </div>
+              </div>
           </div>
         </div>
         <i className="drag-drop-icon fa fa-inbox"></i>
@@ -508,8 +487,44 @@ class ProjectListItem extends React.Component {
             /> : ""}
 
         </div>
-      </li>
+      </div>
     );
+  }
+
+  get renderActionButtons() {
+    return (
+      <div className="action-btn-container d-flex flex-row align-items-center">
+        {
+          this.hasPermission("add") &&
+          <div className="add-btn-group">
+              <button ref={this.setRef("uploadButton")} onClick={this.handleUpload} type="button" className="btn small btn-sm db-btn primary rounded primary">
+                  <i className="fas fa-arrow-circle-up"></i>&nbsp;Select Images and GCP
+              </button>
+
+              <button onClick={this.handleImportTask} type="button" className="btn small btn-sm db-btn primary rounded primary outlined ml-2">
+                  <i className="fas fa-download"></i>&nbsp;Import
+              </button>
+              {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
+          </div>
+        }
+  
+        {
+          this.state.upload.uploading && 
+          <button
+            onClick={this.cancelUpload}
+            disabled={this.state.upload.error !== ""}
+            type="button"
+            className={"btn btn-sm db-btn rounded btn-danger ml-2 "}>
+            Cancel
+          </button>
+        }
+
+        <button onClick={this.viewMap} type="button" className="btn btn-sm db-btn primary rounded primary outlined ml-2">
+            <i className="fas fa-map-marked-alt"></i>&nbsp;View Map
+        </button>
+        
+      </div>
+    )
   }
 }
 
