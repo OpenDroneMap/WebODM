@@ -1,13 +1,13 @@
-import React from 'react'
-import './css/Dashboard.scss'
-import ProjectList from './components/ProjectList'
-import Utils from './classes/Utils'
-import EditProjectDialog from './components/EditProjectDialog';
+import React from "react"
+import "./css/Dashboard.scss"
+import ProjectList from "./components/ProjectList"
+import Utils from "./classes/Utils"
+import EditProjectDialog from "./components/EditProjectDialog"
 import {
   BrowserRouter as Router,
   Route
-} from 'react-router-dom'
-import $ from 'jquery'
+} from "react-router-dom"
+import $ from "jquery"
 
 
 class Dashboard extends React.Component {
