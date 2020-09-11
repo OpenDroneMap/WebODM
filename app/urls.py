@@ -1,4 +1,5 @@
 from django.conf.urls import url, include
+from django.urls import path
 
 from .views import app as app_views, public as public_views
 from .plugins.views import app_view_handler
@@ -19,6 +20,9 @@ if settings.TESTING:
     sync_plugin_db()
 
 urlpatterns = [
+    path("logout", app_views.logout),
+    path("", include("django.contrib.auth.urls")),
+    path("", include("social_django.urls")),
     url(r'^$', app_views.index, name='index'),
     url(r'^welcome/$', app_views.welcome, name='welcome'),
     url(r'^dashboard/$', app_views.dashboard, name='dashboard'),

@@ -76,9 +76,11 @@ target/
 # celery beat schedule file
 celerybeat-schedule
 celerybeat.pid
+celerybeat-schedule.db
 
 # dotenv
 .env
+.env.secret
 
 # virtualenv
 venv/
@@ -97,3 +99,4 @@ pip-selfcheck.json
 package-lock.json
 .cronenv
 .initialized
+.vscode/

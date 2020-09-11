@@ -19,6 +19,7 @@ django-webpack-loader==0.6.0
 djangorestframework==3.9.1
 djangorestframework-jwt==1.9.0
 drf-nested-routers==0.11.1
+social-auth-app-django~=3.1
 funcsigs==1.0.2
 futures==3.0.5
 geojson==2.3.0
@@ -39,6 +40,8 @@ psycopg2-binary==2.8.4
 PyJWT==1.5.3
 pyodm==1.5.4
 pyparsing==2.1.10
+python-jose~=3.0
+python-dotenv~=0.9
 pytz==2019.3
 rcssmin==1.0.6
 redis==3.2.0

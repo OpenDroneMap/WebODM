@@ -32,6 +32,9 @@ services:
       - WO_DEBUG
       - WO_BROKER
       - WO_DEV
+      - WO_AUTH0_DOMAIN
+      - WO_AUTH0_KEY
+      - WO_AUTH0_SECRET
     restart: unless-stopped
     oom_score_adj: 0
   broker:
