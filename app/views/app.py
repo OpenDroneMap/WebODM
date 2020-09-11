@@ -1,11 +1,12 @@
 import json
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout as log_out
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from guardian.shortcuts import get_objects_for_user
+from urllib.parse import urlencode
 
 from nodeodm.models import ProcessingNode
 from app.models import Project, Task
@@ -30,6 +31,16 @@ def index(request):
 
     return redirect(settings.LOGIN_REDIRECT_URL if request.user.is_authenticated
                     else settings.LOGIN_URL)
+
+def logout(request):
+    log_out(request)
+    return_to = urlencode({"returnTo": request.build_absolute_uri("/")})
+    logout_url = "https://%s/v2/logout?client_id=%s&%s" % (
+        settings.SOCIAL_AUTH_AUTH0_DOMAIN,
+        settings.SOCIAL_AUTH_AUTH0_KEY,
+        return_to,
+    )
+    return HttpResponseRedirect(logout_url)
 
 @login_required
 def dashboard(request):

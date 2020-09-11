@@ -30,6 +30,20 @@ DEFAULT_SSL="$WO_SSL"
 DEFAULT_SSL_INSECURE_PORT_REDIRECT="$WO_SSL_INSECURE_PORT_REDIRECT"
 DEFAULT_BROKER="$WO_BROKER"
 
+
+SECRET_ENV_FILE=${__dirname}/.env.secret
+if test -f "$SECRET_ENV_FILE"; then
+    echo "Using secret variables from $SECRET_ENV_FILE"
+else
+    echo "ERROR: $SECRET_ENV_FILE does not exist, please create it before continuing"
+    exit 1
+fi
+source "$SECRET_ENV_FILE"
+export WO_AUTH0_SECRET="$WO_AUTH0_SECRET"
+
+export WO_AUTH0_KEY="$WO_AUTH0_KEY"
+export WO_AUTH0_DOMAIN="$WO_AUTH0_DOMAIN"
+
 # Parse args for overrides
 POSITIONAL=()
 while [[ $# -gt 0 ]]
