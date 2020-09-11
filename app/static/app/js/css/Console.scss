@@ -1,17 +1,22 @@
+@import "../../css/var.scss";
+
 .console-buttons{
     margin-left: 16px;
     margin-bottom: 16px;
     float: right;
     text-align: right;
-    a{
+    a {
         margin-left: 4px;
     }
 }
 
-.console{
+.console {
     .exit-fullscreen{
         display: none;
     }
+
+    border-radius: 8px;
+    border-color: $color-dark;
 }
 
 .console:fullscreen{

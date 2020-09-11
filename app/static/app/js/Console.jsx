@@ -158,12 +158,12 @@ class Console extends React.Component {
 
     if (this.props.showConsoleButtons){
         items.push(<div key="buttons" className="console-buttons">
-            <a href="javascript:void(0);" onClick={() => this.downloadTxt()} className="btn btn-sm btn-primary" title="Download To File">
+            <button href="javascript:void(0);" onClick={() => this.downloadTxt()} className="btn rounded db-btn primary mr-2" title="Download To File">
                 <i className="fa fa-download"></i>
-            </a>
-            <a href="javascript:void(0);" onClick={this.enterFullscreen} className="btn btn-sm btn-primary" title="Toggle Fullscreen">
+            </button>
+            <button href="javascript:void(0);" onClick={this.enterFullscreen} className="btn rounded db-btn primary" title="Toggle Fullscreen">
                 <i className="fa fa-expand"></i>
-            </a>
+            </button>
         </div>);
     }
 

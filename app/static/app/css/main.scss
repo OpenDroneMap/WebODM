@@ -853,3 +853,10 @@ footer {
 .w100 {
     width: 100%;
 }
+
+.hover:hover {
+    cursor: pointer;
+    &.underline {
+        text-decoration: underline;
+    }
+}

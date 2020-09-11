@@ -1,4 +1,75 @@
-.task-list-item{
+@import "../../css/var.scss";
+
+.task-list-item {
+    border-radius: 8px;
+    padding: 16px;
+    .task-name {
+        color: $color-primary;
+        font-size: 20px;
+    }
+
+    .dropdown-menu {
+        min-width: 320px;
+        .menu-item {
+            padding-top: 8px;
+            padding-bottom: 8px;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+    }
+
+    .task-info {
+
+        .labels {
+            strong {
+                font-weight: bold;
+            }
+
+            .task-value {
+                font-weight: 300;
+            }
+    
+        }
+    }
+    .console-output-btns {
+        button {
+            background: transparent;
+            border-color: $color-dark;
+            color: $color-dark;
+            &:not(.active):focus {
+                box-shadow: 0 0 0 0.2rem rgba(60, 60, 60, 0.3);
+            }
+
+            &.active {
+                background: $color-info;
+                border-color: $color-info;
+                color: white;
+                
+            }
+        }
+    }
+
+    .task-status {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-left: 12px;
+        padding-right: 12px;
+        color: white;
+        width: 100%;
+        font-size: 14px;
+
+        &.status-neutral {
+            background: #818181;
+        }
+
+        &.status-done {
+            background: $color-success;
+        }
+
+        &.status-error {
+            background: $color-error;
+        }
+    }
     .row{
         margin: 0;
         padding: 4px;

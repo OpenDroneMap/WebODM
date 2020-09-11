@@ -433,14 +433,6 @@ class ProjectListItem extends React.Component {
           
 
           <div className="row project-links">
-            {/* {numTasks > 0 ? 
-              <span>
-                <i className='fa fa-tasks'>
-                </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
-                  {numTasks} Tasks <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
-                </a>
-              </span>
-              : ""} */}
               <div className="task-toggle d-flex flex-row align-items-center">
                 <i className='fa fa-tasks'></i> 
                 <div onClick={this.toggleTaskList}>
@@ -453,12 +445,13 @@ class ProjectListItem extends React.Component {
         <div className="row">
           {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload}/> : ""}
           
-          {this.state.upload.error !== "" ? 
+          {
+            this.state.upload.error !== "" &&
             <div className="alert alert-warning alert-dismissible">
-                <button type="button" className="close" aria-label="Close" onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
+                <button type="button" className="close flat" aria-label="Close" onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
                 {this.state.upload.error}
             </div>
-            : ""}
+          }
 
           {this.state.upload.editing ? 
             <NewTaskPanel
@@ -497,11 +490,11 @@ class ProjectListItem extends React.Component {
         {
           this.hasPermission("add") &&
           <div className="add-btn-group">
-              <button ref={this.setRef("uploadButton")} onClick={this.handleUpload} type="button" className="btn small btn-sm db-btn primary rounded primary">
+              <button ref={this.setRef("uploadButton")} onClick={this.handleUpload} type="button" className="btn btn-sm db-btn primary rounded primary">
                   <i className="fas fa-arrow-circle-up"></i>&nbsp;Select Images and GCP
               </button>
 
-              <button onClick={this.handleImportTask} type="button" className="btn small btn-sm db-btn primary rounded primary outlined ml-2">
+              <button onClick={this.handleImportTask} type="button" className="btn btn-sm db-btn primary rounded primary outlined ml-2">
                   <i className="fas fa-download"></i>&nbsp;Import
               </button>
               {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
@@ -514,7 +507,7 @@ class ProjectListItem extends React.Component {
             onClick={this.cancelUpload}
             disabled={this.state.upload.error !== ""}
             type="button"
-            className={"btn btn-sm db-btn rounded btn-danger ml-2 "}>
+            className={"btn db-btn rounded btn-danger ml-2 "}>
             Cancel
           </button>
         }

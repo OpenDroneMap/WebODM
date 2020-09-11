@@ -42,3 +42,28 @@ button.close.flat {
         outline: unset; 
     }
 }
+
+.btn-group {
+    &.small {
+        button {
+            padding: .25rem .5rem;
+            font-size: 12px;
+        }
+
+        $small-brd: 60px;
+        &.rounded {
+            button {
+                border-radius: 0;
+                &:first-child {
+                    border-top-left-radius: $small-brd;
+                    border-bottom-left-radius: $small-brd;
+                }
+
+                &:last-child {
+                    border-top-right-radius: $small-brd;
+                    border-bottom-right-radius: $small-brd;
+                }
+            }
+        }
+    }
+}

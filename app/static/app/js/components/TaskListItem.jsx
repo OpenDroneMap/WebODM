@@ -376,7 +376,7 @@ class TaskListItem extends React.Component {
 
 
     let expanded = "";
-    if (this.state.expanded){
+    if (this.state.expanded) {
       let showOrthophotoMissingWarning = false,
           showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
           showTaskWarning = this.state.friendlyTaskError !== "" && task.status == statusCodes.FAILED,
@@ -393,16 +393,17 @@ class TaskListItem extends React.Component {
         });
       };
 
+      
       if (task.status === statusCodes.COMPLETED){
         if (task.available_assets.indexOf("orthophoto.tif") !== -1){
-          addActionButton(" View Map", "btn-primary", "fa fa-globe", () => {
+          addActionButton(" View Map", "db-btn primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         }else{
           showOrthophotoMissingWarning = true;
         }
 
-        addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
+        addActionButton(" View 3D Model", "db-btn primary", "fa fa-cube", () => {
           location.href = `/3d/project/${task.project}/task/${task.id}/`;
         });
       }
@@ -410,7 +411,7 @@ class TaskListItem extends React.Component {
       // Ability to change options
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 ||
           (!task.processing_node)){
-        addActionButton("Edit", "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
+        addActionButton("Edit", "db-btn primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
         }, {
           className: "inline"
@@ -419,7 +420,7 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
           (task.processing_node || imported)){
-        addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: "Cannot cancel task."}));
+        addActionButton("Cancel", "db-btn primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: "Cannot cancel task."}));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
@@ -431,12 +432,12 @@ class TaskListItem extends React.Component {
                               task.can_rerun_from[1] :
                               null;
 
-          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
+          addActionButton("Restart", "db-btn primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
             subItems: this.getRestartSubmenuItems()
           });
       }
 
-      addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
+      addActionButton("Delete", "db-btn btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
         confirm: "All information related to this task, including images, maps and models will be deleted. Continue?",
         defaultError: "Cannot delete task."
       }));
@@ -469,7 +470,7 @@ class TaskListItem extends React.Component {
                               className={"btn btn-sm dropdown-toggle "  + button.className}
                               data-toggle="dropdown"><span className="caret"></span></button>,
                       <ul key="dropdown-menu" className="dropdown-menu">
-                        {subItems.map(subItem => <li key={subItem.label}>
+                        {subItems.map(subItem => <li key={subItem.label} className="menu-item">
                             <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon + ' fa-fw '}></i>{subItem.label}</a>
                           </li>)}
                       </ul>]}
@@ -479,35 +480,54 @@ class TaskListItem extends React.Component {
     
       expanded = (
         <div className="expanded-panel">
+          <hr/>
           <div className="row">
             <div className="col-md-12 no-padding">
-              <div className="console-switch text-right pull-right">
-                  <div className="console-output-label">Task Output: </div><ul className="list-inline">
-                    <li>
-                      <div className="btn-group btn-toggle"> 
-                        <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>On</button>
-                        <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>Off</button>
-                      </div>
-                    </li>
-                  </ul>
+              <div className="console-switch d-flex flex-row justify-content-end align-items-center">
+                  <div className="console-output-label">Task Output: </div>
+                  <div class="btn-group small rounded console-output-btns" role="group" aria-label="Basic example">
+                    <button onClick={this.setView("console")} type="button" class={"btn " + (this.state.view === "console" ? "active" : "")}>
+                      <span className="px-3">On</span>
+                    </button>
+                    <button onClick={this.setView("basic")} type="button" class={"btn " + (this.state.view === "basic" ? "active" : "")}>
+                      <span className="px-3">Off</span>
+                    </button>
+                  </div>
               </div>
 
-              <div className="mb">
-                <div className="labels">
-                  <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
-                </div>
-                <div className="labels">
-                    <strong>Processing Node: </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
-                </div>
-                {Array.isArray(task.options) ?
-                   <div className="labels">
-                    <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
-                  </div>
-                : ""}
+              <div className="mb task-info">
+                {
+                  (() => {
+                    const data = [
+                      {
+                        label: "Created on",
+                        value: (new Date(task.created_at)).toLocaleString()
+                      },
+                      {
+                        label: "Processing Node",
+                        value: task.processing_node_name || "-"
+                      }
+                    ]
+
+                    if (Array.isArray(task.options)) {
+                      data.push({
+                        label: "Options",
+                        value: this.optionsToList(task.options)
+                      })
+                    }
+                    return data.map((d, i) => (
+                      <div className="labels" key={"info-" + i}>
+                        <strong>{ d.label }&nbsp;:&nbsp;&nbsp;</strong>
+                        <span className="task-value">{ d.value }</span>
+                      </div>
+                    ))
+                  })()
+                }
                 {/* TODO: List of images? */}
               </div> 
               
-              {this.state.view === 'console' ?
+              {
+                this.state.view === "console" &&
                 <Console
                     className="floatfix"
                     source={this.consoleOutputUrl}
@@ -518,7 +538,8 @@ class TaskListItem extends React.Component {
                     onAddLines={this.checkForCommonErrors}
                     showConsoleButtons={true}
                     maximumLines={500}
-                    /> : ""}
+                />
+              }
 
               {showOrthophotoMissingWarning ?
               <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.</span></div> : ""}
@@ -563,13 +584,17 @@ class TaskListItem extends React.Component {
 
     // @param type {String} one of: ['neutral', 'done', 'error']
     const getStatusLabel = (text, type = 'neutral', progress = 100) => {
-      let color = 'rgba(255, 255, 255, 0.0)';
-      if (type === 'done') color = this.backgroundSuccessColor;
-      else if (type === 'error') color = this.backgroundFailedColor;
-      return (<div 
-            className={"status-label theme-border-primary " + type} 
-            style={{background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)`}}
-            title={text}>{text}</div>);
+
+      let clazz = "status-neutral"
+      if (type === "done") {
+        clazz = "status-done"
+      } else if (type === "error") {
+        clazz = "status-error"
+      }
+
+      return (
+        <div className={"badge badge-pill task-status " + clazz}>{ text }</div>
+      )
     }
 
     let statusLabel = "";
@@ -605,10 +630,13 @@ class TaskListItem extends React.Component {
     }
 
     return (
-      <div className="task-list-item">
-        <div className="row">
+      <div className="task-list-item card">
+        <div className="row mt-0 task-header align-items-center">
           <div className="col-sm-5 name">
-            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
+            <div className="d-flex flex-row task-name hover underline align-items-center" onClick={this.toggleExpanded}>
+              <i className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i>
+              <span>&nbsp;&nbsp;{name}</span>
+            </div>
           </div>
           <div className="col-sm-1 details">
             <i className="far fa-image"></i> {task.images_count}
@@ -617,9 +645,12 @@ class TaskListItem extends React.Component {
             <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
           <div className="col-sm-3">
-            {showEditLink ?
-              <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
-              : statusLabel}
+            {
+              showEditLink ?
+              <div className="hover" onClick={this.startEditing}>{statusLabel}</div>
+              :
+              statusLabel
+            }
           </div>
           <div className="col-sm-1 text-right">
             <div className="status-icon">

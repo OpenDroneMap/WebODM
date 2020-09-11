@@ -79,7 +79,7 @@ class TaskList extends React.Component {
     }
 
     return (
-      <div className="task-list">
+      <div className="task-list w100">
         {message}
 
         {this.state.tasks.map(task => (
