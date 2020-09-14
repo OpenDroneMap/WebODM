@@ -1,4 +1,4 @@
-
+@import "../css/var.scss";
 /*------------ custom button ----------------*/
 
 button.db-btn {
@@ -64,6 +64,16 @@ button.close.flat {
                     border-bottom-right-radius: $small-brd;
                 }
             }
+        }
+    }
+}
+
+.db-dropdown-menu {
+    .dropdown-item:not(.disabled) {
+        cursor: pointer;
+
+        &.active {
+            background: $color-primary !important;
         }
     }
 }

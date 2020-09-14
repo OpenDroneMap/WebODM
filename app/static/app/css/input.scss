@@ -17,3 +17,7 @@ textarea.db-input {
         box-shadow: 0 0 0 0.2rem rgba(0, 150, 136, 0.3);
     }
 }
+
+select.db-input {
+    height: calc(1.9em + .75rem + 2px);
+}

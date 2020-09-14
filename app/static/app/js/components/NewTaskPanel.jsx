@@ -124,7 +124,7 @@ class NewTaskPanel extends React.Component {
 
   render() {
     return (
-      <div className="new-task-panel theme-background-highlight">
+      <div className="new-task-panel theme-background-highlight col-12">
         <div className="form-horizontal">
           <div className={this.state.inReview ? "disabled" : ""}>
             <p>{this.props.filesCount} files selected. Please check these additional options:</p>
@@ -139,32 +139,30 @@ class NewTaskPanel extends React.Component {
 
             {this.state.editTaskFormLoaded && this.props.showResize ?
               <div>
-                <div className="form-group">
-                  <label className="col-sm-2 control-label">Resize Images</label>
-                  <div className="col-sm-10">
+                <div className="form-group row">
+                  <label className="control-label col-2">Resize Images</label>
+                  <div className="col-10">
                       <div className="btn-group">
-                      <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                          {ResizeModes.toHuman(this.state.resizeMode)} <span className="caret"></span>
-                      </button>
-                      <ul className="dropdown-menu">
-                          {ResizeModes.all().map(mode =>
-                          <li key={mode}>
-                              <a href="javascript:void(0);" 
-                                  onClick={this.setResizeMode(mode)}>
-                                  <i style={{opacity: this.state.resizeMode === mode ? 1 : 0}} className="fa fa-check"></i> {ResizeModes.toHuman(mode)}</a>
-                          </li>
-                          )}
-                      </ul>
+                        <button type="button" className="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
+                            {ResizeModes.toHuman(this.state.resizeMode)}&nbsp;<span className="caret"></span>
+                        </button>
+                        <div className="dropdown-menu db-dropdown-menu">
+                            {ResizeModes.all().map(mode =>
+                            <div key={mode} className={"dropdown-item " + (this.state.resizeMode === mode ? "active" : "")} onClick={this.setResizeMode(mode)}>
+                              <i style={{opacity: this.state.resizeMode === mode ? 1 : 0}} className="fa fa-check"></i>&nbsp;{ResizeModes.toHuman(mode)}
+                            </div>
+                            )}
+                        </div>
                       </div>
                       <div className={"resize-control " + (this.state.resizeMode === ResizeModes.NO ? "hide" : "")}>
                       <input 
                           type="number" 
                           step="100"
-                          className="form-control"
+                          className="form-control db-input"
                           onChange={this.handleResizeSizeChange} 
                           value={this.state.resizeSize} 
                       />
-                      <span>px</span>
+                      <span className="pl-2">px</span>
                       </div>
                   </div>
                 </div>
@@ -180,7 +178,8 @@ class NewTaskPanel extends React.Component {
 
           {this.state.editTaskFormLoaded ? 
             <div className="form-group">
-              <div className="col-sm-offset-2 col-sm-10 text-right">
+              <hr/>
+              <div className="d-flex justify-content-end">
                 {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{marginRight: 4}}><i className="glyphicon glyphicon-remove-circle"></i> Cancel</button>}
                 {this.state.loading ?
                   <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>Loading...</button>

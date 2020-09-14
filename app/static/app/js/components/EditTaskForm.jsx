@@ -476,12 +476,13 @@ class EditTaskForm extends React.Component {
   }
 
   render() {
+    const formId = Math.random().toString(36).substring(7)
     if (this.state.error){
       return (<div className="edit-task-panel">
           <div className="alert alert-warning">
               <div dangerouslySetInnerHTML={{__html:this.state.error}}></div>
               <button className="btn btn-sm btn-primary" onClick={this.retryLoad}>
-                <i className="fa fa-rotate-left"></i> Retry
+                <i className="fa fa-rotate-left"></i>&nbsp;Retry
               </button>
           </div>
         </div>);
@@ -490,10 +491,10 @@ class EditTaskForm extends React.Component {
     let taskOptions = "";
     if (this.formReady()){
 
-      const optionsSelector = (<div>
+      const optionsSelector = (<div className="d-flex flex-row align-items-center">
         <select 
             title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
-            className="form-control" 
+            className="form-control db-input" 
             value={this.state.selectedPreset.id} 
             onChange={this.handleSelectPreset}>
         {this.state.presets.map(preset => 
@@ -502,32 +503,32 @@ class EditTaskForm extends React.Component {
         </select>
 
         {!this.state.presetActionPerforming ?
-        <div className="btn-group presets-dropdown">
-            <button type="button" className="btn btn-default" title="Edit Task Options" onClick={this.handleEditPreset}>
-            <i className="fa fa-sliders-h"></i> Edit
+        <div className="btn-group presets-dropdown pl-2">
+            <button style={{ width: 156 }} type="button" className="btn btn-secondary" title="Edit Task Options" onClick={this.handleEditPreset}>
+              <i className="fa fa-sliders-h"></i>&nbsp;Edit
             </button>
-            <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <button type="button" className="btn btn-secondary dropdown-toggle" data-toggle="dropdown" id={"btn-group-" + formId}>
                 <span className="caret"></span>
             </button>
-            <ul className="dropdown-menu">
-            <li>
-                <a href="javascript:void(0);" onClick={this.handleEditPreset}><i className="fa fa-sliders-h"></i> Edit</a>
-            </li>
-            <li className="divider"></li>
-
-            {this.state.selectedPreset.id !== -1 ?
-                <li>
-                <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-copy"></i> Duplicate</a>
-                </li>
-            :
-                <li>
-                <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-save"></i> Save</a>
-                </li>
-            }
-            <li className={this.state.selectedPreset.system ? "disabled" : ""}>
-                <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash"></i> Delete</a>
-            </li>
-            </ul>
+            <div className="dropdown-menu db-dropdown-menu" aria-labelledby={"btn-group-" + formId}>
+              <div className="dropdown-item" onClick={this.handleEditPreset}>
+                <i className="fa fa-sliders-h"></i>&nbsp;Edit
+              </div>
+              <div className="dropdown-divider"></div>
+              {
+                this.state.selectedPreset.id !== -1 ?
+                <div className="dropdown-item" onClick={this.handleDuplicateSavePreset}>
+                  <i className="fa fa-copy"></i>&nbsp;Duplicate
+                </div>
+              :
+                <div className="dropdown-item" onClick={this.handleDuplicateSavePreset}>
+                  <i className="fa fa-save"></i>&nbsp;Save
+                </div>
+              }
+              <div className={(this.state.selectedPreset.system ? "disabled" : "") + " dropdown-item"} onClick={this.state.selectedPreset.system ? undefined : this.handleDuplicateSavePreset}>
+                <i className="fa fa-trash"></i>&nbsp;Delete
+              </div>
+            </div>
         </div>
         : <i className="preset-performing-action-icon fa fa-cog fa-spin fa-fw"></i>}
         <ErrorMessage className="preset-error" bind={[this, 'presetError']} />
@@ -535,21 +536,21 @@ class EditTaskForm extends React.Component {
 
       taskOptions = (
         <div>
-          <div className="form-group">
-            <label className="col-sm-2 control-label">Processing Node</label>
-              <div className="col-sm-10">
-                <select className="form-control" value={this.state.selectedNode.key} onChange={this.handleSelectNode}>
+          <div className="form-group row">
+            <label className="col-2 control-label">Processing Node</label>
+              <div className="col-10">
+                <select className="form-control db-input" value={this.state.selectedNode.key} onChange={this.handleSelectNode}>
                 {this.state.processingNodes.map(node => 
                   <option value={node.key} key={node.key} disabled={!node.enabled}>{node.label}</option>
                 )}
                 </select>
               </div>
           </div>
-          <div className="form-group form-inline">
-            <label className="col-sm-2 control-label">Options</label>
-            <div className="col-sm-10">
+          <div className="form-group row">
+            <label className="col-2 control-label">Options:&nbsp;</label>
+            <div className="col-10 d-flex flex-row align-items-center w100">
               {!this.props.inReview ? optionsSelector : 
-               <div className="review-options">
+               <div className="review-options d-flex flex-row align-items-center">
                 {this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
                </div>}
             </div>
@@ -570,20 +571,20 @@ class EditTaskForm extends React.Component {
         );
     }else{
       taskOptions = (<div className="form-group">
-          <div className="col-sm-offset-2 col-sm-10">Loading processing nodes and presets... <i className="fa fa-sync fa-spin fa-fw"></i></div>
+          <div className="">Loading processing nodes and presets... <i className="fa fa-sync fa-spin fa-fw"></i></div>
         </div>);
     }
 
     return (
       <div className="edit-task-form">
-        <div className="form-group">
-          <label className="col-sm-2 control-label">Name</label>
-          <div className="col-sm-10">
+        <div className="form-group row">
+          <label className="col-2 control-label">Name</label>
+          <div className="col-10">
             <input type="text" 
-              onChange={this.handleNameChange} 
-              className="form-control"
-              placeholder={this.namePlaceholder} 
-              value={this.state.name} 
+                onChange={this.handleNameChange} 
+                className="form-control db-input"
+                placeholder={this.namePlaceholder} 
+                value={this.state.name} 
             />
           </div>
         </div>
