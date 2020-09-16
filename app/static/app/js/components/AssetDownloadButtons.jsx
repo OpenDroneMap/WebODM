@@ -27,25 +27,25 @@ class AssetDownloadButtons extends React.Component {
     render(){
         const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
 
-        return (<div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
-          <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
-            <i className="glyphicon glyphicon-download"></i>{this.props.showLabel ? " Download Assets" : ""}
+        return (<div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group small" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
+          <button type="button" className={"btn btn-sm btn-info db-btn px-3 " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
+            <i className="fas fa-download"></i>{this.props.showLabel ? " Download Assets" : ""}
           </button>
           {this.props.showLabel ? 
-          <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
+          <button type="button" className={"btn btn-info db-btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
                 <span className="caret"></span>
           </button> : ""}
-          <ul className="dropdown-menu">
+          <div className="dropdown-menu db-dropdown-menu">
             {assetDownloads.map((asset, i) => {
                 if (!asset.separator){
-                    return (<li key={i}>
+                    return (<div className="dropdown-item" key={i}>
                             <a href={asset.downloadUrl(this.props.task.project, this.props.task.id)}><i className={asset.icon + " fa-fw"}></i> {asset.label}</a>
-                        </li>);
+                        </div>)
                 }else{
-                    return (<li key={i} className="divider"></li>);
+                    return (<div key={i} className="divider"></div>)
                 }
             })}
-          </ul>
+          </div>
         </div>);
     }
 }

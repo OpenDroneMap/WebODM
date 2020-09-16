@@ -469,11 +469,11 @@ class TaskListItem extends React.Component {
                               type="button"
                               className={"btn btn-sm dropdown-toggle "  + button.className}
                               data-toggle="dropdown"><span className="caret"></span></button>,
-                      <ul key="dropdown-menu" className="dropdown-menu">
-                        {subItems.map(subItem => <li key={subItem.label} className="menu-item">
-                            <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon + ' fa-fw '}></i>{subItem.label}</a>
-                          </li>)}
-                      </ul>]}
+                      <div key="dropdown-menu" className="dropdown-menu db-dropdown-menu">
+                        {subItems.map(subItem => <div key={subItem.label} className="dropdown-item" onClick={subItem.onClick}>
+                             <i className={subItem.icon + ' fa-fw '}></i>&nbsp;{subItem.label}
+                          </div>)}
+                      </div>]}
                   </div>);
             })}
           </div>);

@@ -71,9 +71,27 @@ button.close.flat {
 .db-dropdown-menu {
     .dropdown-item:not(.disabled) {
         cursor: pointer;
+        color: #747879;
+
+        &:hover {
+            background: $color-primary;
+            color: white;
+
+            a {
+                color: white !important;
+            }
+        }
 
         &.active {
             background: $color-primary !important;
+            color: white;
+        }
+
+        a {
+            color: #747879;
+            &:hover {
+                color: $color-primary;
+            }
         }
     }
 }
