@@ -96,7 +96,7 @@ class MapView extends React.Component {
         </div>
 
         {this.props.title ? 
-          <h3 class="title">{this.props.title}</h3>
+          <h4 class="title">{this.props.title}</h4>
         : ""}
 
         <div className="map-container">

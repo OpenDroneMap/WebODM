@@ -23,16 +23,14 @@
     <script src="/static/app/js/vendor/potree/libs/plasio/js/laslaz.js"></script>
 {% endblock %}
 
-{% block content %}
-	{% load render_bundle from webpack_loader %}
-	{% render_bundle 'ModelView' attrs='async' %}
-
-	<h3><i class="fa fa-cube"></i> {{title}}</h3>
+{% block page-wrapper %}
+<div id="page-wrapper">
     
-	<div data-modelview class="full-height"
-		{% for key, value in params %}
-			data-{{key}}="{{value}}"
-		{% endfor %}
-	></div>
-
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle 'ModelView' attrs='async' %}
+    
+    <div data-modelview {% for key, value in params %} data-{{key}}="{{value}}" {% endfor %}></div>
+</div>
 {% endblock %}
+
+{% block footer %}{% endblock %}
