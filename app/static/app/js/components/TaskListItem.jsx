@@ -449,7 +449,7 @@ class TaskListItem extends React.Component {
 
       actionButtons = (<div className="action-buttons">
             {task.status === statusCodes.COMPLETED ?
-              <AssetDownloadButtons task={this.state.task} disabled={disabled} />
+          <AssetDownloadButtons task={this.state.task} disabled={disabled} buttonClass="db-btn" />
             : ""}
             {actionButtons.map(button => {
               const subItems = button.options.subItems || [];
