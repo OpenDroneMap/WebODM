@@ -1,7 +1,8 @@
 {% extends "app/logged_in_base.html" %}
 {% load i18n %}
 
-{% block content %}
+{% block page-wrapper %}
+<div id="page-wrapper">
 	{% load render_bundle from webpack_loader %}
 	{% render_bundle 'MapView' attrs='async' %}
 
@@ -10,5 +11,6 @@
 			data-{{key}}="{{value}}"
 		{% endfor %}
 	></div>
-
 {% endblock %}
+
+{% block footer %}{% endblock %}

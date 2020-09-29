@@ -1,9 +1,11 @@
 [data-mapview]{
-    height: calc(100vh - 100px);
+    position: fixed;
+    top: 83px;
+    bottom: 0; left: 0; right: 0;
 }
 
 .map-view{
-    height: calc(100% - 20px);
+    height: 100%;
     position: relative;
 
     input[type="range"]{
@@ -16,6 +18,14 @@
 
     .map-type-selector{
         float: right;
+    }
+
+    .title {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        z-index: 99999;
+        color: white;
     }
 
     .map-container{
