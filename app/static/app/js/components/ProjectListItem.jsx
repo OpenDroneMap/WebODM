@@ -490,11 +490,11 @@ class ProjectListItem extends React.Component {
         {
           this.hasPermission("add") &&
           <div className="add-btn-group">
-              <button ref={this.setRef("uploadButton")} onClick={this.handleUpload} type="button" className="btn btn-sm db-btn primary rounded primary">
+              <button ref={this.setRef("uploadButton")} onClick={this.handleUpload} type="button" className="btn btn-sm db-btn primary rounded">
                   <i className="fas fa-arrow-circle-up"></i>&nbsp;Select Images and GCP
               </button>
 
-              <button onClick={this.handleImportTask} type="button" className="btn btn-sm db-btn primary rounded primary outlined ml-2">
+              <button onClick={this.handleImportTask} type="button" className="btn btn-sm db-btn primary rounded outlined ml-2">
                   <i className="fas fa-download"></i>&nbsp;Import
               </button>
               {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
@@ -507,12 +507,12 @@ class ProjectListItem extends React.Component {
             onClick={this.cancelUpload}
             disabled={this.state.upload.error !== ""}
             type="button"
-            className={"btn db-btn rounded btn-danger ml-2 "}>
+            className={"btn btn-sm db-btn rounded btn-danger ml-2 "}>
             Cancel
           </button>
         }
 
-        <button onClick={this.viewMap} type="button" className="btn btn-sm db-btn primary rounded primary outlined ml-2">
+        <button onClick={this.viewMap} type="button" className="btn btn-sm db-btn primary rounded outlined ml-2">
             <i className="fas fa-map-marked-alt"></i>&nbsp;View Map
         </button>
         
