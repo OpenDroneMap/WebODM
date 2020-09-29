@@ -444,7 +444,7 @@ class ModelView extends React.Component {
 
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
-          <div className="container potree_container" 
+          <div className="model-container potree_container" 
              style={{height: "100%", width: "100%", position: "relative"}}
              onContextMenu={(e) => {e.preventDefault();}}>
                 <div id="potree_render_area" 
@@ -457,7 +457,7 @@ class ModelView extends React.Component {
                             task={this.props.task} 
                             direction="up" 
                             showLabel={false}
-                            buttonClass="btn-secondary" />
+                            buttonClass="" />
             {(!this.props.public) ? 
             <ShareButton 
                 ref={(ref) => { this.shareButton = ref; }}

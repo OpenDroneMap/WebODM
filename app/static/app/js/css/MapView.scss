@@ -16,14 +16,20 @@
         top: 6px;
     }
 
-    .map-type-selector{
-        float: right;
+    .map-type-selector {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        z-index: 99999;
+        .btn-default {
+            background-color: white;
+        }
     }
 
     .title {
         position: absolute;
-        top: 14px;
-        left: 14px;
+        bottom: 48px;
+        right: 12px;
         z-index: 99999;
         color: white;
     }

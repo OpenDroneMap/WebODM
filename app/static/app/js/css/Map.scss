@@ -64,7 +64,7 @@
         position: absolute;
         z-index: 2000;
         right: 12px;
-        bottom: 20px;
+        bottom: 12px;
         & > *{
             display: inline-block;
             margin-left: 12px;
@@ -75,7 +75,7 @@
         z-index: 1000;
     }
 
-    .leaflet-control-layers-control {
+    .leaflet-control-layers-control, .leaflet-control-contours {
         background-color: white;
     }
 

@@ -2,7 +2,8 @@
 
 {% block content %}
 <script src="./Chart.min.js"></script>
-<h2>Diagnostic Information</h2>
+<div class="container">
+<h4>Diagnostic Information</h4>
 
 <p><b>App Version:</b> {{ version }}</p>
 
@@ -32,6 +33,7 @@
 <hr/>
 <div style="margin-top: 20px;"><strong>Note!</strong> These values might be relative to the virtualization environment in which the application is running, not necessarily the values of the your machine. See instructions for <a href="http://stackoverflow.com/a/39720010">MacOS</a> and <a href="https://docs.docker.com/docker-for-windows/#advanced">Windows</a> for changing these values in a docker setup.</div>
 
+</div>
 <script>
 (function(){
     var ctx = document.getElementById('diskChart').getContext('2d');

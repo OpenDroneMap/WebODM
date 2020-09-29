@@ -820,15 +820,6 @@ footer {
 #iframe{
     .map-view{
         height: 100%;
-        .map-type-selector{
-            z-index: 1000;
-            position: absolute;
-            float: none;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
         .switchModeButton{
             bottom: 22px;
         }
