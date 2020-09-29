@@ -15,10 +15,11 @@
 {% if app_list %}
     {% for app in app_list %}
         <div class="app-{{ app.app_label }} module">
+        <div>
+            <a href="{{ app.app_url }}"
+                title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+        </div>
         <table>
-        <caption>
-            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
-        </caption>
         {% for model in app.models %}
             <tr class="model-{{ model.object_name|lower }}">
             {% if model.admin_url %}
