@@ -10,7 +10,7 @@ RUN mkdir /webodm
 WORKDIR /webodm
 
 # Install Node.js
-RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget
+RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget curl
 RUN wget --no-check-certificate https://deb.nodesource.com/setup_12.x -O /tmp/node.sh && bash /tmp/node.sh
 RUN apt-get -qq update && apt-get -qq install -y nodejs
 
