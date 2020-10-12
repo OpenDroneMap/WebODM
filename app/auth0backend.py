@@ -31,9 +31,9 @@ class Auth0(BaseOAuth2):
         issuer = 'https://' + self.setting('DOMAIN') + '/'
         audience = self.setting('KEY')  # CLIENT_ID
         payload = jwt.decode(id_token, jwks.read(), algorithms=['RS256'], audience=audience, issuer=issuer)
-
+        # FIXME: Theres a hack here to keep firstname to 30 chars (fixed in Django 3.1)
         return {'username': payload['nickname'],
-                'first_name': payload['name'],
+                'first_name': (payload['name'][:28] + '..') if len(payload['name']) > 30 else payload['name'],
                 'picture': payload['picture'],
                 'user_id': payload['sub'],
                 'email': payload['email']}
