@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM ubuntu:18.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -9,20 +9,18 @@ ENV PROJ_LIB=/usr/share/proj
 RUN mkdir /webodm
 WORKDIR /webodm
 
+RUN apt-get -qq update && apt-get install -y software-properties-common tzdata
+RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+
 # Install Node.js
 RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget curl
 RUN wget --no-check-certificate https://deb.nodesource.com/setup_12.x -O /tmp/node.sh && bash /tmp/node.sh
 RUN apt-get -qq update && apt-get -qq install -y nodejs
 
-# Configure use of testing branch of Debian
-RUN printf "Package: *\nPin: release a=stable\nPin-Priority: 900\n" > /etc/apt/preferences.d/stable.pref
-RUN printf "Package: *\nPin: release a=testing\nPin-Priority: 750\n" > /etc/apt/preferences.d/testing.pref
-RUN printf "deb     http://ftp.us.debian.org/debian/    stable main contrib non-free\ndeb-src http://ftp.us.debian.org/debian/    stable main contrib non-free" > /etc/apt/sources.list.d/stable.list
-RUN printf "deb     http://ftp.us.debian.org/debian/    testing main contrib non-free\ndeb-src http://ftp.us.debian.org/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
-
 # Install Python3, GDAL, nginx, letsencrypt, psql
-RUN apt-get -qq update && apt-get -qq install -t testing -y --no-install-recommends python3 python3-pip git g++ python3-dev libpq-dev binutils libproj-dev gdal-bin python3-gdal nginx certbot grass-core && apt-get -qq install -y --no-install-recommends gettext-base cron postgresql-client-9.6
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
+RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev libpq-dev binutils libproj-dev gdal-bin python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-10
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.6 2
+RUN ln -s /usr/bin/pip3 /usr/bin/pip && pip install -U pip
 
 # Install pip reqs
 ADD requirements.txt /webodm/
@@ -39,7 +37,8 @@ WORKDIR /webodm/nodeodm/external/NodeODM
 RUN npm install --quiet
 
 WORKDIR /webodm
-RUN npm install --quiet -g webpack && npm install --quiet -g webpack-cli && npm install --quiet && webpack --mode production
+RUN npm install --quiet -g webpack@4.16.5 && npm install --quiet -g webpack-cli && npm install --quiet && webpack --mode production
+RUN echo "UTC" > /etc/timezone
 RUN python manage.py collectstatic --noinput
 RUN bash app/scripts/plugin_cleanup.sh && echo "from app.plugins import build_plugins;build_plugins()" | python manage.py shell
 

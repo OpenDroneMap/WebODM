@@ -94,9 +94,10 @@ class GrassContext:
         err = ""
 
         # Setup env
-        env = None
+        env = os.environ.copy()
+        env["LC_ALL"] = "C.UTF-8"
+        
         if self.python_path:
-            env = os.environ.copy()
             sep = ";" if platform.system() == "Windows" else ":"
             env["PYTHONPATH"] = "%s%s%s" % (self.python_path, sep, env.get("PYTHONPATH", ""))
 
