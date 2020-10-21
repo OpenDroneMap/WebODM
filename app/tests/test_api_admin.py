@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_jwt.settings import api_settings
+from django.contrib.auth.hashers import check_password
 
 from .classes import BootTestCase
 from app.api.admin import UserSerializer, GroupSerializer
@@ -46,6 +47,7 @@ class TestApi(BootTestCase):
         self.assertEqual(res.data['username'], user.username)
         self.assertEqual(res.data['email'], user.email)
         self.assertEqual(res.data['password'], user.password)
+        self.assertTrue(check_password('test999', user.password))
 
         # Can update user
         res = client.put('/api/admin/users/{}/'.format(created_user_id), {'username': 'testuser888', 'email': 'testuser888@test.com', 'password': 'test888'})
