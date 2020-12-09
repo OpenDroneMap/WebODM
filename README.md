@@ -49,7 +49,7 @@ To install WebODM manually, these steps should get you up and running:
   - Python
   - Pip
 
-* Windows users have a choice between Docker Toolbox (Windows 10 Home or older) and Docker for Windows (Windows 10 Pro or newer). Docker for Windows users should set up their Docker environment before launching WebODM using the Docker utility in the system tray: 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes). 
+* Windows users should install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows) and 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes).
 
 * From the Docker Quickstart Terminal or Git Bash (Windows), or from the command line (Mac / Linux), type:
 ```bash
@@ -351,12 +351,12 @@ Ubuntu 16.04 LTS users can refer to [this community script](/contrib/ubuntu_1604
 To run WebODM, you will need to install:
  * PostgreSQL (>= 9.5)
  * PostGIS 2.3
- * Python 3.5
- * GDAL (>= 2.1)
+ * Python 3.6
+ * GDAL (>= 3)
  * Node.js (>= 6.0)
  * Nginx (Linux/MacOS) - OR - Apache + mod_wsgi or Waitress (Windows)
  * Redis (>= 2.6)
- * GRASS GIS (>= 7.6)
+ * GRASS GIS (>= 7.8)
 
 On Linux, make sure you have:
 
