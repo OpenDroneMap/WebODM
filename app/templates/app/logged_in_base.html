@@ -12,7 +12,7 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li class="user-profile">
-                    {{ user.username }}<br/>
+                    {% blocktrans with user=user.username %}Hello, {{ user }}!{% endblocktrans %}<br/>
                     <span class="email">{{ user.email }}</span>
                 </li>
                 <li class="divider"></li>
@@ -100,12 +100,12 @@
                         <li>
                             <a href="/admin/app/"><i class="fa fa-cog fa-fw"></i> {% trans 'Application' %}</a>
                         </li>
-                        <li>
-                            <a href="/version/"><i class="fa fa-info-circle fa-fw"></i> {% trans 'Version' %}</a>
-                        </li>
                     </ul>
                 </li>
                 {% endif %}
+                <li id="about-menu">
+                    <a href="/about/"><i class="fa fa-info-circle fa-fw"></i> {% trans 'About' %}</a>
+                </li>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

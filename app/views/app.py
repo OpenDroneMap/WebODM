@@ -99,8 +99,8 @@ def model_display(request, project_pk=None, task_pk=None):
             }.items()
         })
 
-def app_version(request):
-    return render(request, 'app/version.html', {'title': _('Version')})
+def about(request):
+    return render(request, 'app/about.html', {'title': _('About'), 'version': settings.VERSION})
 
 @login_required
 def processing_node(request, processing_node_id):

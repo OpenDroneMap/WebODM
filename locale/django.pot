@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-14 20:25+0000\n"
+"POT-Creation-Date: 2020-12-14 21:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,6 +66,11 @@ msgid ""
 "a> is optional, but can increase georeferencing accuracy"
 msgstr ""
 
+#: app/templates/app/logged_in_base.html:15
+#, python-format
+msgid "Hello, %(user)s!"
+msgstr ""
+
 #: app/templates/app/logged_in_base.html:19
 msgid "Logout"
 msgstr ""
@@ -108,6 +113,10 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:101
 msgid "Application"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:107 app/views/app.py:103
+msgid "About"
 msgstr ""
 
 #: app/templates/app/processing_node.html:11
@@ -195,62 +204,58 @@ msgstr ""
 msgid "Diagnostic Information"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:8
-msgid "App Version"
-msgstr ""
-
-#: plugins/diagnostic/templates/diagnostic.html:12
+#: plugins/diagnostic/templates/diagnostic.html:10
 msgid "Storage Space"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:16
-#: plugins/diagnostic/templates/diagnostic.html:42
-#: plugins/diagnostic/templates/diagnostic.html:47
+#: plugins/diagnostic/templates/diagnostic.html:14
+#: plugins/diagnostic/templates/diagnostic.html:40
+#: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:17
-#: plugins/diagnostic/templates/diagnostic.html:41
-#: plugins/diagnostic/templates/diagnostic.html:47
+#: plugins/diagnostic/templates/diagnostic.html:15
+#: plugins/diagnostic/templates/diagnostic.html:39
+#: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:18
+#: plugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:22
+#: plugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:26
-#: plugins/diagnostic/templates/diagnostic.html:77
-#: plugins/diagnostic/templates/diagnostic.html:82
+#: plugins/diagnostic/templates/diagnostic.html:24
+#: plugins/diagnostic/templates/diagnostic.html:75
+#: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Free"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:27
-#: plugins/diagnostic/templates/diagnostic.html:76
-#: plugins/diagnostic/templates/diagnostic.html:82
+#: plugins/diagnostic/templates/diagnostic.html:25
+#: plugins/diagnostic/templates/diagnostic.html:74
+#: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Used"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:28
+#: plugins/diagnostic/templates/diagnostic.html:26
 msgctxt "Megabytes of memory space"
 msgid "Total"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:35
+#: plugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:35
+#: plugins/diagnostic/templates/diagnostic.html:33
 #, python-format
 msgid ""
 "These values might be relative to the virtualization environment in which "
@@ -259,8 +264,8 @@ msgid ""
 "in a docker setup."
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:49
-#: plugins/diagnostic/templates/diagnostic.html:84
+#: plugins/diagnostic/templates/diagnostic.html:47
+#: plugins/diagnostic/templates/diagnostic.html:82
 msgid "Disk Space"
 msgstr ""
 
