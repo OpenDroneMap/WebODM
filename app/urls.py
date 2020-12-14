@@ -1,4 +1,5 @@
 from django.conf.urls import url, include
+from django.views.i18n import JavaScriptCatalog
 
 from .views import app as app_views, public as public_views
 from .plugins.views import app_view_handler
@@ -36,7 +37,10 @@ urlpatterns = [
 
     url(r'^api/', include("app.api.urls")),
 
-    url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', app_view_handler)
+    url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', app_view_handler),
+
+    # TODO: add caching: https://docs.djangoproject.com/en/3.1/topics/i18n/translation/#note-on-performance
+    url(r'^jsi18n/', JavaScriptCatalog.as_view(packages=['app']), name='javascript-catalog'),
 ]
 
 handler404 = app_views.handler404

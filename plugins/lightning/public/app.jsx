@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Login from './Login';
 import Dashboard from './Dashboard';
-import $ from 'jquery';
 
 export default class LightningPanel extends React.Component {
   static defaultProps = {

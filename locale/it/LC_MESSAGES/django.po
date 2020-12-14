@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-20 20:31+0000\n"
+"POT-Creation-Date: 2020-12-14 18:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,43 +69,43 @@ msgid ""
 "a> is optional, but can increase georeferencing accuracy"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:197
+#: app/templates/app/logged_in_base.html:15
 msgid "Hello"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:201
+#: app/templates/app/logged_in_base.html:19
 msgid "Logout"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:224
+#: app/templates/app/logged_in_base.html:33
 msgid "Dashboard"
-msgstr ""
+msgstr "Pannello di Controllo"
 
-#: app/templates/app/logged_in_base.html:273
+#: app/templates/app/logged_in_base.html:79
 msgid "Administration"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:276
+#: app/templates/app/logged_in_base.html:84
 msgid "Accounts"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:279
+#: app/templates/app/logged_in_base.html:87
 msgid "Groups"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:282
+#: app/templates/app/logged_in_base.html:92
 msgid "Brand"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:285
+#: app/templates/app/logged_in_base.html:95
 msgid "Theme"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:288
+#: app/templates/app/logged_in_base.html:98
 msgid "Plugins"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:291
+#: app/templates/app/logged_in_base.html:101
 msgid "Application"
 msgstr ""
 
@@ -122,38 +122,42 @@ msgid "API Version"
 msgstr ""
 
 #: app/templates/app/processing_node.html:23
-msgid "ODM Version"
+msgid "Engine"
 msgstr ""
 
 #: app/templates/app/processing_node.html:27
-msgid "Queue Count"
+msgid "Engine Version"
 msgstr ""
 
 #: app/templates/app/processing_node.html:31
-msgid "Max Images Limit"
+msgid "Queue Count"
 msgstr ""
 
 #: app/templates/app/processing_node.html:35
-msgid "Label"
+msgid "Max Images Limit"
 msgstr ""
 
 #: app/templates/app/processing_node.html:39
-msgid "Last Refreshed"
-msgstr ""
-
-#: app/templates/app/processing_node.html:40
-msgid "ago"
+msgid "Label"
 msgstr ""
 
 #: app/templates/app/processing_node.html:43
+msgid "Last Refreshed"
+msgstr ""
+
+#: app/templates/app/processing_node.html:44
+msgid "ago"
+msgstr ""
+
+#: app/templates/app/processing_node.html:47
 msgid "Options (JSON)"
 msgstr ""
 
-#: app/templates/app/processing_node.html:49
+#: app/templates/app/processing_node.html:53
 msgid "Edit"
 msgstr ""
 
-#: app/templates/app/processing_node.html:50
+#: app/templates/app/processing_node.html:54
 msgid "Delete"
 msgstr ""
 
@@ -165,14 +169,18 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
-#: app/views/app.py:33
+#: app/views/app.py:44
 msgid "First Project"
 msgstr ""
 
-#: app/views/app.py:43 app/views/public.py:25
+#: app/views/app.py:54 app/views/public.py:26
 msgid "Map"
 msgstr ""
 
-#: app/views/app.py:70
+#: app/views/app.py:81
 msgid "3D Model Display"
+msgstr ""
+
+#: plugins/cesium-ion/api_views.py:170
+msgid "No matching enum type."
 msgstr ""

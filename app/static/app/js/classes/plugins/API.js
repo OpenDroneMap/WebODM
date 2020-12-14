@@ -24,6 +24,7 @@ if (!window.PluginsAPI){
       'leaflet': { loader: 'globals-loader', exports: 'L' },
       'ReactDOM': { loader: 'globals-loader', exports: 'ReactDOM' },
       'React': { loader: 'globals-loader', exports: 'React' },
+      'gettext': { loader: 'globals-loader', exports: 'gettext' },
       'SystemJS': { loader: 'globals-loader', exports: 'SystemJS' }
     }
   });

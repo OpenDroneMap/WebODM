@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-20 20:32+0000\n"
+"POT-Creation-Date: 2020-12-14 18:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,8 +20,4 @@ msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:38
 msgid "Loading dashboard..."
-msgstr ""
-
-#: plugins/lightning/public/Dashboard.jsx:150
-msgid "Logout"
-msgstr ""
+msgstr "Caricando il pannello di controllo..."
