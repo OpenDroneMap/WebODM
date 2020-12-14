@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOCALES="it"
+LOCALES="fr es it de"
 
 if [[ "$1" == "extract" ]]; then
     echo "Extracting .po files from Django/React"

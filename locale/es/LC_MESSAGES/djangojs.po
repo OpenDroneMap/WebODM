@@ -20,4 +20,4 @@ msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:38
 msgid "Loading dashboard..."
-msgstr "Caricando il pannello di controllo..."
+msgstr ""
