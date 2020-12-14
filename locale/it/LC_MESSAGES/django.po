@@ -141,11 +141,11 @@ msgstr "Versione Motore"
 
 #: app/templates/app/processing_node.html:31
 msgid "Queue Count"
-msgstr "Lunghezza Coda"
+msgstr "Coda"
 
 #: app/templates/app/processing_node.html:35
 msgid "Max Images Limit"
-msgstr "Numero Massimo Immagini"
+msgstr "Numero Massimo d'Immagini"
 
 #: app/templates/app/processing_node.html:39
 msgid "Label"
