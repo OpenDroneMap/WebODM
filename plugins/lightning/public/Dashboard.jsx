@@ -3,6 +3,7 @@ import ErrorMessage from 'webodm/components/ErrorMessage';
 import PropTypes from 'prop-types';
 import './Dashboard.scss';
 import $ from 'jquery';
+import _ from 'gettext';
 
 export default class Dashboard extends React.Component {
   static defaultProps = {
@@ -34,7 +35,7 @@ export default class Dashboard extends React.Component {
   }
 
   loadDashboard = () => {
-    this.setState({loading: true, loadingMessage: "Loading dashboard..."});
+    this.setState({loading: true, loadingMessage: _("Loading dashboard...")});
 
     $.get(this.apiUrl('/r/user')).done(json => {
         if (json.balance !== undefined){
@@ -154,7 +155,7 @@ export default class Dashboard extends React.Component {
                 <div className="buttons text-right">
                     <hr/>
                     <button className="btn btn-sm btn-primary logout" onClick={this.handeLogout}>
-                        <i className="fa fa-power-off"></i> Logout
+                        <i className="fa fa-power-off"></i> {_("Logout")}
                     </button>
                 </div>
             </div> : ""}
