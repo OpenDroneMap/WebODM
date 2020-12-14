@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.http import HttpResponse
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from rest_framework.renderers import JSONRenderer
+from django.utils.translation import gettext as _
 
 from app.plugins import GlobalDataStore, logger
 from app.plugins import PluginBase, Menu, MountPoint, UserDataStore, signals
@@ -21,7 +22,7 @@ def JsonResponse(dict):
 
 class Plugin(PluginBase):
     def main_menu(self):
-        return [Menu("Lightning Network", self.public_url(""), "fa fa-bolt fa-fw")]
+        return [Menu(_("Lightning Network"), self.public_url(""), "fa fa-bolt fa-fw")]
 
     def include_js_files(self):
         return ['add_cost_estimate.js']
@@ -35,7 +36,7 @@ class Plugin(PluginBase):
             uds = UserDataStore('lightning', request.user)
 
             return render(request, self.template_path("index.html"), {
-                'title': 'Lightning Network',
+                'title': _('Lightning Network'),
                 'api_key': uds.get_string("api_key")
             })
 

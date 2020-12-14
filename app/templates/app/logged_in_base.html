@@ -12,7 +12,7 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li class="user-profile">
-                    {% trans 'Hello' %}, {{ user.username }}<br/>
+                    {{ user.username }}<br/>
                     <span class="email">{{ user.email }}</span>
                 </li>
                 <li class="divider"></li>
@@ -56,7 +56,7 @@
 
                 {% if view_nodes %}
                 <li>
-                    <a href="#"><i class="fa fa-wrench fa-fw"></i> Processing Nodes<span class="fa arrow"></span></a>
+                    <a href="#"><i class="fa fa-wrench fa-fw"></i> {% trans 'Processing Nodes' %}<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         {% for node in nodes %}
                         <li>
@@ -66,7 +66,7 @@
 
                         {% if add_nodes %}
                         <li>
-                            <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> Add New</a>
+                            <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> {% trans 'Add New' %}</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -99,6 +99,9 @@
                         </li>
                         <li>
                             <a href="/admin/app/"><i class="fa fa-cog fa-fw"></i> {% trans 'Application' %}</a>
+                        </li>
+                        <li>
+                            <a href="/version/"><i class="fa fa-info-circle fa-fw"></i> {% trans 'Version' %}</a>
                         </li>
                     </ul>
                 </li>

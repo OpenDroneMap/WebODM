@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-14 18:40+0000\n"
+"POT-Creation-Date: 2020-12-14 20:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:29
+#: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
-msgid "Welcome! ☺"
+msgid "Welcome!"
 msgstr ""
 
 #: app/templates/app/dashboard.html:16
@@ -29,47 +29,41 @@ msgstr ""
 #: app/templates/app/dashboard.html:19
 #, python-format
 msgid ""
-" \n"
-"\t\t\t\tTo get started, \"%(add_processing_node)s\". A processing node is a "
-"computer running an instance of %(nodeodm_link)s or some other software that "
-"implements this %(api_link)s.\n"
-"\t\t\t"
+"To get started, \"%(add_processing_node)s\". A processing node is a computer "
+"running an instance of %(nodeodm_link)s or some other software that "
+"implements this %(api_link)s."
 msgstr ""
 
-#: app/templates/app/dashboard.html:30
+#: app/templates/app/dashboard.html:28
 msgid "Select Images and GCP"
 msgstr ""
 
-#: app/templates/app/dashboard.html:32
+#: app/templates/app/dashboard.html:30
 #, python-format
 msgid ""
-" To create a map, press the \"%(upload_images)s\" button, or drag and drop "
-"some images into a project. "
+"To create a map, press the \"%(upload_images)s\" button, or drag and drop "
+"some images into a project."
 msgstr ""
 
-#: app/templates/app/dashboard.html:36
+#: app/templates/app/dashboard.html:34
 msgid "You need at least 5 images"
 msgstr ""
 
-#: app/templates/app/dashboard.html:37
+#: app/templates/app/dashboard.html:35
 #, python-format
 msgid "Images must overlap by 65%% or more"
 msgstr ""
 
-#: app/templates/app/dashboard.html:38
+#: app/templates/app/dashboard.html:36
 #, python-format
 msgid "For great 3D, images must overlap by 83%%"
 msgstr ""
 
-#: app/templates/app/dashboard.html:39
+#: app/templates/app/dashboard.html:37
 msgid ""
 "A <a href=\"https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-"
 "OpenDroneMap#running-odm-with-ground-control\" target=\"_blank\">GCP file</"
 "a> is optional, but can increase georeferencing accuracy"
-msgstr ""
-
-#: app/templates/app/logged_in_base.html:15
-msgid "Hello"
 msgstr ""
 
 #: app/templates/app/logged_in_base.html:19
@@ -78,6 +72,14 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:33
 msgid "Dashboard"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:59
+msgid "Processing Nodes"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:69
+msgid "Add New"
 msgstr ""
 
 #: app/templates/app/logged_in_base.html:79
@@ -145,6 +147,7 @@ msgid "Last Refreshed"
 msgstr ""
 
 #: app/templates/app/processing_node.html:44
+msgctxt "5 minutes ago"
 msgid "ago"
 msgstr ""
 
@@ -182,4 +185,89 @@ msgstr ""
 
 #: plugins/cesium-ion/api_views.py:170
 msgid "No matching enum type."
+msgstr ""
+
+#: plugins/diagnostic/plugin.py:36
+msgid "Diagnostic"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:6
+msgid "Diagnostic Information"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:8
+msgid "App Version"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:12
+msgid "Storage Space"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:16
+#: plugins/diagnostic/templates/diagnostic.html:42
+#: plugins/diagnostic/templates/diagnostic.html:47
+msgctxt "Megabytes of storage space"
+msgid "Free"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:17
+#: plugins/diagnostic/templates/diagnostic.html:41
+#: plugins/diagnostic/templates/diagnostic.html:47
+msgctxt "Megabytes of storage space"
+msgid "Used"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:18
+msgctxt "Megabytes of storage space"
+msgid "Total"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:22
+msgctxt "Computer memory (RAM)"
+msgid "Memory"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:26
+#: plugins/diagnostic/templates/diagnostic.html:77
+#: plugins/diagnostic/templates/diagnostic.html:82
+msgctxt "Megabytes of memory space"
+msgid "Free"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:27
+#: plugins/diagnostic/templates/diagnostic.html:76
+#: plugins/diagnostic/templates/diagnostic.html:82
+msgctxt "Megabytes of memory space"
+msgid "Used"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:28
+msgctxt "Megabytes of memory space"
+msgid "Total"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:35
+msgid "Note!"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:35
+#, python-format
+msgid ""
+"These values might be relative to the virtualization environment in which "
+"the application is running, not necessarily the values of the your machine. "
+"See instructions for %(win_link)s and %(mac_link)s for changing these values "
+"in a docker setup."
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:49
+#: plugins/diagnostic/templates/diagnostic.html:84
+msgid "Disk Space"
+msgstr ""
+
+#: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
+msgid "Lightning Network"
+msgstr ""
+
+#: plugins/posm-gcpi/plugin.py:8
+msgid "GCP Interface"
 msgstr ""
