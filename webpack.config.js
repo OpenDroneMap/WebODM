@@ -88,8 +88,7 @@ module.exports = {
     "SystemJS": "SystemJS",
     "THREE": "THREE",
     "React": "React",
-    "ReactDOM": "ReactDOM",
-    "gettext": "gettext"
+    "ReactDOM": "ReactDOM"
   },
 
   watchOptions: {

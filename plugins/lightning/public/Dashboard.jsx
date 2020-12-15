@@ -3,7 +3,7 @@ import ErrorMessage from 'webodm/components/ErrorMessage';
 import PropTypes from 'prop-types';
 import './Dashboard.scss';
 import $ from 'jquery';
-import _ from 'gettext';
+import { _ } from 'webodm/classes/gettext';
 
 export default class Dashboard extends React.Component {
   static defaultProps = {

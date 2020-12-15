@@ -12,7 +12,7 @@ if [[ "$1" == "extract" ]]; then
     
     mkdir -p locale
     django-admin makemessages --keep-pot $locale_param --ignore=build --ignore=app/templates/app/admin/* --ignore=app/templates/app/registration/*
-    django-admin makemessages --keep-pot $locale_param -d djangojs --extension jsx --ignore=build
+    python manage.py makemessages_djangojs --keep-pot $locale_param -d djangojs --extension jsx --ignore=build --language Python
 fi
 
 if [[ "$1" == "build" ]]; then

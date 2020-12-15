@@ -25,20 +25,18 @@ class EditTaskForm extends React.Component {
       onFormChanged: PropTypes.func,
       inReview: PropTypes.bool,
       task: PropTypes.object,
-      suggestedTaskName: PropTypes.string,
+      suggestedTaskName: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
   };
 
   constructor(props){
     super(props);
 
-    this.namePlaceholder = "Task of " + (new Date()).toISOString();
-
     this.state = {
       error: "",
       presetError: "",
       presetActionPerforming: false,
-
-      name: props.suggestedTaskName ? props.suggestedTaskName : (props.task !== null ? (props.task.name || "") : ""),
+      namePlaceholder: typeof props.suggestedTaskName === "string" ? props.suggestedTaskName : (props.task !== null ? (props.task.name || "") : "Task of " + (new Date()).toISOString()),
+      name: typeof props.suggestedTaskName === "string" ? props.suggestedTaskName : (props.task !== null ? (props.task.name || "") : ""),
       loadedProcessingNodes: false,
       loadedPresets: false,
 
@@ -47,7 +45,9 @@ class EditTaskForm extends React.Component {
       selectedPreset: null,
       presets: [],
 
-      editingPreset: false
+      editingPreset: false,
+
+      loadingTaskName: false
     };
 
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -272,6 +272,23 @@ class EditTaskForm extends React.Component {
       });
   }
 
+  loadSuggestedName = () => {
+    if (typeof this.props.suggestedTaskName === "function"){
+        this.setState({loadingTaskName: true});
+
+        this.props.suggestedTaskName().then(name => {
+            if (this.state.loadingTaskName){
+                this.setState({loadingTaskName: false, name});
+            }else{
+                // User started typing its own name
+            }
+        }).catch(e => {
+            // Do Nothing
+            this.setState({loadingTaskName: false});
+        })
+    }
+  }
+
   handleSelectPreset(e){
     this.selectPresetById(e.target.value);
   }
@@ -284,6 +301,7 @@ class EditTaskForm extends React.Component {
   componentDidMount(){
     this.loadProcessingNodes();
     this.loadPresets();
+    this.loadSuggestedName();
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -304,7 +322,7 @@ class EditTaskForm extends React.Component {
   }
 
   handleNameChange(e){
-    this.setState({name: e.target.value});
+    this.setState({name: e.target.value, loadingTaskName: false});
   }
 
   selectNodeByKey(key){
@@ -579,10 +597,13 @@ class EditTaskForm extends React.Component {
         <div className="form-group">
           <label className="col-sm-2 control-label">Name</label>
           <div className="col-sm-10">
+            {this.state.loadingTaskName ? 
+            <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
+            : ""}
             <input type="text" 
               onChange={this.handleNameChange} 
               className="form-control"
-              placeholder={this.namePlaceholder} 
+              placeholder={this.state.namePlaceholder} 
               value={this.state.name} 
             />
           </div>

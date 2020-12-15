@@ -19,7 +19,7 @@ class NewTaskPanel extends React.Component {
       filesCount: PropTypes.number,
       showResize: PropTypes.bool,
       getFiles: PropTypes.func,
-      suggestedTaskName: PropTypes.string,
+      suggestedTaskName: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
   };
 
   constructor(props){

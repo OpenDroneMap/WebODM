@@ -8,6 +8,7 @@ import {
   Route
 } from 'react-router-dom';
 import $ from 'jquery';
+import { _ } from './classes/gettext';
 
 class Dashboard extends React.Component {
   constructor(){
@@ -22,7 +23,7 @@ class Dashboard extends React.Component {
   }
 
   addNewProject(project){
-    if (!project.name) return (new $.Deferred()).reject("Name field is required");
+    if (!project.name) return (new $.Deferred()).reject(_("Name field is required"));
 
     return $.ajax({
           url: `/api/projects/`,
@@ -57,7 +58,7 @@ class Dashboard extends React.Component {
                     className="btn btn-primary btn-sm"
                     onClick={this.handleAddProject}>
               <i className="glyphicon glyphicon-plus"></i>
-              Add Project
+              {_("Add Project")}
             </button>
           </div>
 
@@ -92,7 +93,7 @@ $(function(){
                 // Do nothing
             }
         });
-        return found ? "Your changes will be lost. Are you sure you want to leave?" : undefined; 
+        return found ? _("Your changes will be lost. Are you sure you want to leave?") : undefined; 
     };
 });
 
