@@ -30,7 +30,9 @@ class EditPresetDialog extends React.Component {
         this.options = {};
 
         this.state = {
-            name: props.preset.name
+            name: props.preset.name,
+            search: "",
+            showSearch: false
         };
 
         this.getFormData = this.getFormData.bind(this);
@@ -81,6 +83,16 @@ class EditPresetDialog extends React.Component {
       }
     }
 
+    toggleSearchControl = () => {
+        this.setState({showSearch: !this.state.showSearch});
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        if (this.state.showSearch){
+            this.searchControl.focus();
+        }
+    }
+
     render(){
         let options = PresetUtils.getAvailableOptions(this.props.preset.options, this.props.availableOptions);
 
@@ -97,20 +109,33 @@ class EditPresetDialog extends React.Component {
                     deleteWarning={false}
                     deleteAction={(this.props.preset.id !== -1 && !this.props.preset.system) ? this.props.deleteAction : undefined}>
                   {!this.isCustomPreset() ? 
-                    <div className="row preset-name">
+                    [<div className="row preset-name">
                         <label className="col-sm-2 control-label">{_("Name")}</label>
                         <div className="col-sm-10">
                           <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
                         </div>
-                    </div>
+                    </div>,
+                    <hr/>]
+                  : ""}
+
+                  <button type="submit" className="btn btn-default search-toggle btn-sm"  title={_("Search")} onClick={this.toggleSearchControl}><i className="fa fa-filter"></i></button>
+
+                  {this.state.showSearch ? 
+                    <div className="row search-controls">
+                        <div className="col-sm-12">
+                            <input type="text" className="form-control" value={this.state.search} ref={(node) => { this.searchControl = node}} onChange={this.handleChange('search')} />
+                        </div>
+                    </div> 
                   : ""}
                   <div className="row">
-                    <label className="col-sm-2 control-label"></label>
-                    <div className="col-sm-10">
-                    {options.map(option =>
-                        <ProcessingNodeOption {...option}
-                          key={option.name}
-                          ref={this.setOptionRef(option.name)} /> 
+                    <div className="col-sm-12">
+                    {options.filter(option => this.state.showSearch && this.state.search !== "" ? 
+                                                option.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 :
+                                                true)
+                            .map(option =>
+                                <ProcessingNodeOption {...option}
+                                key={option.name}
+                                ref={this.setOptionRef(option.name)} /> 
                     )}
                     </div>
                   </div>
