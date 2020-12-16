@@ -40,10 +40,12 @@
 
     .status-label{
         padding: 4px;
+        padding-left: 8px;
         width: 100%;
         font-size: 90%;
         border-style: solid;
         border-width: 1px;
+        border-radius: 2px;
     }
 
     .clickable:hover{

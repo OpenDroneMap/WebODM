@@ -34,7 +34,7 @@ export default class LayersControlPanel extends React.Component {
             const m_a = a[Symbol.for("meta")] || {};
             const m_b = b[Symbol.for("meta")] || {};
             return m_a.name > m_b.name ? -1 : 1;
-        }).map((layer, i) => <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} key={i} />)}
+        }).map((layer, i) => <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} key={(layer[Symbol.for("meta")] || {}).name || i} />)}
       </div>);
     }
 
