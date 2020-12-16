@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/LayersControlPanel.scss';
 import LayersControlLayer from './LayersControlLayer';
+import { _ } from '../classes/gettext';
 
 export default class LayersControlPanel extends React.Component {
   static defaultProps = {
@@ -22,7 +23,7 @@ export default class LayersControlPanel extends React.Component {
   render(){
     let content = "";
 
-    if (!this.props.layers.length) content = (<span><i className="loading fa fa-circle-notch fa-spin"></i> Loading...</span>);
+    if (!this.props.layers.length) content = (<span><i className="loading fa fa-circle-notch fa-spin"></i> {_("Loading...")}</span>);
     else{
       content = (<div>
         {this.props.overlays.length ? 
@@ -40,7 +41,7 @@ export default class LayersControlPanel extends React.Component {
 
     return (<div className="layers-control-panel">
       <span className="close-button" onClick={this.props.onClose}/>
-      <div className="title">Layers</div>
+      <div className="title">{_("Layers")}</div>
       <hr/>
       {content}
     </div>);

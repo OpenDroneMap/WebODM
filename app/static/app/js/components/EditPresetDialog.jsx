@@ -4,8 +4,8 @@ import FormDialog from './FormDialog';
 import ProcessingNodeOption from './ProcessingNodeOption';
 import PresetUtils from '../classes/PresetUtils';
 import PropTypes from 'prop-types';
-import $ from 'jquery';
 import values from 'object.values';
+import { _ } from '../classes/gettext';
 
 if (!Object.values) {
     values.shim();
@@ -92,13 +92,13 @@ class EditPresetDialog extends React.Component {
                     show={true}
                     onShow={this.onShow}
                     saveIcon="far fa-edit"
-                    title="Edit Task Options"
+                    title={_("Edit Task Options")}
                     saveAction={this.props.saveAction}
                     deleteWarning={false}
                     deleteAction={(this.props.preset.id !== -1 && !this.props.preset.system) ? this.props.deleteAction : undefined}>
                   {!this.isCustomPreset() ? 
                     <div className="row preset-name">
-                        <label className="col-sm-2 control-label">Name</label>
+                        <label className="col-sm-2 control-label">{_("Name")}</label>
                         <div className="col-sm-10">
                           <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
                         </div>

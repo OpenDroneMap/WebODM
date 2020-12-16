@@ -222,7 +222,7 @@ class TaskListItem extends React.Component {
 
   optionsToList(options){
     if (!Array.isArray(options)) return "";
-    else if (options.length === 0) return _("Default");
+    else if (options.length === 0) return "Default";
     else {
       return options.map(opt => `${opt.name}: ${opt.value}`).join(", ");
     }
@@ -531,9 +531,7 @@ class TaskListItem extends React.Component {
 
               {showExitedWithCodeOneHints ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
-                  "Process exited with code 1" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the Task Options and sometimes it might be a bug!
-                  If you need help, upload your images somewhere like <a href="https://www.dronedb.app/" target="_blank">DroneDB</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making
-                  sure to include a <a href="javascript:void(0);" onClick={this.setView("console")}>copy of your task's output</a>. Our awesome contributors will try to help you! <i className="far fa-smile"></i>
+                  <Trans params={{link1: `<a href="https://www.dronedb.app/" target="_blank">DroneDB</a>`, link2: `<a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a>`, open_a_topic: `<a href="http://community.opendronemap.org/c/webodm" target="_blank">${_("open a topic")}</a>`, }}>{_("\"Process exited with code 1\" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the Task Options and sometimes it might be a bug! If you need help, upload your images somewhere like %(link1)s or %(link2)s and %(open_a_topic)s on our community forum, making sure to include a copy of your task's output. Our awesome contributors will try to help you!")}</Trans> <i className="far fa-smile"></i>
                 </div>
               </div>
               : ""}
@@ -579,12 +577,12 @@ class TaskListItem extends React.Component {
     if (task.last_error){
       statusLabel = getStatusLabel(task.last_error, 'error');
     }else if (!task.processing_node && !imported){
-      statusLabel = getStatusLabel("Set a processing node");
+      statusLabel = getStatusLabel(_("Set a processing node"));
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;
     }else if (task.partial && !task.pending_action){
       statusIcon = "fa fa-hourglass-3";
-      statusLabel = getStatusLabel("Waiting for image upload...");
+      statusLabel = getStatusLabel(_("Waiting for image upload..."));
     }else{
       let progress = 100;
       let type = 'done';

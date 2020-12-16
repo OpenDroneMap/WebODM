@@ -33,8 +33,8 @@
 				<ul>
 					<li>{% trans 'You need at least 5 images' %}</li>
 					<li>{% trans 'Images must overlap by 65% or more' %}</li>
-					<li>{% trans 'For great 3D, images must overlap by 83%' %}</li>
-					<li>{% trans 'A <a href="https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-OpenDroneMap#running-odm-with-ground-control" target="_blank">GCP file</a> is optional, but can increase georeferencing accuracy' %}</li>
+                    <li>{% trans 'For great 3D, images must overlap by 83%' %}</li>
+					<li>{% blocktrans with link_start='<a href="https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-OpenDroneMap#running-odm-with-ground-control" target="_blank">' link_end='</a>' %}A {{link_start}}GCP File{{link_end}} is optional, but can increase georeferencing accuracy{% endblocktrans %}</li>
 				</ul>
 			</p>
 		{% endif %}

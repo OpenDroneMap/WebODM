@@ -540,7 +540,7 @@ class ProjectListItem extends React.Component {
           
           {this.state.upload.error !== "" ? 
             <div className="alert alert-warning alert-dismissible">
-                <button type="button" className="close" aria-label={_("Close")} onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
+                <button type="button" className="close" title={_("Close")} onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
                 {this.state.upload.error}
             </div>
             : ""}
