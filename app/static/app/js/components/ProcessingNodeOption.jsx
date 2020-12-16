@@ -2,6 +2,7 @@ import React from 'react';
 import '../css/ProcessingNodeOption.scss';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import { _ } from '../classes/gettext';
 
 class ProcessingNodeOption extends React.Component {
   static defaultProps = {};
@@ -136,7 +137,7 @@ class ProcessingNodeOption extends React.Component {
             <label>
               <input type="checkbox"
                     checked={this.state.value !== ""}
-                    onChange={this.handleCheckboxChange} /> Enable
+                    onChange={this.handleCheckboxChange} /> {_("Enable")}
             </label>
           </div>
         );
@@ -145,7 +146,7 @@ class ProcessingNodeOption extends React.Component {
     let loadFileControl = "";
     if (this.supportsFileAPI() && this.props.domain === 'json'){
         loadFileControl = ([
-            <button key="btn" type="file" className="btn glyphicon glyphicon-import btn-primary" data-toggle="tooltip" data-placement="left" title="Click to import a .JSON file" onClick={() => this.loadFile()}></button>,
+            <button key="btn" type="file" className="btn glyphicon glyphicon-import btn-primary" data-toggle="tooltip" data-placement="left" title={_("Click to import a .JSON file")} onClick={() => this.loadFile()}></button>,
             <input key="file-ctrl" className="file-control" type="file" 
                 accept="text/*,application/json"
                 onChange={this.handleFileSelect}
@@ -159,7 +160,7 @@ class ProcessingNodeOption extends React.Component {
         {inputControl}
         {loadFileControl}
         <button type="submit" className="btn glyphicon glyphicon-info-sign btn-primary" data-toggle="tooltip" data-placement="left" title={this.props.help} onClick={e => e.preventDefault()}></button>
-        <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title="Reset to default" onClick={this.resetToDefault}></button>
+        <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title={_("Reset to default")} onClick={this.resetToDefault}></button>
       </div>
     );
   }
