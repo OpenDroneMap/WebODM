@@ -49,7 +49,7 @@ class Map extends React.Component {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
       pluginActionButtons: [],
-      showLoading: false, // for drag&drop of files
+      showLoading: false, // for drag&drop of files and first load
       opacity: 100,
       imageryLayers: [],
       overlays: []
@@ -411,7 +411,9 @@ _('Example:'),
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");
 
+    this.setState({showLoading: true});
     this.loadImageryLayers(true).then(() => {
+        this.setState({showLoading: false});
         this.map.fitBounds(this.mapBounds);
 
         this.map.on('click', e => {
@@ -459,6 +461,8 @@ _('Example:'),
                 e.popup.setContent(e.popup.options.lazyrender());
             }
         });
+    }).catch(e => {
+        this.setState({showLoading: false, error: e.message});
     });
 
     PluginsAPI.Map.triggerDidAddControls({
@@ -516,11 +520,11 @@ _('Example:'),
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            Opacity: <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 
-            message="Loading..."
+            message={_("Loading...")}
             show={this.state.showLoading}
             />
             
