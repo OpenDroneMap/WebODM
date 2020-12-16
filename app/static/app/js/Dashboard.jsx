@@ -35,8 +35,8 @@ class Dashboard extends React.Component {
       }).done(() => {
         this.projectList.refresh();
       });
-  }
-
+    }
+    
   render() {
     const projectList = ({ location, history }) => {
       let q = Utils.queryParams(location),
@@ -49,6 +49,7 @@ class Dashboard extends React.Component {
                 history={history}
                 />;
     };
+
 
     return (
       <Router basename="/dashboard">
