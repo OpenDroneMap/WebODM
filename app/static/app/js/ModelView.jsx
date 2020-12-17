@@ -10,6 +10,7 @@ import epsg from 'epsg';
 import PropTypes from 'prop-types';
 import * as THREE from 'THREE';
 import $ from 'jquery';
+import { _, interpolate } from './classes/gettext';
 
 require('./vendor/OBJLoader');
 require('./vendor/MTLLoader');
@@ -38,7 +39,7 @@ class TexturedModelMenu extends React.Component{
                             type="checkbox" 
                             checked={this.state.showTexturedModel}
                             onChange={this.handleClick}
-                        /> Show Model</label>);
+                        /> {_("Show Model")}</label>);
     }
 }
 
@@ -65,7 +66,7 @@ class CamerasMenu extends React.Component{
                             type="checkbox" 
                             checked={this.state.showCameras}
                             onChange={this.handleClick}
-                        /> Show Cameras</label>);
+                        /> {_("Show Cameras")}</label>);
     }
 }
 
@@ -478,7 +479,7 @@ class ModelView extends React.Component {
         </div> : ""}
 
           <Standby 
-            message="Loading textured model..."
+            message={_("Loading textured model...")}
             show={this.state.initializingModel}
             />
       </div>);

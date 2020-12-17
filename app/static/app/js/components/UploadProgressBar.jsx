@@ -1,6 +1,7 @@
 import '../css/UploadProgressBar.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
+import { _, interpolate } from '../classes/gettext';
 
 class UploadProgressBar extends React.Component {
   static propTypes = {
@@ -25,14 +26,14 @@ class UploadProgressBar extends React.Component {
                      this.props.progress : 
                      0).toFixed(2);
     let bytes = this.props.totalBytesSent !== undefined && this.props.totalBytes !== undefined ? 
-              `, remaining to upload: ${this.bytesToSize(this.props.totalBytes - this.props.totalBytesSent)}` : 
+              ' ' + interpolate(_("remaining to upload: %(bytes)s"), { bytes: this.bytesToSize(this.props.totalBytes - this.props.totalBytesSent)}) : 
                "";
 
     let active = percentage < 100 ? "active" : "";
 
     let label = active ? 
-                `${this.props.totalCount} files${bytes}` :
-                `${this.props.totalCount} files uploaded successfully`;
+                interpolate(_('%(count)s files %(remaining)s'), { count: this.props.totalCount, remaining: bytes }) :
+                interpolate(_('%(count)s files uploaded successfully'), { count: this.props.totalCount });
 
     return (
       <div className="upload-progress-bar">

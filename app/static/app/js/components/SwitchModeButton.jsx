@@ -1,6 +1,7 @@
 import React from 'react';
 import '../css/SwitchModeButton.scss';
 import PropTypes from 'prop-types';
+import { _ } from '../classes/gettext';
 
 class SwitchModeButton extends React.Component {
   static defaultProps = {
@@ -43,7 +44,7 @@ class SwitchModeButton extends React.Component {
   }
 
   text(){
-    return this.props.type === 'mapToModel' ? '3D' : '2D';
+    return this.props.type === 'mapToModel' ? _('3D') : _('2D');
   }
 
   render() {
