@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-15 14:34+0000\n"
+"POT-Creation-Date: 2020-12-18 16:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,1239 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: app/static/app/js/Console.jsx:135
+#, python-format
+msgid "output truncated at %(count)s lines"
+msgstr ""
+
+#: app/static/app/js/Console.jsx:147 app/static/app/js/Console.jsx:155
+#: app/static/app/js/Console.jsx:165
+msgid "Toggle Fullscreen"
+msgstr ""
+
+#: app/static/app/js/Console.jsx:148 app/static/app/js/Console.jsx:156
+msgid "Exit Fullscreen"
+msgstr ""
+
+#: app/static/app/js/Console.jsx:162
+msgid "Download To File"
+msgstr ""
+
+#: app/static/app/js/Dashboard.jsx:26
+msgid "Name field is required"
+msgstr ""
+
+#: app/static/app/js/Dashboard.jsx:62
+msgid "Add Project"
+msgstr ""
+
+#: app/static/app/js/Dashboard.jsx:97
+msgid "Your changes will be lost. Are you sure you want to leave?"
+msgstr ""
+
+#: app/static/app/js/MapView.jsx:65
+#: app/static/app/js/classes/PipelineSteps.js:37
+#: app/static/app/js/components/Map.jsx:82
+msgid "Orthophoto"
+msgstr ""
+
+#: app/static/app/js/MapView.jsx:70 app/static/app/js/components/Map.jsx:84
+msgid "Plant Health"
+msgstr ""
+
+#: app/static/app/js/MapView.jsx:75
+msgid "Surface Model"
+msgstr ""
+
+#: app/static/app/js/MapView.jsx:80
+msgid "Terrain Model"
+msgstr ""
+
+#: app/static/app/js/ModelView.jsx:42
+msgid "Show Model"
+msgstr ""
+
+#: app/static/app/js/ModelView.jsx:69
+msgid "Show Cameras"
+msgstr ""
+
+#: app/static/app/js/ModelView.jsx:482
+#, fuzzy
+#| msgid "Loading dashboard..."
+msgid "Loading textured model..."
+msgstr "Caricando il pannello di controllo..."
+
+#: app/static/app/js/classes/AssetDownloads.js:36
+msgid "Orthophoto (GeoTIFF)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:37
+msgid "Orthophoto (PNG)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:38
+msgid "Orthophoto (MBTiles)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:39
+msgid "Orthophoto (Tiles)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:40
+msgid "Terrain Model (GeoTIFF)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:41
+msgid "Terrain Model (Tiles)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:42
+msgid "Surface Model (GeoTIFF)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:43
+msgid "Surface Model (Tiles)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:44
+msgid "Point Cloud (LAS)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:45
+msgid "Point Cloud (LAZ)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:46
+msgid "Point Cloud (PLY)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:47
+msgid "Point Cloud (CSV)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:48
+msgid "Textured Model"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:49
+msgid "Camera Parameters"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:50
+msgid "Camera Shots (GeoJSON)"
+msgstr ""
+
+#: app/static/app/js/classes/AssetDownloads.js:53
+msgid "All Assets"
+msgstr ""
+
+#: app/static/app/js/classes/Basemaps.js:9
+msgid "Google Maps Hybrid"
+msgstr ""
+
+#: app/static/app/js/classes/Basemaps.js:17
+msgid "ESRI Satellite"
+msgstr ""
+
+#: app/static/app/js/classes/Basemaps.js:26
+msgid "OSM Mapnik"
+msgstr ""
+
+#: app/static/app/js/classes/PendingActions.js:11
+msgid "Canceling..."
+msgstr ""
+
+#: app/static/app/js/classes/PendingActions.js:14
+#: app/static/app/js/components/FormDialog.jsx:170
+msgid "Deleting..."
+msgstr ""
+
+#: app/static/app/js/classes/PendingActions.js:17
+msgid "Restarting..."
+msgstr ""
+
+#: app/static/app/js/classes/PendingActions.js:20
+msgid "Resizing images..."
+msgstr ""
+
+#: app/static/app/js/classes/PendingActions.js:23
+msgid "Importing..."
+msgstr ""
+
+#: app/static/app/js/classes/PipelineSteps.js:7
+msgid "Load Dataset"
+msgstr ""
+
+#: app/static/app/js/classes/PipelineSteps.js:12
+msgid "Structure From Motion / MVS"
+msgstr ""
+
+#: app/static/app/js/classes/PipelineSteps.js:17
+msgid "Meshing"
+msgstr ""
+
+#: app/static/app/js/classes/PipelineSteps.js:22
+msgid "Texturing"
+msgstr ""
+
+#: app/static/app/js/classes/PipelineSteps.js:27
+msgid "Georeferencing"
+msgstr ""
+
+#: app/static/app/js/classes/PipelineSteps.js:32
+msgid "DEM"
+msgstr ""
+
+#: app/static/app/js/classes/PipelineSteps.js:42
+msgid "Report"
+msgstr ""
+
+#: app/static/app/js/classes/ResizeModes.js:4
+msgid "No"
+msgstr ""
+
+#: app/static/app/js/classes/ResizeModes.js:5
+msgid "Yes"
+msgstr ""
+
+#: app/static/app/js/classes/StatusCodes.js:11
+msgid "Queued"
+msgstr ""
+
+#: app/static/app/js/classes/StatusCodes.js:15
+msgid "Running"
+msgstr ""
+
+#: app/static/app/js/classes/StatusCodes.js:19
+msgid "Failed"
+msgstr ""
+
+#: app/static/app/js/classes/StatusCodes.js:23
+msgid "Completed"
+msgstr ""
+
+#: app/static/app/js/classes/StatusCodes.js:27
+msgid "Canceled"
+msgstr ""
+
+#: app/static/app/js/classes/TempLayer.js:14
+#, python-format
+msgid "%(file)s is bigger than 5 MB."
+msgstr ""
+
+#: app/static/app/js/classes/TempLayer.js:30
+#, python-format
+msgid "Not a proper zipped shapefile: %(file)s"
+msgstr ""
+
+#: app/static/app/js/classes/TempLayer.js:43
+#, python-format
+msgid "Not a proper JSON file: %(file)s"
+msgstr ""
+
+#: app/static/app/js/components/AssetDownloadButtons.jsx:33
+msgid "Download Assets"
+msgstr ""
+
+#: app/static/app/js/components/EditPresetDialog.jsx:107
+#: app/static/app/js/components/EditTaskForm.jsx:523
+msgid "Edit Task Options"
+msgstr ""
+
+#: app/static/app/js/components/EditPresetDialog.jsx:113
+#: app/static/app/js/components/EditProjectDialog.jsx:85
+#: app/static/app/js/components/EditTaskForm.jsx:597
+msgid "Name"
+msgstr ""
+
+#: app/static/app/js/components/EditPresetDialog.jsx:121
+msgid "Search"
+msgstr ""
+
+#: app/static/app/js/components/EditProjectDialog.jsx:10
+msgid "New Project"
+msgstr ""
+
+#: app/static/app/js/components/EditProjectDialog.jsx:11
+msgid "Create Project"
+msgstr ""
+
+#: app/static/app/js/components/EditProjectDialog.jsx:12
+msgid "Creating project..."
+msgstr ""
+
+#: app/static/app/js/components/EditProjectDialog.jsx:14
+msgid ""
+"All tasks, images and models associated with this project will be "
+"permanently deleted. Are you sure you want to continue?"
+msgstr ""
+
+#: app/static/app/js/components/EditProjectDialog.jsx:91
+msgid "Description (optional)"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:89
+msgid ""
+"Could not load list of processing nodes. Are you connected to the internet?"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:97
+msgid "We tried to reach:"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:98
+msgid "There are no usable processing nodes."
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:98
+msgid ""
+"Make sure that at least one processing node is reachable and that you have "
+"granted the current user sufficient permissions to view the processing node "
+"(by going to Administration -- Processing Nodes -- Select Node -- Object "
+"Permissions -- Add User/Group and check CAN VIEW PROCESSING NODE). If you "
+"are bringing a node back online, it will take about 30 seconds for WebODM to "
+"recognize it."
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:216
+msgid "Could not load list of presets. Are you connected to the internet?"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:225
+#: app/static/app/js/components/EditTaskForm.jsx:384
+#: app/static/app/js/components/Map.jsx:349
+msgid "Custom"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:232
+#: app/static/app/js/components/EditTaskForm.jsx:353
+msgid "Default"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:437
+msgid "My Preset"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:437
+#, python-format
+msgid "Copy of %(preset)s"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:460
+msgid "Could not duplicate the preset. Please try to refresh the page."
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:469
+msgid ""
+"System presets can only be removed by a staff member from the Administration "
+"panel."
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:473
+#, python-format
+msgid "Are you sure you want to delete \"%(preset)s\"?"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:486
+msgid "Could not delete the preset. Please try to refresh the page."
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:501
+msgid "Retry"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:524
+#: app/static/app/js/components/EditTaskForm.jsx:531
+#: app/static/app/js/components/ProjectListItem.jsx:533
+#: app/static/app/js/components/TaskListItem.jsx:413
+msgid "Edit"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:537
+msgid "Duplicate"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:541
+#: app/static/app/js/components/EditTaskPanel.jsx:82
+#: app/static/app/js/components/FormDialog.jsx:11
+msgid "Save"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:545
+#: app/static/app/js/components/FormDialog.jsx:173
+#: app/static/app/js/components/TaskListItem.jsx:439
+msgid "Delete"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:556
+msgid "Processing Node"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:566
+msgid "Options"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskForm.jsx:590
+msgid "Loading processing nodes and presets..."
+msgstr ""
+
+#: app/static/app/js/components/EditTaskPanel.jsx:56
+msgid "Could not update task information. Plese try again."
+msgstr ""
+
+#: app/static/app/js/components/EditTaskPanel.jsx:75
+#: app/static/app/js/components/FormDialog.jsx:151
+#: app/static/app/js/components/NewTaskPanel.jsx:185
+#: app/static/app/js/components/TaskListItem.jsx:422
+msgid "Cancel"
+msgstr ""
+
+#: app/static/app/js/components/EditTaskPanel.jsx:79
+#: app/static/app/js/components/FormDialog.jsx:12
+msgid "Saving..."
+msgstr ""
+
+#: app/static/app/js/components/ErrorMessage.jsx:28
+#: app/static/app/js/components/ProjectListItem.jsx:543
+msgid "Close"
+msgstr ""
+
+#: app/static/app/js/components/FormDialog.jsx:10
+msgid "Title"
+msgstr ""
+
+#: app/static/app/js/components/FormDialog.jsx:14
+msgid "Are you sure?"
+msgstr ""
+
+#: app/static/app/js/components/FormDialog.jsx:109
+msgid "Could not apply changes"
+msgstr ""
+
+#: app/static/app/js/components/FormDialog.jsx:123
+msgid "Could not delete item"
+msgstr ""
+
+#: app/static/app/js/components/Histogram.jsx:293
+msgid "Min:"
+msgstr ""
+
+#: app/static/app/js/components/Histogram.jsx:294
+msgid "Max:"
+msgstr ""
+
+#: app/static/app/js/components/ImagePopup.jsx:47
+msgid "Image is missing"
+msgstr ""
+
+#: app/static/app/js/components/ImagePopup.jsx:86
+msgid "Download Image"
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:63
+msgid "Cannot upload file. Check your internet connection and try again."
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:91
+#, python-format
+msgid "Invalid response from server: %(error)s"
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:94
+msgid "An error occured while uploading the file. Please try again."
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:138
+#: app/static/app/js/components/LayersControlLayer.jsx:249
+#: app/static/app/js/components/ProjectList.jsx:56
+#, python-format
+msgid "Invalid JSON response: %(error)s"
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:142
+msgid "Cannot import from URL. Check your internet connection."
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:159
+msgid "Import Existing Assets"
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:160
+#, python-format
+msgid ""
+"You can import .zip files that have been exported from existing tasks via "
+"Download Assets %(arrow)s All Assets."
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:167
+msgid "Upload a File"
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:175
+msgid "Import From URL"
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:184
+#: app/static/app/js/components/ProjectListItem.jsx:497
+msgid "Import"
+msgstr ""
+
+#: app/static/app/js/components/ImportTaskPanel.jsx:194
+msgid "Cancel Upload"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:287
+msgid "Algorithm:"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:299
+msgid "Filter:"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:311
+msgid "Color:"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:323
+msgid "Shading:"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:326
+#: app/static/app/js/components/Map.jsx:350
+msgid "None"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:327
+msgid "Normal"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:328
+msgid "Extruded"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlLayer.jsx:334
+msgid "Export:"
+msgstr ""
+
+#: app/static/app/js/components/LayersControlPanel.jsx:26
+#: app/static/app/js/components/Map.jsx:527
+#: app/static/app/js/components/NewTaskPanel.jsx:187
+#: app/static/app/js/components/TaskList.jsx:75
+#, fuzzy
+#| msgid "Loading dashboard..."
+msgid "Loading..."
+msgstr "Caricando il pannello di controllo..."
+
+#: app/static/app/js/components/LayersControlPanel.jsx:44
+msgid "Layers"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:86
+msgid "DSM"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:88
+msgid "DTM"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:259
+msgid "(Cameras)"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:331
+msgid "Enter a tile URL template. Valid coordinates are:"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:332
+#, python-brace-format
+msgid "{z}, {x}, {y} for Z/X/Y tile scheme"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:333
+msgid "{-y} for flipped TMS-style Y coordinates"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:335
+msgid "Example:"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:401
+msgid "Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay"
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:452
+msgid "Error: cannot load assets list."
+msgstr ""
+
+#: app/static/app/js/components/Map.jsx:523
+msgid "Opacity:"
+msgstr ""
+
+#: app/static/app/js/components/NewTaskPanel.jsx:83
+msgid "Are you sure you want to cancel?"
+msgstr ""
+
+#: app/static/app/js/components/NewTaskPanel.jsx:131
+#, python-format
+msgid "%(count)s files selected. Please check these additional options:"
+msgstr ""
+
+#: app/static/app/js/components/NewTaskPanel.jsx:144
+msgid "Resize Images"
+msgstr ""
+
+#: app/static/app/js/components/NewTaskPanel.jsx:168
+msgid "px"
+msgstr ""
+
+#: app/static/app/js/components/NewTaskPanel.jsx:189
+msgid "Review"
+msgstr ""
+
+#: app/static/app/js/components/NewTaskPanel.jsx:189
+msgid "Start Processing"
+msgstr ""
+
+#: app/static/app/js/components/ProcessingNodeOption.jsx:140
+#: app/static/app/js/translations/potree_autogenerated.js:62
+msgid "Enable"
+msgstr ""
+
+#: app/static/app/js/components/ProcessingNodeOption.jsx:149
+msgid "Click to import a .JSON file"
+msgstr ""
+
+#: app/static/app/js/components/ProcessingNodeOption.jsx:164
+msgid "Reset to default"
+msgstr ""
+
+#: app/static/app/js/components/ProjectList.jsx:63
+#, python-format
+msgid "Could not load projects list: %(error)s"
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:185
+#, python-format
+msgid "Cannot upload %(filename)s, exceeded max retries (%(max_retries)s)"
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:234
+#: app/static/app/js/components/ProjectListItem.jsx:346
+#, python-format
+msgid "Cannot create new task. Invalid response from server: %(error)s"
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:237
+#: app/static/app/js/components/ProjectListItem.jsx:350
+msgid "Cannot create new task. Please try again later."
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:244
+#, python-format
+msgid ""
+"%(count)s files cannot be uploaded. As a reminder, only images (.jpg, .tif, ."
+"png) and GCP files (.txt) can be uploaded. Try again."
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:472
+msgid "Edit Project"
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:473
+msgid "Save Changes"
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:474
+msgid "Saving changes..."
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:492
+msgid "Select Images and GCP"
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:512
+#: app/static/app/js/components/TaskListItem.jsx:398
+msgid "View Map"
+msgstr ""
+
+#: app/static/app/js/components/ProjectListItem.jsx:527
+#, python-format
+msgid "%(count)s Tasks"
+msgstr ""
+
+#: app/static/app/js/components/ShareButton.jsx:58
+msgid "Share"
+msgstr ""
+
+#: app/static/app/js/components/SharePopup.jsx:60
+msgid "An error occurred. Check your connection and permissions."
+msgstr ""
+
+#: app/static/app/js/components/SharePopup.jsx:78
+msgid "Share This Task"
+msgstr ""
+
+#: app/static/app/js/components/SharePopup.jsx:87
+msgid "QR"
+msgstr ""
+
+#: app/static/app/js/components/SharePopup.jsx:100
+msgid "Enabled"
+msgstr ""
+
+#: app/static/app/js/components/SharePopup.jsx:106
+msgid "Link:"
+msgstr ""
+
+#: app/static/app/js/components/SharePopup.jsx:117
+msgid "HTML iframe:"
+msgstr ""
+
+#: app/static/app/js/components/SwitchModeButton.jsx:47
+msgid "3D"
+msgstr ""
+
+#: app/static/app/js/components/SwitchModeButton.jsx:47
+msgid "2D"
+msgstr ""
+
+#: app/static/app/js/components/TaskList.jsx:51
+#, python-format
+msgid "Could not load task list: %(error)s"
+msgstr ""
+
+#: app/static/app/js/components/TaskList.jsx:77
+#, python-format
+msgid "Error: %(error)s"
+msgstr ""
+
+#: app/static/app/js/components/TaskList.jsx:77
+msgid "Try again"
+msgstr ""
+
+#: app/static/app/js/components/TaskList.jsx:79
+msgid "This project has no tasks. Create one by uploading some images!"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:200
+#: app/static/app/js/components/TaskListItem.jsx:207
+msgid "Cannot complete operation."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:250
+#, python-format
+msgid ""
+"It looks like there might be one of the following problems: %(problems)s You "
+"can read more about best practices for capturing good images %(link)s."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:251
+msgid "Not enough images"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:252
+msgid "Not enough overlap between images"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:253
+msgid "Images might be too blurry (common with phone cameras)"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:254
+msgid ""
+"The min-num-features task option is set too low, try increasing it by 25%"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:255
+msgid "here"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:258
+#, python-format
+msgid ""
+"It looks like this computer might be too old. WebODM requires a computer "
+"with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set "
+"support or higher. You can still run WebODM if you compile your own docker "
+"images. See %(link)s for more information."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:258
+msgid "this page"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:260
+msgid ""
+"The processing node is missing a program necessary to complete the task. "
+"This might indicate a corrupted installation. If you built OpenDroneMap, "
+"please check that all programs built without errors."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:296
+msgid "Resume Processing"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:312
+msgid "Cannot restart task."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:354
+msgid "Cannot restart task from (stage)s."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:368
+#, python-format
+msgid "Task #%(number)s"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:372
+msgid "Uploading images to processing node"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:374
+msgid "Waiting for a node..."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:405
+msgid "View 3D Model"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:422
+msgid "Cannot cancel task."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:434
+msgid "Restart"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:440
+msgid ""
+"All information related to this task, including images, maps and models will "
+"be deleted. Continue?"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:441
+msgid "Cannot delete task."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:485
+msgid "Task Output:"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:488
+msgid "On"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:489
+msgid "Off"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:497
+msgid "Created on:"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:500
+msgid "Processing Node:"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:504
+msgid "Options:"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:524
+msgid ""
+"An orthophoto could not be generated. To generate one, make sure GPS "
+"information is embedded in the EXIF tags of your images, or use a Ground "
+"Control Points (GCP) file."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:527
+msgid "enough RAM allocated"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:527
+msgid "cloud processing node"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:527
+#, python-format
+msgid ""
+"It looks like your processing node ran out of memory. If you are using "
+"docker, make sure that your docker environment has %(memlink)s. "
+"Alternatively, make sure you have enough physical RAM, reduce the number of "
+"images, make your images smaller, or reduce the max-concurrency parameter "
+"from the task's options. You can also try to use a %(cloudlink)s."
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:534
+msgid "open a topic"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:534
+#, python-format
+msgid ""
+"\"Process exited with code 1\" means that part of the processing failed. "
+"Sometimes it's a problem with the dataset, sometimes it can be solved by "
+"tweaking the Task Options and sometimes it might be a bug! If you need help, "
+"upload your images somewhere like %(link1)s or %(link2)s and "
+"%(open_a_topic)s on our community forum, making sure to include a copy of "
+"your task's output. Our awesome contributors will try to help you!"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:580
+msgid "Set a processing node"
+msgstr ""
+
+#: app/static/app/js/components/TaskListItem.jsx:585
+msgid "Waiting for image upload..."
+msgstr ""
+
+#: app/static/app/js/components/UploadProgressBar.jsx:29
+#, python-format
+msgid "remaining to upload: %(bytes)s"
+msgstr ""
+
+#: app/static/app/js/components/UploadProgressBar.jsx:35
+#, python-format
+msgid "%(count)s files %(remaining)s"
+msgstr ""
+
+#: app/static/app/js/components/UploadProgressBar.jsx:36
+#, python-format
+msgid "%(count)s files uploaded successfully"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:3
+msgid "Navigation"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:4
+msgid "Appearance"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:5
+msgid "Tools"
+msgstr "Strumenti"
+
+#: app/static/app/js/translations/potree_autogenerated.js:6
+msgid "Measurements"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:7
+msgid "Clipping"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:8
+msgid "Annotations"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:9
+#: app/static/app/js/translations/potree_autogenerated.js:54
+msgid "Materials"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:10
+msgid "Scene"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:11
+msgid "Classification filter"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:12
+msgid "Filters"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:13
+msgid "Other settings"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:14
+msgid "About"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:15
+msgid "Angle measurement"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:16
+msgid "Point measurement"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:17
+msgid "Distance measurement"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:18
+msgid "Height measurement"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:19
+msgid "Circle measurement"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:20
+msgid "Area measurement"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:21
+msgid "Volume measurement"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:22
+#: app/static/app/js/translations/potree_autogenerated.js:78
+msgid "Height profile"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:23
+msgid "Annotation"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:24
+msgid "Volume clip"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:25
+msgid "Polygon clip"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:26
+msgid "Draw a selection box. Requires you to be in orthographic camera mode!"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:27
+msgid "Clip plane on x axis"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:28
+msgid "Clip plane on y axis"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:29
+msgid "Clip plane on z axis"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:30
+msgid "Remove all measurements"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:31
+msgid "Left view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:32
+msgid "Righ view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:33
+msgid "Front view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:34
+msgid "Back view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:35
+msgid "Top view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:36
+msgid "Bottom view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:37
+msgid "Full extent"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:38
+msgid "Orbit control"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:39
+msgid "Fly control"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:40
+msgid "Helicopter control"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:41
+msgid "Earth control"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:42
+msgid "Perspective camera"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:43
+msgid "Orthographic camera"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:44
+msgid "Navigation cube"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:45
+msgid "Remove all clipping volumes"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:46
+msgid "Compass"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:47
+msgid "Camera Animation"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:48
+msgid "Point budget"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:49
+msgid "Point size"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:50
+msgid "Minimum size"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:51
+#: app/static/app/js/translations/potree_autogenerated.js:61
+msgid "Opacity"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:52
+msgid "Field of view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:53
+msgid "Point sizing"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:55
+msgid "Elevation range"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:56
+msgid "Scalar range"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:57
+msgid "Quality"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:58
+msgid "Shape"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:59
+msgid "Radius"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:60
+msgid "Strength"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:63
+msgid "Min node size"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:64
+msgid "Clip mode"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:65
+msgid "Speed"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:66
+msgid "Sky"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:67
+msgid "Keep above ground"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:68
+msgid "Box"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:69
+msgid "Length unit"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:70
+msgid "Lock view"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:71
+#: app/static/app/js/translations/potree_autogenerated.js:88
+msgid "Language"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:72
+msgid "Backface Culling"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:73
+msgid "clip"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:74
+msgid "show volume"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:75
+msgid "show in 3D"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:76
+msgid "show on map"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:77
+msgid "Number of Points"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:79
+msgid "Save LAS(3D)"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:80
+msgid "Save CSV(2D)"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:81
+msgid "Camera Position"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:82
+msgid "Camera Target"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:83
+msgid "Return Number"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:84
+msgid "Number of Returns"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:85
+msgid "min"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:86
+msgid "max"
+msgstr ""
+
+#: app/static/app/js/translations/potree_autogenerated.js:87
+msgid "GPS Time"
+msgstr ""
+
 #: plugins/lightning/public/Dashboard.jsx:38
 msgid "Loading dashboard..."
 msgstr "Caricando il pannello di controllo..."
+
+#: plugins/lightning/public/Dashboard.jsx:158
+msgid "Logout"
+msgstr ""

@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.dispatch import receiver
 from guardian.models import GroupObjectPermissionBase
 from guardian.models import UserObjectPermissionBase
+from django.utils.translation import gettext_lazy as _
+
 from webodm import settings
 
 import json
@@ -16,7 +18,7 @@ from datetime import timedelta
 
 
 OFFLINE_MINUTES = 5 # Number of minutes a node hasn't been seen before it should be considered offline
-
+# TODO
 class ProcessingNode(models.Model):
     hostname = models.CharField(max_length=255, help_text="Hostname or IP address where the node is located (can be an internal hostname as well). If you are using Docker, this is never 127.0.0.1 or localhost. Find the IP address of your host machine by running ifconfig on Linux or by checking your network settings.")
     port = models.PositiveIntegerField(help_text="Port that connects to the node's API")

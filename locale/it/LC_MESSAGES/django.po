@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-15 14:33+0000\n"
+"POT-Creation-Date: 2020-12-18 16:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,374 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
+msgid "Page not found"
+msgstr ""
+
+#: app/templates/app/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+
+#: app/templates/app/admin/500.html:6 app/templates/app/admin/app_index.html:9
+#: app/templates/app/admin/auth/user/change_password.html:13
+#: app/templates/app/admin/base.html:19
+#: app/templates/app/admin/change_form.html:18
+#: app/templates/app/admin/change_list.html:31
+#: app/templates/app/admin/delete_confirmation.html:13
+#: app/templates/app/admin/delete_selected_confirmation.html:13
+#: app/templates/app/admin/invalid_setup.html:6
+#: app/templates/app/admin/object_history.html:6
+msgid "Home"
+msgstr ""
+
+#: app/templates/app/admin/500.html:7
+msgid "Server error"
+msgstr ""
+
+#: app/templates/app/admin/500.html:11
+msgid "Server error (500)"
+msgstr ""
+
+#: app/templates/app/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr ""
+
+#: app/templates/app/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+#: app/templates/app/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: app/templates/app/admin/actions.html:4
+msgid "Go"
+msgstr ""
+
+#: app/templates/app/admin/actions.html:10
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: app/templates/app/admin/actions.html:10
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: app/templates/app/admin/actions.html:12
+msgid "Clear selection"
+msgstr ""
+
+#: app/templates/app/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+
+#: app/templates/app/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr ""
+
+#: app/templates/app/admin/auth/user/change_password.html:17
+#: app/templates/app/admin/auth/user/change_password.html:54
+msgid "Change password"
+msgstr ""
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+#, fuzzy
+#| msgid "Uh oh! Could you please check the errors below?"
+msgid "Please correct the error below."
+msgstr "Uh oh! Puoi per favore controllare gli errori qui sotto?"
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+#, fuzzy
+#| msgid "Uh oh! Could you please check the errors below?"
+msgid "Please correct the errors below."
+msgstr "Uh oh! Puoi per favore controllare gli errori qui sotto?"
+
+#: app/templates/app/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+#: app/templates/app/admin/base_site.html:3
+msgid "Django site admin"
+msgstr ""
+
+#: app/templates/app/admin/base_site.html:6
+#, fuzzy
+#| msgid "Administration"
+msgid "Django administration"
+msgstr "Amministrazione"
+
+#: app/templates/app/admin/change_form.html:21
+#: app/templates/app/admin/change_list.html:49
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: app/templates/app/admin/change_form.html:33
+#: app/templates/app/admin/object_history.html:10
+msgid "History"
+msgstr ""
+
+#: app/templates/app/admin/change_form.html:35
+#: app/templates/app/admin/edit_inline/stacked.html:14
+#: app/templates/app/admin/edit_inline/tabular.html:36
+msgid "View on site"
+msgstr ""
+
+#: app/templates/app/admin/change_list.html:69
+msgid "Filter"
+msgstr ""
+
+#: app/templates/app/admin/change_list_plugin.html:24
+msgid "Load Plugin (.zip)"
+msgstr ""
+
+#: app/templates/app/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr ""
+
+#: app/templates/app/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+#: app/templates/app/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:17
+#: app/templates/app/admin/related_widget_wrapper.html:23
+#: app/templates/app/admin/submit_line.html:6
+#: app/templates/app/processing_node.html:54
+msgid "Delete"
+msgstr "Cancella"
+
+#: app/templates/app/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:30
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:37
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:39
+#: app/templates/app/admin/delete_selected_confirmation.html:38
+msgid "Objects"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:46
+#: app/templates/app/admin/delete_selected_confirmation.html:49
+msgid "Yes, I'm sure"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:47
+#: app/templates/app/admin/delete_selected_confirmation.html:50
+msgid "No, take me back"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:16
+msgid "Delete multiple objects"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:29
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:36
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+#: app/templates/app/admin/edit_inline/stacked.html:12
+#: app/templates/app/admin/edit_inline/tabular.html:34
+#: app/templates/app/admin/index.html:37
+#: app/templates/app/admin/related_widget_wrapper.html:9
+msgid "Change"
+msgstr ""
+
+#: app/templates/app/admin/edit_inline/tabular.html:20
+#, fuzzy
+#| msgid "Delete"
+msgid "Delete?"
+msgstr "Cancella"
+
+#: app/templates/app/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+#: app/templates/app/admin/includes/object_delete_summary.html:2
+msgid "Summary"
+msgstr ""
+
+#: app/templates/app/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+#: app/templates/app/admin/index.html:31
+#: app/templates/app/admin/related_widget_wrapper.html:16
+#, fuzzy
+#| msgid "Add New"
+msgid "Add"
+msgstr "Aggiungi Nuovo"
+
+#: app/templates/app/admin/index.html:47
+msgid "You don't have permission to edit anything."
+msgstr ""
+
+#: app/templates/app/admin/index.html:55
+msgid "Recent actions"
+msgstr ""
+
+#: app/templates/app/admin/index.html:56
+msgid "My actions"
+msgstr ""
+
+#: app/templates/app/admin/index.html:60
+msgid "None available"
+msgstr ""
+
+#: app/templates/app/admin/index.html:74
+msgid "Unknown content"
+msgstr ""
+
+#: app/templates/app/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+
+#: app/templates/app/admin/login.html:37
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+#: app/templates/app/admin/login.html:57
+msgid "Forgotten your password or username?"
+msgstr ""
+
+#: app/templates/app/admin/login.html:61
+msgid "Log in"
+msgstr ""
+
+#: app/templates/app/admin/object_history.html:22
+msgid "Date/time"
+msgstr ""
+
+#: app/templates/app/admin/object_history.html:23
+msgid "User"
+msgstr ""
+
+#: app/templates/app/admin/object_history.html:24
+#, fuzzy
+#| msgid "Application"
+msgid "Action"
+msgstr "Applicazione"
+
+#: app/templates/app/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+
+#: app/templates/app/admin/pagination.html:10
+#: app/templates/app/admin/search_form.html:9
+msgid "Show all"
+msgstr ""
+
+#: app/templates/app/admin/pagination.html:11
+#: app/templates/app/admin/submit_line.html:3
+msgid "Save"
+msgstr ""
+
+#: app/templates/app/admin/popup_response.html:3
+msgid "Popup closing..."
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:8
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:15
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:22
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/search_form.html:7
+msgid "Search"
+msgstr ""
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
+#: app/templates/app/admin/submit_line.html:8
+msgid "Save as new"
+msgstr ""
+
+#: app/templates/app/admin/submit_line.html:9
+msgid "Save and add another"
+msgstr ""
+
+#: app/templates/app/admin/submit_line.html:10
+msgid "Save and continue editing"
+msgstr ""
 
 #: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
@@ -60,10 +428,10 @@ msgid "For great 3D, images must overlap by 83%%"
 msgstr ""
 
 #: app/templates/app/dashboard.html:37
+#, python-format
 msgid ""
-"A <a href=\"https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-"
-"OpenDroneMap#running-odm-with-ground-control\" target=\"_blank\">GCP file</"
-"a> is optional, but can increase georeferencing accuracy"
+"A %(link_start)sGCP File%(link_end)s is optional, but can increase "
+"georeferencing accuracy"
 msgstr ""
 
 #: app/templates/app/logged_in_base.html:15
@@ -167,10 +535,6 @@ msgstr "Opzioni (JSON)"
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
 msgstr "Modifica"
-
-#: app/templates/app/processing_node.html:54
-msgid "Delete"
-msgstr "Cancella"
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"

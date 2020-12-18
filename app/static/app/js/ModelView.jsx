@@ -496,6 +496,19 @@ $(function(){
     }
     window.proj4.defs(defs);
 
+    // Use gettext for translations
+    const oldInit = i18n.init;
+    i18n.addPostProcessor("gettext", function(v, k, opts){
+        if (v){
+            return _(v);
+        }else return v;
+    });
+    i18n.init = function(opts, cb){
+        opts.preload = ['en'];
+        opts.postProcess = "gettext";
+        oldInit(opts, cb);
+    };
+
     $("[data-modelview]").each(function(){
         let props = $(this).data();
         delete(props.modelview);
