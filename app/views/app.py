@@ -43,7 +43,7 @@ def dashboard(request):
     if Project.objects.count() == 0:
         Project.objects.create(owner=request.user, name=_("First Project"))
 
-    return render(request, 'app/dashboard.html', {'title': 'Dashboard',
+    return render(request, 'app/dashboard.html', {'title': _('Dashboard'),
         'no_processingnodes': no_processingnodes,
         'no_tasks': no_tasks
     })
@@ -144,7 +144,7 @@ def welcome(request):
 
     return render(request, 'app/welcome.html',
                   {
-                      'title': 'Welcome',
+                      'title': _('Welcome'),
                       'firstuserform': fuf
                   })
 

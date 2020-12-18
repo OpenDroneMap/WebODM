@@ -61,7 +61,7 @@ class ThemeModelForm(forms.ModelForm):
                                         label=_("HTML (after header)"),
                                         required=False,
                                         widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
-    html_after_body = forms.CharField(help_text=_("HTML that will be displayed after the &lt;/body&gt; tag"),
+    html_after_body = forms.CharField(help_text=_("HTML that will be displayed after the body tag"),
                                       label=_("HTML (after body)"),
                                       required=False,
                                     widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))

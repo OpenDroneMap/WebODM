@@ -21,6 +21,7 @@ from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
 from .common import get_and_check_project
 from app.security import path_traversal_check
+from django.utils.translation import gettext_lazy as _
 
 
 def flatten_files(request_files):
@@ -175,7 +176,7 @@ class TaskViewSet(viewsets.ViewSet):
         task.images_count = models.ImageUpload.objects.filter(task=task).count()
 
         if task.images_count < 2:
-            raise exceptions.ValidationError(detail="You need to upload at least 2 images before commit")
+            raise exceptions.ValidationError(detail=_("You need to upload at least 2 images before commit"))
 
         task.save()
         worker_tasks.process_task.delay(task.id)
@@ -197,7 +198,7 @@ class TaskViewSet(viewsets.ViewSet):
         files = flatten_files(request.FILES)
 
         if len(files) == 0:
-            raise exceptions.ValidationError(detail="No files uploaded")
+            raise exceptions.ValidationError(detail=_("No files uploaded"))
 
         with transaction.atomic():
             for image in files:
@@ -220,7 +221,7 @@ class TaskViewSet(viewsets.ViewSet):
             files = flatten_files(request.FILES)
 
             if len(files) <= 1:
-                raise exceptions.ValidationError(detail="Cannot create task, you need at least 2 images")
+                raise exceptions.ValidationError(detail=_("Cannot create task, you need at least 2 images"))
 
             with transaction.atomic():
                 task = models.Task.objects.create(project=project,
@@ -325,10 +326,10 @@ class TaskDownloads(TaskNestedView):
         try:
             asset_path = task.get_asset_download_path(asset)
         except FileNotFoundError:
-            raise exceptions.NotFound("Asset does not exist")
+            raise exceptions.NotFound(_("Asset does not exist"))
 
         if not os.path.exists(asset_path):
-            raise exceptions.NotFound("Asset does not exist")
+            raise exceptions.NotFound(_("Asset does not exist"))
 
         return download_file_response(request, asset_path, 'attachment')
 
@@ -347,10 +348,10 @@ class TaskAssets(TaskNestedView):
         try:
             asset_path = path_traversal_check(task.assets_path(unsafe_asset_path), task.assets_path(""))
         except SuspiciousFileOperation:
-            raise exceptions.NotFound("Asset does not exist")
+            raise exceptions.NotFound(_("Asset does not exist"))
 
         if (not os.path.exists(asset_path)) or os.path.isdir(asset_path):
-            raise exceptions.NotFound("Asset does not exist")
+            raise exceptions.NotFound(_("Asset does not exist"))
 
         return download_file_response(request, asset_path, 'inline')
 
@@ -366,13 +367,13 @@ class TaskAssetsImport(APIView):
 
         files = flatten_files(request.FILES)
         import_url = request.data.get('url', None)
-        task_name = request.data.get('name', 'Imported Task')
+        task_name = request.data.get('name', _('Imported Task'))
 
         if not import_url and len(files) != 1:
-            raise exceptions.ValidationError(detail="Cannot create task, you need to upload 1 file")
+            raise exceptions.ValidationError(detail=_("Cannot create task, you need to upload 1 file"))
 
         if import_url and len(files) > 0:
-            raise exceptions.ValidationError(detail="Cannot create task, either specify a URL or upload 1 file.")
+            raise exceptions.ValidationError(detail=_("Cannot create task, either specify a URL or upload 1 file."))
 
         with transaction.atomic():
             task = models.Task.objects.create(project=project,

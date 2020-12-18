@@ -8,7 +8,6 @@ from django.db.models import signals
 from django.dispatch import receiver
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
-from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from webodm import settings
@@ -71,7 +70,7 @@ class Setting(models.Model):
         super(Setting, self).save(*args, **kwargs)
 
     def __str__(self):
-        return gettext("Application")
+        return str(_("Application"))
     
     class Meta:
         verbose_name = _("Settings")

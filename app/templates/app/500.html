@@ -1,9 +1,9 @@
 {% extends "app/base.html" %}
-{% load settings %}
+{% load settings i18n %}
 {% block page-wrapper %}
 <div style="text-align: center;">
-    <h3>500 Internal Server Error</h3>
-    <h5>Something happened. The server logs contain more information.</h5>
+    <h3>{% trans '500 Internal Server Error' %}</h3>
+    <h5>{% trans 'Something happened. The server logs contain more information.' %}</h5>
     <img src="/static/app/img/500.png" alt="500"/>
 </div>
 
