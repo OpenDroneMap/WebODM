@@ -3,20 +3,623 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-18 16:27+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2020-12-18 17:36+0000\n"
+"PO-Revision-Date: 2020-12-17 18:29+0000\n"
+"Last-Translator: Jochen Weis <jochen.weis.ld@gmail.com>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/webodm/webodm/de/"
+">\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.4-dev\n"
+
+#: app/admin.py:52
+msgid "Enter custom CSS"
+msgstr ""
+
+#: app/admin.py:53 app/models/theme.py:38
+msgid "CSS"
+msgstr ""
+
+#: app/admin.py:56
+msgid "HTML that will be displayed above site header"
+msgstr ""
+
+#: app/admin.py:57 app/models/theme.py:39
+msgid "HTML (before header)"
+msgstr ""
+
+#: app/admin.py:60
+msgid "HTML that will be displayed after site header"
+msgstr ""
+
+#: app/admin.py:61 app/models/theme.py:40
+msgid "HTML (after header)"
+msgstr ""
+
+#: app/admin.py:64
+msgid "HTML that will be displayed after the &lt;/body&gt; tag"
+msgstr ""
+
+#: app/admin.py:65 app/models/theme.py:41
+msgid "HTML (after body)"
+msgstr ""
+
+#: app/admin.py:68
+#, python-brace-format
+msgid ""
+"HTML that will be displayed in the footer. You can also use the special tags "
+"such as {ORGANIZATION} and {YEAR}."
+msgstr ""
+
+#: app/admin.py:69 app/models/theme.py:42
+msgid "HTML (footer)"
+msgstr ""
+
+#: app/models/image_upload.py:10
+msgid "Task this image belongs to"
+msgstr ""
+
+#: app/models/image_upload.py:10 app/models/task.py:259
+msgid "Task"
+msgstr ""
+
+#: app/models/image_upload.py:11
+msgid "File uploaded by a user"
+msgstr ""
+
+#: app/models/image_upload.py:11
+msgid "Image"
+msgstr ""
+
+#: app/models/image_upload.py:20
+msgid "Image Upload"
+msgstr ""
+
+#: app/models/image_upload.py:21
+msgid "Image Uploads"
+msgstr ""
+
+#: app/models/plugin.py:5
+#, fuzzy
+#| msgid "Plugins"
+msgid "Plugin name"
+msgstr "Plugins"
+
+#: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
+#: app/models/task.py:221 app/models/theme.py:16
+msgid "Name"
+msgstr ""
+
+#: app/models/plugin.py:6
+msgid "Whether this plugin is enabled."
+msgstr ""
+
+#: app/models/plugin.py:20
+#, fuzzy
+#| msgid "Plugins"
+msgid "Plugin"
+msgstr "Plugins"
+
+#: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
+msgid "Plugins"
+msgstr "Plugins"
+
+#: app/models/plugin_datum.py:7
+msgid "Setting key"
+msgstr ""
+
+#: app/models/plugin_datum.py:7
+msgid "Key"
+msgstr ""
+
+#: app/models/plugin_datum.py:8
+msgid "The user this setting belongs to. If NULL, the setting is global."
+msgstr ""
+
+#: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
+msgid "User"
+msgstr ""
+
+#: app/models/plugin_datum.py:9
+msgid "Integer value"
+msgstr ""
+
+#: app/models/plugin_datum.py:10
+msgid "Float value"
+msgstr ""
+
+#: app/models/plugin_datum.py:11
+msgid "Bool value"
+msgstr ""
+
+#: app/models/plugin_datum.py:12
+msgid "String value"
+msgstr ""
+
+#: app/models/plugin_datum.py:13
+msgid "JSON value"
+msgstr ""
+
+#: app/models/plugin_datum.py:19 app/models/plugin_datum.py:20
+#, fuzzy
+#| msgid "Plugins"
+msgid "Plugin Datum"
+msgstr "Plugins"
+
+#: app/models/preset.py:9
+msgid "The person who owns this preset"
+msgstr ""
+
+#: app/models/preset.py:9 app/models/project.py:22
+msgid "Owner"
+msgstr ""
+
+#: app/models/preset.py:10
+msgid "A label used to describe the preset"
+msgstr ""
+
+#: app/models/preset.py:11
+msgid "Options that define this preset (same format as in a Task's options)."
+msgstr ""
+
+#: app/models/preset.py:11 app/models/task.py:227
+#, fuzzy
+#| msgid "Options (JSON)"
+msgid "Options"
+msgstr "Optionen (JSON)"
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+msgid "Creation date"
+msgstr ""
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+#, fuzzy
+#| msgid "Create Account"
+msgid "Created at"
+msgstr "Erstelle Account"
+
+#: app/models/preset.py:14
+msgid ""
+"Whether this preset is available to every user in the system or just to its "
+"owner."
+msgstr ""
+
+#: app/models/preset.py:14
+msgid "System"
+msgstr ""
+
+#: app/models/preset.py:20
+msgid "Preset"
+msgstr ""
+
+#: app/models/preset.py:21
+msgid "Presets"
+msgstr ""
+
+#: app/models/project.py:22
+msgid "The person who created the project"
+msgstr ""
+
+#: app/models/project.py:23
+msgid "A label used to describe the project"
+msgstr ""
+
+#: app/models/project.py:24
+msgid "More in-depth description of the project"
+msgstr ""
+
+#: app/models/project.py:24
+msgid "Description"
+msgstr ""
+
+#: app/models/project.py:26
+msgid ""
+"Whether this project has been marked for deletion. Projects that have "
+"running tasks need to wait for tasks to be properly cleaned up before they "
+"can be deleted."
+msgstr ""
+
+#: app/models/project.py:26
+#, fuzzy
+#| msgid "Delete"
+msgid "Deleting"
+msgstr "Löschen"
+
+#: app/models/project.py:56 app/models/task.py:220
+#, fuzzy
+#| msgid "First Project"
+msgid "Project"
+msgstr "Erstes Projekt"
+
+#: app/models/project.py:57
+#, fuzzy
+#| msgid "First Project"
+msgid "Projects"
+msgstr "Erstes Projekt"
+
+#: app/models/setting.py:21
+msgid "The name of your application"
+msgstr ""
+
+#: app/models/setting.py:21
+msgid "App name"
+msgstr ""
+
+#: app/models/setting.py:22
+msgid "A 512x512 logo of your application (.png or .jpeg)"
+msgstr ""
+
+#: app/models/setting.py:22
+msgid "App logo"
+msgstr ""
+
+#: app/models/setting.py:32
+msgid "The name of your organization"
+msgstr ""
+
+#: app/models/setting.py:32
+msgid "Organization name"
+msgstr ""
+
+#: app/models/setting.py:33
+msgid "The website URL of your organization"
+msgstr ""
+
+#: app/models/setting.py:33
+msgid "Organization website"
+msgstr ""
+
+#: app/models/setting.py:34 app/models/theme.py:48 app/models/theme.py:49
+#: app/templates/app/logged_in_base.html:95
+msgid "Theme"
+msgstr "Thema"
+
+#: app/models/setting.py:35
+msgid "Active theme"
+msgstr ""
+
+#: app/models/setting.py:74 app/templates/app/logged_in_base.html:101
+msgid "Application"
+msgstr "Anwendung"
+
+#: app/models/setting.py:77 app/models/setting.py:78
+msgid "Settings"
+msgstr ""
+
+#: app/models/task.py:217
+msgid "Id"
+msgstr ""
+
+#: app/models/task.py:219
+msgid "Identifier of the task (as returned by NodeODM API)"
+msgstr ""
+
+#: app/models/task.py:219
+msgid "UUID"
+msgstr ""
+
+#: app/models/task.py:220
+msgid "Project that this task belongs to"
+msgstr ""
+
+#: app/models/task.py:221
+msgid "A label for the task"
+msgstr ""
+
+#: app/models/task.py:222
+msgid ""
+"Number of milliseconds that elapsed since the beginning of this task (-1 "
+"indicates that no information is available)"
+msgstr ""
+
+#: app/models/task.py:222
+msgid "Processing Time"
+msgstr ""
+
+#: app/models/task.py:223
+msgid ""
+"Processing node assigned to this task (or null if this task has not been "
+"associated yet)"
+msgstr ""
+
+#: app/models/task.py:223
+msgid "Processing Node"
+msgstr ""
+
+#: app/models/task.py:224
+msgid ""
+"A flag indicating whether this task should be automatically assigned a "
+"processing node"
+msgstr ""
+
+#: app/models/task.py:224
+msgid "Auto Processing Node"
+msgstr ""
+
+#: app/models/task.py:225
+msgid "Current status of the task"
+msgstr ""
+
+#: app/models/task.py:225
+msgid "Status"
+msgstr ""
+
+#: app/models/task.py:226
+msgid "The last processing error received"
+msgstr ""
+
+#: app/models/task.py:226
+msgid "Last Error"
+msgstr ""
+
+#: app/models/task.py:227
+msgid "Options that are being used to process this task"
+msgstr ""
+
+#: app/models/task.py:228
+msgid "List of available assets to download"
+msgstr ""
+
+#: app/models/task.py:228
+msgid "Available Assets"
+msgstr ""
+
+#: app/models/task.py:229
+msgid "Console output of the processing node"
+msgstr ""
+
+#: app/models/task.py:229
+msgid "Console Output"
+msgstr ""
+
+#: app/models/task.py:231
+msgid "Extent of the orthophoto"
+msgstr ""
+
+#: app/models/task.py:231
+msgid "Orthophoto Extent"
+msgstr ""
+
+#: app/models/task.py:232
+msgid "DSM Extent"
+msgstr ""
+
+#: app/models/task.py:233
+msgid "DTM Extent"
+msgstr ""
+
+#: app/models/task.py:237
+msgid ""
+"A requested action to be performed on the task. The selected action will be "
+"performed by the worker at the next iteration."
+msgstr ""
+
+#: app/models/task.py:237
+msgid "Pending Action"
+msgstr ""
+
+#: app/models/task.py:239
+msgid "A flag indicating whether this task is available to the public"
+msgstr ""
+
+#: app/models/task.py:239
+msgid "Public"
+msgstr ""
+
+#: app/models/task.py:240
+msgid ""
+"When set to a value different than -1, indicates that the images for this "
+"task have been / will be resized to the size specified here before "
+"processing."
+msgstr ""
+
+#: app/models/task.py:240
+msgid "Resize To"
+msgstr ""
+
+#: app/models/task.py:243
+msgid ""
+"Value between 0 and 1 indicating the upload progress of this task's files to "
+"the processing node"
+msgstr ""
+
+#: app/models/task.py:244
+msgid "Upload Progress"
+msgstr ""
+
+#: app/models/task.py:247
+msgid ""
+"Value between 0 and 1 indicating the resize progress of this task's images"
+msgstr ""
+
+#: app/models/task.py:248
+msgid "Resize Progress"
+msgstr ""
+
+#: app/models/task.py:251
+msgid ""
+"Value between 0 and 1 indicating the running progress (estimated) of this "
+"task"
+msgstr ""
+
+#: app/models/task.py:252
+msgid "Running Progress"
+msgstr ""
+
+#: app/models/task.py:254
+msgid "URL this task is imported from (only for imported tasks)"
+msgstr ""
+
+#: app/models/task.py:254
+msgid "Import URL"
+msgstr ""
+
+#: app/models/task.py:255
+msgid "Number of images associated with this task"
+msgstr ""
+
+#: app/models/task.py:255
+msgid "Images Count"
+msgstr ""
+
+#: app/models/task.py:256
+msgid ""
+"A flag indicating whether this task is currently waiting for information or "
+"files to be uploaded before being considered for processing."
+msgstr ""
+
+#: app/models/task.py:256
+msgid "Partial"
+msgstr ""
+
+#: app/models/task.py:260
+msgid "Tasks"
+msgstr ""
+
+#: app/models/task.py:269
+msgid "unnamed"
+msgstr ""
+
+#: app/models/task.py:372
+msgid "Importing assets..."
+msgstr ""
+
+#: app/models/task.py:411 app/models/task.py:679
+msgid "Invalid zip file"
+msgstr ""
+
+#: app/models/task.py:505
+#, python-format
+msgid "Connection error: %(error)s"
+msgstr ""
+
+#: app/models/task.py:585
+msgid "Cannot restart a task that has no processing node"
+msgstr ""
+
+#: app/models/task.py:737
+#, python-format
+msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
+msgstr ""
+
+#: app/models/task.py:747
+msgid "Done!"
+msgstr ""
+
+#: app/models/theme.py:16
+msgid "Name of theme"
+msgstr ""
+
+#: app/models/theme.py:19
+msgid "Most text, icons, and borders."
+msgstr ""
+
+#: app/models/theme.py:19
+msgid "Primary"
+msgstr ""
+
+#: app/models/theme.py:20
+msgid "The main background color, and text color of some buttons."
+msgstr ""
+
+#: app/models/theme.py:20
+msgid "Secondary"
+msgstr ""
+
+#: app/models/theme.py:21
+msgid "Navigation links."
+msgstr ""
+
+#: app/models/theme.py:21
+msgid "Tertiary"
+msgstr ""
+
+#: app/models/theme.py:23
+msgid "Primary button color."
+msgstr ""
+
+#: app/models/theme.py:23
+msgid "Button Primary"
+msgstr ""
+
+#: app/models/theme.py:24
+msgid "Default button color."
+msgstr ""
+
+#: app/models/theme.py:24
+msgid "Button Default"
+msgstr ""
+
+#: app/models/theme.py:25
+msgid "Delete button color."
+msgstr ""
+
+#: app/models/theme.py:25
+msgid "Button Danger"
+msgstr ""
+
+#: app/models/theme.py:27
+msgid "Background color of the site's header."
+msgstr ""
+
+#: app/models/theme.py:27
+msgid "Header Background"
+msgstr ""
+
+#: app/models/theme.py:28
+msgid "Text and icons in the site's header."
+msgstr ""
+
+#: app/models/theme.py:28
+msgid "Header Primary"
+msgstr ""
+
+#: app/models/theme.py:30
+msgid "The color of most borders."
+msgstr ""
+
+#: app/models/theme.py:30
+msgid "Border"
+msgstr ""
+
+#: app/models/theme.py:31
+msgid "The background color of panels and some borders."
+msgstr ""
+
+#: app/models/theme.py:31
+msgid "Highlight"
+msgstr ""
+
+#: app/models/theme.py:33
+msgid "The border color of warning dialogs."
+msgstr ""
+
+#: app/models/theme.py:33
+msgid "Dialog Warning"
+msgstr ""
+
+#: app/models/theme.py:35
+msgid "The background color of failed notifications."
+msgstr ""
+
+#: app/models/theme.py:35
+msgid "Failed"
+msgstr ""
+
+#: app/models/theme.py:36
+msgid "The background color of success notifications."
+msgstr ""
+
+#: app/models/theme.py:36
+msgid "Success"
+msgstr ""
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
 msgid "Page not found"
@@ -47,7 +650,7 @@ msgid "Server error (500)"
 msgstr ""
 
 #: app/templates/app/admin/500.html:14
-msgid "Server Error <em>(500)</em>"
+msgid "Server Error (500)"
 msgstr ""
 
 #: app/templates/app/admin/500.html:15
@@ -96,15 +699,19 @@ msgstr ""
 #: app/templates/app/admin/change_form.html:47
 #: app/templates/app/admin/change_list.html:58
 #: app/templates/app/admin/login.html:21
+#, fuzzy
+#| msgid "Uh oh! Could you please check the errors below?"
 msgid "Please correct the error below."
-msgstr ""
+msgstr "Uhoh! Könntest du bitte die folgenden Fehler überprüfen?"
 
 #: app/templates/app/admin/auth/user/change_password.html:27
 #: app/templates/app/admin/change_form.html:47
 #: app/templates/app/admin/change_list.html:58
 #: app/templates/app/admin/login.html:21
+#, fuzzy
+#| msgid "Uh oh! Could you please check the errors below?"
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Uhoh! Könntest du bitte die folgenden Fehler überprüfen?"
 
 #: app/templates/app/admin/auth/user/change_password.html:31
 #, python-format
@@ -144,6 +751,12 @@ msgstr ""
 msgid "Load Plugin (.zip)"
 msgstr ""
 
+#: app/templates/app/admin/change_list_plugin.html:28
+#, fuzzy
+#| msgid "Plugins"
+msgid "Manage Plugins"
+msgstr "Plugins"
+
 #: app/templates/app/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr ""
@@ -162,7 +775,7 @@ msgstr ""
 #: app/templates/app/admin/submit_line.html:6
 #: app/templates/app/processing_node.html:54
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: app/templates/app/admin/delete_confirmation.html:23
 #, python-format
@@ -235,8 +848,10 @@ msgid "Change"
 msgstr ""
 
 #: app/templates/app/admin/edit_inline/tabular.html:20
+#, fuzzy
+#| msgid "Delete"
 msgid "Delete?"
-msgstr ""
+msgstr "Löschen"
 
 #: app/templates/app/admin/filter.html:2
 #, python-format
@@ -254,8 +869,10 @@ msgstr ""
 
 #: app/templates/app/admin/index.html:31
 #: app/templates/app/admin/related_widget_wrapper.html:16
+#, fuzzy
+#| msgid "Add New"
 msgid "Add"
-msgstr ""
+msgstr "Neues Projekt"
 
 #: app/templates/app/admin/index.html:47
 msgid "You don't have permission to edit anything."
@@ -303,13 +920,11 @@ msgstr ""
 msgid "Date/time"
 msgstr ""
 
-#: app/templates/app/admin/object_history.html:23
-msgid "User"
-msgstr ""
-
 #: app/templates/app/admin/object_history.html:24
+#, fuzzy
+#| msgid "Application"
 msgid "Action"
-msgstr ""
+msgstr "Anwendung"
 
 #: app/templates/app/admin/object_history.html:38
 msgid ""
@@ -377,7 +992,7 @@ msgstr ""
 #: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
 msgid "Welcome!"
-msgstr ""
+msgstr "Willkommen!"
 
 #: app/templates/app/dashboard.html:16
 msgid "Add a Processing Node"
@@ -393,7 +1008,7 @@ msgstr ""
 
 #: app/templates/app/dashboard.html:28
 msgid "Select Images and GCP"
-msgstr ""
+msgstr "Bilder und GCP auswählen"
 
 #: app/templates/app/dashboard.html:30
 #, python-format
@@ -401,20 +1016,22 @@ msgid ""
 "To create a map, press the \"%(upload_images)s\" button, or drag and drop "
 "some images into a project."
 msgstr ""
+"Um eine Karte zu erstellen, drücke den \"%(upload_images)s\" Knopf, oder "
+"ziehe per drag and drop Bilder in das Projekt."
 
 #: app/templates/app/dashboard.html:34
 msgid "You need at least 5 images"
-msgstr ""
+msgstr "Man benötigt mindestens 5 Bilder"
 
 #: app/templates/app/dashboard.html:35
 #, python-format
 msgid "Images must overlap by 65%% or more"
-msgstr ""
+msgstr "Bilder sollten mindestens 65%% überlappen"
 
 #: app/templates/app/dashboard.html:36
 #, python-format
 msgid "For great 3D, images must overlap by 83%%"
-msgstr ""
+msgstr "3D-Bilder benötigen eine Überlappung von min. 83%%"
 
 #: app/templates/app/dashboard.html:37
 #, python-format
@@ -426,15 +1043,15 @@ msgstr ""
 #: app/templates/app/logged_in_base.html:15
 #, python-format
 msgid "Hello, %(user)s!"
-msgstr ""
+msgstr "Hallo, %(user)s!"
 
 #: app/templates/app/logged_in_base.html:19
 msgid "Logout"
-msgstr ""
+msgstr "Abmelden"
 
 #: app/templates/app/logged_in_base.html:33
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: app/templates/app/logged_in_base.html:59
 msgid "Processing Nodes"
@@ -442,7 +1059,7 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:69
 msgid "Add New"
-msgstr ""
+msgstr "Neues Projekt"
 
 #: app/templates/app/logged_in_base.html:79
 msgid "Administration"
@@ -450,31 +1067,19 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:84
 msgid "Accounts"
-msgstr ""
+msgstr "Accounts"
 
 #: app/templates/app/logged_in_base.html:87
 msgid "Groups"
-msgstr ""
+msgstr "Gruppen"
 
 #: app/templates/app/logged_in_base.html:92
 msgid "Brand"
-msgstr ""
-
-#: app/templates/app/logged_in_base.html:95
-msgid "Theme"
-msgstr ""
-
-#: app/templates/app/logged_in_base.html:98
-msgid "Plugins"
-msgstr ""
-
-#: app/templates/app/logged_in_base.html:101
-msgid "Application"
-msgstr ""
+msgstr "Logo"
 
 #: app/templates/app/logged_in_base.html:107 app/views/app.py:103
 msgid "About"
-msgstr ""
+msgstr "Über"
 
 #: app/templates/app/processing_node.html:11
 msgid "Hostname"
@@ -482,11 +1087,11 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:15
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: app/templates/app/processing_node.html:19
 msgid "API Version"
-msgstr ""
+msgstr "API Version"
 
 #: app/templates/app/processing_node.html:23
 msgid "Engine"
@@ -502,48 +1107,48 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:35
 msgid "Max Images Limit"
-msgstr ""
+msgstr "Max Bilderlimit"
 
 #: app/templates/app/processing_node.html:39
 msgid "Label"
-msgstr ""
+msgstr "Label"
 
 #: app/templates/app/processing_node.html:43
 msgid "Last Refreshed"
-msgstr ""
+msgstr "Zuletzt aktualisiert"
 
 #: app/templates/app/processing_node.html:44
 msgctxt "5 minutes ago"
 msgid "ago"
-msgstr ""
+msgstr "zuvor"
 
 #: app/templates/app/processing_node.html:47
 msgid "Options (JSON)"
-msgstr ""
+msgstr "Optionen (JSON)"
 
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"
-msgstr ""
+msgstr "Uhoh! Könntest du bitte die folgenden Fehler überprüfen?"
 
 #: app/templates/app/welcome.html:237
 msgid "Create Account"
-msgstr ""
+msgstr "Erstelle Account"
 
 #: app/views/app.py:44
 msgid "First Project"
-msgstr ""
+msgstr "Erstes Projekt"
 
 #: app/views/app.py:54 app/views/public.py:26
 msgid "Map"
-msgstr ""
+msgstr "Karte"
 
 #: app/views/app.py:81
 msgid "3D Model Display"
-msgstr ""
+msgstr "3D Modell Anzeige"
 
 #: plugins/cesium-ion/api_views.py:170
 msgid "No matching enum type."
@@ -551,62 +1156,62 @@ msgstr ""
 
 #: plugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
-msgstr ""
+msgstr "Diagnositik"
 
 #: plugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
-msgstr ""
+msgstr "Diagnoseinformationen"
 
 #: plugins/diagnostic/templates/diagnostic.html:10
 msgid "Storage Space"
-msgstr ""
+msgstr "Speicherplatz"
 
 #: plugins/diagnostic/templates/diagnostic.html:14
 #: plugins/diagnostic/templates/diagnostic.html:40
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
-msgstr ""
+msgstr "Frei"
 
 #: plugins/diagnostic/templates/diagnostic.html:15
 #: plugins/diagnostic/templates/diagnostic.html:39
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
-msgstr ""
+msgstr "Benutzt"
 
 #: plugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
-msgstr ""
+msgstr "Gesamt"
 
 #: plugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
-msgstr ""
+msgstr "Speicher"
 
 #: plugins/diagnostic/templates/diagnostic.html:24
 #: plugins/diagnostic/templates/diagnostic.html:75
 #: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Free"
-msgstr ""
+msgstr "Frei"
 
 #: plugins/diagnostic/templates/diagnostic.html:25
 #: plugins/diagnostic/templates/diagnostic.html:74
 #: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Used"
-msgstr ""
+msgstr "Benutzt"
 
 #: plugins/diagnostic/templates/diagnostic.html:26
 msgctxt "Megabytes of memory space"
 msgid "Total"
-msgstr ""
+msgstr "Gesamt"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
-msgstr ""
+msgstr "Hinweis!"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 #, python-format
@@ -616,16 +1221,30 @@ msgid ""
 "See instructions for %(win_link)s and %(mac_link)s for changing these values "
 "in a docker setup."
 msgstr ""
+"Diese Werte beziehen sich relativ auf die Virtualisierungsumgebung in "
+"welcher das Programm läuft, nicht zwingendermaßen auf die Werte deines "
+"Computers. Siehe dazu die Anleitungen für %(win_link)s und %(mac_link)s um "
+"diese Werte im Docker-Setup zu ändern."
 
 #: plugins/diagnostic/templates/diagnostic.html:47
 #: plugins/diagnostic/templates/diagnostic.html:82
 msgid "Disk Space"
-msgstr ""
+msgstr "Speicherplatz"
 
 #: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
 msgid "Lightning Network"
-msgstr ""
+msgstr "Lightning Network"
 
 #: plugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
-msgstr ""
+msgstr "GCP Schnittstelle"
+
+#~ msgid ""
+#~ "A <a href=\"https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-"
+#~ "OpenDroneMap#running-odm-with-ground-control\" target=\"_blank\">GCP "
+#~ "file</a> is optional, but can increase georeferencing accuracy"
+#~ msgstr ""
+#~ "Eine <a href=\"https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-"
+#~ "OpenDroneMap#running-odm-with-ground-control\" target=\"_blank\">GCP "
+#~ "Datei</a> ist optional, kann aber die Genauigkeit der Georeferenzierung "
+#~ "erhöhen"

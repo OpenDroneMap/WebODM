@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-18 16:27+0000\n"
+"POT-Creation-Date: 2020-12-18 17:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,592 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: app/admin.py:52
+msgid "Enter custom CSS"
+msgstr ""
+
+#: app/admin.py:53 app/models/theme.py:38
+msgid "CSS"
+msgstr ""
+
+#: app/admin.py:56
+msgid "HTML that will be displayed above site header"
+msgstr ""
+
+#: app/admin.py:57 app/models/theme.py:39
+msgid "HTML (before header)"
+msgstr ""
+
+#: app/admin.py:60
+msgid "HTML that will be displayed after site header"
+msgstr ""
+
+#: app/admin.py:61 app/models/theme.py:40
+msgid "HTML (after header)"
+msgstr ""
+
+#: app/admin.py:64
+msgid "HTML that will be displayed after the &lt;/body&gt; tag"
+msgstr ""
+
+#: app/admin.py:65 app/models/theme.py:41
+msgid "HTML (after body)"
+msgstr ""
+
+#: app/admin.py:68
+#, python-brace-format
+msgid ""
+"HTML that will be displayed in the footer. You can also use the special tags "
+"such as {ORGANIZATION} and {YEAR}."
+msgstr ""
+
+#: app/admin.py:69 app/models/theme.py:42
+msgid "HTML (footer)"
+msgstr ""
+
+#: app/models/image_upload.py:10
+msgid "Task this image belongs to"
+msgstr ""
+
+#: app/models/image_upload.py:10 app/models/task.py:259
+msgid "Task"
+msgstr ""
+
+#: app/models/image_upload.py:11
+msgid "File uploaded by a user"
+msgstr ""
+
+#: app/models/image_upload.py:11
+msgid "Image"
+msgstr ""
+
+#: app/models/image_upload.py:20
+msgid "Image Upload"
+msgstr ""
+
+#: app/models/image_upload.py:21
+msgid "Image Uploads"
+msgstr ""
+
+#: app/models/plugin.py:5
+msgid "Plugin name"
+msgstr ""
+
+#: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
+#: app/models/task.py:221 app/models/theme.py:16
+msgid "Name"
+msgstr ""
+
+#: app/models/plugin.py:6
+msgid "Whether this plugin is enabled."
+msgstr ""
+
+#: app/models/plugin.py:20
+msgid "Plugin"
+msgstr ""
+
+#: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
+msgid "Plugins"
+msgstr ""
+
+#: app/models/plugin_datum.py:7
+msgid "Setting key"
+msgstr ""
+
+#: app/models/plugin_datum.py:7
+msgid "Key"
+msgstr ""
+
+#: app/models/plugin_datum.py:8
+msgid "The user this setting belongs to. If NULL, the setting is global."
+msgstr ""
+
+#: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
+msgid "User"
+msgstr ""
+
+#: app/models/plugin_datum.py:9
+msgid "Integer value"
+msgstr ""
+
+#: app/models/plugin_datum.py:10
+msgid "Float value"
+msgstr ""
+
+#: app/models/plugin_datum.py:11
+msgid "Bool value"
+msgstr ""
+
+#: app/models/plugin_datum.py:12
+msgid "String value"
+msgstr ""
+
+#: app/models/plugin_datum.py:13
+msgid "JSON value"
+msgstr ""
+
+#: app/models/plugin_datum.py:19 app/models/plugin_datum.py:20
+msgid "Plugin Datum"
+msgstr ""
+
+#: app/models/preset.py:9
+msgid "The person who owns this preset"
+msgstr ""
+
+#: app/models/preset.py:9 app/models/project.py:22
+msgid "Owner"
+msgstr ""
+
+#: app/models/preset.py:10
+msgid "A label used to describe the preset"
+msgstr ""
+
+#: app/models/preset.py:11
+msgid "Options that define this preset (same format as in a Task's options)."
+msgstr ""
+
+#: app/models/preset.py:11 app/models/task.py:227
+msgid "Options"
+msgstr ""
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+msgid "Creation date"
+msgstr ""
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+msgid "Created at"
+msgstr ""
+
+#: app/models/preset.py:14
+msgid ""
+"Whether this preset is available to every user in the system or just to its "
+"owner."
+msgstr ""
+
+#: app/models/preset.py:14
+msgid "System"
+msgstr ""
+
+#: app/models/preset.py:20
+msgid "Preset"
+msgstr ""
+
+#: app/models/preset.py:21
+msgid "Presets"
+msgstr ""
+
+#: app/models/project.py:22
+msgid "The person who created the project"
+msgstr ""
+
+#: app/models/project.py:23
+msgid "A label used to describe the project"
+msgstr ""
+
+#: app/models/project.py:24
+msgid "More in-depth description of the project"
+msgstr ""
+
+#: app/models/project.py:24
+msgid "Description"
+msgstr ""
+
+#: app/models/project.py:26
+msgid ""
+"Whether this project has been marked for deletion. Projects that have "
+"running tasks need to wait for tasks to be properly cleaned up before they "
+"can be deleted."
+msgstr ""
+
+#: app/models/project.py:26
+msgid "Deleting"
+msgstr ""
+
+#: app/models/project.py:56 app/models/task.py:220
+msgid "Project"
+msgstr ""
+
+#: app/models/project.py:57
+msgid "Projects"
+msgstr ""
+
+#: app/models/setting.py:21
+msgid "The name of your application"
+msgstr ""
+
+#: app/models/setting.py:21
+msgid "App name"
+msgstr ""
+
+#: app/models/setting.py:22
+msgid "A 512x512 logo of your application (.png or .jpeg)"
+msgstr ""
+
+#: app/models/setting.py:22
+msgid "App logo"
+msgstr ""
+
+#: app/models/setting.py:32
+msgid "The name of your organization"
+msgstr ""
+
+#: app/models/setting.py:32
+msgid "Organization name"
+msgstr ""
+
+#: app/models/setting.py:33
+msgid "The website URL of your organization"
+msgstr ""
+
+#: app/models/setting.py:33
+msgid "Organization website"
+msgstr ""
+
+#: app/models/setting.py:34 app/models/theme.py:48 app/models/theme.py:49
+#: app/templates/app/logged_in_base.html:95
+msgid "Theme"
+msgstr ""
+
+#: app/models/setting.py:35
+msgid "Active theme"
+msgstr ""
+
+#: app/models/setting.py:74 app/templates/app/logged_in_base.html:101
+msgid "Application"
+msgstr ""
+
+#: app/models/setting.py:77 app/models/setting.py:78
+msgid "Settings"
+msgstr ""
+
+#: app/models/task.py:217
+msgid "Id"
+msgstr ""
+
+#: app/models/task.py:219
+msgid "Identifier of the task (as returned by NodeODM API)"
+msgstr ""
+
+#: app/models/task.py:219
+msgid "UUID"
+msgstr ""
+
+#: app/models/task.py:220
+msgid "Project that this task belongs to"
+msgstr ""
+
+#: app/models/task.py:221
+msgid "A label for the task"
+msgstr ""
+
+#: app/models/task.py:222
+msgid ""
+"Number of milliseconds that elapsed since the beginning of this task (-1 "
+"indicates that no information is available)"
+msgstr ""
+
+#: app/models/task.py:222
+msgid "Processing Time"
+msgstr ""
+
+#: app/models/task.py:223
+msgid ""
+"Processing node assigned to this task (or null if this task has not been "
+"associated yet)"
+msgstr ""
+
+#: app/models/task.py:223
+msgid "Processing Node"
+msgstr ""
+
+#: app/models/task.py:224
+msgid ""
+"A flag indicating whether this task should be automatically assigned a "
+"processing node"
+msgstr ""
+
+#: app/models/task.py:224
+msgid "Auto Processing Node"
+msgstr ""
+
+#: app/models/task.py:225
+msgid "Current status of the task"
+msgstr ""
+
+#: app/models/task.py:225
+msgid "Status"
+msgstr ""
+
+#: app/models/task.py:226
+msgid "The last processing error received"
+msgstr ""
+
+#: app/models/task.py:226
+msgid "Last Error"
+msgstr ""
+
+#: app/models/task.py:227
+msgid "Options that are being used to process this task"
+msgstr ""
+
+#: app/models/task.py:228
+msgid "List of available assets to download"
+msgstr ""
+
+#: app/models/task.py:228
+msgid "Available Assets"
+msgstr ""
+
+#: app/models/task.py:229
+msgid "Console output of the processing node"
+msgstr ""
+
+#: app/models/task.py:229
+msgid "Console Output"
+msgstr ""
+
+#: app/models/task.py:231
+msgid "Extent of the orthophoto"
+msgstr ""
+
+#: app/models/task.py:231
+msgid "Orthophoto Extent"
+msgstr ""
+
+#: app/models/task.py:232
+msgid "DSM Extent"
+msgstr ""
+
+#: app/models/task.py:233
+msgid "DTM Extent"
+msgstr ""
+
+#: app/models/task.py:237
+msgid ""
+"A requested action to be performed on the task. The selected action will be "
+"performed by the worker at the next iteration."
+msgstr ""
+
+#: app/models/task.py:237
+msgid "Pending Action"
+msgstr ""
+
+#: app/models/task.py:239
+msgid "A flag indicating whether this task is available to the public"
+msgstr ""
+
+#: app/models/task.py:239
+msgid "Public"
+msgstr ""
+
+#: app/models/task.py:240
+msgid ""
+"When set to a value different than -1, indicates that the images for this "
+"task have been / will be resized to the size specified here before "
+"processing."
+msgstr ""
+
+#: app/models/task.py:240
+msgid "Resize To"
+msgstr ""
+
+#: app/models/task.py:243
+msgid ""
+"Value between 0 and 1 indicating the upload progress of this task's files to "
+"the processing node"
+msgstr ""
+
+#: app/models/task.py:244
+msgid "Upload Progress"
+msgstr ""
+
+#: app/models/task.py:247
+msgid ""
+"Value between 0 and 1 indicating the resize progress of this task's images"
+msgstr ""
+
+#: app/models/task.py:248
+msgid "Resize Progress"
+msgstr ""
+
+#: app/models/task.py:251
+msgid ""
+"Value between 0 and 1 indicating the running progress (estimated) of this "
+"task"
+msgstr ""
+
+#: app/models/task.py:252
+msgid "Running Progress"
+msgstr ""
+
+#: app/models/task.py:254
+msgid "URL this task is imported from (only for imported tasks)"
+msgstr ""
+
+#: app/models/task.py:254
+msgid "Import URL"
+msgstr ""
+
+#: app/models/task.py:255
+msgid "Number of images associated with this task"
+msgstr ""
+
+#: app/models/task.py:255
+msgid "Images Count"
+msgstr ""
+
+#: app/models/task.py:256
+msgid ""
+"A flag indicating whether this task is currently waiting for information or "
+"files to be uploaded before being considered for processing."
+msgstr ""
+
+#: app/models/task.py:256
+msgid "Partial"
+msgstr ""
+
+#: app/models/task.py:260
+msgid "Tasks"
+msgstr ""
+
+#: app/models/task.py:269
+msgid "unnamed"
+msgstr ""
+
+#: app/models/task.py:372
+msgid "Importing assets..."
+msgstr ""
+
+#: app/models/task.py:411 app/models/task.py:679
+msgid "Invalid zip file"
+msgstr ""
+
+#: app/models/task.py:505
+#, python-format
+msgid "Connection error: %(error)s"
+msgstr ""
+
+#: app/models/task.py:585
+msgid "Cannot restart a task that has no processing node"
+msgstr ""
+
+#: app/models/task.py:737
+#, python-format
+msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
+msgstr ""
+
+#: app/models/task.py:747
+msgid "Done!"
+msgstr ""
+
+#: app/models/theme.py:16
+msgid "Name of theme"
+msgstr ""
+
+#: app/models/theme.py:19
+msgid "Most text, icons, and borders."
+msgstr ""
+
+#: app/models/theme.py:19
+msgid "Primary"
+msgstr ""
+
+#: app/models/theme.py:20
+msgid "The main background color, and text color of some buttons."
+msgstr ""
+
+#: app/models/theme.py:20
+msgid "Secondary"
+msgstr ""
+
+#: app/models/theme.py:21
+msgid "Navigation links."
+msgstr ""
+
+#: app/models/theme.py:21
+msgid "Tertiary"
+msgstr ""
+
+#: app/models/theme.py:23
+msgid "Primary button color."
+msgstr ""
+
+#: app/models/theme.py:23
+msgid "Button Primary"
+msgstr ""
+
+#: app/models/theme.py:24
+msgid "Default button color."
+msgstr ""
+
+#: app/models/theme.py:24
+msgid "Button Default"
+msgstr ""
+
+#: app/models/theme.py:25
+msgid "Delete button color."
+msgstr ""
+
+#: app/models/theme.py:25
+msgid "Button Danger"
+msgstr ""
+
+#: app/models/theme.py:27
+msgid "Background color of the site's header."
+msgstr ""
+
+#: app/models/theme.py:27
+msgid "Header Background"
+msgstr ""
+
+#: app/models/theme.py:28
+msgid "Text and icons in the site's header."
+msgstr ""
+
+#: app/models/theme.py:28
+msgid "Header Primary"
+msgstr ""
+
+#: app/models/theme.py:30
+msgid "The color of most borders."
+msgstr ""
+
+#: app/models/theme.py:30
+msgid "Border"
+msgstr ""
+
+#: app/models/theme.py:31
+msgid "The background color of panels and some borders."
+msgstr ""
+
+#: app/models/theme.py:31
+msgid "Highlight"
+msgstr ""
+
+#: app/models/theme.py:33
+msgid "The border color of warning dialogs."
+msgstr ""
+
+#: app/models/theme.py:33
+msgid "Dialog Warning"
+msgstr ""
+
+#: app/models/theme.py:35
+msgid "The background color of failed notifications."
+msgstr ""
+
+#: app/models/theme.py:35
+msgid "Failed"
+msgstr ""
+
+#: app/models/theme.py:36
+msgid "The background color of success notifications."
+msgstr ""
+
+#: app/models/theme.py:36
+msgid "Success"
+msgstr ""
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
 msgid "Page not found"
@@ -47,7 +633,7 @@ msgid "Server error (500)"
 msgstr ""
 
 #: app/templates/app/admin/500.html:14
-msgid "Server Error <em>(500)</em>"
+msgid "Server Error (500)"
 msgstr ""
 
 #: app/templates/app/admin/500.html:15
@@ -142,6 +728,10 @@ msgstr ""
 
 #: app/templates/app/admin/change_list_plugin.html:24
 msgid "Load Plugin (.zip)"
+msgstr ""
+
+#: app/templates/app/admin/change_list_plugin.html:28
+msgid "Manage Plugins"
 msgstr ""
 
 #: app/templates/app/admin/change_list_results.html:17
@@ -303,10 +893,6 @@ msgstr ""
 msgid "Date/time"
 msgstr ""
 
-#: app/templates/app/admin/object_history.html:23
-msgid "User"
-msgstr ""
-
 #: app/templates/app/admin/object_history.html:24
 msgid "Action"
 msgstr ""
@@ -458,18 +1044,6 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:92
 msgid "Brand"
-msgstr ""
-
-#: app/templates/app/logged_in_base.html:95
-msgid "Theme"
-msgstr ""
-
-#: app/templates/app/logged_in_base.html:98
-msgid "Plugins"
-msgstr ""
-
-#: app/templates/app/logged_in_base.html:101
-msgid "Application"
 msgstr ""
 
 #: app/templates/app/logged_in_base.html:107 app/views/app.py:103
