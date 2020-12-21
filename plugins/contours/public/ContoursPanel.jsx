@@ -233,7 +233,7 @@ export default class ContoursPanel extends React.Component {
                       (simplify === "custom" && !customSimplify);
 
     let content = "";
-    if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> {_("Loading...")}</span>);
+    if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> {_("Loading…")}</span>);
     else if (permanentError) content = (<div className="alert alert-warning">{permanentError}</div>);
     else{
       content = (<div>
