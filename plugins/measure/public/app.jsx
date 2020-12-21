@@ -7,6 +7,7 @@ import Utils from 'webodm/classes/Utils';
 import ReactDOM from 'ReactDOM';
 import React from 'React';
 import $ from 'jquery';
+import { _ } from 'webodm/classes/gettext';
 
 export default class App{
     constructor(map){
@@ -14,8 +15,8 @@ export default class App{
 
         const measure = L.control.measure({
           labels:{
-            measureDistancesAndAreas: 'Measure volume, area and length',
-            areaMeasurement: 'Measurement'
+            measureDistancesAndAreas: _('Measure volume, area and length'),
+            areaMeasurement: _('Measurement')
           },
           primaryLengthUnit: 'meters',
           secondaryLengthUnit: 'feet',
@@ -23,7 +24,7 @@ export default class App{
           secondaryAreaUnit: 'acres'
         }).addTo(map);
 
-        const $btnExport = $("<br/><a href='#' class='js-start start'>Export Measurements</a>");
+        const $btnExport = $(`<br/><a href='#' class='js-start start'>${_("Export Measurements")}</a>`);
         $btnExport.appendTo($(measure.$startPrompt).children("ul.tasks"));
         $btnExport.on('click', () => {
           const features = [];

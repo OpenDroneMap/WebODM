@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import './MeasurePopup.scss';
 import Utils from 'webodm/classes/Utils';
 import Workers from 'webodm/classes/Workers';
+import { _, interpolate } from 'webodm/classes/gettext';
 
 import $ from 'jquery';
 import L from 'leaflet';
@@ -101,7 +102,7 @@ export default class MeasurePopup extends React.Component {
                 }else if (result.error){
                     this.setState({error: result.error});
                 }else{
-                    this.setState({error: "Invalid response: " + result});
+                    this.setState({error: interpolate(_("Invalid response: %(error)s"), { error: result})});
                 }
             }).fail(error => {
                 this.setState({error});
@@ -138,12 +139,12 @@ export default class MeasurePopup extends React.Component {
     const { volume, error } = this.state;
 
     return (<div className="plugin-measure popup">
-        <p>Area: {this.props.model.areaDisplay}</p>
-        <p>Perimeter: {this.props.model.lengthDisplay}</p>
-        {volume === null && !error && <p>Volume: <i>computing...</i> <i className="fa fa-cog fa-spin fa-fw" /></p>}
-        {typeof volume === "number" && <p>Volume: {volume.toFixed("2")} Cubic Meters ({(volume * 35.3147).toFixed(2)} Cubic Feet)</p>}
-        {error && <p>Volume: <span className={"error theme-background-failed " + (error.length > 200 ? 'long' : '')}>{error}</span></p>}
-        <a href="#" onClick={this.exportMeasurement} className="export-measurements"><i className="fa fa-download"></i> Export to GeoJSON</a>
+        <p>{_("Area:")} {this.props.model.areaDisplay}</p>
+        <p>{_("Perimeter:")} {this.props.model.lengthDisplay}</p>
+        {volume === null && !error && <p>{_("Volume:")} <i>{_("computing…")}</i> <i className="fa fa-cog fa-spin fa-fw" /></p>}
+        {typeof volume === "number" && <p>{_("Volume:")} {volume.toFixed("2")} {_("Cubic Meters")} ({(volume * 35.3147).toFixed(2)} {_("Cubic Feet")})</p>}
+        {error && <p>{_("Volume:")} <span className={"error theme-background-failed " + (error.length > 200 ? 'long' : '')}>{error}</span></p>}
+        <a href="#" onClick={this.exportMeasurement} className="export-measurements"><i className="fa fa-download"></i> {_("Export to GeoJSON")}</a>
     </div>);
   }
 }

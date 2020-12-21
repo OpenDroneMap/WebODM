@@ -3,6 +3,7 @@ import './Login.scss';
 import ErrorMessage from 'webodm/components/ErrorMessage';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import { _ } from 'webodm/classes/gettext';
 
 export default class Login extends React.Component {
   static defaultProps = {
@@ -52,11 +53,11 @@ export default class Login extends React.Component {
           }else if (json.message){
               this.setState({ loggingIn: false, error: json.message });
           }else{
-              this.setState({ loggingIn: false, error: "Cannot login. Invalid response: " + JSON.stringify(json)});
+              this.setState({ loggingIn: false, error: _("Cannot login. Invalid response:") + " " + JSON.stringify(json)});
           }
       })
       .fail(() => {
-          this.setState({loggingIn: false, error: "Cannot login. Please make sure you are connected to the internet, or try again in an hour."});
+          this.setState({loggingIn: false, error: _("Cannot login. Please make sure you are connected to the internet, or try again in an hour.")});
       });
   }
 
@@ -86,27 +87,27 @@ export default class Login extends React.Component {
                 <div className="form-group text-left">
                     <input id="next" name="next" type="hidden" value="" />
                     <p>
-                        <label htmlFor="email">E-mail Address</label> 
+                        <label htmlFor="email">{_("E-mail Address")}</label> 
                         <input className="form-control" id="email" name="email" required="" 
                             type="text" value={this.state.email} 
                             onChange={this.handleEmailChange} 
                             onKeyPress={this.handleKeyPress} />
                     </p>
                     <p>
-                        <label htmlFor="password">Password</label> 
+                        <label htmlFor="password">{_("Password")}</label> 
                         <input className="form-control" id="password" name="password" required="" 
                             type="password" value={this.state.password} 
                             onChange={this.handlePasswordChange} 
                             onKeyPress={this.handleKeyPress} />
                     </p>
                     <div style={{float: 'right'}} >
-                        <a href="https://webodm.net/register" target="_blank">Don't have an account?</a><br/>
-                        <a href="https://webodm.net/reset" target="_blank">Forgot password?</a>
+                        <a href="https://webodm.net/register" target="_blank">{_("Don't have an account?")}</a><br/>
+                        <a href="https://webodm.net/reset" target="_blank">{_("Forgot password?")}</a>
                     </div>
                     <p><button className="btn btn-primary" onClick={this.handleLogin} disabled={this.state.loggingIn}>
                         {this.state.loggingIn ? 
                         <span><i className="fa fa-spin fa-circle-notch"></i></span> : 
-                        <span><i className="fa fa-lock"></i> Login and Sync</span>}
+                        <span><i className="fa fa-lock"></i> {_("Login and Sync")}</span>}
                     </button></p>
                 </div>
             </div>
