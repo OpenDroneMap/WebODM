@@ -44,7 +44,7 @@ class ImagePopup extends React.Component {
     }
 
     imageOnError = () => {
-        this.setState({error: _("Image is missing"), loading: false});
+        this.setState({error: _("Image missing"), loading: false});
     }
 
     imageOnLoad = () => {
