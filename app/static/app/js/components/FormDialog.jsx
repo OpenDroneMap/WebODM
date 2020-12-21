@@ -9,7 +9,7 @@ class FormDialog extends React.Component {
     static defaultProps = {
         title: _("Title"),
         saveLabel: _("Save"),
-        savingLabel: _("Saving..."),
+        savingLabel: _("Saving…"),
         saveIcon: "glyphicon glyphicon-plus",
         deleteWarning: _("Are you sure?"),
         show: false
