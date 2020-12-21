@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Plugin(models.Model):
     name = models.CharField(max_length=255, primary_key=True, blank=False, null=False, help_text=_("Plugin name"), verbose_name=_("Name"))
-    enabled = models.BooleanField(db_index=True, default=True, help_text=_("Whether this plugin is enabled."), verbose_name=_("Enabled"))
+    enabled = models.BooleanField(db_index=True, default=True, help_text=_("Whether this plugin is turned on."), verbose_name=_("Enabled"))
 
     def __str__(self):
         return self.name
