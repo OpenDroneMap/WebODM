@@ -488,7 +488,7 @@ msgid "unnamed"
 msgstr ""
 
 #: app/models/task.py:372
-msgid "Importing assets…"
+msgid "Importing assets..."
 msgstr ""
 
 #: app/models/task.py:411 app/models/task.py:679
