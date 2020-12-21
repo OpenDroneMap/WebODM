@@ -21,7 +21,7 @@ from django import forms
 from codemirror2.widgets import CodeMirrorEditor
 from webodm import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 
 admin.site.register(Project, GuardedModelAdmin)
 
@@ -95,15 +95,21 @@ class PluginAdmin(admin.ModelAdmin):
 
     def description(self, obj):
         manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
-        return manifest.get('description', '')
+        return _(manifest.get('description', ''))
+
+    description.short_description = _("Description")
 
     def version(self, obj):
         manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
         return manifest.get('version', '')
 
+    version.short_description = _("Version")
+
     def author(self, obj):
         manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
         return manifest.get('author', '')
+
+    author.short_description = _("Author")
 
     def get_urls(self):
         urls = super().get_urls()
@@ -224,7 +230,7 @@ class PluginAdmin(admin.ModelAdmin):
             obj.name
         )
 
-    plugin_actions.short_description = 'Actions'
+    plugin_actions.short_description = _('Actions')
     plugin_actions.allow_tags = True
 
 
