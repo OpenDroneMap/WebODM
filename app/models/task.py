@@ -216,14 +216,14 @@ class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
 
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project this task belongs to")
     name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
-    processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
+    processing_time = models.IntegerField(default=-1, help_text="Number of elapsed milliseconds since the beginning of this task (-1 indicates no available info)")
     processing_node = models.ForeignKey(ProcessingNode, on_delete=models.SET_NULL, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
     auto_processing_node = models.BooleanField(default=True, help_text="A flag indicating whether this task should be automatically assigned a processing node")
     status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
     last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
-    options = fields.JSONField(default=dict, blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
+    options = fields.JSONField(default=dict, blank=True, help_text="Options used to process this task", validators=[validate_task_options])
     available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text="List of available assets to download")
     console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
 
@@ -235,8 +235,8 @@ class Task(models.Model):
     created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration.")
 
-    public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
-    resize_to = models.IntegerField(default=-1, help_text="When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing.")
+    public = models.BooleanField(default=False, help_text="A flag indicating whether this task is publically available")
+    resize_to = models.IntegerField(default=-1, help_text="Indicates images for this task have been, or will be resized to the size specified here before processing; when set to a value other than -1.")
 
     upload_progress = models.FloatField(default=0.0,
                                         help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node",
@@ -249,7 +249,7 @@ class Task(models.Model):
                                         blank=True)
     import_url = models.TextField(null=False, default="", blank=True, help_text="URL this task is imported from (only for imported tasks)")
     images_count = models.IntegerField(null=False, blank=True, default=0, help_text="Number of images associated with this task")
-    partial = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing.")
+    partial = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently awaiting info or files to be uploaded before being considered for processing.")
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -293,7 +293,7 @@ class Task(models.Model):
                                                                                                              old_task_folder,
                                                                                                              new_task_folder))
         except shutil.Error as e:
-            logger.warning("Could not move assets folder for task {}. We're going to proceed anyway, but you might experience issues: {}".format(self, e))
+            logger.warning("Could not move assets folder for task {}. Proceeding anyway, but you might experience issues: {}".format(self, e))
 
     def save(self, *args, **kwargs):
         if self.project.id != self.__original_project_id:
@@ -321,8 +321,8 @@ class Task(models.Model):
 
     def is_asset_available_slow(self, asset):
         """
-        Checks whether a particular asset is available in the file system
-        Generally this should never be used directly, as it's slow. Use the available_assets field
+        Checks whether a particular asset is available in the filesystem
+        Generally this should never be used directly, as it's slow. Use the \"available_assets\" field
         in the database instead.
         :param asset: one of ASSETS_MAP keys
         :return: boolean
@@ -361,14 +361,14 @@ class Task(models.Model):
             raise FileNotFoundError("{} is not a valid asset".format(asset))
 
     def handle_import(self):
-        self.console_output += "Importing assets...\n"
+        self.console_output += "Importing assets…\n"
         self.save()
 
         zip_path = self.assets_path("all.zip")
 
         if self.import_url and not os.path.exists(zip_path):
             try:
-                # TODO: this is potentially vulnerable to a zip bomb attack
+                # TODO: this is potentially vulnerable to a ZIP bomb attack
                 #       mitigated by the fact that a valid account is needed to
                 #       import tasks
                 logger.info("Importing task assets from {} for {}".format(self.import_url, self))
@@ -400,7 +400,7 @@ class Task(models.Model):
         try:
             self.extract_assets_and_complete()
         except zipfile.BadZipFile:
-            raise NodeServerError("Invalid zip file")
+            raise NodeServerError("Invalid ZIP file")
 
         images_json = self.assets_path("images.json")
         if os.path.exists(images_json):
@@ -409,7 +409,7 @@ class Task(models.Model):
                     images = json.load(f)
                     self.images_count = len(images)
             except:
-                logger.warning("Cannot read images count from imported task {}".format(self))
+                logger.warning("Cannot read image count from imported task {}".format(self))
                 pass
 
         self.pending_action = None
@@ -453,7 +453,7 @@ class Task(models.Model):
                     # detach processing node, and reassignment
                     # will be processed at the next tick
                     if self.status == status_codes.QUEUED:
-                        logger.info("Processing node {} went offline, reassigning {}...".format(self.processing_node, self))
+                        logger.info("Processing node {} went offline, reassigning {}…".format(self.processing_node, self))
                         self.uuid = ''
                         self.processing_node = None
                         self.status = None
@@ -471,7 +471,7 @@ class Task(models.Model):
             if self.processing_node:
                 # Need to process some images (UUID not yet set and task doesn't have pending actions)?
                 if not self.uuid and self.pending_action is None and self.status is None:
-                    logger.info("Processing... {}".format(self))
+                    logger.info("Processing… {}".format(self))
 
                     images = [image.path() for image in self.imageupload_set.all()]
 
@@ -514,7 +514,7 @@ class Task(models.Model):
                         try:
                             self.processing_node.cancel_task(self.uuid)
                         except OdmError:
-                            logger.warning("Could not cancel {} on processing node. We'll proceed anyway...".format(self))
+                            logger.warning("Could not cancel {} on processing node. Proceeding anyway…".format(self))
 
                         self.status = status_codes.CANCELED
                         self.pending_action = None
@@ -548,7 +548,7 @@ class Task(models.Model):
                                 self.processing_node.restart_task(self.uuid, self.options)
                             except (NodeServerError, NodeResponseError) as e:
                                 # Something went wrong
-                                logger.warning("Could not restart {}, will start a new one".format(self))
+                                logger.warning("Could not restart {}. Will start a new one".format(self))
                                 need_to_reprocess = True
                         else:
                             need_to_reprocess = True
@@ -668,7 +668,7 @@ class Task(models.Model):
                                         retry_num += 1
                                         os.remove(all_zip_path)
                                     else:
-                                        raise NodeServerError("Invalid zip file")
+                                        raise NodeServerError("Invalid ZIP file")
                         else:
                             # FAILED, CANCELED
                             self.save()
@@ -679,7 +679,7 @@ class Task(models.Model):
         except (NodeServerError, NodeResponseError) as e:
             self.set_failure(str(e))
         except NodeConnectionError as e:
-            logger.warning("{} connection/timeout error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
+            logger.warning("{} connection/timeout error: {}. Attempting reprocessing next time around.".format(self, str(e)))
         except TaskInterruptedException as e:
             # Task was interrupted during image resize / upload
             logger.warning("{} interrupted".format(self, str(e)))
@@ -716,7 +716,7 @@ class Task(models.Model):
                 try:
                     assure_cogeo(raster_path)
                 except IOError as e:
-                    logger.warning("Cannot create Cloud Optimized GeoTIFF for %s (%s). This will result in degraded visualization performance." % (raster_path, str(e)))
+                    logger.warning("Cannot create Cloud Optimized GeoTIFF for %s (%s). This will result in degraded visuals." % (raster_path, str(e)))
 
                 # Read extent and SRID
                 raster = GDALRaster(raster_path)
@@ -853,11 +853,11 @@ class Task(models.Model):
         """
         Destructively resize this task's JPG images while retaining EXIF tags.
         Resulting images are always converted to JPG.
-        TODO: add support for tiff files
+        TODO: add support for TIFF files
         :return list containing paths of resized images and resize ratios
         """
         if self.resize_to < 0:
-            logger.warning("We were asked to resize images to {}, this might be an error.".format(self.resize_to))
+            logger.warning("Request to resize images to {}, this might be an error.".format(self.resize_to))
             return []
 
         images_path = self.find_all_files_matching(r'.*\.(jpe?g|tiff?)$')
@@ -912,7 +912,7 @@ class Task(models.Model):
 
     def create_task_directories(self):
         """
-        Create directories for this task (if they don't exist already)
+        Create directories (that don't exist already) for this task
         """
         assets_dir = self.assets_path("")
         try:
