@@ -57,7 +57,7 @@ class TaskContoursCheck(CheckTask):
     def error_check(self, result):
         contours_file = result.get('file')
         if not contours_file or not os.path.exists(contours_file):
-            return _('Contours file could not be generated. This might be a bug.')
+            return _('Could not generate contour file. This might be a bug.')
 
 class TaskContoursDownload(GetTaskResult):
     pass
