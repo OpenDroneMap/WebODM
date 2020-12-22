@@ -24,3 +24,4 @@ HTMLCanvasElement.prototype.getContext = () => null;
 // Translation methods provided by Django
 global.gettext = v => v;
 global.interpolate = (v, opt) => v;
+global.get_format = v => v;

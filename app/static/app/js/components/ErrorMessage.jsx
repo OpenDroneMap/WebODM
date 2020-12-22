@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { _ } from '../classes/gettext';
 
 class ErrorMessage extends React.Component {
     static propTypes = {

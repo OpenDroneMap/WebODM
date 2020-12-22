@@ -12,7 +12,7 @@ import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import ResizeModes from '../classes/ResizeModes';
-import exifr from 'exifr/dist/mini.esm';
+import exifr from '../vendor/exifr';
 import { _, interpolate } from '../classes/gettext';
 import $ from 'jquery';
 
@@ -450,6 +450,7 @@ class ProjectListItem extends React.Component {
                     type: 'GET'
                 }).done(json => {
                     if (json.name) resolve(`${json.name} - ${dateTime}`);
+                    else if (json.address && json.address.road) resolve(`${json.address.road} - ${dateTime}`);
                     else reject(new Error("Invalid json"));
                 }).fail(reject);
               }).catch(reject);

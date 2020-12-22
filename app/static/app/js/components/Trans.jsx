@@ -15,8 +15,6 @@ class Trans extends React.Component {
       if (!this.props.children) return (<span/>);
 
       let content = "";
-    console.log(this.props.children);
-    console.log(interpolate(this.props.children, this.props.params));
       if (typeof this.props.children === "string"){
         content = (<span dangerouslySetInnerHTML={{__html: interpolate(this.props.children, this.props.params)}}></span>);
       }else{
@@ -32,7 +30,7 @@ class Trans extends React.Component {
             i++;
           });
       }
-      console.log(content);
+
       return content;
   }
 }
