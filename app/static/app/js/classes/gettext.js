@@ -5,5 +5,8 @@ module.exports = {
     _: window.gettext,
     interpolate: function(text, params = {}){
         return window.interpolate(text, params, true);
-    }
+    },
+    get_format: function(format_type){
+        return window.get_format(format_type);
+    } 
 }
