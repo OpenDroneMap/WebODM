@@ -40,6 +40,8 @@ urlpatterns = [
     url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', app_view_handler),
 
     url(r'^about/$', app_views.about, name='about'),
+    url(r'^dev-tools/$', app_views.dev_tools, name='dev_tools'),
+
     # TODO: add caching: https://docs.djangoproject.com/en/3.1/topics/i18n/translation/#note-on-performance
     url(r'^jsi18n/', JavaScriptCatalog.as_view(packages=['app']), name='javascript-catalog'),
 ]

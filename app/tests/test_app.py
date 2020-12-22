@@ -5,6 +5,7 @@ from rest_framework import status
 from app.models import Project, Task
 from app.models import Setting
 from app.models import Theme
+from webodm import settings
 from .classes import BootTestCase
 from django.core.exceptions import ValidationError
 
@@ -167,9 +168,21 @@ class TestApp(BootTestCase):
             res = c.get(url)
             self.assertEqual(res.status_code, status.HTTP_200_OK)
 
+        # Cannot access dev tools (not in dev mode)
+        settings.DEV = False
+        self.assertEqual(c.get('/dev-tools/').status_code, status.HTTP_404_NOT_FOUND)
+        settings.DEV = True
+        
+        # Can access in dev mode
+        self.assertEqual(c.get('/dev-tools/').status_code, status.HTTP_200_OK)
+
         # Cannot access admin views as normal user
         c.logout()
         c.login(username='testuser', password='test1234')
+
+        # Can never access dev tools as user, even in dev mode
+        self.assertRedirects(c.get('/dev-tools/', follow=True), '/login/?next=/dev-tools/')
+        settings.DEV = False
 
         for url in admin_menu_items:
             res = c.get(url, follow=True)

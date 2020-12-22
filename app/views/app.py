@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from guardian.shortcuts import get_objects_for_user
+from django.contrib.auth.decorators import user_passes_test
 
 from nodeodm.models import ProcessingNode
 from app.models import Project, Task
@@ -110,10 +111,19 @@ def processing_node(request, processing_node_id):
 
     return render(request, 'app/processing_node.html', 
             {
-                'title': 'Processing Node', 
+                'title': _('Processing Node'), 
                 'processing_node': pn,
                 'available_options_json': pn.get_available_options_json(pretty=True)
             })
+
+@user_passes_test(lambda u: u.is_superuser)
+def dev_tools(request):
+    if not settings.DEV:
+        raise Http404()
+     
+    return render(request, 'app/dev_tools.html', { 
+            'title': _('Developer Tools')
+        })
 
 class FirstUserForm(forms.ModelForm):
     class Meta:
