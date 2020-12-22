@@ -22,6 +22,7 @@ A user-friendly, commercial grade software for drone image processing. Generate 
  * [Roadmap](#roadmap)
  * [Getting Help](#getting-help)
  * [Support the Project](#support-the-project)
+ * [Translations](#translations)
  * [Become a Contributor](#become-a-contributor)
  * [Architecture Overview](#architecture-overview)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
@@ -270,10 +271,31 @@ There are many ways to contribute back to the project:
  - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
  - ⭐️ us on GitHub.
+ - Help us [translate](#translations) WebODM in your language.
  - Spread the word about WebODM and OpenDroneMap on social media.
  - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
  - You can [pledge funds](https://fund.webodm.org) for getting new features built and bug fixed.
  - Become a contributor 🤘
+
+## Translations
+
+It's easy to translate WebODM in a different language!
+
+ - Visit https://hosted.weblate.org/engage/webodm/ and register an account (it's free)
+ - Pick a language to translate, or [start a new translation](https://hosted.weblate.org/new-lang/webodm/webodm/)
+ - Start translating! It's that easy.
+
+If you want to preview your translation work, start WebODM in developer mode:
+
+```
+./webodm.sh restart --dev
+```
+
+Then edit the [LOCALES](https://github.com/OpenDroneMap/WebODM/blob/master/LOCALES) file to include your translation locale code. Finally, visit the `Developer Tools` panel from WebODM's dashboard and press the `Download and Replace Translation Files` button:
+
+![image](https://user-images.githubusercontent.com/1951843/102927263-a294a100-4464-11eb-956e-888b73dc5b94.png)
+
+The latest translation files from weblate.org will be downloaded and applied to the installation of WebODM.
 
 ## Become a Contributor
 
