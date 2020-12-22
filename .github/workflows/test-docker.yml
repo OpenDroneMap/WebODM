@@ -11,7 +11,8 @@ jobs:
       name: Checkout
      
     - name: Build and Test
+      shell: 'script -q -e -c "bash {0}"'
       run: |
         docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d
         ./wait-for-it.sh localhost:8000 -t 60 -- echo "WebODM is up"
-        docker-compose exec -T webapp /webodm/webodm.sh test
+        docker-compose exec webapp /bin/bash -c "/webodm/webodm.sh test"
