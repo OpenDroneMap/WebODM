@@ -12,6 +12,6 @@ jobs:
      
     - name: Build and Test
       run: |
-        docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d\
+        docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d
         while sleep 5; do docker ps -a; if [[ -n "`docker ps | grep webapp | grep ' Up '`" ]]; then break; fi; done
         docker-compose exec webapp /bin/bash -c "/webodm/webodm.sh test"
