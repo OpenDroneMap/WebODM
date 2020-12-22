@@ -14,4 +14,5 @@ jobs:
       run: |
         docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d
         ./wait-for-it.sh localhost:8000 -t 60 -- echo "WebODM is up"
+        export COMPOSE_INTERACTIVE_NO_CLI=1
         docker-compose exec webapp /bin/bash -c "/webodm/webodm.sh test"
