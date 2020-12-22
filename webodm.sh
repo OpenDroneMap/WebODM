@@ -287,8 +287,7 @@ rebuild(){
 run_tests(){
     # If in a container, we run the actual test commands
     # otherwise we launch this command from the container
-    in_container=$(grep 'docker\|lxc' /proc/1/cgroup || true)
-    if [[ "$in_container" != "" ]]; then
+    if [[ -f /.dockerenv ]]; then
         echo -e "\033[1mRunning frontend tests\033[0m"
         run "npm run test"
 
