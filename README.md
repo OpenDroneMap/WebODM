@@ -28,6 +28,7 @@ A user-friendly, commercial grade software for drone image processing. Generate 
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
  * [Run it on the cloud (Google Compute, Amazon AWS)](#run-it-on-the-cloud-google-compute-amazon-aws)
+ * [License](#license)
  
 ![image](https://user-images.githubusercontent.com/1951843/73680589-8213fa80-468a-11ea-9225-442fdcc8b7c8.png)
 
@@ -502,3 +503,6 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 To setup the firewall on Google Cloud, open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
 
 
+## License
+
+WebODM is licensed under the terms of the [GNU Affero General Public License v3.0](https://github.com/OpenDroneMap/WebODM/blob/master/LICENSE.md).

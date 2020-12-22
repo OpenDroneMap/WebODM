@@ -41,7 +41,7 @@ RUN npm install --quiet -g webpack@4.16.5 && npm install --quiet -g webpack-cli 
 RUN echo "UTC" > /etc/timezone
 RUN python manage.py collectstatic --noinput
 RUN bash app/scripts/plugin_cleanup.sh && echo "from app.plugins import build_plugins;build_plugins()" | python manage.py shell
-RUN bash translate.sh build
+RUN bash translate.sh build safe
 
 # Cleanup
 RUN apt-get remove -y g++ python3-dev libpq-dev && apt-get autoremove -y
