@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-18 17:36+0000\n"
+"POT-Creation-Date: 2020-12-22 19:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,7 +43,7 @@ msgid "HTML (after header)"
 msgstr ""
 
 #: app/admin.py:64
-msgid "HTML that will be displayed after the &lt;/body&gt; tag"
+msgid "HTML that will be displayed after the body tag"
 msgstr ""
 
 #: app/admin.py:65 app/models/theme.py:41
@@ -59,6 +59,137 @@ msgstr ""
 
 #: app/admin.py:69 app/models/theme.py:42
 msgid "HTML (footer)"
+msgstr ""
+
+#: app/admin.py:100 app/models/project.py:24
+msgid "Description"
+msgstr ""
+
+#: app/admin.py:106
+msgid "Version"
+msgstr ""
+
+#: app/admin.py:112
+msgid "Author"
+msgstr ""
+
+#: app/admin.py:233
+msgid "Actions"
+msgstr ""
+
+#: app/api/formulas.py:12 app/api/formulas.py:16
+msgid ""
+"Normalized Difference Vegetation Index shows the amount of green vegetation."
+msgstr ""
+
+#: app/api/formulas.py:20
+msgid ""
+"Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
+"and Green bands instead of only Red to isolate plant health."
+msgstr ""
+
+#: app/api/formulas.py:24
+msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
+msgstr ""
+
+#: app/api/formulas.py:29
+msgid ""
+"Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
+msgstr ""
+
+#: app/api/formulas.py:33
+msgid ""
+"Burn Area Index hightlights burned land in the red to near-infrared spectrum."
+msgstr ""
+
+#: app/api/formulas.py:37
+msgid "Green Leaf Index shows greens leaves and stems."
+msgstr ""
+
+#: app/api/formulas.py:42
+msgid ""
+"Green Normalized Difference Vegetation Index is similar to NDVI, but "
+"measures the green spectrum instead of red."
+msgstr ""
+
+#: app/api/formulas.py:46
+msgid ""
+"Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
+msgstr ""
+
+#: app/api/formulas.py:50
+msgid ""
+"Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
+"effects of soil areas using an adjustment factor (0.5)."
+msgstr ""
+
+#: app/api/formulas.py:54
+msgid ""
+"Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
+"for soil areas."
+msgstr ""
+
+#: app/api/formulas.py:58
+msgid ""
+"Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
+"more sensitive to vegetation."
+msgstr ""
+
+#: app/api/formulas.py:62
+msgid ""
+"Renormalized Difference Vegetation Index uses the difference between near-IR "
+"and red, plus NDVI to show areas of healthy vegetation."
+msgstr ""
+
+#: app/api/formulas.py:66
+msgid ""
+"Transformed Difference Vegetation Index highlights vegetation cover in urban "
+"environments."
+msgstr ""
+
+#: app/api/formulas.py:70
+msgid ""
+"Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work "
+"better in areas with little vegetation where soil is visible."
+msgstr ""
+
+#: app/api/formulas.py:74
+msgid "Leaf Area Index estimates foliage areas and predicts crop yields."
+msgstr ""
+
+#: app/api/formulas.py:79
+msgid ""
+"Enhanced Vegetation Index is useful in areas where NDVI might saturate, by "
+"using blue wavelengths to correct soil signals."
+msgstr ""
+
+#: app/api/tasks.py:179
+msgid "You need to upload at least 2 images before commit"
+msgstr ""
+
+#: app/api/tasks.py:201
+msgid "No files uploaded"
+msgstr ""
+
+#: app/api/tasks.py:224
+msgid "Cannot create task, you need at least 2 images"
+msgstr ""
+
+#: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
+#: app/api/tasks.py:354
+msgid "Asset does not exist"
+msgstr ""
+
+#: app/api/tasks.py:370
+msgid "Imported Task"
+msgstr ""
+
+#: app/api/tasks.py:373
+msgid "Cannot create task, you need to upload 1 file"
+msgstr ""
+
+#: app/api/tasks.py:376
+msgid "Cannot create task, either specify a URL or upload 1 file."
 msgstr ""
 
 #: app/models/image_upload.py:10
@@ -95,7 +226,11 @@ msgid "Name"
 msgstr ""
 
 #: app/models/plugin.py:6
-msgid "Whether this plugin is enabled."
+msgid "Whether this plugin is turned on."
+msgstr ""
+
+#: app/models/plugin.py:6
+msgid "Enabled"
 msgstr ""
 
 #: app/models/plugin.py:20
@@ -204,10 +339,6 @@ msgstr ""
 msgid "More in-depth description of the project"
 msgstr ""
 
-#: app/models/project.py:24
-msgid "Description"
-msgstr ""
-
 #: app/models/project.py:26
 msgid ""
 "Whether this project has been marked for deletion. Projects that have "
@@ -227,52 +358,52 @@ msgstr ""
 msgid "Projects"
 msgstr ""
 
-#: app/models/setting.py:21
+#: app/models/setting.py:20
 msgid "The name of your application"
 msgstr ""
 
-#: app/models/setting.py:21
+#: app/models/setting.py:20
 msgid "App name"
 msgstr ""
 
-#: app/models/setting.py:22
+#: app/models/setting.py:21
 msgid "A 512x512 logo of your application (.png or .jpeg)"
 msgstr ""
 
-#: app/models/setting.py:22
+#: app/models/setting.py:21
 msgid "App logo"
 msgstr ""
 
-#: app/models/setting.py:32
+#: app/models/setting.py:31
 msgid "The name of your organization"
 msgstr ""
 
-#: app/models/setting.py:32
+#: app/models/setting.py:31
 msgid "Organization name"
 msgstr ""
 
-#: app/models/setting.py:33
+#: app/models/setting.py:32
 msgid "The website URL of your organization"
 msgstr ""
 
-#: app/models/setting.py:33
+#: app/models/setting.py:32
 msgid "Organization website"
 msgstr ""
 
-#: app/models/setting.py:34 app/models/theme.py:48 app/models/theme.py:49
+#: app/models/setting.py:33 app/models/theme.py:48 app/models/theme.py:49
 #: app/templates/app/logged_in_base.html:95
 msgid "Theme"
 msgstr ""
 
-#: app/models/setting.py:35
+#: app/models/setting.py:34
 msgid "Active theme"
 msgstr ""
 
-#: app/models/setting.py:74 app/templates/app/logged_in_base.html:101
+#: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
 msgid "Application"
 msgstr ""
 
-#: app/models/setting.py:77 app/models/setting.py:78
+#: app/models/setting.py:76 app/models/setting.py:77
 msgid "Settings"
 msgstr ""
 
@@ -312,7 +443,7 @@ msgid ""
 "associated yet)"
 msgstr ""
 
-#: app/models/task.py:223
+#: app/models/task.py:223 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
 msgstr ""
 
@@ -602,6 +733,32 @@ msgstr ""
 
 #: app/models/theme.py:36
 msgid "Success"
+msgstr ""
+
+#: app/templates/app/404.html:6
+msgid "404 Page Not Found"
+msgstr ""
+
+#: app/templates/app/404.html:7
+msgid "Are you sure the address is correct?"
+msgstr ""
+
+#: app/templates/app/500.html:5
+msgid "500 Internal Server Error"
+msgstr ""
+
+#: app/templates/app/500.html:6
+msgid "Something happened. The server logs contain more information."
+msgstr ""
+
+#: app/templates/app/about.html:94
+#, python-format
+msgid ""
+"This program is free software: you can redistribute it and/or modify it "
+"under the terms of the GNU Affero General Public License as published by the "
+"Free Software Foundation, either version 3 of the License, or (at your "
+"option) any later version. See %(link_start)sthe GNU Affero General Public "
+"License%(link_end)s for more details."
 msgstr ""
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
@@ -973,8 +1130,8 @@ msgstr ""
 #, python-format
 msgid ""
 "To get started, \"%(add_processing_node)s\". A processing node is a computer "
-"running an instance of %(nodeodm_link)s or some other software that "
-"implements this %(api_link)s."
+"running an instance of %(nodeodm_link)s or some other software implementing "
+"this %(api_link)s."
 msgstr ""
 
 #: app/templates/app/dashboard.html:28
@@ -1009,6 +1166,37 @@ msgid ""
 "georeferencing accuracy"
 msgstr ""
 
+#: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
+#: app/views/dev.py:73
+msgid "Developer Tools"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:9
+msgid "Close"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:14
+msgid "Current Locale:"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:15
+msgid ""
+"To change locale, modify your browser's locale settings, then refresh the "
+"page."
+msgstr ""
+
+#: app/templates/app/dev_tools.html:18
+msgid "Translation Files (.zip):"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:22
+msgid "Download and Replace Translation Files"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:26
+msgid "Executing… do not refresh the page! This could take a while."
+msgstr ""
+
 #: app/templates/app/logged_in_base.html:15
 #, python-format
 msgid "Hello, %(user)s!"
@@ -1018,11 +1206,11 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:33
+#: app/templates/app/logged_in_base.html:33 app/views/app.py:46
 msgid "Dashboard"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:59
+#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
 msgid "Processing Nodes"
 msgstr ""
 
@@ -1046,31 +1234,31 @@ msgstr ""
 msgid "Brand"
 msgstr ""
 
-#: app/templates/app/logged_in_base.html:107 app/views/app.py:103
+#: app/templates/app/logged_in_base.html:114 app/views/app.py:103
 msgid "About"
 msgstr ""
 
-#: app/templates/app/processing_node.html:11
+#: app/templates/app/processing_node.html:11 nodeodm/models.py:23
 msgid "Hostname"
 msgstr ""
 
-#: app/templates/app/processing_node.html:15
+#: app/templates/app/processing_node.html:15 nodeodm/models.py:24
 msgid "Port"
 msgstr ""
 
-#: app/templates/app/processing_node.html:19
+#: app/templates/app/processing_node.html:19 nodeodm/models.py:25
 msgid "API Version"
 msgstr ""
 
-#: app/templates/app/processing_node.html:23
+#: app/templates/app/processing_node.html:23 nodeodm/models.py:33
 msgid "Engine"
 msgstr ""
 
-#: app/templates/app/processing_node.html:27
+#: app/templates/app/processing_node.html:27 nodeodm/models.py:31
 msgid "Engine Version"
 msgstr ""
 
-#: app/templates/app/processing_node.html:31
+#: app/templates/app/processing_node.html:31 nodeodm/models.py:27
 msgid "Queue Count"
 msgstr ""
 
@@ -1078,11 +1266,11 @@ msgstr ""
 msgid "Max Images Limit"
 msgstr ""
 
-#: app/templates/app/processing_node.html:39
+#: app/templates/app/processing_node.html:39 nodeodm/models.py:32
 msgid "Label"
 msgstr ""
 
-#: app/templates/app/processing_node.html:43
+#: app/templates/app/processing_node.html:43 nodeodm/models.py:26
 msgid "Last Refreshed"
 msgstr ""
 
@@ -1107,6 +1295,57 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
+#: app/translations/plugin_manifest_autogenerated.py:4
+msgid "Compute volume, area and length measurements on Leaflet"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:5
+#: app/translations/plugin_manifest_autogenerated.py:6
+msgid "A plugin to create GCP files from images"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:7
+msgid ""
+"A plugin to add a button for quickly opening OpenStreetMap's iD editor and "
+"setup a TMS basemap."
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:8
+msgid "A plugin to upload orthophotos to OpenAerialMap"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:9
+msgid "Display program version, memory and disk space usage statistics"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:10
+msgid "Sync accounts from webodm.net"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:11
+msgid "Add a fullscreen button to the 2D map view"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:12
+msgid "Compute, preview and export contours from DEMs"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:13
+msgid "Calculate and draw an elevation map based on a task's DEMs"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:14
+msgid "Upload and tile ODM assets with Cesium ion."
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:15
+msgid "Import images from external sources directly"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:16
+msgid "Detect changes between two different tasks in the same project."
+msgstr ""
+
 #: app/views/app.py:44
 msgid "First Project"
 msgstr ""
@@ -1119,8 +1358,106 @@ msgstr ""
 msgid "3D Model Display"
 msgstr ""
 
+#: app/views/app.py:147
+msgid "Welcome"
+msgstr ""
+
+#: app/views/dev.py:48
+msgid "Cannot find locale/ folder in .zip archive"
+msgstr ""
+
+#: app/views/dev.py:66
+msgid "Translation files reloaded!"
+msgstr ""
+
+#: app/views/dev.py:70
+msgid "Invalid action"
+msgstr ""
+
+#: nodeodm/apps.py:8
+msgid "Node Management"
+msgstr ""
+
+#: nodeodm/models.py:23
+msgid ""
+"Hostname or IP address where the node is located (can be an internal "
+"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
+"localhost. Find the IP address of your host machine by running ifconfig on "
+"Linux or by checking your network settings."
+msgstr ""
+
+#: nodeodm/models.py:24
+msgid "Port that connects to the node's API"
+msgstr ""
+
+#: nodeodm/models.py:25
+msgid "API version used by the node"
+msgstr ""
+
+#: nodeodm/models.py:26
+msgid "When was the information about this node last retrieved?"
+msgstr ""
+
+#: nodeodm/models.py:27
+msgid ""
+"Number of tasks currently being processed by this node (as reported by the "
+"node itself)"
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Available Options"
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Description of the options that can be used for processing"
+msgstr ""
+
+#: nodeodm/models.py:29
+msgid "Token"
+msgstr ""
+
+#: nodeodm/models.py:29
+msgid ""
+"Token to use for authentication. If the node doesn't have authentication, "
+"you can leave this field blank."
+msgstr ""
+
+#: nodeodm/models.py:30
+msgid "Max Images"
+msgstr ""
+
+#: nodeodm/models.py:30
+msgid "Maximum number of images accepted by this node."
+msgstr ""
+
+#: nodeodm/models.py:31
+msgid "Engine version used by the node."
+msgstr ""
+
+#: nodeodm/models.py:32
+msgid ""
+"Optional label for this node. When set, this label will be shown instead of "
+"the hostname:port name."
+msgstr ""
+
+#: nodeodm/models.py:33
+msgid "Engine used by the node."
+msgstr ""
+
 #: plugins/cesium-ion/api_views.py:170
 msgid "No matching enum type."
+msgstr ""
+
+#: plugins/contours/api.py:16
+msgid "No DSM layer is available."
+msgstr ""
+
+#: plugins/contours/api.py:18
+msgid "No DTM layer is available."
+msgstr ""
+
+#: plugins/contours/api.py:60
+msgid "Could not generate contour file. This might be a bug."
 msgstr ""
 
 #: plugins/diagnostic/plugin.py:36
@@ -1188,7 +1525,7 @@ msgid ""
 "These values might be relative to the virtualization environment in which "
 "the application is running, not necessarily the values of the your machine. "
 "See instructions for %(win_link)s and %(mac_link)s for changing these values "
-"in a docker setup."
+"in a Docker setup."
 msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:47
@@ -1198,6 +1535,13 @@ msgstr ""
 
 #: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
 msgid "Lightning Network"
+msgstr ""
+
+#: plugins/measure/api.py:27
+msgid ""
+"No surface model available. From the Dashboard, select this task, press "
+"Edit, from the options make sure to check \"dsm\", then press Restart --> "
+"From DEM."
 msgstr ""
 
 #: plugins/posm-gcpi/plugin.py:8
