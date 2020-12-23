@@ -5,6 +5,7 @@ import L from 'leaflet';
 import './ContoursPanel.scss';
 import ErrorMessage from 'webodm/components/ErrorMessage';
 import Workers from 'webodm/classes/Workers';
+import { _ } from 'webodm/classes/gettext';
 
 export default class ContoursPanel extends React.Component {
   static defaultProps = {
@@ -53,11 +54,11 @@ export default class ContoursPanel extends React.Component {
               if (layers.length > 0){
                 this.setState({layers, layer: layers[0]});
             }else{
-                this.setState({permanentError: "No DSM or DTM is available. To export contours, make sure to process a task with either the --dsm or --dtm option checked."});
+                this.setState({permanentError: _("No DSM or DTM is available. To export contours, make sure to process a task with either the --dsm or --dtm option checked.")});
               }
           })
           .fail(() => {
-            this.setState({permanentError: `Cannot retrieve information for task ${id}. Are you are connected to the internet?`})
+            this.setState({permanentError: _("Cannot retrieve information for task. Are you are connected to the internet?")})
           })
           .always(() => {
             this.setState({loading: false});
@@ -127,7 +128,7 @@ export default class ContoursPanel extends React.Component {
         this.setState({previewLayer: L.geoJSON(geojson, {
           onEachFeature: (feature, layer) => {
               if (feature.properties && feature.properties.level !== undefined) {
-                  layer.bindPopup(`<b>Elevation:</b> ${feature.properties.level} meters`);
+                  layer.bindPopup(`<b>${_("Elevation:")}</b> ${feature.properties.level} ${_("meters")}`);
               }
           },
           style: feature => {
@@ -223,40 +224,40 @@ export default class ContoursPanel extends React.Component {
             simplify, customSimplify,
             previewLoading, previewLayer } = this.state;
     const intervalValues = [0.25, 0.5, 1, 1.5, 2];
-    const simplifyValues = [{label: 'Do not simplify', value: 0},
-                            {label: 'Normal', value: 0.2},
-                            {label: 'Aggressive', value: 1}];
+    const simplifyValues = [{label: _('Do not simplify'), value: 0},
+                            {label: _('Normal'), value: 0.2},
+                            {label: _('Aggressive'), value: 1}];
 
     const disabled = (interval === "custom" && !customInterval) ||
                       (epsg === "custom" && !customEpsg) ||
                       (simplify === "custom" && !customSimplify);
 
     let content = "";
-    if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> Loading...</span>);
+    if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> {_("Loading…")}</span>);
     else if (permanentError) content = (<div className="alert alert-warning">{permanentError}</div>);
     else{
       content = (<div>
         <ErrorMessage bind={[this, "error"]} />
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">Interval:</label>
+          <label className="col-sm-3 control-label">{_("Interval:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={interval} onChange={this.handleSelectInterval}>
-              {intervalValues.map(iv => <option value={iv}>{iv} meter</option>)}
-              <option value="custom">Custom</option>
+              {intervalValues.map(iv => <option value={iv}>{iv} {_("meter")}</option>)}
+              <option value="custom">{_("Custom")}</option>
             </select>
           </div>
         </div>
         {interval === "custom" ? 
           <div className="row form-group form-inline">
-            <label className="col-sm-3 control-label">Value:</label>
+            <label className="col-sm-3 control-label">{_("Value:")}</label>
             <div className="col-sm-9 ">
-              <input type="number" className="form-control custom-interval" value={customInterval} onChange={this.handleChangeCustomInterval} /><span> meter</span>
+              <input type="number" className="form-control custom-interval" value={customInterval} onChange={this.handleChangeCustomInterval} /><span> {_("meter")}</span>
             </div>
           </div>
         : ""}
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">Layer:</label>
+          <label className="col-sm-3 control-label">{_("Layer:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={layer} onChange={this.handleSelectLayer}>
               {layers.map(l => <option value={l}>{l}</option>)}
@@ -265,30 +266,30 @@ export default class ContoursPanel extends React.Component {
         </div>
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">Simplify:</label>
+          <label className="col-sm-3 control-label">{_("Simplify:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={simplify} onChange={this.handleSelectSimplify}>
-              {simplifyValues.map(sv => <option value={sv.value}>{sv.label} ({sv.value} meter)</option>)}
-              <option value="custom">Custom</option>
+              {simplifyValues.map(sv => <option value={sv.value}>{sv.label} ({sv.value} {_("meter")})</option>)}
+              <option value="custom">{_("Custom")}</option>
             </select>
           </div>
         </div>
         {simplify === "custom" ? 
           <div className="row form-group form-inline">
-            <label className="col-sm-3 control-label">Value:</label>
+            <label className="col-sm-3 control-label">{_("Value:")}</label>
             <div className="col-sm-9 ">
-              <input type="number" className="form-control custom-interval" value={customSimplify} onChange={this.handleChangeCustomSimplify} /><span> meter</span>
+              <input type="number" className="form-control custom-interval" value={customSimplify} onChange={this.handleChangeCustomSimplify} /><span> {_("meter")}</span>
             </div>
           </div>
         : ""}
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">Projection:</label>
+          <label className="col-sm-3 control-label">{_("Projection:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
               <option value="4326">WGS84 (EPSG:4326)</option>
               <option value="3857">Web Mercator (EPSG:3857)</option>
-              <option value="custom">Custom EPSG</option>
+              <option value="custom">{_("Custom")} EPSG</option>
             </select>
           </div>
         </div>
@@ -310,12 +311,12 @@ export default class ContoursPanel extends React.Component {
           <div className="col-sm-9 text-right">
             <button onClick={this.handleShowPreview}
                     disabled={disabled || previewLoading} type="button" className="btn btn-sm btn-primary btn-preview">
-              {previewLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-eye-open"/>} Preview
+              {previewLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-eye-open"/>} {_("Preview")}
             </button>
 
             <div className="btn-group">
               <button disabled={disabled || exportLoading} type="button" className="btn btn-sm btn-primary" data-toggle="dropdown">
-                {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-download" />} Export
+                {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-download" />} {_("Export")}
               </button>
               <button disabled={disabled|| exportLoading} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
               <ul className="dropdown-menu  pull-right">
@@ -348,7 +349,7 @@ export default class ContoursPanel extends React.Component {
 
     return (<div className="contours-panel">
       <span className="close-button" onClick={this.props.onClose}/>
-      <div className="title">Contours</div>
+      <div className="title">{_("Contours")}</div>
       <hr/>
       {content}
     </div>);

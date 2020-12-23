@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AssetDownloads from '../classes/AssetDownloads';
 import '../css/ImagePopup.scss';
+import { _ } from '../classes/gettext';
 
 class ImagePopup extends React.Component {
     static propTypes = {
@@ -43,7 +44,7 @@ class ImagePopup extends React.Component {
     }
 
     imageOnError = () => {
-        this.setState({error: "Image is missing", loading: false});
+        this.setState({error: _("Image missing"), loading: false});
     }
 
     imageOnLoad = () => {
@@ -82,7 +83,7 @@ class ImagePopup extends React.Component {
                     <a onClick={this.onImgClick} href="javascript:void(0);" title={feature.properties.filename}><img style={{borderRadius: "4px"}} src={imageUrl} onLoad={this.imageOnLoad} onError={this.imageOnError} /></a>
                 </div>,
                 <div key="download-image">
-                    <a href={downloadImageLink}><i className="fa fa-image"></i> Download Image</a>
+                    <a href={downloadImageLink}><i className="fa fa-image"></i> {_("Download Image")}</a>
                 </div>
             ]}
             <div>

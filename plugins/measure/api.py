@@ -14,6 +14,7 @@ from worker.tasks import execute_grass_script
 
 from app.plugins.grass_engine import grass, GrassEngineException, cleanup_grass_context
 from geojson import Feature, Point, FeatureCollection
+from django.utils.translation import gettext_lazy as _
 
 class GeoJSONSerializer(serializers.Serializer):
     area = serializers.JSONField(help_text="Polygon contour defining the volume area to compute")
@@ -23,7 +24,7 @@ class TaskVolume(TaskView):
     def post(self, request, pk=None):
         task = self.get_and_check_task(request, pk)
         if task.dsm_extent is None:
-            return Response({'error': 'No surface model available. From the Dashboard, select this task, press Edit, from the options make sure to check "dsm", then press Restart --> From DEM.'})
+            return Response({'error': _('No surface model available. From the Dashboard, select this task, press Edit, from the options make sure to check "dsm", then press Restart --> From DEM.')})
 
         serializer = GeoJSONSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

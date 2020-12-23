@@ -4,6 +4,7 @@ import ErrorMessage from './ErrorMessage';
 import EditTaskForm from './EditTaskForm';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import { _ } from '../classes/gettext';
 
 class EditTaskPanel extends React.Component {
     static defaultProps = {
@@ -52,7 +53,7 @@ class EditTaskPanel extends React.Component {
           this.setState({saving: false});
           this.props.onSave(json);
         }).fail(() => {
-          this.setState({saving: false, error: "Could not update task information. Plese try again."});
+          this.setState({saving: false, error: _("Could not update task information. Plese try again.")});
         });     
     }
 
@@ -71,14 +72,14 @@ class EditTaskPanel extends React.Component {
                   task={this.props.task}
                 />
                 <div className="actions">
-                    <button type="button" className="btn btn-sm btn-default" onClick={this.handleCancel} disabled={this.state.saving}>Cancel</button>
+                    <button type="button" className="btn btn-sm btn-default" onClick={this.handleCancel} disabled={this.state.saving}>{_("Cancel")}</button>
                     <button type="button" className="btn btn-sm btn-primary save" onClick={this.handleSave} disabled={this.state.saving || !this.state.editTaskFormLoaded}>
                         {this.state.saving ? 
                             <span>
-                                <i className="fa fa-circle-notch fa-spin"></i> Saving...
+                                <i className="fa fa-circle-notch fa-spin"></i> {_("Saving...")}
                             </span>
                         :   <span>
-                                <i className="fa fa-edit"></i> Save
+                                <i className="fa fa-edit"></i> {_("Save")}
                             </span>}
                     </button>
                 </div>

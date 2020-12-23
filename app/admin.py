@@ -21,6 +21,7 @@ from django import forms
 from codemirror2.widgets import CodeMirrorEditor
 from webodm import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.translation import gettext_lazy as _, gettext
 
 admin.site.register(Project, GuardedModelAdmin)
 
@@ -48,21 +49,24 @@ admin.site.register(Setting, SettingAdmin)
 
 
 class ThemeModelForm(forms.ModelForm):
-    css = forms.CharField(help_text="Enter custom CSS",
+    css = forms.CharField(help_text=_("Enter custom CSS"),
+                          label=_("CSS"),
                           required=False,
                           widget=CodeMirrorEditor(options={'mode': 'css', 'lineNumbers': True}))
-    html_before_header = forms.CharField(help_text="HTML that will be displayed above site header",
+    html_before_header = forms.CharField(help_text=_("HTML that will be displayed above site header"),
+                                         label=_("HTML (before header)"),
                                          required=False,
                                          widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
-    html_after_header = forms.CharField(help_text="HTML that will be displayed after site header",
+    html_after_header = forms.CharField(help_text=_("HTML that will be displayed after site header"),
+                                        label=_("HTML (after header)"),
                                         required=False,
                                         widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
-    html_after_body = forms.CharField(help_text="HTML that will be displayed after the &lt;/body&gt; tag",
+    html_after_body = forms.CharField(help_text=_("HTML that will be displayed after the body tag"),
+                                      label=_("HTML (after body)"),
                                       required=False,
                                     widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
-    html_footer = forms.CharField(help_text="HTML that will be displayed in the footer. You can also use the special tags:"
-                                            "<p class='help'>{ORGANIZATION}: show a link to your organization.</p>"
-                                            "<p class='help'>{YEAR}: show current year</p>",
+    html_footer = forms.CharField(help_text=_("HTML that will be displayed in the footer. You can also use the special tags such as {ORGANIZATION} and {YEAR}."),
+                                  label=_("HTML (footer)"),
                                   required=False,
                                   widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
 
@@ -91,15 +95,21 @@ class PluginAdmin(admin.ModelAdmin):
 
     def description(self, obj):
         manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
-        return manifest.get('description', '')
+        return _(manifest.get('description', ''))
+
+    description.short_description = _("Description")
 
     def version(self, obj):
         manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
         return manifest.get('version', '')
 
+    version.short_description = _("Version")
+
     def author(self, obj):
         manifest = get_plugin_by_name(obj.name, only_active=False, refresh_cache_if_none=True).get_manifest()
         return manifest.get('author', '')
+
+    author.short_description = _("Author")
 
     def get_urls(self):
         urls = super().get_urls()
@@ -220,7 +230,7 @@ class PluginAdmin(admin.ModelAdmin):
             obj.name
         )
 
-    plugin_actions.short_description = 'Actions'
+    plugin_actions.short_description = _('Actions')
     plugin_actions.allow_tags = True
 
 

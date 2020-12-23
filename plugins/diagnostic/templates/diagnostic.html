@@ -1,50 +1,50 @@
 {% extends "app/plugins/templates/base.html" %}
+{% load i18n %}
 
 {% block content %}
 <script src="./Chart.min.js"></script>
-<h2>Diagnostic Information</h2>
-
-<p><b>App Version:</b> {{ version }}</p>
+<h2>{% trans 'Diagnostic Information' %}</h2>
 
 <div class="row text-center">
     <div class="col-md-4 col-sm-12">
-        <h4>Storage Space</h4>
+        <h4>{% trans 'Storage Space' %}</h4>
         <div style="width: 80%; margin-left: 10%;">
             <canvas id="diskChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
         </div>
-        <p><b>Free:</b> {{ free_disk_space|filesizeformat }} |
-            <b>Used:</b> {{ used_disk_space|filesizeformat }} |
-            <b>Total:</b> {{ total_disk_space|filesizeformat }}</p>
+        <p><b>{% trans 'Free' context 'Megabytes of storage space' %}:</b> {{ free_disk_space|filesizeformat }} |
+            <b>{% trans 'Used' context 'Megabytes of storage space' %}:</b> {{ used_disk_space|filesizeformat }} |
+            <b>{% trans 'Total' context 'Megabytes of storage space' %}:</b> {{ total_disk_space|filesizeformat }}</p>
     </div>
     <div class="col-md-4 col-sm-12">
         {% if total_memory %}
-        <h4>Memory</h4>
+        <h4>{% trans 'Memory' context 'Computer memory (RAM)' %}</h4>
         <div style="width: 80%; margin-left: 10%;">
             <canvas id="memoryChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
         </div>
-        <p><b>Free:</b> {{ free_memory|filesizeformat }} |
-            <b>Used:</b> {{ used_memory|filesizeformat }} |
-            <b>Total:</b> {{ total_memory|filesizeformat }}</p>
+        <p><b>{% trans 'Free' context 'Megabytes of memory space' %}:</b> {{ free_memory|filesizeformat }} |
+            <b>{% trans 'Used' context 'Megabytes of memory space' %}:</b> {{ used_memory|filesizeformat }} |
+            <b>{% trans 'Total' context 'Megabytes of memory space'%}:</b> {{ total_memory|filesizeformat }}</p>
         {% endif %}
     </div>
 </div>
 
 <hr/>
-<div style="margin-top: 20px;"><strong>Note!</strong> These values might be relative to the virtualization environment in which the application is running, not necessarily the values of the your machine. See instructions for <a href="http://stackoverflow.com/a/39720010">MacOS</a> and <a href="https://docs.docker.com/docker-for-windows/#advanced">Windows</a> for changing these values in a docker setup.</div>
+
+<div style="margin-top: 20px;"><strong>{% trans 'Note!' %}</strong> {% blocktrans with win_link="<a href='https://docs.docker.com/docker-for-windows/#advanced'>Windows</a>" mac_link="<a href='http://stackoverflow.com/a/39720010'>MacOS</a>" %}These values might be relative to the virtualization environment in which the application is running, not necessarily the values of the your machine. See instructions for {{ win_link }} and {{ mac_link }} for changing these values in a Docker setup.{% endblocktrans %}</div>
 
 <script>
 (function(){
     var ctx = document.getElementById('diskChart').getContext('2d');
     var labels = {
-        'Used': '{{ used_disk_space|filesizeformat }}',
-        'Free': '{{ free_disk_space|filesizeformat }}'
+        "{% trans 'Used' context 'Megabytes of storage space' %}": '{{ used_disk_space|filesizeformat }}',
+        "{% trans 'Free' context 'Megabytes of storage space' %}": '{{ free_disk_space|filesizeformat }}'
     };
     var chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["Used", "Free"],
+            labels: ["{% trans 'Used' context 'Megabytes of storage space' %}", "{% trans 'Free' context 'Megabytes of storage space' %}"],
             datasets: [{
-                label: "Disk Space",
+                label: "{% trans 'Disk Space' %}",
                 backgroundColor:[
                     "rgb(255, 99, 132)",
                     "rgb(54, 162, 235)"
@@ -71,15 +71,15 @@
 (function(){
     var ctx = document.getElementById('memoryChart').getContext('2d');
     var labels = {
-        'Used': '{{ used_memory|filesizeformat }}',
-        'Free': '{{ free_memory|filesizeformat }}'
+        "{% trans 'Used' context 'Megabytes of memory space' %}": '{{ used_memory|filesizeformat }}',
+        "{% trans 'Free' context 'Megabytes of memory space' %}": '{{ free_memory|filesizeformat }}'
     };
     var chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["Used", "Free"],
+            labels: ["{% trans 'Used' context 'Megabytes of memory space' %}", "{% trans 'Free' context 'Megabytes of memory space' %}"],
             datasets: [{
-                label: "Disk Space",
+                label: "{% trans 'Disk Space' %}",
                 backgroundColor:[
                     "rgb(255, 99, 132)",
                     "rgb(54, 162, 235)"

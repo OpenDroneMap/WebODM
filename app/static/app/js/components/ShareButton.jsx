@@ -2,7 +2,7 @@ import React from 'react';
 import '../css/ShareButton.scss';
 import SharePopup from './SharePopup';
 import PropTypes from 'prop-types';
-import $ from 'jquery';
+import { _ } from '../classes/gettext';
 
 class ShareButton extends React.Component {
   static defaultProps = {
@@ -55,7 +55,7 @@ class ShareButton extends React.Component {
           type="button"
           onClick={this.handleClick}
           className={"shareButton btn btn-sm " + (this.state.task.public ? "btn-primary" : "btn-secondary")}>
-          <i className="fa fa-share-alt"></i> Share
+          <i className="fa fa-share-alt"></i> {_("Share")}
         </button>
         {this.props.popupPlacement === 'bottom' && this.state.showPopup ? 
           popup : ""}

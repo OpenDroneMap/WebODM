@@ -37,6 +37,7 @@
     <script src="{% static 'app/js/vendor/es6-shim.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/system.js' %}"></script>
+    <script src="{% url 'javascript-catalog' %}"></script>
 
     {% block headers-before-bundle %}{% endblock %}
 
@@ -63,23 +64,6 @@
     <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <!--
-            {% if request.user.is_authenticated %}
-                {% if user.is_superuser %}          
-                <li>
-                    <a class="page-scroll" href="/admin/">Admin Panel</a>
-                </li>
-                {% endif %}
-                <li>
-                    <a class="page-scroll" href="/logout/">Logout</a>
-                </li>
-            {% else %}
-                 <li>
-                    <a class="page-scroll" href="/login/">Login</a>
-                </li>
-            {% endif %}
-            </ul>
--->
     <div id="wrapper">
         {{ SETTINGS.theme.html_before_header|safe }}
 

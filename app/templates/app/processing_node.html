@@ -41,7 +41,7 @@
 	</tr>
 	<tr>
 		<td>{% trans "Last Refreshed" %}</td>
-		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'ago' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
+		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'ago' context '5 minutes ago' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
 	</tr>
 	<tr>
 		<td>{% trans "Options (JSON)" %}</td>

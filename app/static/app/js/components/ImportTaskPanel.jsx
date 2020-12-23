@@ -5,6 +5,8 @@ import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import ErrorMessage from './ErrorMessage';
 import UploadProgressBar from './UploadProgressBar';
+import { _, interpolate } from '../classes/gettext';
+import Trans from './Trans';
 
 class ImportTaskPanel extends React.Component {
   static defaultProps = {
@@ -58,7 +60,7 @@ class ImportTaskPanel extends React.Component {
       });
 
       this.dz.on("error", (file) => {
-          if (this.state.uploading) this.setState({error: "Cannot upload file. Check your internet connection and try again."});
+          if (this.state.uploading) this.setState({error: _("Cannot upload file. Check your internet connection and try again.")});
         })
         .on("sending", () => {
           this.setState({typeUrl: false, uploading: true, totalCount: 1});
@@ -86,10 +88,10 @@ class ImportTaskPanel extends React.Component {
               if (!response.id) throw new Error(`Expected id field, but none given (${response})`);
               this.props.onImported();
             }catch(e){
-              this.setState({error: `Invalid response from server: ${e.message}`});
+              this.setState({error: interpolate(_('Invalid response from server: %(error)s'), { error: e.message})});
             }
           }else if (this.state.uploading){
-            this.setState({uploading: false, error: "An error occured while uploading the file. Please try again."});
+            this.setState({uploading: false, error: _("An error occured while uploading the file. Please try again.")});
           }
         });
     }
@@ -133,11 +135,11 @@ class ImportTaskPanel extends React.Component {
       if (json.id){
         this.props.onImported();
       }else{
-        this.setState({error: json.error || `Cannot import from URL, server responded: ${JSON.stringify(json)}`});
+        this.setState({error: json.error || interpolate(_("Invalid JSON response: %(error)s"), {error: JSON.stringify(json)})});
       }
     })
     .fail(() => {
-        this.setState({importingFromUrl: false, error: "Cannot import from URL. Check your internet connection."});
+        this.setState({importingFromUrl: false, error: _("Cannot import from URL. Check your internet connection.")});
     });
   }
 
@@ -153,16 +155,16 @@ class ImportTaskPanel extends React.Component {
         <div className="form-horizontal">
           <ErrorMessage bind={[this, 'error']} />
 
-          <button type="button" className="close theme-color-primary" aria-label="Close" onClick={this.cancel}><span aria-hidden="true">&times;</span></button>
-          <h4>Import Existing Assets</h4>
-          <p>You can import .zip files that have been exported from existing tasks via Download Assets <i className="glyphicon glyphicon-arrow-right"></i> All Assets.</p>
+          <button type="button" className="close theme-color-primary" title="Close" onClick={this.cancel}><span aria-hidden="true">&times;</span></button>
+          <h4>{_("Import Existing Assets")}</h4>
+          <p><Trans params={{arrow: '<i class="glyphicon glyphicon-arrow-right"></i>'}}>{_("You can import .zip files that have been exported from existing tasks via Download Assets %(arrow)s All Assets.")}</Trans></p>
           
           <button disabled={this.state.uploading}
                   type="button" 
                   className="btn btn-primary"
                   ref={this.setRef("uploadButton")}>
             <i className="glyphicon glyphicon-upload"></i>
-            Upload a File
+            {_("Upload a File")}
           </button>
           <button disabled={this.state.uploading}
                   type="button" 
@@ -170,7 +172,7 @@ class ImportTaskPanel extends React.Component {
                   onClick={this.handleImportFromUrl}
                   ref={this.setRef("importFromUrlButton")}>
             <i className="glyphicon glyphicon-cloud-download"></i>
-            Import From URL
+            {_("Import From URL")}
           </button>
 
           {this.state.typeUrl ? 
@@ -179,7 +181,7 @@ class ImportTaskPanel extends React.Component {
                 <input disabled={this.state.importingFromUrl} onChange={this.handleChangeImportUrl} size="45" type="text" className="form-control" placeholder="http://" value={this.state.importUrl} />
                 <button onClick={this.handleConfirmImportUrl}
                         disabled={this.state.importUrl.length < 4 || this.state.importingFromUrl} 
-                        className="btn-import btn btn-primary"><i className="glyphicon glyphicon-cloud-download"></i> Import</button>
+                        className="btn-import btn btn-primary"><i className="glyphicon glyphicon-cloud-download"></i> {_("Import")}</button>
               </div>
             </div> : ""}
 
@@ -189,7 +191,7 @@ class ImportTaskPanel extends React.Component {
                     className="btn btn-danger btn-sm" 
                     onClick={this.cancelUpload}>
               <i className="glyphicon glyphicon-remove-circle"></i>
-              Cancel Upload
+              {_("Cancel Upload")}
             </button> 
           </div> : ""}
         </div>

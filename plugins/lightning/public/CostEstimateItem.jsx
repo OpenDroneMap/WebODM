@@ -3,6 +3,7 @@ import './CostEstimateItem.scss';
 import ResizeModes from 'webodm/classes/ResizeModes';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import { _ } from 'webodm/classes/gettext';
 
 export default class CostEstimateItem extends React.Component {
   static defaultProps = {
@@ -99,10 +100,10 @@ export default class CostEstimateItem extends React.Component {
                 if (json.credits_estimate === 0) json.credits_estimate += " (Free)";
                 this.setState({credits: json.credits_estimate})
             }else{
-                this.setState({credits: "Cannot retrieve estimate. Try again later."});
+                this.setState({credits: _("Cannot retrieve estimate. Try again later.")});
             }
         }).fail(e => {
-            this.setState({credits: `Cannot retrieve estimate. Check parameters or try again later.`});
+            this.setState({credits: _("Cannot retrieve estimate. Check parameters or try again later.")});
         }).always(() => {
             this.setState({loading: false});
             this.estimateRequest = null;
@@ -135,7 +136,7 @@ export default class CostEstimateItem extends React.Component {
 
     return (
         <div className={"lightning-cost-estimate-item " + (show ? "" : "hide")}>
-            <label className="col-sm-2 control-label">Credits Estimate</label>
+            <label className="col-sm-2 control-label">{_("Credits Estimate")}</label>
             <div className="col-sm-10 num-credits">
                 {loading ?
                  <i className="fa fa-circle-notch fa-spin"></i> :

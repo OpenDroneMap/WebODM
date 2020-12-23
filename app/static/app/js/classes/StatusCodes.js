@@ -1,3 +1,5 @@
+import { _ } from './gettext';
+
 const QUEUED = 10,
       RUNNING = 20,
       FAILED = 30,
@@ -6,23 +8,23 @@ const QUEUED = 10,
 
 let statusCodes = {
     [QUEUED]: {
-        descr: "Queued",
+        descr: _("Queued"),
         icon: "far fa-hourglass fa-fw"
     },
     [RUNNING]: {
-        descr: "Running",
+        descr: _("Running"),
         icon: "fa fa-cog fa-spin fa-fw"
     },
     [FAILED]: {
-        descr: "Failed",
+        descr: _("Failed"),
         icon: "fa fa-times fa-fw"
     },
     [COMPLETED]: {
-        descr: "Completed",
+        descr: _("Completed"),
         icon: "fa fa-check fa-fw"
     },
     [CANCELED]: {
-        descr: "Canceled",
+        descr: _("Canceled"),
         icon: "fa fa-ban fa-fw"
     }
 };

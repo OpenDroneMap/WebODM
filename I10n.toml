@@ -1,0 +1,4 @@
+[[paths]]
+    l10n = "locale/{locale}/LC_MESSAGES/**" 
+    reference = "locale/*.pot"
+

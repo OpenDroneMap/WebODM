@@ -22,11 +22,13 @@ A user-friendly, commercial grade software for drone image processing. Generate 
  * [Roadmap](#roadmap)
  * [Getting Help](#getting-help)
  * [Support the Project](#support-the-project)
+ * [Translations](#translations)
  * [Become a Contributor](#become-a-contributor)
  * [Architecture Overview](#architecture-overview)
  * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
  * [Run it natively](#run-it-natively)
  * [Run it on the cloud (Google Compute, Amazon AWS)](#run-it-on-the-cloud-google-compute-amazon-aws)
+ * [License](#license)
  
 ![image](https://user-images.githubusercontent.com/1951843/73680589-8213fa80-468a-11ea-9225-442fdcc8b7c8.png)
 
@@ -270,10 +272,31 @@ There are many ways to contribute back to the project:
  - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
  - ⭐️ us on GitHub.
+ - Help us [translate](#translations) WebODM in your language.
  - Spread the word about WebODM and OpenDroneMap on social media.
  - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
  - You can [pledge funds](https://fund.webodm.org) for getting new features built and bug fixed.
  - Become a contributor 🤘
+
+## Translations
+
+It's easy to translate WebODM in a different language!
+
+ - Visit https://hosted.weblate.org/engage/webodm/ and register an account (it's free)
+ - Pick a language to translate, or [start a new translation](https://hosted.weblate.org/new-lang/webodm/webodm/)
+ - Start translating! It's that easy.
+
+If you want to preview your translation work, start WebODM in developer mode:
+
+```
+./webodm.sh restart --dev
+```
+
+Then edit the [LOCALES](https://github.com/OpenDroneMap/WebODM/blob/master/LOCALES) file to include your translation locale code. Finally, visit the `Developer Tools` panel from WebODM's dashboard and press the `Download and Replace Translation Files` button:
+
+![image](https://user-images.githubusercontent.com/1951843/102927263-a294a100-4464-11eb-956e-888b73dc5b94.png)
+
+The latest translation files from weblate.org will be downloaded and applied to the installation of WebODM.
 
 ## Become a Contributor
 
@@ -480,3 +503,6 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 To setup the firewall on Google Cloud, open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
 
 
+## License
+
+WebODM is licensed under the terms of the [GNU Affero General Public License v3.0](https://github.com/OpenDroneMap/WebODM/blob/master/LICENSE.md).

@@ -1,4 +1,5 @@
 import shp from 'shpjs';
+import { _, interpolate } from './gettext';
 
 export function addTempLayer(file, cb) {
   let maxSize = 5242880;
@@ -10,7 +11,7 @@ export function addTempLayer(file, cb) {
 
   if (file && file.size > maxSize) {
     let err = {};
-    err.message = file.name + " is bigger than 5 MB.";
+    err.message = interpolate(_("%(file)s is bigger than 5 MB."), { file: file.name });
     cb(err);
   } else {
     //get just the first file
@@ -26,7 +27,7 @@ export function addTempLayer(file, cb) {
           shp(reader.result).then(function (geojson) {
             addLayer(geojson);
           }).catch(function (err) {
-            err.message = "Not a proper zipped shapefile " + file.name;
+            err.message = interpolate(_("Not a proper zipped shapefile: %(file)s"), { file: file.name });
             cb(err);
           })
         }
@@ -39,7 +40,7 @@ export function addTempLayer(file, cb) {
           let geojson = JSON.parse(reader.result);
           addLayer(geojson);
         } catch (err) {
-          err.message = "Not a proper json file " + file.name;
+          err.message = interpolate(_("Not a proper JSON file: %(file)s"), { file: file.name });
           cb(err);
         }
       }

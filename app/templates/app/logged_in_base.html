@@ -12,7 +12,7 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li class="user-profile">
-                    {% trans 'Hello' %}, {{ user.username }}<br/>
+                    {% blocktrans with user=user.username %}Hello, {{ user }}!{% endblocktrans %}<br/>
                     <span class="email">{{ user.email }}</span>
                 </li>
                 <li class="divider"></li>
@@ -56,7 +56,7 @@
 
                 {% if view_nodes %}
                 <li>
-                    <a href="#"><i class="fa fa-wrench fa-fw"></i> Processing Nodes<span class="fa arrow"></span></a>
+                    <a href="#"><i class="fa fa-wrench fa-fw"></i> {% trans 'Processing Nodes' %}<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         {% for node in nodes %}
                         <li>
@@ -66,7 +66,7 @@
 
                         {% if add_nodes %}
                         <li>
-                            <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> Add New</a>
+                            <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> {% trans 'Add New' %}</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -103,6 +103,16 @@
                     </ul>
                 </li>
                 {% endif %}
+
+                {% is_dev_mode as dev_mode %}
+                {% if dev_mode and user.is_superuser %}
+                <li>
+                    <a href="/dev-tools/"><i class="fa fa-bug fa-fw"></i> {% trans 'Developer Tools' %}</a>
+                </li>
+                {% endif %}
+                <li id="about-menu">
+                    <a href="/about/"><i class="fa fa-info-circle fa-fw"></i> {% trans 'About' %}</a>
+                </li>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.dispatch import receiver
 from guardian.models import GroupObjectPermissionBase
 from guardian.models import UserObjectPermissionBase
+from django.utils.translation import gettext_lazy as _
+
 from webodm import settings
 
 import json
@@ -18,17 +20,21 @@ from datetime import timedelta
 OFFLINE_MINUTES = 5 # Number of minutes a node hasn't been seen before it should be considered offline
 
 class ProcessingNode(models.Model):
-    hostname = models.CharField(max_length=255, help_text="Hostname or IP address where the node is located (can be an internal hostname as well). If you are using Docker, this is never 127.0.0.1 or localhost. Find the IP address of your host machine by running ifconfig on Linux or by checking your network settings.")
-    port = models.PositiveIntegerField(help_text="Port that connects to the node's API")
-    api_version = models.CharField(max_length=32, null=True, help_text="API version used by the node")
-    last_refreshed = models.DateTimeField(null=True, help_text="When was the information about this node last retrieved?")
-    queue_count = models.PositiveIntegerField(default=0, help_text="Number of tasks currently being processed by this node (as reported by the node itself)")
-    available_options = fields.JSONField(default=dict, help_text="Description of the options that can be used for processing")
-    token = models.CharField(max_length=1024, blank=True, default="", help_text="Token to use for authentication. If the node doesn't have authentication, you can leave this field blank.")
-    max_images = models.PositiveIntegerField(help_text="Maximum number of images accepted by this node.", blank=True, null=True)
-    engine_version = models.CharField(max_length=32, null=True, help_text="Engine version used by the node.")
-    label = models.CharField(max_length=255, default="", blank=True, help_text="Optional label for this node. When set, this label will be shown instead of the hostname:port name.")
-    engine = models.CharField(max_length=255, null=True, help_text="Engine used by the node.")
+    hostname = models.CharField(verbose_name=_("Hostname"), max_length=255, help_text=_("Hostname or IP address where the node is located (can be an internal hostname as well). If you are using Docker, this is never 127.0.0.1 or localhost. Find the IP address of your host machine by running ifconfig on Linux or by checking your network settings."))
+    port = models.PositiveIntegerField(verbose_name=_("Port"), help_text=_("Port that connects to the node's API"))
+    api_version = models.CharField(verbose_name=_("API Version"), max_length=32, null=True, help_text=_("API version used by the node"))
+    last_refreshed = models.DateTimeField(verbose_name=_("Last Refreshed"), null=True, help_text=_("When was the information about this node last retrieved?"))
+    queue_count = models.PositiveIntegerField(verbose_name=_("Queue Count"), default=0, help_text=_("Number of tasks currently being processed by this node (as reported by the node itself)"))
+    available_options = fields.JSONField(verbose_name=_("Available Options"), default=dict, help_text=_("Description of the options that can be used for processing"))
+    token = models.CharField(verbose_name=_("Token"), max_length=1024, blank=True, default="", help_text=_("Token to use for authentication. If the node doesn't have authentication, you can leave this field blank."))
+    max_images = models.PositiveIntegerField(verbose_name=_("Max Images"), help_text=_("Maximum number of images accepted by this node."), blank=True, null=True)
+    engine_version = models.CharField(verbose_name=_("Engine Version"), max_length=32, null=True, help_text=_("Engine version used by the node."))
+    label = models.CharField(verbose_name=_("Label"), max_length=255, default="", blank=True, help_text=_("Optional label for this node. When set, this label will be shown instead of the hostname:port name."))
+    engine = models.CharField(verbose_name=_("Engine"), max_length=255, null=True, help_text=_("Engine used by the node."))
+
+    class Meta:
+        verbose_name = _("Processing Node")
+        verbose_name_plural = _("Processing Nodes")
 
     def __str__(self):
         if self.label != "":

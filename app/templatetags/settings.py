@@ -11,6 +11,9 @@ logger = logging.getLogger('app.logger')
 def is_single_user_mode():
     return settings.SINGLE_USER_MODE
 
+@register.simple_tag
+def is_dev_mode():
+    return settings.DEV
 
 @register.simple_tag(takes_context=True)
 def settings_image_url(context, image):

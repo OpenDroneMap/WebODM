@@ -3,6 +3,8 @@ import ErrorMessage from 'webodm/components/ErrorMessage';
 import PropTypes from 'prop-types';
 import './Dashboard.scss';
 import $ from 'jquery';
+import { _ } from 'webodm/classes/gettext';
+import Trans from 'webodm/components/Trans';
 
 export default class Dashboard extends React.Component {
   static defaultProps = {
@@ -34,7 +36,7 @@ export default class Dashboard extends React.Component {
   }
 
   loadDashboard = () => {
-    this.setState({loading: true, loadingMessage: "Loading dashboard..."});
+    this.setState({loading: true, loadingMessage: _("Loading dashboard...")});
 
     $.get(this.apiUrl('/r/user')).done(json => {
         if (json.balance !== undefined){
@@ -43,11 +45,11 @@ export default class Dashboard extends React.Component {
         }else if (json.message === "Unauthorized"){
             this.props.onLogout();
         }else{
-            this.setState({ loading: false, error: `Cannot load lightning dashboard. Server responded: ${JSON.stringify(json)}. Are you running the latest version of WebODM?` });
+            this.setState({ loading: false, error: _('Cannot load lightning dashboard. Are you running the latest version of WebODM?') });
         }
     })
     .fail(() => {
-        this.setState({ loading: false, error: `Cannot load lightning dashboard. Please make sure you are connected to the internet, or try again in an hour.`});
+        this.setState({ loading: false, error: _('Cannot load lightning dashboard. Please make sure you are connected to the internet, or try again in an hour.')});
     });
   }
 
@@ -70,7 +72,7 @@ export default class Dashboard extends React.Component {
         }
     })
     .fail(e => {
-        this.setState({error: `Cannot sync nodes: ${JSON.stringify(e)}. Are you connected to the internet?`});
+        this.setState({error: _('Cannot sync nodes. Are you connected to the internet?')});
     })
     .always(() => {
         this.setState({syncingNodes: false});
@@ -78,18 +80,18 @@ export default class Dashboard extends React.Component {
   }
 
   handeLogout = () => {
-    this.setState({loading: true, loadingMessage: "Logging out..."});
+    this.setState({loading: true, loadingMessage: _('Logging out…')});
 
     $.post("save_api_key", {
         api_key: ""
     }).done(json => {
       if (!json.success){
-          this.setState({error: `Cannot logout: ${JSON.stringify(json)}`});
+          this.setState({error: `${_("Cannot logout:")} ${JSON.stringify(json)}`});
       }
       this.setState({loading: false});
       this.props.onLogout();
     }).fail(e => {
-      this.setState({loading: false, error: `Cannot logout: ${JSON.stringify(e)}`});
+      this.setState({loading: false, error: `${_("Cannot logout:")} ${JSON.stringify(e)}`});
     });
   }
   
@@ -110,9 +112,9 @@ export default class Dashboard extends React.Component {
 
     let balance = "";
     if (user){
-        balance = (<span><strong>{ user.balance }</strong> credits</span>);
+        balance = (<span><strong>{ user.balance }</strong> {_("credits")}</span>);
         if (user.plan !== null){
-            balance = (<span><strong>Unlimited</strong></span>);
+            balance = (<span><strong>{_("Unlimited")}</strong></span>);
         }
     }
 
@@ -125,15 +127,15 @@ export default class Dashboard extends React.Component {
             { user ? 
             <div>
                 <div className="balance">
-                    Balance: { balance } 
-                    <button className="btn btn-primary btn-sm" onClick={this.handleBuyCredits}><i className="fa fa-shopping-cart"></i> Buy Credits</button>
-                    <button className="btn btn-primary btn-sm" onClick={this.handleRefresh}><i className="fa fa-sync"></i> Refresh Balance</button>
+                    {_("Balance:")} { balance } 
+                    <button className="btn btn-primary btn-sm" onClick={this.handleBuyCredits}><i className="fa fa-shopping-cart"></i> {_("Buy Credits")}</button>
+                    <button className="btn btn-primary btn-sm" onClick={this.handleRefresh}><i className="fa fa-sync"></i> {_("Refresh Balance")}</button>
                 </div>
                 
-                <h4>Hello, <a href="javascript:void(0)" onClick={this.handleOpenDashboard}>{ user.email }</a></h4>
+                <h4>{_("Hello,")} <a href="javascript:void(0)" onClick={this.handleOpenDashboard}>{ user.email }</a></h4>
 
                 <div className="lightning-nodes">
-                    <h5>Synced Nodes</h5>
+                    <h5>{_("Synced Nodes")}</h5>
                     { syncingNodes ? <i className="fa fa-spin fa-sync"></i> :
                     <div>
                         <ul>
@@ -141,20 +143,20 @@ export default class Dashboard extends React.Component {
                                 <li key={n.id}><i className="fa fa-laptop"></i> <a href={`/processingnode/${n.id}/`}>{n.label}</a></li>
                             )}
                         </ul>
-                        <button className="btn btn-sm btn-default" onClick={this.handleSyncProcessingNode}><i className="fa fa-sync"></i> Resync</button>
+                        <button className="btn btn-sm btn-default" onClick={this.handleSyncProcessingNode}><i className="fa fa-sync"></i> {_("Resync")}</button>
                     </div> }
                 </div>
 
                 {nodes.length > 0 ? 
                 <div>
-                    <hr/>
-                    <i className="far fa-thumbs-up"></i> You are all set! When creating a new task from the <a href="/dashboard">Dashboard</a>, select <strong>{nodes[0].label}</strong> from the <strong>Processing Node</strong> drop-down instead of Auto.
+                    <hr/> 
+                    <i className="far fa-thumbs-up"></i> <Trans params={{dashboard: `<a href="/dashboard">${_("Dashboard")}</a>`, name: `<strong>${nodes[0].label}</strong>`, node: `<strong>${_("Processing Node")}</strong>`}}>You are all set! When creating a new task from the %(dashboard)s, select %(name)s from the %(node)s drop-down instead of Auto.</Trans>
                 </div> : ""}
 
                 <div className="buttons text-right">
                     <hr/>
                     <button className="btn btn-sm btn-primary logout" onClick={this.handeLogout}>
-                        <i className="fa fa-power-off"></i> Logout
+                        <i className="fa fa-power-off"></i> {_("Logout")}
                     </button>
                 </div>
             </div> : ""}

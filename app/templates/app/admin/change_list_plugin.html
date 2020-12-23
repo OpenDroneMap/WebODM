@@ -1,4 +1,5 @@
 {% extends "admin/change_list.html" %}
+{% load i18n %}
 
 {% block content_title %}
 <style type="text/css">
@@ -20,10 +21,10 @@
            onchange="document.getElementById('plugin-upload-form').submit();"
            accept=".zip"/>
     <button type="submit" class="btn btn-sm btn-primary" onclick="document.getElementById('plugin-upload-file').click(); return false;">
-      <i class="glyphicon glyphicon-upload"></i> Load Plugin (.zip)
+      <i class="glyphicon glyphicon-upload"></i> {% trans 'Load Plugin (.zip)' %}
     </button>
   </form>
 </div>
-<h1>Manage Plugins</h1>
+<h1>{% trans 'Manage Plugins' %}</h1>
 <div style="clear: both;"></div>
 {% endblock %}

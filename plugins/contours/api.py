@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from app.plugins.views import TaskView, CheckTask, GetTaskResult
 from worker.tasks import execute_grass_script
 from app.plugins.grass_engine import grass, GrassEngineException, cleanup_grass_context
+from django.utils.translation import gettext_lazy as _
 
 class TaskContoursGenerate(TaskView):
     def post(self, request, pk=None):
@@ -12,9 +13,9 @@ class TaskContoursGenerate(TaskView):
 
         layer = request.data.get('layer', None)
         if layer == 'DSM' and task.dsm_extent is None:
-            return Response({'error': 'No DSM layer is available.'})
+            return Response({'error': _('No DSM layer is available.')})
         elif layer == 'DTM' and task.dtm_extent is None:
-            return Response({'error': 'No DTM layer is available.'})
+            return Response({'error': _('No DTM layer is available.')})
 
         try:
             if layer == 'DSM':
@@ -56,7 +57,7 @@ class TaskContoursCheck(CheckTask):
     def error_check(self, result):
         contours_file = result.get('file')
         if not contours_file or not os.path.exists(contours_file):
-            return 'Contours file could not be generated. This might be a bug.'
+            return _('Could not generate contour file. This might be a bug.')
 
 class TaskContoursDownload(GetTaskResult):
     pass

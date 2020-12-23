@@ -5,6 +5,7 @@ import './vendor/google-code-prettify/prettify.css';
 import update from 'immutability-helper';
 import Utils from './classes/Utils';
 import $ from 'jquery';
+import { _, interpolate } from './classes/gettext';
 
 class Console extends React.Component {
   constructor(props){
@@ -131,7 +132,7 @@ class Console extends React.Component {
     let lines = this.state.lines;
     if (this.props.maximumLines && lines.length > this.props.maximumLines){
         lines = lines.slice(-this.props.maximumLines);
-        lines.unshift(`... output truncated at ${this.props.maximumLines} lines ...`);
+        lines.unshift('... ' + interpolate(_("output truncated at %(count)s lines"), { lines: this.props.maximumLines }) + ' ...');
     }
 
     const items = [
@@ -143,25 +144,25 @@ class Console extends React.Component {
             onMouseOver={this.handleMouseOver}
             onMouseOut={this.handleMouseOut}
             ref={this.setRef}
-            ><a href="javascript:void(0);" onClick={this.exitFullscreen} className="exit-fullscreen btn btn-sm btn-primary" title="Toggle Fullscreen">
-                <i className="fa fa-expand"></i> Exit Fullscreen
+            ><a href="javascript:void(0);" onClick={this.exitFullscreen} className="exit-fullscreen btn btn-sm btn-primary" title={_("Toggle Fullscreen")}>
+                <i className="fa fa-expand"></i> {_("Exit Fullscreen")}
             </a>
             {lines.map(line => {
             if (this.props.lang) return (<div key={i++} dangerouslySetInnerHTML={prettyLine(line)}></div>);
             else return line + "\n";
             })}
             {"\n"}
-            <a href="javascript:void(0);" onClick={this.exitFullscreen} className="exit-fullscreen btn btn-sm btn-primary" title="Toggle Fullscreen">
-                <i className="fa fa-expand"></i> Exit Fullscreen
+            <a href="javascript:void(0);" onClick={this.exitFullscreen} className="exit-fullscreen btn btn-sm btn-primary" title={_("Toggle Fullscreen")}>
+                <i className="fa fa-expand"></i> {_("Exit Fullscreen")}
             </a>
         </pre>];
 
     if (this.props.showConsoleButtons){
         items.push(<div key="buttons" className="console-buttons">
-            <a href="javascript:void(0);" onClick={() => this.downloadTxt()} className="btn btn-sm btn-primary" title="Download To File">
+            <a href="javascript:void(0);" onClick={() => this.downloadTxt()} className="btn btn-sm btn-primary" title={_("Download To File")}>
                 <i className="fa fa-download"></i>
             </a>
-            <a href="javascript:void(0);" onClick={this.enterFullscreen} className="btn btn-sm btn-primary" title="Toggle Fullscreen">
+            <a href="javascript:void(0);" onClick={this.enterFullscreen} className="btn btn-sm btn-primary" title={_("Toggle Fullscreen")}>
                 <i className="fa fa-expand"></i>
             </a>
         </div>);

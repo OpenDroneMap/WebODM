@@ -3,6 +3,7 @@ import './css/MapView.scss';
 import Map from './components/Map';
 import $ from 'jquery';
 import PropTypes from 'prop-types';
+import { _, interpolate } from './classes/gettext';
 
 class MapView extends React.Component {
   static defaultProps = {
@@ -61,22 +62,22 @@ class MapView extends React.Component {
   render(){
     let mapTypeButtons = [
       {
-        label: "Orthophoto",
+        label: _("Orthophoto"),
         type: "orthophoto",
         icon: "far fa-image"
       },
       {
-        label: "Plant Health",
+        label: _("Plant Health"),
         type: "plant",
         icon: "fa fa-seedling"
       },
       {
-        label: "Surface Model",
+        label: _("Surface Model"),
         type: "dsm",
         icon: "fa fa-chart-area"
       },
       {
-        label: "Terrain Model",
+        label: _("Terrain Model"),
         type: "dtm",
         icon: "fa fa-chart-area"
       }

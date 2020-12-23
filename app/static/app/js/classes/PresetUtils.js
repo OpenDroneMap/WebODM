@@ -26,6 +26,9 @@ class PresetUtils{
         }
     });
 
+    // Sort by name ascending
+    result.sort((a, b) => a.name < b.name ? -1 : 1);
+
     return result;
   }
 }

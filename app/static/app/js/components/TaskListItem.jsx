@@ -11,6 +11,8 @@ import PropTypes from 'prop-types';
 import TaskPluginActionButtons from './TaskPluginActionButtons';
 import PipelineSteps from '../classes/PipelineSteps';
 import Css from '../classes/Css';
+import Trans from './Trans';
+import { _, interpolate } from '../classes/gettext';
 
 class TaskListItem extends React.Component {
   static propTypes = {
@@ -195,14 +197,14 @@ class TaskListItem extends React.Component {
               if (options.success !== undefined) options.success();
             }else{
               this.setState({
-                actionError: json.error || options.defaultError || "Cannot complete operation.",
+                actionError: json.error || options.defaultError || _("Cannot complete operation."),
                 actionButtonsDisabled: false
               });
             }
         })
         .fail(() => {
             this.setState({
-              actionError: options.defaultError || "Cannot complete operation.",
+              actionError: options.defaultError || _("Cannot complete operation."),
               actionButtonsDisabled: false
             });
         });
@@ -245,19 +247,17 @@ class TaskListItem extends React.Component {
         this.setState({memoryError: true});
       }else if (line.indexOf("SVD did not converge") !== -1 || 
                 line.indexOf("0 partial reconstructions in total") !== -1){
-        this.setState({friendlyTaskError: `It looks like there might be one of the following problems:
-        <ul>
-          <li>Not enough images</li>
-          <li>Not enough overlap between images</li>
-          <li>Images might be too blurry (common with phone cameras)</li>
-          <li>The min-num-features task option is set too low, try increasing it by 25%</li>
-        </ul>
-        You can read more about best practices for capturing good images <a href='https://support.dronedeploy.com/v1.0/docs/making-successful-maps' target='_blank'>here</a>.`});
+        this.setState({friendlyTaskError: interpolate(_("It looks like there might be one of the following problems: %(problems)s You can read more about best practices for capturing good images %(link)s."), { problems: `<ul>
+          <li>${_("Not enough images")}</li>
+          <li>${_("Not enough overlap between images")}</li>
+          <li>${_("Images might be too blurry (common with phone cameras)")}</li>
+          <li>${_("The min-num-features task option is set too low, try increasing it by 25%")}</li>
+        </ul>`, link: `<a href='https://support.dronedeploy.com/v1.0/docs/making-successful-maps' target='_blank'>${_("here")}</a>`})});
       }else if (line.indexOf("Illegal instruction") !== -1 ||
                 line.indexOf("Child returned 132") !== -1){
-        this.setState({friendlyTaskError: "It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See <a href='https://github.com/OpenDroneMap/WebODM#common-troubleshooting'>this page</a> for more information."});
+        this.setState({friendlyTaskError: interpolate(_("It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See %(link)s for more information."), { link: `<a href='https://github.com/OpenDroneMap/WebODM#common-troubleshooting'>${_("this page")}</a>` } )});
       }else if (line.indexOf("Child returned 127") !== -1){
-        this.setState({friendlyTaskError: "The processing node is missing a program necessary to complete the task. This might indicate a corrupted installation. If you built OpenDroneMap, please check that all programs built without errors."});
+        this.setState({friendlyTaskError: _("The processing node is missing a program necessary to complete the task. This might indicate a corrupted installation. If you built OpenDroneMap, please check that all programs built without errors.")});
       }
     }
   }
@@ -293,7 +293,7 @@ class TaskListItem extends React.Component {
         // Add resume "pseudo button" to help users understand
         // how to resume a task that failed for memory/disk issues.
         items.unshift({
-            label: "Resume Processing",
+            label: _("Resume Processing"),
             icon: "fa fa-bolt",
             onClick: this.genRestartAction(task.can_rerun_from[task.can_rerun_from.length - 1])
         });
@@ -309,7 +309,7 @@ class TaskListItem extends React.Component {
         success: () => {
             this.setState({time: -1});
         },
-        defaultError: "Cannot restart task."
+        defaultError: _("Cannot restart task.")
       }
     );
 
@@ -351,7 +351,7 @@ class TaskListItem extends React.Component {
           })
           .fail(() => {
             this.setState({
-              actionError: `Cannot restart task from ${value || "the start"}.`,
+              actionError: interpolate(_("Cannot restart task from (stage)s."), { stage: value || "the start"}),
               actionButtonsDisabled: false
             });
           });
@@ -365,13 +365,13 @@ class TaskListItem extends React.Component {
 
   render() {
     const task = this.state.task;
-    const name = task.name !== null ? task.name : `Task #${task.id}`;
+    const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
     const imported = task.import_url !== "";
 
     let status = statusCodes.description(task.status);
-    if (status === "") status = "Uploading images to processing node";
+    if (status === "") status = _("Uploading images to processing node");
 
-    if (!task.processing_node && !imported) status = "Waiting for a node...";
+    if (!task.processing_node && !imported) status = _("Waiting for a node...");
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
 
@@ -395,14 +395,14 @@ class TaskListItem extends React.Component {
 
       if (task.status === statusCodes.COMPLETED){
         if (task.available_assets.indexOf("orthophoto.tif") !== -1){
-          addActionButton(" View Map", "btn-primary", "fa fa-globe", () => {
+          addActionButton(" " + _("View Map"), "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         }else{
           showOrthophotoMissingWarning = true;
         }
 
-        addActionButton(" View 3D Model", "btn-primary", "fa fa-cube", () => {
+        addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
           location.href = `/3d/project/${task.project}/task/${task.id}/`;
         });
       }
@@ -410,7 +410,7 @@ class TaskListItem extends React.Component {
       // Ability to change options
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 ||
           (!task.processing_node)){
-        addActionButton("Edit", "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
+        addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
         }, {
           className: "inline"
@@ -419,7 +419,7 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
           (task.processing_node || imported)){
-        addActionButton("Cancel", "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: "Cannot cancel task."}));
+        addActionButton(_("Cancel"), "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: _("Cannot cancel task.")}));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
@@ -431,14 +431,14 @@ class TaskListItem extends React.Component {
                               task.can_rerun_from[1] :
                               null;
 
-          addActionButton("Restart", "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
+          addActionButton(_("Restart"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
             subItems: this.getRestartSubmenuItems()
           });
       }
 
-      addActionButton("Delete", "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
-        confirm: "All information related to this task, including images, maps and models will be deleted. Continue?",
-        defaultError: "Cannot delete task."
+      addActionButton(_("Delete"), "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
+        confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
+        defaultError: _("Cannot delete task.")
       }));
 
       const disabled = this.state.actionButtonsDisabled || 
@@ -482,11 +482,11 @@ class TaskListItem extends React.Component {
           <div className="row">
             <div className="col-md-12 no-padding">
               <div className="console-switch text-right pull-right">
-                  <div className="console-output-label">Task Output: </div><ul className="list-inline">
+                  <div className="console-output-label">{_("Task Output:")} </div><ul className="list-inline">
                     <li>
                       <div className="btn-group btn-toggle"> 
-                        <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>On</button>
-                        <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>Off</button>
+                        <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
+                        <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>{_("Off")}</button>
                       </div>
                     </li>
                   </ul>
@@ -494,14 +494,14 @@ class TaskListItem extends React.Component {
 
               <div className="mb">
                 <div className="labels">
-                  <strong>Created on: </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
+                  <strong>{_("Created on:")} </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
                 </div>
                 <div className="labels">
-                    <strong>Processing Node: </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
+                    <strong>{_("Processing Node:")} </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
                 </div>
                 {Array.isArray(task.options) ?
                    <div className="labels">
-                    <strong>Options: </strong> {this.optionsToList(task.options)}<br/>
+                    <strong>{_("Options:")} </strong> {this.optionsToList(task.options)}<br/>
                   </div>
                 : ""}
                 {/* TODO: List of images? */}
@@ -521,19 +521,17 @@ class TaskListItem extends React.Component {
                     /> : ""}
 
               {showOrthophotoMissingWarning ?
-              <div className="task-warning"><i className="fa fa-warning"></i> <span>An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.</span></div> : ""}
+              <div className="task-warning"><i className="fa fa-warning"></i> <span>{_("An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.")}</span></div> : ""}
 
               {showMemoryErrorWarning ?
-              <div className="task-warning"><i className="fa fa-support"></i> <span>It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has <a href={memoryErrorLink} target="_blank">enough RAM allocated</a>. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's <a href="javascript:void(0);" onClick={this.startEditing}>options</a>. You can also try to use a <a href="https://www.opendronemap.org/webodm/lightning/" target="_blank">cloud processing node</a>.</span></div> : ""}
+              <div className="task-warning"><i className="fa fa-support"></i> <Trans params={{ memlink: `<a href="${memoryErrorLink}" target='_blank'>${_("enough RAM allocated")}</a>`, cloudlink: `<a href='https://www.opendronemap.org/webodm/lightning/' target='_blank'>${_("cloud processing node")}</a>` }}>{_("It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has %(memlink)s. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's options. You can also try to use a %(cloudlink)s.")}</Trans></div> : ""}
 
               {showTaskWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span dangerouslySetInnerHTML={{__html: this.state.friendlyTaskError}} /></div> : ""}
 
               {showExitedWithCodeOneHints ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
-                  "Process exited with code 1" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the <a href="javascript:void(0);" onClick={this.startEditing}>Task Options</a> and sometimes it might be a bug!
-                  If you need help, upload your images somewhere like <a href="https://www.dropbox.com/" target="_blank">Dropbox</a> or <a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a> and <a href="http://community.opendronemap.org/c/webodm" target="_blank">open a topic</a> on our community forum, making
-                  sure to include a <a href="javascript:void(0);" onClick={this.setView("console")}>copy of your task's output</a>. Our awesome contributors will try to help you! <i className="far fa-smile"></i>
+                  <Trans params={{link1: `<a href="https://www.dronedb.app/" target="_blank">DroneDB</a>`, link2: `<a href="https://drive.google.com/drive/u/0/" target="_blank">Google Drive</a>`, open_a_topic: `<a href="http://community.opendronemap.org/c/webodm" target="_blank">${_("open a topic")}</a>`, }}>{_("\"Process exited with code 1\" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the Task Options and sometimes it might be a bug! If you need help, upload your images somewhere like %(link1)s or %(link2)s and %(open_a_topic)s on our community forum, making sure to include a copy of your task's output. Our awesome contributors will try to help you!")}</Trans> <i className="far fa-smile"></i>
                 </div>
               </div>
               : ""}
@@ -579,12 +577,12 @@ class TaskListItem extends React.Component {
     if (task.last_error){
       statusLabel = getStatusLabel(task.last_error, 'error');
     }else if (!task.processing_node && !imported){
-      statusLabel = getStatusLabel("Set a processing node");
+      statusLabel = getStatusLabel(_("Set a processing node"));
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;
     }else if (task.partial && !task.pending_action){
       statusIcon = "fa fa-hourglass-3";
-      statusLabel = getStatusLabel("Waiting for image upload...");
+      statusLabel = getStatusLabel(_("Waiting for image upload..."));
     }else{
       let progress = 100;
       let type = 'done';
