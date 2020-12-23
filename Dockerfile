@@ -31,7 +31,7 @@ ADD . /webodm/
 # Setup cron
 RUN ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && chmod 0644 /webodm/nginx/crontab && service cron start && chmod +x /webodm/nginx/letsencrypt-autogen.sh
 
-RUN git submodule update --init
+#RUN git submodule update --init
 
 WORKDIR /webodm/nodeodm/external/NodeODM
 RUN npm install --quiet
