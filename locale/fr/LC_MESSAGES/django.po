@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-22 19:06+0000\n"
-"PO-Revision-Date: 2020-12-22 17:23+0000\n"
+"POT-Creation-Date: 2020-12-24 01:30+0000\n"
+"PO-Revision-Date: 2020-12-23 16:28+0000\n"
 "Last-Translator: Nathan <bonnemainsnathan@gmail.com>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/webodm/webodm/fr/"
 ">\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.4-dev\n"
+"X-Generator: Weblate 4.4.1-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
@@ -44,10 +44,8 @@ msgid "HTML (after header)"
 msgstr "HTML (après l'entête)"
 
 #: app/admin.py:64
-#, fuzzy
-#| msgid "HTML that will be displayed after the &lt;/body&gt; tag"
 msgid "HTML that will be displayed after the body tag"
-msgstr "HTML qui sera affiché après la balise &lt;/body&gt;"
+msgstr "HTML qui sera affiché après la balise body"
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
@@ -71,25 +69,23 @@ msgid "Description"
 msgstr "Description"
 
 #: app/admin.py:106
-#, fuzzy
-#| msgid "API Version"
 msgid "Version"
-msgstr "Version de l'API"
+msgstr "Version"
 
 #: app/admin.py:112
 msgid "Author"
-msgstr ""
+msgstr "Auteur"
 
 #: app/admin.py:233
-#, fuzzy
-#| msgid "Action"
 msgid "Actions"
-msgstr "Action"
+msgstr "Actions"
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
 msgstr ""
+"L'indice de végétation par différence normalisée indique la quantité de "
+"végétation verte."
 
 #: app/api/formulas.py:20
 msgid ""
@@ -100,11 +96,14 @@ msgstr ""
 #: app/api/formulas.py:24
 msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
 msgstr ""
+"L'indice visuel de résistance atmosphérique montre les zones de végétation."
 
 #: app/api/formulas.py:29
 msgid ""
 "Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
 msgstr ""
+"L'indice de verdure excédentaire met l'accent sur la verdeur des cultures à "
+"feuilles comme les pommes de terre."
 
 #: app/api/formulas.py:33
 msgid ""
@@ -173,41 +172,34 @@ msgid ""
 msgstr ""
 
 #: app/api/tasks.py:179
-#, fuzzy
-#| msgid "You need at least 5 images"
 msgid "You need to upload at least 2 images before commit"
-msgstr "Il faut au minimum 5 images"
+msgstr "Vous devez envoyer au moins 2 images avant de valider"
 
 #: app/api/tasks.py:201
-#, fuzzy
-#| msgid "File uploaded by a user"
 msgid "No files uploaded"
-msgstr "Fchier mis en ligne par un utilisateur"
+msgstr "Aucun fichier envoyé"
 
 #: app/api/tasks.py:224
-#, fuzzy
-#| msgid "You need at least 5 images"
 msgid "Cannot create task, you need at least 2 images"
-msgstr "Il faut au minimum 5 images"
+msgstr "Impossible de créer la tâche, il vous faut au moins 2 images"
 
 #: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
 #: app/api/tasks.py:354
 msgid "Asset does not exist"
-msgstr ""
+msgstr "La ressource n'existe pas"
 
 #: app/api/tasks.py:370
-#, fuzzy
-#| msgid "Import URL"
 msgid "Imported Task"
-msgstr "URL d’importation"
+msgstr "Tâche importée"
 
 #: app/api/tasks.py:373
 msgid "Cannot create task, you need to upload 1 file"
-msgstr ""
+msgstr "Impossiber de créer la tâche, vous devez envoyer un fichier"
 
 #: app/api/tasks.py:376
 msgid "Cannot create task, either specify a URL or upload 1 file."
 msgstr ""
+"Impossible de créer la tâche, spécifiez une URL ou bien envoyez un fichier."
 
 #: app/models/image_upload.py:10
 msgid "Task this image belongs to"
@@ -243,14 +235,12 @@ msgid "Name"
 msgstr "Nom"
 
 #: app/models/plugin.py:6
-#, fuzzy
-#| msgid "Whether this plugin is enabled."
 msgid "Whether this plugin is turned on."
-msgstr "Si l'extension est activée ou non."
+msgstr "Si l'extension est activée."
 
 #: app/models/plugin.py:6
 msgid "Enabled"
-msgstr ""
+msgstr "Activé"
 
 #: app/models/plugin.py:20
 msgid "Plugin"
@@ -789,22 +779,22 @@ msgid "Success"
 msgstr "Succès"
 
 #: app/templates/app/404.html:6
-#, fuzzy
-#| msgid "Page not found"
 msgid "404 Page Not Found"
-msgstr "Page non trouvée"
+msgstr "404 Page non trouvée"
 
 #: app/templates/app/404.html:7
 msgid "Are you sure the address is correct?"
-msgstr ""
+msgstr "Êtes-vous sûr que l'adresse est correcte ?"
 
 #: app/templates/app/500.html:5
 msgid "500 Internal Server Error"
-msgstr ""
+msgstr "500 Erreur interne du serveur"
 
 #: app/templates/app/500.html:6
 msgid "Something happened. The server logs contain more information."
 msgstr ""
+"Une erreur s'est produite. Les journaux du serveur contiennent plus "
+"d'informations."
 
 #: app/templates/app/about.html:94
 #, python-format
@@ -815,6 +805,12 @@ msgid ""
 "option) any later version. See %(link_start)sthe GNU Affero General Public "
 "License%(link_end)s for more details."
 msgstr ""
+"Ce programme est un logiciel libre : vous pouvez le redistribuer et/ou le "
+"modifier selon les termes de la licence publique générale GNU Affero telle "
+"que publiée par la Free Software Foundation, soit la version 3 de la "
+"licence, soit (à votre choix) toute version ultérieure. Voir %(link_start)s "
+"la licence publique générale GNU Affero %(link_end)s pour plus "
+"d'informations."
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
 msgid "Page not found"
@@ -1212,11 +1208,7 @@ msgid "Add a Processing Node"
 msgstr "Ajouter un nœud de traitement"
 
 #: app/templates/app/dashboard.html:19
-#, fuzzy, python-format
-#| msgid ""
-#| "To get started, \"%(add_processing_node)s\". A processing node is a "
-#| "computer running an instance of %(nodeodm_link)s or some other software "
-#| "that implements this %(api_link)s."
+#, python-format
 msgid ""
 "To get started, \"%(add_processing_node)s\". A processing node is a computer "
 "running an instance of %(nodeodm_link)s or some other software implementing "
@@ -1224,7 +1216,7 @@ msgid ""
 msgstr ""
 "Pour commencer, « %(add_processing_node)s ». Un nœud de traitement est un "
 "ordinateur qui exécute une instance de %(nodeodm_link)s ou un autre logiciel "
-"qui implémente ce %(api_link)s."
+"implémentant ce %(api_link)s."
 
 #: app/templates/app/dashboard.html:28
 msgid "Select Images and GCP"
@@ -1267,33 +1259,37 @@ msgstr ""
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
 #: app/views/dev.py:73
 msgid "Developer Tools"
-msgstr ""
+msgstr "Outils de développement"
 
 #: app/templates/app/dev_tools.html:9
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 #: app/templates/app/dev_tools.html:14
 msgid "Current Locale:"
-msgstr ""
+msgstr "Langue actuelle :"
 
 #: app/templates/app/dev_tools.html:15
 msgid ""
 "To change locale, modify your browser's locale settings, then refresh the "
 "page."
 msgstr ""
+"Pour changer la langue, modifiez les paramètres de langue de votre "
+"navigateur, puis actualisez la page."
 
 #: app/templates/app/dev_tools.html:18
 msgid "Translation Files (.zip):"
-msgstr ""
+msgstr "Fichiers de traduction (.zip) :"
 
 #: app/templates/app/dev_tools.html:22
 msgid "Download and Replace Translation Files"
-msgstr ""
+msgstr "Télécharger et remplacer les fichiers de traduction"
 
 #: app/templates/app/dev_tools.html:26
 msgid "Executing… do not refresh the page! This could take a while."
 msgstr ""
+"En cours d'éxecution… Veuillez ne pas actualiser la page ! Cela peut prendre "
+"un moment."
 
 #: app/templates/app/logged_in_base.html:15
 #, python-format
@@ -1400,21 +1396,25 @@ msgstr ""
 #: app/translations/plugin_manifest_autogenerated.py:5
 #: app/translations/plugin_manifest_autogenerated.py:6
 msgid "A plugin to create GCP files from images"
-msgstr ""
+msgstr "Une extension pour créer des fichiers GCP à partir d'images"
 
 #: app/translations/plugin_manifest_autogenerated.py:7
 msgid ""
 "A plugin to add a button for quickly opening OpenStreetMap's iD editor and "
 "setup a TMS basemap."
 msgstr ""
+"Une extension pour ajouter un bouton afin d'ouvrir rapidement l'éditeur iD "
+"d'OpenStreetMap et configurer une carte TMS de base."
 
 #: app/translations/plugin_manifest_autogenerated.py:8
 msgid "A plugin to upload orthophotos to OpenAerialMap"
-msgstr ""
+msgstr "Une extension pour envoyer des orthophotos vers OpenAerialMap"
 
 #: app/translations/plugin_manifest_autogenerated.py:9
 msgid "Display program version, memory and disk space usage statistics"
 msgstr ""
+"Affiche la version du programme, les statistiques d'utilisation de la "
+"mémoire et du disque"
 
 #: app/translations/plugin_manifest_autogenerated.py:10
 msgid "Sync accounts from webodm.net"
@@ -1422,7 +1422,7 @@ msgstr ""
 
 #: app/translations/plugin_manifest_autogenerated.py:11
 msgid "Add a fullscreen button to the 2D map view"
-msgstr ""
+msgstr "Ajoute un bouton plein-écran à la vue 2D de la carte"
 
 #: app/translations/plugin_manifest_autogenerated.py:12
 msgid "Compute, preview and export contours from DEMs"
@@ -1443,6 +1443,7 @@ msgstr ""
 #: app/translations/plugin_manifest_autogenerated.py:16
 msgid "Detect changes between two different tasks in the same project."
 msgstr ""
+"Détecte les modifications entre deux tâches différentes dans le même projet."
 
 #: app/views/app.py:44
 msgid "First Project"
@@ -1457,28 +1458,24 @@ msgid "3D Model Display"
 msgstr "Affichage du modèle 3D"
 
 #: app/views/app.py:147
-#, fuzzy
-#| msgid "Welcome!"
 msgid "Welcome"
-msgstr "Bienvenue !"
+msgstr "Bienvenue"
 
 #: app/views/dev.py:48
 msgid "Cannot find locale/ folder in .zip archive"
-msgstr ""
+msgstr "Impossible de trouver le fichier/dossier de langue dans l'archive .zip"
 
 #: app/views/dev.py:66
 msgid "Translation files reloaded!"
-msgstr ""
+msgstr "Fichiers de traduction rechargés !"
 
 #: app/views/dev.py:70
-#, fuzzy
-#| msgid "Invalid zip file"
 msgid "Invalid action"
-msgstr "Fichier zip invalide"
+msgstr "Action invalide"
 
 #: nodeodm/apps.py:8
 msgid "Node Management"
-msgstr ""
+msgstr "Gestion des nœuds"
 
 #: nodeodm/models.py:23
 msgid ""
@@ -1487,92 +1484,93 @@ msgid ""
 "localhost. Find the IP address of your host machine by running ifconfig on "
 "Linux or by checking your network settings."
 msgstr ""
+"Nom d'hôte ou adresse IP où le nœud est situé (il peut également s'agir d'un "
+"nom d'hôte interne). Si vous utilisez Docker, ce n'est jamais 127.0.0.1 ou "
+"localhost. Trouvez l'adresse IP de votre machine hôte en exécutant ifconfig "
+"sur Linux ou bien en vérifiant vos paramètres réseau."
 
 #: nodeodm/models.py:24
 msgid "Port that connects to the node's API"
-msgstr ""
+msgstr "Port qui se connecte à l'API du nœud"
 
 #: nodeodm/models.py:25
 msgid "API version used by the node"
-msgstr ""
+msgstr "Version de l'API utilisée par le nœud"
 
 #: nodeodm/models.py:26
 msgid "When was the information about this node last retrieved?"
 msgstr ""
+"Quand l'information à propos de ce nœud a-t-elle été récupérée pour la "
+"dernière fois ?"
 
 #: nodeodm/models.py:27
 msgid ""
 "Number of tasks currently being processed by this node (as reported by the "
 "node itself)"
 msgstr ""
+"Nombre de tâches étant actuellement traitées par ce nœud (comme indiqué par "
+"le nœud lui-même)"
 
 #: nodeodm/models.py:28
-#, fuzzy
-#| msgid "Available Assets"
 msgid "Available Options"
-msgstr "Ressources disponibles"
+msgstr "Actions disponibles"
 
 #: nodeodm/models.py:28
-#, fuzzy
-#| msgid "Options that are being used to process this task"
 msgid "Description of the options that can be used for processing"
-msgstr "Options utilisées pour effectuer cette tâche"
+msgstr "Description des options qui peuvent être utilisées pour le traitement"
 
 #: nodeodm/models.py:29
 msgid "Token"
-msgstr ""
+msgstr "Jeton"
 
 #: nodeodm/models.py:29
 msgid ""
 "Token to use for authentication. If the node doesn't have authentication, "
 "you can leave this field blank."
 msgstr ""
+"Jeton à utiliser pour l'authentification. Si le nœud n'a pas "
+"d'authentification, vous pouvez laisser ce champ vide."
 
 #: nodeodm/models.py:30
-#, fuzzy
-#| msgid "Max Images Limit"
 msgid "Max Images"
-msgstr "Limite d’images maximale"
+msgstr "Images maximum"
 
 #: nodeodm/models.py:30
-#, fuzzy
-#| msgid "Number of images associated with this task"
 msgid "Maximum number of images accepted by this node."
-msgstr "Nombre d'images associées à cette tâche"
+msgstr "Nombre d'images maximum accepté par ce nœud."
 
 #: nodeodm/models.py:31
 msgid "Engine version used by the node."
-msgstr ""
+msgstr "Version du moteur utilisé par le nœud."
 
 #: nodeodm/models.py:32
 msgid ""
 "Optional label for this node. When set, this label will be shown instead of "
 "the hostname:port name."
 msgstr ""
+"Nom facultatif pour ce nœud. Lorsque défini, ce nom sera affiché à la place "
+"du nom hôte:port."
 
 #: nodeodm/models.py:33
 msgid "Engine used by the node."
-msgstr ""
+msgstr "Moteur utilisé par le nœud."
 
 #: plugins/cesium-ion/api_views.py:170
 msgid "No matching enum type."
 msgstr "Aucun type d'énumération correspondant."
 
 #: plugins/contours/api.py:16
-#, fuzzy
-#| msgid "None available"
 msgid "No DSM layer is available."
-msgstr "Aucun disponible"
+msgstr "Aucune couche DSM n'est disponible."
 
 #: plugins/contours/api.py:18
-#, fuzzy
-#| msgid "None available"
 msgid "No DTM layer is available."
-msgstr "Aucun disponible"
+msgstr "Aucune couche DTM n'est disponible."
 
 #: plugins/contours/api.py:60
 msgid "Could not generate contour file. This might be a bug."
 msgstr ""
+"Impossible de générer le fichier de contour. Il pourrait s'agir d'un bug."
 
 #: plugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
@@ -1634,12 +1632,7 @@ msgid "Note!"
 msgstr "Attention !"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
-#, fuzzy, python-format
-#| msgid ""
-#| "These values might be relative to the virtualization environment in which "
-#| "the application is running, not necessarily the values of the your "
-#| "machine. See instructions for %(win_link)s and %(mac_link)s for changing "
-#| "these values in a docker setup."
+#, python-format
 msgid ""
 "These values might be relative to the virtualization environment in which "
 "the application is running, not necessarily the values of the your machine. "
@@ -1649,7 +1642,7 @@ msgstr ""
 "Ces valeurs peuvent dépendre de l'environnement de virtualisation dans "
 "lequel l'application fonctionne, pas forcément des valeurs de votre machine. "
 "Consultez les instructions pour %(win_link)s et %(mac_link)s pour modifier "
-"ces valeurs dans une configuration docker."
+"ces valeurs dans une configuration Docker."
 
 #: plugins/diagnostic/templates/diagnostic.html:47
 #: plugins/diagnostic/templates/diagnostic.html:82
@@ -1666,6 +1659,10 @@ msgid ""
 "Edit, from the options make sure to check \"dsm\", then press Restart --> "
 "From DEM."
 msgstr ""
+"Aucun modèle de surface disponible. À partir du Tableau de bord, "
+"sélectionnez cette tâche, appuyez sur Modifier, puis dans les options "
+"assurez-vous d'avoir coché « dsm », ensuite appuyez sur Redémarrer --> À "
+"partir de DEM."
 
 #: plugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
