@@ -20,4 +20,8 @@
         position: absolute;
         left: -99999px;
     }
+
+    .tooltip .tooltip-inner{
+        padding: 3px 16px;
+    }
 }
