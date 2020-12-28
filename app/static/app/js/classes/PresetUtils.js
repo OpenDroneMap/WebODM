@@ -1,4 +1,5 @@
 import Utils from './Utils';
+import { _, interpolate } from './gettext';
 
 class PresetUtils{
 
@@ -23,6 +24,13 @@ class PresetUtils{
               opt.defaultValue = opt.value !== undefined ? opt.value : "";
               delete(opt.value);
             }
+        }
+
+        if (typeof opt.help === "string"){
+            opt.help = interpolate(_(opt.help), {
+                choices: Array.isArray(opt.domain) ? opt.domain.join(", ") : opt.domain,
+                'default': opt.defaultValue === "" ? "\"\"" : opt.defaultValue
+            });
         }
     });
 
