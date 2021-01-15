@@ -8,17 +8,16 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 15:19+0000\n"
-"PO-Revision-Date: 2020-12-30 22:42+0000\n"
-"Last-Translator: Dmytro Teslov <hellios.dt@gmail.com>\n"
-"Language-Team: Russian <https://hosted.weblate.org/projects/webodm/react-ui/"
-"ru/>\n"
-"Language: ru\n"
+"PO-Revision-Date: 2021-01-15 15:17+0000\n"
+"Last-Translator: Carlos Grohmann <carlos.grohmann@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
+"webodm/react-ui/pt_BR/>\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 4.4.1-dev\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.5-dev\n"
 
 #: app/static/app/js/Console.jsx:135
 #, python-format
@@ -28,122 +27,123 @@ msgstr ""
 #: app/static/app/js/Console.jsx:147 app/static/app/js/Console.jsx:155
 #: app/static/app/js/Console.jsx:165
 msgid "Toggle Fullscreen"
-msgstr "Включить полноэкранный режим"
+msgstr "Alternar para tela inteira"
 
 #: app/static/app/js/Console.jsx:148 app/static/app/js/Console.jsx:156
 msgid "Exit Fullscreen"
-msgstr "Выйти из полноэкранного режима"
+msgstr "Sair da tela inteira"
 
 #: app/static/app/js/Console.jsx:162
 msgid "Download To File"
-msgstr "Скачать в виде файла"
+msgstr "Baixar para arquivo"
 
 #: app/static/app/js/Dashboard.jsx:26
 msgid "Name field is required"
-msgstr ""
+msgstr "O nome do campo é necessário"
 
 #: app/static/app/js/Dashboard.jsx:62
 msgid "Add Project"
-msgstr "Добавить проект"
+msgstr "Adicionar projeto"
 
 #: app/static/app/js/Dashboard.jsx:97
 msgid "Your changes will be lost. Are you sure you want to leave?"
-msgstr ""
+msgstr "Suas alterações serão perdidas. Você tem certeza de que quer sair?"
 
 #: app/static/app/js/MapView.jsx:65
 #: app/static/app/js/classes/PipelineSteps.js:37
 #: app/static/app/js/components/Map.jsx:82
 msgid "Orthophoto"
-msgstr "Ортофото"
+msgstr "Ortofoto"
 
 #: app/static/app/js/MapView.jsx:70 app/static/app/js/components/Map.jsx:84
 msgid "Plant Health"
-msgstr ""
+msgstr "Fitossanidade"
 
 #: app/static/app/js/MapView.jsx:75
 msgid "Surface Model"
-msgstr "Модель поверхности"
+msgstr "Modelo de Superfície"
 
 #: app/static/app/js/MapView.jsx:80
 msgid "Terrain Model"
-msgstr "Модель местности"
+msgstr "Modelo de Terreno"
 
 #: app/static/app/js/ModelView.jsx:42
 msgid "Show Model"
-msgstr "Показать модель"
+msgstr "Exibir modelo"
 
 #: app/static/app/js/ModelView.jsx:69
 msgid "Show Cameras"
-msgstr "Показать камеры"
+msgstr "Exibir câmeras"
 
 #: app/static/app/js/ModelView.jsx:482
-#, fuzzy
 msgid "Loading textured model..."
-msgstr "Загрузка текстурированной модели..."
+msgstr "Carregando modelo texturizado..."
 
 #: app/static/app/js/classes/AssetDownloads.js:36
 msgid "Orthophoto (GeoTIFF)"
-msgstr "Ортофото (GeoTIFF)"
+msgstr "Ortofoto (GeoTIFF)"
 
 #: app/static/app/js/classes/AssetDownloads.js:37
 msgid "Orthophoto (PNG)"
-msgstr "Ортофото (PNG)"
+msgstr "Ortofoto (PNG)"
 
 #: app/static/app/js/classes/AssetDownloads.js:38
 msgid "Orthophoto (MBTiles)"
-msgstr "Ортофото (MBTiles)"
+msgstr "Ortofoto (MBTiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:39
 msgid "Orthophoto (Tiles)"
-msgstr ""
+msgstr "Ortofoto (Tiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:40
 msgid "Terrain Model (GeoTIFF)"
-msgstr ""
+msgstr "Modelo de Terreno (GeoTIFF)"
 
 #: app/static/app/js/classes/AssetDownloads.js:41
 msgid "Terrain Model (Tiles)"
-msgstr ""
+msgstr "Modelo de Terreno (Tiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:42
 msgid "Surface Model (GeoTIFF)"
-msgstr ""
+msgstr "Modelo de Superfície (GeoTIFF)"
 
 #: app/static/app/js/classes/AssetDownloads.js:43
 msgid "Surface Model (Tiles)"
-msgstr ""
+msgstr "Modelo de Superfície (Tiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:44
 msgid "Point Cloud (LAS)"
-msgstr ""
+msgstr "Nuvem de pontos (LAS)"
 
 #: app/static/app/js/classes/AssetDownloads.js:45
 msgid "Point Cloud (LAZ)"
-msgstr ""
+msgstr "Nuvem de pontos (LAZ)"
 
 #: app/static/app/js/classes/AssetDownloads.js:46
 msgid "Point Cloud (PLY)"
-msgstr ""
+msgstr "Nuvem de pontos (PLY)"
 
 #: app/static/app/js/classes/AssetDownloads.js:47
 msgid "Point Cloud (CSV)"
-msgstr ""
+msgstr "Nuvem de pontos (CSV)"
 
 #: app/static/app/js/classes/AssetDownloads.js:48
 msgid "Textured Model"
-msgstr ""
+msgstr "Modelo texturizado"
 
 #: app/static/app/js/classes/AssetDownloads.js:49
 msgid "Camera Parameters"
-msgstr ""
+msgstr "Parâmetros da câmera"
 
 #: app/static/app/js/classes/AssetDownloads.js:50
 msgid "Camera Shots (GeoJSON)"
-msgstr ""
+msgstr "Fotos da câmera (GeoJSON)"
 
 #: app/static/app/js/classes/AssetDownloads.js:51
+#, fuzzy
+#| msgid "Report"
 msgid "Quality Report"
-msgstr ""
+msgstr "Relatório"
 
 #: app/static/app/js/classes/AssetDownloads.js:55
 msgid "All Assets"
@@ -151,44 +151,44 @@ msgstr ""
 
 #: app/static/app/js/classes/Basemaps.js:9
 msgid "Google Maps Hybrid"
-msgstr ""
+msgstr "Google Maps híbrido"
 
 #: app/static/app/js/classes/Basemaps.js:17
 msgid "ESRI Satellite"
-msgstr ""
+msgstr "ESRI Satellite"
 
 #: app/static/app/js/classes/Basemaps.js:26
 msgid "OSM Mapnik"
-msgstr ""
+msgstr "OSM Mapnik"
 
 #: app/static/app/js/classes/PendingActions.js:11
 msgid "Canceling..."
-msgstr ""
+msgstr "Cancelando..."
 
 #: app/static/app/js/classes/PendingActions.js:14
 #: app/static/app/js/components/FormDialog.jsx:170
 msgid "Deleting..."
-msgstr ""
+msgstr "Excluindo..."
 
 #: app/static/app/js/classes/PendingActions.js:17
 msgid "Restarting..."
-msgstr ""
+msgstr "Reiniciando..."
 
 #: app/static/app/js/classes/PendingActions.js:20
 msgid "Resizing images..."
-msgstr ""
+msgstr "Redimensionando as imagens..."
 
 #: app/static/app/js/classes/PendingActions.js:23
 msgid "Importing..."
-msgstr ""
+msgstr "Importando..."
 
 #: app/static/app/js/classes/PipelineSteps.js:7
 msgid "Load Dataset"
-msgstr ""
+msgstr "Carregar dataset"
 
 #: app/static/app/js/classes/PipelineSteps.js:12
 msgid "Structure From Motion / MVS"
-msgstr ""
+msgstr "Structure From Motion / MVS"
 
 #: app/static/app/js/classes/PipelineSteps.js:17
 msgid "Meshing"
@@ -196,62 +196,62 @@ msgstr ""
 
 #: app/static/app/js/classes/PipelineSteps.js:22
 msgid "Texturing"
-msgstr ""
+msgstr "Texturizando"
 
 #: app/static/app/js/classes/PipelineSteps.js:27
 msgid "Georeferencing"
-msgstr ""
+msgstr "Georeferenciando"
 
 #: app/static/app/js/classes/PipelineSteps.js:32
 msgid "DEM"
-msgstr ""
+msgstr "MDE"
 
 #: app/static/app/js/classes/PipelineSteps.js:42
 msgid "Report"
-msgstr ""
+msgstr "Relatório"
 
 #: app/static/app/js/classes/ResizeModes.js:4
 msgid "No"
-msgstr ""
+msgstr "Não"
 
 #: app/static/app/js/classes/ResizeModes.js:5
 msgid "Yes"
-msgstr ""
+msgstr "Sim"
 
 #: app/static/app/js/classes/StatusCodes.js:11
 msgid "Queued"
-msgstr ""
+msgstr "Na fila"
 
 #: app/static/app/js/classes/StatusCodes.js:15
 msgid "Running"
-msgstr ""
+msgstr "Executando"
 
 #: app/static/app/js/classes/StatusCodes.js:19
 msgid "Failed"
-msgstr "Ошибка"
+msgstr "Falhou"
 
 #: app/static/app/js/classes/StatusCodes.js:23
 msgid "Completed"
-msgstr ""
+msgstr "Completo"
 
 #: app/static/app/js/classes/StatusCodes.js:27
 msgid "Canceled"
-msgstr ""
+msgstr "Cancelado"
 
 #: app/static/app/js/classes/TempLayer.js:14
 #, python-format
 msgid "%(file)s is bigger than 5 MB."
-msgstr ""
+msgstr "%(file)s é maior que 5 MB."
 
 #: app/static/app/js/classes/TempLayer.js:30
 #, python-format
 msgid "Not a proper zipped shapefile: %(file)s"
-msgstr ""
+msgstr "Não é um arquivo shapefile apropriado: %(file)s"
 
 #: app/static/app/js/classes/TempLayer.js:43
 #, python-format
 msgid "Not a proper JSON file: %(file)s"
-msgstr ""
+msgstr "Não é um arquivo JSON apropriado: %(file)s"
 
 #: app/static/app/js/components/AssetDownloadButtons.jsx:33
 msgid "Download Assets"
@@ -260,52 +260,56 @@ msgstr ""
 #: app/static/app/js/components/EditPresetDialog.jsx:107
 #: app/static/app/js/components/EditTaskForm.jsx:523
 msgid "Edit Task Options"
-msgstr ""
+msgstr "Editar opções da tarefa"
 
 #: app/static/app/js/components/EditPresetDialog.jsx:113
 #: app/static/app/js/components/EditProjectDialog.jsx:85
 #: app/static/app/js/components/EditTaskForm.jsx:597
 msgid "Name"
-msgstr "Имя"
+msgstr "Nome"
 
 #: app/static/app/js/components/EditPresetDialog.jsx:121
 msgid "Search"
-msgstr "Поиск"
+msgstr "Buscar"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:10
 msgid "New Project"
-msgstr ""
+msgstr "Novo Projeto"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:11
 msgid "Create Project"
-msgstr ""
+msgstr "Criar projeto"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:12
 msgid "Creating project..."
-msgstr ""
+msgstr "Criando projeto..."
 
 #: app/static/app/js/components/EditProjectDialog.jsx:14
 msgid ""
 "All tasks, images and models associated with this project will be "
 "permanently deleted. Are you sure you want to continue?"
 msgstr ""
+"Todas as tarefas, imagens e modelos associados a este projeto serão "
+"excluídos permanentemente. Você tem certeza que quer continuar?"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:91
 msgid "Description (optional)"
-msgstr ""
+msgstr "Descrição (opcional)"
 
 #: app/static/app/js/components/EditTaskForm.jsx:89
 msgid ""
 "Could not load list of processing nodes. Are you connected to the internet?"
 msgstr ""
+"Não foi possível carregar a lista de nós de processamento. Você está "
+"conectado à internet?"
 
 #: app/static/app/js/components/EditTaskForm.jsx:97
 msgid "We tried to reach:"
-msgstr ""
+msgstr "Tentamos alcançar:"
 
 #: app/static/app/js/components/EditTaskForm.jsx:98
 msgid "There are no usable processing nodes."
-msgstr ""
+msgstr "Não há nós de processamento utilizáveis."
 
 #: app/static/app/js/components/EditTaskForm.jsx:98
 msgid ""
@@ -316,10 +320,18 @@ msgid ""
 "are bringing a node back online, it will take about 30 seconds for WebODM to "
 "recognize it."
 msgstr ""
+"Certifique-se de que pelo menos um nó de processamento está acessível e que "
+"você concedeu ao usuário atual permissões suficientes para visualizar o nó "
+"de processamento (indo para Administração - Nós de processamento - "
+"Selecionar nó - Permissões de objeto - Adicionar usuário/grupo e verificar "
+"PODE VER O NÓ DE PROCESSAMENTO). Se você estiver colocando um nó novamente "
+"online, levará cerca de 30 segundos para que o WebODM o reconheça."
 
 #: app/static/app/js/components/EditTaskForm.jsx:216
 msgid "Could not load list of presets. Are you connected to the internet?"
 msgstr ""
+"Não foi possível carregar a lista de predefinições. Você está conectado à "
+"internet?"
 
 #: app/static/app/js/components/EditTaskForm.jsx:225
 #: app/static/app/js/components/EditTaskForm.jsx:384
@@ -333,80 +345,87 @@ msgstr ""
 #: app/static/app/js/components/EditTaskForm.jsx:232
 #: app/static/app/js/components/EditTaskForm.jsx:353
 msgid "Default"
-msgstr ""
+msgstr "Padrão"
 
 #: app/static/app/js/components/EditTaskForm.jsx:437
 msgid "My Preset"
-msgstr ""
+msgstr "Minha predefinição"
 
 #: app/static/app/js/components/EditTaskForm.jsx:437
 #, python-format
 msgid "Copy of %(preset)s"
-msgstr ""
+msgstr "Cópia de %(preset)s"
 
 #: app/static/app/js/components/EditTaskForm.jsx:460
 msgid "Could not duplicate the preset. Please try to refresh the page."
 msgstr ""
+"Não foi possível duplicar a predefinição. Por favor, tente atualizar a "
+"página."
 
 #: app/static/app/js/components/EditTaskForm.jsx:469
 msgid ""
 "System presets can only be removed by a staff member from the Administration "
 "panel."
 msgstr ""
+"As predefinições do sistema só podem ser removidas por um membro da equipe "
+"do painel de Administração."
 
 #: app/static/app/js/components/EditTaskForm.jsx:473
 #, python-format
 msgid "Are you sure you want to delete \"%(preset)s\"?"
-msgstr ""
+msgstr "Tem certeza de que deseja excluir \"%(preset)s\"?"
 
 #: app/static/app/js/components/EditTaskForm.jsx:486
 msgid "Could not delete the preset. Please try to refresh the page."
 msgstr ""
+"Não foi possível excluir a predefinição. Por favor, tente atualizar a página."
 
 #: app/static/app/js/components/EditTaskForm.jsx:501
 msgid "Retry"
-msgstr ""
+msgstr "Tentar novamente"
 
 #: app/static/app/js/components/EditTaskForm.jsx:524
 #: app/static/app/js/components/EditTaskForm.jsx:531
 #: app/static/app/js/components/ProjectListItem.jsx:534
 #: app/static/app/js/components/TaskListItem.jsx:413
 msgid "Edit"
-msgstr "Редактировать"
+msgstr "Editar"
 
 #: app/static/app/js/components/EditTaskForm.jsx:537
 msgid "Duplicate"
-msgstr ""
+msgstr "Duplicar"
 
 #: app/static/app/js/components/EditTaskForm.jsx:541
 #: app/static/app/js/components/EditTaskPanel.jsx:82
 #: app/static/app/js/components/FormDialog.jsx:11
 msgid "Save"
-msgstr "Сохранить"
+msgstr "Salvar"
 
 #: app/static/app/js/components/EditTaskForm.jsx:545
 #: app/static/app/js/components/FormDialog.jsx:173
 #: app/static/app/js/components/TaskListItem.jsx:439
 #: plugins/measure/public/app.jsx:34
 msgid "Delete"
-msgstr "Удалить"
+msgstr "Excluir"
 
 #: app/static/app/js/components/EditTaskForm.jsx:556
 #: plugins/lightning/public/Dashboard.jsx:153
 msgid "Processing Node"
-msgstr ""
+msgstr "Nó de processamento"
 
 #: app/static/app/js/components/EditTaskForm.jsx:566
 msgid "Options"
-msgstr "Опции"
+msgstr "Opções"
 
 #: app/static/app/js/components/EditTaskForm.jsx:590
 msgid "Loading processing nodes and presets..."
-msgstr ""
+msgstr "Carregando nós de processamento e predefinições ..."
 
 #: app/static/app/js/components/EditTaskPanel.jsx:56
 msgid "Could not update task information. Plese try again."
 msgstr ""
+"Não foi possível atualizar as informações da tarefa. Por favor, tente "
+"novamente."
 
 #: app/static/app/js/components/EditTaskPanel.jsx:75
 #: app/static/app/js/components/FormDialog.jsx:151
@@ -414,76 +433,79 @@ msgstr ""
 #: app/static/app/js/components/TaskListItem.jsx:422
 #: plugins/measure/public/app.jsx:33
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: app/static/app/js/components/EditTaskPanel.jsx:79
 msgid "Saving..."
-msgstr ""
+msgstr "Salvando..."
 
 #: app/static/app/js/components/ErrorMessage.jsx:29
 #: app/static/app/js/components/ProjectListItem.jsx:544
 msgid "Close"
-msgstr "Закрыть"
+msgstr "Fechar"
 
 #: app/static/app/js/components/FormDialog.jsx:10
 msgid "Title"
-msgstr ""
+msgstr "Título"
 
 #: app/static/app/js/components/FormDialog.jsx:12
 msgid "Saving…"
-msgstr ""
+msgstr "Salvando…"
 
 #: app/static/app/js/components/FormDialog.jsx:14
 msgid "Are you sure?"
-msgstr ""
+msgstr "Você tem certeza?"
 
 #: app/static/app/js/components/FormDialog.jsx:109
 msgid "Could not apply changes"
-msgstr ""
+msgstr "Não foi possível aplicar as alterações"
 
 #: app/static/app/js/components/FormDialog.jsx:123
 msgid "Could not delete item"
-msgstr ""
+msgstr "Não foi possível excluir o item"
 
 #: app/static/app/js/components/Histogram.jsx:293
 msgid "Min:"
-msgstr ""
+msgstr "Mín:"
 
 #: app/static/app/js/components/Histogram.jsx:294
 msgid "Max:"
-msgstr ""
+msgstr "Máx:"
 
 #: app/static/app/js/components/ImagePopup.jsx:47
 msgid "Image missing"
-msgstr ""
+msgstr "Imagem faltando"
 
 #: app/static/app/js/components/ImagePopup.jsx:86
 msgid "Download Image"
-msgstr ""
+msgstr "Baixar imagem"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:63
 msgid "Cannot upload file. Check your internet connection and try again."
 msgstr ""
+"Não é possível fazer upload do arquivo. Verifique sua conexão com a Internet "
+"e tente novamente."
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:91
 #, python-format
 msgid "Invalid response from server: %(error)s"
-msgstr ""
+msgstr "Resposta inválida do servidor: %(error)s"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:94
 msgid "An error occured while uploading the file. Please try again."
-msgstr ""
+msgstr "Ocorreu um erro ao enviar o arquivo. Por favor, tente novamente."
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:138
 #: app/static/app/js/components/LayersControlLayer.jsx:249
 #: app/static/app/js/components/ProjectList.jsx:56
 #, python-format
 msgid "Invalid JSON response: %(error)s"
-msgstr ""
+msgstr "Resposta JSON inválida: %(error)s"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:142
 msgid "Cannot import from URL. Check your internet connection."
 msgstr ""
+"Não é possível importar do URL. Verifique a sua conexão com a internet."
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:159
 msgid "Import Existing Assets"
@@ -498,169 +520,175 @@ msgstr ""
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:167
 msgid "Upload a File"
-msgstr ""
+msgstr "Enviar um arquivo"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:175
 msgid "Import From URL"
-msgstr ""
+msgstr "Importar de um URL"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:184
 #: app/static/app/js/components/ProjectListItem.jsx:498
 msgid "Import"
-msgstr ""
+msgstr "Importar"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:194
 msgid "Cancel Upload"
-msgstr ""
+msgstr "Cancelar envio"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:287
 msgid "Algorithm:"
-msgstr ""
+msgstr "Algoritmo:"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:299
 msgid "Filter:"
-msgstr ""
+msgstr "Filtro:"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:311
 msgid "Color:"
-msgstr ""
+msgstr "Cor:"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:323
 msgid "Shading:"
-msgstr ""
+msgstr "Sombreamento:"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:326
 #: app/static/app/js/components/Map.jsx:350
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:327
 #: plugins/contours/public/ContoursPanel.jsx:228
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:328
 msgid "Extruded"
-msgstr ""
+msgstr "Extrudado"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:334
 msgid "Export:"
-msgstr ""
+msgstr "Exportar:"
 
 #: app/static/app/js/components/LayersControlPanel.jsx:26
 #: app/static/app/js/components/NewTaskPanel.jsx:187
 #: plugins/contours/public/ContoursPanel.jsx:236
 msgid "Loading…"
-msgstr ""
+msgstr "Carregando…"
 
 #: app/static/app/js/components/LayersControlPanel.jsx:44
 msgid "Layers"
-msgstr ""
+msgstr "Camadas"
 
 #: app/static/app/js/components/Map.jsx:86
 msgid "DSM"
-msgstr ""
+msgstr "MDS"
 
 #: app/static/app/js/components/Map.jsx:88
 msgid "DTM"
-msgstr ""
+msgstr "MDT"
 
 #: app/static/app/js/components/Map.jsx:259
 msgid "(Cameras)"
-msgstr ""
+msgstr "(Câmeras)"
 
 #: app/static/app/js/components/Map.jsx:331
 msgid "Enter a tile URL template. Valid coordinates are:"
-msgstr ""
+msgstr "Insira um modelo de URL de mosaico (tile). As coordenadas válidas são:"
 
 #: app/static/app/js/components/Map.jsx:332
 #, python-brace-format
 msgid "{z}, {x}, {y} for Z/X/Y tile scheme"
-msgstr ""
+msgstr "{z}, {x}, {y} para esquema de mosaico Z/X/Y"
 
 #: app/static/app/js/components/Map.jsx:333
 msgid "{-y} for flipped TMS-style Y coordinates"
-msgstr ""
+msgstr "{-y} para coordenada Y invertida de estilo TMS"
 
 #: app/static/app/js/components/Map.jsx:335
 msgid "Example:"
-msgstr ""
+msgstr "Exemplo:"
 
 #: app/static/app/js/components/Map.jsx:401
 msgid "Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay"
 msgstr ""
+"Adicionar uma camada (overlay) GeoJSON (.json) ou ShapeFile (.zip) temporária"
 
 #: app/static/app/js/components/Map.jsx:452
 msgid "Error: cannot load assets list."
-msgstr ""
+msgstr "Erro: não é possível carregar a lista de recursos."
 
 #: app/static/app/js/components/Map.jsx:523
 msgid "Opacity:"
-msgstr ""
+msgstr "Opacidade:"
 
 #: app/static/app/js/components/Map.jsx:527
 #: app/static/app/js/components/TaskList.jsx:75
 msgid "Loading..."
-msgstr ""
+msgstr "Carregando..."
 
 #: app/static/app/js/components/NewTaskPanel.jsx:83
 msgid "Are you sure you want to cancel?"
-msgstr ""
+msgstr "Você tem certeza que deseja cancelar?"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:131
 #, python-format
 msgid "%(count)s files selected. Please check these additional options:"
-msgstr ""
+msgstr "%(count)s arquivos selecionados. Verifique estas opções adicionais:"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:144
 msgid "Resize Images"
-msgstr ""
+msgstr "Redimensionar imagens"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:168
 msgid "px"
-msgstr ""
+msgstr "px"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:189
 msgid "Review"
-msgstr ""
+msgstr "Revisar"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:189
 msgid "Start Processing"
-msgstr ""
+msgstr "Iniciar o processamento"
 
 #: app/static/app/js/components/ProcessingNodeOption.jsx:140
 #: app/static/app/js/translations/potree_autogenerated.js:62
 msgid "Enable"
-msgstr ""
+msgstr "Habilitar"
 
 #: app/static/app/js/components/ProcessingNodeOption.jsx:149
 msgid "Click to import a .JSON file"
-msgstr ""
+msgstr "Clique para importar um arquivo .JSON"
 
 #: app/static/app/js/components/ProcessingNodeOption.jsx:164
 msgid "Reset to default"
-msgstr ""
+msgstr "Restaurar ao padrão"
 
 #: app/static/app/js/components/ProjectList.jsx:63
 #, python-format
 msgid "Could not load projects list: %(error)s"
-msgstr ""
+msgstr "Não foi possível carregar a lista de projetos: %(error)s"
 
 #: app/static/app/js/components/ProjectListItem.jsx:185
 #, python-format
 msgid "Cannot upload %(filename)s, exceeded max retries (%(max_retries)s)"
 msgstr ""
+"Não é possível fazer upload de %(filename)s, ultrapassou o máximo de "
+"tentativas (%(max_retries)s)"
 
 #: app/static/app/js/components/ProjectListItem.jsx:234
 #: app/static/app/js/components/ProjectListItem.jsx:346
 #, python-format
 msgid "Cannot create new task. Invalid response from server: %(error)s"
 msgstr ""
+"Não é possível criar uma nova tarefa. Resposta inválida do servidor: "
+"%(error)s"
 
 #: app/static/app/js/components/ProjectListItem.jsx:237
 #: app/static/app/js/components/ProjectListItem.jsx:350
 msgid "Cannot create new task. Please try again later."
 msgstr ""
+"Não é possível criar uma nova tarefa. Por favor, tente novamente mais tarde."
 
 #: app/static/app/js/components/ProjectListItem.jsx:244
 #, python-format
@@ -668,91 +696,94 @@ msgid ""
 "%(count)s files cannot be uploaded. As a reminder, only images (.jpg, .tif, ."
 "png) and GCP files (.txt) can be uploaded. Try again."
 msgstr ""
+"%(count)s arquivos não podem ser carregados. Como um lembrete, apenas "
+"imagens (.jpg, .tif, .png) e arquivos GCP (.txt) podem ser carregados. Tente "
+"novamente."
 
 #: app/static/app/js/components/ProjectListItem.jsx:473
 msgid "Edit Project"
-msgstr ""
+msgstr "Editar projeto"
 
 #: app/static/app/js/components/ProjectListItem.jsx:474
 msgid "Save Changes"
-msgstr ""
+msgstr "Salvar alterações"
 
 #: app/static/app/js/components/ProjectListItem.jsx:475
 msgid "Saving changes..."
-msgstr ""
+msgstr "Salvando alterações..."
 
 #: app/static/app/js/components/ProjectListItem.jsx:493
 msgid "Select Images and GCP"
-msgstr ""
+msgstr "Selecionar imagens e GCPs"
 
 #: app/static/app/js/components/ProjectListItem.jsx:513
 #: app/static/app/js/components/TaskListItem.jsx:398
 msgid "View Map"
-msgstr ""
+msgstr "Ver mapa"
 
 #: app/static/app/js/components/ProjectListItem.jsx:528
 #, python-format
 msgid "%(count)s Tasks"
-msgstr ""
+msgstr "%(count)s tarefas"
 
 #: app/static/app/js/components/ShareButton.jsx:58
 msgid "Share"
-msgstr ""
+msgstr "Compartilhar"
 
 #: app/static/app/js/components/SharePopup.jsx:60
 msgid "An error occurred. Check your connection and permissions."
-msgstr ""
+msgstr "Um erro ocorreu. Verifique sua conexão e permissões."
 
 #: app/static/app/js/components/SharePopup.jsx:78
 msgid "Share This Task"
-msgstr ""
+msgstr "Compartilhar esta tarefa"
 
 #: app/static/app/js/components/SharePopup.jsx:87
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 #: app/static/app/js/components/SharePopup.jsx:100
 msgid "Enabled"
-msgstr "Включено"
+msgstr "Ativado"
 
 #: app/static/app/js/components/SharePopup.jsx:106
 msgid "Link:"
-msgstr ""
+msgstr "Link:"
 
 #: app/static/app/js/components/SharePopup.jsx:117
 msgid "HTML iframe:"
-msgstr ""
+msgstr "iframe HTML:"
 
 #: app/static/app/js/components/SwitchModeButton.jsx:47
 msgid "3D"
-msgstr ""
+msgstr "3D"
 
 #: app/static/app/js/components/SwitchModeButton.jsx:47
 msgid "2D"
-msgstr ""
+msgstr "2D"
 
 #: app/static/app/js/components/TaskList.jsx:51
 #, python-format
 msgid "Could not load task list: %(error)s"
-msgstr ""
+msgstr "Não foi possível carregar a lista de tarefas: %(error)s"
 
 #: app/static/app/js/components/TaskList.jsx:77
 #, python-format
 msgid "Error: %(error)s"
-msgstr ""
+msgstr "Erro: %(error)s"
 
 #: app/static/app/js/components/TaskList.jsx:77
 msgid "Try again"
-msgstr ""
+msgstr "Tente novamente"
 
 #: app/static/app/js/components/TaskList.jsx:79
 msgid "This project has no tasks. Create one by uploading some images!"
-msgstr ""
+msgstr "Este projeto não tem tarefas. Crie um enviando algumas imagens!"
 
 #: app/static/app/js/components/TaskListItem.jsx:200
 #: app/static/app/js/components/TaskListItem.jsx:207
 msgid "Cannot complete operation."
-msgstr ""
+msgstr "Não é possível concluir a operação."
 
 #: app/static/app/js/components/TaskListItem.jsx:250
 #, python-format
@@ -760,27 +791,32 @@ msgid ""
 "It looks like there might be one of the following problems: %(problems)s You "
 "can read more about best practices for capturing good images %(link)s."
 msgstr ""
+"Parece que pode haver um dos seguintes problemas: %(problems)s Você pode ler "
+"mais sobre as melhores práticas para capturar boas imagens %(link)s."
 
 #: app/static/app/js/components/TaskListItem.jsx:251
 msgid "Not enough images"
-msgstr ""
+msgstr "Imagens insuficientes"
 
 #: app/static/app/js/components/TaskListItem.jsx:252
 msgid "Not enough overlap between images"
-msgstr ""
+msgstr "Sobreposição insuficiente entre as imagens"
 
 #: app/static/app/js/components/TaskListItem.jsx:253
 msgid "Images might be too blurry (common with phone cameras)"
 msgstr ""
+"As imagens podem estar muito desfocadas (comum em câmeras de telefones)"
 
 #: app/static/app/js/components/TaskListItem.jsx:254
 msgid ""
 "The min-num-features task option is set too low, try increasing it by 25%"
 msgstr ""
+"A opção de tarefa min-num-features está definida com valor muito baixo, "
+"tente aumentá-la em 25%"
 
 #: app/static/app/js/components/TaskListItem.jsx:255
 msgid "here"
-msgstr ""
+msgstr "aqui"
 
 #: app/static/app/js/components/TaskListItem.jsx:258
 #, python-format
@@ -790,10 +826,15 @@ msgid ""
 "support or higher. You can still run WebODM if you compile your own docker "
 "images. See %(link)s for more information."
 msgstr ""
+"Parece que este computador pode ser muito antigo. WebODM requer um "
+"computador com uma CPU de 64 bits com suporte para MMX, SSE, SSE2, SSE3 e "
+"SSSE3 conjunto de instruções ou superior. Você ainda pode executar o WebODM "
+"se compilar suas próprias imagens do docker. Veja %(link)s para mais "
+"informações."
 
 #: app/static/app/js/components/TaskListItem.jsx:258
 msgid "this page"
-msgstr ""
+msgstr "esta página"
 
 #: app/static/app/js/components/TaskListItem.jsx:260
 msgid ""
@@ -801,77 +842,82 @@ msgid ""
 "This might indicate a corrupted installation. If you built OpenDroneMap, "
 "please check that all programs built without errors."
 msgstr ""
+"O nó de processamento está sem um programa necessário para concluir a "
+"tarefa. Isso pode indicar uma instalação corrompida. Se você compilou o "
+"OpenDroneMap, verifique se todos os programas foram compilados sem erros."
 
 #: app/static/app/js/components/TaskListItem.jsx:296
 msgid "Resume Processing"
-msgstr ""
+msgstr "Retomar o processamento"
 
 #: app/static/app/js/components/TaskListItem.jsx:312
 msgid "Cannot restart task."
-msgstr ""
+msgstr "Não é possível reiniciar a tarefa."
 
 #: app/static/app/js/components/TaskListItem.jsx:354
 msgid "Cannot restart task from (stage)s."
-msgstr ""
+msgstr "Não é possível reiniciar a tarefa a partir de (stage)s."
 
 #: app/static/app/js/components/TaskListItem.jsx:368
 #, python-format
 msgid "Task #%(number)s"
-msgstr ""
+msgstr "Tarefa n° %(number)s"
 
 #: app/static/app/js/components/TaskListItem.jsx:372
 msgid "Uploading images to processing node"
-msgstr ""
+msgstr "Enviando imagens para o nó de processamento"
 
 #: app/static/app/js/components/TaskListItem.jsx:374
 msgid "Waiting for a node..."
-msgstr ""
+msgstr "Esperando por um nó..."
 
 #: app/static/app/js/components/TaskListItem.jsx:405
 msgid "View 3D Model"
-msgstr ""
+msgstr "Ver modelo 3D"
 
 #: app/static/app/js/components/TaskListItem.jsx:422
 msgid "Cannot cancel task."
-msgstr ""
+msgstr "Não é possível cancelar a tarefa."
 
 #: app/static/app/js/components/TaskListItem.jsx:434
 msgid "Restart"
-msgstr ""
+msgstr "Reiniciar"
 
 #: app/static/app/js/components/TaskListItem.jsx:440
 msgid ""
 "All information related to this task, including images, maps and models will "
 "be deleted. Continue?"
 msgstr ""
+"Todas as informações relacionadas a esta tarefa, incluindo imagens, mapas e "
+"modelos serão excluídas. Continuar?"
 
 #: app/static/app/js/components/TaskListItem.jsx:441
 msgid "Cannot delete task."
-msgstr ""
+msgstr "Não é possível excluir tarefa."
 
 #: app/static/app/js/components/TaskListItem.jsx:485
 msgid "Task Output:"
-msgstr ""
+msgstr "Resultado da tarefa:"
 
 #: app/static/app/js/components/TaskListItem.jsx:488
 msgid "On"
-msgstr ""
+msgstr "Liga"
 
 #: app/static/app/js/components/TaskListItem.jsx:489
 msgid "Off"
-msgstr ""
+msgstr "Desliga"
 
 #: app/static/app/js/components/TaskListItem.jsx:497
 msgid "Created on:"
-msgstr ""
+msgstr "Criado em:"
 
 #: app/static/app/js/components/TaskListItem.jsx:500
 msgid "Processing Node:"
-msgstr ""
+msgstr "Nó de processamento:"
 
 #: app/static/app/js/components/TaskListItem.jsx:504
 msgid "Options:"
-msgstr ""
+msgstr "Opções:"
 
 #: app/static/app/js/components/TaskListItem.jsx:524
 msgid ""
@@ -879,14 +925,17 @@ msgid ""
 "information is embedded in the EXIF tags of your images, or use a Ground "
 "Control Points (GCP) file."
 msgstr ""
+"Não foi possível gerar uma ortofoto. Para gerar uma, certifique-se de que as "
+"informações de GPS estejam incorporadas às tags EXIF de suas imagens ou use "
+"um arquivo de pontos de controle (GCPs)."
 
 #: app/static/app/js/components/TaskListItem.jsx:527
 msgid "enough RAM allocated"
-msgstr ""
+msgstr "RAM suficiente alocada"
 
 #: app/static/app/js/components/TaskListItem.jsx:527
 msgid "cloud processing node"
-msgstr ""
+msgstr "nó de processamento em nuvem"
 
 #: app/static/app/js/components/TaskListItem.jsx:527
 #, python-format
@@ -897,10 +946,15 @@ msgid ""
 "images, make your images smaller, or reduce the max-concurrency parameter "
 "from the task's options. You can also try to use a %(cloudlink)s."
 msgstr ""
+"Parece que seu nó de processamento ficou sem memória. Se você estiver usando "
+"o docker, verifique se o ambiente do docker tem %(memlink)s. Como "
+"alternativa, certifique-se de ter RAM física suficiente, reduza o número de "
+"imagens, torne suas imagens menores ou reduza o parâmetromax-concurrency das "
+"opções da tarefa. Você também pode tentar usar um %(cloudlink)s."
 
 #: app/static/app/js/components/TaskListItem.jsx:534
 msgid "open a topic"
-msgstr ""
+msgstr "abra um tópico"
 
 #: app/static/app/js/components/TaskListItem.jsx:534
 #, python-format
@@ -912,29 +966,36 @@ msgid ""
 "%(open_a_topic)s on our community forum, making sure to include a copy of "
 "your task's output. Our awesome contributors will try to help you!"
 msgstr ""
+"\"Processo encerrado com código 1\" significa que parte do processamento "
+"falhou. Às vezes é um problema com o conjunto de dados, às vezes pode ser "
+"resolvido ajustando as Opções de tarefa e às vezes pode ser um bug! Se "
+"precisar de ajuda, carregue suas imagens em algum lugar como %(link1)s ou "
+"%(link2)s e %(open_a_topic)s em nosso fórum da comunidade, certificando-se "
+"de incluir uma cópia do resultado de sua tarefa. Nossos incríveis "
+"colaboradores tentarão ajudá-lo!"
 
 #: app/static/app/js/components/TaskListItem.jsx:580
 msgid "Set a processing node"
-msgstr ""
+msgstr "Defina um nó de processamento"
 
 #: app/static/app/js/components/TaskListItem.jsx:585
 msgid "Waiting for image upload..."
-msgstr ""
+msgstr "Esperando o envio da imagem ..."
 
 #: app/static/app/js/components/UploadProgressBar.jsx:29
 #, python-format
 msgid "remaining to upload: %(bytes)s"
-msgstr ""
+msgstr "restante para envio: %(bytes)s"
 
 #: app/static/app/js/components/UploadProgressBar.jsx:35
 #, python-format
 msgid "%(count)s files %(remaining)s"
-msgstr ""
+msgstr "%(count)s arquivos %(remaining)s"
 
 #: app/static/app/js/components/UploadProgressBar.jsx:36
 #, python-format
 msgid "%(count)s files uploaded successfully"
-msgstr ""
+msgstr "%(count)s arquivos enviados com sucesso"
 
 #: app/static/app/js/translations/odm_autogenerated.js:3
 #, python-format
@@ -943,11 +1004,14 @@ msgid ""
 "This flag is useful if you have high precision GPS measurements. If there "
 "are no GCPs, this flag does nothing. Default: %(default)s"
 msgstr ""
+"Usa os dados exif de GPS das imagens para reconstrução, mesmo se houver GCPs "
+"presentes. Esta flag é útil se você tiver medições de GPS de alta precisão. "
+"Se não houver GCPs, esta flag não fará nada. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:4
 #, python-format
 msgid "Skip the blending of colors near seams. Default: %(default)s"
-msgstr ""
+msgstr "Omite a mistura de cores perto das costuras. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:5
 #, python-format
@@ -963,6 +1027,10 @@ msgid ""
 "skip pre-matching. Neighbors works together with Distance parameter, set "
 "both to 0 to not use pre-matching. Default: %(default)s"
 msgstr ""
+"Número de imagens mais próximas a serem pré-combinadas com base nos dados "
+"GPS exif. Defina como 0 para pular a pré-correspondência. O parâmetro "
+"Vizinhos trabalha em conjunto com o parâmetro Distância, defina ambos como 0 "
+"para não usar pré-correspondência. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:7
 #, python-format
@@ -972,6 +1040,10 @@ msgid ""
 "as a JSON string representing the contents of a cameras.json file. Default: "
 "%(default)s"
 msgstr ""
+"Use os parâmetros da câmera calculados a partir de outro conjunto de dados "
+"em vez de calculá-los. Pode ser especificado como caminho para um arquivo "
+"cameras.json ou como uma string JSON representando o conteúdo de um arquivo "
+"cameras.json. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:8
 #, python-format
@@ -986,6 +1058,8 @@ msgid ""
 "Simple Morphological Filter window radius parameter (meters). Default: "
 "%(default)s"
 msgstr ""
+"Parâmetro de raio da janela do Filtro Morfológico Simples (metros). Padrão: "
+"%(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:10
 #, python-format
@@ -995,6 +1069,9 @@ msgid ""
 "orthophoto and do not need a full 3D model, turn on this option. Default: "
 "%(default)s"
 msgstr ""
+"Ignora a reconstrução densa e a geração do modelo 3D. Gera uma ortofoto "
+"diretamente da reconstrução esparsa. Se você precisa apenas de uma ortofoto "
+"e não precisa de um modelo 3D completo, ative esta opção. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:11
 #, python-format
@@ -1010,6 +1087,8 @@ msgid ""
 "Rerun processing from this stage. Can be one of: %(choices)s. Default: "
 "%(default)s"
 msgstr ""
+"Execute novamente o processamento a partir deste estágio. Pode ser um de: "
+"%(choices)s. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:13
 #, python-format
@@ -1018,6 +1097,9 @@ msgid ""
 "but requires more memory and takes longer. Can be one of: %(choices)s. "
 "Default: %(default)s"
 msgstr ""
+"Define a qualidade da extração das feições. Qualidade superior gera feições "
+"melhores, mas requer mais memória e leva mais tempo. Pode ser um de: "
+"%(choices)s. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:14
 #, python-format
@@ -1035,6 +1117,12 @@ msgid ""
 "distance weighted (IDW) algorithm and merged together. Remaining gaps are "
 "then merged using nearest neighbor interpolation. Default: %(default)s"
 msgstr ""
+"Número de passos usados para preencher áreas com vazios. Defina como 0 para "
+"desativar o preenchimento de vazios. Começando com um raio igual à resolução "
+"de saída, N diferentes MDEs são gerados com raio progressivamente maior "
+"usando o algoritmo do inverso da potência da distância (IDW) e mesclados. Os "
+"vazios restantes são então mesclados usando a interpolação dpor vizinho mais "
+"próximo. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:16
 #, python-format
@@ -1042,6 +1130,8 @@ msgid ""
 "Set this parameter if you want to generate a PNG rendering of the "
 "orthophoto. Default: %(default)s"
 msgstr ""
+"Defina este parâmetro se quiser gerar uma renderização PNG da ortofoto. "
+"Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:17
 #, python-format
@@ -1049,6 +1139,8 @@ msgid ""
 "Choose the algorithm for extracting keypoints and computing descriptors. Can "
 "be one of: %(choices)s. Default: %(default)s"
 msgstr ""
+"Escolha o algoritmo para extrair pontos chave (keypoints) e descritores de "
+"cálculo. Pode ser um de: %(choices)s. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:18
 #, python-format
@@ -1057,6 +1149,9 @@ msgid ""
 "deviations from the local mean. Set to 0 to disable filtering. Default: "
 "%(default)s"
 msgstr ""
+"Filtra a nuvem de pontos removendo pontos que se desviam mais do que N "
+"desvios padrão da média local. Defina como 0 para desativar a filtragem. "
+"Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:19
 #, python-format
@@ -1069,7 +1164,7 @@ msgstr ""
 #: app/static/app/js/translations/odm_autogenerated.js:20
 #, python-format
 msgid "Print debug messages. Default: %(default)s"
-msgstr ""
+msgstr "Exibe mensagens de debug. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:21
 #, python-format
@@ -1080,6 +1175,11 @@ msgid ""
 "ignoring it can result in slightly better image output quality. Default: "
 "%(default)s"
 msgstr ""
+"Ignora a Distância de Amostragem no Solo (Ground Sampling Distance - GSD). O "
+"GSD limita a resolução máxima das saídas de imagem e redimensiona as imagens "
+"quando necessário, resultando em um processamento mais rápido e menor uso de "
+"memória. Como o GSD é uma estimativa, às vezes ignorá-lo pode resultar em "
+"uma qualidade de saída de imagem ligeiramente melhor. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:22
 #, python-format
@@ -1096,6 +1196,10 @@ msgid ""
 "sometimes useful for improving results that exhibit doming/bowling or when "
 "images are taken with a rolling shutter camera. Default: %(default)s"
 msgstr ""
+"Desliga a otimização dos parâmetros da câmera durante o ajuste de conjunto "
+"(bundle adjustment). Isso às vezes pode ser útil para melhorar os resultados "
+"que exibem domeamento/embaciamento ou quando as imagens são tiradas com uma "
+"câmera tipo rolling shutter. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:24
 #, python-format
@@ -1104,6 +1208,9 @@ msgid ""
 "a global adjustment every 100 images. Speeds up reconstruction for very "
 "large datasets. Default: %(default)s"
 msgstr ""
+"Executa um ajuste de conjunto (bundle adjustment) local para cada imagem "
+"adicionada à reconstrução e um ajuste global a cada 100 imagens. Acelera a "
+"reconstrução para conjuntos de dados muito grandes. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:25
 #, python-format
@@ -1144,6 +1251,9 @@ msgid ""
 "Path to the project folder. Your project folder should contain subfolders "
 "for each dataset. Each dataset should have an \"images\" folder."
 msgstr ""
+"Caminho para a pasta do projeto. A pasta do projeto deve conter subpastas "
+"para cada conjunto de dados. Cada conjunto de dados deve ter uma pasta "
+"\"images\"."
 
 #: app/static/app/js/translations/odm_autogenerated.js:31
 #, python-format
@@ -1164,6 +1274,8 @@ msgid ""
 "Generate static tiles for orthophotos and DEMs that are suitable for viewers "
 "like Leaflet or OpenLayers. Default: %(default)s"
 msgstr ""
+"Gere mosaicos (tiles) estáticos para ortofotos e MDEs adequados para "
+"visualizadores como Leaflet ou OpenLayers. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:34
 #, python-format
@@ -1173,10 +1285,15 @@ msgid ""
 "datasets to be processed on machines that don't have sufficient disk space "
 "available. Default: %(default)s"
 msgstr ""
+"Exclui arquivos intermediários pesados para otimizar o uso do espaço em "
+"disco. Isso afeta a capacidade de reiniciar o pipeline a partir de um "
+"estágio intermediário, mas permite que os conjuntos de dados sejam "
+"processados em máquinas que não têm espaço em disco suficiente disponível. "
+"Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:35
 msgid "show this help message and exit"
-msgstr ""
+msgstr "mostra esta mensagem de ajuda e sai"
 
 #: app/static/app/js/translations/odm_autogenerated.js:36
 #, python-format
@@ -1186,6 +1303,10 @@ msgid ""
 "+proj definition>geo_x geo_y geo_z im_x im_y image_name [gcp_name] [extra1] "
 "[extra2]Default: %(default)s"
 msgstr ""
+"Caminho para o arquivo que contém os pontos de controle (GCPs) usados para "
+"georreferenciamento. O arquivo precisa usar o seguinte formato: EPSG: <code> "
+"ou <+definição proj>geo_x geo_y geo_z im_x im_y image_name [gcp_name] "
+"[extra1] [extra2] Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:37
 #, python-format
@@ -1193,6 +1314,8 @@ msgid ""
 "Skip generation of a full 3D model. This can save time if you only need 2D "
 "results such as orthophotos and DEMs. Default: %(default)s"
 msgstr ""
+"Omite a geração de um modelo 3D completo. Isso pode economizar tempo se você "
+"precisar apenas de resultados 2D, como ortofotos e MDEs. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:38
 #, python-format
@@ -1210,6 +1333,9 @@ msgid ""
 "ground sampling distance (GSD) estimate. To remove the cap, check --ignore-"
 "gsd also. Default: %(default)s"
 msgstr ""
+"Resolução da ortofoto em cm / pixel. Observe que este valor é limitado por "
+"uma estimativa da distância de amostragem no solo (GSD). Para remover o "
+"limite, marque --ignore-gsd também. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:40
 #, python-format
@@ -1218,6 +1344,9 @@ msgid ""
 "deviation threshold to include patches. Patches with lower standard "
 "deviation are ignored. Default: %(default)s"
 msgstr ""
+"Ao usar PATCH_MATCH ou PATCH_MATCH_SAMPLE, controla o limite do desvio "
+"padrão para incluir o fragmento (patch). Fragmentos com desvio padrão mais "
+"baixo são ignorados. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:41
 #, python-format
@@ -1227,6 +1356,10 @@ msgid ""
 "increases processing time roughly by a factor of 4x.Can be one of: "
 "%(choices)s. Default: %(default)s"
 msgstr ""
+"Definir a qualidade da nuvem de pontos. Uma qualidade superior gera nuvens "
+"de pontos melhores e mais densas, mas requer mais memória e leva mais tempo. "
+"Cada aumento na qualidade aumenta o tempo de processamento aproximadamente "
+"por um fator de 4x. Pode ser um de: %(choices)s. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:42
 #, python-format
@@ -1251,6 +1384,10 @@ msgid ""
 "faster, but might miss some valid points. BRUTE_FORCE takes longer but "
 "produces denser reconstructions. Default: %(default)s"
 msgstr ""
+"Algoritmo de cálculo de mapas de profundidade brutos (raw depthmap). "
+"PATCH_MATCH e PATCH_MATCH_SAMPLE são mais rápidos, mas podem perder alguns "
+"pontos válidos. BRUTE_FORCE leva mais tempo, mas produz reconstruções mais "
+"densas. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:45
 #, python-format
@@ -1268,6 +1405,10 @@ msgid ""
 "type from the images metadata. Can be one of: %(choices)s. Default: "
 "%(default)s"
 msgstr ""
+"Define um tipo de projeção da câmera. Definir um valor manualmente pode "
+"ajudar a melhorar a distorção geométrica. Por padrão, o aplicativo tenta "
+"determinar um tipo de lente a partir dos metadados das imagens. Pode ser um "
+"de: %(choices)s. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:47
 #, python-format
@@ -1275,6 +1416,8 @@ msgid ""
 "Set the compression to use for orthophotos. Can be one of: %(choices)s. "
 "Default: %(default)s"
 msgstr ""
+"Define a compactação a ser usada para ortofotos. Pode ser um de: "
+"%(choices)s. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:48
 #, python-format
@@ -1283,6 +1426,9 @@ msgid ""
 "meters). This can be useful to limit the output resolution of the point "
 "cloud. Set to 0 to disable sampling. Default: %(default)s"
 msgstr ""
+"Filtra a nuvem de pontos mantendo apenas um único ponto em torno de um raio "
+"N (em metros). Isso pode ser útil para limitar a resolução de saída da nuvem "
+"de pontos. Defina como 0 para desativar a amostragem. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:49
 #, python-format
@@ -1291,6 +1437,10 @@ msgid ""
 "cloud by setting the resolution of the depthmap images. Higher values take "
 "longer to compute but produce denser point clouds. Default: %(default)s"
 msgstr ""
+"Opção antiga (use --pc-quality ao invés). Controla a densidade da nuvem de "
+"pontos definindo a resolução das imagens do mapa de profundidade (depth "
+"maps). Valores mais altos demoram mais para serem computados, mas produzem "
+"nuvens de pontos mais densas. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:50
 #, python-format
@@ -1299,6 +1449,9 @@ msgid ""
 "with sharp features (gmi) or those that cover the largest area (area). "
 "Default: %(default)s"
 msgstr ""
+"Ao texturizar a malha 3D, para cada triângulo, escolha priorizar imagens com "
+"características nítidas (gmi) ou aquelas que cobrem a maior área (área). "
+"Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:51
 #, python-format
@@ -1322,6 +1475,8 @@ msgid ""
 "URL to a ClusterODM instance for distributing a split-merge workflow on "
 "multiple nodes in parallel. Default: %(default)s"
 msgstr ""
+"URL para uma instância ClusterODM para distribuir um fluxo de trabalho de "
+"split-merge em vários nós em paralelo. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:54
 #, python-format
@@ -1337,6 +1492,8 @@ msgid ""
 "Build orthophoto overviews for faster display in programs such as QGIS. "
 "Default: %(default)s"
 msgstr ""
+"Cria “overviews” da ortofoto para exibição mais rápida em programas como o "
+"QGIS. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:56
 #, python-format
@@ -1368,11 +1525,20 @@ msgid ""
 "(degrees)] [phi (degrees)] [kappa (degrees)] [horz accuracy (meters)] [vert "
 "accuracy (meters)]Default: %(default)s"
 msgstr ""
+"Caminho para o arquivo de geolocalização da imagem contendo as coordenadas "
+"do centro da câmera usadas para georreferenciamento. Observe que omega/phi/"
+"kappa atualmente não são suportados (você pode defini-los como 0). O arquivo "
+"deve usar o seguinte formato: EPSG: <código> ou <+ definição proj> "
+"nome_da_imagem geo_x geo_y geo_z [omega (graus)] [phi (graus)] [kappa "
+"(graus)] [precisão horz (metros)] [ precisão vertical (metros)] Padrão: "
+"%(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:60
 msgid ""
 "Permanently delete all previous results and rerun the processing pipeline."
 msgstr ""
+"Exclua permanentemente todos os resultados anteriores e execute novamente o "
+"pipeline de processamento."
 
 #: app/static/app/js/translations/odm_autogenerated.js:61
 #, python-format
@@ -1380,6 +1546,8 @@ msgid ""
 "Turn on gamma tone mapping or none for no tone mapping. Can be one of "
 "%(choices)s. Default: %(default)s "
 msgstr ""
+"Ativa o mapeamento de tons gama ou use “nenhum” para nenhum mapeamento de "
+"tons. Pode ser um de %(choices)s. Padrão: %(default)s "
 
 #: app/static/app/js/translations/odm_autogenerated.js:62
 #, python-format
@@ -1389,6 +1557,10 @@ msgid ""
 "place). This can be useful to isolate the areas that have been filled. "
 "Default: %(default)s"
 msgstr ""
+"Calcula um mapa raster euclidiano para cada MDE. O mapa mostra a distância "
+"de cada célula até o valor NODATA mais próximo (antes que ocorra qualquer "
+"preenchimento de vazio). Isso pode ser útil para isolar as áreas que foram "
+"preenchidas. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:63
 #, python-format
@@ -1417,6 +1589,9 @@ msgid ""
 "images for each band. If the images have been postprocessed and are already "
 "aligned, use this option. Default: %(default)s"
 msgstr ""
+"Ao processar conjuntos de dados multiespectrais, o ODM alinhará "
+"automaticamente as imagens para cada banda. Se as imagens foram processadas "
+"e já estão alinhadas, use esta opção. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:67
 #, python-format
@@ -1424,6 +1599,8 @@ msgid ""
 "Octree depth used in the mesh reconstruction, increase to get more vertices, "
 "recommended values are 8-12. Default: %(default)s"
 msgstr ""
+"A profundidade da octree usada na reconstrução da malha, aumente para obter "
+"mais vértices, os valores recomendados são 8-12. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:68
 #, python-format
@@ -1456,6 +1633,9 @@ msgid ""
 "option is a bit faster and provides similar results in planar areas. "
 "Default: %(default)s"
 msgstr ""
+"Usa uma malha 3D completa para calcular a ortofoto em vez de uma malha 2,5D. "
+"Esta opção é um pouco mais rápida e fornece resultados semelhantes em áreas "
+"planas. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:72
 #, python-format
@@ -1463,6 +1643,9 @@ msgid ""
 "Choose what to merge in the merge step in a split dataset. By default all "
 "available outputs are merged. Options: %(choices)s. Default: %(default)s"
 msgstr ""
+"Escolha o que mesclar na etapa de mesclagem em um conjunto de dados "
+"dividido. Por padrão, todas as saídas disponíveis são mescladas. Opções: "
+"%(choices)s. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:73
 #, python-format
@@ -1495,6 +1678,8 @@ msgid ""
 "End processing at this stage. Can be one of: %(choices)s. Default: "
 "%(default)s"
 msgstr ""
+"Finalize o processamento nesta fase. Pode ser um de: %(choices)s. Padrão: "
+"%(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:77
 #, python-format
@@ -1502,6 +1687,8 @@ msgid ""
 "Skip normalization of colors across all images. Useful when processing "
 "radiometric data. Default: %(default)s"
 msgstr ""
+"Omite a normalização de cores em todas as imagens. Útil ao processar dados "
+"radiométricos. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:78
 #, python-format
@@ -1510,11 +1697,14 @@ msgid ""
 "can control the behavior of this option by tweaking the --dem-* parameters. "
 "Default: %(default)s"
 msgstr ""
+"Classifica as saídas da nuvem de pontos usando um Filtro Morfológico "
+"Simples. Você pode controlar o comportamento desta opção ajustando os "
+"parâmetros --dem-*. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:79
 #, python-format
 msgid "Print additional messages to the console. Default: %(default)s"
-msgstr ""
+msgstr "Exibe mensagens adicionais no console. Padrão: %(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:80
 #, python-format
@@ -1529,54 +1719,58 @@ msgstr ""
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:3
 msgid "Compute volume, area and length measurements on Leaflet"
-msgstr ""
+msgstr "Calcule medidas de volume, área e comprimento no Leaflet"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:4
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:5
 msgid "A plugin to create GCP files from images"
-msgstr ""
+msgstr "Um plugin para criar arquivos de GCP a partir de imagens"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:6
 msgid ""
 "A plugin to add a button for quickly opening OpenStreetMap's iD editor and "
 "setup a TMS basemap."
 msgstr ""
+"Um plugin para adicionar um botão para abrir rapidamente o editor de iD do "
+"OpenStreetMap e configurar um mapa base TMS."
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:7
 msgid "A plugin to upload orthophotos to OpenAerialMap"
-msgstr ""
+msgstr "Um plugin para fazer upload de ortofotos para OpenAerialMap"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:8
 msgid "Display program version, memory and disk space usage statistics"
 msgstr ""
+"Exibir estatísticas de versão do programa, memória e uso de espaço em disco"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:9
 msgid "Sync accounts from webodm.net"
-msgstr ""
+msgstr "Sincronizar contas de webodm.net"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:10
 msgid "Add a fullscreen button to the 2D map view"
-msgstr ""
+msgstr "Adicionar um botão de tela inteira à visualização do mapa 2D"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:11
 msgid "Compute, preview and export contours from DEMs"
-msgstr ""
+msgstr "Calcule, visualize e exporte curvas de nível de DEMs"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:12
 msgid "Calculate and draw an elevation map based on a task's DEMs"
-msgstr ""
+msgstr "Calcule e desenhe um mapa de elevação com base nos DEMs de uma tarefa"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:13
+#, fuzzy
 msgid "Upload and tile ODM assets with Cesium ion."
-msgstr ""
+msgstr "Faça upload e agrupe ativos ODM com Cesium ion."
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:14
 msgid "Import images from external sources directly"
-msgstr ""
+msgstr "Importe imagens de fontes externas diretamente"
 
 #: app/static/app/js/translations/plugin_manifest_autogenerated.js:15
 msgid "Detect changes between two different tasks in the same project."
-msgstr ""
+msgstr "Detecte mudanças entre duas tarefas diferentes no mesmo projeto."
 
 #: app/static/app/js/translations/potree_autogenerated.js:3
 msgid "Navigation"
@@ -1625,7 +1819,7 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:14
 msgid "About"
-msgstr ""
+msgstr "Sobre"
 
 #: app/static/app/js/translations/potree_autogenerated.js:15
 msgid "Angle measurement"
@@ -2048,11 +2242,11 @@ msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:153
 msgid "Dashboard"
-msgstr "Панель управления"
+msgstr "Painel de controle"
 
 #: plugins/lightning/public/Dashboard.jsx:159
 msgid "Logout"
-msgstr "Выйти"
+msgstr "Desconectar"
 
 #: plugins/lightning/public/Login.jsx:56
 msgid "Cannot login. Invalid response:"
@@ -2086,7 +2280,7 @@ msgstr ""
 
 #: plugins/lightning/public/app.jsx:39
 msgid "Lightning Network"
-msgstr ""
+msgstr "Rede Lightning"
 
 #: plugins/lightning/public/app.jsx:40
 msgid ""

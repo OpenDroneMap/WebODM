@@ -8,21 +8,20 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 15:19+0000\n"
-"PO-Revision-Date: 2021-01-12 14:33+0000\n"
-"Last-Translator: Jurijs Jeskins <jurijs.jeshkins@gmail.com>\n"
-"Language-Team: Russian <https://hosted.weblate.org/projects/webodm/webodm/ru/"
+"PO-Revision-Date: 2020-12-29 07:14+0000\n"
+"Last-Translator: Park Jeongyong <kladess@gmail.com>\n"
+"Language-Team: Korean <https://hosted.weblate.org/projects/webodm/webodm/ko/"
 ">\n"
-"Language: ru\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.4.1-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
-msgstr "Введите свой CSS"
+msgstr "사용자 정의 CSS를 입력"
 
 #: app/admin.py:53 app/models/theme.py:38
 msgid "CSS"
@@ -30,30 +29,27 @@ msgstr "CSS"
 
 #: app/admin.py:56
 msgid "HTML that will be displayed above site header"
-msgstr "HTML код, который будет показан выше \"шапки\" (хидера) сайта"
+msgstr "사이트 헤더 상단에 표시될 HTML"
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr "HTML (перед заголовком)"
+msgstr "HTML (머릿글 이전)"
 
 #: app/admin.py:60
-#, fuzzy
 msgid "HTML that will be displayed after site header"
-msgstr "HTML код, который будет показан под \"шапкой\" (хидером) сайта"
+msgstr "사이트 머릿글 다음에 표시될 HTML"
 
 #: app/admin.py:61 app/models/theme.py:40
-#, fuzzy
 msgid "HTML (after header)"
-msgstr "HTML (после заголовка)"
+msgstr "HTML (머릿글 다음)"
 
 #: app/admin.py:64
-#, fuzzy
 msgid "HTML that will be displayed after the body tag"
-msgstr "HTML, который будет отображаться после тега body"
+msgstr "Body 태그 다음에 표시 될 HTML"
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
-msgstr "HTML (после тега body)"
+msgstr "HTML (body 다음)"
 
 #: app/admin.py:68
 #, python-brace-format
@@ -61,60 +57,65 @@ msgid ""
 "HTML that will be displayed in the footer. You can also use the special tags "
 "such as {ORGANIZATION} and {YEAR}."
 msgstr ""
-"HTML который будет показан в футере. Вы также можете использовать "
-"специальные теги по типу {ORGANIZATION} и {YEAR}."
+"바닥글에 표시 될 HTML. {ORGANIZATION} 과 {YEAR} 등 특수 태그를 사용할 수도 있"
+"습니다."
 
 #: app/admin.py:69 app/models/theme.py:42
-#, fuzzy
 msgid "HTML (footer)"
-msgstr "HTML (футер)"
+msgstr "HTML (바닥글)"
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr "Описание"
+msgstr "설명"
 
 #: app/admin.py:106
 msgid "Version"
-msgstr "Версия"
+msgstr "버전"
 
 #: app/admin.py:112
 msgid "Author"
-msgstr "Автор"
+msgstr "작성자"
 
 #: app/admin.py:233
 msgid "Actions"
-msgstr "Действия"
+msgstr "행동"
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
-msgstr ""
-"Нормализованый Индекс Разницы Озеленения показывает количество зеленых "
-"насаждений."
+msgstr "정규식생지수(NDVI)는 녹색 식색의 양을 보여줍니다."
 
 #: app/api/formulas.py:20
 msgid ""
 "Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
 "and Green bands instead of only Red to isolate plant health."
 msgstr ""
+"향상된정규식생지수(ENDVI)는 NDVI와 비슷하지만 식생 건강 분리를 위해 적색 대신"
+"에 청색과 녹색 밴드만을 사용합니다."
 
 #: app/api/formulas.py:24
 msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
 msgstr ""
+"시각대기저항지수(Visual Atmospheric Resistance Index)는 식생의 영역을 보여줍"
+"니다."
 
 #: app/api/formulas.py:29
 msgid ""
 "Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
 msgstr ""
+"과잉녹색지수(Excess Green Index)는 감자와 같은 잎이 많은 작물의 녹색성을 강조"
+"합니다."
 
 #: app/api/formulas.py:33
 msgid ""
 "Burn Area Index hightlights burned land in the red to near-infrared spectrum."
 msgstr ""
+"불탄지역지수(Burn Area Index)는 적색과 근적외선 스펙트럼에서 연소된 토지를 강"
+"조합니다."
 
 #: app/api/formulas.py:37
 msgid "Green Leaf Index shows greens leaves and stems."
-msgstr ""
+msgstr "녹색잎지수는 녹색 잎과 줄기등을 보여줍니다."
 
 #: app/api/formulas.py:42
 msgid ""
@@ -179,28 +180,29 @@ msgstr ""
 
 #: app/api/tasks.py:201
 msgid "No files uploaded"
-msgstr "Нет загруженных файлов"
+msgstr "업로드된 파일이 없습니다"
 
 #: app/api/tasks.py:224
 msgid "Cannot create task, you need at least 2 images"
-msgstr ""
+msgstr "작업을 생성할 수 없습니다, 최소 2장 이상의 이미지가 필요합니다"
 
 #: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
 #: app/api/tasks.py:354
 msgid "Asset does not exist"
-msgstr ""
+msgstr "애셋이 존재하지 않습니다"
 
 #: app/api/tasks.py:370
 msgid "Imported Task"
-msgstr "Импортированная задача"
+msgstr "불러온 작업"
 
 #: app/api/tasks.py:373
 msgid "Cannot create task, you need to upload 1 file"
-msgstr ""
+msgstr "작업을 생성할 수 없습니다, 1개의 파일을 업로드 해야합니다"
 
 #: app/api/tasks.py:376
 msgid "Cannot create task, either specify a URL or upload 1 file."
 msgstr ""
+"작업을 생성할 수 없습니다, URL을 지정하거나 1개의 파일을 업로드 하세요."
 
 #: app/models/image_upload.py:10
 msgid "Task this image belongs to"
@@ -208,56 +210,56 @@ msgstr ""
 
 #: app/models/image_upload.py:10 app/models/task.py:260
 msgid "Task"
-msgstr "Задача"
+msgstr "작업"
 
 #: app/models/image_upload.py:11
 msgid "File uploaded by a user"
-msgstr ""
+msgstr "사용자에 의해 업로드된 파일"
 
 #: app/models/image_upload.py:11
 msgid "Image"
-msgstr "Изображение"
+msgstr "이미지"
 
 #: app/models/image_upload.py:20
 msgid "Image Upload"
-msgstr ""
+msgstr "이미지 업로드"
 
 #: app/models/image_upload.py:21
 msgid "Image Uploads"
-msgstr ""
+msgstr "이미지 업로드"
 
 #: app/models/plugin.py:5
 msgid "Plugin name"
-msgstr ""
+msgstr "플러그인 이름"
 
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
 #: app/models/task.py:222 app/models/theme.py:16
 msgid "Name"
-msgstr "Имя"
+msgstr "이름"
 
 #: app/models/plugin.py:6
 msgid "Whether this plugin is turned on."
-msgstr ""
+msgstr "이 플러그인이 활성화되어있는지 여부."
 
 #: app/models/plugin.py:6
 msgid "Enabled"
-msgstr "Включено"
+msgstr "활성화됨"
 
 #: app/models/plugin.py:20
 msgid "Plugin"
-msgstr "Плагин"
+msgstr "플러그인"
 
 #: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
 msgid "Plugins"
-msgstr "Плагины"
+msgstr "플러그인"
 
 #: app/models/plugin_datum.py:7
 msgid "Setting key"
-msgstr ""
+msgstr "설정 키"
 
 #: app/models/plugin_datum.py:7
 msgid "Key"
-msgstr "Ключ"
+msgstr "키"
 
 #: app/models/plugin_datum.py:8
 msgid "The user this setting belongs to. If NULL, the setting is global."
@@ -265,43 +267,43 @@ msgstr ""
 
 #: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
 msgid "User"
-msgstr "Пользователь"
+msgstr "사용자"
 
 #: app/models/plugin_datum.py:9
 msgid "Integer value"
-msgstr "Целое значение"
+msgstr "정수 값"
 
 #: app/models/plugin_datum.py:10
 msgid "Float value"
-msgstr ""
+msgstr "실수 값"
 
 #: app/models/plugin_datum.py:11
 msgid "Bool value"
-msgstr ""
+msgstr "부울 값"
 
 #: app/models/plugin_datum.py:12
 msgid "String value"
-msgstr "Строковое значение"
+msgstr "문자열 값"
 
 #: app/models/plugin_datum.py:13
 msgid "JSON value"
-msgstr ""
+msgstr "JSON 값"
 
 #: app/models/plugin_datum.py:19 app/models/plugin_datum.py:20
 msgid "Plugin Datum"
-msgstr ""
+msgstr "플러그인 영역"
 
 #: app/models/preset.py:9
 msgid "The person who owns this preset"
-msgstr ""
+msgstr "이 프리셋을 소유한 사람"
 
 #: app/models/preset.py:9 app/models/project.py:22
 msgid "Owner"
-msgstr "Владелец"
+msgstr "소유자"
 
 #: app/models/preset.py:10
 msgid "A label used to describe the preset"
-msgstr ""
+msgstr "이 프리셋을 설명하기 위한 레이블"
 
 #: app/models/preset.py:11
 msgid "Options that define this preset (same format as in a Task's options)."
@@ -309,15 +311,15 @@ msgstr ""
 
 #: app/models/preset.py:11 app/models/task.py:228
 msgid "Options"
-msgstr "Опции"
+msgstr "옵션"
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Creation date"
-msgstr "Дата создания"
+msgstr "생성일"
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Created at"
-msgstr "Создано в"
+msgstr "생성 됨"
 
 #: app/models/preset.py:14
 msgid ""
@@ -327,15 +329,15 @@ msgstr ""
 
 #: app/models/preset.py:14
 msgid "System"
-msgstr ""
+msgstr "시스템"
 
 #: app/models/preset.py:20
 msgid "Preset"
-msgstr "Пресет"
+msgstr "사전 설정"
 
 #: app/models/preset.py:21
 msgid "Presets"
-msgstr "Пресеты"
+msgstr "사전 설정"
 
 #: app/models/project.py:22
 msgid "The person who created the project"
@@ -358,15 +360,15 @@ msgstr ""
 
 #: app/models/project.py:26
 msgid "Deleting"
-msgstr ""
+msgstr "삭제 중"
 
 #: app/models/project.py:56 app/models/task.py:221
 msgid "Project"
-msgstr "Проект"
+msgstr "프로젝트"
 
 #: app/models/project.py:57
 msgid "Projects"
-msgstr "Проекты"
+msgstr "프로젝트"
 
 #: app/models/setting.py:20
 msgid "The name of your application"
@@ -390,7 +392,7 @@ msgstr ""
 
 #: app/models/setting.py:31
 msgid "Organization name"
-msgstr "Название организации"
+msgstr "조직 이름"
 
 #: app/models/setting.py:32
 msgid "The website URL of your organization"
@@ -398,12 +400,12 @@ msgstr ""
 
 #: app/models/setting.py:32
 msgid "Organization website"
-msgstr "Веб-сайт организации"
+msgstr ""
 
 #: app/models/setting.py:33 app/models/theme.py:48 app/models/theme.py:49
 #: app/templates/app/logged_in_base.html:95
 msgid "Theme"
-msgstr "Тема"
+msgstr "테마"
 
 #: app/models/setting.py:34
 msgid "Active theme"
@@ -411,11 +413,11 @@ msgstr ""
 
 #: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
 msgid "Application"
-msgstr "Приложение"
+msgstr "응용프로그램"
 
 #: app/models/setting.py:76 app/models/setting.py:77
 msgid "Settings"
-msgstr "Настройки"
+msgstr "설정"
 
 #: app/models/task.py:218
 msgid "Id"
@@ -427,7 +429,7 @@ msgstr ""
 
 #: app/models/task.py:220
 msgid "UUID"
-msgstr "UUID"
+msgstr ""
 
 #: app/models/task.py:221
 msgid "Project that this task belongs to"
@@ -455,7 +457,7 @@ msgstr ""
 
 #: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
-msgstr ""
+msgstr "프로세싱 노드"
 
 #: app/models/task.py:225
 msgid ""
@@ -473,7 +475,7 @@ msgstr ""
 
 #: app/models/task.py:226
 msgid "Status"
-msgstr "Статус"
+msgstr "상태"
 
 #: app/models/task.py:227
 msgid "The last processing error received"
@@ -535,7 +537,7 @@ msgstr ""
 
 #: app/models/task.py:240
 msgid "Public"
-msgstr ""
+msgstr "공용"
 
 #: app/models/task.py:241
 msgid ""
@@ -601,11 +603,11 @@ msgstr ""
 
 #: app/models/task.py:257
 msgid "Partial"
-msgstr ""
+msgstr "부분적"
 
 #: app/models/task.py:261
 msgid "Tasks"
-msgstr "Задачи"
+msgstr "작업"
 
 #: app/models/task.py:270
 msgid "unnamed"
@@ -635,7 +637,7 @@ msgstr ""
 
 #: app/models/task.py:748
 msgid "Done!"
-msgstr "Готово!"
+msgstr "완료!"
 
 #: app/models/theme.py:16
 msgid "Name of theme"
@@ -647,7 +649,7 @@ msgstr ""
 
 #: app/models/theme.py:19
 msgid "Primary"
-msgstr ""
+msgstr "기본"
 
 #: app/models/theme.py:20
 msgid "The main background color, and text color of some buttons."
@@ -655,7 +657,7 @@ msgstr ""
 
 #: app/models/theme.py:20
 msgid "Secondary"
-msgstr ""
+msgstr "보조"
 
 #: app/models/theme.py:21
 msgid "Navigation links."
@@ -711,7 +713,7 @@ msgstr ""
 
 #: app/models/theme.py:30
 msgid "Border"
-msgstr ""
+msgstr "경계"
 
 #: app/models/theme.py:31
 msgid "The background color of panels and some borders."
@@ -719,7 +721,7 @@ msgstr ""
 
 #: app/models/theme.py:31
 msgid "Highlight"
-msgstr ""
+msgstr "강조"
 
 #: app/models/theme.py:33
 msgid "The border color of warning dialogs."
@@ -735,7 +737,7 @@ msgstr ""
 
 #: app/models/theme.py:35
 msgid "Failed"
-msgstr "Ошибка"
+msgstr "실패 됨"
 
 #: app/models/theme.py:36
 msgid "The background color of success notifications."
@@ -743,11 +745,11 @@ msgstr ""
 
 #: app/models/theme.py:36
 msgid "Success"
-msgstr ""
+msgstr "성공"
 
 #: app/templates/app/404.html:6
 msgid "404 Page Not Found"
-msgstr "404 Страница не найдена"
+msgstr "404 페이지를 찾을 수 없음"
 
 #: app/templates/app/404.html:7
 msgid "Are you sure the address is correct?"
@@ -755,7 +757,7 @@ msgstr ""
 
 #: app/templates/app/500.html:5
 msgid "500 Internal Server Error"
-msgstr "500 Внутренняя ошибка сервера"
+msgstr "500 내부 서버 오류"
 
 #: app/templates/app/500.html:6
 msgid "Something happened. The server logs contain more information."
@@ -773,7 +775,7 @@ msgstr ""
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
 msgid "Page not found"
-msgstr "Страница не найдена"
+msgstr "페이지를 찾을 수 없습니다"
 
 #: app/templates/app/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
@@ -789,11 +791,11 @@ msgstr ""
 #: app/templates/app/admin/invalid_setup.html:6
 #: app/templates/app/admin/object_history.html:6
 msgid "Home"
-msgstr ""
+msgstr "집"
 
 #: app/templates/app/admin/500.html:7
 msgid "Server error"
-msgstr "Ошибка сервера"
+msgstr "서버 오류"
 
 #: app/templates/app/admin/500.html:11
 msgid "Server error (500)"
@@ -815,7 +817,7 @@ msgstr ""
 
 #: app/templates/app/admin/actions.html:4
 msgid "Go"
-msgstr "Поехали"
+msgstr "실행"
 
 #: app/templates/app/admin/actions.html:10
 msgid "Click here to select the objects across all pages"
@@ -828,7 +830,7 @@ msgstr ""
 
 #: app/templates/app/admin/actions.html:12
 msgid "Clear selection"
-msgstr ""
+msgstr "선택 항목 지우기"
 
 #: app/templates/app/admin/auth/user/add_form.html:6
 msgid ""
@@ -838,26 +840,26 @@ msgstr ""
 
 #: app/templates/app/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "사용자명과 암호를 입력하세요."
 
 #: app/templates/app/admin/auth/user/change_password.html:17
 #: app/templates/app/admin/auth/user/change_password.html:54
 msgid "Change password"
-msgstr "Изменить пароль"
+msgstr "비밀번호 변경"
 
 #: app/templates/app/admin/auth/user/change_password.html:27
 #: app/templates/app/admin/change_form.html:47
 #: app/templates/app/admin/change_list.html:58
 #: app/templates/app/admin/login.html:21
 msgid "Please correct the error below."
-msgstr ""
+msgstr "아래의 오류를 확인하십시오."
 
 #: app/templates/app/admin/auth/user/change_password.html:27
 #: app/templates/app/admin/change_form.html:47
 #: app/templates/app/admin/change_list.html:58
 #: app/templates/app/admin/login.html:21
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "아래의 오류를 확인하십시오."
 
 #: app/templates/app/admin/auth/user/change_password.html:31
 #, python-format
@@ -881,7 +883,7 @@ msgstr ""
 #: app/templates/app/admin/change_form.html:33
 #: app/templates/app/admin/object_history.html:10
 msgid "History"
-msgstr "История"
+msgstr "최근 기록"
 
 #: app/templates/app/admin/change_form.html:35
 #: app/templates/app/admin/edit_inline/stacked.html:14
@@ -891,7 +893,7 @@ msgstr ""
 
 #: app/templates/app/admin/change_list.html:69
 msgid "Filter"
-msgstr ""
+msgstr "필터"
 
 #: app/templates/app/admin/change_list_plugin.html:24
 msgid "Load Plugin (.zip)"
@@ -919,7 +921,7 @@ msgstr ""
 #: app/templates/app/admin/submit_line.html:6
 #: app/templates/app/processing_node.html:54
 msgid "Delete"
-msgstr "Удалить"
+msgstr "삭제"
 
 #: app/templates/app/admin/delete_confirmation.html:23
 #, python-format
@@ -946,7 +948,7 @@ msgstr ""
 #: app/templates/app/admin/delete_confirmation.html:39
 #: app/templates/app/admin/delete_selected_confirmation.html:38
 msgid "Objects"
-msgstr "Объекты"
+msgstr "객체"
 
 #: app/templates/app/admin/delete_confirmation.html:46
 #: app/templates/app/admin/delete_selected_confirmation.html:49
@@ -989,11 +991,11 @@ msgstr ""
 #: app/templates/app/admin/index.html:37
 #: app/templates/app/admin/related_widget_wrapper.html:9
 msgid "Change"
-msgstr "Изменить"
+msgstr "변경"
 
 #: app/templates/app/admin/edit_inline/tabular.html:20
 msgid "Delete?"
-msgstr "Удалить?"
+msgstr "삭제?"
 
 #: app/templates/app/admin/filter.html:2
 #, python-format
@@ -1002,37 +1004,37 @@ msgstr ""
 
 #: app/templates/app/admin/includes/object_delete_summary.html:2
 msgid "Summary"
-msgstr "Итого"
+msgstr "요약"
 
 #: app/templates/app/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "%(name)s 응용 프로그램의 모델"
 
 #: app/templates/app/admin/index.html:31
 #: app/templates/app/admin/related_widget_wrapper.html:16
 msgid "Add"
-msgstr "Добавить"
+msgstr "추가"
 
 #: app/templates/app/admin/index.html:47
 msgid "You don't have permission to edit anything."
-msgstr ""
+msgstr "아무 것도 수정할 수있는 권한이 없습니다."
 
 #: app/templates/app/admin/index.html:55
 msgid "Recent actions"
-msgstr ""
+msgstr "최근 작업"
 
 #: app/templates/app/admin/index.html:56
 msgid "My actions"
-msgstr ""
+msgstr "내 행동"
 
 #: app/templates/app/admin/index.html:60
 msgid "None available"
-msgstr ""
+msgstr "사용 가능한 스크립트가 없음"
 
 #: app/templates/app/admin/index.html:74
 msgid "Unknown content"
-msgstr ""
+msgstr "알 수없는 콘텐츠"
 
 #: app/templates/app/admin/invalid_setup.html:12
 msgid ""
@@ -1054,15 +1056,15 @@ msgstr ""
 
 #: app/templates/app/admin/login.html:61
 msgid "Log in"
-msgstr ""
+msgstr "로그인"
 
 #: app/templates/app/admin/object_history.html:22
 msgid "Date/time"
-msgstr "Дата и время"
+msgstr "날짜/시간"
 
 #: app/templates/app/admin/object_history.html:24
 msgid "Action"
-msgstr "Действие"
+msgstr "활동"
 
 #: app/templates/app/admin/object_history.html:38
 msgid ""
@@ -1073,12 +1075,12 @@ msgstr ""
 #: app/templates/app/admin/pagination.html:10
 #: app/templates/app/admin/search_form.html:9
 msgid "Show all"
-msgstr "Показать все"
+msgstr "모두 표시"
 
 #: app/templates/app/admin/pagination.html:11
 #: app/templates/app/admin/submit_line.html:3
 msgid "Save"
-msgstr "Сохранить"
+msgstr "저장"
 
 #: app/templates/app/admin/popup_response.html:3
 msgid "Popup closing..."
@@ -1101,15 +1103,13 @@ msgstr ""
 
 #: app/templates/app/admin/search_form.html:7
 msgid "Search"
-msgstr "Поиск"
+msgstr "검색"
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1131,7 +1131,7 @@ msgstr ""
 #: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
 msgid "Welcome!"
-msgstr "Добро пожаловать!"
+msgstr "환영합니다!"
 
 #: app/templates/app/dashboard.html:16
 msgid "Add a Processing Node"
@@ -1147,7 +1147,7 @@ msgstr ""
 
 #: app/templates/app/dashboard.html:28
 msgid "Select Images and GCP"
-msgstr ""
+msgstr "이미지와 GCP를 선택"
 
 #: app/templates/app/dashboard.html:30
 #, python-format
@@ -1180,11 +1180,11 @@ msgstr ""
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
 #: app/views/dev.py:83
 msgid "Developer Tools"
-msgstr "Инструменты разработчика"
+msgstr "개발자 도구"
 
 #: app/templates/app/dev_tools.html:9
 msgid "Close"
-msgstr "Закрыть"
+msgstr "닫기"
 
 #: app/templates/app/dev_tools.html:14
 msgid "Current Locale:"
@@ -1211,15 +1211,15 @@ msgstr ""
 #: app/templates/app/logged_in_base.html:15
 #, python-format
 msgid "Hello, %(user)s!"
-msgstr ""
+msgstr "안녕하세요, %(user)s!"
 
 #: app/templates/app/logged_in_base.html:19
 msgid "Logout"
-msgstr "Выйти"
+msgstr "로그아웃"
 
 #: app/templates/app/logged_in_base.html:33 app/views/app.py:46
 msgid "Dashboard"
-msgstr "Панель управления"
+msgstr "계기판"
 
 #: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
 msgid "Processing Nodes"
@@ -1227,76 +1227,76 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:69
 msgid "Add New"
-msgstr ""
+msgstr "새로 추가"
 
 #: app/templates/app/logged_in_base.html:79
 msgid "Administration"
-msgstr ""
+msgstr "관리"
 
 #: app/templates/app/logged_in_base.html:84
 msgid "Accounts"
-msgstr "Аккаунты"
+msgstr "계정"
 
 #: app/templates/app/logged_in_base.html:87
 msgid "Groups"
-msgstr "Группы"
+msgstr "그룹"
 
 #: app/templates/app/logged_in_base.html:92
 msgid "Brand"
-msgstr ""
+msgstr "브랜드"
 
 #: app/templates/app/logged_in_base.html:114 app/views/app.py:103
 msgid "About"
-msgstr ""
+msgstr "소개"
 
 #: app/templates/app/processing_node.html:11 nodeodm/models.py:23
 msgid "Hostname"
-msgstr ""
+msgstr "호스트 이름"
 
 #: app/templates/app/processing_node.html:15 nodeodm/models.py:24
 msgid "Port"
-msgstr "Порт"
+msgstr "포트 번호"
 
 #: app/templates/app/processing_node.html:19 nodeodm/models.py:25
 msgid "API Version"
-msgstr ""
+msgstr "API 버전"
 
 #: app/templates/app/processing_node.html:23 nodeodm/models.py:33
 msgid "Engine"
-msgstr "Ядро"
+msgstr "엔진"
 
 #: app/templates/app/processing_node.html:27 nodeodm/models.py:31
 msgid "Engine Version"
-msgstr ""
+msgstr "엔진 버전"
 
 #: app/templates/app/processing_node.html:31 nodeodm/models.py:27
 msgid "Queue Count"
-msgstr ""
+msgstr "대기열 개수"
 
 #: app/templates/app/processing_node.html:35
 msgid "Max Images Limit"
-msgstr ""
+msgstr "최대 이미지 개수 제한"
 
 #: app/templates/app/processing_node.html:39 nodeodm/models.py:32
 msgid "Label"
-msgstr ""
+msgstr "레이블"
 
 #: app/templates/app/processing_node.html:43 nodeodm/models.py:26
 msgid "Last Refreshed"
-msgstr ""
+msgstr "마지막 새로고침"
 
 #: app/templates/app/processing_node.html:44
 msgctxt "5 minutes ago"
 msgid "ago"
-msgstr ""
+msgstr "전에"
 
 #: app/templates/app/processing_node.html:47
 msgid "Options (JSON)"
-msgstr ""
+msgstr "옵션 (JSON)"
 
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
-msgstr "Редактировать"
+msgstr "편집"
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"
@@ -1304,7 +1304,7 @@ msgstr ""
 
 #: app/templates/app/welcome.html:237
 msgid "Create Account"
-msgstr "Создать аккаунт"
+msgstr "계정 생성"
 
 #: app/translations/plugin_manifest_autogenerated.py:4
 msgid "Compute volume, area and length measurements on Leaflet"
@@ -1363,7 +1363,7 @@ msgstr ""
 
 #: app/views/app.py:54 app/views/public.py:26
 msgid "Map"
-msgstr "Карта"
+msgstr "지도"
 
 #: app/views/app.py:81
 msgid "3D Model Display"
@@ -1371,7 +1371,7 @@ msgstr ""
 
 #: app/views/app.py:147
 msgid "Welcome"
-msgstr "Добро пожаловать"
+msgstr "환영 합니다"
 
 #: app/views/dev.py:59
 msgid "Cannot find locale/ folder in .zip archive"
@@ -1425,7 +1425,7 @@ msgstr ""
 
 #: nodeodm/models.py:29
 msgid "Token"
-msgstr "Токен"
+msgstr ""
 
 #: nodeodm/models.py:29
 msgid ""
@@ -1473,62 +1473,62 @@ msgstr ""
 
 #: plugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
-msgstr "Диагностика"
+msgstr "진단용"
 
 #: plugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
-msgstr ""
+msgstr "진단용 정보"
 
 #: plugins/diagnostic/templates/diagnostic.html:10
 msgid "Storage Space"
-msgstr ""
+msgstr "저장소 공간"
 
 #: plugins/diagnostic/templates/diagnostic.html:14
 #: plugins/diagnostic/templates/diagnostic.html:40
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
-msgstr ""
+msgstr "여유"
 
 #: plugins/diagnostic/templates/diagnostic.html:15
 #: plugins/diagnostic/templates/diagnostic.html:39
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
-msgstr "Используется"
+msgstr "사용 됨"
 
 #: plugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
-msgstr "Итого"
+msgstr "전체"
 
 #: plugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
-msgstr "Память"
+msgstr "메모리"
 
 #: plugins/diagnostic/templates/diagnostic.html:24
 #: plugins/diagnostic/templates/diagnostic.html:75
 #: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Free"
-msgstr ""
+msgstr "여유"
 
 #: plugins/diagnostic/templates/diagnostic.html:25
 #: plugins/diagnostic/templates/diagnostic.html:74
 #: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Used"
-msgstr ""
+msgstr "사용 됨"
 
 #: plugins/diagnostic/templates/diagnostic.html:26
 msgctxt "Megabytes of memory space"
 msgid "Total"
-msgstr ""
+msgstr "전체"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
-msgstr "Заметки!"
+msgstr "주의!"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 #, python-format
@@ -1542,11 +1542,11 @@ msgstr ""
 #: plugins/diagnostic/templates/diagnostic.html:47
 #: plugins/diagnostic/templates/diagnostic.html:82
 msgid "Disk Space"
-msgstr ""
+msgstr "디스크 공간"
 
 #: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
 msgid "Lightning Network"
-msgstr ""
+msgstr "라이트닝 네트워크"
 
 #: plugins/measure/api.py:27
 msgid ""
@@ -1557,4 +1557,4 @@ msgstr ""
 
 #: plugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
-msgstr ""
+msgstr "GCP 인터페이스"

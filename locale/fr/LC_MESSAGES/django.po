@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-24 01:30+0000\n"
+"POT-Creation-Date: 2021-01-15 15:19+0000\n"
 "PO-Revision-Date: 2020-12-23 16:28+0000\n"
 "Last-Translator: Nathan <bonnemainsnathan@gmail.com>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/webodm/webodm/fr/"
@@ -205,7 +205,7 @@ msgstr ""
 msgid "Task this image belongs to"
 msgstr "La tâche à laquelle cette image appartient"
 
-#: app/models/image_upload.py:10 app/models/task.py:259
+#: app/models/image_upload.py:10 app/models/task.py:260
 msgid "Task"
 msgstr "Tâche"
 
@@ -230,7 +230,7 @@ msgid "Plugin name"
 msgstr "Nom de l'extension"
 
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
-#: app/models/task.py:221 app/models/theme.py:16
+#: app/models/task.py:222 app/models/theme.py:16
 msgid "Name"
 msgstr "Nom"
 
@@ -310,15 +310,15 @@ msgstr ""
 "Options qui définissent ce préréglage (même format que dans les options "
 "d'une tâche)."
 
-#: app/models/preset.py:11 app/models/task.py:227
+#: app/models/preset.py:11 app/models/task.py:228
 msgid "Options"
 msgstr "Options"
 
-#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Creation date"
 msgstr "Date de création"
 
-#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Created at"
 msgstr "Créé le"
 
@@ -368,7 +368,7 @@ msgstr ""
 msgid "Deleting"
 msgstr "Suppression"
 
-#: app/models/project.py:56 app/models/task.py:220
+#: app/models/project.py:56 app/models/task.py:221
 msgid "Project"
 msgstr "Projet"
 
@@ -425,27 +425,27 @@ msgstr "Application"
 msgid "Settings"
 msgstr "Paramètres"
 
-#: app/models/task.py:217
+#: app/models/task.py:218
 msgid "Id"
 msgstr "Identifiant"
 
-#: app/models/task.py:219
+#: app/models/task.py:220
 msgid "Identifier of the task (as returned by NodeODM API)"
 msgstr "Identifiant de la tâche (tel que retourné par l'API NodeODM)"
 
-#: app/models/task.py:219
+#: app/models/task.py:220
 msgid "UUID"
 msgstr "Identifiant unique"
 
-#: app/models/task.py:220
+#: app/models/task.py:221
 msgid "Project that this task belongs to"
 msgstr "Projet auquel appartient cette tâche"
 
-#: app/models/task.py:221
+#: app/models/task.py:222
 msgid "A label for the task"
 msgstr "Un nom pour cette tâche"
 
-#: app/models/task.py:222
+#: app/models/task.py:223
 msgid ""
 "Number of milliseconds that elapsed since the beginning of this task (-1 "
 "indicates that no information is available)"
@@ -453,11 +453,11 @@ msgstr ""
 "Nombre de millisecondes écoulées depuis le début de cette tâche (-1 indique "
 "qu'il n'y a pas d'information disponible)"
 
-#: app/models/task.py:222
+#: app/models/task.py:223
 msgid "Processing Time"
 msgstr "Temps de traitement"
 
-#: app/models/task.py:223
+#: app/models/task.py:224
 msgid ""
 "Processing node assigned to this task (or null if this task has not been "
 "associated yet)"
@@ -465,11 +465,11 @@ msgstr ""
 "Nœud de traitement assigné à cette tâche (ou défini à null si la tâche n'a "
 "pas encore été associée)"
 
-#: app/models/task.py:223 app/views/app.py:113 nodeodm/models.py:36
+#: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
 msgstr "Nœud de traitement"
 
-#: app/models/task.py:224
+#: app/models/task.py:225
 msgid ""
 "A flag indicating whether this task should be automatically assigned a "
 "processing node"
@@ -477,63 +477,63 @@ msgstr ""
 "Un drapeau indiquant si cette tâche doit être automatiquement associée ou "
 "non à un nœud de traitement"
 
-#: app/models/task.py:224
+#: app/models/task.py:225
 msgid "Auto Processing Node"
 msgstr "Nœud de traitement automatique"
 
-#: app/models/task.py:225
+#: app/models/task.py:226
 msgid "Current status of the task"
 msgstr "État actuel de la tâche"
 
-#: app/models/task.py:225
+#: app/models/task.py:226
 msgid "Status"
 msgstr "État"
 
-#: app/models/task.py:226
+#: app/models/task.py:227
 msgid "The last processing error received"
 msgstr "La dernière erreur de traitement reçue"
 
-#: app/models/task.py:226
+#: app/models/task.py:227
 msgid "Last Error"
 msgstr "Dernière erreur"
 
-#: app/models/task.py:227
+#: app/models/task.py:228
 msgid "Options that are being used to process this task"
 msgstr "Options utilisées pour effectuer cette tâche"
 
-#: app/models/task.py:228
+#: app/models/task.py:229
 msgid "List of available assets to download"
 msgstr "Liste des ressources disponibles au téléchargement"
 
-#: app/models/task.py:228
+#: app/models/task.py:229
 msgid "Available Assets"
 msgstr "Ressources disponibles"
 
-#: app/models/task.py:229
+#: app/models/task.py:230
 msgid "Console output of the processing node"
 msgstr "Sortie console du nœud de traitement"
 
-#: app/models/task.py:229
+#: app/models/task.py:230
 msgid "Console Output"
 msgstr "Sortie console"
 
-#: app/models/task.py:231
+#: app/models/task.py:232
 msgid "Extent of the orthophoto"
 msgstr "Étendue de l'orthophoto"
 
-#: app/models/task.py:231
+#: app/models/task.py:232
 msgid "Orthophoto Extent"
 msgstr "Étendue de l'orthophoto"
 
-#: app/models/task.py:232
+#: app/models/task.py:233
 msgid "DSM Extent"
 msgstr "Étendue du DSM"
 
-#: app/models/task.py:233
+#: app/models/task.py:234
 msgid "DTM Extent"
 msgstr "Étendue du DTM"
 
-#: app/models/task.py:237
+#: app/models/task.py:238
 msgid ""
 "A requested action to be performed on the task. The selected action will be "
 "performed by the worker at the next iteration."
@@ -541,19 +541,19 @@ msgstr ""
 "Une action demandée à effectuer sur la tâche. L'action sélectionnée sera "
 "exécutée par le processus lors de la prochaine itération."
 
-#: app/models/task.py:237
+#: app/models/task.py:238
 msgid "Pending Action"
 msgstr "Action en attente"
 
-#: app/models/task.py:239
+#: app/models/task.py:240
 msgid "A flag indicating whether this task is available to the public"
 msgstr "Un drapeau indiquant si cette tâche est disponible au public ou non"
 
-#: app/models/task.py:239
+#: app/models/task.py:240
 msgid "Public"
 msgstr "Public"
 
-#: app/models/task.py:240
+#: app/models/task.py:241
 msgid ""
 "When set to a value different than -1, indicates that the images for this "
 "task have been / will be resized to the size specified here before "
@@ -563,11 +563,11 @@ msgstr ""
 "cette tâche ont été / seront redimensionnées à la taille définie ici avant "
 "le traitement."
 
-#: app/models/task.py:240
+#: app/models/task.py:241
 msgid "Resize To"
 msgstr "Redimensionner vers"
 
-#: app/models/task.py:243
+#: app/models/task.py:244
 msgid ""
 "Value between 0 and 1 indicating the upload progress of this task's files to "
 "the processing node"
@@ -575,51 +575,51 @@ msgstr ""
 "Les valeurs entre 0 et 1 indiquent la progression du téléversement des "
 "fichiers de cette tâche vers le nœud de traitement"
 
-#: app/models/task.py:244
+#: app/models/task.py:245
 msgid "Upload Progress"
 msgstr "Progression du téléversement"
 
-#: app/models/task.py:247
+#: app/models/task.py:248
 msgid ""
 "Value between 0 and 1 indicating the resize progress of this task's images"
 msgstr ""
 "Les valeurs entre 0 et 1 indiquent la progression du redimensionnement des "
 "images de cette tâche"
 
-#: app/models/task.py:248
+#: app/models/task.py:249
 msgid "Resize Progress"
 msgstr "Progression du redimensionnement"
 
-#: app/models/task.py:251
+#: app/models/task.py:252
 msgid ""
 "Value between 0 and 1 indicating the running progress (estimated) of this "
 "task"
 msgstr ""
 "Les valeurs entre 0 et 1 indiquent la progression (estimée) de cette tâche"
 
-#: app/models/task.py:252
+#: app/models/task.py:253
 msgid "Running Progress"
 msgstr "Progression de l'exécution"
 
-#: app/models/task.py:254
+#: app/models/task.py:255
 msgid "URL this task is imported from (only for imported tasks)"
 msgstr ""
 "URL à partir de laquelle cette tâche a été importée (uniquement pour les "
 "tâches importées)"
 
-#: app/models/task.py:254
+#: app/models/task.py:255
 msgid "Import URL"
 msgstr "URL d’importation"
 
-#: app/models/task.py:255
+#: app/models/task.py:256
 msgid "Number of images associated with this task"
 msgstr "Nombre d'images associées à cette tâche"
 
-#: app/models/task.py:255
+#: app/models/task.py:256
 msgid "Images Count"
 msgstr "Nombre d'images"
 
-#: app/models/task.py:256
+#: app/models/task.py:257
 msgid ""
 "A flag indicating whether this task is currently waiting for information or "
 "files to be uploaded before being considered for processing."
@@ -628,43 +628,43 @@ msgstr ""
 "d'information des fichiers à téléverser avant d'être considérée pour le "
 "traitement."
 
-#: app/models/task.py:256
+#: app/models/task.py:257
 msgid "Partial"
 msgstr "Partiel"
 
-#: app/models/task.py:260
+#: app/models/task.py:261
 msgid "Tasks"
 msgstr "Tâches"
 
-#: app/models/task.py:269
+#: app/models/task.py:270
 msgid "unnamed"
 msgstr "sans nom"
 
-#: app/models/task.py:372
+#: app/models/task.py:373
 msgid "Importing assets..."
 msgstr "Importation des ressources…"
 
-#: app/models/task.py:411 app/models/task.py:679
+#: app/models/task.py:412 app/models/task.py:680
 msgid "Invalid zip file"
 msgstr "Fichier zip invalide"
 
-#: app/models/task.py:505
+#: app/models/task.py:506
 #, python-format
 msgid "Connection error: %(error)s"
 msgstr "Erreur de connexion : %(error)s"
 
-#: app/models/task.py:585
+#: app/models/task.py:586
 msgid "Cannot restart a task that has no processing node"
 msgstr "Impossible de redémarrer une tâche qui n'a pas de nœud de traitement"
 
-#: app/models/task.py:737
+#: app/models/task.py:738
 #, python-format
 msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
 msgstr ""
 "SRS non pris en charge %(code)s. S’il vous plaît assurez-vous que vous avez "
 "sélectionné un SRS pris en charge."
 
-#: app/models/task.py:747
+#: app/models/task.py:748
 msgid "Done!"
 msgstr "Terminé !"
 
@@ -1257,7 +1257,7 @@ msgstr ""
 "la précision du géoréférencement"
 
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
-#: app/views/dev.py:73
+#: app/views/dev.py:83
 msgid "Developer Tools"
 msgstr "Outils de développement"
 
@@ -1461,15 +1461,15 @@ msgstr "Affichage du modèle 3D"
 msgid "Welcome"
 msgstr "Bienvenue"
 
-#: app/views/dev.py:48
+#: app/views/dev.py:59
 msgid "Cannot find locale/ folder in .zip archive"
 msgstr "Impossible de trouver le fichier/dossier de langue dans l'archive .zip"
 
-#: app/views/dev.py:66
+#: app/views/dev.py:76
 msgid "Translation files reloaded!"
 msgstr "Fichiers de traduction rechargés !"
 
-#: app/views/dev.py:70
+#: app/views/dev.py:80
 msgid "Invalid action"
 msgstr "Action invalide"
 

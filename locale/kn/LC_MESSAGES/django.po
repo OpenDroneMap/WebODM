@@ -7,53 +7,49 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 15:19+0000\n"
-"PO-Revision-Date: 2021-01-12 14:33+0000\n"
-"Last-Translator: Jurijs Jeskins <jurijs.jeshkins@gmail.com>\n"
-"Language-Team: Russian <https://hosted.weblate.org/projects/webodm/webodm/ru/"
+"POT-Creation-Date: 2020-12-24 01:30+0000\n"
+"PO-Revision-Date: 2021-01-15 15:17+0000\n"
+"Last-Translator: Anand Mahesh <manand881@gmail.com>\n"
+"Language-Team: Kannada <https://hosted.weblate.org/projects/webodm/webodm/kn/"
 ">\n"
-"Language: ru\n"
+"Language: kn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 4.4.1-dev\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.5-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
-msgstr "Введите свой CSS"
+msgstr "ಕಸ್ಟಮ್ ಸಿ.ಸ್.ಸ್ ಅನ್ನು ನಮೂದಿಸಿ"
 
 #: app/admin.py:53 app/models/theme.py:38
 msgid "CSS"
-msgstr "CSS"
+msgstr "ಸಿ.ಸ್.ಸ್"
 
 #: app/admin.py:56
 msgid "HTML that will be displayed above site header"
-msgstr "HTML код, который будет показан выше \"шапки\" (хидера) сайта"
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ ಅನ್ನು ಸೈಟ್ ಹೆಡರ್ ಮೇಲೆ ಪ್ರದರ್ಶಿಸಲಾಗುತ್ತದೆ"
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr "HTML (перед заголовком)"
+msgstr ""
 
 #: app/admin.py:60
-#, fuzzy
 msgid "HTML that will be displayed after site header"
-msgstr "HTML код, который будет показан под \"шапкой\" (хидером) сайта"
+msgstr ""
 
 #: app/admin.py:61 app/models/theme.py:40
-#, fuzzy
 msgid "HTML (after header)"
-msgstr "HTML (после заголовка)"
+msgstr ""
 
 #: app/admin.py:64
-#, fuzzy
 msgid "HTML that will be displayed after the body tag"
-msgstr "HTML, который будет отображаться после тега body"
+msgstr ""
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
-msgstr "HTML (после тега body)"
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ (ದೇಹದ ಕೆಳಗೆ)"
 
 #: app/admin.py:68
 #, python-brace-format
@@ -61,36 +57,31 @@ msgid ""
 "HTML that will be displayed in the footer. You can also use the special tags "
 "such as {ORGANIZATION} and {YEAR}."
 msgstr ""
-"HTML который будет показан в футере. Вы также можете использовать "
-"специальные теги по типу {ORGANIZATION} и {YEAR}."
 
 #: app/admin.py:69 app/models/theme.py:42
-#, fuzzy
 msgid "HTML (footer)"
-msgstr "HTML (футер)"
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ (ಫೂಟರ್ )"
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr "Описание"
+msgstr "ವಿವರಣೆ"
 
 #: app/admin.py:106
 msgid "Version"
-msgstr "Версия"
+msgstr "ಆವೃತ್ತಿ"
 
 #: app/admin.py:112
 msgid "Author"
-msgstr "Автор"
+msgstr "ಲೇಖಕ"
 
 #: app/admin.py:233
 msgid "Actions"
-msgstr "Действия"
+msgstr "ಕ್ರಿಯೆಗಳು"
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
 msgstr ""
-"Нормализованый Индекс Разницы Озеленения показывает количество зеленых "
-"насаждений."
 
 #: app/api/formulas.py:20
 msgid ""
@@ -179,11 +170,11 @@ msgstr ""
 
 #: app/api/tasks.py:201
 msgid "No files uploaded"
-msgstr "Нет загруженных файлов"
+msgstr "ಯಾವುದೇ ಫೈಲ್‌ಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿಲ್ಲ"
 
 #: app/api/tasks.py:224
 msgid "Cannot create task, you need at least 2 images"
-msgstr ""
+msgstr "ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ನಿಮಗೆ ಕನಿಷ್ಠ 2 ಚಿತ್ರಗಳು ಬೇಕಾಗುತ್ತವೆ"
 
 #: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
 #: app/api/tasks.py:354
@@ -192,7 +183,7 @@ msgstr ""
 
 #: app/api/tasks.py:370
 msgid "Imported Task"
-msgstr "Импортированная задача"
+msgstr "ಆಮದು ಮಾಡಿದ ಕಾರ್ಯ"
 
 #: app/api/tasks.py:373
 msgid "Cannot create task, you need to upload 1 file"
@@ -206,9 +197,9 @@ msgstr ""
 msgid "Task this image belongs to"
 msgstr ""
 
-#: app/models/image_upload.py:10 app/models/task.py:260
+#: app/models/image_upload.py:10 app/models/task.py:259
 msgid "Task"
-msgstr "Задача"
+msgstr "ಕಾರ್ಯ"
 
 #: app/models/image_upload.py:11
 msgid "File uploaded by a user"
@@ -216,7 +207,7 @@ msgstr ""
 
 #: app/models/image_upload.py:11
 msgid "Image"
-msgstr "Изображение"
+msgstr "ಚಿತ್ರ"
 
 #: app/models/image_upload.py:20
 msgid "Image Upload"
@@ -231,9 +222,9 @@ msgid "Plugin name"
 msgstr ""
 
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
-#: app/models/task.py:222 app/models/theme.py:16
+#: app/models/task.py:221 app/models/theme.py:16
 msgid "Name"
-msgstr "Имя"
+msgstr "ಹೆಸರು"
 
 #: app/models/plugin.py:6
 msgid "Whether this plugin is turned on."
@@ -241,15 +232,15 @@ msgstr ""
 
 #: app/models/plugin.py:6
 msgid "Enabled"
-msgstr "Включено"
+msgstr "ಸಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ"
 
 #: app/models/plugin.py:20
 msgid "Plugin"
-msgstr "Плагин"
+msgstr ""
 
 #: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
 msgid "Plugins"
-msgstr "Плагины"
+msgstr ""
 
 #: app/models/plugin_datum.py:7
 msgid "Setting key"
@@ -257,7 +248,7 @@ msgstr ""
 
 #: app/models/plugin_datum.py:7
 msgid "Key"
-msgstr "Ключ"
+msgstr "ಕೀ"
 
 #: app/models/plugin_datum.py:8
 msgid "The user this setting belongs to. If NULL, the setting is global."
@@ -265,11 +256,11 @@ msgstr ""
 
 #: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
 msgid "User"
-msgstr "Пользователь"
+msgstr "ಬಳಕೆದಾರ"
 
 #: app/models/plugin_datum.py:9
 msgid "Integer value"
-msgstr "Целое значение"
+msgstr ""
 
 #: app/models/plugin_datum.py:10
 msgid "Float value"
@@ -281,7 +272,7 @@ msgstr ""
 
 #: app/models/plugin_datum.py:12
 msgid "String value"
-msgstr "Строковое значение"
+msgstr ""
 
 #: app/models/plugin_datum.py:13
 msgid "JSON value"
@@ -297,7 +288,7 @@ msgstr ""
 
 #: app/models/preset.py:9 app/models/project.py:22
 msgid "Owner"
-msgstr "Владелец"
+msgstr "ಒಡೆಯ"
 
 #: app/models/preset.py:10
 msgid "A label used to describe the preset"
@@ -307,17 +298,17 @@ msgstr ""
 msgid "Options that define this preset (same format as in a Task's options)."
 msgstr ""
 
-#: app/models/preset.py:11 app/models/task.py:228
+#: app/models/preset.py:11 app/models/task.py:227
 msgid "Options"
-msgstr "Опции"
+msgstr "ಆಯ್ಕೆಗಳು"
 
-#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
 msgid "Creation date"
-msgstr "Дата создания"
+msgstr ""
 
-#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
 msgid "Created at"
-msgstr "Создано в"
+msgstr ""
 
 #: app/models/preset.py:14
 msgid ""
@@ -327,15 +318,15 @@ msgstr ""
 
 #: app/models/preset.py:14
 msgid "System"
-msgstr ""
+msgstr "ಸಿಸ್ಟಮ್"
 
 #: app/models/preset.py:20
 msgid "Preset"
-msgstr "Пресет"
+msgstr ""
 
 #: app/models/preset.py:21
 msgid "Presets"
-msgstr "Пресеты"
+msgstr ""
 
 #: app/models/project.py:22
 msgid "The person who created the project"
@@ -360,13 +351,13 @@ msgstr ""
 msgid "Deleting"
 msgstr ""
 
-#: app/models/project.py:56 app/models/task.py:221
+#: app/models/project.py:56 app/models/task.py:220
 msgid "Project"
-msgstr "Проект"
+msgstr "ಯೋಜನೆ"
 
 #: app/models/project.py:57
 msgid "Projects"
-msgstr "Проекты"
+msgstr "ಯೋಜನೆಗಳು"
 
 #: app/models/setting.py:20
 msgid "The name of your application"
@@ -390,7 +381,7 @@ msgstr ""
 
 #: app/models/setting.py:31
 msgid "Organization name"
-msgstr "Название организации"
+msgstr "ಸಂಸ್ಥೆಯ ಹೆಸರು"
 
 #: app/models/setting.py:32
 msgid "The website URL of your organization"
@@ -398,12 +389,12 @@ msgstr ""
 
 #: app/models/setting.py:32
 msgid "Organization website"
-msgstr "Веб-сайт организации"
+msgstr ""
 
 #: app/models/setting.py:33 app/models/theme.py:48 app/models/theme.py:49
 #: app/templates/app/logged_in_base.html:95
 msgid "Theme"
-msgstr "Тема"
+msgstr ""
 
 #: app/models/setting.py:34
 msgid "Active theme"
@@ -411,231 +402,231 @@ msgstr ""
 
 #: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
 msgid "Application"
-msgstr "Приложение"
+msgstr "ಅಪ್ಲಿಕೇಶನ್"
 
 #: app/models/setting.py:76 app/models/setting.py:77
 msgid "Settings"
-msgstr "Настройки"
+msgstr ""
 
-#: app/models/task.py:218
+#: app/models/task.py:217
 msgid "Id"
-msgstr "ID"
+msgstr "ಐಡಿ"
 
-#: app/models/task.py:220
+#: app/models/task.py:219
 msgid "Identifier of the task (as returned by NodeODM API)"
 msgstr ""
 
-#: app/models/task.py:220
+#: app/models/task.py:219
 msgid "UUID"
-msgstr "UUID"
+msgstr ""
 
-#: app/models/task.py:221
+#: app/models/task.py:220
 msgid "Project that this task belongs to"
 msgstr ""
 
-#: app/models/task.py:222
+#: app/models/task.py:221
 msgid "A label for the task"
 msgstr ""
 
-#: app/models/task.py:223
+#: app/models/task.py:222
 msgid ""
 "Number of milliseconds that elapsed since the beginning of this task (-1 "
 "indicates that no information is available)"
 msgstr ""
 
-#: app/models/task.py:223
+#: app/models/task.py:222
 msgid "Processing Time"
 msgstr ""
 
-#: app/models/task.py:224
+#: app/models/task.py:223
 msgid ""
 "Processing node assigned to this task (or null if this task has not been "
 "associated yet)"
 msgstr ""
 
-#: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
+#: app/models/task.py:223 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
 msgstr ""
 
-#: app/models/task.py:225
+#: app/models/task.py:224
 msgid ""
 "A flag indicating whether this task should be automatically assigned a "
 "processing node"
 msgstr ""
 
-#: app/models/task.py:225
+#: app/models/task.py:224
 msgid "Auto Processing Node"
 msgstr ""
 
-#: app/models/task.py:226
+#: app/models/task.py:225
 msgid "Current status of the task"
 msgstr ""
 
-#: app/models/task.py:226
+#: app/models/task.py:225
 msgid "Status"
-msgstr "Статус"
+msgstr ""
 
-#: app/models/task.py:227
+#: app/models/task.py:226
 msgid "The last processing error received"
 msgstr ""
 
-#: app/models/task.py:227
+#: app/models/task.py:226
 msgid "Last Error"
-msgstr ""
+msgstr "ಹಿಂದಿನ ತಪ್ಪು"
 
-#: app/models/task.py:228
+#: app/models/task.py:227
 msgid "Options that are being used to process this task"
 msgstr ""
 
-#: app/models/task.py:229
+#: app/models/task.py:228
 msgid "List of available assets to download"
 msgstr ""
 
-#: app/models/task.py:229
+#: app/models/task.py:228
 msgid "Available Assets"
 msgstr ""
 
-#: app/models/task.py:230
+#: app/models/task.py:229
 msgid "Console output of the processing node"
 msgstr ""
 
-#: app/models/task.py:230
+#: app/models/task.py:229
 msgid "Console Output"
 msgstr ""
 
-#: app/models/task.py:232
+#: app/models/task.py:231
 msgid "Extent of the orthophoto"
 msgstr ""
 
-#: app/models/task.py:232
+#: app/models/task.py:231
 msgid "Orthophoto Extent"
 msgstr ""
 
-#: app/models/task.py:233
+#: app/models/task.py:232
 msgid "DSM Extent"
 msgstr ""
 
-#: app/models/task.py:234
+#: app/models/task.py:233
 msgid "DTM Extent"
 msgstr ""
 
-#: app/models/task.py:238
+#: app/models/task.py:237
 msgid ""
 "A requested action to be performed on the task. The selected action will be "
 "performed by the worker at the next iteration."
 msgstr ""
 
-#: app/models/task.py:238
+#: app/models/task.py:237
 msgid "Pending Action"
-msgstr ""
+msgstr "ಬಾಕಿ ಉಳಿದಿರುವ ಕ್ರಮಗಳು"
 
-#: app/models/task.py:240
+#: app/models/task.py:239
 msgid "A flag indicating whether this task is available to the public"
 msgstr ""
 
-#: app/models/task.py:240
+#: app/models/task.py:239
 msgid "Public"
-msgstr ""
+msgstr "ಸಾರ್ವಜನಿಕ"
 
-#: app/models/task.py:241
+#: app/models/task.py:240
 msgid ""
 "When set to a value different than -1, indicates that the images for this "
 "task have been / will be resized to the size specified here before "
 "processing."
 msgstr ""
 
-#: app/models/task.py:241
+#: app/models/task.py:240
 msgid "Resize To"
 msgstr ""
 
-#: app/models/task.py:244
+#: app/models/task.py:243
 msgid ""
 "Value between 0 and 1 indicating the upload progress of this task's files to "
 "the processing node"
 msgstr ""
 
-#: app/models/task.py:245
+#: app/models/task.py:244
 msgid "Upload Progress"
 msgstr ""
 
-#: app/models/task.py:248
+#: app/models/task.py:247
 msgid ""
 "Value between 0 and 1 indicating the resize progress of this task's images"
 msgstr ""
 
-#: app/models/task.py:249
+#: app/models/task.py:248
 msgid "Resize Progress"
 msgstr ""
 
-#: app/models/task.py:252
+#: app/models/task.py:251
 msgid ""
 "Value between 0 and 1 indicating the running progress (estimated) of this "
 "task"
 msgstr ""
 
-#: app/models/task.py:253
+#: app/models/task.py:252
 msgid "Running Progress"
 msgstr ""
 
-#: app/models/task.py:255
+#: app/models/task.py:254
 msgid "URL this task is imported from (only for imported tasks)"
 msgstr ""
 
-#: app/models/task.py:255
+#: app/models/task.py:254
 msgid "Import URL"
 msgstr ""
 
-#: app/models/task.py:256
+#: app/models/task.py:255
 msgid "Number of images associated with this task"
 msgstr ""
 
-#: app/models/task.py:256
+#: app/models/task.py:255
 msgid "Images Count"
 msgstr ""
 
-#: app/models/task.py:257
+#: app/models/task.py:256
 msgid ""
 "A flag indicating whether this task is currently waiting for information or "
 "files to be uploaded before being considered for processing."
 msgstr ""
 
-#: app/models/task.py:257
+#: app/models/task.py:256
 msgid "Partial"
 msgstr ""
 
-#: app/models/task.py:261
+#: app/models/task.py:260
 msgid "Tasks"
-msgstr "Задачи"
+msgstr "ಕಾರ್ಯಗಳು"
 
-#: app/models/task.py:270
+#: app/models/task.py:269
 msgid "unnamed"
 msgstr ""
 
-#: app/models/task.py:373
+#: app/models/task.py:372
 msgid "Importing assets..."
 msgstr ""
 
-#: app/models/task.py:412 app/models/task.py:680
+#: app/models/task.py:411 app/models/task.py:679
 msgid "Invalid zip file"
 msgstr ""
 
-#: app/models/task.py:506
+#: app/models/task.py:505
 #, python-format
 msgid "Connection error: %(error)s"
 msgstr ""
 
-#: app/models/task.py:586
+#: app/models/task.py:585
 msgid "Cannot restart a task that has no processing node"
 msgstr ""
 
-#: app/models/task.py:738
+#: app/models/task.py:737
 #, python-format
 msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
 msgstr ""
 
-#: app/models/task.py:748
+#: app/models/task.py:747
 msgid "Done!"
-msgstr "Готово!"
+msgstr ""
 
 #: app/models/theme.py:16
 msgid "Name of theme"
@@ -711,7 +702,7 @@ msgstr ""
 
 #: app/models/theme.py:30
 msgid "Border"
-msgstr ""
+msgstr "ಗಡಿ"
 
 #: app/models/theme.py:31
 msgid "The background color of panels and some borders."
@@ -735,7 +726,7 @@ msgstr ""
 
 #: app/models/theme.py:35
 msgid "Failed"
-msgstr "Ошибка"
+msgstr "ಅಯಶಸ್ವಿಯಾದ"
 
 #: app/models/theme.py:36
 msgid "The background color of success notifications."
@@ -743,11 +734,11 @@ msgstr ""
 
 #: app/models/theme.py:36
 msgid "Success"
-msgstr ""
+msgstr "ಯಶಸ್ಸು"
 
 #: app/templates/app/404.html:6
 msgid "404 Page Not Found"
-msgstr "404 Страница не найдена"
+msgstr ""
 
 #: app/templates/app/404.html:7
 msgid "Are you sure the address is correct?"
@@ -755,7 +746,7 @@ msgstr ""
 
 #: app/templates/app/500.html:5
 msgid "500 Internal Server Error"
-msgstr "500 Внутренняя ошибка сервера"
+msgstr ""
 
 #: app/templates/app/500.html:6
 msgid "Something happened. The server logs contain more information."
@@ -773,7 +764,7 @@ msgstr ""
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
 msgid "Page not found"
-msgstr "Страница не найдена"
+msgstr ""
 
 #: app/templates/app/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
@@ -789,11 +780,11 @@ msgstr ""
 #: app/templates/app/admin/invalid_setup.html:6
 #: app/templates/app/admin/object_history.html:6
 msgid "Home"
-msgstr ""
+msgstr "ಮನೆ"
 
 #: app/templates/app/admin/500.html:7
 msgid "Server error"
-msgstr "Ошибка сервера"
+msgstr ""
 
 #: app/templates/app/admin/500.html:11
 msgid "Server error (500)"
@@ -815,7 +806,7 @@ msgstr ""
 
 #: app/templates/app/admin/actions.html:4
 msgid "Go"
-msgstr "Поехали"
+msgstr "ಹೋಗಿ"
 
 #: app/templates/app/admin/actions.html:10
 msgid "Click here to select the objects across all pages"
@@ -843,7 +834,7 @@ msgstr ""
 #: app/templates/app/admin/auth/user/change_password.html:17
 #: app/templates/app/admin/auth/user/change_password.html:54
 msgid "Change password"
-msgstr "Изменить пароль"
+msgstr ""
 
 #: app/templates/app/admin/auth/user/change_password.html:27
 #: app/templates/app/admin/change_form.html:47
@@ -881,7 +872,7 @@ msgstr ""
 #: app/templates/app/admin/change_form.html:33
 #: app/templates/app/admin/object_history.html:10
 msgid "History"
-msgstr "История"
+msgstr ""
 
 #: app/templates/app/admin/change_form.html:35
 #: app/templates/app/admin/edit_inline/stacked.html:14
@@ -919,7 +910,7 @@ msgstr ""
 #: app/templates/app/admin/submit_line.html:6
 #: app/templates/app/processing_node.html:54
 msgid "Delete"
-msgstr "Удалить"
+msgstr ""
 
 #: app/templates/app/admin/delete_confirmation.html:23
 #, python-format
@@ -946,12 +937,12 @@ msgstr ""
 #: app/templates/app/admin/delete_confirmation.html:39
 #: app/templates/app/admin/delete_selected_confirmation.html:38
 msgid "Objects"
-msgstr "Объекты"
+msgstr ""
 
 #: app/templates/app/admin/delete_confirmation.html:46
 #: app/templates/app/admin/delete_selected_confirmation.html:49
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "ಹೌದು. ನಾನು ನಿಖರವಾಗಿದ್ದೇನೆ"
 
 #: app/templates/app/admin/delete_confirmation.html:47
 #: app/templates/app/admin/delete_selected_confirmation.html:50
@@ -989,11 +980,11 @@ msgstr ""
 #: app/templates/app/admin/index.html:37
 #: app/templates/app/admin/related_widget_wrapper.html:9
 msgid "Change"
-msgstr "Изменить"
+msgstr ""
 
 #: app/templates/app/admin/edit_inline/tabular.html:20
 msgid "Delete?"
-msgstr "Удалить?"
+msgstr ""
 
 #: app/templates/app/admin/filter.html:2
 #, python-format
@@ -1002,7 +993,7 @@ msgstr ""
 
 #: app/templates/app/admin/includes/object_delete_summary.html:2
 msgid "Summary"
-msgstr "Итого"
+msgstr ""
 
 #: app/templates/app/admin/index.html:20
 #, python-format
@@ -1012,7 +1003,7 @@ msgstr ""
 #: app/templates/app/admin/index.html:31
 #: app/templates/app/admin/related_widget_wrapper.html:16
 msgid "Add"
-msgstr "Добавить"
+msgstr ""
 
 #: app/templates/app/admin/index.html:47
 msgid "You don't have permission to edit anything."
@@ -1058,11 +1049,11 @@ msgstr ""
 
 #: app/templates/app/admin/object_history.html:22
 msgid "Date/time"
-msgstr "Дата и время"
+msgstr ""
 
 #: app/templates/app/admin/object_history.html:24
 msgid "Action"
-msgstr "Действие"
+msgstr ""
 
 #: app/templates/app/admin/object_history.html:38
 msgid ""
@@ -1073,12 +1064,12 @@ msgstr ""
 #: app/templates/app/admin/pagination.html:10
 #: app/templates/app/admin/search_form.html:9
 msgid "Show all"
-msgstr "Показать все"
+msgstr ""
 
 #: app/templates/app/admin/pagination.html:11
 #: app/templates/app/admin/submit_line.html:3
 msgid "Save"
-msgstr "Сохранить"
+msgstr ""
 
 #: app/templates/app/admin/popup_response.html:3
 msgid "Popup closing..."
@@ -1101,7 +1092,7 @@ msgstr ""
 
 #: app/templates/app/admin/search_form.html:7
 msgid "Search"
-msgstr "Поиск"
+msgstr ""
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1109,7 +1100,6 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1131,7 +1121,7 @@ msgstr ""
 #: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
 msgid "Welcome!"
-msgstr "Добро пожаловать!"
+msgstr ""
 
 #: app/templates/app/dashboard.html:16
 msgid "Add a Processing Node"
@@ -1178,13 +1168,13 @@ msgid ""
 msgstr ""
 
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
-#: app/views/dev.py:83
+#: app/views/dev.py:73
 msgid "Developer Tools"
-msgstr "Инструменты разработчика"
+msgstr ""
 
 #: app/templates/app/dev_tools.html:9
 msgid "Close"
-msgstr "Закрыть"
+msgstr ""
 
 #: app/templates/app/dev_tools.html:14
 msgid "Current Locale:"
@@ -1215,11 +1205,11 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:19
 msgid "Logout"
-msgstr "Выйти"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:33 app/views/app.py:46
 msgid "Dashboard"
-msgstr "Панель управления"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
 msgid "Processing Nodes"
@@ -1235,11 +1225,11 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:84
 msgid "Accounts"
-msgstr "Аккаунты"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:87
 msgid "Groups"
-msgstr "Группы"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:92
 msgid "Brand"
@@ -1255,7 +1245,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:15 nodeodm/models.py:24
 msgid "Port"
-msgstr "Порт"
+msgstr ""
 
 #: app/templates/app/processing_node.html:19 nodeodm/models.py:25
 msgid "API Version"
@@ -1263,7 +1253,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:23 nodeodm/models.py:33
 msgid "Engine"
-msgstr "Ядро"
+msgstr ""
 
 #: app/templates/app/processing_node.html:27 nodeodm/models.py:31
 msgid "Engine Version"
@@ -1296,7 +1286,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
-msgstr "Редактировать"
+msgstr ""
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"
@@ -1304,7 +1294,7 @@ msgstr ""
 
 #: app/templates/app/welcome.html:237
 msgid "Create Account"
-msgstr "Создать аккаунт"
+msgstr ""
 
 #: app/translations/plugin_manifest_autogenerated.py:4
 msgid "Compute volume, area and length measurements on Leaflet"
@@ -1363,7 +1353,7 @@ msgstr ""
 
 #: app/views/app.py:54 app/views/public.py:26
 msgid "Map"
-msgstr "Карта"
+msgstr ""
 
 #: app/views/app.py:81
 msgid "3D Model Display"
@@ -1371,17 +1361,17 @@ msgstr ""
 
 #: app/views/app.py:147
 msgid "Welcome"
-msgstr "Добро пожаловать"
+msgstr ""
 
-#: app/views/dev.py:59
+#: app/views/dev.py:48
 msgid "Cannot find locale/ folder in .zip archive"
 msgstr ""
 
-#: app/views/dev.py:76
+#: app/views/dev.py:66
 msgid "Translation files reloaded!"
 msgstr ""
 
-#: app/views/dev.py:80
+#: app/views/dev.py:70
 msgid "Invalid action"
 msgstr ""
 
@@ -1425,7 +1415,7 @@ msgstr ""
 
 #: nodeodm/models.py:29
 msgid "Token"
-msgstr "Токен"
+msgstr ""
 
 #: nodeodm/models.py:29
 msgid ""
@@ -1473,7 +1463,7 @@ msgstr ""
 
 #: plugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
-msgstr "Диагностика"
+msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
@@ -1488,47 +1478,47 @@ msgstr ""
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
-msgstr ""
+msgstr "ಉಚಿತ"
 
 #: plugins/diagnostic/templates/diagnostic.html:15
 #: plugins/diagnostic/templates/diagnostic.html:39
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
-msgstr "Используется"
+msgstr "ಬಳಸಿದ"
 
 #: plugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
-msgstr "Итого"
+msgstr "ಒಟ್ಟು"
 
 #: plugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
-msgstr "Память"
+msgstr "ಮೆಮೊರಿ"
 
 #: plugins/diagnostic/templates/diagnostic.html:24
 #: plugins/diagnostic/templates/diagnostic.html:75
 #: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Free"
-msgstr ""
+msgstr "ಉಚಿತ"
 
 #: plugins/diagnostic/templates/diagnostic.html:25
 #: plugins/diagnostic/templates/diagnostic.html:74
 #: plugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Used"
-msgstr ""
+msgstr "ಬಳಸಿದ"
 
 #: plugins/diagnostic/templates/diagnostic.html:26
 msgctxt "Megabytes of memory space"
 msgid "Total"
-msgstr ""
+msgstr "ಒಟ್ಟು"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
-msgstr "Заметки!"
+msgstr "ಸೂಚನೆ!"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 #, python-format
@@ -1546,7 +1536,7 @@ msgstr ""
 
 #: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
 msgid "Lightning Network"
-msgstr ""
+msgstr "ಲೈಟನಿಂಗ್ ನೆಟ್ವರ್ಕ್"
 
 #: plugins/measure/api.py:27
 msgid ""
@@ -1557,4 +1547,4 @@ msgstr ""
 
 #: plugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
-msgstr ""
+msgstr "ಜಿ.ಸಿ.ಪಿ ಇಂಟರ್ಫೇಸ್"
