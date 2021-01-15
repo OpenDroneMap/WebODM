@@ -194,6 +194,7 @@ class Task(models.Model):
             },
             'cameras.json': 'cameras.json',
             'shots.geojson': os.path.join('odm_report', 'shots.geojson'),
+            'report.pdf': os.path.join('odm_report', 'report.pdf'),
     }
 
     STATUS_CODES = (

@@ -8,21 +8,20 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 15:19+0000\n"
-"PO-Revision-Date: 2021-01-12 14:33+0000\n"
-"Last-Translator: Jurijs Jeskins <jurijs.jeshkins@gmail.com>\n"
-"Language-Team: Russian <https://hosted.weblate.org/projects/webodm/webodm/ru/"
-">\n"
-"Language: ru\n"
+"PO-Revision-Date: 2021-01-02 05:00+0000\n"
+"Last-Translator: Yu-Huang Wang <yuhuangwang@gmail.com>\n"
+"Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
+"webodm/webodm/zh_Hant/>\n"
+"Language: zh_Hant\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.4.1-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
-msgstr "Введите свой CSS"
+msgstr "輸入自訂CSS"
 
 #: app/admin.py:53 app/models/theme.py:38
 msgid "CSS"
@@ -30,30 +29,27 @@ msgstr "CSS"
 
 #: app/admin.py:56
 msgid "HTML that will be displayed above site header"
-msgstr "HTML код, который будет показан выше \"шапки\" (хидера) сайта"
+msgstr "網站標題以上顯示的HTML"
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr "HTML (перед заголовком)"
+msgstr "HTML (在標題之前)"
 
 #: app/admin.py:60
-#, fuzzy
 msgid "HTML that will be displayed after site header"
-msgstr "HTML код, который будет показан под \"шапкой\" (хидером) сайта"
+msgstr "網站標題之後顯示的HTML"
 
 #: app/admin.py:61 app/models/theme.py:40
-#, fuzzy
 msgid "HTML (after header)"
-msgstr "HTML (после заголовка)"
+msgstr "HTML (在標題之後)"
 
 #: app/admin.py:64
-#, fuzzy
 msgid "HTML that will be displayed after the body tag"
-msgstr "HTML, который будет отображаться после тега body"
+msgstr "顯示網頁內文的HTML"
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
-msgstr "HTML (после тега body)"
+msgstr "HTML (內文標籤之後)"
 
 #: app/admin.py:68
 #, python-brace-format
@@ -61,89 +57,88 @@ msgid ""
 "HTML that will be displayed in the footer. You can also use the special tags "
 "such as {ORGANIZATION} and {YEAR}."
 msgstr ""
-"HTML который будет показан в футере. Вы также можете использовать "
-"специальные теги по типу {ORGANIZATION} и {YEAR}."
+"在網頁註腳中顯示的HTML。 您還可以使用特殊標籤，例如{ORGANIZATION}和{YEAR}。"
 
 #: app/admin.py:69 app/models/theme.py:42
-#, fuzzy
 msgid "HTML (footer)"
-msgstr "HTML (футер)"
+msgstr "HTML (網頁註腳)"
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr "Описание"
+msgstr "描述"
 
 #: app/admin.py:106
 msgid "Version"
-msgstr "Версия"
+msgstr "版本"
 
 #: app/admin.py:112
 msgid "Author"
-msgstr "Автор"
+msgstr "作者"
 
 #: app/admin.py:233
 msgid "Actions"
-msgstr "Действия"
+msgstr "動作"
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
-msgstr ""
-"Нормализованый Индекс Разницы Озеленения показывает количество зеленых "
-"насаждений."
+msgstr "常態差值植生指數顯示綠色植被的數量。"
 
 #: app/api/formulas.py:20
 msgid ""
 "Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
 "and Green bands instead of only Red to isolate plant health."
 msgstr ""
+"強化常態差值植生指數(Enhanced NDVI)類似於NDVI，但使用藍色和綠色波段而不是僅使"
+"用紅色波段來區別植物健康。"
 
 #: app/api/formulas.py:24
 msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
-msgstr ""
+msgstr "視覺大氣阻力指數顯示植被面積。"
 
 #: app/api/formulas.py:29
 msgid ""
 "Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
-msgstr ""
+msgstr "過量綠指數強調馬鈴薯等葉類作物的綠色。"
 
 #: app/api/formulas.py:33
 msgid ""
 "Burn Area Index hightlights burned land in the red to near-infrared spectrum."
-msgstr ""
+msgstr "燃燒面積指數以紅光至近紅外光波段來凸顯火災後的土地。"
 
 #: app/api/formulas.py:37
 msgid "Green Leaf Index shows greens leaves and stems."
-msgstr ""
+msgstr "綠葉指數顯示綠葉和莖。"
 
 #: app/api/formulas.py:42
 msgid ""
 "Green Normalized Difference Vegetation Index is similar to NDVI, but "
 "measures the green spectrum instead of red."
-msgstr ""
+msgstr "綠色常態差值植生指數類似於NDVI，但是量測的是綠光波段而非紅光波段。"
 
 #: app/api/formulas.py:46
 msgid ""
 "Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
-msgstr ""
+msgstr "綠色比例植生指數能敏感的反應森林光合作用速率。"
 
 #: app/api/formulas.py:50
 msgid ""
 "Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
 "effects of soil areas using an adjustment factor (0.5)."
 msgstr ""
+"土壤調整植生指數與NDVI相似，但嘗試使用調整因子(0.5)以消除土壤區域的影響。"
 
 #: app/api/formulas.py:54
 msgid ""
 "Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
 "for soil areas."
-msgstr ""
+msgstr "修改後的非線性指數改進了非線性指數算法以顯示土壤區域。"
 
 #: app/api/formulas.py:58
 msgid ""
 "Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
 "more sensitive to vegetation."
-msgstr ""
+msgstr "修改後的簡單比例(MSR)是對簡單比例(SR)指數的改進，使其對植被更加敏感。"
 
 #: app/api/formulas.py:62
 msgid ""
@@ -179,7 +174,7 @@ msgstr ""
 
 #: app/api/tasks.py:201
 msgid "No files uploaded"
-msgstr "Нет загруженных файлов"
+msgstr ""
 
 #: app/api/tasks.py:224
 msgid "Cannot create task, you need at least 2 images"
@@ -192,7 +187,7 @@ msgstr ""
 
 #: app/api/tasks.py:370
 msgid "Imported Task"
-msgstr "Импортированная задача"
+msgstr ""
 
 #: app/api/tasks.py:373
 msgid "Cannot create task, you need to upload 1 file"
@@ -208,7 +203,7 @@ msgstr ""
 
 #: app/models/image_upload.py:10 app/models/task.py:260
 msgid "Task"
-msgstr "Задача"
+msgstr ""
 
 #: app/models/image_upload.py:11
 msgid "File uploaded by a user"
@@ -216,7 +211,7 @@ msgstr ""
 
 #: app/models/image_upload.py:11
 msgid "Image"
-msgstr "Изображение"
+msgstr ""
 
 #: app/models/image_upload.py:20
 msgid "Image Upload"
@@ -233,7 +228,7 @@ msgstr ""
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
 #: app/models/task.py:222 app/models/theme.py:16
 msgid "Name"
-msgstr "Имя"
+msgstr "名稱"
 
 #: app/models/plugin.py:6
 msgid "Whether this plugin is turned on."
@@ -241,15 +236,15 @@ msgstr ""
 
 #: app/models/plugin.py:6
 msgid "Enabled"
-msgstr "Включено"
+msgstr "已啟用"
 
 #: app/models/plugin.py:20
 msgid "Plugin"
-msgstr "Плагин"
+msgstr ""
 
 #: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
 msgid "Plugins"
-msgstr "Плагины"
+msgstr ""
 
 #: app/models/plugin_datum.py:7
 msgid "Setting key"
@@ -257,7 +252,7 @@ msgstr ""
 
 #: app/models/plugin_datum.py:7
 msgid "Key"
-msgstr "Ключ"
+msgstr ""
 
 #: app/models/plugin_datum.py:8
 msgid "The user this setting belongs to. If NULL, the setting is global."
@@ -265,11 +260,11 @@ msgstr ""
 
 #: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
 msgid "User"
-msgstr "Пользователь"
+msgstr ""
 
 #: app/models/plugin_datum.py:9
 msgid "Integer value"
-msgstr "Целое значение"
+msgstr ""
 
 #: app/models/plugin_datum.py:10
 msgid "Float value"
@@ -281,7 +276,7 @@ msgstr ""
 
 #: app/models/plugin_datum.py:12
 msgid "String value"
-msgstr "Строковое значение"
+msgstr ""
 
 #: app/models/plugin_datum.py:13
 msgid "JSON value"
@@ -297,7 +292,7 @@ msgstr ""
 
 #: app/models/preset.py:9 app/models/project.py:22
 msgid "Owner"
-msgstr "Владелец"
+msgstr ""
 
 #: app/models/preset.py:10
 msgid "A label used to describe the preset"
@@ -309,15 +304,15 @@ msgstr ""
 
 #: app/models/preset.py:11 app/models/task.py:228
 msgid "Options"
-msgstr "Опции"
+msgstr "選項"
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Creation date"
-msgstr "Дата создания"
+msgstr ""
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Created at"
-msgstr "Создано в"
+msgstr ""
 
 #: app/models/preset.py:14
 msgid ""
@@ -331,11 +326,11 @@ msgstr ""
 
 #: app/models/preset.py:20
 msgid "Preset"
-msgstr "Пресет"
+msgstr ""
 
 #: app/models/preset.py:21
 msgid "Presets"
-msgstr "Пресеты"
+msgstr ""
 
 #: app/models/project.py:22
 msgid "The person who created the project"
@@ -362,11 +357,11 @@ msgstr ""
 
 #: app/models/project.py:56 app/models/task.py:221
 msgid "Project"
-msgstr "Проект"
+msgstr ""
 
 #: app/models/project.py:57
 msgid "Projects"
-msgstr "Проекты"
+msgstr ""
 
 #: app/models/setting.py:20
 msgid "The name of your application"
@@ -390,7 +385,7 @@ msgstr ""
 
 #: app/models/setting.py:31
 msgid "Organization name"
-msgstr "Название организации"
+msgstr ""
 
 #: app/models/setting.py:32
 msgid "The website URL of your organization"
@@ -398,12 +393,12 @@ msgstr ""
 
 #: app/models/setting.py:32
 msgid "Organization website"
-msgstr "Веб-сайт организации"
+msgstr ""
 
 #: app/models/setting.py:33 app/models/theme.py:48 app/models/theme.py:49
 #: app/templates/app/logged_in_base.html:95
 msgid "Theme"
-msgstr "Тема"
+msgstr ""
 
 #: app/models/setting.py:34
 msgid "Active theme"
@@ -411,15 +406,15 @@ msgstr ""
 
 #: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
 msgid "Application"
-msgstr "Приложение"
+msgstr ""
 
 #: app/models/setting.py:76 app/models/setting.py:77
 msgid "Settings"
-msgstr "Настройки"
+msgstr ""
 
 #: app/models/task.py:218
 msgid "Id"
-msgstr "ID"
+msgstr ""
 
 #: app/models/task.py:220
 msgid "Identifier of the task (as returned by NodeODM API)"
@@ -427,7 +422,7 @@ msgstr ""
 
 #: app/models/task.py:220
 msgid "UUID"
-msgstr "UUID"
+msgstr ""
 
 #: app/models/task.py:221
 msgid "Project that this task belongs to"
@@ -455,7 +450,7 @@ msgstr ""
 
 #: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
-msgstr ""
+msgstr "處理節點"
 
 #: app/models/task.py:225
 msgid ""
@@ -473,7 +468,7 @@ msgstr ""
 
 #: app/models/task.py:226
 msgid "Status"
-msgstr "Статус"
+msgstr ""
 
 #: app/models/task.py:227
 msgid "The last processing error received"
@@ -605,7 +600,7 @@ msgstr ""
 
 #: app/models/task.py:261
 msgid "Tasks"
-msgstr "Задачи"
+msgstr ""
 
 #: app/models/task.py:270
 msgid "unnamed"
@@ -635,7 +630,7 @@ msgstr ""
 
 #: app/models/task.py:748
 msgid "Done!"
-msgstr "Готово!"
+msgstr ""
 
 #: app/models/theme.py:16
 msgid "Name of theme"
@@ -735,7 +730,7 @@ msgstr ""
 
 #: app/models/theme.py:35
 msgid "Failed"
-msgstr "Ошибка"
+msgstr "失敗"
 
 #: app/models/theme.py:36
 msgid "The background color of success notifications."
@@ -747,7 +742,7 @@ msgstr ""
 
 #: app/templates/app/404.html:6
 msgid "404 Page Not Found"
-msgstr "404 Страница не найдена"
+msgstr ""
 
 #: app/templates/app/404.html:7
 msgid "Are you sure the address is correct?"
@@ -755,7 +750,7 @@ msgstr ""
 
 #: app/templates/app/500.html:5
 msgid "500 Internal Server Error"
-msgstr "500 Внутренняя ошибка сервера"
+msgstr ""
 
 #: app/templates/app/500.html:6
 msgid "Something happened. The server logs contain more information."
@@ -773,7 +768,7 @@ msgstr ""
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
 msgid "Page not found"
-msgstr "Страница не найдена"
+msgstr ""
 
 #: app/templates/app/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
@@ -793,7 +788,7 @@ msgstr ""
 
 #: app/templates/app/admin/500.html:7
 msgid "Server error"
-msgstr "Ошибка сервера"
+msgstr ""
 
 #: app/templates/app/admin/500.html:11
 msgid "Server error (500)"
@@ -815,7 +810,7 @@ msgstr ""
 
 #: app/templates/app/admin/actions.html:4
 msgid "Go"
-msgstr "Поехали"
+msgstr ""
 
 #: app/templates/app/admin/actions.html:10
 msgid "Click here to select the objects across all pages"
@@ -843,7 +838,7 @@ msgstr ""
 #: app/templates/app/admin/auth/user/change_password.html:17
 #: app/templates/app/admin/auth/user/change_password.html:54
 msgid "Change password"
-msgstr "Изменить пароль"
+msgstr ""
 
 #: app/templates/app/admin/auth/user/change_password.html:27
 #: app/templates/app/admin/change_form.html:47
@@ -881,7 +876,7 @@ msgstr ""
 #: app/templates/app/admin/change_form.html:33
 #: app/templates/app/admin/object_history.html:10
 msgid "History"
-msgstr "История"
+msgstr ""
 
 #: app/templates/app/admin/change_form.html:35
 #: app/templates/app/admin/edit_inline/stacked.html:14
@@ -919,7 +914,7 @@ msgstr ""
 #: app/templates/app/admin/submit_line.html:6
 #: app/templates/app/processing_node.html:54
 msgid "Delete"
-msgstr "Удалить"
+msgstr "刪除"
 
 #: app/templates/app/admin/delete_confirmation.html:23
 #, python-format
@@ -946,7 +941,7 @@ msgstr ""
 #: app/templates/app/admin/delete_confirmation.html:39
 #: app/templates/app/admin/delete_selected_confirmation.html:38
 msgid "Objects"
-msgstr "Объекты"
+msgstr ""
 
 #: app/templates/app/admin/delete_confirmation.html:46
 #: app/templates/app/admin/delete_selected_confirmation.html:49
@@ -989,11 +984,11 @@ msgstr ""
 #: app/templates/app/admin/index.html:37
 #: app/templates/app/admin/related_widget_wrapper.html:9
 msgid "Change"
-msgstr "Изменить"
+msgstr ""
 
 #: app/templates/app/admin/edit_inline/tabular.html:20
 msgid "Delete?"
-msgstr "Удалить?"
+msgstr ""
 
 #: app/templates/app/admin/filter.html:2
 #, python-format
@@ -1002,7 +997,7 @@ msgstr ""
 
 #: app/templates/app/admin/includes/object_delete_summary.html:2
 msgid "Summary"
-msgstr "Итого"
+msgstr ""
 
 #: app/templates/app/admin/index.html:20
 #, python-format
@@ -1012,7 +1007,7 @@ msgstr ""
 #: app/templates/app/admin/index.html:31
 #: app/templates/app/admin/related_widget_wrapper.html:16
 msgid "Add"
-msgstr "Добавить"
+msgstr ""
 
 #: app/templates/app/admin/index.html:47
 msgid "You don't have permission to edit anything."
@@ -1058,11 +1053,11 @@ msgstr ""
 
 #: app/templates/app/admin/object_history.html:22
 msgid "Date/time"
-msgstr "Дата и время"
+msgstr ""
 
 #: app/templates/app/admin/object_history.html:24
 msgid "Action"
-msgstr "Действие"
+msgstr ""
 
 #: app/templates/app/admin/object_history.html:38
 msgid ""
@@ -1073,12 +1068,12 @@ msgstr ""
 #: app/templates/app/admin/pagination.html:10
 #: app/templates/app/admin/search_form.html:9
 msgid "Show all"
-msgstr "Показать все"
+msgstr ""
 
 #: app/templates/app/admin/pagination.html:11
 #: app/templates/app/admin/submit_line.html:3
 msgid "Save"
-msgstr "Сохранить"
+msgstr "儲存"
 
 #: app/templates/app/admin/popup_response.html:3
 msgid "Popup closing..."
@@ -1101,15 +1096,13 @@ msgstr ""
 
 #: app/templates/app/admin/search_form.html:7
 msgid "Search"
-msgstr "Поиск"
+msgstr "搜尋"
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1131,7 +1124,7 @@ msgstr ""
 #: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
 msgid "Welcome!"
-msgstr "Добро пожаловать!"
+msgstr ""
 
 #: app/templates/app/dashboard.html:16
 msgid "Add a Processing Node"
@@ -1147,7 +1140,7 @@ msgstr ""
 
 #: app/templates/app/dashboard.html:28
 msgid "Select Images and GCP"
-msgstr ""
+msgstr "選擇影像和GCP"
 
 #: app/templates/app/dashboard.html:30
 #, python-format
@@ -1180,11 +1173,11 @@ msgstr ""
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
 #: app/views/dev.py:83
 msgid "Developer Tools"
-msgstr "Инструменты разработчика"
+msgstr ""
 
 #: app/templates/app/dev_tools.html:9
 msgid "Close"
-msgstr "Закрыть"
+msgstr "關閉"
 
 #: app/templates/app/dev_tools.html:14
 msgid "Current Locale:"
@@ -1215,11 +1208,11 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:19
 msgid "Logout"
-msgstr "Выйти"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:33 app/views/app.py:46
 msgid "Dashboard"
-msgstr "Панель управления"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
 msgid "Processing Nodes"
@@ -1235,11 +1228,11 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:84
 msgid "Accounts"
-msgstr "Аккаунты"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:87
 msgid "Groups"
-msgstr "Группы"
+msgstr ""
 
 #: app/templates/app/logged_in_base.html:92
 msgid "Brand"
@@ -1255,7 +1248,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:15 nodeodm/models.py:24
 msgid "Port"
-msgstr "Порт"
+msgstr ""
 
 #: app/templates/app/processing_node.html:19 nodeodm/models.py:25
 msgid "API Version"
@@ -1263,7 +1256,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:23 nodeodm/models.py:33
 msgid "Engine"
-msgstr "Ядро"
+msgstr ""
 
 #: app/templates/app/processing_node.html:27 nodeodm/models.py:31
 msgid "Engine Version"
@@ -1296,7 +1289,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
-msgstr "Редактировать"
+msgstr "編輯"
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"
@@ -1304,7 +1297,7 @@ msgstr ""
 
 #: app/templates/app/welcome.html:237
 msgid "Create Account"
-msgstr "Создать аккаунт"
+msgstr ""
 
 #: app/translations/plugin_manifest_autogenerated.py:4
 msgid "Compute volume, area and length measurements on Leaflet"
@@ -1363,7 +1356,7 @@ msgstr ""
 
 #: app/views/app.py:54 app/views/public.py:26
 msgid "Map"
-msgstr "Карта"
+msgstr ""
 
 #: app/views/app.py:81
 msgid "3D Model Display"
@@ -1371,7 +1364,7 @@ msgstr ""
 
 #: app/views/app.py:147
 msgid "Welcome"
-msgstr "Добро пожаловать"
+msgstr ""
 
 #: app/views/dev.py:59
 msgid "Cannot find locale/ folder in .zip archive"
@@ -1425,7 +1418,7 @@ msgstr ""
 
 #: nodeodm/models.py:29
 msgid "Token"
-msgstr "Токен"
+msgstr ""
 
 #: nodeodm/models.py:29
 msgid ""
@@ -1473,7 +1466,7 @@ msgstr ""
 
 #: plugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
-msgstr "Диагностика"
+msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
@@ -1495,17 +1488,17 @@ msgstr ""
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
-msgstr "Используется"
+msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
-msgstr "Итого"
+msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
-msgstr "Память"
+msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:24
 #: plugins/diagnostic/templates/diagnostic.html:75
@@ -1528,7 +1521,7 @@ msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
-msgstr "Заметки!"
+msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 #, python-format

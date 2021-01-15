@@ -8,304 +8,304 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 15:19+0000\n"
-"PO-Revision-Date: 2020-12-30 22:42+0000\n"
-"Last-Translator: Dmytro Teslov <hellios.dt@gmail.com>\n"
-"Language-Team: Russian <https://hosted.weblate.org/projects/webodm/react-ui/"
-"ru/>\n"
-"Language: ru\n"
+"PO-Revision-Date: 2021-01-04 03:29+0000\n"
+"Last-Translator: Yu-Huang Wang <yuhuangwang@gmail.com>\n"
+"Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
+"webodm/react-ui/zh_Hant/>\n"
+"Language: zh_Hant\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.4.1-dev\n"
 
 #: app/static/app/js/Console.jsx:135
 #, python-format
 msgid "output truncated at %(count)s lines"
-msgstr ""
+msgstr "輸出在%(count)s行被截斷"
 
 #: app/static/app/js/Console.jsx:147 app/static/app/js/Console.jsx:155
 #: app/static/app/js/Console.jsx:165
 msgid "Toggle Fullscreen"
-msgstr "Включить полноэкранный режим"
+msgstr "切換全螢幕"
 
 #: app/static/app/js/Console.jsx:148 app/static/app/js/Console.jsx:156
 msgid "Exit Fullscreen"
-msgstr "Выйти из полноэкранного режима"
+msgstr "離開全螢幕"
 
 #: app/static/app/js/Console.jsx:162
 msgid "Download To File"
-msgstr "Скачать в виде файла"
+msgstr "下載檔案"
 
 #: app/static/app/js/Dashboard.jsx:26
 msgid "Name field is required"
-msgstr ""
+msgstr "名稱欄位必填"
 
 #: app/static/app/js/Dashboard.jsx:62
 msgid "Add Project"
-msgstr "Добавить проект"
+msgstr "新增專案"
 
 #: app/static/app/js/Dashboard.jsx:97
 msgid "Your changes will be lost. Are you sure you want to leave?"
-msgstr ""
+msgstr "修改將遺失。 確定要離開嗎？"
 
 #: app/static/app/js/MapView.jsx:65
 #: app/static/app/js/classes/PipelineSteps.js:37
 #: app/static/app/js/components/Map.jsx:82
 msgid "Orthophoto"
-msgstr "Ортофото"
+msgstr "正射影像"
 
 #: app/static/app/js/MapView.jsx:70 app/static/app/js/components/Map.jsx:84
 msgid "Plant Health"
-msgstr ""
+msgstr "植物健康"
 
 #: app/static/app/js/MapView.jsx:75
 msgid "Surface Model"
-msgstr "Модель поверхности"
+msgstr "地表模型"
 
 #: app/static/app/js/MapView.jsx:80
 msgid "Terrain Model"
-msgstr "Модель местности"
+msgstr "地形模型"
 
 #: app/static/app/js/ModelView.jsx:42
 msgid "Show Model"
-msgstr "Показать модель"
+msgstr "顯示模型"
 
 #: app/static/app/js/ModelView.jsx:69
 msgid "Show Cameras"
-msgstr "Показать камеры"
+msgstr "顯示相機"
 
 #: app/static/app/js/ModelView.jsx:482
-#, fuzzy
 msgid "Loading textured model..."
-msgstr "Загрузка текстурированной модели..."
+msgstr "載入材質貼附模型..."
 
 #: app/static/app/js/classes/AssetDownloads.js:36
 msgid "Orthophoto (GeoTIFF)"
-msgstr "Ортофото (GeoTIFF)"
+msgstr "正射影像 (GeoTIFF)"
 
 #: app/static/app/js/classes/AssetDownloads.js:37
 msgid "Orthophoto (PNG)"
-msgstr "Ортофото (PNG)"
+msgstr "正射影像 (PNG)"
 
 #: app/static/app/js/classes/AssetDownloads.js:38
 msgid "Orthophoto (MBTiles)"
-msgstr "Ортофото (MBTiles)"
+msgstr "正射影像 (MBTiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:39
 msgid "Orthophoto (Tiles)"
-msgstr ""
+msgstr "正射影像 (Tiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:40
 msgid "Terrain Model (GeoTIFF)"
-msgstr ""
+msgstr "地形模型 (GeoTIFF)"
 
 #: app/static/app/js/classes/AssetDownloads.js:41
 msgid "Terrain Model (Tiles)"
-msgstr ""
+msgstr "地形模型 (Tiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:42
 msgid "Surface Model (GeoTIFF)"
-msgstr ""
+msgstr "地表模型 (GeoTIFF)"
 
 #: app/static/app/js/classes/AssetDownloads.js:43
 msgid "Surface Model (Tiles)"
-msgstr ""
+msgstr "地表模型 (Tiles)"
 
 #: app/static/app/js/classes/AssetDownloads.js:44
 msgid "Point Cloud (LAS)"
-msgstr ""
+msgstr "點雲 (LAS)"
 
 #: app/static/app/js/classes/AssetDownloads.js:45
 msgid "Point Cloud (LAZ)"
-msgstr ""
+msgstr "點雲 (LAZ)"
 
 #: app/static/app/js/classes/AssetDownloads.js:46
 msgid "Point Cloud (PLY)"
-msgstr ""
+msgstr "點雲 (PLY)"
 
 #: app/static/app/js/classes/AssetDownloads.js:47
 msgid "Point Cloud (CSV)"
-msgstr ""
+msgstr "點雲 (CSV)"
 
 #: app/static/app/js/classes/AssetDownloads.js:48
 msgid "Textured Model"
-msgstr ""
+msgstr "材質貼附模型"
 
 #: app/static/app/js/classes/AssetDownloads.js:49
 msgid "Camera Parameters"
-msgstr ""
+msgstr "相機參數"
 
 #: app/static/app/js/classes/AssetDownloads.js:50
 msgid "Camera Shots (GeoJSON)"
-msgstr ""
+msgstr "拍攝影像"
 
 #: app/static/app/js/classes/AssetDownloads.js:51
+#, fuzzy
+#| msgid "Report"
 msgid "Quality Report"
-msgstr ""
+msgstr "報告"
 
 #: app/static/app/js/classes/AssetDownloads.js:55
 msgid "All Assets"
-msgstr ""
+msgstr "所有資料"
 
 #: app/static/app/js/classes/Basemaps.js:9
 msgid "Google Maps Hybrid"
-msgstr ""
+msgstr "Google衛星影像混合地圖"
 
 #: app/static/app/js/classes/Basemaps.js:17
 msgid "ESRI Satellite"
-msgstr ""
+msgstr "ESRI衛星影像"
 
 #: app/static/app/js/classes/Basemaps.js:26
 msgid "OSM Mapnik"
-msgstr ""
+msgstr "OSM Mapnik"
 
 #: app/static/app/js/classes/PendingActions.js:11
 msgid "Canceling..."
-msgstr ""
+msgstr "正在取消..."
 
 #: app/static/app/js/classes/PendingActions.js:14
 #: app/static/app/js/components/FormDialog.jsx:170
 msgid "Deleting..."
-msgstr ""
+msgstr "正在刪除..."
 
 #: app/static/app/js/classes/PendingActions.js:17
 msgid "Restarting..."
-msgstr ""
+msgstr "正在重新啟動..."
 
 #: app/static/app/js/classes/PendingActions.js:20
 msgid "Resizing images..."
-msgstr ""
+msgstr "正在調整影像大小..."
 
 #: app/static/app/js/classes/PendingActions.js:23
 msgid "Importing..."
-msgstr ""
+msgstr "正在匯入..."
 
 #: app/static/app/js/classes/PipelineSteps.js:7
 msgid "Load Dataset"
-msgstr ""
+msgstr "載入資料集"
 
 #: app/static/app/js/classes/PipelineSteps.js:12
 msgid "Structure From Motion / MVS"
-msgstr ""
+msgstr "Structure From Motion / MVS"
 
 #: app/static/app/js/classes/PipelineSteps.js:17
 msgid "Meshing"
-msgstr ""
+msgstr "網格化"
 
 #: app/static/app/js/classes/PipelineSteps.js:22
 msgid "Texturing"
-msgstr ""
+msgstr "紋理化"
 
 #: app/static/app/js/classes/PipelineSteps.js:27
 msgid "Georeferencing"
-msgstr ""
+msgstr "地理座標定位"
 
 #: app/static/app/js/classes/PipelineSteps.js:32
 msgid "DEM"
-msgstr ""
+msgstr "DEM"
 
 #: app/static/app/js/classes/PipelineSteps.js:42
 msgid "Report"
-msgstr ""
+msgstr "報告"
 
 #: app/static/app/js/classes/ResizeModes.js:4
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: app/static/app/js/classes/ResizeModes.js:5
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: app/static/app/js/classes/StatusCodes.js:11
 msgid "Queued"
-msgstr ""
+msgstr "佇列"
 
 #: app/static/app/js/classes/StatusCodes.js:15
 msgid "Running"
-msgstr ""
+msgstr "正在執行"
 
 #: app/static/app/js/classes/StatusCodes.js:19
 msgid "Failed"
-msgstr "Ошибка"
+msgstr "失敗"
 
 #: app/static/app/js/classes/StatusCodes.js:23
 msgid "Completed"
-msgstr ""
+msgstr "已完成"
 
 #: app/static/app/js/classes/StatusCodes.js:27
 msgid "Canceled"
-msgstr ""
+msgstr "已取消"
 
 #: app/static/app/js/classes/TempLayer.js:14
 #, python-format
 msgid "%(file)s is bigger than 5 MB."
-msgstr ""
+msgstr "%(file)s 大於5 MB。"
 
 #: app/static/app/js/classes/TempLayer.js:30
 #, python-format
 msgid "Not a proper zipped shapefile: %(file)s"
-msgstr ""
+msgstr "非正確壓縮的shapfilw: %(file)s"
 
 #: app/static/app/js/classes/TempLayer.js:43
 #, python-format
 msgid "Not a proper JSON file: %(file)s"
-msgstr ""
+msgstr "非正確的JSON檔: %(file)s"
 
 #: app/static/app/js/components/AssetDownloadButtons.jsx:33
 msgid "Download Assets"
-msgstr ""
+msgstr "下載所有資料"
 
 #: app/static/app/js/components/EditPresetDialog.jsx:107
 #: app/static/app/js/components/EditTaskForm.jsx:523
 msgid "Edit Task Options"
-msgstr ""
+msgstr "編輯任務選項"
 
 #: app/static/app/js/components/EditPresetDialog.jsx:113
 #: app/static/app/js/components/EditProjectDialog.jsx:85
 #: app/static/app/js/components/EditTaskForm.jsx:597
 msgid "Name"
-msgstr "Имя"
+msgstr "名稱"
 
 #: app/static/app/js/components/EditPresetDialog.jsx:121
 msgid "Search"
-msgstr "Поиск"
+msgstr "搜尋"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:10
 msgid "New Project"
-msgstr ""
+msgstr "新專案"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:11
 msgid "Create Project"
-msgstr ""
+msgstr "建立專案"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:12
 msgid "Creating project..."
-msgstr ""
+msgstr "正在建立專案..."
 
 #: app/static/app/js/components/EditProjectDialog.jsx:14
 msgid ""
 "All tasks, images and models associated with this project will be "
 "permanently deleted. Are you sure you want to continue?"
-msgstr ""
+msgstr "此專案所有的任務，影像和模型將被永久刪除。 確定要繼續嗎？"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:91
 msgid "Description (optional)"
-msgstr ""
+msgstr "描述 (非必要)"
 
 #: app/static/app/js/components/EditTaskForm.jsx:89
 msgid ""
 "Could not load list of processing nodes. Are you connected to the internet?"
-msgstr ""
+msgstr "無法載入處理節點列表。 是否已連接到網路？"
 
 #: app/static/app/js/components/EditTaskForm.jsx:97
 msgid "We tried to reach:"
-msgstr ""
+msgstr "我們嘗試達到："
 
 #: app/static/app/js/components/EditTaskForm.jsx:98
 msgid "There are no usable processing nodes."
-msgstr ""
+msgstr "沒有可用的處理節點。"
 
 #: app/static/app/js/components/EditTaskForm.jsx:98
 msgid ""
@@ -316,10 +316,13 @@ msgid ""
 "are bringing a node back online, it will take about 30 seconds for WebODM to "
 "recognize it."
 msgstr ""
+"確保至少有一個處理節點可用，並且已賦予當前使用者有足夠的權限來查看此處理節點 "
+"(管理--處理節點--選擇節點--物件權限--增加使用者/群組，並勾選可查看處理節"
+"點)。 如果要使節點重新連線，WebODM大約需要30秒才能識別它。"
 
 #: app/static/app/js/components/EditTaskForm.jsx:216
 msgid "Could not load list of presets. Are you connected to the internet?"
-msgstr ""
+msgstr "無法載入預設值。 是否已連接到網路？"
 
 #: app/static/app/js/components/EditTaskForm.jsx:225
 #: app/static/app/js/components/EditTaskForm.jsx:384
@@ -328,85 +331,85 @@ msgstr ""
 #: plugins/contours/public/ContoursPanel.jsx:273
 #: plugins/contours/public/ContoursPanel.jsx:292
 msgid "Custom"
-msgstr ""
+msgstr "自訂"
 
 #: app/static/app/js/components/EditTaskForm.jsx:232
 #: app/static/app/js/components/EditTaskForm.jsx:353
 msgid "Default"
-msgstr ""
+msgstr "預設"
 
 #: app/static/app/js/components/EditTaskForm.jsx:437
 msgid "My Preset"
-msgstr ""
+msgstr "我的預設"
 
 #: app/static/app/js/components/EditTaskForm.jsx:437
 #, python-format
 msgid "Copy of %(preset)s"
-msgstr ""
+msgstr "複製%(preset)s"
 
 #: app/static/app/js/components/EditTaskForm.jsx:460
 msgid "Could not duplicate the preset. Please try to refresh the page."
-msgstr ""
+msgstr "無法複製預設。 請重新整理頁面。"
 
 #: app/static/app/js/components/EditTaskForm.jsx:469
 msgid ""
 "System presets can only be removed by a staff member from the Administration "
 "panel."
-msgstr ""
+msgstr "系統預設只能由工作人員從“管理”面板中刪除。"
 
 #: app/static/app/js/components/EditTaskForm.jsx:473
 #, python-format
 msgid "Are you sure you want to delete \"%(preset)s\"?"
-msgstr ""
+msgstr "確定要刪除%(preset)s？"
 
 #: app/static/app/js/components/EditTaskForm.jsx:486
 msgid "Could not delete the preset. Please try to refresh the page."
-msgstr ""
+msgstr "無法刪除預設。 請重新整理頁面。"
 
 #: app/static/app/js/components/EditTaskForm.jsx:501
 msgid "Retry"
-msgstr ""
+msgstr "重試"
 
 #: app/static/app/js/components/EditTaskForm.jsx:524
 #: app/static/app/js/components/EditTaskForm.jsx:531
 #: app/static/app/js/components/ProjectListItem.jsx:534
 #: app/static/app/js/components/TaskListItem.jsx:413
 msgid "Edit"
-msgstr "Редактировать"
+msgstr "編輯"
 
 #: app/static/app/js/components/EditTaskForm.jsx:537
 msgid "Duplicate"
-msgstr ""
+msgstr "複製"
 
 #: app/static/app/js/components/EditTaskForm.jsx:541
 #: app/static/app/js/components/EditTaskPanel.jsx:82
 #: app/static/app/js/components/FormDialog.jsx:11
 msgid "Save"
-msgstr "Сохранить"
+msgstr "儲存"
 
 #: app/static/app/js/components/EditTaskForm.jsx:545
 #: app/static/app/js/components/FormDialog.jsx:173
 #: app/static/app/js/components/TaskListItem.jsx:439
 #: plugins/measure/public/app.jsx:34
 msgid "Delete"
-msgstr "Удалить"
+msgstr "刪除"
 
 #: app/static/app/js/components/EditTaskForm.jsx:556
 #: plugins/lightning/public/Dashboard.jsx:153
 msgid "Processing Node"
-msgstr ""
+msgstr "處理節點"
 
 #: app/static/app/js/components/EditTaskForm.jsx:566
 msgid "Options"
-msgstr "Опции"
+msgstr "選項"
 
 #: app/static/app/js/components/EditTaskForm.jsx:590
 msgid "Loading processing nodes and presets..."
-msgstr ""
+msgstr "載入處理節點和預設..."
 
 #: app/static/app/js/components/EditTaskPanel.jsx:56
 msgid "Could not update task information. Plese try again."
-msgstr ""
+msgstr "無法更新任務資訊。 請再試一次。"
 
 #: app/static/app/js/components/EditTaskPanel.jsx:75
 #: app/static/app/js/components/FormDialog.jsx:151
@@ -414,253 +417,253 @@ msgstr ""
 #: app/static/app/js/components/TaskListItem.jsx:422
 #: plugins/measure/public/app.jsx:33
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: app/static/app/js/components/EditTaskPanel.jsx:79
 msgid "Saving..."
-msgstr ""
+msgstr "正在儲存..."
 
 #: app/static/app/js/components/ErrorMessage.jsx:29
 #: app/static/app/js/components/ProjectListItem.jsx:544
 msgid "Close"
-msgstr "Закрыть"
+msgstr "關閉"
 
 #: app/static/app/js/components/FormDialog.jsx:10
 msgid "Title"
-msgstr ""
+msgstr "標題"
 
 #: app/static/app/js/components/FormDialog.jsx:12
 msgid "Saving…"
-msgstr ""
+msgstr "正在儲存…"
 
 #: app/static/app/js/components/FormDialog.jsx:14
 msgid "Are you sure?"
-msgstr ""
+msgstr "確定？"
 
 #: app/static/app/js/components/FormDialog.jsx:109
 msgid "Could not apply changes"
-msgstr ""
+msgstr "無法套用更改"
 
 #: app/static/app/js/components/FormDialog.jsx:123
 msgid "Could not delete item"
-msgstr ""
+msgstr "無法刪除項目"
 
 #: app/static/app/js/components/Histogram.jsx:293
 msgid "Min:"
-msgstr ""
+msgstr "最小："
 
 #: app/static/app/js/components/Histogram.jsx:294
 msgid "Max:"
-msgstr ""
+msgstr "最大："
 
 #: app/static/app/js/components/ImagePopup.jsx:47
 msgid "Image missing"
-msgstr ""
+msgstr "影像遺失"
 
 #: app/static/app/js/components/ImagePopup.jsx:86
 msgid "Download Image"
-msgstr ""
+msgstr "下載影像"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:63
 msgid "Cannot upload file. Check your internet connection and try again."
-msgstr ""
+msgstr "無法上傳檔案。請檢查網路連線，再試一次。"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:91
 #, python-format
 msgid "Invalid response from server: %(error)s"
-msgstr ""
+msgstr "服務器的無效回應：%(error)s"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:94
 msgid "An error occured while uploading the file. Please try again."
-msgstr ""
+msgstr "上載檔案時發生錯誤。 請再試一次。"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:138
 #: app/static/app/js/components/LayersControlLayer.jsx:249
 #: app/static/app/js/components/ProjectList.jsx:56
 #, python-format
 msgid "Invalid JSON response: %(error)s"
-msgstr ""
+msgstr "無效的JSON回應：%(error)s"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:142
 msgid "Cannot import from URL. Check your internet connection."
-msgstr ""
+msgstr "無法從網址匯入。請檢查網路連線。"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:159
 msgid "Import Existing Assets"
-msgstr ""
+msgstr "匯入現有資產"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:160
 #, python-format
 msgid ""
 "You can import .zip files that have been exported from existing tasks via "
 "Download Assets %(arrow)s All Assets."
-msgstr ""
+msgstr "你可以匯入從既有任務匯出的.zip壓縮檔 (經由下載資產%(arrow)s所有資產)。"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:167
 msgid "Upload a File"
-msgstr ""
+msgstr "上傳檔案"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:175
 msgid "Import From URL"
-msgstr ""
+msgstr "從網址匯入"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:184
 #: app/static/app/js/components/ProjectListItem.jsx:498
 msgid "Import"
-msgstr ""
+msgstr "匯入"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:194
 msgid "Cancel Upload"
-msgstr ""
+msgstr "取消上傳"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:287
 msgid "Algorithm:"
-msgstr ""
+msgstr "演算法："
 
 #: app/static/app/js/components/LayersControlLayer.jsx:299
 msgid "Filter:"
-msgstr ""
+msgstr "篩選："
 
 #: app/static/app/js/components/LayersControlLayer.jsx:311
 msgid "Color:"
-msgstr ""
+msgstr "顏色："
 
 #: app/static/app/js/components/LayersControlLayer.jsx:323
 msgid "Shading:"
-msgstr ""
+msgstr "明暗："
 
 #: app/static/app/js/components/LayersControlLayer.jsx:326
 #: app/static/app/js/components/Map.jsx:350
 msgid "None"
-msgstr ""
+msgstr "無"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:327
 #: plugins/contours/public/ContoursPanel.jsx:228
 msgid "Normal"
-msgstr ""
+msgstr "正常"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:328
 msgid "Extruded"
-msgstr ""
+msgstr "擠出"
 
 #: app/static/app/js/components/LayersControlLayer.jsx:334
 msgid "Export:"
-msgstr ""
+msgstr "匯出："
 
 #: app/static/app/js/components/LayersControlPanel.jsx:26
 #: app/static/app/js/components/NewTaskPanel.jsx:187
 #: plugins/contours/public/ContoursPanel.jsx:236
 msgid "Loading…"
-msgstr ""
+msgstr "正在載入…"
 
 #: app/static/app/js/components/LayersControlPanel.jsx:44
 msgid "Layers"
-msgstr ""
+msgstr "圖層"
 
 #: app/static/app/js/components/Map.jsx:86
 msgid "DSM"
-msgstr ""
+msgstr "DSM"
 
 #: app/static/app/js/components/Map.jsx:88
 msgid "DTM"
-msgstr ""
+msgstr "DTM"
 
 #: app/static/app/js/components/Map.jsx:259
 msgid "(Cameras)"
-msgstr ""
+msgstr "(相機)"
 
 #: app/static/app/js/components/Map.jsx:331
 msgid "Enter a tile URL template. Valid coordinates are:"
-msgstr ""
+msgstr "輸入圖磚URL樣板。 有效坐標為："
 
 #: app/static/app/js/components/Map.jsx:332
 #, python-brace-format
 msgid "{z}, {x}, {y} for Z/X/Y tile scheme"
-msgstr ""
+msgstr "{z}, {x}, {y} 為 Z/X/Y 圖磚格式"
 
 #: app/static/app/js/components/Map.jsx:333
 msgid "{-y} for flipped TMS-style Y coordinates"
-msgstr ""
+msgstr "{-y}用於翻轉TMS樣式的Y坐標"
 
 #: app/static/app/js/components/Map.jsx:335
 msgid "Example:"
-msgstr ""
+msgstr "範例："
 
 #: app/static/app/js/components/Map.jsx:401
 msgid "Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay"
-msgstr ""
+msgstr "加入GeoJSON (.json)或ShapeFile (.zip)暫套疊的圖層"
 
 #: app/static/app/js/components/Map.jsx:452
 msgid "Error: cannot load assets list."
-msgstr ""
+msgstr "錯誤：無法載入資產列表。"
 
 #: app/static/app/js/components/Map.jsx:523
 msgid "Opacity:"
-msgstr ""
+msgstr "不透明度："
 
 #: app/static/app/js/components/Map.jsx:527
 #: app/static/app/js/components/TaskList.jsx:75
 msgid "Loading..."
-msgstr ""
+msgstr "載入中..."
 
 #: app/static/app/js/components/NewTaskPanel.jsx:83
 msgid "Are you sure you want to cancel?"
-msgstr ""
+msgstr "你確定要取消？"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:131
 #, python-format
 msgid "%(count)s files selected. Please check these additional options:"
-msgstr ""
+msgstr "%(count)s檔案已選取。請檢查其他選項："
 
 #: app/static/app/js/components/NewTaskPanel.jsx:144
 msgid "Resize Images"
-msgstr ""
+msgstr "重新調整影像大小"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:168
 msgid "px"
-msgstr ""
+msgstr "像素"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:189
 msgid "Review"
-msgstr ""
+msgstr "再檢視"
 
 #: app/static/app/js/components/NewTaskPanel.jsx:189
 msgid "Start Processing"
-msgstr ""
+msgstr "開始處理"
 
 #: app/static/app/js/components/ProcessingNodeOption.jsx:140
 #: app/static/app/js/translations/potree_autogenerated.js:62
 msgid "Enable"
-msgstr ""
+msgstr "啟用"
 
 #: app/static/app/js/components/ProcessingNodeOption.jsx:149
 msgid "Click to import a .JSON file"
-msgstr ""
+msgstr "點選以匯入.JSON檔"
 
 #: app/static/app/js/components/ProcessingNodeOption.jsx:164
 msgid "Reset to default"
-msgstr ""
+msgstr "重置預設"
 
 #: app/static/app/js/components/ProjectList.jsx:63
 #, python-format
 msgid "Could not load projects list: %(error)s"
-msgstr ""
+msgstr "無法匯入專案列表：%(error)s"
 
 #: app/static/app/js/components/ProjectListItem.jsx:185
 #, python-format
 msgid "Cannot upload %(filename)s, exceeded max retries (%(max_retries)s)"
-msgstr ""
+msgstr "無法上傳%(filename)s，已超過最大重試次數(%(max_retries)s)"
 
 #: app/static/app/js/components/ProjectListItem.jsx:234
 #: app/static/app/js/components/ProjectListItem.jsx:346
 #, python-format
 msgid "Cannot create new task. Invalid response from server: %(error)s"
-msgstr ""
+msgstr "無法建立新任務。 來自服務器的無效回應：%(error)s"
 
 #: app/static/app/js/components/ProjectListItem.jsx:237
 #: app/static/app/js/components/ProjectListItem.jsx:350
 msgid "Cannot create new task. Please try again later."
-msgstr ""
+msgstr "無法建立新任務。 請稍後再試。"
 
 #: app/static/app/js/components/ProjectListItem.jsx:244
 #, python-format
@@ -668,91 +671,93 @@ msgid ""
 "%(count)s files cannot be uploaded. As a reminder, only images (.jpg, .tif, ."
 "png) and GCP files (.txt) can be uploaded. Try again."
 msgstr ""
+"%(count)s檔案無法上傳。只能上傳圖像(.jpg，.tif，.png)和GCP文件(.txt)。請 再試"
+"一次。"
 
 #: app/static/app/js/components/ProjectListItem.jsx:473
 msgid "Edit Project"
-msgstr ""
+msgstr "編輯專案"
 
 #: app/static/app/js/components/ProjectListItem.jsx:474
 msgid "Save Changes"
-msgstr ""
+msgstr "儲存變更"
 
 #: app/static/app/js/components/ProjectListItem.jsx:475
 msgid "Saving changes..."
-msgstr ""
+msgstr "正在儲存變更..."
 
 #: app/static/app/js/components/ProjectListItem.jsx:493
 msgid "Select Images and GCP"
-msgstr ""
+msgstr "選擇影像和GCP"
 
 #: app/static/app/js/components/ProjectListItem.jsx:513
 #: app/static/app/js/components/TaskListItem.jsx:398
 msgid "View Map"
-msgstr ""
+msgstr "檢視地圖"
 
 #: app/static/app/js/components/ProjectListItem.jsx:528
 #, python-format
 msgid "%(count)s Tasks"
-msgstr ""
+msgstr "%(count)s任務"
 
 #: app/static/app/js/components/ShareButton.jsx:58
 msgid "Share"
-msgstr ""
+msgstr "分享"
 
 #: app/static/app/js/components/SharePopup.jsx:60
 msgid "An error occurred. Check your connection and permissions."
-msgstr ""
+msgstr "發生錯誤。請檢查連線和權限。"
 
 #: app/static/app/js/components/SharePopup.jsx:78
 msgid "Share This Task"
-msgstr ""
+msgstr "分享此任務"
 
 #: app/static/app/js/components/SharePopup.jsx:87
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 #: app/static/app/js/components/SharePopup.jsx:100
 msgid "Enabled"
-msgstr "Включено"
+msgstr "已啟用"
 
 #: app/static/app/js/components/SharePopup.jsx:106
 msgid "Link:"
-msgstr ""
+msgstr "連結："
 
 #: app/static/app/js/components/SharePopup.jsx:117
 msgid "HTML iframe:"
-msgstr ""
+msgstr "HTML iframe:"
 
 #: app/static/app/js/components/SwitchModeButton.jsx:47
 msgid "3D"
-msgstr ""
+msgstr "3D"
 
 #: app/static/app/js/components/SwitchModeButton.jsx:47
 msgid "2D"
-msgstr ""
+msgstr "2D"
 
 #: app/static/app/js/components/TaskList.jsx:51
 #, python-format
 msgid "Could not load task list: %(error)s"
-msgstr ""
+msgstr "無法載入任務清單：%(error)s"
 
 #: app/static/app/js/components/TaskList.jsx:77
 #, python-format
 msgid "Error: %(error)s"
-msgstr ""
+msgstr "錯誤：%(error)s"
 
 #: app/static/app/js/components/TaskList.jsx:77
 msgid "Try again"
-msgstr ""
+msgstr "再試一次"
 
 #: app/static/app/js/components/TaskList.jsx:79
 msgid "This project has no tasks. Create one by uploading some images!"
-msgstr ""
+msgstr "此專案沒有任務。 請上傳一些影像檔來建立一個任務！"
 
 #: app/static/app/js/components/TaskListItem.jsx:200
 #: app/static/app/js/components/TaskListItem.jsx:207
 msgid "Cannot complete operation."
-msgstr ""
+msgstr "無法完成操作。"
 
 #: app/static/app/js/components/TaskListItem.jsx:250
 #, python-format
@@ -760,27 +765,29 @@ msgid ""
 "It looks like there might be one of the following problems: %(problems)s You "
 "can read more about best practices for capturing good images %(link)s."
 msgstr ""
+"似乎可能有其中之一的問題：%(problems)s。你可以閱讀更多有關獲取優良影像的最佳"
+"做法%(link)s。"
 
 #: app/static/app/js/components/TaskListItem.jsx:251
 msgid "Not enough images"
-msgstr ""
+msgstr "影像數量不足"
 
 #: app/static/app/js/components/TaskListItem.jsx:252
 msgid "Not enough overlap between images"
-msgstr ""
+msgstr "影像重疊率不足"
 
 #: app/static/app/js/components/TaskListItem.jsx:253
 msgid "Images might be too blurry (common with phone cameras)"
-msgstr ""
+msgstr "影像或許太模糊(常見於手機拍攝的影像)"
 
 #: app/static/app/js/components/TaskListItem.jsx:254
 msgid ""
 "The min-num-features task option is set too low, try increasing it by 25%"
-msgstr ""
+msgstr "min-num-features任務選項設置得太低，試著將其增加25％"
 
 #: app/static/app/js/components/TaskListItem.jsx:255
 msgid "here"
-msgstr ""
+msgstr "這裡"
 
 #: app/static/app/js/components/TaskListItem.jsx:258
 #, python-format
@@ -790,10 +797,13 @@ msgid ""
 "support or higher. You can still run WebODM if you compile your own docker "
 "images. See %(link)s for more information."
 msgstr ""
+"這部電腦可能太舊了。 WebODM需要具有64位元CPU的電腦，支援MMX, SSE, SSE2, SSE3"
+"和SSSE3以上版本的指令集。 如果使用自行編譯的Docker映像檔，你仍然可以執行"
+"WebODM。閱讀%(link)s以獲得更多資訊。"
 
 #: app/static/app/js/components/TaskListItem.jsx:258
 msgid "this page"
-msgstr ""
+msgstr "此頁"
 
 #: app/static/app/js/components/TaskListItem.jsx:260
 msgid ""
@@ -801,77 +811,79 @@ msgid ""
 "This might indicate a corrupted installation. If you built OpenDroneMap, "
 "please check that all programs built without errors."
 msgstr ""
+"處理節點缺少完成任務所需的程式。 這可能是安裝已損壞。 如果你自行編譯"
+"OpenDroneMap，請檢查所有編譯的程式都沒有錯誤。"
 
 #: app/static/app/js/components/TaskListItem.jsx:296
 msgid "Resume Processing"
-msgstr ""
+msgstr "恢復處理"
 
 #: app/static/app/js/components/TaskListItem.jsx:312
 msgid "Cannot restart task."
-msgstr ""
+msgstr "無法重新啟動任務。"
 
 #: app/static/app/js/components/TaskListItem.jsx:354
 msgid "Cannot restart task from (stage)s."
-msgstr ""
+msgstr "無法從 (stage)s 重新啟動任務。"
 
 #: app/static/app/js/components/TaskListItem.jsx:368
 #, python-format
 msgid "Task #%(number)s"
-msgstr ""
+msgstr "任務 #%(number)s"
 
 #: app/static/app/js/components/TaskListItem.jsx:372
 msgid "Uploading images to processing node"
-msgstr ""
+msgstr "上傳影像至處理節點"
 
 #: app/static/app/js/components/TaskListItem.jsx:374
 msgid "Waiting for a node..."
-msgstr ""
+msgstr "等候節點..."
 
 #: app/static/app/js/components/TaskListItem.jsx:405
 msgid "View 3D Model"
-msgstr ""
+msgstr "檢視3D模型"
 
 #: app/static/app/js/components/TaskListItem.jsx:422
 msgid "Cannot cancel task."
-msgstr ""
+msgstr "無法取消任務。"
 
 #: app/static/app/js/components/TaskListItem.jsx:434
 msgid "Restart"
-msgstr ""
+msgstr "重新啟動"
 
 #: app/static/app/js/components/TaskListItem.jsx:440
 msgid ""
 "All information related to this task, including images, maps and models will "
 "be deleted. Continue?"
-msgstr ""
+msgstr "與此任務有關的所有資訊，包括影像，地圖和模型都將被刪除。 要繼續？"
 
 #: app/static/app/js/components/TaskListItem.jsx:441
 msgid "Cannot delete task."
-msgstr ""
+msgstr "無法刪除任務。"
 
 #: app/static/app/js/components/TaskListItem.jsx:485
 msgid "Task Output:"
-msgstr ""
+msgstr "任務輸出："
 
 #: app/static/app/js/components/TaskListItem.jsx:488
 msgid "On"
-msgstr ""
+msgstr "開啟"
 
 #: app/static/app/js/components/TaskListItem.jsx:489
 msgid "Off"
-msgstr ""
+msgstr "關閉"
 
 #: app/static/app/js/components/TaskListItem.jsx:497
 msgid "Created on:"
-msgstr ""
+msgstr "建立時間："
 
 #: app/static/app/js/components/TaskListItem.jsx:500
 msgid "Processing Node:"
-msgstr ""
+msgstr "處理節點："
 
 #: app/static/app/js/components/TaskListItem.jsx:504
 msgid "Options:"
-msgstr ""
+msgstr "選項："
 
 #: app/static/app/js/components/TaskListItem.jsx:524
 msgid ""
@@ -879,14 +891,16 @@ msgid ""
 "information is embedded in the EXIF tags of your images, or use a Ground "
 "Control Points (GCP) file."
 msgstr ""
+"無法產生正射影像。 請確認GPS資訊已內嵌於影像的EXIF標籤中，或使用地面控制點"
+"(GCP)檔案。"
 
 #: app/static/app/js/components/TaskListItem.jsx:527
 msgid "enough RAM allocated"
-msgstr ""
+msgstr "已分配足夠的記憶體"
 
 #: app/static/app/js/components/TaskListItem.jsx:527
 msgid "cloud processing node"
-msgstr ""
+msgstr "雲端處理節點"
 
 #: app/static/app/js/components/TaskListItem.jsx:527
 #, python-format
@@ -897,10 +911,13 @@ msgid ""
 "images, make your images smaller, or reduce the max-concurrency parameter "
 "from the task's options. You can also try to use a %(cloudlink)s."
 msgstr ""
+"處理節點的記憶體似乎不足。 如果你使用docker，確認docker環境具有%(memlink)s。 "
+"或者，確認電腦有足夠的實體記憶體、減少影像數量、縮小影像尺寸、降低任務選項中"
+"的max-concurrency參數。 你也可以嘗試使用%(cloudlink)s。"
 
 #: app/static/app/js/components/TaskListItem.jsx:534
 msgid "open a topic"
-msgstr ""
+msgstr "開啟一個主題"
 
 #: app/static/app/js/components/TaskListItem.jsx:534
 #, python-format
@@ -912,29 +929,33 @@ msgid ""
 "%(open_a_topic)s on our community forum, making sure to include a copy of "
 "your task's output. Our awesome contributors will try to help you!"
 msgstr ""
+"\"Process exited with code 1\"表示部分處理失敗。 有時這是資料集的問題，可以調"
+"整“任務選項”來解決；有時可能是一個錯誤！ 如果需要協助，請將影像上傳到我們的社"
+"群論壇上%(link1)s或%(link2)s和%(open_a_topic)s這些地方，並確認包含一份任務輸"
+"出的訊息。 我們的傑出貢獻者將盡力提供協助！"
 
 #: app/static/app/js/components/TaskListItem.jsx:580
 msgid "Set a processing node"
-msgstr ""
+msgstr "設定處理節點"
 
 #: app/static/app/js/components/TaskListItem.jsx:585
 msgid "Waiting for image upload..."
-msgstr ""
+msgstr "等候影像上傳..."
 
 #: app/static/app/js/components/UploadProgressBar.jsx:29
 #, python-format
 msgid "remaining to upload: %(bytes)s"
-msgstr ""
+msgstr "剩餘上傳：%(bytes)s"
 
 #: app/static/app/js/components/UploadProgressBar.jsx:35
 #, python-format
 msgid "%(count)s files %(remaining)s"
-msgstr ""
+msgstr "%(count)s檔案%(remaining)s"
 
 #: app/static/app/js/components/UploadProgressBar.jsx:36
 #, python-format
 msgid "%(count)s files uploaded successfully"
-msgstr ""
+msgstr "已成功上傳%(count)s檔案"
 
 #: app/static/app/js/translations/odm_autogenerated.js:3
 #, python-format
@@ -985,7 +1006,7 @@ msgstr ""
 msgid ""
 "Simple Morphological Filter window radius parameter (meters). Default: "
 "%(default)s"
-msgstr ""
+msgstr "簡單形態過濾器窗口半徑參數(公尺)。 預設值：%(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:10
 #, python-format
@@ -1080,6 +1101,9 @@ msgid ""
 "ignoring it can result in slightly better image output quality. Default: "
 "%(default)s"
 msgstr ""
+"忽略地面取樣距離(GSD)。 GSD限制輸出影像的最大解析度，並在必要時調整影像大小，"
+"從而加快處理速度並降低記憶體用量。 由於GSD是估計值，有時忽略它可以產生稍好的"
+"影像輸出品質。預設值：%(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:22
 #, python-format
@@ -1291,6 +1315,8 @@ msgid ""
 "cloud by setting the resolution of the depthmap images. Higher values take "
 "longer to compute but produce denser point clouds. Default: %(default)s"
 msgstr ""
+"舊的選項(改用 use--pc-quality)。 可經由設定景深圖影像的解析度來控制點雲的密"
+"度。 數值高所需的計算時間會更長，但會產生更密集的點雲。預設值：%(default)s"
 
 #: app/static/app/js/translations/odm_autogenerated.js:50
 #, python-format
@@ -2048,11 +2074,11 @@ msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:153
 msgid "Dashboard"
-msgstr "Панель управления"
+msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:159
 msgid "Logout"
-msgstr "Выйти"
+msgstr ""
 
 #: plugins/lightning/public/Login.jsx:56
 msgid "Cannot login. Invalid response:"
