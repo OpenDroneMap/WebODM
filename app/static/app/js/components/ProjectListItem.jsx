@@ -432,7 +432,7 @@ class ProjectListItem extends React.Component {
                 const parts = dateTime.split(" ");
                 if (parts.length == 2){
                     let [ d, t ] = parts;
-                    d = d.replace(":", "-");
+                    d = d.replace(/:/g, "-");
                     const tm = Date.parse(`${d} ${t}`);
                     if (!isNaN(tm)){
                         dateTime = new Date(tm).toLocaleDateString();
