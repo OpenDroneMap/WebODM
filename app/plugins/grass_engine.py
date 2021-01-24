@@ -102,9 +102,9 @@ class GrassContext:
             env["PYTHONPATH"] = "%s%s%s" % (self.python_path, sep, env.get("PYTHONPATH", ""))
 
         # Execute it
-        logger.info("Executing grass script from {}: {} -c {} location --exec python {} {}".format(self.get_cwd(), self.grass_binary, self.location, script, " ".join(params)))
+        logger.info("Executing grass script from {}: {} -c {} location --exec python3 {} {}".format(self.get_cwd(), self.grass_binary, self.location, script, " ".join(params)))
         
-        command = [self.grass_binary, '-c', self.location, 'location', '--exec', 'python', script] + params
+        command = [self.grass_binary, '-c', self.location, 'location', '--exec', 'python3', script] + params
         if platform.system() == "Windows":
             # communicate() hangs on Windows so we use check_output instead
             try:
