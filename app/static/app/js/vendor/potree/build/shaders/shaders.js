@@ -242,8 +242,11 @@ float getLOD(){
 			depth++;
 		}else{
 			// no more visible child nodes at this position
-			return value.a * 255.0;
-			//return depth;
+			//return value.a * 255.0;
+
+			float lodOffset = (255.0 * value.a) / 10.0 - 10.0;
+
+			return depth  + lodOffset;
 		}
 		
 		offset = offset + (vec3(1.0, 1.0, 1.0) * nodeSizeAtLevel * 0.5) * index3d;
@@ -445,6 +448,46 @@ vec4 getClassification(){
 	return classColor;
 }
 
+vec3 getReturns(){
+
+	// 0b 00_000_111
+	float rn = mod(returnNumber, 8.0);
+	// 0b 00_111_000
+	float nr = mod(returnNumber / 8.0, 8.0);
+
+	if(nr <= 1.0){
+		return vec3(1.0, 0.0, 0.0);
+	}else{
+		return vec3(0.0, 1.0, 0.0);
+	}
+
+	// return vec3(nr / 4.0, 0.0, 0.0);
+
+	// if(nr == 1.0){
+	// 	return vec3(1.0, 1.0, 0.0);
+	// }else{
+	// 	if(rn == 1.0){
+	// 		return vec3(1.0, 0.0, 0.0);
+	// 	}else if(rn == nr){
+	// 		return vec3(0.0, 0.0, 1.0);
+	// 	}else{
+	// 		return vec3(0.0, 1.0, 0.0);
+	// 	}
+	// }
+
+	// if(numberOfReturns == 1.0){
+	// 	return vec3(1.0, 1.0, 0.0);
+	// }else{
+	// 	if(returnNumber == 1.0){
+	// 		return vec3(1.0, 0.0, 0.0);
+	// 	}else if(returnNumber == numberOfReturns){
+	// 		return vec3(0.0, 0.0, 1.0);
+	// 	}else{
+	// 		return vec3(0.0, 1.0, 0.0);
+	// 	}
+	// }
+}
+
 vec3 getReturnNumber(){
 	if(numberOfReturns == 1.0){
 		return vec3(1.0, 1.0, 0.0);
@@ -595,9 +638,13 @@ vec3 getColor(){
 		color = cl.rgb;
 	#elif defined color_type_return_number
 		color = getReturnNumber();
+	#elif defined color_type_returns
+		color = getReturns();
 	#elif defined color_type_number_of_returns
 		color = getNumberOfReturns();
 	#elif defined color_type_source_id
+		color = getSourceID();
+	#elif defined color_type_point_source_id
 		color = getSourceID();
 	#elif defined color_type_normal
 		color = (modelMatrix * vec4(normal, 0.0)).xyz;
@@ -623,6 +670,12 @@ float getPointSize(){
 	
 	float slope = tan(fov / 2.0);
 	float projFactor = -0.5 * uScreenHeight / (slope * vViewPosition.z);
+
+	float scale = length(
+		modelViewMatrix * vec4(0, 0, 0, 1) - 
+		modelViewMatrix * vec4(uOctreeSpacing, 0, 0, 1)
+	) / uOctreeSpacing;
+	projFactor = projFactor * scale;
 	
 	float r = uOctreeSpacing * 1.7;
 	vRadius = r;
@@ -640,13 +693,8 @@ float getPointSize(){
 			float worldSpaceSize = 1.0 * size * r / getPointSizeAttenuation();
 			pointSize = (worldSpaceSize / uOrthoWidth) * uScreenWidth;
 		} else {
-
-			if(uIsLeafNode && false){
-				pointSize = size * spacing * projFactor;
-			}else{
-				float worldSpaceSize = 1.0 * size * r / getPointSizeAttenuation();
-				pointSize = worldSpaceSize * projFactor;
-			}
+			float worldSpaceSize = 1.0 * size * r / getPointSizeAttenuation();
+			pointSize = worldSpaceSize * projFactor;
 		}
 	#endif
 
@@ -819,19 +867,29 @@ void main() {
 	gl_Position = projectionMatrix * mvPosition;
 	vLogDepth = log2(-mvPosition.z);
 
+	//gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+	//gl_PointSize = 5.0;
+
 	// POINT SIZE
 	float pointSize = getPointSize();
+	//float pointSize = 2.0;
 	gl_PointSize = pointSize;
 	vPointSize = pointSize;
 
 	// COLOR
 	vColor = getColor();
+	// vColor = vec3(1.0, 0.0, 0.0);
 
 	//gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
 	//gl_Position = vec4(position.xzy / 1000.0, 1.0 );
 
 	//gl_PointSize = 5.0;
 	//vColor = vec3(1.0, 1.0, 1.0);
+
+	// only for "replacing" approaches
+	// if(getLOD() != uLevel){
+	// 	gl_Position = vec4(10.0, 10.0, 10.0, 1.0);
+	// }
 
 
 	#if defined hq_depth_pass
@@ -963,6 +1021,8 @@ varying vec3 	vPosition;
 float specularStrength = 1.0;
 
 void main() {
+
+	// gl_FragColor = vec4(vColor, 1.0);
 
 	vec3 color = vColor;
 	float depth = gl_FragCoord.z;

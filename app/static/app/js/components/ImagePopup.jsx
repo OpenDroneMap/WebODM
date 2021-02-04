@@ -30,11 +30,11 @@ class ImagePopup extends React.Component {
     }
 
     componentDidMount(){
-        this.image.addEventListener("fullscreenchange", this.onFullscreenChange);
+        if (this.image) this.image.addEventListener("fullscreenchange", this.onFullscreenChange);
     }
 
     componentWillUnmount(){
-        this.image.removeEventListener("fullscreenchange", this.onFullscreenChange);
+        if (this.image) this.image.removeEventListener("fullscreenchange", this.onFullscreenChange);
     }
 
     onFullscreenChange = (e) => {
