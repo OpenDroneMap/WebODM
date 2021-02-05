@@ -275,9 +275,8 @@ class TaskListItem extends React.Component {
     const { task } = this.state;
 
     // Map rerun-from parameters to display items
-    // (remove the first item so that 'dataset' is not displayed)
     const rfMap = {};
-    PipelineSteps.get().slice(1).forEach(rf => rfMap[rf.action] = rf);
+    PipelineSteps.get().forEach(rf => rfMap[rf.action] = rf);
 
     // Create onClick handlers
     for (let rfParam in rfMap){

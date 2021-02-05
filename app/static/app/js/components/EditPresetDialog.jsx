@@ -111,7 +111,7 @@ class EditPresetDialog extends React.Component {
                   {!this.isCustomPreset() ? 
                     [<div className="row preset-name">
                         <label className="col-sm-2 control-label">{_("Name")}</label>
-                        <div className="col-sm-10">
+                        <div className="col-sm-10" style={{marginRight: "40px"}}>
                           <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
                         </div>
                     </div>,
