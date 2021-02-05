@@ -274,7 +274,7 @@ export default class LayersControlLayer extends React.Component {
 
         {this.state.expanded ? 
         <div className="layer-expanded">
-            <Histogram width={280}
+            <Histogram width={274}
                         loading={histogramLoading}
                         statistics={tmeta.statistics} 
                         colorMap={cmapValues}
