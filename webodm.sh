@@ -22,9 +22,11 @@ default_nodes=1
 dev_mode=false
 
 # define realpath replacement function
-realpath() {
-    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
-}
+if [[ $platform = "MacOS / OSX" ]]; then
+    realpath() {
+        [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+    }
+fi
 
 # Load default values
 source "${__dirname}/.env"
