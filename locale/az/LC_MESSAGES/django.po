@@ -7,21 +7,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-08 14:32+0000\n"
-"PO-Revision-Date: 2021-01-02 05:00+0000\n"
-"Last-Translator: Yu-Huang Wang <yuhuangwang@gmail.com>\n"
-"Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
-"webodm/webodm/zh_Hant/>\n"
-"Language: zh_Hant\n"
+"POT-Creation-Date: 2021-01-15 15:19+0000\n"
+"PO-Revision-Date: 2021-02-08 14:30+0000\n"
+"Last-Translator: Aslan Rustamov <aslan.rustamov10@gmail.com>\n"
+"Language-Team: Azerbaijani <https://hosted.weblate.org/projects/webodm/"
+"webodm/az/>\n"
+"Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.4.1-dev\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.5-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
-msgstr "輸入自訂CSS"
+msgstr "Xüsusi CSS daxil edin"
 
 #: app/admin.py:53 app/models/theme.py:38
 msgid "CSS"
@@ -29,27 +29,27 @@ msgstr "CSS"
 
 #: app/admin.py:56
 msgid "HTML that will be displayed above site header"
-msgstr "網站標題以上顯示的HTML"
+msgstr "Sayt başlığının üstündə görünəcək HTML"
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr "HTML (在標題之前)"
+msgstr "HTML (başlıqdan əvvəl)"
 
 #: app/admin.py:60
 msgid "HTML that will be displayed after site header"
-msgstr "網站標題之後顯示的HTML"
+msgstr "Sayt başlığından sonra göstəriləcək HTML"
 
 #: app/admin.py:61 app/models/theme.py:40
 msgid "HTML (after header)"
-msgstr "HTML (在標題之後)"
+msgstr "HTML (başlıqdan sonra)"
 
 #: app/admin.py:64
 msgid "HTML that will be displayed after the body tag"
-msgstr "顯示網頁內文的HTML"
+msgstr ""
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
-msgstr "HTML (內文標籤之後)"
+msgstr ""
 
 #: app/admin.py:68
 #, python-brace-format
@@ -57,88 +57,86 @@ msgid ""
 "HTML that will be displayed in the footer. You can also use the special tags "
 "such as {ORGANIZATION} and {YEAR}."
 msgstr ""
-"在網頁註腳中顯示的HTML。 您還可以使用特殊標籤，例如{ORGANIZATION}和{YEAR}。"
 
 #: app/admin.py:69 app/models/theme.py:42
 msgid "HTML (footer)"
-msgstr "HTML (網頁註腳)"
+msgstr ""
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr "描述"
+msgstr "Təsvir"
 
 #: app/admin.py:106
 msgid "Version"
-msgstr "版本"
+msgstr "Versiya"
 
 #: app/admin.py:112
 msgid "Author"
-msgstr "作者"
+msgstr "Müəllif"
 
 #: app/admin.py:233
 msgid "Actions"
-msgstr "動作"
+msgstr "Fəaliyyətlər"
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
-msgstr "常態差值植生指數顯示綠色植被的數量。"
+msgstr ""
+"Normallaşdırılmış Fərqlilik Bitki İndeksi yaşıl bitki örtüyünün miqdarını "
+"göstərir."
 
 #: app/api/formulas.py:20
 msgid ""
 "Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
 "and Green bands instead of only Red to isolate plant health."
 msgstr ""
-"強化常態差值植生指數(Enhanced NDVI)類似於NDVI，但使用藍色和綠色波段而不是僅使"
-"用紅色波段來區別植物健康。"
 
 #: app/api/formulas.py:24
 msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
-msgstr "視覺大氣阻力指數顯示植被面積。"
+msgstr ""
 
 #: app/api/formulas.py:29
 msgid ""
 "Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
-msgstr "過量綠指數強調馬鈴薯等葉類作物的綠色。"
+msgstr ""
 
 #: app/api/formulas.py:33
 msgid ""
 "Burn Area Index hightlights burned land in the red to near-infrared spectrum."
-msgstr "燃燒面積指數以紅光至近紅外光波段來凸顯火災後的土地。"
+msgstr ""
 
 #: app/api/formulas.py:37
 msgid "Green Leaf Index shows greens leaves and stems."
-msgstr "綠葉指數顯示綠葉和莖。"
+msgstr ""
 
 #: app/api/formulas.py:42
 msgid ""
 "Green Normalized Difference Vegetation Index is similar to NDVI, but "
 "measures the green spectrum instead of red."
-msgstr "綠色常態差值植生指數類似於NDVI，但是量測的是綠光波段而非紅光波段。"
+msgstr ""
 
 #: app/api/formulas.py:46
 msgid ""
 "Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
-msgstr "綠色比例植生指數能敏感的反應森林光合作用速率。"
+msgstr ""
 
 #: app/api/formulas.py:50
 msgid ""
 "Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
 "effects of soil areas using an adjustment factor (0.5)."
 msgstr ""
-"土壤調整植生指數與NDVI相似，但嘗試使用調整因子(0.5)以消除土壤區域的影響。"
 
 #: app/api/formulas.py:54
 msgid ""
 "Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
 "for soil areas."
-msgstr "修改後的非線性指數改進了非線性指數算法以顯示土壤區域。"
+msgstr ""
 
 #: app/api/formulas.py:58
 msgid ""
 "Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
 "more sensitive to vegetation."
-msgstr "修改後的簡單比例(MSR)是對簡單比例(SR)指數的改進，使其對植被更加敏感。"
+msgstr ""
 
 #: app/api/formulas.py:62
 msgid ""
@@ -170,11 +168,11 @@ msgstr ""
 
 #: app/api/tasks.py:179
 msgid "You need to upload at least 2 images before commit"
-msgstr ""
+msgstr "İşə başlamazdan əvvəl ən azı 2 şəkil yükləməlisiniz"
 
 #: app/api/tasks.py:201
 msgid "No files uploaded"
-msgstr ""
+msgstr "Heç bir fayl yüklənmədi"
 
 #: app/api/tasks.py:224
 msgid "Cannot create task, you need at least 2 images"
@@ -203,7 +201,7 @@ msgstr ""
 
 #: app/models/image_upload.py:10 app/models/task.py:260
 msgid "Task"
-msgstr ""
+msgstr "Tapşırıq"
 
 #: app/models/image_upload.py:11
 msgid "File uploaded by a user"
@@ -211,7 +209,7 @@ msgstr ""
 
 #: app/models/image_upload.py:11
 msgid "Image"
-msgstr ""
+msgstr "Şəkil"
 
 #: app/models/image_upload.py:20
 msgid "Image Upload"
@@ -219,16 +217,16 @@ msgstr ""
 
 #: app/models/image_upload.py:21
 msgid "Image Uploads"
-msgstr ""
+msgstr "Şəkil yükləmələri"
 
 #: app/models/plugin.py:5
 msgid "Plugin name"
-msgstr ""
+msgstr "Qoşmanın adı"
 
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
 #: app/models/task.py:222 app/models/theme.py:16
 msgid "Name"
-msgstr "名稱"
+msgstr "Adı"
 
 #: app/models/plugin.py:6
 msgid "Whether this plugin is turned on."
@@ -236,15 +234,15 @@ msgstr ""
 
 #: app/models/plugin.py:6
 msgid "Enabled"
-msgstr "已啟用"
+msgstr "Aktiv"
 
 #: app/models/plugin.py:20
 msgid "Plugin"
-msgstr ""
+msgstr "Qoşma"
 
 #: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
 msgid "Plugins"
-msgstr ""
+msgstr "Qoşmalar"
 
 #: app/models/plugin_datum.py:7
 msgid "Setting key"
@@ -252,7 +250,7 @@ msgstr ""
 
 #: app/models/plugin_datum.py:7
 msgid "Key"
-msgstr ""
+msgstr "Açar"
 
 #: app/models/plugin_datum.py:8
 msgid "The user this setting belongs to. If NULL, the setting is global."
@@ -260,7 +258,7 @@ msgstr ""
 
 #: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
 msgid "User"
-msgstr ""
+msgstr "İstifadəçi"
 
 #: app/models/plugin_datum.py:9
 msgid "Integer value"
@@ -304,7 +302,7 @@ msgstr ""
 
 #: app/models/preset.py:11 app/models/task.py:228
 msgid "Options"
-msgstr "選項"
+msgstr "Seçimlər"
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Creation date"
@@ -322,7 +320,7 @@ msgstr ""
 
 #: app/models/preset.py:14
 msgid "System"
-msgstr ""
+msgstr "Sistem"
 
 #: app/models/preset.py:20
 msgid "Preset"
@@ -353,15 +351,15 @@ msgstr ""
 
 #: app/models/project.py:26
 msgid "Deleting"
-msgstr ""
+msgstr "Silinir"
 
 #: app/models/project.py:56 app/models/task.py:221
 msgid "Project"
-msgstr ""
+msgstr "Layihə"
 
 #: app/models/project.py:57
 msgid "Projects"
-msgstr ""
+msgstr "Layihələr"
 
 #: app/models/setting.py:20
 msgid "The name of your application"
@@ -410,7 +408,7 @@ msgstr ""
 
 #: app/models/setting.py:76 app/models/setting.py:77
 msgid "Settings"
-msgstr ""
+msgstr "Tənzimləmələr"
 
 #: app/models/task.py:218
 msgid "Id"
@@ -450,7 +448,7 @@ msgstr ""
 
 #: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
-msgstr "處理節點"
+msgstr "Node işlənir"
 
 #: app/models/task.py:225
 msgid ""
@@ -468,7 +466,7 @@ msgstr ""
 
 #: app/models/task.py:226
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: app/models/task.py:227
 msgid "The last processing error received"
@@ -630,7 +628,7 @@ msgstr ""
 
 #: app/models/task.py:748
 msgid "Done!"
-msgstr ""
+msgstr "Hazırdır!"
 
 #: app/models/theme.py:16
 msgid "Name of theme"
@@ -642,7 +640,7 @@ msgstr ""
 
 #: app/models/theme.py:19
 msgid "Primary"
-msgstr ""
+msgstr "Birinci dərəcəli"
 
 #: app/models/theme.py:20
 msgid "The main background color, and text color of some buttons."
@@ -730,7 +728,7 @@ msgstr ""
 
 #: app/models/theme.py:35
 msgid "Failed"
-msgstr "失敗"
+msgstr "Uğursuz oldu"
 
 #: app/models/theme.py:36
 msgid "The background color of success notifications."
@@ -750,7 +748,7 @@ msgstr ""
 
 #: app/templates/app/500.html:5
 msgid "500 Internal Server Error"
-msgstr ""
+msgstr "500 Daxili Server Xətası"
 
 #: app/templates/app/500.html:6
 msgid "Something happened. The server logs contain more information."
@@ -768,7 +766,7 @@ msgstr ""
 
 #: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
 msgid "Page not found"
-msgstr ""
+msgstr "Səhifə tapılmadı"
 
 #: app/templates/app/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
@@ -784,11 +782,11 @@ msgstr ""
 #: app/templates/app/admin/invalid_setup.html:6
 #: app/templates/app/admin/object_history.html:6
 msgid "Home"
-msgstr ""
+msgstr "Başlanğıc"
 
 #: app/templates/app/admin/500.html:7
 msgid "Server error"
-msgstr ""
+msgstr "Server xətası"
 
 #: app/templates/app/admin/500.html:11
 msgid "Server error (500)"
@@ -810,7 +808,7 @@ msgstr ""
 
 #: app/templates/app/admin/actions.html:4
 msgid "Go"
-msgstr ""
+msgstr "Davam"
 
 #: app/templates/app/admin/actions.html:10
 msgid "Click here to select the objects across all pages"
@@ -838,7 +836,7 @@ msgstr ""
 #: app/templates/app/admin/auth/user/change_password.html:17
 #: app/templates/app/admin/auth/user/change_password.html:54
 msgid "Change password"
-msgstr ""
+msgstr "Parolu dəyiş"
 
 #: app/templates/app/admin/auth/user/change_password.html:27
 #: app/templates/app/admin/change_form.html:47
@@ -876,7 +874,7 @@ msgstr ""
 #: app/templates/app/admin/change_form.html:33
 #: app/templates/app/admin/object_history.html:10
 msgid "History"
-msgstr ""
+msgstr "Tarixçə"
 
 #: app/templates/app/admin/change_form.html:35
 #: app/templates/app/admin/edit_inline/stacked.html:14
@@ -886,7 +884,7 @@ msgstr ""
 
 #: app/templates/app/admin/change_list.html:69
 msgid "Filter"
-msgstr ""
+msgstr "Filtr"
 
 #: app/templates/app/admin/change_list_plugin.html:24
 msgid "Load Plugin (.zip)"
@@ -914,7 +912,7 @@ msgstr ""
 #: app/templates/app/admin/submit_line.html:6
 #: app/templates/app/processing_node.html:54
 msgid "Delete"
-msgstr "刪除"
+msgstr "Sil"
 
 #: app/templates/app/admin/delete_confirmation.html:23
 #, python-format
@@ -984,7 +982,7 @@ msgstr ""
 #: app/templates/app/admin/index.html:37
 #: app/templates/app/admin/related_widget_wrapper.html:9
 msgid "Change"
-msgstr ""
+msgstr "Dəyişdir"
 
 #: app/templates/app/admin/edit_inline/tabular.html:20
 msgid "Delete?"
@@ -1007,7 +1005,7 @@ msgstr ""
 #: app/templates/app/admin/index.html:31
 #: app/templates/app/admin/related_widget_wrapper.html:16
 msgid "Add"
-msgstr ""
+msgstr "Əlavə et"
 
 #: app/templates/app/admin/index.html:47
 msgid "You don't have permission to edit anything."
@@ -1023,7 +1021,7 @@ msgstr ""
 
 #: app/templates/app/admin/index.html:60
 msgid "None available"
-msgstr ""
+msgstr "Heç biri mövcud deyil"
 
 #: app/templates/app/admin/index.html:74
 msgid "Unknown content"
@@ -1049,7 +1047,7 @@ msgstr ""
 
 #: app/templates/app/admin/login.html:61
 msgid "Log in"
-msgstr ""
+msgstr "Giriş et"
 
 #: app/templates/app/admin/object_history.html:22
 msgid "Date/time"
@@ -1057,7 +1055,7 @@ msgstr ""
 
 #: app/templates/app/admin/object_history.html:24
 msgid "Action"
-msgstr ""
+msgstr "Fəaliyyət"
 
 #: app/templates/app/admin/object_history.html:38
 msgid ""
@@ -1068,12 +1066,12 @@ msgstr ""
 #: app/templates/app/admin/pagination.html:10
 #: app/templates/app/admin/search_form.html:9
 msgid "Show all"
-msgstr ""
+msgstr "Hamısını göstər"
 
 #: app/templates/app/admin/pagination.html:11
 #: app/templates/app/admin/submit_line.html:3
 msgid "Save"
-msgstr "儲存"
+msgstr "Yadda saxla"
 
 #: app/templates/app/admin/popup_response.html:3
 msgid "Popup closing..."
@@ -1096,13 +1094,14 @@ msgstr ""
 
 #: app/templates/app/admin/search_form.html:7
 msgid "Search"
-msgstr "搜尋"
+msgstr "Axtarış"
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
+msgstr[1] ""
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1124,7 +1123,7 @@ msgstr ""
 #: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
 msgid "Welcome!"
-msgstr ""
+msgstr "Xoş gəlmisiniz!"
 
 #: app/templates/app/dashboard.html:16
 msgid "Add a Processing Node"
@@ -1140,7 +1139,7 @@ msgstr ""
 
 #: app/templates/app/dashboard.html:28
 msgid "Select Images and GCP"
-msgstr "選擇影像和GCP"
+msgstr "Şəkillər və GCP seçin"
 
 #: app/templates/app/dashboard.html:30
 #, python-format
@@ -1177,7 +1176,7 @@ msgstr ""
 
 #: app/templates/app/dev_tools.html:9
 msgid "Close"
-msgstr "關閉"
+msgstr "Bağla"
 
 #: app/templates/app/dev_tools.html:14
 msgid "Current Locale:"
@@ -1208,31 +1207,31 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:19
 msgid "Logout"
-msgstr ""
+msgstr "Çıxış"
 
 #: app/templates/app/logged_in_base.html:33 app/views/app.py:46
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
 msgid "Processing Nodes"
-msgstr ""
+msgstr "İşləmə nodu"
 
 #: app/templates/app/logged_in_base.html:69
 msgid "Add New"
-msgstr ""
+msgstr "Yenisini əlavə et"
 
 #: app/templates/app/logged_in_base.html:79
 msgid "Administration"
-msgstr ""
+msgstr "Administrasiya"
 
 #: app/templates/app/logged_in_base.html:84
 msgid "Accounts"
-msgstr ""
+msgstr "Hesablar"
 
 #: app/templates/app/logged_in_base.html:87
 msgid "Groups"
-msgstr ""
+msgstr "Qruplar"
 
 #: app/templates/app/logged_in_base.html:92
 msgid "Brand"
@@ -1240,15 +1239,15 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:114 app/views/app.py:103
 msgid "About"
-msgstr ""
+msgstr "Haqqında"
 
 #: app/templates/app/processing_node.html:11 nodeodm/models.py:23
 msgid "Hostname"
-msgstr ""
+msgstr "Host adı"
 
 #: app/templates/app/processing_node.html:15 nodeodm/models.py:24
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: app/templates/app/processing_node.html:19 nodeodm/models.py:25
 msgid "API Version"
@@ -1256,7 +1255,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:23 nodeodm/models.py:33
 msgid "Engine"
-msgstr ""
+msgstr "Mühərrik"
 
 #: app/templates/app/processing_node.html:27 nodeodm/models.py:31
 msgid "Engine Version"
@@ -1272,7 +1271,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:39 nodeodm/models.py:32
 msgid "Label"
-msgstr ""
+msgstr "Etiket"
 
 #: app/templates/app/processing_node.html:43 nodeodm/models.py:26
 msgid "Last Refreshed"
@@ -1289,7 +1288,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
-msgstr "編輯"
+msgstr "Düzəliş et"
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"
@@ -1356,7 +1355,7 @@ msgstr ""
 
 #: app/views/app.py:54 app/views/public.py:26
 msgid "Map"
-msgstr ""
+msgstr "Xəritə"
 
 #: app/views/app.py:81
 msgid "3D Model Display"
@@ -1364,7 +1363,7 @@ msgstr ""
 
 #: app/views/app.py:147
 msgid "Welcome"
-msgstr ""
+msgstr "Xoş gəlmisiniz"
 
 #: app/views/dev.py:59
 msgid "Cannot find locale/ folder in .zip archive"
@@ -1466,11 +1465,11 @@ msgstr ""
 
 #: plugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
-msgstr ""
+msgstr "Diaqnostika"
 
 #: plugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
-msgstr ""
+msgstr "Diaqnostik məlumat"
 
 #: plugins/diagnostic/templates/diagnostic.html:10
 msgid "Storage Space"
@@ -1481,7 +1480,7 @@ msgstr ""
 #: plugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
-msgstr ""
+msgstr "Pulsuz"
 
 #: plugins/diagnostic/templates/diagnostic.html:15
 #: plugins/diagnostic/templates/diagnostic.html:39
@@ -1493,7 +1492,7 @@ msgstr ""
 #: plugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
-msgstr ""
+msgstr "Cəmi"
 
 #: plugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
@@ -1521,7 +1520,7 @@ msgstr ""
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
-msgstr ""
+msgstr "Qeyd!"
 
 #: plugins/diagnostic/templates/diagnostic.html:33
 #, python-format
@@ -1550,4 +1549,4 @@ msgstr ""
 
 #: plugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
-msgstr ""
+msgstr "GCP interfeysi"

@@ -9,8 +9,13 @@ export default {
             },
             {
                 action: "opensfm",
-                label: _("Structure From Motion / MVS"),
+                label: _("Structure From Motion"),
                 icon: "fa fa-camera"
+            },
+            {
+                action: "openmvs",
+                label: _("Multi View Stereo"),
+                icon: "fa fa-braille"
             },
             {
                 action: "odm_meshing",

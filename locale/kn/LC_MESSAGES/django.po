@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-24 01:30+0000\n"
-"PO-Revision-Date: 2021-01-15 15:17+0000\n"
+"PO-Revision-Date: 2021-01-17 11:32+0000\n"
 "Last-Translator: Anand Mahesh <manand881@gmail.com>\n"
 "Language-Team: Kannada <https://hosted.weblate.org/projects/webodm/webodm/kn/"
 ">\n"
@@ -33,11 +33,11 @@ msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ ಅನ್ನು ಸೈಟ್ ಹೆಡರ್
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr ""
+msgstr "ಎಚ್.ಟಿ.ಎಂ.ಎಲ್ (ಅಡಿಟಿಪ್ಪಣಿಗೆ ಮೊದಲು)"
 
 #: app/admin.py:60
 msgid "HTML that will be displayed after site header"
-msgstr ""
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ ಅನ್ನು ಸೈಟ್ ಹೆಡರ್ ಮೇಲೆ ಪ್ರದರ್ಶಿಸಲಾಗುತ್ತದೆ"
 
 #: app/admin.py:61 app/models/theme.py:40
 msgid "HTML (after header)"
@@ -64,7 +64,7 @@ msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ (ಫೂಟರ್ )"
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr "ವಿವರಣೆ"
+msgstr "ವಿವರ"
 
 #: app/admin.py:106
 msgid "Version"
@@ -76,7 +76,7 @@ msgstr "ಲೇಖಕ"
 
 #: app/admin.py:233
 msgid "Actions"
-msgstr "ಕ್ರಿಯೆಗಳು"
+msgstr "ಕ್ರಿಯೆಗಳನ್ನು"
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
@@ -166,7 +166,7 @@ msgstr ""
 
 #: app/api/tasks.py:179
 msgid "You need to upload at least 2 images before commit"
-msgstr ""
+msgstr "ಬದ್ಧರಾಗುವ ಮೊದಲು ನೀವು ಕನಿಷ್ಠ 2 ಚಿತ್ರಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಬೇಕಾಗುತ್ತದೆ"
 
 #: app/api/tasks.py:201
 msgid "No files uploaded"
@@ -179,7 +179,7 @@ msgstr "ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿ�
 #: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
 #: app/api/tasks.py:354
 msgid "Asset does not exist"
-msgstr ""
+msgstr "ಆಸ್ತಿ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್"
 
 #: app/api/tasks.py:370
 msgid "Imported Task"
@@ -187,11 +187,13 @@ msgstr "ಆಮದು ಮಾಡಿದ ಕಾರ್ಯ"
 
 #: app/api/tasks.py:373
 msgid "Cannot create task, you need to upload 1 file"
-msgstr ""
+msgstr "ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ನೀವು 1 ಫೈಲ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಬೇಕಾಗುತ್ತದೆ"
 
 #: app/api/tasks.py:376
 msgid "Cannot create task, either specify a URL or upload 1 file."
 msgstr ""
+"ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ಉ.ರ್.ಲ್  ಅನ್ನು ನಿರ್ದಿಷ್ಟಪಡಿಸಿ ಅಥವಾ 1 ಫೈಲ್ ಅನ್ನು"
+" ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
 
 #: app/models/image_upload.py:10
 msgid "Task this image belongs to"
@@ -203,7 +205,7 @@ msgstr "ಕಾರ್ಯ"
 
 #: app/models/image_upload.py:11
 msgid "File uploaded by a user"
-msgstr ""
+msgstr "ಬಳಕೆದಾರರಿಂದ ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾದ ಫೈಲ್"
 
 #: app/models/image_upload.py:11
 msgid "Image"
@@ -211,15 +213,15 @@ msgstr "ಚಿತ್ರ"
 
 #: app/models/image_upload.py:20
 msgid "Image Upload"
-msgstr ""
+msgstr "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್"
 
 #: app/models/image_upload.py:21
 msgid "Image Uploads"
-msgstr ""
+msgstr "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್‌ಗಳು"
 
 #: app/models/plugin.py:5
 msgid "Plugin name"
-msgstr ""
+msgstr "ಪ್ಲಗಿನ್ ಹೆಸರು"
 
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
 #: app/models/task.py:221 app/models/theme.py:16
@@ -304,7 +306,7 @@ msgstr "ಆಯ್ಕೆಗಳು"
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
 msgid "Creation date"
-msgstr ""
+msgstr "ಸೃಷ್ಟಿ ದಿನಾಂಕ"
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
 msgid "Created at"
@@ -349,7 +351,7 @@ msgstr ""
 
 #: app/models/project.py:26
 msgid "Deleting"
-msgstr ""
+msgstr "ಅಳಿಸಲಾಗುತ್ತಿದೆ"
 
 #: app/models/project.py:56 app/models/task.py:220
 msgid "Project"
