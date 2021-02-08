@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-22 19:06+0000\n"
-"PO-Revision-Date: 2020-12-22 17:23+0000\n"
+"PO-Revision-Date: 2021-02-08 14:30+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/webodm/"
 "webodm/nb_NO/>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.4-dev\n"
+"X-Generator: Weblate 4.5-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
-msgstr ""
+msgstr "Skriv inn egendefinert CSS"
 
 #: app/admin.py:53 app/models/theme.py:38
 msgid "CSS"
-msgstr ""
+msgstr "CSS"
 
 #: app/admin.py:56
 msgid "HTML that will be displayed above site header"
@@ -33,23 +33,23 @@ msgstr ""
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr ""
+msgstr "HTML (før hode)"
 
 #: app/admin.py:60
 msgid "HTML that will be displayed after site header"
-msgstr ""
+msgstr "HTML som vil bli vist etter sidehode"
 
 #: app/admin.py:61 app/models/theme.py:40
 msgid "HTML (after header)"
-msgstr ""
+msgstr "HTML (etter hode)"
 
 #: app/admin.py:64
 msgid "HTML that will be displayed after the body tag"
-msgstr ""
+msgstr "HTML som vil bli vist etter body-tagg"
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
-msgstr ""
+msgstr "HTML (etter kropp)"
 
 #: app/admin.py:68
 #, python-brace-format
@@ -60,11 +60,11 @@ msgstr ""
 
 #: app/admin.py:69 app/models/theme.py:42
 msgid "HTML (footer)"
-msgstr ""
+msgstr "HTML (bunntekst)"
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr ""
+msgstr "Beskrivelse"
 
 #: app/admin.py:106
 #, fuzzy

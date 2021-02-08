@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-24 01:30+0000\n"
-"PO-Revision-Date: 2021-01-15 15:17+0000\n"
+"PO-Revision-Date: 2021-01-17 11:32+0000\n"
 "Last-Translator: Anand Mahesh <manand881@gmail.com>\n"
 "Language-Team: Kannada <https://hosted.weblate.org/projects/webodm/react-ui/"
 "kn/>\n"
@@ -39,25 +39,25 @@ msgstr ""
 
 #: app/static/app/js/Dashboard.jsx:26
 msgid "Name field is required"
-msgstr ""
+msgstr "ಹೆಸರು ಕ್ಷೇತ್ರ ಅಗತ್ಯವಿದೆ"
 
 #: app/static/app/js/Dashboard.jsx:62
 msgid "Add Project"
-msgstr ""
+msgstr "ಯೋಜನೆಯನ್ನು ಸೇರಿಸಿ"
 
 #: app/static/app/js/Dashboard.jsx:97
 msgid "Your changes will be lost. Are you sure you want to leave?"
-msgstr ""
+msgstr "ನಿಮ್ಮ ಬದಲಾವಣೆಗಳು ಕಳೆದುಹೋಗುತ್ತವೆ. ನೀವು ಬಿಡಲು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?"
 
 #: app/static/app/js/MapView.jsx:65
 #: app/static/app/js/classes/PipelineSteps.js:37
 #: app/static/app/js/components/Map.jsx:82
 msgid "Orthophoto"
-msgstr ""
+msgstr "ಆರ್ಥೋಫೋಟೋ"
 
 #: app/static/app/js/MapView.jsx:70 app/static/app/js/components/Map.jsx:84
 msgid "Plant Health"
-msgstr ""
+msgstr "ಸಸ್ಯ ಆರೋಗ್ಯ"
 
 #: app/static/app/js/MapView.jsx:75
 msgid "Surface Model"

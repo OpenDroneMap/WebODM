@@ -7,49 +7,47 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-08 14:32+0000\n"
-"PO-Revision-Date: 2021-01-02 05:00+0000\n"
-"Last-Translator: Yu-Huang Wang <yuhuangwang@gmail.com>\n"
-"Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
-"webodm/webodm/zh_Hant/>\n"
-"Language: zh_Hant\n"
+"POT-Creation-Date: 2021-01-15 15:19+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: enm\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.4.1-dev\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
-msgstr "輸入自訂CSS"
+msgstr ""
 
 #: app/admin.py:53 app/models/theme.py:38
 msgid "CSS"
-msgstr "CSS"
+msgstr ""
 
 #: app/admin.py:56
 msgid "HTML that will be displayed above site header"
-msgstr "網站標題以上顯示的HTML"
+msgstr ""
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr "HTML (在標題之前)"
+msgstr ""
 
 #: app/admin.py:60
 msgid "HTML that will be displayed after site header"
-msgstr "網站標題之後顯示的HTML"
+msgstr ""
 
 #: app/admin.py:61 app/models/theme.py:40
 msgid "HTML (after header)"
-msgstr "HTML (在標題之後)"
+msgstr ""
 
 #: app/admin.py:64
 msgid "HTML that will be displayed after the body tag"
-msgstr "顯示網頁內文的HTML"
+msgstr ""
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
-msgstr "HTML (內文標籤之後)"
+msgstr ""
 
 #: app/admin.py:68
 #, python-brace-format
@@ -57,88 +55,84 @@ msgid ""
 "HTML that will be displayed in the footer. You can also use the special tags "
 "such as {ORGANIZATION} and {YEAR}."
 msgstr ""
-"在網頁註腳中顯示的HTML。 您還可以使用特殊標籤，例如{ORGANIZATION}和{YEAR}。"
 
 #: app/admin.py:69 app/models/theme.py:42
 msgid "HTML (footer)"
-msgstr "HTML (網頁註腳)"
+msgstr ""
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr "描述"
+msgstr ""
 
 #: app/admin.py:106
 msgid "Version"
-msgstr "版本"
+msgstr ""
 
 #: app/admin.py:112
 msgid "Author"
-msgstr "作者"
+msgstr ""
 
 #: app/admin.py:233
 msgid "Actions"
-msgstr "動作"
+msgstr ""
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
-msgstr "常態差值植生指數顯示綠色植被的數量。"
+msgstr ""
 
 #: app/api/formulas.py:20
 msgid ""
 "Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
 "and Green bands instead of only Red to isolate plant health."
 msgstr ""
-"強化常態差值植生指數(Enhanced NDVI)類似於NDVI，但使用藍色和綠色波段而不是僅使"
-"用紅色波段來區別植物健康。"
 
 #: app/api/formulas.py:24
 msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
-msgstr "視覺大氣阻力指數顯示植被面積。"
+msgstr ""
 
 #: app/api/formulas.py:29
 msgid ""
 "Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
-msgstr "過量綠指數強調馬鈴薯等葉類作物的綠色。"
+msgstr ""
 
 #: app/api/formulas.py:33
 msgid ""
 "Burn Area Index hightlights burned land in the red to near-infrared spectrum."
-msgstr "燃燒面積指數以紅光至近紅外光波段來凸顯火災後的土地。"
+msgstr ""
 
 #: app/api/formulas.py:37
 msgid "Green Leaf Index shows greens leaves and stems."
-msgstr "綠葉指數顯示綠葉和莖。"
+msgstr ""
 
 #: app/api/formulas.py:42
 msgid ""
 "Green Normalized Difference Vegetation Index is similar to NDVI, but "
 "measures the green spectrum instead of red."
-msgstr "綠色常態差值植生指數類似於NDVI，但是量測的是綠光波段而非紅光波段。"
+msgstr ""
 
 #: app/api/formulas.py:46
 msgid ""
 "Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
-msgstr "綠色比例植生指數能敏感的反應森林光合作用速率。"
+msgstr ""
 
 #: app/api/formulas.py:50
 msgid ""
 "Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
 "effects of soil areas using an adjustment factor (0.5)."
 msgstr ""
-"土壤調整植生指數與NDVI相似，但嘗試使用調整因子(0.5)以消除土壤區域的影響。"
 
 #: app/api/formulas.py:54
 msgid ""
 "Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
 "for soil areas."
-msgstr "修改後的非線性指數改進了非線性指數算法以顯示土壤區域。"
+msgstr ""
 
 #: app/api/formulas.py:58
 msgid ""
 "Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
 "more sensitive to vegetation."
-msgstr "修改後的簡單比例(MSR)是對簡單比例(SR)指數的改進，使其對植被更加敏感。"
+msgstr ""
 
 #: app/api/formulas.py:62
 msgid ""
@@ -228,7 +222,7 @@ msgstr ""
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
 #: app/models/task.py:222 app/models/theme.py:16
 msgid "Name"
-msgstr "名稱"
+msgstr ""
 
 #: app/models/plugin.py:6
 msgid "Whether this plugin is turned on."
@@ -236,7 +230,7 @@ msgstr ""
 
 #: app/models/plugin.py:6
 msgid "Enabled"
-msgstr "已啟用"
+msgstr ""
 
 #: app/models/plugin.py:20
 msgid "Plugin"
@@ -304,7 +298,7 @@ msgstr ""
 
 #: app/models/preset.py:11 app/models/task.py:228
 msgid "Options"
-msgstr "選項"
+msgstr ""
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Creation date"
@@ -450,7 +444,7 @@ msgstr ""
 
 #: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
-msgstr "處理節點"
+msgstr ""
 
 #: app/models/task.py:225
 msgid ""
@@ -730,7 +724,7 @@ msgstr ""
 
 #: app/models/theme.py:35
 msgid "Failed"
-msgstr "失敗"
+msgstr ""
 
 #: app/models/theme.py:36
 msgid "The background color of success notifications."
@@ -914,7 +908,7 @@ msgstr ""
 #: app/templates/app/admin/submit_line.html:6
 #: app/templates/app/processing_node.html:54
 msgid "Delete"
-msgstr "刪除"
+msgstr ""
 
 #: app/templates/app/admin/delete_confirmation.html:23
 #, python-format
@@ -1073,7 +1067,7 @@ msgstr ""
 #: app/templates/app/admin/pagination.html:11
 #: app/templates/app/admin/submit_line.html:3
 msgid "Save"
-msgstr "儲存"
+msgstr ""
 
 #: app/templates/app/admin/popup_response.html:3
 msgid "Popup closing..."
@@ -1096,13 +1090,14 @@ msgstr ""
 
 #: app/templates/app/admin/search_form.html:7
 msgid "Search"
-msgstr "搜尋"
+msgstr ""
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
+msgstr[1] ""
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1140,7 +1135,7 @@ msgstr ""
 
 #: app/templates/app/dashboard.html:28
 msgid "Select Images and GCP"
-msgstr "選擇影像和GCP"
+msgstr ""
 
 #: app/templates/app/dashboard.html:30
 #, python-format
@@ -1177,7 +1172,7 @@ msgstr ""
 
 #: app/templates/app/dev_tools.html:9
 msgid "Close"
-msgstr "關閉"
+msgstr ""
 
 #: app/templates/app/dev_tools.html:14
 msgid "Current Locale:"
@@ -1289,7 +1284,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
-msgstr "編輯"
+msgstr ""
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"

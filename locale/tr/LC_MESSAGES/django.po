@@ -3,52 +3,53 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 15:19+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2021-02-08 14:32+0000\n"
+"PO-Revision-Date: 2021-02-01 10:39+0000\n"
+"Last-Translator: Gunduzhan Gunduz <gunduzhan@gmail.com>\n"
+"Language-Team: Turkish <https://hosted.weblate.org/projects/webodm/webodm/tr/"
+">\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.5-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
-msgstr ""
+msgstr "Özel CSS girin"
 
 #: app/admin.py:53 app/models/theme.py:38
 msgid "CSS"
-msgstr ""
+msgstr "CSS"
 
 #: app/admin.py:56
 msgid "HTML that will be displayed above site header"
-msgstr ""
+msgstr "Site başlığının üzerinde görüntülenecek HTML"
 
 #: app/admin.py:57 app/models/theme.py:39
 msgid "HTML (before header)"
-msgstr ""
+msgstr "HTML (başlıktan önce)"
 
 #: app/admin.py:60
 msgid "HTML that will be displayed after site header"
-msgstr ""
+msgstr "Site başlığından sonra görüntülenecek HTML"
 
 #: app/admin.py:61 app/models/theme.py:40
 msgid "HTML (after header)"
-msgstr ""
+msgstr "HTML (başlıktan sonra)"
 
 #: app/admin.py:64
 msgid "HTML that will be displayed after the body tag"
-msgstr ""
+msgstr "Gövde etiketinden sonra görüntülenecek HTML"
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
-msgstr ""
+msgstr "HTML (gövdeden sonra)"
 
 #: app/admin.py:68
 #, python-brace-format
@@ -56,78 +57,97 @@ msgid ""
 "HTML that will be displayed in the footer. You can also use the special tags "
 "such as {ORGANIZATION} and {YEAR}."
 msgstr ""
+"Altbilgide görüntülenecek HTML. {ORGANIZATION} ve {YEAR} gibi özel "
+"etiketleri de kullanabilirsiniz."
 
 #: app/admin.py:69 app/models/theme.py:42
 msgid "HTML (footer)"
-msgstr ""
+msgstr "HTML (altbilgi)"
 
 #: app/admin.py:100 app/models/project.py:24
 msgid "Description"
-msgstr ""
+msgstr "Tanım"
 
 #: app/admin.py:106
 msgid "Version"
-msgstr ""
+msgstr "Sürüm"
 
 #: app/admin.py:112
 msgid "Author"
-msgstr ""
+msgstr "Yazar"
 
 #: app/admin.py:233
 msgid "Actions"
-msgstr ""
+msgstr "Eylemler"
 
 #: app/api/formulas.py:12 app/api/formulas.py:16
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
 msgstr ""
+"Normalleştirilmiş Bitki Örtüsü İndeksi yeşil bitki örtüsünün miktarını "
+"gösterir."
 
 #: app/api/formulas.py:20
 msgid ""
 "Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
 "and Green bands instead of only Red to isolate plant health."
 msgstr ""
+"Gelişmiş Normalleştirilmiş Farklı Bitki Örtüsü Endeksi, NDVI gibidir, ancak "
+"bitki sağlığını izole etmek için yalnızca Kırmızı yerine Mavi ve Yeşil "
+"bantları kullanır."
 
 #: app/api/formulas.py:24
 msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
-msgstr ""
+msgstr "Görsel Atmosferik Direnç Endeksi, bitki örtüsünün alanlarını gösterir."
 
 #: app/api/formulas.py:29
 msgid ""
 "Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
 msgstr ""
+"Fazla Yeşil İndeks, patates gibi yapraklı mahsullerin yeşilliğini vurgular."
 
 #: app/api/formulas.py:33
 msgid ""
 "Burn Area Index hightlights burned land in the red to near-infrared spectrum."
 msgstr ""
+"Yanık Alanı Endeksi, kırmızıdan kızılötesine yakın spektrumdaki yanmış "
+"araziyi vurgular."
 
 #: app/api/formulas.py:37
 msgid "Green Leaf Index shows greens leaves and stems."
-msgstr ""
+msgstr "Yeşil Yaprak İndeksi, yeşil yaprak ve sapları gösterir."
 
 #: app/api/formulas.py:42
 msgid ""
 "Green Normalized Difference Vegetation Index is similar to NDVI, but "
 "measures the green spectrum instead of red."
 msgstr ""
+"Yeşil Normalleştirilmiş Bitki Örtüsü Endeksi NDVI'ya benzer, ancak kırmızı "
+"yerine yeşil spektrumu ölçer."
 
 #: app/api/formulas.py:46
 msgid ""
 "Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
 msgstr ""
+"Yeşil Oran Bitki Örtüsü Endeksi, ormanlardaki fotosentetik oranlara "
+"duyarlıdır."
 
 #: app/api/formulas.py:50
 msgid ""
 "Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
 "effects of soil areas using an adjustment factor (0.5)."
 msgstr ""
+"Toprak Ayarlı Bitki Örtüsü Endeksi NDVI'ya benzer, ancak bir ayarlama "
+"faktörü (0,5) kullanarak toprak alanlarının etkilerini ortadan kaldırmaya "
+"çalışır."
 
 #: app/api/formulas.py:54
 msgid ""
 "Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
 "for soil areas."
 msgstr ""
+"Değiştirilmiş Doğrusal Olmayan İndeks, toprak alanlarını hesaba katmak için "
+"Doğrusal Olmayan İndeks algoritmasını geliştirir."
 
 #: app/api/formulas.py:58
 msgid ""
@@ -140,114 +160,126 @@ msgid ""
 "Renormalized Difference Vegetation Index uses the difference between near-IR "
 "and red, plus NDVI to show areas of healthy vegetation."
 msgstr ""
+"Yeniden Normalize Edilmiş Bitki Örtüsü Endeksi, sağlıklı bitki örtüsü "
+"alanlarını göstermek için YAKIN IR ve kırmızı, artı NDVI arasındaki farkı "
+"kullanır."
 
 #: app/api/formulas.py:66
 msgid ""
 "Transformed Difference Vegetation Index highlights vegetation cover in urban "
 "environments."
 msgstr ""
+"Dönüştürülmüş Farklı Bitki Örtüsü Endeksi, kentsel ortamlardaki bitki "
+"örtüsünü vurgular."
 
 #: app/api/formulas.py:70
 msgid ""
 "Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work "
 "better in areas with little vegetation where soil is visible."
 msgstr ""
+"Optimize Edilmiş Toprak Ayarlı Bitki Örtüsü Endeksi SAVI'ye dayalıdır, ancak "
+"toprağın görünür olduğu az bitki örtüsüne sahip alanlarda daha iyi çalışma "
+"eğilimindedir."
 
 #: app/api/formulas.py:74
 msgid "Leaf Area Index estimates foliage areas and predicts crop yields."
 msgstr ""
+"Yaprak Alanı Endeksi, yeşillik alanlarını tahmin eder ve mahsul verimini "
+"tahmin eder."
 
 #: app/api/formulas.py:79
 msgid ""
 "Enhanced Vegetation Index is useful in areas where NDVI might saturate, by "
 "using blue wavelengths to correct soil signals."
 msgstr ""
+"Gelişmiş Bitki Örtüsü İndeksi, toprak sinyallerini düzeltmek için mavi dalga "
+"boylarını kullanarak NDVI'nın doygun olabileceği alanlarda kullanışlıdır."
 
 #: app/api/tasks.py:179
 msgid "You need to upload at least 2 images before commit"
-msgstr ""
+msgstr "Kaydetmeden önce en az 2 resim yüklemelisiniz"
 
 #: app/api/tasks.py:201
 msgid "No files uploaded"
-msgstr ""
+msgstr "Dosya yüklenmedi"
 
 #: app/api/tasks.py:224
 msgid "Cannot create task, you need at least 2 images"
-msgstr ""
+msgstr "Görev oluşturulamıyor, en az 2 resme ihtiyacınız var"
 
 #: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
 #: app/api/tasks.py:354
 msgid "Asset does not exist"
-msgstr ""
+msgstr "Varlık mevcut değil"
 
 #: app/api/tasks.py:370
 msgid "Imported Task"
-msgstr ""
+msgstr "İçe Aktarılan Görev"
 
 #: app/api/tasks.py:373
 msgid "Cannot create task, you need to upload 1 file"
-msgstr ""
+msgstr "Görev oluşturulamıyor, 1 dosya yüklemeniz gerekiyor"
 
 #: app/api/tasks.py:376
 msgid "Cannot create task, either specify a URL or upload 1 file."
-msgstr ""
+msgstr "Görev oluşturulamıyor, bir URL belirtin veya 1 dosya yükleyin."
 
 #: app/models/image_upload.py:10
 msgid "Task this image belongs to"
-msgstr ""
+msgstr "Bu görüntünün ait olduğu görev"
 
 #: app/models/image_upload.py:10 app/models/task.py:260
 msgid "Task"
-msgstr ""
+msgstr "Görev"
 
 #: app/models/image_upload.py:11
 msgid "File uploaded by a user"
-msgstr ""
+msgstr "Kullanıcı tarafından yüklenen dosya"
 
 #: app/models/image_upload.py:11
 msgid "Image"
-msgstr ""
+msgstr "Görüntü"
 
 #: app/models/image_upload.py:20
 msgid "Image Upload"
-msgstr ""
+msgstr "Resim Yükleme"
 
 #: app/models/image_upload.py:21
 msgid "Image Uploads"
-msgstr ""
+msgstr "Resim Yüklemeleri"
 
 #: app/models/plugin.py:5
 msgid "Plugin name"
-msgstr ""
+msgstr "Eklenti adı"
 
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
 #: app/models/task.py:222 app/models/theme.py:16
 msgid "Name"
-msgstr ""
+msgstr "İsim"
 
 #: app/models/plugin.py:6
 msgid "Whether this plugin is turned on."
-msgstr ""
+msgstr "Bu eklentinin açık olup olmadığı."
 
 #: app/models/plugin.py:6
 msgid "Enabled"
-msgstr ""
+msgstr "Aktif"
 
 #: app/models/plugin.py:20
 msgid "Plugin"
-msgstr ""
+msgstr "Eklenti"
 
 #: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
 msgid "Plugins"
-msgstr ""
+msgstr "Eklentiler"
 
 #: app/models/plugin_datum.py:7
 msgid "Setting key"
-msgstr ""
+msgstr "Ayar anahtarı"
 
 #: app/models/plugin_datum.py:7
 msgid "Key"
-msgstr ""
+msgstr "Anahtar"
 
 #: app/models/plugin_datum.py:8
 msgid "The user this setting belongs to. If NULL, the setting is global."
@@ -299,7 +331,7 @@ msgstr ""
 
 #: app/models/preset.py:11 app/models/task.py:228
 msgid "Options"
-msgstr ""
+msgstr "Opsiyonlar"
 
 #: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
 msgid "Creation date"
@@ -445,7 +477,7 @@ msgstr ""
 
 #: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
 msgid "Processing Node"
-msgstr ""
+msgstr "İşlem Nodu"
 
 #: app/models/task.py:225
 msgid ""
@@ -909,7 +941,7 @@ msgstr ""
 #: app/templates/app/admin/submit_line.html:6
 #: app/templates/app/processing_node.html:54
 msgid "Delete"
-msgstr ""
+msgstr "Sil"
 
 #: app/templates/app/admin/delete_confirmation.html:23
 #, python-format
@@ -1068,7 +1100,7 @@ msgstr ""
 #: app/templates/app/admin/pagination.html:11
 #: app/templates/app/admin/submit_line.html:3
 msgid "Save"
-msgstr ""
+msgstr "Sakla"
 
 #: app/templates/app/admin/popup_response.html:3
 msgid "Popup closing..."
@@ -1091,7 +1123,7 @@ msgstr ""
 
 #: app/templates/app/admin/search_form.html:7
 msgid "Search"
-msgstr ""
+msgstr "Araştır"
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1173,7 +1205,7 @@ msgstr ""
 
 #: app/templates/app/dev_tools.html:9
 msgid "Close"
-msgstr ""
+msgstr "Kapat"
 
 #: app/templates/app/dev_tools.html:14
 msgid "Current Locale:"
@@ -1285,7 +1317,7 @@ msgstr ""
 
 #: app/templates/app/processing_node.html:53
 msgid "Edit"
-msgstr ""
+msgstr "Düzenle"
 
 #: app/templates/app/welcome.html:224
 msgid "Uh oh! Could you please check the errors below?"
