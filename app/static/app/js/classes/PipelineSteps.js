@@ -18,6 +18,11 @@ export default {
                 icon: "fa fa-braille"
             },
             {
+                action: "odm_filterpoints",
+                label: _("Point Filtering"),
+                icon: "fa fa-filter"
+            },
+            {
                 action: "odm_meshing",
                 label: _("Meshing"),
                 icon: "fa fa-cube"
