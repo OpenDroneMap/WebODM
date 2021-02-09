@@ -362,7 +362,7 @@ class ModelView extends React.Component {
                     const cameraMesh = new THREE.Mesh(cameraObj.geometry, material);
                     cameraMesh.matrixAutoUpdate = false;
                     let scale = 1.0;
-                    if (!this.pointCloud.projection) scale = 0.1;
+                    // if (!this.pointCloud.projection) scale = 0.1;
 
                     cameraMesh.matrix.set(...getMatrix(feat.properties.translation, feat.properties.rotation, scale).elements);
                     
