@@ -2,6 +2,7 @@ FROM postgres:9.5
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV POSTGIS_MAJOR 2.3
+ENV POSTGRES_PASSWORD postgres
 
 RUN . /etc/os-release \
       && echo "deb http://deb.debian.org/debian "$VERSION_CODENAME"-backports main" >> /etc/apt/sources.list \

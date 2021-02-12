@@ -169,14 +169,14 @@ class TestApiTask(BootTransactionTestCase):
 
                 [x, y, z, px, py, imagename, *extras] = lines[1].split(' ')
                 self.assertTrue(imagename == "tiny_drone_image.JPG") # case insensitive
-                self.assertTrue(float(px) == 2.0) # scaled by half
-                self.assertTrue(float(py) == 3.0) # scaled by half
-                self.assertTrue(float(x) == 576529.22) # Didn't change
+                self.assertEqual(float(px), 2.0) # scaled by half
+                self.assertEqual(float(py), 3.0) # scaled by half
+                self.assertEqual(float(x), 576529.22) # Didn't change
 
                 [x, y, z, px, py, imagename, *extras] = lines[5].split(' ')
-                self.assertTrue(imagename == "missing_image.jpg")
-                self.assertTrue(float(px) == 8.0)  # Didn't change
-                self.assertTrue(float(py) == 8.0)  # Didn't change
+                self.assertEqual(imagename, "missing_image.jpg")
+                self.assertEqual(float(px), 8.0)  # Didn't change
+                self.assertEqual(float(py), 8.0)  # Didn't change
 
             # Resize progress is 100%
             resized_task.refresh_from_db()
@@ -284,6 +284,12 @@ class TestApiTask(BootTransactionTestCase):
             res = client.patch("/api/projects/{}/tasks/{}/".format(other_project.id, other_task.id), {
                 'processing_node': pnode.id
             })
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+
+            # Cannot download/preview images for a task we have no access to
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg".format(other_project.id, other_task.id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+            res = client.get("/api/projects/{}/tasks/{}/images/download/tiny_drone_image.jpg".format(other_project.id, other_task.id))
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
             # Cannot export orthophoto
@@ -395,6 +401,35 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue("celery_task_id" in reply)
             celery_task_id = reply["celery_task_id"]
 
+            # Can access thumbnails
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg?size=4".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            with Image.open(io.BytesIO(res.content)) as i:
+                # Thumbnail has been resized
+                self.assertEqual(i.width, 4)
+                self.assertEqual(i.height, 3)
+
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg?size=9999999".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            with Image.open(io.BytesIO(res.content)) as i:
+                # Thumbnail has been resized to the max allowed (oringinal image size)
+                self.assertEqual(i.width, 48)
+                self.assertEqual(i.height, 36)
+
+            # Can download images
+            res = client.get("/api/projects/{}/tasks/{}/images/download/tiny_drone_image.jpg".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            with Image.open(io.BytesIO(res.content)) as i:
+                # Thumbnail has been resized
+                self.assertEqual(i.width, 48)
+                self.assertEqual(i.height, 36)
+
+            # Cannot get thumbnails/download images that don't exist
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/nonexistant.jpg".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+            res = client.get("/api/projects/{}/tasks/{}/images/download/nonexistant.jpg".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+            
             # Check export status
             res = client.get("/api/workers/check/{}".format(celery_task_id))
             self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -795,7 +830,7 @@ class TestApiTask(BootTransactionTestCase):
             worker.tasks.process_pending_tasks()
 
             task = Task.objects.get(pk=res.data['id'])
-            self.assertTrue(task.status == status_codes.COMPLETED)
+            self.assertEqual(task.status, status_codes.COMPLETED)
 
             # Orthophoto files/directories should be missing
             self.assertFalse(os.path.exists(task.assets_path("odm_orthophoto", "odm_orthophoto.tif")))

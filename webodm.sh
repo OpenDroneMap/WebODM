@@ -21,6 +21,13 @@ fi
 default_nodes=1
 dev_mode=false
 
+# define realpath replacement function
+if [[ $platform = "MacOS / OSX" ]]; then
+    realpath() {
+        [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+    }
+fi
+
 # Load default values
 source "${__dirname}/.env"
 DEFAULT_PORT="$WO_PORT"
@@ -287,8 +294,7 @@ rebuild(){
 run_tests(){
     # If in a container, we run the actual test commands
     # otherwise we launch this command from the container
-    in_container=$(grep 'docker\|lxc' /proc/1/cgroup || true)
-    if [[ "$in_container" != "" ]]; then
+    if [[ -f /.dockerenv ]]; then
         echo -e "\033[1mRunning frontend tests\033[0m"
         run "npm run test"
 

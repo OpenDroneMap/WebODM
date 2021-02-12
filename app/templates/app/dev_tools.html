@@ -1,0 +1,77 @@
+{% extends "app/logged_in_base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h2>{% trans 'Developer Tools' %}</h2>
+
+<div id="errorDialog" class="alert alert-warning alert-dismissible" style="display: none;">
+    <button type="button" class="close" title="{% trans 'Close' %}" onClick="javascript:hideError()"><span aria-hidden="true">&times;</span></button>
+    <div id="errorMessage"></div>
+</div>
+
+<form class="form-inline" style="margin-top: 32px;">
+    <strong>{% trans 'Current Locale:' %}</strong> {{ current_locale }}<br/>
+    <small>{% trans "To change locale, modify your browser's locale settings, then refresh the page." %}</small>
+    <br/><br/>
+    <div class="form-group margin-bottom">
+      <label for="transFiles">{% trans 'Translation Files (.zip):' %}</label>
+      <input id='transFiles' type="text" class="form-control" size="50" value="https://hosted.weblate.org/download/webodm/?format=zip">
+    </div>
+    <div style="margin-top: 16px;">
+        <button type="button" class="btn btn-danger" onClick="javascript:execute(this, 'reloadTranslation', document.getElementById('transFiles').value)"><i class="fa fa-language"></i> {% trans 'Download and Replace Translation Files' %}</button>
+    </div>
+</form>
+<div id="action-loading" style="display: none; margin-top: 12px">
+    <i class="fa fa-circle-notch fa-spin fa-fw"></i> {% trans 'Executing… do not refresh the page! This could take a while.' %}
+</div>
+
+<script>
+var loading = document.getElementById("action-loading");
+var errorDlg = document.getElementById("errorDialog");
+var errorMsg = document.getElementById("errorMessage");
+
+function showError(error){
+    errorDlg.style.display="block";
+    errorMsg.innerText = error;
+}
+function hideError(){
+    errorDlg.style.display="none";
+    errorMsg.innerText = "";
+}
+
+function execute(sender, action){
+    sender.disabled = true;
+    loading.style.display='block';
+    hideError();
+
+    var args = Array.prototype.slice.call(arguments);
+    args = args.slice(2);
+    
+    $.ajax({
+      url: `/dev-tools/${action}`,
+      contentType: 'application/json',
+      data: JSON.stringify({ args: args }),
+      dataType: 'json',
+      type: 'POST'
+    }).done(function(result){
+        if (result.error) {
+            showError(result.error);
+        }else{
+            setTimeout(function(){
+                alert(result.message || "Done!");
+                if (result.reload){
+                    location.reload(true);
+                }
+            }, 100);
+        }
+    }).fail(function(e){
+        showError(JSON.stringify(e));
+    }).always(function(){
+        sender.disabled = false;
+        loading.style.display = 'none';
+    });
+}
+</script>
+
+{% endblock %}

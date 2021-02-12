@@ -1,0 +1,15 @@
+{
+  "name": "changedetection",
+  "version": "0.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "leaflet.heat": "^0.2.0",
+    "react-tooltip": "^3.10.0"
+  }
+}

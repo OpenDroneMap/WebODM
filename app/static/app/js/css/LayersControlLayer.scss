@@ -4,6 +4,8 @@
 
         .layer-label{
             width: auto;
+            position: relative;
+            top: 1px;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
@@ -55,5 +57,15 @@
           }
         }
 
+        .overlayIcon{
+            float: left;
+            width: 22px;
+
+            i{
+                font-size: 16px;
+                margin-top: 4px;
+                margin-left: 1px;
+            }
+        }
     }
 }

@@ -1,0 +1,24 @@
+.leaflet-control-changedetection{
+  z-index: 999;
+
+  a.leaflet-control-changedetection-button{
+    background: url(icon.png) no-repeat 0 0;
+    background-size: 26px 26px;
+    border-radius: 2px;
+  }
+
+  div.changedetection-panel{ display: none; }
+
+  .open{
+    a.leaflet-control-changedetection-button{
+      display: none;
+    }
+
+    div.changedetection-panel{
+      display: block;
+    }
+  }
+}
+.leaflet-touch .leaflet-control-changedetection a {
+  background-position: 2px 2px;
+}

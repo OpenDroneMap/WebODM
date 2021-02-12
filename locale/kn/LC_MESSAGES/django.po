@@ -1,0 +1,1552 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-12-24 01:30+0000\n"
+"PO-Revision-Date: 2021-01-17 11:32+0000\n"
+"Last-Translator: Anand Mahesh <manand881@gmail.com>\n"
+"Language-Team: Kannada <https://hosted.weblate.org/projects/webodm/webodm/kn/"
+">\n"
+"Language: kn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.5-dev\n"
+
+#: app/admin.py:52
+msgid "Enter custom CSS"
+msgstr "ಕಸ್ಟಮ್ ಸಿ.ಸ್.ಸ್ ಅನ್ನು ನಮೂದಿಸಿ"
+
+#: app/admin.py:53 app/models/theme.py:38
+msgid "CSS"
+msgstr "ಸಿ.ಸ್.ಸ್"
+
+#: app/admin.py:56
+msgid "HTML that will be displayed above site header"
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ ಅನ್ನು ಸೈಟ್ ಹೆಡರ್ ಮೇಲೆ ಪ್ರದರ್ಶಿಸಲಾಗುತ್ತದೆ"
+
+#: app/admin.py:57 app/models/theme.py:39
+msgid "HTML (before header)"
+msgstr "ಎಚ್.ಟಿ.ಎಂ.ಎಲ್ (ಅಡಿಟಿಪ್ಪಣಿಗೆ ಮೊದಲು)"
+
+#: app/admin.py:60
+msgid "HTML that will be displayed after site header"
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ ಅನ್ನು ಸೈಟ್ ಹೆಡರ್ ಮೇಲೆ ಪ್ರದರ್ಶಿಸಲಾಗುತ್ತದೆ"
+
+#: app/admin.py:61 app/models/theme.py:40
+msgid "HTML (after header)"
+msgstr ""
+
+#: app/admin.py:64
+msgid "HTML that will be displayed after the body tag"
+msgstr ""
+
+#: app/admin.py:65 app/models/theme.py:41
+msgid "HTML (after body)"
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ (ದೇಹದ ಕೆಳಗೆ)"
+
+#: app/admin.py:68
+#, python-brace-format
+msgid ""
+"HTML that will be displayed in the footer. You can also use the special tags "
+"such as {ORGANIZATION} and {YEAR}."
+msgstr ""
+
+#: app/admin.py:69 app/models/theme.py:42
+msgid "HTML (footer)"
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ (ಫೂಟರ್ )"
+
+#: app/admin.py:100 app/models/project.py:24
+msgid "Description"
+msgstr "ವಿವರ"
+
+#: app/admin.py:106
+msgid "Version"
+msgstr "ಆವೃತ್ತಿ"
+
+#: app/admin.py:112
+msgid "Author"
+msgstr "ಲೇಖಕ"
+
+#: app/admin.py:233
+msgid "Actions"
+msgstr "ಕ್ರಿಯೆಗಳನ್ನು"
+
+#: app/api/formulas.py:12 app/api/formulas.py:16
+msgid ""
+"Normalized Difference Vegetation Index shows the amount of green vegetation."
+msgstr ""
+
+#: app/api/formulas.py:20
+msgid ""
+"Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
+"and Green bands instead of only Red to isolate plant health."
+msgstr ""
+
+#: app/api/formulas.py:24
+msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
+msgstr ""
+
+#: app/api/formulas.py:29
+msgid ""
+"Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
+msgstr ""
+
+#: app/api/formulas.py:33
+msgid ""
+"Burn Area Index hightlights burned land in the red to near-infrared spectrum."
+msgstr ""
+
+#: app/api/formulas.py:37
+msgid "Green Leaf Index shows greens leaves and stems."
+msgstr ""
+
+#: app/api/formulas.py:42
+msgid ""
+"Green Normalized Difference Vegetation Index is similar to NDVI, but "
+"measures the green spectrum instead of red."
+msgstr ""
+
+#: app/api/formulas.py:46
+msgid ""
+"Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
+msgstr ""
+
+#: app/api/formulas.py:50
+msgid ""
+"Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
+"effects of soil areas using an adjustment factor (0.5)."
+msgstr ""
+
+#: app/api/formulas.py:54
+msgid ""
+"Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
+"for soil areas."
+msgstr ""
+
+#: app/api/formulas.py:58
+msgid ""
+"Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
+"more sensitive to vegetation."
+msgstr ""
+
+#: app/api/formulas.py:62
+msgid ""
+"Renormalized Difference Vegetation Index uses the difference between near-IR "
+"and red, plus NDVI to show areas of healthy vegetation."
+msgstr ""
+
+#: app/api/formulas.py:66
+msgid ""
+"Transformed Difference Vegetation Index highlights vegetation cover in urban "
+"environments."
+msgstr ""
+
+#: app/api/formulas.py:70
+msgid ""
+"Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work "
+"better in areas with little vegetation where soil is visible."
+msgstr ""
+
+#: app/api/formulas.py:74
+msgid "Leaf Area Index estimates foliage areas and predicts crop yields."
+msgstr ""
+
+#: app/api/formulas.py:79
+msgid ""
+"Enhanced Vegetation Index is useful in areas where NDVI might saturate, by "
+"using blue wavelengths to correct soil signals."
+msgstr ""
+
+#: app/api/tasks.py:179
+msgid "You need to upload at least 2 images before commit"
+msgstr "ಬದ್ಧರಾಗುವ ಮೊದಲು ನೀವು ಕನಿಷ್ಠ 2 ಚಿತ್ರಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಬೇಕಾಗುತ್ತದೆ"
+
+#: app/api/tasks.py:201
+msgid "No files uploaded"
+msgstr "ಯಾವುದೇ ಫೈಲ್‌ಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿಲ್ಲ"
+
+#: app/api/tasks.py:224
+msgid "Cannot create task, you need at least 2 images"
+msgstr "ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ನಿಮಗೆ ಕನಿಷ್ಠ 2 ಚಿತ್ರಗಳು ಬೇಕಾಗುತ್ತವೆ"
+
+#: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
+#: app/api/tasks.py:354
+msgid "Asset does not exist"
+msgstr "ಆಸ್ತಿ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್"
+
+#: app/api/tasks.py:370
+msgid "Imported Task"
+msgstr "ಆಮದು ಮಾಡಿದ ಕಾರ್ಯ"
+
+#: app/api/tasks.py:373
+msgid "Cannot create task, you need to upload 1 file"
+msgstr "ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ನೀವು 1 ಫೈಲ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಬೇಕಾಗುತ್ತದೆ"
+
+#: app/api/tasks.py:376
+msgid "Cannot create task, either specify a URL or upload 1 file."
+msgstr ""
+"ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ಉ.ರ್.ಲ್  ಅನ್ನು ನಿರ್ದಿಷ್ಟಪಡಿಸಿ ಅಥವಾ 1 ಫೈಲ್ ಅನ್ನು"
+" ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+
+#: app/models/image_upload.py:10
+msgid "Task this image belongs to"
+msgstr ""
+
+#: app/models/image_upload.py:10 app/models/task.py:259
+msgid "Task"
+msgstr "ಕಾರ್ಯ"
+
+#: app/models/image_upload.py:11
+msgid "File uploaded by a user"
+msgstr "ಬಳಕೆದಾರರಿಂದ ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾದ ಫೈಲ್"
+
+#: app/models/image_upload.py:11
+msgid "Image"
+msgstr "ಚಿತ್ರ"
+
+#: app/models/image_upload.py:20
+msgid "Image Upload"
+msgstr "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್"
+
+#: app/models/image_upload.py:21
+msgid "Image Uploads"
+msgstr "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್‌ಗಳು"
+
+#: app/models/plugin.py:5
+msgid "Plugin name"
+msgstr "ಪ್ಲಗಿನ್ ಹೆಸರು"
+
+#: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
+#: app/models/task.py:221 app/models/theme.py:16
+msgid "Name"
+msgstr "ಹೆಸರು"
+
+#: app/models/plugin.py:6
+msgid "Whether this plugin is turned on."
+msgstr ""
+
+#: app/models/plugin.py:6
+msgid "Enabled"
+msgstr "ಸಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ"
+
+#: app/models/plugin.py:20
+msgid "Plugin"
+msgstr ""
+
+#: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
+msgid "Plugins"
+msgstr ""
+
+#: app/models/plugin_datum.py:7
+msgid "Setting key"
+msgstr ""
+
+#: app/models/plugin_datum.py:7
+msgid "Key"
+msgstr "ಕೀ"
+
+#: app/models/plugin_datum.py:8
+msgid "The user this setting belongs to. If NULL, the setting is global."
+msgstr ""
+
+#: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
+msgid "User"
+msgstr "ಬಳಕೆದಾರ"
+
+#: app/models/plugin_datum.py:9
+msgid "Integer value"
+msgstr ""
+
+#: app/models/plugin_datum.py:10
+msgid "Float value"
+msgstr ""
+
+#: app/models/plugin_datum.py:11
+msgid "Bool value"
+msgstr ""
+
+#: app/models/plugin_datum.py:12
+msgid "String value"
+msgstr ""
+
+#: app/models/plugin_datum.py:13
+msgid "JSON value"
+msgstr ""
+
+#: app/models/plugin_datum.py:19 app/models/plugin_datum.py:20
+msgid "Plugin Datum"
+msgstr ""
+
+#: app/models/preset.py:9
+msgid "The person who owns this preset"
+msgstr ""
+
+#: app/models/preset.py:9 app/models/project.py:22
+msgid "Owner"
+msgstr "ಒಡೆಯ"
+
+#: app/models/preset.py:10
+msgid "A label used to describe the preset"
+msgstr ""
+
+#: app/models/preset.py:11
+msgid "Options that define this preset (same format as in a Task's options)."
+msgstr ""
+
+#: app/models/preset.py:11 app/models/task.py:227
+msgid "Options"
+msgstr "ಆಯ್ಕೆಗಳು"
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+msgid "Creation date"
+msgstr "ಸೃಷ್ಟಿ ದಿನಾಂಕ"
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:236
+msgid "Created at"
+msgstr ""
+
+#: app/models/preset.py:14
+msgid ""
+"Whether this preset is available to every user in the system or just to its "
+"owner."
+msgstr ""
+
+#: app/models/preset.py:14
+msgid "System"
+msgstr "ಸಿಸ್ಟಮ್"
+
+#: app/models/preset.py:20
+msgid "Preset"
+msgstr ""
+
+#: app/models/preset.py:21
+msgid "Presets"
+msgstr ""
+
+#: app/models/project.py:22
+msgid "The person who created the project"
+msgstr ""
+
+#: app/models/project.py:23
+msgid "A label used to describe the project"
+msgstr ""
+
+#: app/models/project.py:24
+msgid "More in-depth description of the project"
+msgstr ""
+
+#: app/models/project.py:26
+msgid ""
+"Whether this project has been marked for deletion. Projects that have "
+"running tasks need to wait for tasks to be properly cleaned up before they "
+"can be deleted."
+msgstr ""
+
+#: app/models/project.py:26
+msgid "Deleting"
+msgstr "ಅಳಿಸಲಾಗುತ್ತಿದೆ"
+
+#: app/models/project.py:56 app/models/task.py:220
+msgid "Project"
+msgstr "ಯೋಜನೆ"
+
+#: app/models/project.py:57
+msgid "Projects"
+msgstr "ಯೋಜನೆಗಳು"
+
+#: app/models/setting.py:20
+msgid "The name of your application"
+msgstr ""
+
+#: app/models/setting.py:20
+msgid "App name"
+msgstr ""
+
+#: app/models/setting.py:21
+msgid "A 512x512 logo of your application (.png or .jpeg)"
+msgstr ""
+
+#: app/models/setting.py:21
+msgid "App logo"
+msgstr ""
+
+#: app/models/setting.py:31
+msgid "The name of your organization"
+msgstr ""
+
+#: app/models/setting.py:31
+msgid "Organization name"
+msgstr "ಸಂಸ್ಥೆಯ ಹೆಸರು"
+
+#: app/models/setting.py:32
+msgid "The website URL of your organization"
+msgstr ""
+
+#: app/models/setting.py:32
+msgid "Organization website"
+msgstr ""
+
+#: app/models/setting.py:33 app/models/theme.py:48 app/models/theme.py:49
+#: app/templates/app/logged_in_base.html:95
+msgid "Theme"
+msgstr ""
+
+#: app/models/setting.py:34
+msgid "Active theme"
+msgstr ""
+
+#: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
+msgid "Application"
+msgstr "ಅಪ್ಲಿಕೇಶನ್"
+
+#: app/models/setting.py:76 app/models/setting.py:77
+msgid "Settings"
+msgstr ""
+
+#: app/models/task.py:217
+msgid "Id"
+msgstr "ಐಡಿ"
+
+#: app/models/task.py:219
+msgid "Identifier of the task (as returned by NodeODM API)"
+msgstr ""
+
+#: app/models/task.py:219
+msgid "UUID"
+msgstr ""
+
+#: app/models/task.py:220
+msgid "Project that this task belongs to"
+msgstr ""
+
+#: app/models/task.py:221
+msgid "A label for the task"
+msgstr ""
+
+#: app/models/task.py:222
+msgid ""
+"Number of milliseconds that elapsed since the beginning of this task (-1 "
+"indicates that no information is available)"
+msgstr ""
+
+#: app/models/task.py:222
+msgid "Processing Time"
+msgstr ""
+
+#: app/models/task.py:223
+msgid ""
+"Processing node assigned to this task (or null if this task has not been "
+"associated yet)"
+msgstr ""
+
+#: app/models/task.py:223 app/views/app.py:113 nodeodm/models.py:36
+msgid "Processing Node"
+msgstr ""
+
+#: app/models/task.py:224
+msgid ""
+"A flag indicating whether this task should be automatically assigned a "
+"processing node"
+msgstr ""
+
+#: app/models/task.py:224
+msgid "Auto Processing Node"
+msgstr ""
+
+#: app/models/task.py:225
+msgid "Current status of the task"
+msgstr ""
+
+#: app/models/task.py:225
+msgid "Status"
+msgstr ""
+
+#: app/models/task.py:226
+msgid "The last processing error received"
+msgstr ""
+
+#: app/models/task.py:226
+msgid "Last Error"
+msgstr "ಹಿಂದಿನ ತಪ್ಪು"
+
+#: app/models/task.py:227
+msgid "Options that are being used to process this task"
+msgstr ""
+
+#: app/models/task.py:228
+msgid "List of available assets to download"
+msgstr ""
+
+#: app/models/task.py:228
+msgid "Available Assets"
+msgstr ""
+
+#: app/models/task.py:229
+msgid "Console output of the processing node"
+msgstr ""
+
+#: app/models/task.py:229
+msgid "Console Output"
+msgstr ""
+
+#: app/models/task.py:231
+msgid "Extent of the orthophoto"
+msgstr ""
+
+#: app/models/task.py:231
+msgid "Orthophoto Extent"
+msgstr ""
+
+#: app/models/task.py:232
+msgid "DSM Extent"
+msgstr ""
+
+#: app/models/task.py:233
+msgid "DTM Extent"
+msgstr ""
+
+#: app/models/task.py:237
+msgid ""
+"A requested action to be performed on the task. The selected action will be "
+"performed by the worker at the next iteration."
+msgstr ""
+
+#: app/models/task.py:237
+msgid "Pending Action"
+msgstr "ಬಾಕಿ ಉಳಿದಿರುವ ಕ್ರಮಗಳು"
+
+#: app/models/task.py:239
+msgid "A flag indicating whether this task is available to the public"
+msgstr ""
+
+#: app/models/task.py:239
+msgid "Public"
+msgstr "ಸಾರ್ವಜನಿಕ"
+
+#: app/models/task.py:240
+msgid ""
+"When set to a value different than -1, indicates that the images for this "
+"task have been / will be resized to the size specified here before "
+"processing."
+msgstr ""
+
+#: app/models/task.py:240
+msgid "Resize To"
+msgstr ""
+
+#: app/models/task.py:243
+msgid ""
+"Value between 0 and 1 indicating the upload progress of this task's files to "
+"the processing node"
+msgstr ""
+
+#: app/models/task.py:244
+msgid "Upload Progress"
+msgstr ""
+
+#: app/models/task.py:247
+msgid ""
+"Value between 0 and 1 indicating the resize progress of this task's images"
+msgstr ""
+
+#: app/models/task.py:248
+msgid "Resize Progress"
+msgstr ""
+
+#: app/models/task.py:251
+msgid ""
+"Value between 0 and 1 indicating the running progress (estimated) of this "
+"task"
+msgstr ""
+
+#: app/models/task.py:252
+msgid "Running Progress"
+msgstr ""
+
+#: app/models/task.py:254
+msgid "URL this task is imported from (only for imported tasks)"
+msgstr ""
+
+#: app/models/task.py:254
+msgid "Import URL"
+msgstr ""
+
+#: app/models/task.py:255
+msgid "Number of images associated with this task"
+msgstr ""
+
+#: app/models/task.py:255
+msgid "Images Count"
+msgstr ""
+
+#: app/models/task.py:256
+msgid ""
+"A flag indicating whether this task is currently waiting for information or "
+"files to be uploaded before being considered for processing."
+msgstr ""
+
+#: app/models/task.py:256
+msgid "Partial"
+msgstr ""
+
+#: app/models/task.py:260
+msgid "Tasks"
+msgstr "ಕಾರ್ಯಗಳು"
+
+#: app/models/task.py:269
+msgid "unnamed"
+msgstr ""
+
+#: app/models/task.py:372
+msgid "Importing assets..."
+msgstr ""
+
+#: app/models/task.py:411 app/models/task.py:679
+msgid "Invalid zip file"
+msgstr ""
+
+#: app/models/task.py:505
+#, python-format
+msgid "Connection error: %(error)s"
+msgstr ""
+
+#: app/models/task.py:585
+msgid "Cannot restart a task that has no processing node"
+msgstr ""
+
+#: app/models/task.py:737
+#, python-format
+msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
+msgstr ""
+
+#: app/models/task.py:747
+msgid "Done!"
+msgstr ""
+
+#: app/models/theme.py:16
+msgid "Name of theme"
+msgstr ""
+
+#: app/models/theme.py:19
+msgid "Most text, icons, and borders."
+msgstr ""
+
+#: app/models/theme.py:19
+msgid "Primary"
+msgstr ""
+
+#: app/models/theme.py:20
+msgid "The main background color, and text color of some buttons."
+msgstr ""
+
+#: app/models/theme.py:20
+msgid "Secondary"
+msgstr ""
+
+#: app/models/theme.py:21
+msgid "Navigation links."
+msgstr ""
+
+#: app/models/theme.py:21
+msgid "Tertiary"
+msgstr ""
+
+#: app/models/theme.py:23
+msgid "Primary button color."
+msgstr ""
+
+#: app/models/theme.py:23
+msgid "Button Primary"
+msgstr ""
+
+#: app/models/theme.py:24
+msgid "Default button color."
+msgstr ""
+
+#: app/models/theme.py:24
+msgid "Button Default"
+msgstr ""
+
+#: app/models/theme.py:25
+msgid "Delete button color."
+msgstr ""
+
+#: app/models/theme.py:25
+msgid "Button Danger"
+msgstr ""
+
+#: app/models/theme.py:27
+msgid "Background color of the site's header."
+msgstr ""
+
+#: app/models/theme.py:27
+msgid "Header Background"
+msgstr ""
+
+#: app/models/theme.py:28
+msgid "Text and icons in the site's header."
+msgstr ""
+
+#: app/models/theme.py:28
+msgid "Header Primary"
+msgstr ""
+
+#: app/models/theme.py:30
+msgid "The color of most borders."
+msgstr ""
+
+#: app/models/theme.py:30
+msgid "Border"
+msgstr "ಗಡಿ"
+
+#: app/models/theme.py:31
+msgid "The background color of panels and some borders."
+msgstr ""
+
+#: app/models/theme.py:31
+msgid "Highlight"
+msgstr ""
+
+#: app/models/theme.py:33
+msgid "The border color of warning dialogs."
+msgstr ""
+
+#: app/models/theme.py:33
+msgid "Dialog Warning"
+msgstr ""
+
+#: app/models/theme.py:35
+msgid "The background color of failed notifications."
+msgstr ""
+
+#: app/models/theme.py:35
+msgid "Failed"
+msgstr "ಅಯಶಸ್ವಿಯಾದ"
+
+#: app/models/theme.py:36
+msgid "The background color of success notifications."
+msgstr ""
+
+#: app/models/theme.py:36
+msgid "Success"
+msgstr "ಯಶಸ್ಸು"
+
+#: app/templates/app/404.html:6
+msgid "404 Page Not Found"
+msgstr ""
+
+#: app/templates/app/404.html:7
+msgid "Are you sure the address is correct?"
+msgstr ""
+
+#: app/templates/app/500.html:5
+msgid "500 Internal Server Error"
+msgstr ""
+
+#: app/templates/app/500.html:6
+msgid "Something happened. The server logs contain more information."
+msgstr ""
+
+#: app/templates/app/about.html:94
+#, python-format
+msgid ""
+"This program is free software: you can redistribute it and/or modify it "
+"under the terms of the GNU Affero General Public License as published by the "
+"Free Software Foundation, either version 3 of the License, or (at your "
+"option) any later version. See %(link_start)sthe GNU Affero General Public "
+"License%(link_end)s for more details."
+msgstr ""
+
+#: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
+msgid "Page not found"
+msgstr ""
+
+#: app/templates/app/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+
+#: app/templates/app/admin/500.html:6 app/templates/app/admin/app_index.html:9
+#: app/templates/app/admin/auth/user/change_password.html:13
+#: app/templates/app/admin/base.html:19
+#: app/templates/app/admin/change_form.html:18
+#: app/templates/app/admin/change_list.html:31
+#: app/templates/app/admin/delete_confirmation.html:13
+#: app/templates/app/admin/delete_selected_confirmation.html:13
+#: app/templates/app/admin/invalid_setup.html:6
+#: app/templates/app/admin/object_history.html:6
+msgid "Home"
+msgstr "ಮನೆ"
+
+#: app/templates/app/admin/500.html:7
+msgid "Server error"
+msgstr ""
+
+#: app/templates/app/admin/500.html:11
+msgid "Server error (500)"
+msgstr ""
+
+#: app/templates/app/admin/500.html:14
+msgid "Server Error (500)"
+msgstr ""
+
+#: app/templates/app/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+#: app/templates/app/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: app/templates/app/admin/actions.html:4
+msgid "Go"
+msgstr "ಹೋಗಿ"
+
+#: app/templates/app/admin/actions.html:10
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: app/templates/app/admin/actions.html:10
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: app/templates/app/admin/actions.html:12
+msgid "Clear selection"
+msgstr ""
+
+#: app/templates/app/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+
+#: app/templates/app/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr ""
+
+#: app/templates/app/admin/auth/user/change_password.html:17
+#: app/templates/app/admin/auth/user/change_password.html:54
+msgid "Change password"
+msgstr ""
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+msgid "Please correct the error below."
+msgstr ""
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+msgid "Please correct the errors below."
+msgstr ""
+
+#: app/templates/app/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+#: app/templates/app/admin/base_site.html:3
+msgid "Django site admin"
+msgstr ""
+
+#: app/templates/app/admin/base_site.html:6
+msgid "Django administration"
+msgstr ""
+
+#: app/templates/app/admin/change_form.html:21
+#: app/templates/app/admin/change_list.html:49
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: app/templates/app/admin/change_form.html:33
+#: app/templates/app/admin/object_history.html:10
+msgid "History"
+msgstr ""
+
+#: app/templates/app/admin/change_form.html:35
+#: app/templates/app/admin/edit_inline/stacked.html:14
+#: app/templates/app/admin/edit_inline/tabular.html:36
+msgid "View on site"
+msgstr ""
+
+#: app/templates/app/admin/change_list.html:69
+msgid "Filter"
+msgstr ""
+
+#: app/templates/app/admin/change_list_plugin.html:24
+msgid "Load Plugin (.zip)"
+msgstr ""
+
+#: app/templates/app/admin/change_list_plugin.html:28
+msgid "Manage Plugins"
+msgstr ""
+
+#: app/templates/app/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr ""
+
+#: app/templates/app/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+#: app/templates/app/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:17
+#: app/templates/app/admin/related_widget_wrapper.html:23
+#: app/templates/app/admin/submit_line.html:6
+#: app/templates/app/processing_node.html:54
+msgid "Delete"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:30
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:37
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:39
+#: app/templates/app/admin/delete_selected_confirmation.html:38
+msgid "Objects"
+msgstr ""
+
+#: app/templates/app/admin/delete_confirmation.html:46
+#: app/templates/app/admin/delete_selected_confirmation.html:49
+msgid "Yes, I'm sure"
+msgstr "ಹೌದು. ನಾನು ನಿಖರವಾಗಿದ್ದೇನೆ"
+
+#: app/templates/app/admin/delete_confirmation.html:47
+#: app/templates/app/admin/delete_selected_confirmation.html:50
+msgid "No, take me back"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:16
+msgid "Delete multiple objects"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:29
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#: app/templates/app/admin/delete_selected_confirmation.html:36
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+#: app/templates/app/admin/edit_inline/stacked.html:12
+#: app/templates/app/admin/edit_inline/tabular.html:34
+#: app/templates/app/admin/index.html:37
+#: app/templates/app/admin/related_widget_wrapper.html:9
+msgid "Change"
+msgstr ""
+
+#: app/templates/app/admin/edit_inline/tabular.html:20
+msgid "Delete?"
+msgstr ""
+
+#: app/templates/app/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+#: app/templates/app/admin/includes/object_delete_summary.html:2
+msgid "Summary"
+msgstr ""
+
+#: app/templates/app/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+#: app/templates/app/admin/index.html:31
+#: app/templates/app/admin/related_widget_wrapper.html:16
+msgid "Add"
+msgstr ""
+
+#: app/templates/app/admin/index.html:47
+msgid "You don't have permission to edit anything."
+msgstr ""
+
+#: app/templates/app/admin/index.html:55
+msgid "Recent actions"
+msgstr ""
+
+#: app/templates/app/admin/index.html:56
+msgid "My actions"
+msgstr ""
+
+#: app/templates/app/admin/index.html:60
+msgid "None available"
+msgstr ""
+
+#: app/templates/app/admin/index.html:74
+msgid "Unknown content"
+msgstr ""
+
+#: app/templates/app/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+
+#: app/templates/app/admin/login.html:37
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+#: app/templates/app/admin/login.html:57
+msgid "Forgotten your password or username?"
+msgstr ""
+
+#: app/templates/app/admin/login.html:61
+msgid "Log in"
+msgstr ""
+
+#: app/templates/app/admin/object_history.html:22
+msgid "Date/time"
+msgstr ""
+
+#: app/templates/app/admin/object_history.html:24
+msgid "Action"
+msgstr ""
+
+#: app/templates/app/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+
+#: app/templates/app/admin/pagination.html:10
+#: app/templates/app/admin/search_form.html:9
+msgid "Show all"
+msgstr ""
+
+#: app/templates/app/admin/pagination.html:11
+#: app/templates/app/admin/submit_line.html:3
+msgid "Save"
+msgstr ""
+
+#: app/templates/app/admin/popup_response.html:3
+msgid "Popup closing..."
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:8
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:15
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:22
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/search_form.html:7
+msgid "Search"
+msgstr ""
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
+#: app/templates/app/admin/submit_line.html:8
+msgid "Save as new"
+msgstr ""
+
+#: app/templates/app/admin/submit_line.html:9
+msgid "Save and add another"
+msgstr ""
+
+#: app/templates/app/admin/submit_line.html:10
+msgid "Save and continue editing"
+msgstr ""
+
+#: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
+#: app/templates/app/welcome.html:227
+msgid "Welcome!"
+msgstr ""
+
+#: app/templates/app/dashboard.html:16
+msgid "Add a Processing Node"
+msgstr ""
+
+#: app/templates/app/dashboard.html:19
+#, python-format
+msgid ""
+"To get started, \"%(add_processing_node)s\". A processing node is a computer "
+"running an instance of %(nodeodm_link)s or some other software implementing "
+"this %(api_link)s."
+msgstr ""
+
+#: app/templates/app/dashboard.html:28
+msgid "Select Images and GCP"
+msgstr ""
+
+#: app/templates/app/dashboard.html:30
+#, python-format
+msgid ""
+"To create a map, press the \"%(upload_images)s\" button, or drag and drop "
+"some images into a project."
+msgstr ""
+
+#: app/templates/app/dashboard.html:34
+msgid "You need at least 5 images"
+msgstr ""
+
+#: app/templates/app/dashboard.html:35
+#, python-format
+msgid "Images must overlap by 65%% or more"
+msgstr ""
+
+#: app/templates/app/dashboard.html:36
+#, python-format
+msgid "For great 3D, images must overlap by 83%%"
+msgstr ""
+
+#: app/templates/app/dashboard.html:37
+#, python-format
+msgid ""
+"A %(link_start)sGCP File%(link_end)s is optional, but can increase "
+"georeferencing accuracy"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
+#: app/views/dev.py:73
+msgid "Developer Tools"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:9
+msgid "Close"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:14
+msgid "Current Locale:"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:15
+msgid ""
+"To change locale, modify your browser's locale settings, then refresh the "
+"page."
+msgstr ""
+
+#: app/templates/app/dev_tools.html:18
+msgid "Translation Files (.zip):"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:22
+msgid "Download and Replace Translation Files"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:26
+msgid "Executing… do not refresh the page! This could take a while."
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:15
+#, python-format
+msgid "Hello, %(user)s!"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:19
+msgid "Logout"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:33 app/views/app.py:46
+msgid "Dashboard"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
+msgid "Processing Nodes"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:69
+msgid "Add New"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:79
+msgid "Administration"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:84
+msgid "Accounts"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:87
+msgid "Groups"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:92
+msgid "Brand"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:114 app/views/app.py:103
+msgid "About"
+msgstr ""
+
+#: app/templates/app/processing_node.html:11 nodeodm/models.py:23
+msgid "Hostname"
+msgstr ""
+
+#: app/templates/app/processing_node.html:15 nodeodm/models.py:24
+msgid "Port"
+msgstr ""
+
+#: app/templates/app/processing_node.html:19 nodeodm/models.py:25
+msgid "API Version"
+msgstr ""
+
+#: app/templates/app/processing_node.html:23 nodeodm/models.py:33
+msgid "Engine"
+msgstr ""
+
+#: app/templates/app/processing_node.html:27 nodeodm/models.py:31
+msgid "Engine Version"
+msgstr ""
+
+#: app/templates/app/processing_node.html:31 nodeodm/models.py:27
+msgid "Queue Count"
+msgstr ""
+
+#: app/templates/app/processing_node.html:35
+msgid "Max Images Limit"
+msgstr ""
+
+#: app/templates/app/processing_node.html:39 nodeodm/models.py:32
+msgid "Label"
+msgstr ""
+
+#: app/templates/app/processing_node.html:43 nodeodm/models.py:26
+msgid "Last Refreshed"
+msgstr ""
+
+#: app/templates/app/processing_node.html:44
+msgctxt "5 minutes ago"
+msgid "ago"
+msgstr ""
+
+#: app/templates/app/processing_node.html:47
+msgid "Options (JSON)"
+msgstr ""
+
+#: app/templates/app/processing_node.html:53
+msgid "Edit"
+msgstr ""
+
+#: app/templates/app/welcome.html:224
+msgid "Uh oh! Could you please check the errors below?"
+msgstr ""
+
+#: app/templates/app/welcome.html:237
+msgid "Create Account"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:4
+msgid "Compute volume, area and length measurements on Leaflet"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:5
+#: app/translations/plugin_manifest_autogenerated.py:6
+msgid "A plugin to create GCP files from images"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:7
+msgid ""
+"A plugin to add a button for quickly opening OpenStreetMap's iD editor and "
+"setup a TMS basemap."
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:8
+msgid "A plugin to upload orthophotos to OpenAerialMap"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:9
+msgid "Display program version, memory and disk space usage statistics"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:10
+msgid "Sync accounts from webodm.net"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:11
+msgid "Add a fullscreen button to the 2D map view"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:12
+msgid "Compute, preview and export contours from DEMs"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:13
+msgid "Calculate and draw an elevation map based on a task's DEMs"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:14
+msgid "Upload and tile ODM assets with Cesium ion."
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:15
+msgid "Import images from external sources directly"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:16
+msgid "Detect changes between two different tasks in the same project."
+msgstr ""
+
+#: app/views/app.py:44
+msgid "First Project"
+msgstr ""
+
+#: app/views/app.py:54 app/views/public.py:26
+msgid "Map"
+msgstr ""
+
+#: app/views/app.py:81
+msgid "3D Model Display"
+msgstr ""
+
+#: app/views/app.py:147
+msgid "Welcome"
+msgstr ""
+
+#: app/views/dev.py:48
+msgid "Cannot find locale/ folder in .zip archive"
+msgstr ""
+
+#: app/views/dev.py:66
+msgid "Translation files reloaded!"
+msgstr ""
+
+#: app/views/dev.py:70
+msgid "Invalid action"
+msgstr ""
+
+#: nodeodm/apps.py:8
+msgid "Node Management"
+msgstr ""
+
+#: nodeodm/models.py:23
+msgid ""
+"Hostname or IP address where the node is located (can be an internal "
+"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
+"localhost. Find the IP address of your host machine by running ifconfig on "
+"Linux or by checking your network settings."
+msgstr ""
+
+#: nodeodm/models.py:24
+msgid "Port that connects to the node's API"
+msgstr ""
+
+#: nodeodm/models.py:25
+msgid "API version used by the node"
+msgstr ""
+
+#: nodeodm/models.py:26
+msgid "When was the information about this node last retrieved?"
+msgstr ""
+
+#: nodeodm/models.py:27
+msgid ""
+"Number of tasks currently being processed by this node (as reported by the "
+"node itself)"
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Available Options"
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Description of the options that can be used for processing"
+msgstr ""
+
+#: nodeodm/models.py:29
+msgid "Token"
+msgstr ""
+
+#: nodeodm/models.py:29
+msgid ""
+"Token to use for authentication. If the node doesn't have authentication, "
+"you can leave this field blank."
+msgstr ""
+
+#: nodeodm/models.py:30
+msgid "Max Images"
+msgstr ""
+
+#: nodeodm/models.py:30
+msgid "Maximum number of images accepted by this node."
+msgstr ""
+
+#: nodeodm/models.py:31
+msgid "Engine version used by the node."
+msgstr ""
+
+#: nodeodm/models.py:32
+msgid ""
+"Optional label for this node. When set, this label will be shown instead of "
+"the hostname:port name."
+msgstr ""
+
+#: nodeodm/models.py:33
+msgid "Engine used by the node."
+msgstr ""
+
+#: plugins/cesium-ion/api_views.py:170
+msgid "No matching enum type."
+msgstr ""
+
+#: plugins/contours/api.py:16
+msgid "No DSM layer is available."
+msgstr ""
+
+#: plugins/contours/api.py:18
+msgid "No DTM layer is available."
+msgstr ""
+
+#: plugins/contours/api.py:60
+msgid "Could not generate contour file. This might be a bug."
+msgstr ""
+
+#: plugins/diagnostic/plugin.py:36
+msgid "Diagnostic"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:6
+msgid "Diagnostic Information"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:10
+msgid "Storage Space"
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:14
+#: plugins/diagnostic/templates/diagnostic.html:40
+#: plugins/diagnostic/templates/diagnostic.html:45
+msgctxt "Megabytes of storage space"
+msgid "Free"
+msgstr "ಉಚಿತ"
+
+#: plugins/diagnostic/templates/diagnostic.html:15
+#: plugins/diagnostic/templates/diagnostic.html:39
+#: plugins/diagnostic/templates/diagnostic.html:45
+msgctxt "Megabytes of storage space"
+msgid "Used"
+msgstr "ಬಳಸಿದ"
+
+#: plugins/diagnostic/templates/diagnostic.html:16
+msgctxt "Megabytes of storage space"
+msgid "Total"
+msgstr "ಒಟ್ಟು"
+
+#: plugins/diagnostic/templates/diagnostic.html:20
+msgctxt "Computer memory (RAM)"
+msgid "Memory"
+msgstr "ಮೆಮೊರಿ"
+
+#: plugins/diagnostic/templates/diagnostic.html:24
+#: plugins/diagnostic/templates/diagnostic.html:75
+#: plugins/diagnostic/templates/diagnostic.html:80
+msgctxt "Megabytes of memory space"
+msgid "Free"
+msgstr "ಉಚಿತ"
+
+#: plugins/diagnostic/templates/diagnostic.html:25
+#: plugins/diagnostic/templates/diagnostic.html:74
+#: plugins/diagnostic/templates/diagnostic.html:80
+msgctxt "Megabytes of memory space"
+msgid "Used"
+msgstr "ಬಳಸಿದ"
+
+#: plugins/diagnostic/templates/diagnostic.html:26
+msgctxt "Megabytes of memory space"
+msgid "Total"
+msgstr "ಒಟ್ಟು"
+
+#: plugins/diagnostic/templates/diagnostic.html:33
+msgid "Note!"
+msgstr "ಸೂಚನೆ!"
+
+#: plugins/diagnostic/templates/diagnostic.html:33
+#, python-format
+msgid ""
+"These values might be relative to the virtualization environment in which "
+"the application is running, not necessarily the values of the your machine. "
+"See instructions for %(win_link)s and %(mac_link)s for changing these values "
+"in a Docker setup."
+msgstr ""
+
+#: plugins/diagnostic/templates/diagnostic.html:47
+#: plugins/diagnostic/templates/diagnostic.html:82
+msgid "Disk Space"
+msgstr ""
+
+#: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
+msgid "Lightning Network"
+msgstr "ಲೈಟನಿಂಗ್ ನೆಟ್ವರ್ಕ್"
+
+#: plugins/measure/api.py:27
+msgid ""
+"No surface model available. From the Dashboard, select this task, press "
+"Edit, from the options make sure to check \"dsm\", then press Restart --> "
+"From DEM."
+msgstr ""
+
+#: plugins/posm-gcpi/plugin.py:8
+msgid "GCP Interface"
+msgstr "ಜಿ.ಸಿ.ಪಿ ಇಂಟರ್ಫೇಸ್"

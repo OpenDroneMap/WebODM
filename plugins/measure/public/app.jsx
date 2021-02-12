@@ -7,6 +7,7 @@ import Utils from 'webodm/classes/Utils';
 import ReactDOM from 'ReactDOM';
 import React from 'React';
 import $ from 'jquery';
+import { _, get_format } from 'webodm/classes/gettext';
 
 export default class App{
     constructor(map){
@@ -14,8 +15,34 @@ export default class App{
 
         const measure = L.control.measure({
           labels:{
-            measureDistancesAndAreas: 'Measure volume, area and length',
-            areaMeasurement: 'Measurement'
+            measureDistancesAndAreas: _('Measure volume, area and length'),
+            areaMeasurement: _('Measurement'),
+            measure: _("Measure"),
+            createNewMeasurement: _("Create a new measurement"),
+            startCreating: _("Start creating a measurement by adding points to the map"),
+            finishMeasurement: _("Finish measurement"),
+            lastPoint: _("Last point"),
+            area: _("Area"),
+            perimeter: _("Perimeter"),
+            pointLocation: _("Point location"),
+            linearMeasurement: _("Linear measurement"),
+            pathDistance: _("Path distance"),
+            centerOnArea: _("Center on this area"),
+            centerOnLine: _("Center on this line"),
+            centerOnLocation: _("Center on this location"),
+            cancel: _("Cancel"),
+            delete: _("Delete"),
+            acres: _("Acres"),
+            feet: _("Feet"),
+            kilometers: _("Kilometers"),
+            hectares: _("Hectares"),
+            meters: _("Meters"),
+            miles: _("Miles"),
+            sqfeet: _("Sq Feet"),
+            sqmeters: _("Sq Meters"),
+            sqmiles: _("Sq Miles"),
+            decPoint: get_format("DECIMAL_SEPARATOR"),
+            thousandsSep: get_format("THOUSAND_SEPARATOR")
           },
           primaryLengthUnit: 'meters',
           secondaryLengthUnit: 'feet',
@@ -23,7 +50,9 @@ export default class App{
           secondaryAreaUnit: 'acres'
         }).addTo(map);
 
-        const $btnExport = $("<br/><a href='#' class='js-start start'>Export Measurements</a>");
+        // measure.options.labels.
+
+        const $btnExport = $(`<br/><a href='#' class='js-start start'>${_("Export Measurements")}</a>`);
         $btnExport.appendTo($(measure.$startPrompt).children("ul.tasks"));
         $btnExport.on('click', () => {
           const features = [];

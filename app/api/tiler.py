@@ -168,7 +168,12 @@ class Metadata(TaskNestedView):
                 if has_alpha_band(src):
                     band_count -= 1
 
-                info = main.metadata(src, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr)
+                nodata = None
+                # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
+                if tile_type == 'orthophoto':
+                    nodata = 0
+
+                info = main.metadata(src, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr, nodata=nodata)
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata
             raise exceptions.ValidationError("Cannot retrieve raster metadata: %s" % str(e))
@@ -338,9 +343,12 @@ class Tiles(TaskNestedView):
                     else:
                         # Fallback to first three
                         indexes = (1, 2, 3, )
-
                 elif has_alpha:
                     indexes = non_alpha_indexes(src)
+            
+            # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
+            if nodata is None and tile_type =='orthophoto':
+                nodata = 0
 
         resampling="nearest"
         padding=0

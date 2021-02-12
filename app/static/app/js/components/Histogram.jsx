@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/Histogram.scss';
 import d3 from 'd3';
+import { _ } from '../classes/gettext';
 
 export default class Histogram extends React.Component {
   static defaultProps = {
@@ -289,8 +290,8 @@ export default class Histogram extends React.Component {
     return (<div className={"histogram " + (this.props.loading ? "disabled" : "")}>
         <div ref={(domNode) => { this.hgContainer = domNode; }}>
         </div>
-        <label>Min:</label> <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.min} />
-        <label>Max:</label> <input onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.max} />
+        <label>{_("Min:")}</label> <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.min} />
+        <label>{_("Max:")}</label> <input onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.max} />
     </div>);
   }
 }

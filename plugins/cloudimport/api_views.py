@@ -5,8 +5,8 @@ from os import path
 
 from app import models, pending_actions
 from app.plugins.views import TaskView
-from app.plugins.worker import task
-from app.plugins import logger, get_current_plugin
+from app.plugins.worker import run_function_async
+from app.plugins import get_current_plugin
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -52,8 +52,8 @@ class ImportFolderTaskView(TaskView):
 
         # Start importing the files in the background
         serialized = [file.serialize() for file in files]
-        import_files.delay(task.id, serialized)
-        
+        run_function_async(import_files, task.id, serialized)
+
         return Response({}, status=status.HTTP_200_OK)
 
 class CheckUrlTaskView(TaskView):
@@ -99,11 +99,21 @@ class PlatformsTaskView(TaskView):
         return Response({'platforms': [platform.serialize(user = request.user) for platform in platforms]}, status=status.HTTP_200_OK)
 
 
-###                        ###
-#       CELERY TASK(S)       #
-###                        ###
-@task
 def import_files(task_id, files):
+    import requests
+    from app import models
+    from app.plugins import logger
+
+    def download_file(task, file):
+        path = task.task_path(file['name'])
+        download_stream = requests.get(file['url'], stream=True, timeout=60)
+
+        with open(path, 'wb') as fd:
+            for chunk in download_stream.iter_content(4096):
+                fd.write(chunk)
+        
+        models.ImageUpload.objects.create(task=task, image=path)
+
     logger.info("Will import {} files".format(len(files)))
     task = models.Task.objects.get(pk=task_id)
     task.create_task_directories()
@@ -125,13 +135,3 @@ def import_files(task_id, files):
     task.processing_time = 0
     task.partial = False
     task.save()
-
-def download_file(task, file):
-    path = task.task_path(file['name'])
-    download_stream = requests.get(file['url'], stream=True, timeout=60)
-
-    with open(path, 'wb') as fd:
-        for chunk in download_stream.iter_content(4096):
-            fd.write(chunk)
-    
-    models.ImageUpload.objects.create(task=task, image=path)

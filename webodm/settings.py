@@ -45,6 +45,7 @@ with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
     VERSION = data['version']
 
 TESTING = sys.argv[1:2] == ['test']
+FLUSHING = sys.argv[1:2] == ['flush']
 MIGRATING = sys.argv[1:2] == ['migrate']
 WORKER_RUNNING = sys.argv[2:3] == ["worker"]
 
@@ -56,6 +57,27 @@ INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
 
+# Branding
+APP_NAME = "WebODM"
+APP_DEFAULT_LOGO = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
+
+# In single user mode, a default admin account is created and automatically
+# used so that no login windows are displayed
+SINGLE_USER_MODE = False
+
+# URL to redirect to if there are no processing nodes when visiting the dashboard
+PROCESSING_NODES_ONBOARDING = None
+
+# Default CSS to add to theme
+DEFAULT_THEME_CSS = ''
+
+# Plugins never to load
+PLUGINS_BLACKLIST = [
+    #'measure',
+]
+
+# Serve media static files URLs even in production
+FORCE_MEDIA_STATICFILES = False
 
 # Application definition
 
@@ -123,12 +145,12 @@ WSGI_APPLICATION = 'webodm.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'webodm_dev',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
+        'ENGINE': os.environ.get('WO_DATABASE_ENGINE', 'django.contrib.gis.db.backends.postgis'),
+        'NAME': os.environ.get('WO_DATABASE_NAME', 'webodm_dev'),
+        'USER': os.environ.get('WO_DATABASE_USER', 'postgres'),
+        'PASSWORD': os.environ.get('WO_DATABASE_PASSWORD', 'postgres'),
+        'HOST': os.environ.get('WO_DATABASE_HOST', 'db'),
+        'PORT': os.environ.get('WO_DATABASE_PORT', '5432'),
     }
 }
 
@@ -166,6 +188,9 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale')
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -331,11 +356,11 @@ CELERY_RESULT_BACKEND = os.environ.get('WO_BROKER', 'redis://localhost')
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_INCLUDE=['worker.tasks']
+CELERY_INCLUDE=['worker.tasks', 'app.plugins.worker']
 CELERY_WORKER_REDIRECT_STDOUTS = False
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
-if TESTING:
+if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
 
 try:

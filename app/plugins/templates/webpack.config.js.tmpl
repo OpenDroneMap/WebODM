@@ -1,5 +1,8 @@
 // Magic to include node_modules of root WebODM's directory
-process.env.NODE_PATH = "../../../node_modules";
+const fs = require('fs');
+let webodmRoot = "../../../"; // Assuming plugins/<name>/public
+if (!fs.existsSync(webodmRoot + "webodm.sh")) webodmRoot = "../../../../../"; // Assuming app/media/plugins/<name>/public
+process.env.NODE_PATH = webodmRoot + "node_modules";
 require("module").Module._initPaths();
 
 let path = require("path");
@@ -69,7 +72,7 @@ module.exports = {
     modules: ['node_modules', 'bower_components'],
     extensions: ['.js', '.jsx'],
     alias: {
-        webodm: path.resolve(__dirname, '../../../app/static/app/js')
+        webodm: path.resolve(__dirname, webodmRoot + 'app/static/app/js')
     }
   },
 

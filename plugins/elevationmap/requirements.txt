@@ -1,2 +1,2 @@
 geojson==2.4.1
-opencv-python==4.1.0.25
+opencv-python==4.4.0.44

@@ -1,6 +1,8 @@
+import { _ } from './gettext';
+
 const dict = [
-  {k: 'NO', v: 0, human: "No"}, // Don't resize
-  {k: 'YES', v: 1, human: "Yes"} // Resize on server
+  {k: 'NO', v: 0, human: _("No")}, // Don't resize
+  {k: 'YES', v: 1, human: _("Yes")} // Resize on server
 ];
 
 const exp = {

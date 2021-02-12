@@ -3,10 +3,11 @@ import logging
 import importlib
 import subprocess
 import traceback
+import platform
 
-import django
 import json
-from django.conf.urls import url
+
+import shutil
 from functools import reduce
 from string import Template
 
@@ -15,6 +16,7 @@ from django.http import HttpResponse
 from app.models import Plugin
 from app.models import Setting
 from django.conf import settings
+from app.security import path_traversal_check
 
 logger = logging.getLogger('app.logger')
 
@@ -58,7 +60,7 @@ def sync_plugin_db():
             defaults={'enabled': not disabled},
         )
         if created:
-            logger.info("Added [{}] plugin to database".format(plugin.get_name()))
+            logger.info("Added [{}] plugin to database".format(plugin))
 
 
 def clear_plugins_cache():
@@ -72,7 +74,15 @@ def build_plugins():
         # and run npm install if needed
         if plugin.path_exists("public/package.json") and not plugin.path_exists("public/node_modules"):
             logger.info("Running npm install for {}".format(plugin))
-            subprocess.call(['npm', 'install'], cwd=plugin.get_path("public"))
+
+            try:
+                npm = "npm"
+                if platform.system() == "Windows":
+                    npm = "npm.cmd"
+                subprocess.call([npm, 'install'], cwd=plugin.get_path("public"))
+            except FileNotFoundError:
+                logger.warn("npm is not installed, will skip this plugin")
+                continue
 
         # Check if we need to generate a webpack.config.js
         if len(plugin.build_jsx_components()) > 0 and plugin.path_exists('public'):
@@ -105,8 +115,15 @@ def build_plugins():
                 subprocess.Popen(['webpack-cli', '--watch'], cwd=plugin.get_path("public"))
             elif not plugin.path_exists("public/build"):
                 logger.info("Running webpack for {}".format(plugin.get_name()))
-                subprocess.call(['webpack-cli'], cwd=plugin.get_path("public"))
 
+                try:
+                    webpack = "webpack-cli"
+                    if platform.system() == "Windows":
+                        webpack = "webpack-cli.cmd"
+
+                    subprocess.call([webpack], cwd=plugin.get_path("public"))
+                except FileNotFoundError:
+                    logger.warn("webpack-cli is not installed, plugin will not work")
 
 def webpack_watch_process_count():
     count = 0
@@ -133,40 +150,11 @@ def register_plugins():
             disable_plugin(plugin.get_name())
             logger.warning("Cannot register {}: {}".format(plugin, str(e)))
 
-
-def get_app_url_patterns():
-    """
-    @return the patterns to expose the /public directory of each plugin (if needed) and
-        each mount point
-    """
-    url_patterns = []
-    for plugin in get_plugins():
-        for mount_point in plugin.app_mount_points():
-            url_patterns.append(url('^plugins/{}/{}'.format(plugin.get_name(), mount_point.url),
-                                mount_point.view,
-                                *mount_point.args,
-                                **mount_point.kwargs))
-
-        if plugin.path_exists("public"):
-            url_patterns.append(url('^plugins/{}/(.*)'.format(plugin.get_name()),
-                                    django.views.static.serve,
-                                    {'document_root': plugin.get_path("public")}))
-
-    return url_patterns
-
-def get_api_url_patterns():
-    """
-    @return the patterns to expose the plugin API mount points (if any)
-    """
-    url_patterns = []
-    for plugin in get_plugins():
-        for mount_point in plugin.api_mount_points():
-            url_patterns.append(url('^plugins/{}/{}'.format(plugin.get_name(), mount_point.url),
-                                mount_point.view,
-                                *mount_point.args,
-                                **mount_point.kwargs))
-
-    return url_patterns
+def valid_plugin(plugin_path):
+    initpy_path = os.path.join(plugin_path, "__init__.py")
+    pluginpy_path = os.path.join(plugin_path, "plugin.py")
+    manifest_path = os.path.join(plugin_path, "manifest.json")
+    return os.path.isfile(initpy_path) and os.path.isfile(manifest_path) and os.path.isfile(pluginpy_path)
 
 plugins = None
 def get_plugins():
@@ -177,47 +165,66 @@ def get_plugins():
     global plugins
     if plugins != None: return plugins
 
-    plugins_path = get_plugins_path()
+    plugins_paths = get_plugins_paths()
     plugins = []
 
-    for dir in [d for d in os.listdir(plugins_path) if os.path.isdir(plugins_path)]:
-        # Each plugin must have a manifest.json and a plugin.py
-        plugin_path = os.path.join(plugins_path, dir)
-        pluginpy_path = os.path.join(plugin_path, "plugin.py")
-        manifest_path = os.path.join(plugin_path, "manifest.json")
-
-        # Do not load test plugin unless we're in test mode
-        if os.path.basename(plugin_path) == 'test' and not settings.TESTING:
+    for plugins_path in plugins_paths:
+        if not os.path.isdir(plugins_path):
             continue
 
-        # Ignore .gitignore
-        if os.path.basename(plugin_path) == '.gitignore':
-            continue
+        for dir in os.listdir(plugins_path):
+            # Each plugin must have a manifest.json and a plugin.py
+            plugin_path = os.path.join(plugins_path, dir)
 
-        # Check plugin required files
-        if not os.path.isfile(manifest_path) or not os.path.isfile(pluginpy_path):
-            logger.warning("Found invalid plugin in {}".format(plugin_path))
-            continue
+            # Do not load test plugin unless we're in test mode
+            if os.path.basename(plugin_path).endswith('test') and not settings.TESTING:
+                continue
 
-        # Instantiate the plugin
-        try:
-            module = importlib.import_module("plugins.{}".format(dir))
-            plugin = (getattr(module, "Plugin"))()
+            # Ignore .gitignore
+            if os.path.basename(plugin_path) == '.gitignore':
+                continue
 
-            # Check version
-            manifest = plugin.get_manifest()
-            if 'webodmMinVersion' in manifest:
-                min_version = manifest['webodmMinVersion']
+            # Check plugin required files
+            if not valid_plugin(plugin_path):
+                continue
 
-                if versionToInt(min_version) > versionToInt(settings.VERSION):
-                    logger.warning(
-                        "In {} webodmMinVersion is set to {} but WebODM version is {}. Plugin will not be loaded. Update WebODM.".format(
-                            manifest_path, min_version, settings.VERSION))
+            # Instantiate the plugin
+            try:
+                try:
+                    if settings.TESTING:
+                        module = importlib.import_module("app.media_test.plugins.{}".format(dir))
+                    else:
+                        module = importlib.import_module("app.media.plugins.{}".format(dir))
+
+                    plugin = (getattr(module, "Plugin"))()
+                except (ImportError, AttributeError):
+                    module = importlib.import_module("plugins.{}".format(dir))
+                    plugin = (getattr(module, "Plugin"))()
+
+                # Check version
+                manifest = plugin.get_manifest()
+                if 'webodmMinVersion' in manifest:
+                    min_version = manifest['webodmMinVersion']
+                    manifest_path = os.path.join(plugin_path, "manifest.json")
+
+                    if versionToInt(min_version) > versionToInt(settings.VERSION):
+                        logger.warning(
+                            "In {} webodmMinVersion is set to {} but WebODM version is {}. Plugin will not be loaded. Update WebODM.".format(
+                                manifest_path, min_version, settings.VERSION))
+                        continue
+
+                # Skip plugins in blacklist
+                if plugin.get_name() in settings.PLUGINS_BLACKLIST:
                     continue
 
-            plugins.append(plugin)
-        except Exception as e:
-            logger.warning("Failed to instantiate plugin {}: {}".format(dir, e))
+                # Skip plugins already added
+                if plugin.get_name() in [p.get_name() for p in plugins]:
+                    logger.warning("Duplicate plugin name found in {}, skipping".format(plugin_path))
+                    continue
+
+                plugins.append(plugin)
+            except Exception as e:
+                logger.warning("Failed to instantiate plugin {}: {}".format(dir, e))
 
     return plugins
 
@@ -261,20 +268,27 @@ def get_current_plugin():
     """
     caller_filename = traceback.extract_stack()[-2][0]
 
-    relp = os.path.relpath(caller_filename, get_plugins_path())
-    parts = relp.split(os.sep)
-    if len(parts) > 0:
-        plugin_name = parts[0]
-        return get_plugin_by_name(plugin_name, only_active=False)
+    for p in get_plugins_paths():
+        relp = os.path.relpath(caller_filename, p)
+        if ".." in relp:
+            continue
+
+        parts = relp.split(os.sep)
+        if len(parts) > 0:
+            plugin_name = parts[0]
+            return get_plugin_by_name(plugin_name, only_active=False)
 
     return None
 
-def get_plugins_path():
+def get_plugins_paths():
     current_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.abspath(os.path.join(current_path, "..", "..", "plugins"))
+    return [
+        os.path.abspath(get_plugins_persistent_path()),
+        os.path.abspath(os.path.join(current_path, "..", "..", "plugins")),
+    ]
 
 def get_plugins_persistent_path(*paths):
-    return os.path.join(settings.MEDIA_ROOT, "plugins", *paths)
+    return path_traversal_check(os.path.join(settings.MEDIA_ROOT, "plugins", *paths), os.path.join(settings.MEDIA_ROOT, "plugins"))
 
 def get_dynamic_script_handler(script_path, callback=None, **kwargs):
     def handleRequest(request):
@@ -301,6 +315,12 @@ def enable_plugin(plugin_name):
 
 def disable_plugin(plugin_name):
     Plugin.objects.get(pk=plugin_name).disable()
+
+def delete_plugin(plugin_name):
+    Plugin.objects.get(pk=plugin_name).delete()
+    if os.path.exists(get_plugins_persistent_path(plugin_name)):
+        shutil.rmtree(get_plugins_persistent_path(plugin_name))
+    clear_plugins_cache()
 
 def get_site_settings():
     return Setting.objects.first()

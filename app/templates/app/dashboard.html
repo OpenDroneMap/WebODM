@@ -12,13 +12,11 @@
 	<![endif]-->
 
 	{% if no_processingnodes %}
-		<h3>{% trans 'Welcome! ☺' %}</h3>
+		<h3>{% trans 'Welcome!' %} ☺</h3>
 		{% trans 'Add a Processing Node' as add_processing_node %}
 		{% with nodeodm_link='<a href="https://github.com/OpenDroneMap/NodeODM" target="_blank">NodeODM</a>' api_link='<a href="https://github.com/OpenDroneMap/NodeODM/blob/master/docs/index.adoc" target="_blank">API</a>' %}
 			<p>
-			{% blocktrans %} 
-				To get started, "{{ add_processing_node }}". A processing node is a computer running an instance of {{ nodeodm_link }} or some other software that implements this {{ api_link }}.
-			{% endblocktrans %}
+			{% blocktrans %}To get started, "{{ add_processing_node }}". A processing node is a computer running an instance of {{ nodeodm_link }} or some other software implementing this {{ api_link }}.{% endblocktrans %}
 			</p>
 		{% endwith %}
 		<button class="btn btn-primary" onclick="location.href='{% url "admin:nodeodm_processingnode_add" %}';"><i class="fa fa-plus-circle"></i> {{ add_processing_node }}</button>
@@ -26,17 +24,17 @@
 	{% else %}
 		
 		{% if no_tasks %}
-			<h3>{% trans 'Welcome! ☺' %}</h3>
+			<h3>{% trans 'Welcome!' %} ☺</h3>
 			{% trans 'Select Images and GCP' as upload_images %}
 			<p>
-				{% blocktrans %} To create a map, press the "{{ upload_images }}" button, or drag and drop some images into a project. {% endblocktrans %}
+				{% blocktrans %}To create a map, press the "{{ upload_images }}" button, or drag and drop some images into a project.{% endblocktrans %}
 			</p>
 			<p>
 				<ul>
 					<li>{% trans 'You need at least 5 images' %}</li>
 					<li>{% trans 'Images must overlap by 65% or more' %}</li>
-					<li>{% trans 'For great 3D, images must overlap by 83%' %}</li>
-					<li>{% trans 'A <a href="https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-OpenDroneMap#running-odm-with-ground-control" target="_blank">GCP file</a> is optional, but can increase georeferencing accuracy' %}</li>
+                    <li>{% trans 'For great 3D, images must overlap by 83%' %}</li>
+					<li>{% blocktrans with link_start='<a href="https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-OpenDroneMap#running-odm-with-ground-control" target="_blank">' link_end='</a>' %}A {{link_start}}GCP File{{link_end}} is optional, but can increase georeferencing accuracy{% endblocktrans %}</li>
 				</ul>
 			</p>
 		{% endif %}

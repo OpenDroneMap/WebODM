@@ -1,8 +1,10 @@
 {% extends "app/base.html" %}
-{% load i18n static %}
-
+{% load i18n static settings %}
 
 {% block navbar-top-links %}
+    {% is_single_user_mode as single_user %}
+
+    {% if not single_user %}
     <ul class="nav navbar-top-links navbar-right">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -10,7 +12,7 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li class="user-profile">
-                    {% trans 'Hello' %}, {{ user.username }}<br/>
+                    {% blocktrans with user=user.username %}Hello, {{ user }}!{% endblocktrans %}<br/>
                     <span class="email">{{ user.email }}</span>
                 </li>
                 <li class="divider"></li>
@@ -21,6 +23,7 @@
         </li>
         <!-- /.dropdown -->
     </ul>
+    {% endif %}
 {% endblock %}
 {% block navbar-sidebar %}
     <div class="navbar-default sidebar" role="navigation">
@@ -53,17 +56,17 @@
 
                 {% if view_nodes %}
                 <li>
-                    <a href="#"><i class="fa fa-wrench fa-fw"></i> Processing Nodes<span class="fa arrow"></span></a>
+                    <a href="#"><i class="fa fa-wrench fa-fw"></i> {% trans 'Processing Nodes' %}<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         {% for node in nodes %}
                         <li>
-                            <a href="{% url 'processing_node' node.id %}"><span class="fa fa-laptop {% if node.is_online %}theme-color-button-primary{% else %}theme-color-button-danger{% endif %}"></span> {{node}}</a>
+                            <a href="{% url 'processing_node' node.id %}"><span class="fa fa-laptop {% if not node.is_online %}theme-color-button-danger{% endif %}"></span> {{node}}</a>
                         </li>
                         {% endfor %}
 
                         {% if add_nodes %}
                         <li>
-                            <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> Add New</a>
+                            <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle"></span> {% trans 'Add New' %}</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -75,12 +78,16 @@
                 <li>
                     <a href="#"><i class="fa fa-cogs fa-fw"></i> {% trans 'Administration' %}<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
+                        {% is_single_user_mode as hide_users %}
+                        {% if not hide_users %}
                         <li>
                             <a href="/admin/auth/user/"><i class="fa fa-user fa-fw"></i> {% trans 'Accounts' %}</a>
                         </li>
                         <li>
                             <a href="/admin/auth/group/"><i class="fa fa-users fa-fw"></i> {% trans 'Groups' %}</a>
                         </li>
+                        {% endif %}
+
                         <li>
                             <a href="{% url 'admin:app_setting_change' SETTINGS.id %}"><i class="fa fa-magic fa-fw"></i> {% trans 'Brand' %}</a>
                         </li>
@@ -96,6 +103,16 @@
                     </ul>
                 </li>
                 {% endif %}
+
+                {% is_dev_mode as dev_mode %}
+                {% if dev_mode and user.is_superuser %}
+                <li>
+                    <a href="/dev-tools/"><i class="fa fa-bug fa-fw"></i> {% trans 'Developer Tools' %}</a>
+                </li>
+                {% endif %}
+                <li id="about-menu">
+                    <a href="/about/"><i class="fa fa-info-circle fa-fw"></i> {% trans 'About' %}</a>
+                </li>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

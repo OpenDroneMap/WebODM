@@ -35,7 +35,9 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
 from webodm import settings
+from app.classes.gcp import GCPFile
 from .project import Project
+from django.utils.translation import gettext_lazy as _, gettext
 
 from functools import partial
 import subprocess
@@ -166,6 +168,7 @@ class Task(models.Model):
     ASSETS_MAP = {
             'all.zip': 'all.zip',
             'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+            'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
             'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
             'georeferenced_model.las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.las'),
             'georeferenced_model.laz': os.path.join('odm_georeferencing', 'odm_georeferenced_model.laz'),
@@ -190,6 +193,8 @@ class Task(models.Model):
                 'deferred_compress_dir': 'orthophoto_tiles'
             },
             'cameras.json': 'cameras.json',
+            'shots.geojson': os.path.join('odm_report', 'shots.geojson'),
+            'report.pdf': os.path.join('odm_report', 'report.pdf'),
     }
 
     STATUS_CODES = (
@@ -210,43 +215,50 @@ class Task(models.Model):
 
     TASK_PROGRESS_LAST_VALUE = 0.85
 
-    id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False, verbose_name=_("Id"))
 
-    uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text="Identifier of the task (as returned by OpenDroneMap's REST API)")
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text="Project that this task belongs to")
-    name = models.CharField(max_length=255, null=True, blank=True, help_text="A label for the task")
-    processing_time = models.IntegerField(default=-1, help_text="Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)")
-    processing_node = models.ForeignKey(ProcessingNode, on_delete=models.SET_NULL, null=True, blank=True, help_text="Processing node assigned to this task (or null if this task has not been associated yet)")
-    auto_processing_node = models.BooleanField(default=True, help_text="A flag indicating whether this task should be automatically assigned a processing node")
-    status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text="Current status of the task")
-    last_error = models.TextField(null=True, blank=True, help_text="The last processing error received")
-    options = fields.JSONField(default=dict, blank=True, help_text="Options that are being used to process this task", validators=[validate_task_options])
-    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text="List of available assets to download")
-    console_output = models.TextField(null=False, default="", blank=True, help_text="Console output of the OpenDroneMap's process")
+    uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text=_("Identifier of the task (as returned by NodeODM API)"), verbose_name=_("UUID"))
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=_("Project that this task belongs to"), verbose_name=_("Project"))
+    name = models.CharField(max_length=255, null=True, blank=True, help_text=_("A label for the task"), verbose_name=_("Name"))
+    processing_time = models.IntegerField(default=-1, help_text=_("Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)"), verbose_name=_("Processing Time"))
+    processing_node = models.ForeignKey(ProcessingNode, on_delete=models.SET_NULL, null=True, blank=True, help_text=_("Processing node assigned to this task (or null if this task has not been associated yet)"), verbose_name=_("Processing Node"))
+    auto_processing_node = models.BooleanField(default=True, help_text=_("A flag indicating whether this task should be automatically assigned a processing node"), verbose_name=_("Auto Processing Node"))
+    status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text=_("Current status of the task"), verbose_name=_("Status"))
+    last_error = models.TextField(null=True, blank=True, help_text=_("The last processing error received"), verbose_name=_("Last Error"))
+    options = fields.JSONField(default=dict, blank=True, help_text=_("Options that are being used to process this task"), validators=[validate_task_options], verbose_name=_("Options"))
+    available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text=_("List of available assets to download"), verbose_name=_("Available Assets"))
+    console_output = models.TextField(null=False, default="", blank=True, help_text=_("Console output of the processing node"), verbose_name=_("Console Output"))
 
-    orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the orthophoto created by OpenDroneMap")
-    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM created by OpenDroneMap")
-    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DTM created by OpenDroneMap")
+    orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text=_("Extent of the orthophoto"), verbose_name=_("Orthophoto Extent"))
+    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM", verbose_name=_("DSM Extent"))
+    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DTM", verbose_name=_("DTM Extent"))
 
     # mission
-    created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
-    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text="A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration.")
+    created_at = models.DateTimeField(default=timezone.now, help_text=_("Creation date"), verbose_name=_("Created at"))
+    pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text=_("A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration."), verbose_name=_("Pending Action"))
 
-    public = models.BooleanField(default=False, help_text="A flag indicating whether this task is available to the public")
-    resize_to = models.IntegerField(default=-1, help_text="When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing.")
+    public = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is available to the public"), verbose_name=_("Public"))
+    resize_to = models.IntegerField(default=-1, help_text=_("When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing."), verbose_name=_("Resize To"))
 
     upload_progress = models.FloatField(default=0.0,
-                                        help_text="Value between 0 and 1 indicating the upload progress of this task's files to the processing node",
+                                        help_text=_("Value between 0 and 1 indicating the upload progress of this task's files to the processing node"),
+                                        verbose_name=_("Upload Progress"),
                                         blank=True)
     resize_progress = models.FloatField(default=0.0,
-                                        help_text="Value between 0 and 1 indicating the resize progress of this task's images",
+                                        help_text=_("Value between 0 and 1 indicating the resize progress of this task's images"),
+                                        verbose_name=_("Resize Progress"),
                                         blank=True)
     running_progress = models.FloatField(default=0.0,
-                                        help_text="Value between 0 and 1 indicating the running progress (estimated) of this task",
+                                        help_text=_("Value between 0 and 1 indicating the running progress (estimated) of this task"),
+                                        verbose_name=_("Running Progress"),
                                         blank=True)
-    import_url = models.TextField(null=False, default="", blank=True, help_text="URL this task is imported from (only for imported tasks)")
-    images_count = models.IntegerField(null=False, blank=True, default=0, help_text="Number of images associated with this task")
-    partial = models.BooleanField(default=False, help_text="A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing.")
+    import_url = models.TextField(null=False, default="", blank=True, help_text=_("URL this task is imported from (only for imported tasks)"), verbose_name=_("Import URL"))
+    images_count = models.IntegerField(null=False, blank=True, default=0, help_text=_("Number of images associated with this task"), verbose_name=_("Images Count"))
+    partial = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing."), verbose_name=_("Partial"))
+
+    class Meta:
+        verbose_name = _("Task")
+        verbose_name_plural = _("Tasks")
 
     def __init__(self, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
@@ -255,7 +267,7 @@ class Task(models.Model):
         self.__original_project_id = self.project.id
 
     def __str__(self):
-        name = self.name if self.name is not None else "unnamed"
+        name = self.name if self.name is not None else gettext("unnamed")
 
         return 'Task [{}] ({})'.format(name, self.id)
 
@@ -358,7 +370,7 @@ class Task(models.Model):
             raise FileNotFoundError("{} is not a valid asset".format(asset))
 
     def handle_import(self):
-        self.console_output += "Importing assets...\n"
+        self.console_output += gettext("Importing assets...") + "\n"
         self.save()
 
         zip_path = self.assets_path("all.zip")
@@ -397,7 +409,7 @@ class Task(models.Model):
         try:
             self.extract_assets_and_complete()
         except zipfile.BadZipFile:
-            raise NodeServerError("Invalid zip file")
+            raise NodeServerError(gettext("Invalid zip file"))
 
         images_json = self.assets_path("images.json")
         if os.path.exists(images_json):
@@ -491,7 +503,7 @@ class Task(models.Model):
                     except NodeConnectionError as e:
                         # If we can't create a task because the node is offline
                         # We want to fail instead of trying again
-                        raise NodeServerError('Connection error: ' + str(e))
+                        raise NodeServerError(gettext('Connection error: %(error)s') % {'error': str(e)})
 
                     # Refresh task object before committing change
                     self.refresh_from_db()
@@ -571,7 +583,7 @@ class Task(models.Model):
                         self.running_progress = 0
                         self.save()
                     else:
-                        raise NodeServerError("Cannot restart a task that has no processing node")
+                        raise NodeServerError(gettext("Cannot restart a task that has no processing node"))
 
                 elif self.pending_action == pending_actions.REMOVE:
                     logger.info("Removing {}".format(self))
@@ -628,7 +640,7 @@ class Task(models.Model):
                             os.makedirs(assets_dir)
 
                             # Download and try to extract results up to 4 times
-                            # (~95% of the times, on large downloads, the archive could be corrupted)
+                            # (~5% of the times, on large downloads, the archive could be corrupted)
                             retry_num = 0
                             extracted = False
                             last_update = 0
@@ -648,7 +660,7 @@ class Task(models.Model):
                                 logger.info("Downloading all.zip for {}".format(self))
 
                                 # Download all assets
-                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback)
+                                zip_path = self.processing_node.download_task_assets(self.uuid, assets_dir, progress_callback=callback, parallel_downloads=max(1, int(16 / (2 ** retry_num))))
 
                                 # Rename to all.zip
                                 all_zip_path = self.assets_path("all.zip")
@@ -660,12 +672,12 @@ class Task(models.Model):
                                     self.extract_assets_and_complete()
                                     extracted = True
                                 except zipfile.BadZipFile:
-                                    if retry_num < 4:
+                                    if retry_num < 5:
                                         logger.warning("{} seems corrupted. Retrying...".format(all_zip_path))
                                         retry_num += 1
                                         os.remove(all_zip_path)
                                     else:
-                                        raise NodeServerError("Invalid zip file")
+                                        raise NodeServerError(gettext("Invalid zip file"))
                         else:
                             # FAILED, CANCELED
                             self.save()
@@ -723,7 +735,7 @@ class Task(models.Model):
                 with connection.cursor() as cursor:
                     cursor.execute("SELECT SRID FROM spatial_ref_sys WHERE SRID = %s", [raster.srid])
                     if cursor.rowcount == 0:
-                        raise NodeServerError("Unsupported SRS {}. Please make sure you picked a supported SRS.".format(raster.srid))
+                        raise NodeServerError(gettext("Unsupported SRS %(code)s. Please make sure you picked a supported SRS.") % {'code': str(raster.srid)})
 
                 # It will be implicitly transformed into the SRID of the model’s field
                 # self.field = GEOSGeometry(...)
@@ -733,7 +745,7 @@ class Task(models.Model):
 
         self.update_available_assets_field()
         self.running_progress = 1.0
-        self.console_output += "Done!\n"
+        self.console_output += gettext("Done!") + "\n"
         self.status = status_codes.COMPLETED
         self.save()
 
@@ -757,13 +769,17 @@ class Task(models.Model):
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
 
+        camera_shots = ''
+        if 'shots.geojson' in self.available_assets: camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)
+
         return {
             'tiles': [{'url': self.get_tile_base_url(t), 'type': t} for t in types],
             'meta': {
                 'task': {
                     'id': str(self.id),
                     'project': self.project.id,
-                    'public': self.public
+                    'public': self.public,
+                    'camera_shots': camera_shots
                 }
             }
         }
@@ -889,21 +905,19 @@ class Task(models.Model):
 
         # Assume we only have a single GCP file per task
         gcp_path = gcp_path[0]
-        resize_script_path = os.path.join(settings.BASE_DIR, 'app', 'scripts', 'resize_gcp.js')
 
-        dict = {}
+        image_ratios = {}
         for ri in resized_images:
-            dict[os.path.basename(ri['path'])] = ri['resize_ratio']
+            image_ratios[os.path.basename(ri['path']).lower()] = ri['resize_ratio']
 
         try:
-            new_gcp_content = subprocess.check_output("node {} {} '{}'".format(quote(resize_script_path), quote(gcp_path), json.dumps(dict)), shell=True)
-            with open(gcp_path, 'w') as f:
-                f.write(new_gcp_content.decode('utf-8'))
+            gcpFile = GCPFile(gcp_path)
+            gcpFile.create_resized_copy(gcp_path, image_ratios)
             logger.info("Resized GCP file {}".format(gcp_path))
             return gcp_path
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logger.warning("Could not resize GCP file {}: {}".format(gcp_path, str(e)))
-            return None
+
 
     def create_task_directories(self):
         """

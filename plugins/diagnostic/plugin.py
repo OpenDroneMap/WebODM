@@ -1,6 +1,7 @@
 from app.plugins import PluginBase, Menu, MountPoint
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext as _
 
 import json, shutil
 
@@ -32,22 +33,15 @@ def get_memory_stats():
 
 class Plugin(PluginBase):
     def main_menu(self):
-        return [Menu("Diagnostic", self.public_url(""), "fa fa-chart-pie fa-fw")]
+        return [Menu(_("Diagnostic"), self.public_url(""), "fa fa-chart-pie fa-fw")]
 
     def app_mount_points(self):
         @login_required
         def diagnostic(request):
-            # Load version number
-            with open('./package.json') as f:
-                package = json.load(f)
-                version = package['version']
-
             # Disk space
             total_disk_space, used_disk_space, free_disk_space = shutil.disk_usage('./')
 
             template_args = {
-                'title': 'Diagnostic',
-                'version': version,
                 'total_disk_space': total_disk_space,
                 'used_disk_space': used_disk_space,
                 'free_disk_space': free_disk_space

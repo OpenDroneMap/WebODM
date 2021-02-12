@@ -87,6 +87,26 @@ You assign a [Task](#task) to a [Project](#project) by passing the proper `proje
 
 Parameters are the same as above.
 
+### Import Task
+
+`POST /api/projects/{project_id}/tasks/import`
+
+Import task that have been processed by another WebODM instance (or via [webodm.net](https://webodm.net) or NodeODM)
+
+Parameter | Required | Default          | Description
+--------- | -------- | -------          | ----------
+name      |          | Imported Task    | User defined name for the task.
+filename  | */       | ""               | File with assets. Must be a zip.
+url       | /*       | ""               | URL to zipped zipped assets.
+
+You have to provide either `filename` or `url` parameter (but not both) in order to import created assets.
+ 
+Remember to set proper Content-type for the request depending on how the assets are uploaded:
+
+Parameter | Content-Type
+--------- | ---
+filename  | application/zip
+url       | application/x-www-form-urlencoded
 
 ### Get list of tasks
 

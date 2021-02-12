@@ -1,4 +1,5 @@
 import Utils from './Utils';
+import { _, interpolate } from './gettext';
 
 class PresetUtils{
 
@@ -24,7 +25,17 @@ class PresetUtils{
               delete(opt.value);
             }
         }
+
+        if (typeof opt.help === "string"){
+            opt.help = interpolate(_(opt.help), {
+                choices: Array.isArray(opt.domain) ? opt.domain.join(", ") : opt.domain,
+                'default': opt.defaultValue === "" ? "\"\"" : opt.defaultValue
+            });
+        }
     });
+
+    // Sort by name ascending
+    result.sort((a, b) => a.name < b.name ? -1 : 1);
 
     return result;
   }

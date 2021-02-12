@@ -3,22 +3,12 @@
   background: #fff;
   width: 300px;
   min-height: 74px;
+  max-height: 400px;
   overflow-y: auto;
 
   .loading{
       margin-top: 6px;
       margin-left: 4px;
-  }
-
-  .overlays{
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-
-    a.toggle{
-        margin-left: 22px;
-    }
   }
 
   .close-button{

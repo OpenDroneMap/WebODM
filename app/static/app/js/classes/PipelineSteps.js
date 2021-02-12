@@ -1,53 +1,56 @@
+import { _ } from './gettext';
+
 export default {
     get: function(){
         return [{
                 action: "dataset",
-                label: "Load Dataset",
-                icon: "fa fa-database",
-                beginsWith: "Running ODM Load Dataset Cell",
-                endsWith: "Running ODM Load Dataset Cell - Finished"
+                label: _("Load Dataset"),
+                icon: "fa fa-database"
             },
             {
                 action: "opensfm",
-                label: "Structure From Motion / MVS",
-                icon: "fa fa-camera",
-                beginsWith: "Running ODM OpenSfM Cell",
-                endsWith: "Running ODM Meshing Cell"
+                label: _("Structure From Motion"),
+                icon: "fa fa-camera"
+            },
+            {
+                action: "openmvs",
+                label: _("Multi View Stereo"),
+                icon: "fa fa-braille"
+            },
+            {
+                action: "odm_filterpoints",
+                label: _("Point Filtering"),
+                icon: "fa fa-filter"
             },
             {
                 action: "odm_meshing",
-                label: "Meshing",
-                icon: "fa fa-cube",
-                beginsWith: "Running ODM Meshing Cell",
-                endsWith: "Running ODM Meshing Cell - Finished"
+                label: _("Meshing"),
+                icon: "fa fa-cube"
             },
             {
                 action: "mvs_texturing",
-                label: "Texturing",
-                icon: "fab fa-connectdevelop",
-                beginsWith: "Running MVS Texturing Cell",
-                endsWith: "Running ODM Texturing Cell - Finished"
+                label: _("Texturing"),
+                icon: "fab fa-connectdevelop"
             },
             {
                 action: "odm_georeferencing",
-                label: "Georeferencing",
-                icon: "fa fa-globe",
-                beginsWith: "Running ODM Georeferencing Cell",
-                endsWith: "Running ODM Georeferencing Cell - Finished"
+                label: _("Georeferencing"),
+                icon: "fa fa-globe"
             },
             {
                 action: "odm_dem",
-                label: "DEM",
-                icon: "fa fa-chart-area",
-                beginsWith: "Running ODM DEM Cell",
-                endsWith: "Running ODM DEM Cell - Finished"
+                label: _("DEM"),
+                icon: "fa fa-chart-area"
             },
             {
                 action: "odm_orthophoto",
-                label: "Orthophoto",
-                icon: "far fa-image",
-                beginsWith: "Running ODM Orthophoto Cell",
-                endsWith: "Running ODM OrthoPhoto Cell - Finished"
+                label: _("Orthophoto"),
+                icon: "far fa-image"
+            },
+            {
+                action: "odm_report",
+                label: _("Report"),
+                icon: "far fa-file-alt"
             }
         ];
     }

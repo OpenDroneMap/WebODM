@@ -2,7 +2,24 @@
 <html lang="en">
 <head>
     {% load i18n static settings compress plugins %}
+    <!-- 
+    WebODM - User-friendly, commercial grade software for processing aerial imagery.
+    Copyright (C) 2020  WebODM Authors
 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    -->
+    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,6 +37,9 @@
     <script src="{% static 'app/js/vendor/es6-shim.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
     <script src="{% static 'app/js/vendor/system.js' %}"></script>
+    <script src="{% url 'javascript-catalog' %}"></script>
+
+    {% block headers-before-bundle %}{% endblock %}
 
     {% load render_bundle from webpack_loader %}
     {% render_bundle 'main' %}
@@ -44,23 +64,6 @@
     <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <!--
-            {% if request.user.is_authenticated %}
-                {% if user.is_superuser %}          
-                <li>
-                    <a class="page-scroll" href="/admin/">Admin Panel</a>
-                </li>
-                {% endif %}
-                <li>
-                    <a class="page-scroll" href="/logout/">Logout</a>
-                </li>
-            {% else %}
-                 <li>
-                    <a class="page-scroll" href="/login/">Login</a>
-                </li>
-            {% endif %}
-            </ul>
--->
     <div id="wrapper">
         {{ SETTINGS.theme.html_before_header|safe }}
 

@@ -13,31 +13,42 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django import forms
+from webodm import settings
 
 def index(request):
-    # Check first access where the user is expected to
-    # create an admin account
+    # Check first access
     if User.objects.filter(is_superuser=True).count() == 0:
-        return redirect('welcome')
+        if settings.SINGLE_USER_MODE:
+            # Automatically create a default account
+            User.objects.create_superuser('admin', 'admin@localhost', 'admin')
+        else:
+            # the user is expected to create an admin account
+            return redirect('welcome')
+
+    if settings.SINGLE_USER_MODE and not request.user.is_authenticated:
+        login(request, User.objects.get(username="admin"), 'django.contrib.auth.backends.ModelBackend')
 
     # Auto login
     if not request.user.is_authenticated:
         login(request, User.objects.get(username="demouser"), 'django.contrib.auth.backends.ModelBackend')
         return redirect('dashboard')
 
-    return redirect('dashboard' if request.user.is_authenticated
-                    else 'login')
+    return redirect(settings.LOGIN_REDIRECT_URL if request.user.is_authenticated
+                    else settings.LOGIN_URL)
 
 @login_required
 def dashboard(request):
     no_processingnodes = ProcessingNode.objects.count() == 0
     no_tasks = False
+    
+    if no_processingnodes and settings.PROCESSING_NODES_ONBOARDING is not None:
+        return redirect(settings.PROCESSING_NODES_ONBOARDING)
 
     # Create first project automatically
     if Project.objects.count() == 0:
         Project.objects.create(owner=request.user, name=_("First Project"))
 
-    return render(request, 'app/dashboard.html', {'title': 'Dashboard',
+    return render(request, 'app/dashboard.html', {'title': _('Dashboard'),
         'no_processingnodes': no_processingnodes,
         'no_tasks': no_tasks
     })
@@ -93,6 +104,8 @@ def model_display(request, project_pk=None, task_pk=None):
             }.items()
         })
 
+def about(request):
+    return render(request, 'app/about.html', {'title': _('About'), 'version': settings.VERSION})
 
 @login_required
 def processing_node(request, processing_node_id):
@@ -102,7 +115,7 @@ def processing_node(request, processing_node_id):
 
     return render(request, 'app/processing_node.html', 
             {
-                'title': 'Processing Node', 
+                'title': _('Processing Node'), 
                 'processing_node': pn,
                 'available_options_json': pn.get_available_options_json(pretty=True)
             })
@@ -136,7 +149,7 @@ def welcome(request):
 
     return render(request, 'app/welcome.html',
                   {
-                      'title': 'Welcome',
+                      'title': _('Welcome'),
                       'firstuserform': fuf
                   })
 

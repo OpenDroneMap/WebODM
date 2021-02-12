@@ -1,3 +1,5 @@
+import { _ } from './gettext';
+
 class AssetDownload{
   constructor(label, asset, icon){
     this.label = label;
@@ -31,22 +33,26 @@ class AssetDownloadSeparator extends AssetDownload{
 const api = {
   all: function() {
     return [
-      new AssetDownload("Orthophoto (GeoTIFF)","orthophoto.tif","far fa-image"),
-      new AssetDownload("Orthophoto (PNG)","orthophoto.png","far fa-image"),
-      new AssetDownload("Orthophoto (MBTiles)","orthophoto.mbtiles","far fa-image"),
-      new AssetDownload("Orthophoto (Tiles)","orthophoto_tiles.zip","fa fa-table"),
-      new AssetDownload("Terrain Model (GeoTIFF)","dtm.tif","fa fa-chart-area"),
-      new AssetDownload("Terrain Model (Tiles)","dtm_tiles.zip","fa fa-table"),
-      new AssetDownload("Surface Model (GeoTIFF)","dsm.tif","fa fa-chart-area"),
-      new AssetDownload("Surface Model (Tiles)","dsm_tiles.zip","fa fa-table"),
-      new AssetDownload("Point Cloud (LAS)","georeferenced_model.las","fa fa-cube"),
-      new AssetDownload("Point Cloud (LAZ)","georeferenced_model.laz","fa fa-cube"),
-      new AssetDownload("Point Cloud (PLY)","georeferenced_model.ply","fa fa-cube"),
-      new AssetDownload("Point Cloud (CSV)","georeferenced_model.csv","fa fa-cube"),
-      new AssetDownload("Textured Model","textured_model.zip","fab fa-connectdevelop"),
-      new AssetDownload("Camera Parameters","cameras.json","fa fa-camera-retro"),
+      new AssetDownload(_("Orthophoto (GeoTIFF)"),"orthophoto.tif","far fa-image"),
+      new AssetDownload(_("Orthophoto (PNG)"),"orthophoto.png","far fa-image"),
+      new AssetDownload(_("Orthophoto (MBTiles)"),"orthophoto.mbtiles","far fa-image"),
+      new AssetDownload(_("Orthophoto (Tiles)"),"orthophoto_tiles.zip","fa fa-table"),
+      new AssetDownload(_("Terrain Model (GeoTIFF)"),"dtm.tif","fa fa-chart-area"),
+      new AssetDownload(_("Terrain Model (Tiles)"),"dtm_tiles.zip","fa fa-table"),
+      new AssetDownload(_("Surface Model (GeoTIFF)"),"dsm.tif","fa fa-chart-area"),
+      new AssetDownload(_("Surface Model (Tiles)"),"dsm_tiles.zip","fa fa-table"),
+      new AssetDownload(_("Point Cloud (LAS)"),"georeferenced_model.las","fa fa-cube"),
+      new AssetDownload(_("Point Cloud (LAZ)"),"georeferenced_model.laz","fa fa-cube"),
+      new AssetDownload(_("Point Cloud (PLY)"),"georeferenced_model.ply","fa fa-cube"),
+      new AssetDownload(_("Point Cloud (CSV)"),"georeferenced_model.csv","fa fa-cube"),
+      new AssetDownload(_("Textured Model"),"textured_model.zip","fab fa-connectdevelop"),
+      new AssetDownload(_("Camera Parameters"),"cameras.json","fa fa-camera"),
+      new AssetDownload(_("Camera Shots (GeoJSON)"),"shots.geojson","fa fa-camera"),
+      new AssetDownload(_("Quality Report"),"report.pdf","far fa-file-pdf"),
+      
+      
       new AssetDownloadSeparator(),
-      new AssetDownload("All Assets","all.zip","far fa-file-archive")
+      new AssetDownload(_("All Assets"),"all.zip","far fa-file-archive")
     ];
   },
 

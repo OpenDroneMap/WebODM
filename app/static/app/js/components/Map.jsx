@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'ReactDOM';
 import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
@@ -11,6 +12,7 @@ import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
 import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
+import ImagePopup from './ImagePopup';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
@@ -22,6 +24,9 @@ import Standby from './Standby';
 import LayersControl from './LayersControl';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
+import '../vendor/leaflet/Leaflet.Ajax';
+import '../vendor/leaflet/Leaflet.Awesome-markers';
+import { _ } from '../classes/gettext';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -44,7 +49,7 @@ class Map extends React.Component {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
       pluginActionButtons: [],
-      showLoading: false, // for drag&drop of files
+      showLoading: false, // for drag&drop of files and first load
       opacity: 100,
       imageryLayers: [],
       overlays: []
@@ -53,6 +58,7 @@ class Map extends React.Component {
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
+    this.addedCameraShots = false;
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
@@ -70,7 +76,27 @@ class Map extends React.Component {
     $('#layerOpacity', popup.getContent()).val(layer.options.opacity);
   }
 
+  typeToHuman = (type) => {
+      switch(type){
+          case "orthophoto":
+              return _("Orthophoto");
+          case "plant":
+              return _("Plant Health");
+          case "dsm":
+              return _("DSM");
+          case "dtm":
+              return _("DTM");
+      }
+      return "";
+  }
+
   loadImageryLayers(forceAddLayers = false){
+    // Cancel previous requests
+    if (this.tileJsonRequests) {
+        this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
+        this.tileJsonRequests = [];
+    }
+
     const { tiles } = this.props,
           layerId = layer => {
             const meta = layer[Symbol.for("meta")];
@@ -135,7 +161,7 @@ class Map extends React.Component {
                 });
             
             // Associate metadata with this layer
-            meta.name = name;
+            meta.name = name + ` (${this.typeToHuman(type)})`;
             meta.metaUrl = metaUrl;
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
@@ -191,15 +217,65 @@ class Map extends React.Component {
             mapBounds.extend(bounds);
             this.mapBounds = mapBounds;
 
+            // Add camera shots layer if available
+            if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
+                const cameraMarker = L.AwesomeMarkers.icon({
+                    icon: 'camera',
+                    markerColor: 'blue',
+                    prefix: 'fa'
+                });
+
+                const shotsLayer = new L.GeoJSON.AJAX(meta.task.camera_shots, {
+                    style: function (feature) {
+                      return {
+                        opacity: 1,
+                        fillOpacity: 0.7,
+                        color: "#000000"
+                      }
+                    },
+                    pointToLayer: function (feature, latlng) {
+                      return L.marker(latlng, {
+                        icon: cameraMarker
+                      });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties && feature.properties.filename) {
+                            let root = null;
+                            const lazyrender = () => {
+                                if (!root) root = document.createElement("div");
+                                ReactDOM.render(<ImagePopup task={meta.task} feature={feature}/>, root);
+                                return root;
+                            }
+
+                            layer.bindPopup(L.popup(
+                                {
+                                    lazyrender,
+                                    maxHeight: 450,
+                                    minWidth: 320
+                                }));
+                        }
+                    }
+                });
+                shotsLayer[Symbol.for("meta")] = {name: name + " " + _("(Cameras)"), icon: "fa fa-camera fa-fw"};
+
+                this.setState(update(this.state, {
+                    overlays: {$push: [shotsLayer]}
+                }));
+
+                this.addedCameraShots = true;
+            }
+
             done();
           })
           .fail((_, __, err) => done(err))
         );
       }, err => {
         if (err){
-          this.setState({error: err.message || JSON.stringify(err)});
-        }
-        resolve();
+          if (err !== "abort"){
+              this.setState({error: err.message || JSON.stringify(err)});
+          }
+          reject();
+        }else resolve();
       });
     });
   }
@@ -252,13 +328,12 @@ class Map extends React.Component {
 
       const customLayer = L.layerGroup();
       customLayer.on("add", a => {
-        let url = window.prompt(`Enter a tile URL template. Valid tokens are:
-{z}, {x}, {y} for Z/X/Y tile scheme
-{-y} for flipped TMS-style Y coordinates
-
-Example:
-https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
-`, 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png');
+        let url = window.prompt([_('Enter a tile URL template. Valid coordinates are:'),
+_('{z}, {x}, {y} for Z/X/Y tile scheme'),
+_('{-y} for flipped TMS-style Y coordinates'),
+'',
+_('Example:'),
+'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'].join("\n"), 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png');
         
         if (url){
           customLayer.clearLayers();
@@ -271,8 +346,8 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
           l.bringToBack();
         }
       });
-      this.basemaps["Custom"] = customLayer;
-      this.basemaps["None"] = L.layerGroup();
+      this.basemaps[_("Custom")] = customLayer;
+      this.basemaps[_("None")] = L.layerGroup();
     }
 
     this.layersControl = new LayersControl({
@@ -323,7 +398,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
             this.container = Leaflet.DomUtil.create('div', 'leaflet-control-add-overlay leaflet-bar leaflet-control');
             Leaflet.DomEvent.disableClickPropagation(this.container);
             const btn = Leaflet.DomUtil.create('a', 'leaflet-control-add-overlay-button');
-            btn.setAttribute("title", "Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay");
+            btn.setAttribute("title", _("Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay"));
             
             this.container.append(btn);
             addDnDZone(btn, {url: "/", clickable: true});
@@ -336,7 +411,9 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     this.map.fitWorld();
     this.map.attributionControl.setPrefix("");
 
+    this.setState({showLoading: true});
     this.loadImageryLayers(true).then(() => {
+        this.setState({showLoading: false});
         this.map.fitBounds(this.mapBounds);
 
         this.map.on('click', e => {
@@ -351,7 +428,7 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
           }
         }).on('popupopen', e => {
             // Load task assets links in popup
-            if (e.popup && e.popup._source && e.popup._content){
+            if (e.popup && e.popup._source && e.popup._content && !e.popup.options.lazyrender){
                 const infoWindow = e.popup._content;
                 if (typeof infoWindow === 'string') return;
 
@@ -372,14 +449,20 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
                             $assetLinks.append($(linksHtml));
                         })
                         .fail(() => {
-                            $assetLinks.append($("<li>Error: cannot load assets list. </li>"));
+                            $assetLinks.append($("<li>" + _("Error: cannot load assets list.") + "</li>"));
                         })
                         .always(() => {
                             $assetLinks.removeClass('loading');
                         });
                 }
             }
+
+            if (e.popup && e.popup.options.lazyrender){
+                e.popup.setContent(e.popup.options.lazyrender());
+            }
         });
+    }).catch(e => {
+        this.setState({showLoading: false, error: e.message});
     });
 
     PluginsAPI.Map.triggerDidAddControls({
@@ -409,11 +492,11 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
     });
 
     if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers();
+      this.loadImageryLayers(true);
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
-                               prevState.overlays !== this.state.overlays)){
+                            prevState.overlays !== this.state.overlays)){
         this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
   }
@@ -437,11 +520,11 @@ https://a.tile.openstreetmap.org/{z}/{x}/{y}.png
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            Opacity: <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 
-            message="Loading..."
+            message={_("Loading...")}
             show={this.state.showLoading}
             />
             

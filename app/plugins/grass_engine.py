@@ -3,8 +3,7 @@ import shutil
 import tempfile
 import subprocess
 import os
-
-from string import Template
+import platform
 
 from webodm import settings
 
@@ -13,11 +12,17 @@ logger = logging.getLogger('app.logger')
 class GrassEngine:
     def __init__(self):
         self.grass_binary = shutil.which('grass7') or \
+                            shutil.which('grass7.bat') or \
                             shutil.which('grass72') or \
+                            shutil.which('grass72.bat') or \
                             shutil.which('grass74') or \
+                            shutil.which('grass74.bat') or \
                             shutil.which('grass76') or \
+                            shutil.which('grass76.bat') or \
                             shutil.which('grass78') or \
-                            shutil.which('grass80')
+                            shutil.which('grass78.bat') or \
+                            shutil.which('grass80') or \
+                            shutil.which('grass80.bat')
 
         if self.grass_binary is None:
             logger.warning("Could not find a GRASS 7 executable. GRASS scripts will not work.")
@@ -30,14 +35,15 @@ class GrassEngine:
 
 
 class GrassContext:
-    def __init__(self, grass_binary, tmpdir = None, template_args = {}, location = None, auto_cleanup=True):
+    def __init__(self, grass_binary, tmpdir = None, script_opts = {}, location = None, auto_cleanup=True, python_path=None):
         self.grass_binary = grass_binary
         if tmpdir is None:
             tmpdir = os.path.basename(tempfile.mkdtemp('_grass_engine', dir=settings.MEDIA_TMP))
         self.tmpdir = tmpdir
-        self.template_args = template_args
+        self.script_opts = script_opts.copy()
         self.location = location
         self.auto_cleanup = auto_cleanup
+        self.python_path = python_path
 
     def get_cwd(self):
         return os.path.join(settings.MEDIA_TMP, self.tmpdir)
@@ -48,15 +54,15 @@ class GrassContext:
         dst_path = os.path.abspath(os.path.join(self.get_cwd(), filename))
         with open(dst_path, 'w') as f:
             f.write(source)
-        self.template_args[param] = dst_path
+        self.script_opts[param] = dst_path
 
         if use_as_location:
-            self.set_location(self.template_args[param])
+            self.set_location(self.script_opts[param])
 
         return dst_path
 
     def add_param(self, param, value):
-        self.template_args[param] = value
+        self.script_opts[param] = value
 
     def set_location(self, location):
         """
@@ -75,32 +81,48 @@ class GrassContext:
 
         script = os.path.abspath(script)
 
-        # Create grass script via template substitution
-        try:
-            with open(script) as f:
-                script_content = f.read()
-        except FileNotFoundError:
-            raise GrassEngineException("Script does not exist: {}".format(script))
-
-        tmpl = Template(script_content)
-
-        # Write script to disk
+        # Make sure working directory exists
         if not os.path.exists(self.get_cwd()):
             os.mkdir(self.get_cwd())
 
-        with open(os.path.join(self.get_cwd(), 'script.sh'), 'w') as f:
-            f.write(tmpl.substitute(self.template_args))
+        # Create param list
+        params = ["{}={}".format(opt,value) for opt,value in self.script_opts.items()]
+
+        # Track success, output
+        success = False
+        out = ""
+        err = ""
+
+        # Setup env
+        env = os.environ.copy()
+        env["LC_ALL"] = "C.UTF-8"
+        
+        if self.python_path:
+            sep = ";" if platform.system() == "Windows" else ":"
+            env["PYTHONPATH"] = "%s%s%s" % (self.python_path, sep, env.get("PYTHONPATH", ""))
 
         # Execute it
-        logger.info("Executing grass script from {}: {} -c {} location --exec sh script.sh".format(self.get_cwd(), self.grass_binary, self.location))
-        p = subprocess.Popen([self.grass_binary, '-c', self.location, 'location', '--exec', 'sh', 'script.sh'],
-                             cwd=self.get_cwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = p.communicate()
+        logger.info("Executing grass script from {}: {} -c {} location --exec python3 {} {}".format(self.get_cwd(), self.grass_binary, self.location, script, " ".join(params)))
+        
+        command = [self.grass_binary, '-c', self.location, 'location', '--exec', 'python3', script] + params
+        if platform.system() == "Windows":
+            # communicate() hangs on Windows so we use check_output instead
+            try:
+                out = subprocess.check_output(command, cwd=self.get_cwd(), env=env).decode('utf-8').strip()
+                success = True
+            except:
+                success = False
+                err = out
+        else:
+            p = subprocess.Popen(command, cwd=self.get_cwd(), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            out, err = p.communicate()
 
-        out = out.decode('utf-8').strip()
-        err = err.decode('utf-8').strip()
+            out = out.decode('utf-8').strip()
+            err = err.decode('utf-8').strip()
+            success = p.returncode == 0
 
-        if p.returncode == 0:
+        if success:
             return out
         else:
             raise GrassEngineException("Could not execute GRASS script {} from {}: {}".format(script, self.get_cwd(), err))
@@ -108,9 +130,10 @@ class GrassContext:
     def serialize(self):
         return {
             'tmpdir': self.tmpdir,
-            'template_args': self.template_args,
+            'script_opts': self.script_opts,
             'location': self.location,
-            'auto_cleanup': self.auto_cleanup
+            'auto_cleanup': self.auto_cleanup,
+            'python_path': self.python_path,
         }
 
     def cleanup(self):

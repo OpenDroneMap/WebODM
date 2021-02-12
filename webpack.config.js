@@ -26,9 +26,6 @@ module.exports = {
     new BundleTracker({filename: './webpack-stats.json'}),
     new ExtractTextPlugin('css/[name]-[hash].css', {
         allChunks: true
-    }),
-    new webpack.ProvidePlugin({
-        THREE: path.join(__dirname, './app/static/app/js/vendor/potree/three')
     })
   ],
 
@@ -89,6 +86,7 @@ module.exports = {
     //  on the global let jQuery
     "jquery": "jQuery",
     "SystemJS": "SystemJS",
+    "THREE": "THREE",
     "React": "React",
     "ReactDOM": "ReactDOM"
   },

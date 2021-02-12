@@ -1,4 +1,3 @@
-import importlib
 import json
 import logging, os, sys, subprocess
 from abc import ABC
@@ -120,12 +119,22 @@ class PluginBase(ABC):
         """
         return "/plugins/{}/{}".format(self.get_name(), path)
 
+    def is_persistent(self):
+        """
+        :return: whether this plugin is persistent (stored in the /plugins directory,
+                instead of /app/media/plugins which are transient)
+        """
+        return ".." in os.path.relpath(self.get_path(), get_plugins_persistent_path())
+
     def template_path(self, path):
         """
         :param path: unix-style path
         :return: path used to reference Django templates for a plugin
         """
-        return "plugins/{}/templates/{}".format(self.get_name(), path)
+        if self.is_persistent():
+            return "plugins/{}/templates/{}".format(self.get_name(), path)
+        else:
+            return "app/media/plugins/{}/templates/{}".format(self.get_name(), path)
 
     def path_exists(self, path):
         return os.path.exists(self.get_path(path))
@@ -178,6 +187,16 @@ class PluginBase(ABC):
         :return: [] of MountPoint objects
         """
         return []
+
+    def serve_public_assets(self, request):
+        """
+        Should be overriden by plugins that want to control which users
+        have access to the public assets. By default anyone can access them,
+        including anonymous users.
+        :param request: HTTP request
+        :return: boolean (whether the plugin's public assets should be exposed for this request)
+        """
+        return True
 
     def get_dynamic_script(self, script_path, callback = None, **template_args):
         """

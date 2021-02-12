@@ -1,5 +1,33 @@
 .edit-preset-dialog{
 	.preset-name{
-		margin-bottom: 16px;
-	}
+        margin-bottom: 16px;
+        display: flex;
+        label{
+            text-align: left;
+        }
+    }
+    .info-button{
+        position: relative;
+        top: 1px;
+        left: 2px;
+    }
+    
+    .checkbox{
+        min-height: 45px;
+    }
+
+    .search-toggle{
+        position: absolute;
+        right: 24px;
+        top: 24px;
+        z-index: 2;
+    }
+
+    .search-controls{
+        margin-bottom: 12px;
+        margin-right: 38px;
+        input{
+            height: 36px;
+        }
+    }
 }

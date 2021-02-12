@@ -1,9 +1,10 @@
 {% extends "app/base.html" %}
-{% load settings %}
+{% load settings i18n %}
+
 {% block page-wrapper %}
 <div style="text-align: center;">
-    <h3>404 Page Not Found</h3>
-    <h5>Are you sure the address is correct?</h5>
+    <h3>{% trans '404 Page Not Found' %}</h3>
+    <h5>{% trans 'Are you sure the address is correct?' %}</h5>
     <img src="/static/app/img/404.png" alt="404"/>
 </div>
 

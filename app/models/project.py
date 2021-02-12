@@ -9,6 +9,7 @@ from django.utils import timezone
 from guardian.models import GroupObjectPermissionBase
 from guardian.models import UserObjectPermissionBase
 from guardian.shortcuts import get_perms_for_model, assign_perm
+from django.utils.translation import gettext_lazy as _
 
 from app import pending_actions
 
@@ -18,11 +19,11 @@ logger = logging.getLogger('app.logger')
 
 
 class Project(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, help_text="The person who created the project")
-    name = models.CharField(max_length=255, help_text="A label used to describe the project")
-    description = models.TextField(default="", blank=True, help_text="More in-depth description of the project")
-    created_at = models.DateTimeField(default=timezone.now, help_text="Creation date")
-    deleting = models.BooleanField(db_index=True, default=False, help_text="Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted.")
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, help_text=_("The person who created the project"), verbose_name=_("Owner"))
+    name = models.CharField(max_length=255, help_text=_("A label used to describe the project"), verbose_name=_("Name"))
+    description = models.TextField(default="", blank=True, help_text=_("More in-depth description of the project"), verbose_name=_("Description"))
+    created_at = models.DateTimeField(default=timezone.now, help_text=_("Creation date"), verbose_name=_("Created at"))
+    deleting = models.BooleanField(db_index=True, default=False, help_text=_("Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted."), verbose_name=_("Deleting"))
 
     def delete(self, *args):
         # No tasks?
@@ -51,6 +52,9 @@ class Project(models.Model):
                 ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
                 .only('id', 'project_id')]
 
+    class Meta:
+        verbose_name = _("Project")
+        verbose_name_plural = _("Projects")
 
 @receiver(signals.post_save, sender=Project, dispatch_uid="project_post_save")
 def project_post_save(sender, instance, created, **kwargs):

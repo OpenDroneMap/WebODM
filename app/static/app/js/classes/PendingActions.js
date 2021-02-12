@@ -1,3 +1,5 @@
+import { _ } from './gettext';
+
 const CANCEL = 1,
       REMOVE = 2,
       RESTART = 3,
@@ -6,19 +8,19 @@ const CANCEL = 1,
 
 let pendingActions = {
     [CANCEL]: {
-        descr: "Canceling..."
+        descr: _("Canceling...")
     },
     [REMOVE]: {
-        descr: "Deleting..."
+        descr: _("Deleting...")
     },
     [RESTART]: {
-        descr: "Restarting..."
+        descr: _("Restarting...")
     },
     [RESIZE]: {
-      descr: "Resizing images..."
+      descr: _("Resizing images...")
     },
     [IMPORT]: {
-      descr: "Importing..."
+      descr: _("Importing...")
     }
 };
 
