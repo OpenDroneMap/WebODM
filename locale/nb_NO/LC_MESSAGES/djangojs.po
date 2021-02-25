@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-22 19:06+0000\n"
-"PO-Revision-Date: 2020-12-22 17:23+0000\n"
+"PO-Revision-Date: 2021-02-11 02:50+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/webodm/"
 "react-ui/nb_NO/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.4-dev\n"
+"X-Generator: Weblate 4.5-dev\n"
 
 #: app/static/app/js/Console.jsx:135
 #, python-format
@@ -27,7 +27,7 @@ msgstr ""
 #: app/static/app/js/Console.jsx:147 app/static/app/js/Console.jsx:155
 #: app/static/app/js/Console.jsx:165
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "Veksle fullskjermsvisning"
 
 #: app/static/app/js/Console.jsx:148 app/static/app/js/Console.jsx:156
 msgid "Exit Fullscreen"
@@ -40,7 +40,7 @@ msgstr "Last ned som fil"
 
 #: app/static/app/js/Dashboard.jsx:26
 msgid "Name field is required"
-msgstr ""
+msgstr "Navnefelt kreves"
 
 #: app/static/app/js/Dashboard.jsx:62
 msgid "Add Project"
@@ -58,7 +58,7 @@ msgstr ""
 
 #: app/static/app/js/MapView.jsx:70 app/static/app/js/components/Map.jsx:84
 msgid "Plant Health"
-msgstr ""
+msgstr "Plantehelse"
 
 #: app/static/app/js/MapView.jsx:75
 msgid "Surface Model"
@@ -74,7 +74,7 @@ msgstr ""
 
 #: app/static/app/js/ModelView.jsx:69
 msgid "Show Cameras"
-msgstr ""
+msgstr "Vis kamera"
 
 #: app/static/app/js/ModelView.jsx:482
 msgid "Loading textured model..."
@@ -102,31 +102,31 @@ msgstr ""
 
 #: app/static/app/js/classes/AssetDownloads.js:41
 msgid "Terrain Model (Tiles)"
-msgstr ""
+msgstr "Terrengmodell (flis)"
 
 #: app/static/app/js/classes/AssetDownloads.js:42
 msgid "Surface Model (GeoTIFF)"
-msgstr ""
+msgstr "Overflatemodell (GeoTIFF)"
 
 #: app/static/app/js/classes/AssetDownloads.js:43
 msgid "Surface Model (Tiles)"
-msgstr ""
+msgstr "Overflatemodell (flis)"
 
 #: app/static/app/js/classes/AssetDownloads.js:44
 msgid "Point Cloud (LAS)"
-msgstr ""
+msgstr "Punktsky (LAS)"
 
 #: app/static/app/js/classes/AssetDownloads.js:45
 msgid "Point Cloud (LAZ)"
-msgstr ""
+msgstr "Punktsky (LAZ)"
 
 #: app/static/app/js/classes/AssetDownloads.js:46
 msgid "Point Cloud (PLY)"
-msgstr ""
+msgstr "Punktsky (PLY)"
 
 #: app/static/app/js/classes/AssetDownloads.js:47
 msgid "Point Cloud (CSV)"
-msgstr ""
+msgstr "Punktsky (CSV)"
 
 #: app/static/app/js/classes/AssetDownloads.js:48
 msgid "Textured Model"
@@ -163,23 +163,23 @@ msgstr ""
 #: app/static/app/js/classes/PendingActions.js:14
 #: app/static/app/js/components/FormDialog.jsx:170
 msgid "Deleting..."
-msgstr ""
+msgstr "Sletter …"
 
 #: app/static/app/js/classes/PendingActions.js:17
 msgid "Restarting..."
-msgstr ""
+msgstr "Starter på ny …"
 
 #: app/static/app/js/classes/PendingActions.js:20
 msgid "Resizing images..."
-msgstr ""
+msgstr "Endrer bildeoppløsning …"
 
 #: app/static/app/js/classes/PendingActions.js:23
 msgid "Importing..."
-msgstr ""
+msgstr "Importerer …"
 
 #: app/static/app/js/classes/PipelineSteps.js:7
 msgid "Load Dataset"
-msgstr ""
+msgstr "Last inn datasett"
 
 #: app/static/app/js/classes/PipelineSteps.js:12
 msgid "Structure From Motion / MVS"
@@ -207,36 +207,36 @@ msgstr ""
 
 #: app/static/app/js/classes/ResizeModes.js:4
 msgid "No"
-msgstr ""
+msgstr "Nei"
 
 #: app/static/app/js/classes/ResizeModes.js:5
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: app/static/app/js/classes/StatusCodes.js:11
 msgid "Queued"
-msgstr ""
+msgstr "I kø"
 
 #: app/static/app/js/classes/StatusCodes.js:15
 msgid "Running"
-msgstr ""
+msgstr "Kjører"
 
 #: app/static/app/js/classes/StatusCodes.js:19
 msgid "Failed"
-msgstr ""
+msgstr "Mislyktes"
 
 #: app/static/app/js/classes/StatusCodes.js:23
 msgid "Completed"
-msgstr ""
+msgstr "Fullført"
 
 #: app/static/app/js/classes/StatusCodes.js:27
 msgid "Canceled"
-msgstr ""
+msgstr "Kansellert"
 
 #: app/static/app/js/classes/TempLayer.js:14
 #, python-format
 msgid "%(file)s is bigger than 5 MB."
-msgstr ""
+msgstr "%(file)s er større enn 5 MB."
 
 #: app/static/app/js/classes/TempLayer.js:30
 #, python-format
@@ -328,7 +328,7 @@ msgstr ""
 #: app/static/app/js/components/EditTaskForm.jsx:232
 #: app/static/app/js/components/EditTaskForm.jsx:353
 msgid "Default"
-msgstr ""
+msgstr "Forvalg"
 
 #: app/static/app/js/components/EditTaskForm.jsx:437
 msgid "My Preset"
@@ -337,7 +337,7 @@ msgstr ""
 #: app/static/app/js/components/EditTaskForm.jsx:437
 #, python-format
 msgid "Copy of %(preset)s"
-msgstr ""
+msgstr "Kopi av %(preset)s"
 
 #: app/static/app/js/components/EditTaskForm.jsx:460
 msgid "Could not duplicate the preset. Please try to refresh the page."
@@ -352,7 +352,7 @@ msgstr ""
 #: app/static/app/js/components/EditTaskForm.jsx:473
 #, python-format
 msgid "Are you sure you want to delete \"%(preset)s\"?"
-msgstr ""
+msgstr "Er du sikker på at du vil slette «%(preset)s»?"
 
 #: app/static/app/js/components/EditTaskForm.jsx:486
 msgid "Could not delete the preset. Please try to refresh the page."
@@ -444,11 +444,11 @@ msgstr "Kunne ikke slette element"
 
 #: app/static/app/js/components/Histogram.jsx:293
 msgid "Min:"
-msgstr ""
+msgstr "Min:"
 
 #: app/static/app/js/components/Histogram.jsx:294
 msgid "Max:"
-msgstr ""
+msgstr "Maks:"
 
 #: app/static/app/js/components/ImagePopup.jsx:47
 #, fuzzy
@@ -467,7 +467,7 @@ msgstr ""
 #: app/static/app/js/components/ImportTaskPanel.jsx:91
 #, python-format
 msgid "Invalid response from server: %(error)s"
-msgstr "Ugyldig svar fra tjener:"
+msgstr "Ugyldig svar fra tjener: %(error)s"
 
 #: app/static/app/js/components/ImportTaskPanel.jsx:94
 msgid "An error occured while uploading the file. Please try again."
@@ -633,7 +633,7 @@ msgstr ""
 #: app/static/app/js/components/ProcessingNodeOption.jsx:140
 #: app/static/app/js/translations/potree_autogenerated.js:62
 msgid "Enable"
-msgstr ""
+msgstr "Skru på"
 
 #: app/static/app/js/components/ProcessingNodeOption.jsx:149
 #, fuzzy
@@ -647,12 +647,13 @@ msgstr "Tilbakestill til forvalg"
 #: app/static/app/js/components/ProjectList.jsx:63
 #, python-format
 msgid "Could not load projects list: %(error)s"
-msgstr "Kunne ikke laste inn prosjektliste:"
+msgstr "Kunne ikke laste inn prosjektliste: %(error)s"
 
 #: app/static/app/js/components/ProjectListItem.jsx:185
 #, python-format
 msgid "Cannot upload %(filename)s, exceeded max retries (%(max_retries)s)"
 msgstr ""
+"Kan ikke laste opp %(filename)s. For mange forsøk brukt (%(max_retries)s)"
 
 #: app/static/app/js/components/ProjectListItem.jsx:234
 #: app/static/app/js/components/ProjectListItem.jsx:346
@@ -663,7 +664,7 @@ msgstr ""
 #: app/static/app/js/components/ProjectListItem.jsx:237
 #: app/static/app/js/components/ProjectListItem.jsx:350
 msgid "Cannot create new task. Please try again later."
-msgstr ""
+msgstr "Kan ikke opprette ny oppgave. Prøv igjen senere."
 
 #: app/static/app/js/components/ProjectListItem.jsx:244
 #, python-format
@@ -674,7 +675,7 @@ msgstr ""
 
 #: app/static/app/js/components/ProjectListItem.jsx:473
 msgid "Edit Project"
-msgstr ""
+msgstr "Rediger prosjekt"
 
 #: app/static/app/js/components/ProjectListItem.jsx:474
 msgid "Save Changes"
@@ -696,7 +697,7 @@ msgstr "Vis kart"
 #: app/static/app/js/components/ProjectListItem.jsx:528
 #, python-format
 msgid "%(count)s Tasks"
-msgstr ""
+msgstr "%(count)s gjøremål"
 
 #: app/static/app/js/components/ShareButton.jsx:58
 msgid "Share"
@@ -708,7 +709,7 @@ msgstr ""
 
 #: app/static/app/js/components/SharePopup.jsx:78
 msgid "Share This Task"
-msgstr ""
+msgstr "Del dette gjøremålet"
 
 #: app/static/app/js/components/SharePopup.jsx:87
 msgid "QR"
@@ -737,12 +738,12 @@ msgstr "2D"
 #: app/static/app/js/components/TaskList.jsx:51
 #, python-format
 msgid "Could not load task list: %(error)s"
-msgstr ""
+msgstr "Kunne ikke laste inn gjøremålsliste: %(error)s"
 
 #: app/static/app/js/components/TaskList.jsx:77
 #, python-format
 msgid "Error: %(error)s"
-msgstr "Feil:"
+msgstr "Feil: %(error)s"
 
 #: app/static/app/js/components/TaskList.jsx:77
 msgid "Try again"
@@ -755,7 +756,7 @@ msgstr ""
 #: app/static/app/js/components/TaskListItem.jsx:200
 #: app/static/app/js/components/TaskListItem.jsx:207
 msgid "Cannot complete operation."
-msgstr ""
+msgstr "Kan ikke fullføre operasjon."
 
 #: app/static/app/js/components/TaskListItem.jsx:250
 #, python-format
@@ -766,7 +767,7 @@ msgstr ""
 
 #: app/static/app/js/components/TaskListItem.jsx:251
 msgid "Not enough images"
-msgstr ""
+msgstr "Ikke nok bilder"
 
 #: app/static/app/js/components/TaskListItem.jsx:252
 msgid "Not enough overlap between images"
@@ -820,7 +821,7 @@ msgstr ""
 #: app/static/app/js/components/TaskListItem.jsx:368
 #, python-format
 msgid "Task #%(number)s"
-msgstr ""
+msgstr "Gjøremål #%(number)s"
 
 #: app/static/app/js/components/TaskListItem.jsx:372
 msgid "Uploading images to processing node"
@@ -840,7 +841,7 @@ msgstr ""
 
 #: app/static/app/js/components/TaskListItem.jsx:434
 msgid "Restart"
-msgstr ""
+msgstr "Omstart"
 
 #: app/static/app/js/components/TaskListItem.jsx:440
 msgid ""
@@ -928,12 +929,12 @@ msgstr ""
 #: app/static/app/js/components/UploadProgressBar.jsx:29
 #, python-format
 msgid "remaining to upload: %(bytes)s"
-msgstr "gjenstår å laste opp:"
+msgstr "gjenstår å laste opp: %(bytes)s"
 
 #: app/static/app/js/components/UploadProgressBar.jsx:35
 #, python-format
 msgid "%(count)s files %(remaining)s"
-msgstr "%(count)s filer"
+msgstr "%(count)s filer %(remaining)s"
 
 #: app/static/app/js/components/UploadProgressBar.jsx:36
 #, fuzzy, python-format
@@ -1606,7 +1607,7 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:16
 msgid "Point measurement"
-msgstr ""
+msgstr "Punktmåling"
 
 #: app/static/app/js/translations/potree_autogenerated.js:17
 msgid "Distance measurement"
@@ -1727,28 +1728,28 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:46
 msgid "Compass"
-msgstr ""
+msgstr "Kompass"
 
 #: app/static/app/js/translations/potree_autogenerated.js:47
 msgid "Camera Animation"
-msgstr ""
+msgstr "Kameraanimasjon"
 
 #: app/static/app/js/translations/potree_autogenerated.js:48
 msgid "Point budget"
-msgstr ""
+msgstr "Punktbudsjett"
 
 #: app/static/app/js/translations/potree_autogenerated.js:49
 msgid "Point size"
-msgstr ""
+msgstr "Punktstørrelse"
 
 #: app/static/app/js/translations/potree_autogenerated.js:50
 msgid "Minimum size"
-msgstr ""
+msgstr "Minimumsstørrelse"
 
 #: app/static/app/js/translations/potree_autogenerated.js:51
 #: app/static/app/js/translations/potree_autogenerated.js:61
 msgid "Opacity"
-msgstr ""
+msgstr "Dekkevne"
 
 #: app/static/app/js/translations/potree_autogenerated.js:52
 msgid "Field of view"
@@ -1768,19 +1769,19 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:57
 msgid "Quality"
-msgstr ""
+msgstr "Kvalitet"
 
 #: app/static/app/js/translations/potree_autogenerated.js:58
 msgid "Shape"
-msgstr ""
+msgstr "Form"
 
 #: app/static/app/js/translations/potree_autogenerated.js:59
 msgid "Radius"
-msgstr ""
+msgstr "Radius"
 
 #: app/static/app/js/translations/potree_autogenerated.js:60
 msgid "Strength"
-msgstr ""
+msgstr "Styrke"
 
 #: app/static/app/js/translations/potree_autogenerated.js:63
 msgid "Min node size"
@@ -1796,7 +1797,7 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:66
 msgid "Sky"
-msgstr ""
+msgstr "Himmel"
 
 #: app/static/app/js/translations/potree_autogenerated.js:67
 msgid "Keep above ground"
@@ -1808,16 +1809,16 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:69
 msgid "Length unit"
-msgstr ""
+msgstr "Lengdeenhet"
 
 #: app/static/app/js/translations/potree_autogenerated.js:70
 msgid "Lock view"
-msgstr ""
+msgstr "Lås visning"
 
 #: app/static/app/js/translations/potree_autogenerated.js:71
 #: app/static/app/js/translations/potree_autogenerated.js:88
 msgid "Language"
-msgstr ""
+msgstr "Språk"
 
 #: app/static/app/js/translations/potree_autogenerated.js:72
 msgid "Backface Culling"
@@ -1833,31 +1834,33 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:75
 msgid "show in 3D"
-msgstr ""
+msgstr "vis i 3D"
 
 #: app/static/app/js/translations/potree_autogenerated.js:76
 msgid "show on map"
-msgstr ""
+msgstr "vis på kart"
 
 #: app/static/app/js/translations/potree_autogenerated.js:77
 msgid "Number of Points"
-msgstr ""
+msgstr "Antall piunkter"
 
 #: app/static/app/js/translations/potree_autogenerated.js:79
+#, fuzzy
 msgid "Save LAS(3D)"
-msgstr ""
+msgstr "Lagren LAS(3D)"
 
 #: app/static/app/js/translations/potree_autogenerated.js:80
+#, fuzzy
 msgid "Save CSV(2D)"
-msgstr ""
+msgstr "Lagre CSV(2D)"
 
 #: app/static/app/js/translations/potree_autogenerated.js:81
 msgid "Camera Position"
-msgstr ""
+msgstr "Kameraposisjon"
 
 #: app/static/app/js/translations/potree_autogenerated.js:82
 msgid "Camera Target"
-msgstr ""
+msgstr "Kameramål"
 
 #: app/static/app/js/translations/potree_autogenerated.js:83
 msgid "Return Number"
@@ -1873,11 +1876,11 @@ msgstr ""
 
 #: app/static/app/js/translations/potree_autogenerated.js:86
 msgid "max"
-msgstr ""
+msgstr "maks"
 
 #: app/static/app/js/translations/potree_autogenerated.js:87
 msgid "GPS Time"
-msgstr ""
+msgstr "GPS-tid"
 
 #: plugins/contours/public/ContoursPanel.jsx:57
 msgid ""
@@ -1912,19 +1915,19 @@ msgstr ""
 
 #: plugins/contours/public/ContoursPanel.jsx:242
 msgid "Interval:"
-msgstr ""
+msgstr "Intervall:"
 
 #: plugins/contours/public/ContoursPanel.jsx:245
 #: plugins/contours/public/ContoursPanel.jsx:254
 #: plugins/contours/public/ContoursPanel.jsx:272
 #: plugins/contours/public/ContoursPanel.jsx:281
 msgid "meter"
-msgstr ""
+msgstr "meter"
 
 #: plugins/contours/public/ContoursPanel.jsx:252
 #: plugins/contours/public/ContoursPanel.jsx:279
 msgid "Value:"
-msgstr ""
+msgstr "Verdi:"
 
 #: plugins/contours/public/ContoursPanel.jsx:260
 #, fuzzy
@@ -1934,7 +1937,7 @@ msgstr "Lag"
 
 #: plugins/contours/public/ContoursPanel.jsx:269
 msgid "Simplify:"
-msgstr ""
+msgstr "Forenkle:"
 
 #: plugins/contours/public/ContoursPanel.jsx:287
 #, fuzzy
@@ -1943,8 +1946,9 @@ msgid "Projection:"
 msgstr "Legg til prosjekt"
 
 #: plugins/contours/public/ContoursPanel.jsx:314
+#, fuzzy
 msgid "Preview"
-msgstr ""
+msgstr "Forhåndsvis"
 
 #: plugins/contours/public/ContoursPanel.jsx:319
 #, fuzzy
@@ -1953,7 +1957,7 @@ msgstr "Importer"
 
 #: plugins/contours/public/ContoursPanel.jsx:352
 msgid "Contours"
-msgstr ""
+msgstr "Konturer"
 
 #: plugins/lightning/public/CostEstimateItem.jsx:103
 msgid "Cannot retrieve estimate. Try again later."
@@ -1989,12 +1993,12 @@ msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:83
 msgid "Logging out…"
-msgstr ""
+msgstr "Logger ut …"
 
 #: plugins/lightning/public/Dashboard.jsx:89
 #: plugins/lightning/public/Dashboard.jsx:94
 msgid "Cannot logout:"
-msgstr ""
+msgstr "Kan ikke logge ut:"
 
 #: plugins/lightning/public/Dashboard.jsx:115
 msgid "credits"
@@ -2018,7 +2022,7 @@ msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:135
 msgid "Hello,"
-msgstr ""
+msgstr "Hei,"
 
 #: plugins/lightning/public/Dashboard.jsx:138
 msgid "Synced Nodes"
@@ -2033,12 +2037,14 @@ msgid "Dashboard"
 msgstr ""
 
 #: plugins/lightning/public/Dashboard.jsx:159
+#, fuzzy
 msgid "Logout"
-msgstr ""
+msgstr "Logg ut"
 
 #: plugins/lightning/public/Login.jsx:56
+#, fuzzy
 msgid "Cannot login. Invalid response:"
-msgstr ""
+msgstr "Kan ikke logge inn. Ugyldig respons:"
 
 #: plugins/lightning/public/Login.jsx:60
 msgid ""
@@ -2048,23 +2054,24 @@ msgstr ""
 
 #: plugins/lightning/public/Login.jsx:90
 msgid "E-mail Address"
-msgstr ""
+msgstr "E-postadresse"
 
 #: plugins/lightning/public/Login.jsx:97
 msgid "Password"
-msgstr ""
+msgstr "Passord"
 
 #: plugins/lightning/public/Login.jsx:104
 msgid "Don't have an account?"
-msgstr ""
+msgstr "Har du ikke en konto?"
 
 #: plugins/lightning/public/Login.jsx:105
 msgid "Forgot password?"
-msgstr ""
+msgstr "Glemt passordet?"
 
 #: plugins/lightning/public/Login.jsx:110
+#, fuzzy
 msgid "Login and Sync"
-msgstr ""
+msgstr "Logg inn og synkroniser"
 
 #: plugins/lightning/public/app.jsx:39
 msgid "Lightning Network"
@@ -2096,7 +2103,7 @@ msgstr "Ugyldig JSON-svar: %(error)s"
 
 #: plugins/measure/public/MeasurePopup.jsx:142
 msgid "Area:"
-msgstr ""
+msgstr "Område:"
 
 #: plugins/measure/public/MeasurePopup.jsx:143
 msgid "Perimeter:"
@@ -2200,7 +2207,7 @@ msgstr ""
 
 #: plugins/measure/public/app.jsx:36
 msgid "Feet"
-msgstr ""
+msgstr "Fot"
 
 #: plugins/measure/public/app.jsx:37
 #, fuzzy
@@ -2210,7 +2217,7 @@ msgstr "Filter"
 
 #: plugins/measure/public/app.jsx:38
 msgid "Hectares"
-msgstr ""
+msgstr "Hektar"
 
 #: plugins/measure/public/app.jsx:39
 #, fuzzy
