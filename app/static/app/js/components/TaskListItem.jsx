@@ -280,7 +280,7 @@ class TaskListItem extends React.Component {
 
     // Create onClick handlers
     for (let rfParam in rfMap){
-      rfMap[rfParam].label = "From " + rfMap[rfParam].label;
+      rfMap[rfParam].label = interpolate(_("From %(stage)s"), { stage: rfMap[rfParam].label});
       rfMap[rfParam].onClick = this.genRestartAction(rfParam);
     }
 
@@ -505,7 +505,7 @@ class TaskListItem extends React.Component {
                   <strong>{_("Created on:")} </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
                 </div>
                 <div className="labels">
-                    <strong>{_("Processing Node:")} </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? "auto" : "manual"})<br/>
+                    <strong>{_("Processing Node:")} </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})<br/>
                 </div>
                 {Array.isArray(task.options) ?
                    <div className="labels">

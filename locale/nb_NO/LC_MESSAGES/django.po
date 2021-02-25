@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-22 19:06+0000\n"
-"PO-Revision-Date: 2021-02-08 14:30+0000\n"
+"PO-Revision-Date: 2021-02-11 02:50+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/webodm/"
 "webodm/nb_NO/>\n"
@@ -729,7 +729,7 @@ msgstr ""
 
 #: app/models/theme.py:35
 msgid "Failed"
-msgstr ""
+msgstr "Mislyktes"
 
 #: app/models/theme.py:36
 msgid "The background color of success notifications."
@@ -1210,8 +1210,9 @@ msgid "Hello, %(user)s!"
 msgstr ""
 
 #: app/templates/app/logged_in_base.html:19
+#, fuzzy
 msgid "Logout"
-msgstr ""
+msgstr "Logg ut"
 
 #: app/templates/app/logged_in_base.html:33 app/views/app.py:46
 msgid "Dashboard"
