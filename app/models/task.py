@@ -728,6 +728,7 @@ class Task(models.Model):
                             last_update = time.time()
 
                     # This takes a while
+                    new_task_exception = None
                     try:
                         uuid = self.processing_node.process_new_task(
                             images, self.name, self.options, callback
@@ -735,13 +736,24 @@ class Task(models.Model):
                     except NodeConnectionError as e:
                         # If we can't create a task because the node is offline
                         # We want to fail instead of trying again
-                        raise NodeServerError(gettext('Connection error: %(error)s') % {'error': str(e)})
+                        # But if there is a uuid, it _may_ be going.
+                        new_task_exception = NodeServerError(
+                            gettext("Connection error: %(error)s") % {"error": str(e)}
+                        )
+                        if not hasattr(e, "uuid"):
+                            raise new_task_exception
+                        uuid = e.uuid
+                        new_task_exception.uuid = uuid
 
                     # Refresh task object before committing change
                     self.refresh_from_db()
                     self.upload_progress = 1.0
                     self.uuid = uuid
                     self.save()
+
+                    # Reraise the exception, just in case
+                    if new_task_exception:
+                        raise new_task_exception
 
                     # TODO: log process has started processing
 
