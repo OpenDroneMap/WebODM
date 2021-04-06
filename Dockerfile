@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -18,8 +18,8 @@ RUN wget --no-check-certificate https://deb.nodesource.com/setup_12.x -O /tmp/no
 RUN apt-get -qq update && apt-get -qq install -y nodejs
 
 # Install Python3, GDAL, nginx, letsencrypt, psql
-RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev libpq-dev binutils libproj-dev gdal-bin python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-10 gettext
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.6 2
+RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-12 gettext
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
 RUN ln -s /usr/bin/pip3 /usr/bin/pip && pip install -U pip
 
 # Install pip reqs
