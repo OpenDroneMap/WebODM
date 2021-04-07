@@ -38,6 +38,14 @@ To run the unit tests, simply type:
 
 `./webodm.sh test`
 
+## Apply Changes In Production
+
+Once you're done making changes, if you start WebODM in production mode (without the `--dev` flag), you will notice that your changes are missing. This is because `webodm.sh` uses the `opendronemap/webodm_webapp` docker image to launch WebODM, which doesn't have your changes. To apply the changes, you need to rebuild the docker image locally:
+
+`docker build -t opendronemap/webodm_webapp .`
+
+You can also modify the `docker-compose.yml` file to point to a different image.
+
 ## Project Overview
 
 ### Backend
