@@ -69,5 +69,9 @@
     "webpack": "^4.16.2",
     "webpack-bundle-tracker": "0.0.93",
     "webpack-livereload-plugin": "^2.1.1"
+  },
+  "devDependencies": {
+    "react-hot-loader": "^4.13.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }

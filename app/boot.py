@@ -79,7 +79,10 @@ def boot():
             s = Setting.objects.create(
                     app_name=settings.APP_NAME,
                     theme=default_theme)
-            s.app_logo.save(os.path.basename(settings.APP_DEFAULT_LOGO), File(open(settings.APP_DEFAULT_LOGO, 'rb')))
+            try:
+                s.app_logo.save(os.path.basename(settings.APP_DEFAULT_LOGO), File(open(settings.APP_DEFAULT_LOGO, 'rb')))
+            except FileNotFoundError:
+                pass
 
             logger.info("Created settings")
 
