@@ -154,7 +154,7 @@ class Map extends React.Component {
                   bounds,
                   minZoom: 0,
                   maxZoom: maxzoom + 99,
-                  maxNativeZoom: maxzoom,
+                  maxNativeZoom: maxzoom - 1,
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
                   detectRetina: true
