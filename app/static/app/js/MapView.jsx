@@ -10,14 +10,16 @@ class MapView extends React.Component {
     mapItems: [],
     selectedMapType: 'orthophoto',
     title: "",
-    public: false
+    public: false,
+    shareButtons: true
   };
 
   static propTypes = {
       mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
       selectedMapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
       title: PropTypes.string,
-      public: PropTypes.bool
+      public: PropTypes.bool,
+      shareButtons: PropTypes.bool
   };
 
   constructor(props){
@@ -106,6 +108,7 @@ class MapView extends React.Component {
                 showBackground={true} 
                 mapType={this.state.selectedMapType} 
                 public={this.props.public}
+                shareButtons={this.props.shareButtons}
             />
         </div>
       </div>);

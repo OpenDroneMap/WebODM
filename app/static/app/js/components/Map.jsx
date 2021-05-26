@@ -32,14 +32,16 @@ class Map extends React.Component {
   static defaultProps = {
     showBackground: false,
     mapType: "orthophoto",
-    public: false
+    public: false,
+    shareButtons: true
   };
 
   static propTypes = {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
-    public: PropTypes.bool
+    public: PropTypes.bool,
+    shareButtons: PropTypes.bool
   };
 
   constructor(props) {
@@ -536,7 +538,7 @@ _('Example:'),
 
         <div className="actionButtons">
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
-          {(!this.props.public && this.state.singleTask !== null) ? 
+          {(this.props.shareButtons && !this.props.public && this.state.singleTask !== null) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
               task={this.state.singleTask} 

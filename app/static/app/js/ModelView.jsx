@@ -75,12 +75,14 @@ class CamerasMenu extends React.Component{
 class ModelView extends React.Component {
   static defaultProps = {
     task: null,
-    public: false
+    public: false,
+    shareButtons: true
   };
 
   static propTypes = {
       task: PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
-      public: PropTypes.bool // Is the view being displayed via a shared link?
+      public: PropTypes.bool, // Is the view being displayed via a shared link?
+      shareButtons: PropTypes.bool
   };
 
   constructor(props){
@@ -499,7 +501,7 @@ class ModelView extends React.Component {
                             direction="up" 
                             showLabel={false}
                             buttonClass="btn-secondary" />
-            {(!this.props.public) ? 
+            {(this.props.shareButtons && !this.props.public) ? 
             <ShareButton 
                 ref={(ref) => { this.shareButton = ref; }}
                 task={this.props.task} 
