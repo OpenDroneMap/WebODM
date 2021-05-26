@@ -84,6 +84,10 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
         }
     }
 
+    .sidebar-nav.navbar-collapse{
+        width: 100%;
+    }
+
     .navbar-top-links li a.dropdown-toggle{
         height: 50px;
     }
