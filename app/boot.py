@@ -1,4 +1,5 @@
 import os
+import sys
 
 import kombu
 from django.contrib.auth.models import Permission
@@ -82,8 +83,10 @@ def boot():
             s.app_logo.save(os.path.basename(settings.APP_DEFAULT_LOGO), File(open(settings.APP_DEFAULT_LOGO, 'rb')))
 
             logger.info("Created settings")
-
-        init_plugins()
+        
+        # Invoked via manage.py
+        if len(sys.argv[1:2]) > 0 and not settings.TESTING:
+            init_plugins()
 
         if not settings.TESTING:
             try:

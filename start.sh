@@ -51,7 +51,7 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     pip install -r requirements.txt
 
     echo Build translations...
-    ./translate.sh build safe
+    python manage.py translate build --safe
 
     echo Setup webpack watch...
     webpack --watch &
