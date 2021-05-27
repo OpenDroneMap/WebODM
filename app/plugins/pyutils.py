@@ -27,7 +27,7 @@ def requirements_installed(requirements_file, python_path):
     """
     env = os.environ.copy()
     env["PYTHONPATH"] = env.get("PYTHONPATH", "") + ":" + python_path
-    reqs = subprocess.check_output(['pip', 'freeze'], env=env)
+    reqs = subprocess.check_output(['python', '-m', 'pip', 'freeze'], env=env)
     installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
     deps = parse_requirements(requirements_file)
 
