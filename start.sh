@@ -61,11 +61,16 @@ echo Running migrations
 python manage.py migrate
 
 if [[ "$WO_DEFAULT_NODES" > 0 ]]; then
-   echo -e "from nodeodm.models import ProcessingNode\nfor node_index in map(str, range(1, $WO_DEFAULT_NODES + 1)):\n\t ProcessingNode.objects.update_or_create(hostname='webodm_node-odm_' + node_index, defaults={'hostname': 'webodm_node-odm_' + node_index, 'port': 3000, 'label': 'node-odm-' + node_index})" | python manage.py shell
+    i=0
+    while [ $i -ne "$WO_DEFAULT_NODES" ]
+    do
+        i=$(($i+1))
+        python manage.py addnode webodm_node-odm_$i 3000 --label node-odm-$i
+    done
 fi
 
 if [[ "$WO_CREATE_MICMAC_PNODE" = "YES" ]]; then
-   echo "from nodeodm.models import ProcessingNode; ProcessingNode.objects.update_or_create(hostname='node-micmac-1', defaults={'hostname': 'node-micmac-1', 'port': 3000})" | python manage.py shell
+    python manage.py addnode node-micmac-1 3000
 fi
 
 export WO_HOST="${WO_HOST:=localhost}"
