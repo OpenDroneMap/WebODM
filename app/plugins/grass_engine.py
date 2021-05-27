@@ -26,8 +26,6 @@ class GrassEngine:
 
         if self.grass_binary is None:
             logger.warning("Could not find a GRASS 7 executable. GRASS scripts will not work.")
-        else:
-            logger.info("Initializing GRASS engine using {}".format(self.grass_binary))
 
     def create_context(self, serialized_context = {}):
         if self.grass_binary is None: raise GrassEngineException("GRASS engine is unavailable")

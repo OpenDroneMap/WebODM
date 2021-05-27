@@ -17,6 +17,8 @@ def cleanup():
     print("Cleanup done!")
 
 class Command(BaseCommand):
+    requires_system_checks = []
+    
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
 

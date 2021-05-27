@@ -9,9 +9,11 @@ from app.scripts.extract_potree_strings import extract_potree_strings
 root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 
 class Command(BaseCommand):
+    requires_system_checks = []
+
     def add_arguments(self, parser):
         parser.add_argument("action", type=str, choices=['extract', 'build'])
-        parser.add_argument("--safe", type=bool, required=False, help="Skip invalid languages")
+        parser.add_argument("--safe", action='store_true', required=False, help="Skip invalid languages")
         super(Command, self).add_arguments(parser)
 
     def handle(self, **options):
@@ -41,3 +43,12 @@ class Command(BaseCommand):
 
             call_command('makemessages', '--keep-pot', *locale_params, '--ignore=build', '--ignore=app/templates/app/registration/*')
             call_command('makemessages_djangojs', '--keep-pot', *locale_params, '-d=djangojs', '--extension=jsx', '--extension=js', '--ignore=build', '--ignore=app/static/app/js/vendor', '--ignore=app/static/app/bundles', '--ignore=node_modules', '--language=Python')
+
+        elif options.get('action') == 'build':
+            if options.get('safe'):
+                for l in locales:
+                    print("Building %s .po files into .mo" % l)
+                    call_command('compilemessages', '--locale=%s' % l)
+            else:
+                print("Building .po files into .mo")
+                call_command('compilemessages')

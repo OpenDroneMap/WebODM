@@ -84,9 +84,7 @@ def boot():
 
             logger.info("Created settings")
         
-        # Invoked via manage.py
-        if len(sys.argv[1:2]) > 0 and not settings.TESTING:
-            init_plugins()
+        init_plugins()
 
         if not settings.TESTING:
             try:
