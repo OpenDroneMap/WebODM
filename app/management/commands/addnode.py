@@ -9,6 +9,8 @@ class Command(BaseCommand):
         parser.add_argument("host", type=str)
         parser.add_argument("port", type=int)
         parser.add_argument("--label", type=str, required=False, default="", help="Node label")
+        parser.add_argument("--token", type=str, required=False, default="", help="Node token")
+        
         super(Command, self).add_arguments(parser)
 
     def handle(self, **options):
@@ -16,5 +18,6 @@ class Command(BaseCommand):
                 defaults={
                     'hostname': options.get('host'), 
                     'port': options.get('port'), 
-                    'label': options.get('label', '')
+                    'label': options.get('label', ''),
+                    'token': options.get('token', '')
                 })
