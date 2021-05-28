@@ -44,6 +44,7 @@ urlpatterns = [
 
     # TODO: add caching: https://docs.djangoproject.com/en/3.1/topics/i18n/translation/#note-on-performance
     url(r'^jsi18n/', JavaScriptCatalog.as_view(packages=['app']), name='javascript-catalog'),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 ]
 
 handler404 = app_views.handler404

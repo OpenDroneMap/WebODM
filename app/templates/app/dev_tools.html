@@ -12,7 +12,7 @@
 
 <form class="form-inline" style="margin-top: 32px;">
     <strong>{% trans 'Current Locale:' %}</strong> {{ current_locale }}<br/>
-    <small>{% trans "To change locale, modify your browser's locale settings, then refresh the page." %}</small>
+    <small>{% trans "To change locale, modify your browser's locale settings, then refresh the page, or use the set locale button below." %}</small>
     <br/><br/>
     <div class="form-group margin-bottom">
       <label for="transFiles">{% trans 'Translation Files (.zip):' %}</label>
@@ -20,6 +20,13 @@
     </div>
     <div style="margin-top: 16px;">
         <button type="button" class="btn btn-danger" onClick="javascript:execute(this, 'reloadTranslation', document.getElementById('transFiles').value)"><i class="fa fa-language"></i> {% trans 'Download and Replace Translation Files' %}</button>
+    </div>
+</form>
+<form class="form-inline" style="margin-top: 32px;" onsubmit="return false;">
+    <div class="form-group margin-bottom">
+        <label for="targetLocale">{% trans 'Set locale:' %}</label>
+        <input id='targetLocale' type="text" class="form-control" size="6" value="it-IT">
+        <button class="btn btn-primary" onclick="window.setLocale(document.getElementById('targetLocale').value);"><i class="fa fa-globe"></i> {% trans 'Apply' %}</button>
     </div>
 </form>
 <div id="action-loading" style="display: none; margin-top: 12px">
