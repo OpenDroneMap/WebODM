@@ -55,11 +55,27 @@
     <link rel="stylesheet" type="text/x-scss" href="{% static 'app/css/theme.scss' %}" />
     {% endcompress %}
 
+    {% is_desktop_mode as desktop_mode %}
+    {% if desktop_mode %}
+    <!-- Hide top nav bar -->
+    <style type="text/css">
+        .navbar-header { display: none; }
+        #navbar-top .navbar-default.sidebar{ top: 0; position: fixed; margin-top: 1px; }
+        #navbar-top { height: 0; min-height: 0; }
+        .map-view { height: calc(100% + 30px) !important; }
+        .model-view { height: calc(100% + 50px) !important; }
+    </style>
+    {% endif %}
+
     <style type="text/css">
         {{ SETTINGS.theme.css|safe }}
     </style>
 </head>
 <body data-admin-utc-offset="{% now "Z" %}">
+{% if desktop_mode %}
+    <div class='topLine' style="background: #e7e7e7; position: absolute; left: 0; right: 0; height: 1px;"></div>
+{% endif %}
+
 {% block body %}
     <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -97,11 +113,18 @@ $(function(){
     $('#side-menu').metisMenu();
 
     $(window).bind("load resize", function() {
+        {% if desktop_mode %}
+        var topOffset = 0;
+        {% else %}
         var topOffset = 50;
+        {% endif %}
+
         var width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
         if (width < 768) {
             $('div.navbar-collapse').addClass('collapse');
+            {% if not desktop_mode %}
             topOffset = 100; // 2-row-menu
+            {% endif %}
         } else {
             $('div.navbar-collapse').removeClass('collapse');
         }

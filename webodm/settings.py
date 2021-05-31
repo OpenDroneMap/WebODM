@@ -68,6 +68,11 @@ SINGLE_USER_MODE = False
 # URL to redirect to if there are no processing nodes when visiting the dashboard
 PROCESSING_NODES_ONBOARDING = None
 
+# Enable desktop mode. In desktop mode some styling changes
+# are applied to make the application look nicer on desktop
+# as well as disabling certain features (e.g. sharing)
+DESKTOP_MODE = False
+
 # Default CSS to add to theme
 DEFAULT_THEME_CSS = ''
 

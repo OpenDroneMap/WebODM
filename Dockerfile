@@ -20,7 +20,6 @@ RUN apt-get -qq update && apt-get -qq install -y nodejs
 # Install Python3, GDAL, nginx, letsencrypt, psql
 RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-12 gettext
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
-RUN ln -s /usr/bin/pip3 /usr/bin/pip && pip install -U pip
 
 # Install pip reqs
 ADD requirements.txt /webodm/
@@ -40,8 +39,8 @@ WORKDIR /webodm
 RUN npm install --quiet -g webpack@4.16.5 && npm install --quiet -g webpack-cli@4.2.0 && npm install --quiet && webpack --mode production
 RUN echo "UTC" > /etc/timezone
 RUN python manage.py collectstatic --noinput
-RUN bash app/scripts/plugin_cleanup.sh && echo "from app.plugins import build_plugins;build_plugins()" | python manage.py shell
-RUN bash translate.sh build safe
+RUN python manage.py rebuildplugins
+RUN python manage.py translate build --safe
 
 # Cleanup
 RUN apt-get remove -y g++ python3-dev libpq-dev && apt-get autoremove -y

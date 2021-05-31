@@ -41,7 +41,7 @@ class PluginBase(ABC):
                 if not os.path.exists(self.get_python_packages_path()):
                     os.makedirs(self.get_python_packages_path(), exist_ok=True)
 
-                p = subprocess.Popen(['pip', 'install', '-U', '-r', 'requirements.txt',
+                p = subprocess.Popen(['python', '-m', 'pip', 'install', '-U', '-r', 'requirements.txt',
                                   '--target', self.get_python_packages_path()],
                                      cwd=self.get_path())
                 p.wait()
