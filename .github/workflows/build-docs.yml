@@ -23,11 +23,9 @@ jobs:
     - name: bundle exec
       working-directory: ./slate
       run: bundle exec middleman build
-
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
-      working-directory: ./slate
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build
+        publish_dir: ./slate/build
         keep_files: true
