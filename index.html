@@ -17,7 +17,7 @@
   color: #272822;
   background-color: #f92672;
 }
-.highlight .c, .highlight .cd, .highlight .cm, .highlight .c1, .highlight .cs {
+.highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cpf, .highlight .c1, .highlight .cs {
   color: #75715e;
 }
 .highlight .cp {
@@ -55,8 +55,11 @@
 .highlight .kd {
   color: #fd971f;
 }
-.highlight .s, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
+.highlight .s, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
   color: #a6e22e;
+}
+.highlight .sa {
+  color: #ae81ff;
 }
 .highlight .sr {
   color: #a1efe4;
@@ -79,7 +82,7 @@
 .highlight .na {
   color: #66d9ef;
 }
-.highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mb, .highlight .mx {
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mx {
   color: #a6e22e;
 }
 .highlight .ss {
@@ -95,11 +98,11 @@
     <a href="#" id="nav-button">
       <span>
         NAV
-        <img src="images/navbar.png" alt="Navbar" />
+        <img src="images/navbar.png" alt="" />
       </span>
     </a>
     <div class="tocify-wrapper">
-      <img src="images/logo.png" alt="Logo" />
+      <img src="images/logo.png" alt="" />
         <div class="lang-selector">
               <a href="#" data-language-name="code">code</a>
         </div>
@@ -151,67 +154,67 @@ $ pip install requests
 <aside class="notice">
 The <a href="https://github.com/OpenDroneMap/WebODM/tree/master/slate/examples/process_images.py" target="_blank">source code</a> for this example is available on GitHub</a>.
 </aside>
-<pre class="highlight python"><code><span class="kn">import</span> <span class="nn">requests</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/token-auth/'</span><span class="p">,</span> 
+<div class="highlight"><pre class="highlight python"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/token-auth/'</span><span class="p">,</span> 
                     <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'username'</span><span class="p">:</span> <span class="s">'admin'</span><span class="p">,</span>
-                          <span class="s">'password'</span><span class="p">:</span> <span class="s">'admin'</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                          <span class="s">'password'</span><span class="p">:</span> <span class="s">'admin'</span><span class="p">}).</span><span class="n">json</span><span class="p">()</span>
 <span class="n">token</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'token'</span><span class="p">]</span>
-</code></pre>
+</code></pre></div>
 <p>First, we <a href="#authenticate">authenticate</a> with WebODM. A <code class="prettyprint">token</code> is returned when authentication is successful.
 <div class="clear"></div></p>
-<pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/'</span><span class="p">,</span> 
-                    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
-                    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'Hello WebODM!'</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<div class="highlight"><pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/'</span><span class="p">,</span> 
+                    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'Hello WebODM!'</span><span class="p">}).</span><span class="n">json</span><span class="p">()</span>
 <span class="n">project_id</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'id'</span><span class="p">]</span>
-</code></pre>
+</code></pre></div>
 <p>Then we need to create a <a href="#project">Project</a>. We pass our <code class="prettyprint">token</code> via the <code class="prettyprint">Authorization</code> header. If we forget to pass this header, the system will not authenticate us and will refuse to process the request. We also assign a <code class="prettyprint">name</code> to our project.
 <div class="clear"></div></p>
-<pre class="highlight python"><code><span class="n">images</span> <span class="o">=</span> <span class="p">[</span>
+<div class="highlight"><pre class="highlight python"><code><span class="n">images</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s">'images'</span><span class="p">,</span> <span class="p">(</span><span class="s">'image1.jpg'</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s">'image1.jpg'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">),</span> <span class="s">'image/jpg'</span><span class="p">)),</span> 
     <span class="p">(</span><span class="s">'images'</span><span class="p">,</span> <span class="p">(</span><span class="s">'image2.jpg'</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s">'image2.jpg'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">),</span> <span class="s">'image/jpg'</span><span class="p">)),</span>
-    <span class="c"># ...</span>
-<span class="p">]</span>
-<span class="n">options</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span>
+    <span class="c1"># ...
+</span><span class="p">]</span>
+<span class="n">options</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">([</span>
     <span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">"orthophoto-resolution"</span><span class="p">,</span> <span class="s">'value'</span><span class="p">:</span> <span class="mi">24</span><span class="p">}</span>
 <span class="p">])</span>
 
-<span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/{}/tasks/'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> 
-            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/{}/tasks/'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> 
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
             <span class="n">files</span><span class="o">=</span><span class="n">images</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="p">{</span>
                 <span class="s">'options'</span><span class="p">:</span> <span class="n">options</span>
-            <span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="p">}).</span><span class="n">json</span><span class="p">()</span>
 
 <span class="n">task_id</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'id'</span><span class="p">]</span>
-</code></pre>
+</code></pre></div>
 <p>We can then create a <a href="#task">Task</a>. The only required parameter is a list of multiple, multipart-encoded <code class="prettyprint">images</code>. Processing will start automatically
 as soon as a <a href="#processing-node">Processing Node</a> is available. It is possible to specify additional options by passing an <code class="prettyprint">options</code> value, which is a JSON-encoded list of name/value pairs. Several other options are available. See the <a href="#processing-options">Task - Processing Options</a> reference for more information.
 <div class="clear"></div></p>
-<pre class="highlight python"><code><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/{}/tasks/{}/'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
-                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<div class="highlight"><pre class="highlight python"><code><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'http://localhost:8000/api/projects/{}/tasks/{}/'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">token</span><span class="p">)}).</span><span class="n">json</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="s">'status'</span><span class="p">]</span> <span class="o">==</span> <span class="n">status_codes</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="s">'status'</span><span class="p">]</span> <span class="o">==</span> <span class="n">status_codes</span><span class="p">.</span><span class="n">COMPLETED</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="s">"Task has completed!"</span><span class="p">)</span>
         <span class="k">break</span>
-    <span class="k">elif</span> <span class="n">res</span><span class="p">[</span><span class="s">'status'</span><span class="p">]</span> <span class="o">==</span> <span class="n">status_codes</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"Task failed: {}"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
-        <span class="n">sys</span><span class="o">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">res</span><span class="p">[</span><span class="s">'status'</span><span class="p">]</span> <span class="o">==</span> <span class="n">status_codes</span><span class="p">.</span><span class="n">FAILED</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Task failed: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="s">"Processing, hold on..."</span><span class="p">)</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-</code></pre>
+        <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div>
 <p>We periodically check for the <a href="#task">Task</a> status using a loop.
 <div class="clear"></div></p>
-<pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"http://localhost:8000/api/projects/{}/tasks/{}/download/orthophoto.tif"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
-                        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
+<div class="highlight"><pre class="highlight python"><code><span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"http://localhost:8000/api/projects/{}/tasks/{}/download/orthophoto.tif"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">),</span> 
+                        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'JWT {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">token</span><span class="p">)},</span>
                         <span class="n">stream</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"orthophoto.tif"</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span> 
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">res</span><span class="p">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span> 
         <span class="k">if</span> <span class="n">chunk</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">"Saved ./orthophoto.tif"</span><span class="p">)</span>
-</code></pre>
+</code></pre></div>
 <p>Our orthophoto is ready to be downloaded. A variety of other assets, including a dense 3D point cloud and a textured model <a href="#download-assets">are also available</a>.</p>
 
 <p>Congratulations! You just processed some images.</p>
@@ -227,24 +230,24 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <blockquote>
 <p>Get authentication token:</p>
 </blockquote>
-<pre class="highlight shell"><code>curl -X POST -d <span class="s2">"username=testuser&amp;password=testpass"</span> http://localhost:8000/api/token-auth/
+<div class="highlight"><pre class="highlight shell"><code>curl <span class="nt">-X</span> POST <span class="nt">-d</span> <span class="s2">"username=testuser&amp;password=testpass"</span> http://localhost:8000/api/token-auth/
 
 <span class="o">{</span><span class="s2">"token"</span>:<span class="s2">"eyJ0eXAiO..."</span><span class="o">}</span>
-</code></pre>
+</code></pre></div>
 <blockquote>
 <p>Use authentication token:</p>
 </blockquote>
-<pre class="highlight shell"><code>curl -H <span class="s2">"Authorization: JWT &lt;your_token&gt;"</span> http://localhost:8000/api/projects/
+<div class="highlight"><pre class="highlight shell"><code>curl <span class="nt">-H</span> <span class="s2">"Authorization: JWT &lt;your_token&gt;"</span> http://localhost:8000/api/projects/
 
 <span class="o">{</span><span class="s2">"count"</span>:13, ...<span class="o">}</span>
-</code></pre>
+</code></pre></div>
 <blockquote>
 <p>Use authentication token via querystring (less secure):</p>
 </blockquote>
-<pre class="highlight shell"><code>curl http://localhost:8000/api/projects/?jwt<span class="o">=</span>&lt;your_token&gt;
+<div class="highlight"><pre class="highlight shell"><code>curl http://localhost:8000/api/projects/?jwt<span class="o">=</span>&lt;your_token&gt;
 
 <span class="o">{</span><span class="s2">"count"</span>:13, ...<span class="o">}</span>
-</code></pre>
+</code></pre></div>
 <p><code class="prettyprint">POST /api/token-auth/</code></p>
 
 <table><thead>
@@ -295,24 +298,24 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <blockquote>
 <p>Example project:</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">7</span><span class="p">,</span><span class="w">
         </span><span class="mi">6</span><span class="p">,</span><span class="w">
         </span><span class="mi">5</span><span class="w">
     </span><span class="p">],</span><span class="w">
-    </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="s2">"delete"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"change"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"add"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"view"</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>A <a href="#project">Project</a> is a collection of <a href="#task">Task</a> items.</p>
 
 <table><thead>
@@ -401,25 +404,25 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <blockquote>
 <p>Project list:</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"next"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"previous"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"results"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"next"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"previous"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"results"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="mi">7</span><span class="p">,</span><span class="w">
                 </span><span class="mi">6</span><span class="p">,</span><span class="w">
                 </span><span class="mi">5</span><span class="w">
             </span><span class="p">],</span><span class="w">
-            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+            </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-07T02:09:28.515319Z"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
         </span><span class="p">}</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p><code class="prettyprint">GET /api/projects/</code></p>
 
 <table><thead>
@@ -487,14 +490,14 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 <blockquote>
 <p>Example task:</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">134</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"processing_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost:3000"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"can_rerun_from"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-  </span><span class="s2">"available_assets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">134</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"processing_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost:3000"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"can_rerun_from"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+  </span><span class="nl">"available_assets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="s2">"all.zip"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"orthophoto.tif"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"orthophoto.png"</span><span class="p">,</span><span class="w">
@@ -503,25 +506,25 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
     </span><span class="s2">"georeferenced_model.csv"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"textured_model.zip"</span><span class="w">
   </span><span class="p">],</span><span class="w">
-  </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4338d684-91b4-49a2-b907-8ba171894393"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Task Name"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"processing_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">2197417</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"auto_processing_node"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"last_error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+  </span><span class="nl">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4338d684-91b4-49a2-b907-8ba171894393"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Task Name"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"processing_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">2197417</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"auto_processing_node"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"last_error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"use-opensfm-pointcloud"</span><span class="p">,</span><span class="w">
-      </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"use-opensfm-pointcloud"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">],</span><span class="w">
-  </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-02-18T18:01:55.402551Z"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"upload_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"resize_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"running_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
+  </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-02-18T18:01:55.402551Z"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"upload_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"resize_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"running_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>A <a href="#task">Task</a> is the basic processing unit of WebODM. To compute an orthophoto, point cloud and textured model from a set of images, you need to create a <a href="#task">Task</a>.</p>
 
 <table><thead>
@@ -682,33 +685,87 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 
 <p>Parameters are the same as above.</p>
 
+<h3 id="import-task">Import Task</h3>
+
+<p><code class="prettyprint">POST /api/projects/{project_id}/tasks/import</code></p>
+
+<p>Import task that have been processed by another WebODM instance (or via <a href="https://webodm.net">webodm.net</a> or NodeODM)</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>name</td>
+<td></td>
+<td>Imported Task</td>
+<td>User defined name for the task.</td>
+</tr>
+<tr>
+<td>filename</td>
+<td>*/</td>
+<td>&ldquo;&rdquo;</td>
+<td>File with assets. Must be a zip.</td>
+</tr>
+<tr>
+<td>url</td>
+<td>/*</td>
+<td>&ldquo;&rdquo;</td>
+<td>URL to zipped zipped assets.</td>
+</tr>
+</tbody></table>
+
+<p>You have to provide either <code class="prettyprint">filename</code> or <code class="prettyprint">url</code> parameter (but not both) in order to import created assets.</p>
+
+<p>Remember to set proper Content-type for the request depending on how the assets are uploaded:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Content-Type</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>filename</td>
+<td>application/zip</td>
+</tr>
+<tr>
+<td>url</td>
+<td>application/x-www-form-urlencoded</td>
+</tr>
+</tbody></table>
+
 <h3 id="get-list-of-tasks">Get list of tasks</h3>
 
 <blockquote>
 <p>Task list:</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
-        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"processing_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost:3000"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">89</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2e8b687d-c269-4e2f-91b3-5a2cd51b5321"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test name"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"processing_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">8402184</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"auto_processing_node"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"last_error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-08T13:32:28.139474Z"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"upload_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"resize_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"running_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
+        </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"project"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"processing_node"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"processing_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost:3000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"images_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">89</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2e8b687d-c269-4e2f-91b3-5a2cd51b5321"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test name"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"processing_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">8402184</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"auto_processing_node"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"last_error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-12-08T13:32:28.139474Z"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"pending_action"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"upload_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"resize_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"running_progress"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p><code class="prettyprint">GET /api/projects/{project_id}/tasks/</code></p>
 
 <p>Retrieves all <a href="#task">Task</a> items associated with <code class="prettyprint">project_id</code>.</p>
@@ -774,10 +831,10 @@ These paths could change in future versions of WebODM. If the asset you need can
 <blockquote>
 <p>Console output example:</p>
 </blockquote>
-<pre class="highlight shell"><code>curl -H <span class="s2">"Authorization: JWT &lt;your_token&gt;"</span> http://localhost:8000/api/projects/2/tasks/1/output/?line<span class="o">=</span>5
+<div class="highlight"><pre class="highlight shell"><code>curl <span class="nt">-H</span> <span class="s2">"Authorization: JWT &lt;your_token&gt;"</span> http://localhost:8000/api/projects/2/tasks/1/output/?line<span class="o">=</span>5
 
 <span class="o">[</span>DEBUG]   /var/www/data/e453747f-5fd4-4654-9622-b02727b29fc5/images<span class="se">\n</span><span class="o">[</span>DEBUG]   Loaded DJI_0219.JPG | camera: dji fc300s ...
-</code></pre>
+</code></pre></div>
 <p><code class="prettyprint">GET /api/projects/{project_id}/tasks/{task_id}/output/</code></p>
 
 <p>As a <a href="#task">Task</a> is being processed, processing nodes will return an output string that can be used for debugging and informative purposes. Output is only available after processing has started.</p>
@@ -907,28 +964,28 @@ These paths could change in future versions of WebODM. If the asset you need can
 <blockquote>
 <p>Example processing node:</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"online"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"hostname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"api_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.1"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"engine_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.6.0"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"engine"</span><span class="p">:</span><span class="w"> </span><span class="s2">"odm"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"last_refreshed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-03-01T21:14:49.918276Z"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"queue_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"max_images"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com:80"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"available_options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"online"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"hostname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"port"</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"api_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"engine_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.6.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"engine"</span><span class="p">:</span><span class="w"> </span><span class="s2">"odm"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"last_refreshed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-03-01T21:14:49.918276Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"queue_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"max_images"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodeodm.masseranolabs.com:80"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"available_options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mesh-solver-divide"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"int"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"positive integer"</span><span class="w">
+            </span><span class="nl">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mesh-solver-divide"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"int"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"positive integer"</span><span class="w">
         </span><span class="p">},</span><span class="w">
     </span><span class="err">...</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>Processing nodes are associated with zero or more tasks and
 take care of processing input images. Processing nodes are computers or virtual machines running <a href="https://github.com/OpenDroneMap/NodeODM">NodeODM</a> or any other API compatible with it.</p>
 
@@ -1162,23 +1219,23 @@ take care of processing input images. Processing nodes are computers or virtual 
 <blockquote>
 <p>Processing options example:</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
-        </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mesh-solver-divide"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"int"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"positive integer"</span><span class="w">
+        </span><span class="nl">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Oct-tree depth at which the Laplacian equation is solved in the surface reconstruction step. Increasing this value increases computation times slightly but helps reduce memory usage. Default: 9"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mesh-solver-divide"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"int"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"positive integer"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
-        </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ignore matched keypoints if the two images share less than &lt;float&gt; percent of keypoints. Default: 2"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"matcher-threshold"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"float"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"percent"</span><span class="w">
+        </span><span class="nl">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ignore matched keypoints if the two images share less than &lt;float&gt; percent of keypoints. Default: 2"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"matcher-threshold"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"float"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"percent"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="err">...</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p><code class="prettyprint">GET /api/processingnodes/options/</code></p>
 
 <p>Display the common options available among all online processing nodes. This is calculated by intersecting the <code class="prettyprint">available_options</code> field of all online processing nodes visible to the current user.</p>
@@ -1230,29 +1287,29 @@ model-wise (can a user add a project? can a user view projects?).</p>
 <blockquote>
 <p>Example User</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pbkdf2_sha256$120000$vkzUnKJwwaNl$95nqgBjqZ3/8Plk5soe2SjUPEF5fFNjBDfIapOXCy/Y="</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"last_login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-09-12T01:45:05Z"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"is_superuser"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin@example.com"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"is_staff"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"is_active"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"date_joined"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-09-12T01:44:18Z"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pbkdf2_sha256$120000$vkzUnKJwwaNl$95nqgBjqZ3/8Plk5soe2SjUPEF5fFNjBDfIapOXCy/Y="</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"last_login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-09-12T01:45:05Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"is_superuser"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin@example.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"is_staff"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"is_active"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"date_joined"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-09-12T01:44:18Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">1</span><span class="w">
     </span><span class="p">],</span><span class="w">
-    </span><span class="s2">"user_permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="nl">"user_permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">9</span><span class="p">,</span><span class="w">
         </span><span class="mi">10</span><span class="p">,</span><span class="w">
         </span><span class="mi">11</span><span class="p">,</span><span class="w">
         </span><span class="mi">12</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>This API can only be used by admin users.</p>
 
 <table><thead>
@@ -1405,7 +1462,7 @@ model-wise (can a user add a project? can a user view projects?).</p>
 
 <h3 id="update-a-user">Update a user</h3>
 
-<p><code class="prettyprint">POST /api/admin/users/{id}/</code></p>
+<p><code class="prettyprint">PUT /api/admin/users/{id}/</code></p>
 
 <p>Parameters are the same as above.</p>
 
@@ -1448,10 +1505,10 @@ model-wise (can a user add a project? can a user view projects?).</p>
 <blockquote>
 <p>Example Group</p>
 </blockquote>
-<pre class="highlight json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Xyz"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Xyz"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"permissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="mi">53</span><span class="p">,</span><span class="w">
         </span><span class="mi">54</span><span class="p">,</span><span class="w">
         </span><span class="mi">55</span><span class="p">,</span><span class="w">
@@ -1467,7 +1524,7 @@ model-wise (can a user add a project? can a user view projects?).</p>
         </span><span class="mi">76</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>This API can only be used by admin users.</p>
 
 <table><thead>
@@ -1522,7 +1579,7 @@ model-wise (can a user add a project? can a user view projects?).</p>
 
 <h3 id="update-a-group">Update a group</h3>
 
-<p><code class="prettyprint">POST /api/admin/groups/{id}/</code></p>
+<p><code class="prettyprint">PUT /api/admin/groups/{id}/</code></p>
 
 <p>Parameters are the same as above.</p>
 
@@ -1635,6 +1692,14 @@ model-wise (can a user add a project? can a user view projects?).</p>
 <p>To run the unit tests, simply type:</p>
 
 <p><code class="prettyprint">./webodm.sh test</code></p>
+
+<h2 id="apply-changes-in-production">Apply Changes In Production</h2>
+
+<p>Once you&rsquo;re done making changes, if you start WebODM in production mode (without the <code class="prettyprint">--dev</code> flag), you will notice that your changes are missing. This is because <code class="prettyprint">webodm.sh</code> uses the <code class="prettyprint">opendronemap/webodm_webapp</code> docker image to launch WebODM, which doesn&rsquo;t have your changes. To apply the changes, you need to rebuild the docker image locally:</p>
+
+<p><code class="prettyprint">docker build -t opendronemap/webodm_webapp .</code></p>
+
+<p>You can also modify the <code class="prettyprint">docker-compose.yml</code> file to point to a different image.</p>
 
 <h2 id="project-overview">Project Overview</h2>
 
