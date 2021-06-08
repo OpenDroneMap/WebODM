@@ -194,11 +194,11 @@ def get_plugins():
                     if settings.TESTING:
                         module = importlib.import_module("app.media_test.plugins.{}".format(dir))
                     else:
-                        module = importlib.import_module("app.media.plugins.{}".format(dir))
+                        module = importlib.import_module("plugins.{}".format(dir))
 
                     plugin = (getattr(module, "Plugin"))()
                 except (ImportError, AttributeError):
-                    module = importlib.import_module("plugins.{}".format(dir))
+                    module = importlib.import_module("coreplugins.{}".format(dir))
                     plugin = (getattr(module, "Plugin"))()
 
                 # Check version
@@ -284,7 +284,7 @@ def get_plugins_paths():
     current_path = os.path.dirname(os.path.realpath(__file__))
     return [
         os.path.abspath(get_plugins_persistent_path()),
-        os.path.abspath(os.path.join(current_path, "..", "..", "plugins")),
+        os.path.abspath(os.path.join(current_path, "..", "..", "coreplugins")),
     ]
 
 def get_plugins_persistent_path(*paths):
