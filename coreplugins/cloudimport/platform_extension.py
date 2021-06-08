@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from app.plugins import get_current_plugin
-from .cloud_platform import CloudPlatform
+from coreplugins.cloudimport.cloud_platform import CloudPlatform
 
 class PlatformExtension(CloudPlatform):
     """A platform extension is a platform with extra capacities. It may require extra configuration, or it might provide new features."""

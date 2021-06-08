@@ -5,7 +5,7 @@ from app.plugins import PluginBase, Menu, MountPoint
 from django.contrib.auth.decorators import login_required
 from django import forms
 
-from plugins.openaerialmap.api import Info, Share
+from .api import Info, Share
 
 
 class TokenForm(forms.Form):

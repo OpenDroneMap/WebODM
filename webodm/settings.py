@@ -121,27 +121,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'webodm.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'app', 'templates'),
-            os.path.join(BASE_DIR, 'app', 'templates', 'app'),
-            BASE_DIR
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'app.contexts.settings.load',
-            ],
-        },
-    },
-]
-
 WSGI_APPLICATION = 'webodm.wsgi.application'
 
 
@@ -289,6 +268,28 @@ if TESTING:
 MEDIA_TMP = os.path.join(MEDIA_ROOT, 'tmp')
 
 FILE_UPLOAD_TEMP_DIR = MEDIA_TMP
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'app', 'templates'),
+            os.path.join(BASE_DIR, 'app', 'templates', 'app'),
+            BASE_DIR,
+            MEDIA_ROOT,
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'app.contexts.settings.load',
+            ],
+        },
+    },
+]
 
 # Store flash messages in cookies
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

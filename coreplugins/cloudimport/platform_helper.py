@@ -28,7 +28,7 @@ def read_platform_from_files():
         # Each python script must have a class called Platform
         # Instantiate the platform
         try:
-            module_path = "plugins.cloudimport.platforms.{}".format(path.splitext(platform_script)[0])
+            module_path = "coreplugins.cloudimport.platforms.{}".format(path.splitext(platform_script)[0])
             module = importlib.import_module(module_path)
             platform = (getattr(module, "Platform"))()
             platforms.append(platform)

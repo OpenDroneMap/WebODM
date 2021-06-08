@@ -132,9 +132,10 @@ class PluginBase(ABC):
         :return: path used to reference Django templates for a plugin
         """
         if self.is_persistent():
-            return "plugins/{}/templates/{}".format(self.get_name(), path)
+            return "coreplugins/{}/templates/{}".format(self.get_name(), path)
         else:
-            return "app/media/plugins/{}/templates/{}".format(self.get_name(), path)
+            return "plugins/{}/templates/{}".format(self.get_name(), path)
+
 
     def path_exists(self, path):
         return os.path.exists(self.get_path(path))

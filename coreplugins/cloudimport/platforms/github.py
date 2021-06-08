@@ -1,7 +1,7 @@
 # Check https://github.com/
 from urllib.parse import urlparse
 from os import path
-from plugins.cloudimport.cloud_platform import File, Folder, CloudPlatform
+from coreplugins.cloudimport.cloud_platform import File, Folder, CloudPlatform
 from app.plugins import logger
 
 class Platform(CloudPlatform):

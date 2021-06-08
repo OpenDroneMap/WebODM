@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import importlib
 import subprocess
@@ -24,6 +25,17 @@ def init_plugins():
     # Make sure app/media/plugins exists
     if not os.path.exists(get_plugins_persistent_path()):
         os.mkdir(get_plugins_persistent_path())
+
+    # Make sure app/media/plugins is importable as a module
+    if not os.path.isfile(os.path.join(get_plugins_persistent_path(), "__init__.py")):
+        try:
+            with open(os.path.join(get_plugins_persistent_path(), "__init__.py"), 'w') as f:
+                f.write("\n")
+        except Exception as e:
+            logger.warning("Cannot create __init__.py: %s" % str(e))
+    
+    # Add additional python path to discover plugins
+    sys.path.append(settings.MEDIA_ROOT)
 
     build_plugins()
     sync_plugin_db()
@@ -194,11 +206,11 @@ def get_plugins():
                     if settings.TESTING:
                         module = importlib.import_module("app.media_test.plugins.{}".format(dir))
                     else:
-                        module = importlib.import_module("app.media.plugins.{}".format(dir))
+                        module = importlib.import_module("plugins.{}".format(dir))
 
                     plugin = (getattr(module, "Plugin"))()
                 except (ImportError, AttributeError):
-                    module = importlib.import_module("plugins.{}".format(dir))
+                    module = importlib.import_module("coreplugins.{}".format(dir))
                     plugin = (getattr(module, "Plugin"))()
 
                 # Check version
@@ -284,7 +296,7 @@ def get_plugins_paths():
     current_path = os.path.dirname(os.path.realpath(__file__))
     return [
         os.path.abspath(get_plugins_persistent_path()),
-        os.path.abspath(os.path.join(current_path, "..", "..", "plugins")),
+        os.path.abspath(os.path.join(current_path, "..", "..", "coreplugins")),
     ]
 
 def get_plugins_persistent_path(*paths):
