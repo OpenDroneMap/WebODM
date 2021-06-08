@@ -53,7 +53,7 @@ class TestPlugins(BootTestCase):
         # We mounted an endpoint
         res = client.get('/plugins/test/app_mountpoint/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(res, 'plugins/test/templates/app.html')
+        self.assertTemplateUsed(res, 'coreplugins/test/templates/app.html')
 
         # Form was rendered correctly
         self.assertContains(res,
@@ -300,19 +300,19 @@ class TestPlugins(BootTestCase):
 
     def test_plugin_functions(self):
         # Check db/fs syncing
-        if os.path.exists('plugins/test_copy'):
+        if os.path.exists('coreplugins/test_copy'):
             print("Removing plugins/test_copy")
-            shutil.rmtree('plugins/test_copy')
+            shutil.rmtree('coreplugins/test_copy')
 
         sync_plugin_db()
         self.assertTrue(Plugin.objects.filter(pk='test_copy').count() == 0)
 
-        shutil.copytree('plugins/test', 'plugins/test_copy')
+        shutil.copytree('coreplugins/test', 'coreplugins/test_copy')
 
         sync_plugin_db()
         self.assertTrue(Plugin.objects.filter(pk='test_copy').count() == 1)
 
-        shutil.rmtree('plugins/test_copy')
+        shutil.rmtree('coreplugins/test_copy')
         sync_plugin_db()
         self.assertTrue(Plugin.objects.filter(pk='test_copy').count() == 0)
 
