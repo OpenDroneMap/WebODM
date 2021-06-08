@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import importlib
 import subprocess
@@ -24,6 +25,17 @@ def init_plugins():
     # Make sure app/media/plugins exists
     if not os.path.exists(get_plugins_persistent_path()):
         os.mkdir(get_plugins_persistent_path())
+
+    # Make sure app/media/plugins is importable as a module
+    if not os.path.isfile(os.path.join(get_plugins_persistent_path(), "__init__.py")):
+        try:
+            with open(os.path.join(get_plugins_persistent_path(), "__init__.py"), 'w') as f:
+                f.write("\n")
+        except Exception as e:
+            print("Cannot create __init__.py: %s" % str(e))
+    
+    # Add additional python path to discover plugins
+    sys.path.append(settings.MEDIA_ROOT)
 
     build_plugins()
     sync_plugin_db()
