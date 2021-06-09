@@ -12,8 +12,9 @@ from app.models import Project, Task
 from app.plugins.signals import processing_node_removed
 from app.tests.utils import catch_signal
 from nodeodm import status_codes
-from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
+from nodeodm.models import ProcessingNode
 from .classes import BootTestCase
+from webodm import settings
 
 
 class TestApi(BootTestCase):
@@ -416,7 +417,7 @@ class TestApi(BootTestCase):
                                            last_refreshed=timezone.now(),
                                            available_options=[{'name': 'd'}])
         p4 = ProcessingNode.objects.create(hostname="invalid-host-4", port=11223,
-                                           last_refreshed=timezone.now() - datetime.timedelta(minutes=OFFLINE_MINUTES * 2),
+                                           last_refreshed=timezone.now() - datetime.timedelta(minutes=settings.NODE_OFFLINE_MINUTES * 2),
                                            available_options=[{'name': 'd'}]) # offline
 
         assign_perm('view_processingnode', user, p1)
