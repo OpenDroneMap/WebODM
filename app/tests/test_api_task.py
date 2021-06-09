@@ -27,7 +27,7 @@ from app.models.task import task_directory_path, full_task_directory_path, TaskI
 from app.plugins.signals import task_completed, task_removed, task_removing
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
-from nodeodm.models import ProcessingNode, OFFLINE_MINUTES
+from nodeodm.models import ProcessingNode
 from app.testwatch import testWatch
 from .utils import start_processing_node, clear_test_media_root, catch_signal
 
@@ -909,7 +909,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(task.last_error is not None)
 
         # Bring another processing node online, and bring the old one offline
-        pnode.last_refreshed = timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
+        pnode.last_refreshed = timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES)
         pnode.save()
 
         another_pnode.last_refreshed = timezone.now()
@@ -936,7 +936,7 @@ class TestApiTask(BootTransactionTestCase):
         task.last_error = None
         task.status = status_codes.RUNNING
         task.save()
-        another_pnode.last_refreshed = timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
+        another_pnode.last_refreshed = timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES)
         another_pnode.save()
 
         worker.tasks.process_pending_tasks()

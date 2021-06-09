@@ -17,8 +17,6 @@ from django.db.models import signals
 from datetime import timedelta
 
 
-OFFLINE_MINUTES = 5 # Number of minutes a node hasn't been seen before it should be considered offline
-
 class ProcessingNode(models.Model):
     hostname = models.CharField(verbose_name=_("Hostname"), max_length=255, help_text=_("Hostname or IP address where the node is located (can be an internal hostname as well). If you are using Docker, this is never 127.0.0.1 or localhost. Find the IP address of your host machine by running ifconfig on Linux or by checking your network settings."))
     port = models.PositiveIntegerField(verbose_name=_("Port"), help_text=_("Port that connects to the node's API"))
@@ -48,12 +46,12 @@ class ProcessingNode(models.Model):
         Attempts to find an available node (seen in the last 5 minutes, and with lowest queue count)
         :return: ProcessingNode | None
         """
-        return ProcessingNode.objects.filter(last_refreshed__gte=timezone.now() - timedelta(minutes=OFFLINE_MINUTES)) \
+        return ProcessingNode.objects.filter(last_refreshed__gte=timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES)) \
                                      .order_by('queue_count').first()
 
     def is_online(self):
         return self.last_refreshed is not None and \
-               self.last_refreshed >= timezone.now() - timedelta(minutes=OFFLINE_MINUTES)
+               self.last_refreshed >= timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES)
 
     def update_node_info(self):
         """
