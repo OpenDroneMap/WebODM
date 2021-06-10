@@ -274,7 +274,17 @@ class ModelView extends React.Component {
           material.size = 1;
 
           viewer.fitToScreen();
-        });     
+
+          // Load saved scene (if any)
+          $.ajax({
+              type: "GET",
+              url: `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/3d/scene`
+          }).done(sceneData => {
+              Potree.loadProject(viewer, sceneData);
+          }).fail(e => {
+              console.error("Cannot load 3D scene information", e);
+          });
+        });
     });
 
     viewer.renderer.domElement.addEventListener( 'mousedown', this.handleRenderMouseClick );
