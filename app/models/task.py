@@ -745,6 +745,7 @@ class Task(models.Model):
                 logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
         self.update_available_assets_field()
+        self.potree_scene = {}
         self.running_progress = 1.0
         self.console_output += gettext("Done!") + "\n"
         self.status = status_codes.COMPLETED
