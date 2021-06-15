@@ -79291,6 +79291,7 @@ ENDSEC
 				'[title]tt.remove_all_measurement',
 				() => {
 					this.viewer.scene.removeAllMeasurements();
+					this.viewer.scene.annotations.removeAllChildren();
 				}
 			));
 
