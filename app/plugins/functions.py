@@ -21,6 +21,10 @@ from app.security import path_traversal_check
 
 logger = logging.getLogger('app.logger')
 
+# Add additional python path to discover plugins
+if not settings.MEDIA_ROOT in sys.path:
+    sys.path.append(settings.MEDIA_ROOT)
+
 def init_plugins():
     # Make sure app/media/plugins exists
     if not os.path.exists(get_plugins_persistent_path()):
@@ -34,9 +38,6 @@ def init_plugins():
         except Exception as e:
             logger.warning("Cannot create __init__.py: %s" % str(e))
     
-    # Add additional python path to discover plugins
-    sys.path.append(settings.MEDIA_ROOT)
-
     build_plugins()
     sync_plugin_db()
     register_plugins()
