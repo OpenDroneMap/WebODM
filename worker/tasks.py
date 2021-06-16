@@ -86,13 +86,13 @@ def process_task(taskId):
         task_lock_last_update = redis_client.getset(lock_id, time.time())
         if task_lock_last_update is not None:
             # Check if lock has expired
-            if time.time() - float(task_lock_last_update) <= 30:
+            if time.time() - float(task_lock_last_update) <= 600:
                 # Locked
                 delete_lock = False
                 return
             else:
                 # Expired
-                logger.warning("Task {} has an expired lock! This could mean that WebODM is running out of memory. Check your server configuration.")
+                logger.warning("Task {} has an expired lock! This could mean that WebODM is running out of memory. Check your server configuration.".format(taskId))
 
         # Set lock
         def update_lock():
