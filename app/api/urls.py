@@ -10,6 +10,7 @@ from .admin import UserViewSet, GroupViewSet
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
 from .tiler import TileJson, Bounds, Metadata, Tiles, Export
+from .potree import Scene, CameraView
 from .workers import CheckTask, GetTaskResult
 
 router = routers.DefaultRouter()
@@ -44,6 +45,9 @@ urlpatterns = [
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/import$', TaskAssetsImport.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/images/thumbnail/(?P<image_filename>.+)$', Thumbnail.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/images/download/(?P<image_filename>.+)$', ImageDownload.as_view()),
+
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/scene$', Scene.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/cameraview$', CameraView.as_view()),
 
     url(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
     url(r'workers/get/(?P<celery_task_id>.+)', GetTaskResult.as_view()),

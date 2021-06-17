@@ -255,6 +255,7 @@ class Task(models.Model):
     import_url = models.TextField(null=False, default="", blank=True, help_text=_("URL this task is imported from (only for imported tasks)"), verbose_name=_("Import URL"))
     images_count = models.IntegerField(null=False, blank=True, default=0, help_text=_("Number of images associated with this task"), verbose_name=_("Images Count"))
     partial = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing."), verbose_name=_("Partial"))
+    potree_scene = fields.JSONField(default=dict, blank=True, help_text=_("Serialized potree scene information used to save/load measurements and camera view angle"), verbose_name=_("Potree Scene"))
 
     class Meta:
         verbose_name = _("Task")
@@ -744,6 +745,7 @@ class Task(models.Model):
                 logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
         self.update_available_assets_field()
+        self.potree_scene = {}
         self.running_progress = 1.0
         self.console_output += gettext("Done!") + "\n"
         self.status = status_codes.COMPLETED
