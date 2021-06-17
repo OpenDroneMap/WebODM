@@ -86,7 +86,7 @@ def process_task(taskId):
         task_lock_last_update = redis_client.getset(lock_id, time.time())
         if task_lock_last_update is not None:
             # Check if lock has expired
-            if time.time() - float(task_lock_last_update) <= 600:
+            if time.time() - float(task_lock_last_update) <= 30:
                 # Locked
                 delete_lock = False
                 return
