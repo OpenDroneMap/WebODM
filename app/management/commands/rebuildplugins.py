@@ -7,10 +7,10 @@ from app.plugins import build_plugins
 def cleanup():
     # Delete all node_modules and build directories within plugins' public/ folders
     root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
-    for d in glob.glob(os.path.join(root, "plugins", "**", "public", "node_modules")):
+    for d in glob.glob(os.path.join(root, "coreplugins", "**", "public", "node_modules")):
         shutil.rmtree(d)
         print("R\t" + d)
-    for d in glob.glob(os.path.join(root, "plugins", "**", "public", "build")):
+    for d in glob.glob(os.path.join(root, "coreplugins", "**", "public", "build")):
         shutil.rmtree(d)
         print("R\t" + d)
 
