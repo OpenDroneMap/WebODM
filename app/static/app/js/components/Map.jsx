@@ -221,11 +221,6 @@ class Map extends React.Component {
 
             // Add camera shots layer if available
             if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
-                const cameraMarker = L.AwesomeMarkers.icon({
-                    icon: 'camera',
-                    markerColor: 'blue',
-                    prefix: 'fa'
-                });
 
                 const shotsLayer = new L.GeoJSON.AJAX(meta.task.camera_shots, {
                     style: function (feature) {
@@ -236,8 +231,12 @@ class Map extends React.Component {
                       }
                     },
                     pointToLayer: function (feature, latlng) {
-                      return L.marker(latlng, {
-                        icon: cameraMarker
+                      return new L.CircleMarker(latlng, {
+                        color: '#3498db',
+                        fillColor: '#3498db',
+                        fillOpacity: 0.9,
+                        radius: 10,
+                        weight: 1
                       });
                     },
                     onEachFeature: function (feature, layer) {
