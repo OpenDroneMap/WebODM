@@ -325,6 +325,7 @@ def enable_plugin(plugin_name):
     p = get_plugin_by_name(plugin_name, only_active=False)
     p.register()
     Plugin.objects.get(pk=plugin_name).enable()
+    return p
 
 def disable_plugin(plugin_name):
     Plugin.objects.get(pk=plugin_name).disable()

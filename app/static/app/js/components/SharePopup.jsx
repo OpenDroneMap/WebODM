@@ -5,6 +5,7 @@ import ErrorMessage from './ErrorMessage';
 import Utils from '../classes/Utils';
 import ClipboardInput from './ClipboardInput';
 import QRCode from 'qrcode.react';
+import update from 'immutability-helper';
 import $ from 'jquery';
 import { _ } from '../classes/gettext';
 
@@ -27,16 +28,32 @@ class SharePopup extends React.Component{
       task: props.task,
       togglingShare: false,
       error: "",
-      showQR: false
+      showQR: false,
+      linkControls: [], // coming from plugins,
+      relShareLink: this.getRelShareLink()
     };
 
     this.handleEnableSharing = this.handleEnableSharing.bind(this);
+  }
+
+  getRelShareLink = () => {
+    return `/public/task/${this.props.task.id}/${this.props.linksTarget}/`;
   }
 
   componentDidMount(){
     if (!this.state.task.public){
       this.handleEnableSharing();
     }
+
+    PluginsAPI.SharePopup.triggerAddLinkControl({
+            sharePopup: this
+        }, (ctrl) => {
+            if (!ctrl) return;
+
+            this.setState(update(this.state, {
+                linkControls: {$push: [ctrl]}
+            }));
+        });
   }
 
   handleEnableSharing(e){
@@ -68,7 +85,7 @@ class SharePopup extends React.Component{
   }
 
   render(){
-    const shareLink = Utils.absoluteUrl(`/public/task/${this.state.task.id}/${this.props.linksTarget}/`);
+    const shareLink = Utils.absoluteUrl(this.state.relShareLink);
     const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/${this.props.linksTarget}/`);
     const iframeCode = `<iframe scrolling="no" title="WebODM" width="61.8033%" height="360" frameBorder="0" src="${iframeUrl}"></iframe>`;
 
@@ -111,6 +128,12 @@ class SharePopup extends React.Component{
                   readOnly={true} 
                   />
               </label>
+            </div>
+            <div className={"form-group " + (this.state.showQR || this.state.linkControls.length === 0 ? "hide" : "")}>
+            {this.state.linkControls.map((Ctrl, i) => 
+                  <Ctrl key={i} 
+                        sharePopup={this}
+                      />)}
             </div>
             <div className={"form-group " + (this.state.showQR ? "hide" : "")}>
               <label>
