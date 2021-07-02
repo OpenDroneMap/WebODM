@@ -24,9 +24,6 @@ export default class SLCheckbox extends React.Component{
         };
     }
 
-    componentDidMount(){
-    }
-    
     toggleShortLinks = (e) => {
         e.stopPropagation();
         if (!this.state.useShortLink && !this.state.loading){
