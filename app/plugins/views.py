@@ -5,7 +5,7 @@ from app.api.workers import CheckTask as CheckTask
 from app.api.workers import GetTaskResult as GetTaskResult
 
 from django.http import HttpResponse, Http404
-from .functions import get_plugin_by_name
+from .functions import get_plugin_by_name, get_active_plugins
 from django.conf.urls import url
 from django.views.static import serve
 from urllib.parse import urlparse
@@ -59,3 +59,11 @@ def api_view_handler(request, plugin_name=None):
             return view(request, *args, **kwargs)
 
     raise Http404("No valid routes")
+
+def root_url_patterns():
+    result = []
+    for p in get_active_plugins():
+        for mount_point in p.root_mount_points():
+            result.append(url(mount_point.url, mount_point.view, *mount_point.args, **mount_point.kwargs))
+            
+    return result

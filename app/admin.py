@@ -139,17 +139,21 @@ class PluginAdmin(admin.ModelAdmin):
 
     def plugin_enable(self, request, plugin_name, *args, **kwargs):
         try:
-            enable_plugin(plugin_name)
+            p = enable_plugin(plugin_name)
+            if p.requires_restart():
+                messages.warning(request, _("Restart required. Please restart WebODM to enable %(plugin)s") % {'plugin': plugin_name})
         except Exception as e:
-            messages.warning(request, "Cannot enable plugin {}: {}".format(plugin_name, str(e)))
+            messages.warning(request, _("Cannot enable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name, 'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
     def plugin_disable(self, request, plugin_name, *args, **kwargs):
         try:
-            disable_plugin(plugin_name)
+            p = disable_plugin(plugin_name)
+            if p.requires_restart():
+                messages.warning(request, _("Restart required. Please restart WebODM to fully disable %(plugin)s") % {'plugin': plugin_name})
         except Exception as e:
-            messages.warning(request, "Cannot disable plugin {}: {}".format(plugin_name, str(e)))
+            messages.warning(request, _("Cannot disable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name, 'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
@@ -157,7 +161,7 @@ class PluginAdmin(admin.ModelAdmin):
         try:
             delete_plugin(plugin_name)
         except Exception as e:
-            messages.warning(request, "Cannot delete plugin {}: {}".format(plugin_name, str(e)))
+            messages.warning(request, _("Cannot delete plugin %(plugin)s: %(message)s") % {'plugin': plugin_name, 'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
@@ -201,15 +205,15 @@ class PluginAdmin(admin.ModelAdmin):
                 clear_plugins_cache()
                 init_plugins()
 
-                messages.info(request, "Plugin added successfully")
+                messages.info(request, _("Plugin added successfully"))
             except Exception as e:
-                messages.warning(request, "Cannot load plugin: {}".format(str(e)))
+                messages.warning(request, _("Cannot load plugin: %(message)s") % {'message': str(e)})
                 if os.path.exists(tmp_zip_path):
                     os.remove(tmp_zip_path)
                 if os.path.exists(tmp_extract_path):
                     shutil.rmtree(tmp_extract_path)
         else:
-            messages.error(request, "You need to upload a zip file")
+            messages.error(request, _("You need to upload a zip file"))
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
@@ -217,15 +221,16 @@ class PluginAdmin(admin.ModelAdmin):
     def plugin_actions(self, obj):
         plugin = get_plugin_by_name(obj.name, only_active=False)
         return format_html(
-            '<a class="button" href="{}" {}>Disable</a>&nbsp;'
-            '<a class="button" href="{}" {}>Enable</a>'
+            '<a class="button" href="{}" {}>{}</a>&nbsp;'
+            '<a class="button" href="{}" {}>{}</a>'
             + ('&nbsp;<a class="button" href="{}" onclick="return confirm(\'Are you sure you want to delete {}?\')"><i class="fa fa-trash"></i></a>' if not plugin.is_persistent() else '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
             ,
             reverse('admin:plugin-disable', args=[obj.pk]) if obj.enabled else '#',
             'disabled' if not obj.enabled else '',
+            _('Disable'),
             reverse('admin:plugin-enable', args=[obj.pk]) if not obj.enabled else '#',
             'disabled' if obj.enabled else '',
-
+            _('Enable'),
             reverse('admin:plugin-delete', args=[obj.pk]),
             obj.name
         )

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-24 01:30+0000\n"
-"PO-Revision-Date: 2021-01-17 11:32+0000\n"
+"PO-Revision-Date: 2021-04-28 02:31+0000\n"
 "Last-Translator: Anand Mahesh <manand881@gmail.com>\n"
 "Language-Team: Kannada <https://hosted.weblate.org/projects/webodm/webodm/kn/"
 ">\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.5-dev\n"
+"X-Generator: Weblate 4.7-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
@@ -41,11 +41,11 @@ msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ ಅನ್ನು ಸೈಟ್ ಹೆಡರ್
 
 #: app/admin.py:61 app/models/theme.py:40
 msgid "HTML (after header)"
-msgstr ""
+msgstr "ಹ್.ಟಿ.ಮ್.ಲ್ (ಹೆಡರ್ ನಂತರ)"
 
 #: app/admin.py:64
 msgid "HTML that will be displayed after the body tag"
-msgstr ""
+msgstr "ಬಾಡಿ ಟ್ಯಾಗ್ ನಂತರ ಪ್ರದರ್ಶಿಸಲಾಗುವ ಹ್.ಟಿ.ಮ್.ಲ್"
 
 #: app/admin.py:65 app/models/theme.py:41
 msgid "HTML (after body)"
@@ -82,6 +82,7 @@ msgstr "ಕ್ರಿಯೆಗಳನ್ನು"
 msgid ""
 "Normalized Difference Vegetation Index shows the amount of green vegetation."
 msgstr ""
+"ಸಾಮಾನ್ಯ ವ್ಯತ್ಯಾಸ ಸಸ್ಯವರ್ಗದ ಸೂಚ್ಯಂಕವು ಹಸಿರು ಸಸ್ಯವರ್ಗದ ಪ್ರಮಾಣವನ್ನು ತೋರಿಸುತ್ತದೆ."
 
 #: app/api/formulas.py:20
 msgid ""
@@ -97,6 +98,7 @@ msgstr ""
 msgid ""
 "Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
 msgstr ""
+"ಹೆಚ್ಚುವರಿ ಹಸಿರು ಸೂಚ್ಯಂಕವು ಆಲೂಗಡ್ಡೆಯಂತಹ ಎಲೆಗಳ ಬೆಳೆಗಳ ಹಸಿರನ್ನು ಒತ್ತಿಹೇಳುತ್ತದೆ."
 
 #: app/api/formulas.py:33
 msgid ""
@@ -105,7 +107,7 @@ msgstr ""
 
 #: app/api/formulas.py:37
 msgid "Green Leaf Index shows greens leaves and stems."
-msgstr ""
+msgstr "ಹಸಿರು ಎಲೆ ಸೂಚ್ಯಂಕವು ಸೊಪ್ಪಿನ ಎಲೆಗಳು ಮತ್ತು ಕಾಂಡಗಳನ್ನು ತೋರಿಸುತ್ತದೆ."
 
 #: app/api/formulas.py:42
 msgid ""
@@ -157,6 +159,8 @@ msgstr ""
 #: app/api/formulas.py:74
 msgid "Leaf Area Index estimates foliage areas and predicts crop yields."
 msgstr ""
+"ಎಲೆ ಪ್ರದೇಶ ಸೂಚ್ಯಂಕವು ಎಲೆಗಳ ಪ್ರದೇಶಗಳನ್ನು ಅಂದಾಜು ಮಾಡುತ್ತದೆ ಮತ್ತು ಬೆಳೆ "
+"ಇಳುವರಿಯನ್ನು ts ಹಿಸುತ್ತದೆ."
 
 #: app/api/formulas.py:79
 msgid ""
@@ -192,12 +196,12 @@ msgstr "ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿ�
 #: app/api/tasks.py:376
 msgid "Cannot create task, either specify a URL or upload 1 file."
 msgstr ""
-"ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ಉ.ರ್.ಲ್  ಅನ್ನು ನಿರ್ದಿಷ್ಟಪಡಿಸಿ ಅಥವಾ 1 ಫೈಲ್ ಅನ್ನು"
-" ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+"ಕಾರ್ಯವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ, ಉ.ರ್.ಲ್ ಅನ್ನು ನಿರ್ದಿಷ್ಟಪಡಿಸಿ ಅಥವಾ 1 ಫೈಲ್ ಅನ್ನು "
+"ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
 
 #: app/models/image_upload.py:10
 msgid "Task this image belongs to"
-msgstr ""
+msgstr "ಈ ಚಿತ್ರವು ಸೇರಿರುವ ಕಾರ್ಯ"
 
 #: app/models/image_upload.py:10 app/models/task.py:259
 msgid "Task"
@@ -230,7 +234,7 @@ msgstr "ಹೆಸರು"
 
 #: app/models/plugin.py:6
 msgid "Whether this plugin is turned on."
-msgstr ""
+msgstr "ಈ ಪ್ಲಗಿನ್ ಆನ್ ಆಗಿದೆಯೇ."
 
 #: app/models/plugin.py:6
 msgid "Enabled"
@@ -238,15 +242,15 @@ msgstr "ಸಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ"
 
 #: app/models/plugin.py:20
 msgid "Plugin"
-msgstr ""
+msgstr "ಪ್ಲಗಿನ್"
 
 #: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
 msgid "Plugins"
-msgstr ""
+msgstr "ಪ್ಲಗಿನ್‌ಗಳು"
 
 #: app/models/plugin_datum.py:7
 msgid "Setting key"
-msgstr ""
+msgstr "ಕೀಲಿಯನ್ನು ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ"
 
 #: app/models/plugin_datum.py:7
 msgid "Key"
@@ -254,7 +258,7 @@ msgstr "ಕೀ"
 
 #: app/models/plugin_datum.py:8
 msgid "The user this setting belongs to. If NULL, the setting is global."
-msgstr ""
+msgstr "ಈ ಸೆಟ್ಟಿಂಗ್ ಬಳಕೆದಾರರಿಗೆ ಸೇರಿದೆ. NULL ಆಗಿದ್ದರೆ, ಸೆಟ್ಟಿಂಗ್ ಜಾಗತಿಕವಾಗಿದೆ."
 
 #: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
 msgid "User"
@@ -262,11 +266,11 @@ msgstr "ಬಳಕೆದಾರ"
 
 #: app/models/plugin_datum.py:9
 msgid "Integer value"
-msgstr ""
+msgstr "ಪೂರ್ಣಾಂಕ ಮೌಲ್ಯ"
 
 #: app/models/plugin_datum.py:10
 msgid "Float value"
-msgstr ""
+msgstr "ಫ್ಲೋಟ್ ಮೌಲ್ಯ"
 
 #: app/models/plugin_datum.py:11
 msgid "Bool value"
@@ -1071,7 +1075,7 @@ msgstr ""
 #: app/templates/app/admin/pagination.html:11
 #: app/templates/app/admin/submit_line.html:3
 msgid "Save"
-msgstr ""
+msgstr "ಉಳಿಸಿ"
 
 #: app/templates/app/admin/popup_response.html:3
 msgid "Popup closing..."
@@ -1094,7 +1098,7 @@ msgstr ""
 
 #: app/templates/app/admin/search_form.html:7
 msgid "Search"
-msgstr ""
+msgstr "ಹುಡುಕಿ"
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
@@ -1534,7 +1538,7 @@ msgstr ""
 #: plugins/diagnostic/templates/diagnostic.html:47
 #: plugins/diagnostic/templates/diagnostic.html:82
 msgid "Disk Space"
-msgstr ""
+msgstr "ಡಿಸ್ಕ್ ಸ್ಪೇಸ್"
 
 #: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
 msgid "Lightning Network"

@@ -165,6 +165,13 @@ class PluginBase(ABC):
         """
         return []
 
+    def requires_restart(self):
+        """
+        Whether the plugin requires an app restart to
+        function properly
+        """
+        return len(self.root_mount_points()) > 0
+
     def main_menu(self):
         """
         Should be overriden by plugins that want to add
@@ -172,6 +179,19 @@ class PluginBase(ABC):
         :return: [] of Menu objects
         """
         return []
+
+    def root_mount_points(self):
+        """
+        Should be overriden by plugins that want to 
+        add routes to the root view controller.
+        CAUTION: this should be used sparingly, as
+        routes could conflict with other plugins and
+        future versions of WebODM might break the routes.
+        It's recommended to use app_mount_points, unless
+        you know what you are doing.
+        :return: [] of MountPoint objects
+        """
+        return [] 
 
     def app_mount_points(self):
         """

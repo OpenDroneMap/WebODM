@@ -3,6 +3,7 @@ import ApiFactory from './ApiFactory';
 import Map from './Map';
 import Dashboard from './Dashboard';
 import App from './App';
+import SharePopup from './SharePopup';
 import SystemJS from 'SystemJS';
 
 if (!window.PluginsAPI){
@@ -31,6 +32,7 @@ if (!window.PluginsAPI){
     Map: factory.create(Map),
     Dashboard: factory.create(Dashboard),
     App: factory.create(App),
+    SharePopup: factory.create(SharePopup),
 
     SystemJS,
     events
