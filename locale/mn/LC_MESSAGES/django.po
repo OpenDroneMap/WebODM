@@ -1,0 +1,1667 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-25 17:42+0000\n"
+"PO-Revision-Date: 2021-05-19 10:21+0000\n"
+"Last-Translator: oyunbat <tseku1116@yahoo.com>\n"
+"Language-Team: Mongolian <https://hosted.weblate.org/projects/webodm/webodm/"
+"mn/>\n"
+"Language: mn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.7-dev\n"
+
+#: app/admin.py:52
+msgid "Enter custom CSS"
+msgstr "Захиалгат CSS оруулна уу"
+
+#: app/admin.py:53 app/models/theme.py:38
+msgid "CSS"
+msgstr "CSS"
+
+#: app/admin.py:56
+msgid "HTML that will be displayed above site header"
+msgstr "Сайтын толгой дээр гарч ирэх HTML"
+
+#: app/admin.py:57 app/models/theme.py:39
+msgid "HTML (before header)"
+msgstr "HTML (толгойноос өмнө)"
+
+#: app/admin.py:60
+msgid "HTML that will be displayed after site header"
+msgstr "Сайтын толгойн дараа гарч ирэх HTML"
+
+#: app/admin.py:61 app/models/theme.py:40
+msgid "HTML (after header)"
+msgstr "HTML (толгойн дараа)"
+
+#: app/admin.py:64
+msgid "HTML that will be displayed after the body tag"
+msgstr "Үндсэн шошгоны дараа харагдах HTML"
+
+#: app/admin.py:65 app/models/theme.py:41
+msgid "HTML (after body)"
+msgstr "HTML (биеийн дараа)"
+
+#: app/admin.py:68
+#, python-brace-format
+msgid ""
+"HTML that will be displayed in the footer. You can also use the special tags "
+"such as {ORGANIZATION} and {YEAR}."
+msgstr ""
+"Хөл хэсэгт харагдах HTML. Та {ORGANIZATION}, {YEAR} зэрэг тусгай тагуудыг "
+"ашиглаж болно."
+
+#: app/admin.py:69 app/models/theme.py:42
+msgid "HTML (footer)"
+msgstr "HTML (хөл)"
+
+#: app/admin.py:100 app/models/project.py:24
+msgid "Description"
+msgstr "Тодорхойлолт"
+
+#: app/admin.py:106
+msgid "Version"
+msgstr "Хувилбар"
+
+#: app/admin.py:112
+msgid "Author"
+msgstr "Зохиогч"
+
+#: app/admin.py:233
+msgid "Actions"
+msgstr "Үйлдэл"
+
+#: app/api/formulas.py:12 app/api/formulas.py:16
+msgid ""
+"Normalized Difference Vegetation Index shows the amount of green vegetation."
+msgstr "Ургамлын хэвийн ялгааг индекс нь ногоон ургамлын хэмжээг харуулдаг."
+
+#: app/api/formulas.py:20
+msgid ""
+"Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
+"and Green bands instead of only Red to isolate plant health."
+msgstr ""
+"Өргөтгөсөн хэвийн ургамлын ялгагдах ургамлын индекс нь NDVI-тэй адил боловч "
+"ургамлын эрүүл мэндийг тусгаарлахын тулд зөвхөн улаан биш цэнхэр ба ногоон "
+"туузыг ашигладаг."
+
+#: app/api/formulas.py:24
+msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
+msgstr "Агаар мандлын эсэргүүцлийн индекс нь ургамлын талбайнуудыг харуулдаг."
+
+#: app/api/formulas.py:29
+msgid ""
+"Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
+msgstr ""
+"Илүүдэл ногоон индекс нь төмс гэх мэт навчит ургацын ногоон байдлыг онцолдог."
+
+#: app/api/formulas.py:33
+msgid ""
+"Burn Area Index hightlights burned land in the red to near-infrared spectrum."
+msgstr ""
+"Түлэнхийн талбайн индексийн гэрлийн гэрлүүд нь улаанаар хэт улаан туяаны "
+"спектр хүртэл шатсан."
+
+#: app/api/formulas.py:37
+msgid "Green Leaf Index shows greens leaves and stems."
+msgstr "Ногоон навчны индекс нь ногоон навч, ишийг харуулдаг."
+
+#: app/api/formulas.py:42
+msgid ""
+"Green Normalized Difference Vegetation Index is similar to NDVI, but "
+"measures the green spectrum instead of red."
+msgstr ""
+"Ногоон хэвийн ургамлын ялгавартай ургамлын индекс нь NDVI-тэй төстэй боловч "
+"улаан биш харин ногоон спектрийг хэмждэг."
+
+#: app/api/formulas.py:46
+msgid ""
+"Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
+msgstr ""
+"Ногоон харьцааны ургамалжилтын индекс нь ой дахь фотосинтезийн түвшинд "
+"мэдрэмтгий байдаг."
+
+#: app/api/formulas.py:50
+msgid ""
+"Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
+"effects of soil areas using an adjustment factor (0.5)."
+msgstr ""
+"Хөрсөнд тохируулсан ургамалжилтын индекс нь NDVI-тэй төстэй боловч хөрсний "
+"талбайн нөлөөллийг тохируулах коэффициент (0.5) ашиглан арилгахыг оролдож "
+"байна."
+
+#: app/api/formulas.py:54
+msgid ""
+"Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
+"for soil areas."
+msgstr ""
+"Шугаман бус индексийг өөрчлөх нь шугаман бус индексийн алгоритмыг сайжруулж "
+"хөрсний талбайн хэмжээг тооцдог."
+
+#: app/api/formulas.py:58
+msgid ""
+"Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
+"more sensitive to vegetation."
+msgstr ""
+"Өөрчлөгдсөн энгийн харьцаа нь ургамалжилтанд илүү мэдрэмтгий байхын тулд "
+"Энгийн харьцаа (SR) индексийг сайжруулж сайжруулах явдал юм."
+
+#: app/api/formulas.py:62
+msgid ""
+"Renormalized Difference Vegetation Index uses the difference between near-IR "
+"and red, plus NDVI to show areas of healthy vegetation."
+msgstr ""
+"Ургамлын өөрчлөлтийг индексжүүлэхдээ IR-ийн ойролцоо ба улаан, NDVI-ийн "
+"хоорондох ялгааг ашиглан эрүүл ургамлын талбайнуудыг харуулна."
+
+#: app/api/formulas.py:66
+msgid ""
+"Transformed Difference Vegetation Index highlights vegetation cover in urban "
+"environments."
+msgstr ""
+"Ургамлын өөрчлөлтийн индексээр хот суурин газрын ургамлын бүрхэвчийг "
+"онцолсон болно."
+
+#: app/api/formulas.py:70
+msgid ""
+"Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work "
+"better in areas with little vegetation where soil is visible."
+msgstr ""
+"Хөрсөнд тохирсон ургамалжилтын оновчтой индексийг SAVI дээр үндэслэсэн "
+"боловч ургамал багатай, хөрс харагддаг газруудад илүү сайн ажиллах "
+"хандлагатай байдаг."
+
+#: app/api/formulas.py:74
+msgid "Leaf Area Index estimates foliage areas and predicts crop yields."
+msgstr ""
+"Навчны талбайн индекс нь навчлах талбайн хэмжээг тооцоолж, ургацын ургацыг "
+"урьдчилан таамаглаж байна."
+
+#: app/api/formulas.py:79
+msgid ""
+"Enhanced Vegetation Index is useful in areas where NDVI might saturate, by "
+"using blue wavelengths to correct soil signals."
+msgstr ""
+"Ургамлын сайжруулсан индекс нь хөрсний дохиог засахын тулд цэнхэр долгионы "
+"уртыг ашиглан NDVI ханасан газарт ашигтай байдаг."
+
+#: app/api/tasks.py:179
+msgid "You need to upload at least 2 images before commit"
+msgstr "Хийхээсээ өмнө дор хаяж 2 зураг байршуулах шаардлагатай"
+
+#: app/api/tasks.py:201
+msgid "No files uploaded"
+msgstr "Файл байршуулаагүй байна"
+
+#: app/api/tasks.py:224
+msgid "Cannot create task, you need at least 2 images"
+msgstr "Даалгавар үүсгэх боломжгүй, танд дор хаяж 2 зураг хэрэгтэй"
+
+#: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
+#: app/api/tasks.py:354
+msgid "Asset does not exist"
+msgstr "Хөрөнгө байхгүй байна"
+
+#: app/api/tasks.py:370
+msgid "Imported Task"
+msgstr "Импортын даалгавар"
+
+#: app/api/tasks.py:373
+msgid "Cannot create task, you need to upload 1 file"
+msgstr "Даалгавар үүсгэх боломжгүй тул та 1 файл байршуулах шаардлагатай"
+
+#: app/api/tasks.py:376
+msgid "Cannot create task, either specify a URL or upload 1 file."
+msgstr ""
+"Даалгавар үүсгэх боломжгүй, эсвэл URL зааж өгөх эсвэл 1 файл байршуулах."
+
+#: app/models/image_upload.py:10
+msgid "Task this image belongs to"
+msgstr "Энэ зургийн харьяалагдах даалгавар"
+
+#: app/models/image_upload.py:10 app/models/task.py:260
+msgid "Task"
+msgstr "Даалгавар"
+
+#: app/models/image_upload.py:11
+msgid "File uploaded by a user"
+msgstr "Хэрэглэгчийн байршуулсан файл"
+
+#: app/models/image_upload.py:11
+msgid "Image"
+msgstr "Зураг"
+
+#: app/models/image_upload.py:20
+msgid "Image Upload"
+msgstr "Зураг байршуулах"
+
+#: app/models/image_upload.py:21
+msgid "Image Uploads"
+msgstr "Зураг байршуулах"
+
+#: app/models/plugin.py:5
+msgid "Plugin name"
+msgstr "Залгаасны нэр"
+
+#: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
+#: app/models/task.py:222 app/models/theme.py:16
+msgid "Name"
+msgstr "Нэр"
+
+#: app/models/plugin.py:6
+msgid "Whether this plugin is turned on."
+msgstr "Энэ залгаас асаалттай эсэх."
+
+#: app/models/plugin.py:6
+msgid "Enabled"
+msgstr "Идэвхжсэн"
+
+#: app/models/plugin.py:20
+msgid "Plugin"
+msgstr "Залгах"
+
+#: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
+msgid "Plugins"
+msgstr "Залгаасууд"
+
+#: app/models/plugin_datum.py:7
+msgid "Setting key"
+msgstr "Түлхүүрийг тохируулах"
+
+#: app/models/plugin_datum.py:7
+msgid "Key"
+msgstr "Түлхүүр"
+
+#: app/models/plugin_datum.py:8
+msgid "The user this setting belongs to. If NULL, the setting is global."
+msgstr ""
+"Энэ тохиргоо нь хэрэглэгчид хамаарна. Хэрэв NULL бол тохиргоо дэлхийн "
+"хэмжээнд байна."
+
+#: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
+msgid "User"
+msgstr "Хэрэглэгч"
+
+#: app/models/plugin_datum.py:9
+msgid "Integer value"
+msgstr "Бүхэл утга"
+
+#: app/models/plugin_datum.py:10
+msgid "Float value"
+msgstr "Хөвөгч утга"
+
+#: app/models/plugin_datum.py:11
+msgid "Bool value"
+msgstr "Bool утга"
+
+#: app/models/plugin_datum.py:12
+msgid "String value"
+msgstr "Мөрний утга"
+
+#: app/models/plugin_datum.py:13
+msgid "JSON value"
+msgstr "JSON утга"
+
+#: app/models/plugin_datum.py:19 app/models/plugin_datum.py:20
+msgid "Plugin Datum"
+msgstr "Plugin Datum"
+
+#: app/models/preset.py:9
+msgid "The person who owns this preset"
+msgstr "Энэ тохиргоог эзэмшдэг хүн"
+
+#: app/models/preset.py:9 app/models/project.py:22
+msgid "Owner"
+msgstr "Эзэмшигч"
+
+#: app/models/preset.py:10
+msgid "A label used to describe the preset"
+msgstr "Урьдчилан тохируулсан байдлыг тодорхойлоход ашигладаг шошго"
+
+#: app/models/preset.py:11
+msgid "Options that define this preset (same format as in a Task's options)."
+msgstr ""
+"Энэ урьдчилсан тохиргоог тодорхойлох сонголтууд (Task-ийн сонголттой ижил "
+"форматтай)."
+
+#: app/models/preset.py:11 app/models/task.py:228
+msgid "Options"
+msgstr "Сонголтууд"
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
+msgid "Creation date"
+msgstr "Бүтээсэн огноо"
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
+msgid "Created at"
+msgstr "Үүсгэсэн"
+
+#: app/models/preset.py:14
+msgid ""
+"Whether this preset is available to every user in the system or just to its "
+"owner."
+msgstr ""
+"Энэ урьдчилсан тохируулга нь системийн бүх хэрэглэгч эсвэл зөвхөн эзэмшигчид "
+"боломжтой эсэх."
+
+#: app/models/preset.py:14
+msgid "System"
+msgstr "Систем"
+
+#: app/models/preset.py:20
+msgid "Preset"
+msgstr "Урьдчилан тохируулсан"
+
+#: app/models/preset.py:21
+msgid "Presets"
+msgstr "Урьдчилсан тохируулга"
+
+#: app/models/project.py:22
+msgid "The person who created the project"
+msgstr "Төслийг бүтээсэн хүн"
+
+#: app/models/project.py:23
+msgid "A label used to describe the project"
+msgstr "Төслийг тайлбарлахад ашигладаг шошго"
+
+#: app/models/project.py:24
+msgid "More in-depth description of the project"
+msgstr "Төслийн талаар илүү гүнзгий тайлбар"
+
+#: app/models/project.py:26
+msgid ""
+"Whether this project has been marked for deletion. Projects that have "
+"running tasks need to wait for tasks to be properly cleaned up before they "
+"can be deleted."
+msgstr ""
+"Энэ төслийг устгахаар тэмдэглэсэн эсэх. Ажиллаж байгаа төслүүд "
+"устгагдахаасаа өмнө зөв цэвэрлэгдэхийг хүлээх хэрэгтэй."
+
+#: app/models/project.py:26
+msgid "Deleting"
+msgstr "Устгаж байна"
+
+#: app/models/project.py:56 app/models/task.py:221
+msgid "Project"
+msgstr "Төсөл"
+
+#: app/models/project.py:57
+msgid "Projects"
+msgstr "Төсөл"
+
+#: app/models/setting.py:20
+msgid "The name of your application"
+msgstr "Таны өргөдлийн нэр"
+
+#: app/models/setting.py:20
+msgid "App name"
+msgstr "Аппын нэр"
+
+#: app/models/setting.py:21
+msgid "A 512x512 logo of your application (.png or .jpeg)"
+msgstr "Таны програмын 512x512 лого (.png эсвэл .jpeg)"
+
+#: app/models/setting.py:21
+msgid "App logo"
+msgstr "Апп лого"
+
+#: app/models/setting.py:31
+msgid "The name of your organization"
+msgstr "Танай байгууллагын нэр"
+
+#: app/models/setting.py:31
+msgid "Organization name"
+msgstr "Байгууллагын нэр"
+
+#: app/models/setting.py:32
+msgid "The website URL of your organization"
+msgstr "Танай байгууллагын вэбсайтын URL хаяг"
+
+#: app/models/setting.py:32
+msgid "Organization website"
+msgstr "Байгууллагын вэбсайт"
+
+#: app/models/setting.py:33 app/models/theme.py:48 app/models/theme.py:49
+#: app/templates/app/logged_in_base.html:95
+msgid "Theme"
+msgstr "Сэдэв"
+
+#: app/models/setting.py:34
+msgid "Active theme"
+msgstr "Идэвхтэй сэдэв"
+
+#: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
+msgid "Application"
+msgstr "Програм"
+
+#: app/models/setting.py:76 app/models/setting.py:77
+msgid "Settings"
+msgstr "Тохиргоо"
+
+#: app/models/task.py:218
+msgid "Id"
+msgstr "Id"
+
+#: app/models/task.py:220
+msgid "Identifier of the task (as returned by NodeODM API)"
+msgstr "Даалгаврын тодорхойлогч (NodeODM API-ийн буцаасан шиг)"
+
+#: app/models/task.py:220
+msgid "UUID"
+msgstr "UUID"
+
+#: app/models/task.py:221
+msgid "Project that this task belongs to"
+msgstr "Энэ даалгаварт хамаарах төсөл"
+
+#: app/models/task.py:222
+msgid "A label for the task"
+msgstr "Даалгаврын шошго"
+
+#: app/models/task.py:223
+msgid ""
+"Number of milliseconds that elapsed since the beginning of this task (-1 "
+"indicates that no information is available)"
+msgstr ""
+"Энэ даалгавар эхэлснээс хойш өнгөрсөн миллисекундын тоо (-1 нь мэдээлэлгүй "
+"байгааг харуулж байна)"
+
+#: app/models/task.py:223
+msgid "Processing Time"
+msgstr "Боловсруулах цаг"
+
+#: app/models/task.py:224
+msgid ""
+"Processing node assigned to this task (or null if this task has not been "
+"associated yet)"
+msgstr ""
+"Энэ даалгаварт оноогдсон зангилааны боловсруулалт (эсвэл энэ даалгавар "
+"хараахан холбогдоогүй бол хүчингүй)"
+
+#: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
+msgid "Processing Node"
+msgstr "Боловсруулах цэг"
+
+#: app/models/task.py:225
+msgid ""
+"A flag indicating whether this task should be automatically assigned a "
+"processing node"
+msgstr ""
+"Энэ даалгаварт автоматаар боловсруулах цэгийг оноож өгөх эсэхийг зааж өгсөн "
+"туг"
+
+#: app/models/task.py:225
+msgid "Auto Processing Node"
+msgstr "Автоматаар боловсруулах цэг"
+
+#: app/models/task.py:226
+msgid "Current status of the task"
+msgstr "Ажлын өнөөгийн байдал"
+
+#: app/models/task.py:226
+msgid "Status"
+msgstr "Статус"
+
+#: app/models/task.py:227
+msgid "The last processing error received"
+msgstr "Сүүлчийн боловсруулалтын алдаа хүлээн авав"
+
+#: app/models/task.py:227
+msgid "Last Error"
+msgstr "Сүүлийн алдаа"
+
+#: app/models/task.py:228
+msgid "Options that are being used to process this task"
+msgstr "Энэ даалгаврыг боловсруулахад ашиглаж буй сонголтууд"
+
+#: app/models/task.py:229
+msgid "List of available assets to download"
+msgstr "Татаж авах боломжтой хөрөнгийн жагсаалт"
+
+#: app/models/task.py:229
+msgid "Available Assets"
+msgstr "Боломжит хөрөнгө"
+
+#: app/models/task.py:230
+msgid "Console output of the processing node"
+msgstr "Боловсруулалтын зангилааны консол гаралт"
+
+#: app/models/task.py:230
+msgid "Console Output"
+msgstr "Консол гаралт"
+
+#: app/models/task.py:232
+msgid "Extent of the orthophoto"
+msgstr "Ортофотогийн хэмжээ"
+
+#: app/models/task.py:232
+msgid "Orthophoto Extent"
+msgstr "Ортофото хэмжээ"
+
+#: app/models/task.py:233
+msgid "DSM Extent"
+msgstr "DSM хэмжээ"
+
+#: app/models/task.py:234
+msgid "DTM Extent"
+msgstr "DTM хэмжээ"
+
+#: app/models/task.py:238
+msgid ""
+"A requested action to be performed on the task. The selected action will be "
+"performed by the worker at the next iteration."
+msgstr ""
+"Даалгавар дээр хийхийг хүссэн үйл ажиллагаа. Сонгосон үйлдлийг дараагийн "
+"давталт дээр ажилчин гүйцэтгэнэ."
+
+#: app/models/task.py:238
+msgid "Pending Action"
+msgstr "Хүлээгдэж буй арга хэмжээ"
+
+#: app/models/task.py:240
+msgid "A flag indicating whether this task is available to the public"
+msgstr "Энэ даалгавар олон нийтэд нээлттэй байгаа эсэхийг харуулсан туг"
+
+#: app/models/task.py:240
+msgid "Public"
+msgstr "Олон нийтийн"
+
+#: app/models/task.py:241
+msgid ""
+"When set to a value different than -1, indicates that the images for this "
+"task have been / will be resized to the size specified here before "
+"processing."
+msgstr ""
+"-1-ээс өөр утгыг тохируулсан тохиолдолд энэ даалгаврын зургуудыг "
+"боловсруулахаас өмнө энд заасан хэмжээгээр өөрчилсөн болохыг илэрхийлнэ."
+
+#: app/models/task.py:241
+msgid "Resize To"
+msgstr "Хэмжээгээ өөрчлөх"
+
+#: app/models/task.py:244
+msgid ""
+"Value between 0 and 1 indicating the upload progress of this task's files to "
+"the processing node"
+msgstr ""
+"Энэ даалгаврын файлуудыг боловсруулах цэг рүү байршуулах явцыг харуулсан 0-1 "
+"хоорондох утга"
+
+#: app/models/task.py:245
+msgid "Upload Progress"
+msgstr "Байршуулах явц"
+
+#: app/models/task.py:248
+msgid ""
+"Value between 0 and 1 indicating the resize progress of this task's images"
+msgstr ""
+"Энэ даалгаврын зургуудын хэмжээг өөрчлөх явцыг харуулсан 0-1 хоорондох утга"
+
+#: app/models/task.py:249
+msgid "Resize Progress"
+msgstr "Ахиц дэвшлийн хэмжээг өөрчлөх"
+
+#: app/models/task.py:252
+msgid ""
+"Value between 0 and 1 indicating the running progress (estimated) of this "
+"task"
+msgstr ""
+"Энэ даалгаврын явц (тооцоолсон) явцыг харуулсан 0-ээс 1-ийн хоорондох утга"
+
+#: app/models/task.py:253
+msgid "Running Progress"
+msgstr "Прогресс ажиллуулж байна"
+
+#: app/models/task.py:255
+msgid "URL this task is imported from (only for imported tasks)"
+msgstr "Энэ даалгаврыг URL-аас импортлох (зөвхөн импортын даалгаврын хувьд)"
+
+#: app/models/task.py:255
+msgid "Import URL"
+msgstr "Импортын URL"
+
+#: app/models/task.py:256
+msgid "Number of images associated with this task"
+msgstr "Энэ даалгавартай холбоотой зургийн тоо"
+
+#: app/models/task.py:256
+msgid "Images Count"
+msgstr "Зураг тоолох"
+
+#: app/models/task.py:257
+msgid ""
+"A flag indicating whether this task is currently waiting for information or "
+"files to be uploaded before being considered for processing."
+msgstr ""
+"Энэ даалгавар нь боловсруулалт хийхээс өмнө мэдээлэл эсвэл файл оруулахыг "
+"хүлээж байгаа эсэхийг харуулсан туг."
+
+#: app/models/task.py:257
+msgid "Partial"
+msgstr "Хэсэгчилсэн"
+
+#: app/models/task.py:261
+msgid "Tasks"
+msgstr "Даалгавар"
+
+#: app/models/task.py:270
+msgid "unnamed"
+msgstr "нэргүй"
+
+#: app/models/task.py:373
+msgid "Importing assets..."
+msgstr "Хөрөнгө оруулж ирж байна ..."
+
+#: app/models/task.py:412 app/models/task.py:680
+msgid "Invalid zip file"
+msgstr "Зип файл буруу байна"
+
+#: app/models/task.py:506
+#, python-format
+msgid "Connection error: %(error)s"
+msgstr "Холболтын алдаа: %(error)s"
+
+#: app/models/task.py:586
+msgid "Cannot restart a task that has no processing node"
+msgstr "Боловсруулах цэггүй ажлыг дахин эхлүүлэх боломжгүй"
+
+#: app/models/task.py:738
+#, python-format
+msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
+msgstr ""
+"Дэмжигдээгүй SRS %(code)s. Дэмжигдсэн SRS-ийг сонгосон эсэхээ шалгана уу."
+
+#: app/models/task.py:748
+msgid "Done!"
+msgstr "Болов!"
+
+#: app/models/theme.py:16
+msgid "Name of theme"
+msgstr "Сэдвийн нэр"
+
+#: app/models/theme.py:19
+msgid "Most text, icons, and borders."
+msgstr "Ихэнх текст, дүрс, хүрээ."
+
+#: app/models/theme.py:19
+msgid "Primary"
+msgstr "Анхан шатны"
+
+#: app/models/theme.py:20
+msgid "The main background color, and text color of some buttons."
+msgstr "Үндсэн товчлуурын өнгө, зарим товчлуурын текстийн өнгө."
+
+#: app/models/theme.py:20
+msgid "Secondary"
+msgstr "Хоёрдогч"
+
+#: app/models/theme.py:21
+msgid "Navigation links."
+msgstr "Навигацийн холбоосууд."
+
+#: app/models/theme.py:21
+msgid "Tertiary"
+msgstr "Гуравдагч"
+
+#: app/models/theme.py:23
+msgid "Primary button color."
+msgstr "Анхдагч товчлуурын өнгө."
+
+#: app/models/theme.py:23
+msgid "Button Primary"
+msgstr "Анхан шатны товчлуур"
+
+#: app/models/theme.py:24
+msgid "Default button color."
+msgstr "Анхдагч товчлуурын өнгө."
+
+#: app/models/theme.py:24
+msgid "Button Default"
+msgstr "Анхдагч товчлуур"
+
+#: app/models/theme.py:25
+msgid "Delete button color."
+msgstr "Товчлуурын өнгийг устгах."
+
+#: app/models/theme.py:25
+msgid "Button Danger"
+msgstr "Товчлуурын аюул"
+
+#: app/models/theme.py:27
+msgid "Background color of the site's header."
+msgstr "Сайтын толгойн дэвсгэр өнгө."
+
+#: app/models/theme.py:27
+msgid "Header Background"
+msgstr "Толгойн ар тал"
+
+#: app/models/theme.py:28
+msgid "Text and icons in the site's header."
+msgstr "Сайтын толгой дээрх текст ба дүрс тэмдэг."
+
+#: app/models/theme.py:28
+msgid "Header Primary"
+msgstr "Толгой хэсэг"
+
+#: app/models/theme.py:30
+msgid "The color of most borders."
+msgstr "Ихэнх хүрээний өнгө."
+
+#: app/models/theme.py:30
+msgid "Border"
+msgstr "Хил"
+
+#: app/models/theme.py:31
+msgid "The background color of panels and some borders."
+msgstr "Самбарын арын өнгө ба зарим хүрээ."
+
+#: app/models/theme.py:31
+msgid "Highlight"
+msgstr "Тодруулах"
+
+#: app/models/theme.py:33
+msgid "The border color of warning dialogs."
+msgstr "Анхааруулах харилцах цонхны хүрээ өнгө."
+
+#: app/models/theme.py:33
+msgid "Dialog Warning"
+msgstr "Харилцан ярианы анхааруулга"
+
+#: app/models/theme.py:35
+msgid "The background color of failed notifications."
+msgstr "Алдаатай мэдэгдлийн арын өнгө."
+
+#: app/models/theme.py:35
+msgid "Failed"
+msgstr "Амжилтгүй боллоо"
+
+#: app/models/theme.py:36
+msgid "The background color of success notifications."
+msgstr "Амжилтын мэдэгдлийн арын өнгө."
+
+#: app/models/theme.py:36
+msgid "Success"
+msgstr "Амжилт"
+
+#: app/templates/app/404.html:6
+msgid "404 Page Not Found"
+msgstr "404 Хуудас олдсонгүй"
+
+#: app/templates/app/404.html:7
+msgid "Are you sure the address is correct?"
+msgstr "Хаяг зөв гэдэгт итгэлтэй байна уу?"
+
+#: app/templates/app/500.html:5
+msgid "500 Internal Server Error"
+msgstr "500 Дотоод серверийн алдаа"
+
+#: app/templates/app/500.html:6
+msgid "Something happened. The server logs contain more information."
+msgstr "Ямар нэг зүйл болсон. Серверийн бүртгэлүүд илүү их мэдээллийг агуулдаг."
+
+#: app/templates/app/about.html:94
+#, python-format
+msgid ""
+"This program is free software: you can redistribute it and/or modify it "
+"under the terms of the GNU Affero General Public License as published by the "
+"Free Software Foundation, either version 3 of the License, or (at your "
+"option) any later version. See %(link_start)sthe GNU Affero General Public "
+"License%(link_end)s for more details."
+msgstr ""
+"Энэхүү програм нь үнэгүй програм хангамж юм. Та үүнийг үнэгүй програм "
+"хангамжийн сангаас гаргасан GNU Affero Public Public License-ийн дагуу "
+"лицензийн 3 хувилбар, эсвэл дараачийн хувилбар болгон дахин хуваарилах ба / "
+"эсвэл өөрчлөх боломжтой. Илүү дэлгэрэнгүйг %(link_start)s GNU Affero Public "
+"Public License %(link_end)s -с үзнэ үү."
+
+#: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
+msgid "Page not found"
+msgstr "Хуудас олдсонгүй"
+
+#: app/templates/app/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Уучлаарай, хүссэн хуудас олдсонгүй."
+
+#: app/templates/app/admin/500.html:6 app/templates/app/admin/app_index.html:9
+#: app/templates/app/admin/auth/user/change_password.html:13
+#: app/templates/app/admin/base.html:19
+#: app/templates/app/admin/change_form.html:18
+#: app/templates/app/admin/change_list.html:31
+#: app/templates/app/admin/delete_confirmation.html:13
+#: app/templates/app/admin/delete_selected_confirmation.html:13
+#: app/templates/app/admin/invalid_setup.html:6
+#: app/templates/app/admin/object_history.html:6
+msgid "Home"
+msgstr "Нүүр хуудас"
+
+#: app/templates/app/admin/500.html:7
+msgid "Server error"
+msgstr "Серверийн алдаа"
+
+#: app/templates/app/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Серверийн алдаа (500)"
+
+#: app/templates/app/admin/500.html:14
+msgid "Server Error (500)"
+msgstr "Серверийн алдаа (500)"
+
+#: app/templates/app/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Алдаа гарлаа. Энэ талаар сайтын админуудад имэйлээр мэдэгдсэн бөгөөд удахгүй "
+"засах ёстой. Тэвчээр гаргасанд баярлалаа."
+
+#: app/templates/app/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Сонгосон үйлдлийг ажиллуулна уу"
+
+#: app/templates/app/admin/actions.html:4
+msgid "Go"
+msgstr "Яв"
+
+#: app/templates/app/admin/actions.html:10
+msgid "Click here to select the objects across all pages"
+msgstr "Бүх хуудсан дээрх объектуудыг сонгохын тулд энд дарна уу"
+
+#: app/templates/app/admin/actions.html:10
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Бүгдийг нь сонгох %(total_count)s %(module_name)s"
+
+#: app/templates/app/admin/actions.html:12
+msgid "Clear selection"
+msgstr "Сонголтыг арилгах"
+
+#: app/templates/app/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Эхлээд хэрэглэгчийн нэр, нууц үгээ оруулна уу. Дараа нь та илүү олон "
+"хэрэглэгчийн сонголтыг засах боломжтой болно."
+
+#: app/templates/app/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Хэрэглэгчийн нэр, нууц үгээ оруулна уу."
+
+#: app/templates/app/admin/auth/user/change_password.html:17
+#: app/templates/app/admin/auth/user/change_password.html:54
+msgid "Change password"
+msgstr "Нууц үгээ солих"
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+msgid "Please correct the error below."
+msgstr "Доорх алдааг засна уу."
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+msgid "Please correct the errors below."
+msgstr "Доорх алдааг засна уу."
+
+#: app/templates/app/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+"Хэрэглэгчийн хувьд шинэ нууц үг оруулна уу <strong> %(username)s </strong>."
+
+#: app/templates/app/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Django сайтын админ"
+
+#: app/templates/app/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Жанго захиргаа"
+
+#: app/templates/app/admin/change_form.html:21
+#: app/templates/app/admin/change_list.html:49
+#, python-format
+msgid "Add %(name)s"
+msgstr "Нэмэх %(name)s"
+
+#: app/templates/app/admin/change_form.html:33
+#: app/templates/app/admin/object_history.html:10
+msgid "History"
+msgstr "Түүх"
+
+#: app/templates/app/admin/change_form.html:35
+#: app/templates/app/admin/edit_inline/stacked.html:14
+#: app/templates/app/admin/edit_inline/tabular.html:36
+msgid "View on site"
+msgstr "Сайт дээр үзэх"
+
+#: app/templates/app/admin/change_list.html:69
+msgid "Filter"
+msgstr "Шүүлтүүр"
+
+#: app/templates/app/admin/change_list_plugin.html:24
+msgid "Load Plugin (.zip)"
+msgstr "Ачааллын залгаас (.zip)"
+
+#: app/templates/app/admin/change_list_plugin.html:28
+msgid "Manage Plugins"
+msgstr "Залгаасуудыг удирдах"
+
+#: app/templates/app/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Эрэмбэлэхээс хасах"
+
+#: app/templates/app/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Эрэмбэлэх тэргүүлэх чиглэл: %(priority_number)s"
+
+#: app/templates/app/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Эрэмбэлэлтийг сэлгэх"
+
+#: app/templates/app/admin/delete_confirmation.html:17
+#: app/templates/app/admin/related_widget_wrapper.html:23
+#: app/templates/app/admin/submit_line.html:6
+#: app/templates/app/processing_node.html:54
+msgid "Delete"
+msgstr "Устгах"
+
+#: app/templates/app/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' -ийг устгаснаар холбогдох объектуудыг "
+"устгах болно, гэхдээ таны дансанд дараахь төрлийн объектуудыг устгах "
+"зөвшөөрөл байхгүй байна."
+
+#: app/templates/app/admin/delete_confirmation.html:30
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s' -ийг устгахын тулд дараахь "
+"хамгаалагдсан холбогдох объектуудыг устгах шаардлагатай болно."
+
+#: app/templates/app/admin/delete_confirmation.html:37
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Та %(object_name)s \"%(escaped_object)s\" - г устгахдаа итгэлтэй байна уу? "
+"Дараахтай холбоотой бүх зүйлийг устгах болно:"
+
+#: app/templates/app/admin/delete_confirmation.html:39
+#: app/templates/app/admin/delete_selected_confirmation.html:38
+msgid "Objects"
+msgstr "Объект"
+
+#: app/templates/app/admin/delete_confirmation.html:46
+#: app/templates/app/admin/delete_selected_confirmation.html:49
+msgid "Yes, I'm sure"
+msgstr "Тиймээ би итгэлтэй байна"
+
+#: app/templates/app/admin/delete_confirmation.html:47
+#: app/templates/app/admin/delete_selected_confirmation.html:50
+msgid "No, take me back"
+msgstr "Үгүй ээ, намайг буцааж ав"
+
+#: app/templates/app/admin/delete_selected_confirmation.html:16
+msgid "Delete multiple objects"
+msgstr "Олон объектыг устгах"
+
+#: app/templates/app/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Сонгосон %(objects_name)s -г устгаснаар холбогдох объектуудыг устгах болно, "
+"гэхдээ таны дансанд дараахь төрлийн объектуудыг устгах зөвшөөрөл байхгүй "
+"байна."
+
+#: app/templates/app/admin/delete_selected_confirmation.html:29
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Сонгосон %(objects_name)s -г устгахын тулд дараахь хамгаалагдсан холбогдох "
+"объектуудыг устгах шаардлагатай болно."
+
+#: app/templates/app/admin/delete_selected_confirmation.html:36
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Сонгосон %(objects_name)s -г устгахдаа итгэлтэй байна уу? Дараахь бүх "
+"объектууд болон тэдгээртэй холбоотой зүйлсийг устгах болно."
+
+#: app/templates/app/admin/edit_inline/stacked.html:12
+#: app/templates/app/admin/edit_inline/tabular.html:34
+#: app/templates/app/admin/index.html:37
+#: app/templates/app/admin/related_widget_wrapper.html:9
+msgid "Change"
+msgstr "Өөрчлөлт"
+
+#: app/templates/app/admin/edit_inline/tabular.html:20
+msgid "Delete?"
+msgstr "Устгах уу?"
+
+#: app/templates/app/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Бичсэн %(filter_title)s "
+
+#: app/templates/app/admin/includes/object_delete_summary.html:2
+msgid "Summary"
+msgstr "Хураангуй"
+
+#: app/templates/app/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s програмын загварууд"
+
+#: app/templates/app/admin/index.html:31
+#: app/templates/app/admin/related_widget_wrapper.html:16
+msgid "Add"
+msgstr "Нэмэх"
+
+#: app/templates/app/admin/index.html:47
+msgid "You don't have permission to edit anything."
+msgstr "Танд ямар нэгэн зүйл засах зөвшөөрөл байхгүй байна."
+
+#: app/templates/app/admin/index.html:55
+msgid "Recent actions"
+msgstr "Сүүлийн үеийн үйлдлүүд"
+
+#: app/templates/app/admin/index.html:56
+msgid "My actions"
+msgstr "Миний үйлдэл"
+
+#: app/templates/app/admin/index.html:60
+msgid "None available"
+msgstr "Байхгүй"
+
+#: app/templates/app/admin/index.html:74
+msgid "Unknown content"
+msgstr "Тодорхойгүй агуулга"
+
+#: app/templates/app/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Таны мэдээллийн баазыг суулгахад алдаа гарлаа. Тохирох өгөгдлийн сангийн "
+"хүснэгтүүдийг үүсгэсэн эсэх, мэдээллийн санг зохих хэрэглэгч унших боломжтой "
+"эсэхийг шалгаарай."
+
+#: app/templates/app/admin/login.html:37
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Та %(username)s гэж танигдсан боловч энэ хуудсанд нэвтрэх эрхгүй. Та өөр "
+"данс руу нэвтрэхийг хүсч байна уу?"
+
+#: app/templates/app/admin/login.html:57
+msgid "Forgotten your password or username?"
+msgstr "Нууц үг, хэрэглэгчийн нэрээ мартсан уу?"
+
+#: app/templates/app/admin/login.html:61
+msgid "Log in"
+msgstr "Нэвтрэх"
+
+#: app/templates/app/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Он сар өдөр цаг"
+
+#: app/templates/app/admin/object_history.html:24
+msgid "Action"
+msgstr "Үйлдэл"
+
+#: app/templates/app/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Энэ объектын өөрчлөлтийн түүх байхгүй байна. Энэ админ сайтаар дамжуулан "
+"нэмж оруулаагүй байх."
+
+#: app/templates/app/admin/pagination.html:10
+#: app/templates/app/admin/search_form.html:9
+msgid "Show all"
+msgstr "Бүгдийг харуулах"
+
+#: app/templates/app/admin/pagination.html:11
+#: app/templates/app/admin/submit_line.html:3
+msgid "Save"
+msgstr "Хадгалах"
+
+#: app/templates/app/admin/popup_response.html:3
+msgid "Popup closing..."
+msgstr "Попап хаагдаж байна ..."
+
+#: app/templates/app/admin/related_widget_wrapper.html:8
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Сонгосон өөрчлөлт %(model)s"
+
+#: app/templates/app/admin/related_widget_wrapper.html:15
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Өөр нэгийг нэмэх %(model)s"
+
+#: app/templates/app/admin/related_widget_wrapper.html:22
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Сонгогдсоныг устгах %(model)s"
+
+#: app/templates/app/admin/search_form.html:7
+msgid "Search"
+msgstr "Хайх"
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s үр дүн"
+msgstr[1] "%(counter)s үр дүн"
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s нийт"
+
+#: app/templates/app/admin/submit_line.html:8
+msgid "Save as new"
+msgstr "Шинэ гэж хадгалах"
+
+#: app/templates/app/admin/submit_line.html:9
+msgid "Save and add another"
+msgstr "Хадгалаад өөрийг нь нэмээрэй"
+
+#: app/templates/app/admin/submit_line.html:10
+msgid "Save and continue editing"
+msgstr "Хадгалж, үргэлжлүүлэн засах"
+
+#: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
+#: app/templates/app/welcome.html:227
+msgid "Welcome!"
+msgstr "Тавтай морил!"
+
+#: app/templates/app/dashboard.html:16
+msgid "Add a Processing Node"
+msgstr "Боловсруулах цэг нэмэх"
+
+#: app/templates/app/dashboard.html:19
+#, python-format
+msgid ""
+"To get started, \"%(add_processing_node)s\". A processing node is a computer "
+"running an instance of %(nodeodm_link)s or some other software implementing "
+"this %(api_link)s."
+msgstr ""
+"Эхлэхийн тулд \"%(add_processing_node)s\". Боловсруулах зангилаа нь "
+"%(nodeodm_link)s эсвэл үүнийг хэрэгжүүлж буй бусад програм хангамжийн жишээг "
+"ажиллуулж буй компьютер юм %(api_link)s."
+
+#: app/templates/app/dashboard.html:28
+msgid "Select Images and GCP"
+msgstr "Зураг ба GCP-г сонгоно уу"
+
+#: app/templates/app/dashboard.html:30
+#, python-format
+msgid ""
+"To create a map, press the \"%(upload_images)s\" button, or drag and drop "
+"some images into a project."
+msgstr ""
+"Газрын зураг үүсгэхийн тулд \"%(upload_images)s\" товчийг дарна уу, эсвэл "
+"зарим зургийг чирээд төсөл рүү оруулна уу."
+
+#: app/templates/app/dashboard.html:34
+msgid "You need at least 5 images"
+msgstr "Танд дор хаяж 5 зураг хэрэгтэй"
+
+#: app/templates/app/dashboard.html:35
+#, python-format
+msgid "Images must overlap by 65%% or more"
+msgstr "Зургууд 65 %% ба түүнээс дээш давхцах ёстой"
+
+#: app/templates/app/dashboard.html:36
+#, python-format
+msgid "For great 3D, images must overlap by 83%%"
+msgstr "Маш сайн 3D-ийн хувьд зураг 83-тай давхцах ёстой %%"
+
+#: app/templates/app/dashboard.html:37
+#, python-format
+msgid ""
+"A %(link_start)sGCP File%(link_end)s is optional, but can increase "
+"georeferencing accuracy"
+msgstr ""
+"A %(link_start)s GCP файл %(link_end)s нь заавал байх албагүй боловч "
+"газарзүйн холболтын нарийвчлалыг нэмэгдүүлэх боломжтой"
+
+#: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
+#: app/views/dev.py:83
+msgid "Developer Tools"
+msgstr "Хөгжүүлэгчийн хэрэгсэл"
+
+#: app/templates/app/dev_tools.html:9
+msgid "Close"
+msgstr "Хаах"
+
+#: app/templates/app/dev_tools.html:14
+msgid "Current Locale:"
+msgstr "Одоогийн байршил:"
+
+#: app/templates/app/dev_tools.html:15
+msgid ""
+"To change locale, modify your browser's locale settings, then refresh the "
+"page."
+msgstr ""
+"Орон нутгийн тохиргоог өөрчлөхийн тулд хөтөчийнхөө тохиргоог өөрчилж, "
+"хуудсыг дахин сэргээнэ үү."
+
+#: app/templates/app/dev_tools.html:18
+msgid "Translation Files (.zip):"
+msgstr "Орчуулгын файлууд (.zip):"
+
+#: app/templates/app/dev_tools.html:22
+msgid "Download and Replace Translation Files"
+msgstr "Орчуулгын файлуудыг татаж авах, солих"
+
+#: app/templates/app/dev_tools.html:26
+msgid "Executing… do not refresh the page! This could take a while."
+msgstr ""
+"Гүйцэтгэж байна ... хуудсыг дахин бүү сэргээ! Үүнд хэсэг хугацаа шаардагдаж "
+"магадгүй юм."
+
+#: app/templates/app/logged_in_base.html:15
+#, python-format
+msgid "Hello, %(user)s!"
+msgstr "Сайн уу, %(user)s!"
+
+#: app/templates/app/logged_in_base.html:19
+msgid "Logout"
+msgstr "Гарах"
+
+#: app/templates/app/logged_in_base.html:33 app/views/app.py:46
+msgid "Dashboard"
+msgstr "Хяналтын самбар"
+
+#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
+msgid "Processing Nodes"
+msgstr "Зангилаа боловсруулах"
+
+#: app/templates/app/logged_in_base.html:69
+msgid "Add New"
+msgstr "Шинээр нэмэх"
+
+#: app/templates/app/logged_in_base.html:79
+msgid "Administration"
+msgstr "Захиргаа"
+
+#: app/templates/app/logged_in_base.html:84
+msgid "Accounts"
+msgstr "Данс"
+
+#: app/templates/app/logged_in_base.html:87
+msgid "Groups"
+msgstr "Бүлгүүд"
+
+#: app/templates/app/logged_in_base.html:92
+msgid "Brand"
+msgstr "Брэнд"
+
+#: app/templates/app/logged_in_base.html:114 app/views/app.py:103
+msgid "About"
+msgstr "Тухай"
+
+#: app/templates/app/processing_node.html:11 nodeodm/models.py:23
+msgid "Hostname"
+msgstr "Хостын нэр"
+
+#: app/templates/app/processing_node.html:15 nodeodm/models.py:24
+msgid "Port"
+msgstr "Боомт"
+
+#: app/templates/app/processing_node.html:19 nodeodm/models.py:25
+msgid "API Version"
+msgstr "API хувилбар"
+
+#: app/templates/app/processing_node.html:23 nodeodm/models.py:33
+msgid "Engine"
+msgstr "Хөдөлгүүр"
+
+#: app/templates/app/processing_node.html:27 nodeodm/models.py:31
+msgid "Engine Version"
+msgstr "Хөдөлгүүрийн хувилбар"
+
+#: app/templates/app/processing_node.html:31 nodeodm/models.py:27
+msgid "Queue Count"
+msgstr "Дарааллын тоо"
+
+#: app/templates/app/processing_node.html:35
+msgid "Max Images Limit"
+msgstr "Макс зургийн хязгаар"
+
+#: app/templates/app/processing_node.html:39 nodeodm/models.py:32
+msgid "Label"
+msgstr "Шошго"
+
+#: app/templates/app/processing_node.html:43 nodeodm/models.py:26
+msgid "Last Refreshed"
+msgstr "Сүүлд шинэчлэгдсэн"
+
+#: app/templates/app/processing_node.html:44
+msgctxt "5 minutes ago"
+msgid "ago"
+msgstr "өмнө"
+
+#: app/templates/app/processing_node.html:47
+msgid "Options (JSON)"
+msgstr "Сонголтууд (JSON)"
+
+#: app/templates/app/processing_node.html:53
+msgid "Edit"
+msgstr "Засах"
+
+#: app/templates/app/welcome.html:224
+msgid "Uh oh! Could you please check the errors below?"
+msgstr "Өө өө! Доорх алдааг шалгаж болох уу?"
+
+#: app/templates/app/welcome.html:237
+msgid "Create Account"
+msgstr "Бүртгэл үүсгэх"
+
+#: app/translations/plugin_manifest_autogenerated.py:4
+msgid "Compute volume, area and length measurements on Leaflet"
+msgstr "Leaflet дээр эзэлхүүн, талбай, уртын хэмжилтийг тооцоолох"
+
+#: app/translations/plugin_manifest_autogenerated.py:5
+#: app/translations/plugin_manifest_autogenerated.py:6
+msgid "A plugin to create GCP files from images"
+msgstr "Зурган дээрээс GCP файл үүсгэх залгаас"
+
+#: app/translations/plugin_manifest_autogenerated.py:7
+msgid ""
+"A plugin to add a button for quickly opening OpenStreetMap's iD editor and "
+"setup a TMS basemap."
+msgstr ""
+"OpenStreetMap-ийн iD засварлагчийг хурдан нээж, TMS basemap тохируулах "
+"товчлуурыг нэмэх залгаас."
+
+#: app/translations/plugin_manifest_autogenerated.py:8
+msgid "A plugin to upload orthophotos to OpenAerialMap"
+msgstr "Ортофотог OpenAerialMap дээр байршуулах залгаас"
+
+#: app/translations/plugin_manifest_autogenerated.py:9
+msgid "Display program version, memory and disk space usage statistics"
+msgstr ""
+"Програмын хувилбар, санах ой, дискний зайг ашиглах статистикийг харуулах"
+
+#: app/translations/plugin_manifest_autogenerated.py:10
+msgid "Sync accounts from webodm.net"
+msgstr "Акаунтуудыг webodm.net сайтаас синк хийх"
+
+#: app/translations/plugin_manifest_autogenerated.py:11
+msgid "Add a fullscreen button to the 2D map view"
+msgstr "2D газрын зураг дээр бүрэн дэлгэцийн товчлуурыг нэмнэ үү"
+
+#: app/translations/plugin_manifest_autogenerated.py:12
+msgid "Compute, preview and export contours from DEMs"
+msgstr "DEM-ээс контурыг тооцоолох, урьдчилан харах, экспортлох"
+
+#: app/translations/plugin_manifest_autogenerated.py:13
+msgid "Calculate and draw an elevation map based on a task's DEMs"
+msgstr "Даалгаврын DEM дээр үндэслэн өндрийн газрын зургийг тооцоолж зур"
+
+#: app/translations/plugin_manifest_autogenerated.py:14
+msgid "Upload and tile ODM assets with Cesium ion."
+msgstr "ODM-ийн хөрөнгийг цезийн ионоор байршуулж, хавтангаар байрлуул."
+
+#: app/translations/plugin_manifest_autogenerated.py:15
+msgid "Import images from external sources directly"
+msgstr "Гадны эх үүсвэрээс зургийг шууд импортлох"
+
+#: app/translations/plugin_manifest_autogenerated.py:16
+msgid "Detect changes between two different tasks in the same project."
+msgstr "Нэг төслийн хоёр өөр ажлын хоорондох өөрчлөлтийг илрүүлэх."
+
+#: app/views/app.py:44
+msgid "First Project"
+msgstr "Эхний төсөл"
+
+#: app/views/app.py:54 app/views/public.py:26
+msgid "Map"
+msgstr "Газрын зураг"
+
+#: app/views/app.py:81
+msgid "3D Model Display"
+msgstr "3D загварын дэлгэц"
+
+#: app/views/app.py:147
+msgid "Welcome"
+msgstr "Тавтай морилно уу"
+
+#: app/views/dev.py:59
+msgid "Cannot find locale/ folder in .zip archive"
+msgstr ".Zip архиваас локал / хавтас олох боломжгүй байна"
+
+#: app/views/dev.py:76
+msgid "Translation files reloaded!"
+msgstr "Орчуулгын файлуудыг дахин ачаалав!"
+
+#: app/views/dev.py:80
+msgid "Invalid action"
+msgstr "Буруу үйлдэл"
+
+#: nodeodm/apps.py:8
+msgid "Node Management"
+msgstr "Зангилааны менежмент"
+
+#: nodeodm/models.py:23
+msgid ""
+"Hostname or IP address where the node is located (can be an internal "
+"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
+"localhost. Find the IP address of your host machine by running ifconfig on "
+"Linux or by checking your network settings."
+msgstr ""
+"Зангилаа байрладаг хостын нэр эсвэл IP хаяг (дотоод хостын нэр ч байж болно)"
+". Хэрэв та Docker ашиглаж байгаа бол энэ нь хэзээ ч 127.0.0.1 эсвэл "
+"localhost биш юм. Linux дээр ifconfig ажиллуулж эсвэл сүлжээний тохиргоогоо "
+"шалгаад хост машиныхаа IP хаягийг олоорой."
+
+#: nodeodm/models.py:24
+msgid "Port that connects to the node's API"
+msgstr "Зангилааны API-тай холбогддог порт"
+
+#: nodeodm/models.py:25
+msgid "API version used by the node"
+msgstr "Зангилаа ашигладаг API хувилбар"
+
+#: nodeodm/models.py:26
+msgid "When was the information about this node last retrieved?"
+msgstr "Энэ зангилааны талаархи мэдээллийг хэзээ хамгийн сүүлд олж авсан бэ?"
+
+#: nodeodm/models.py:27
+msgid ""
+"Number of tasks currently being processed by this node (as reported by the "
+"node itself)"
+msgstr ""
+"Одоогоор энэ зангилаан дээр боловсруулж байгаа ажлуудын тоо (зангилааны "
+"өөрөө мэдээлсэн шиг)"
+
+#: nodeodm/models.py:28
+msgid "Available Options"
+msgstr "Бэлэн сонголтууд"
+
+#: nodeodm/models.py:28
+msgid "Description of the options that can be used for processing"
+msgstr "Боловсруулахад ашиглаж болох хувилбаруудын тодорхойлолт"
+
+#: nodeodm/models.py:29
+msgid "Token"
+msgstr "Токен"
+
+#: nodeodm/models.py:29
+msgid ""
+"Token to use for authentication. If the node doesn't have authentication, "
+"you can leave this field blank."
+msgstr ""
+"Баталгаажуулалтад ашиглах токен. Хэрэв зангилаанд нэвтрэлт танилт байхгүй "
+"бол та энэ талбарыг хоосон үлдээж болно."
+
+#: nodeodm/models.py:30
+msgid "Max Images"
+msgstr "Макс зураг"
+
+#: nodeodm/models.py:30
+msgid "Maximum number of images accepted by this node."
+msgstr "Энэ зангилааг хүлээн зөвшөөрсөн зургийн хамгийн их тоо."
+
+#: nodeodm/models.py:31
+msgid "Engine version used by the node."
+msgstr "Зангилаа ашигладаг хөдөлгүүрийн хувилбар."
+
+#: nodeodm/models.py:32
+msgid ""
+"Optional label for this node. When set, this label will be shown instead of "
+"the hostname:port name."
+msgstr ""
+"Энэ зангилааны нэмэлт шошго. Тохируулах үед энэ хаяг нь хостын нэрний оронд "
+"харагдах болно: порт нэр."
+
+#: nodeodm/models.py:33
+msgid "Engine used by the node."
+msgstr "Зангилаа ашигладаг хөдөлгүүр."
+
+#: plugins/cesium-ion/api_views.py:170
+msgid "No matching enum type."
+msgstr "Тохирох enum төрөл алга."
+
+#: plugins/contours/api.py:16
+msgid "No DSM layer is available."
+msgstr "DSM давхарга байхгүй байна."
+
+#: plugins/contours/api.py:18
+msgid "No DTM layer is available."
+msgstr "DTM давхарга байхгүй байна."
+
+#: plugins/contours/api.py:60
+msgid "Could not generate contour file. This might be a bug."
+msgstr "Контур файл үүсгэж чадсангүй. Энэ нь алдаа байж магадгүй юм."
+
+#: plugins/diagnostic/plugin.py:36
+msgid "Diagnostic"
+msgstr "Оношлогоо"
+
+#: plugins/diagnostic/templates/diagnostic.html:6
+msgid "Diagnostic Information"
+msgstr "Оношлогооны мэдээлэл"
+
+#: plugins/diagnostic/templates/diagnostic.html:10
+msgid "Storage Space"
+msgstr "Хадгалах зай"
+
+#: plugins/diagnostic/templates/diagnostic.html:14
+#: plugins/diagnostic/templates/diagnostic.html:40
+#: plugins/diagnostic/templates/diagnostic.html:45
+msgctxt "Megabytes of storage space"
+msgid "Free"
+msgstr "Үнэгүй"
+
+#: plugins/diagnostic/templates/diagnostic.html:15
+#: plugins/diagnostic/templates/diagnostic.html:39
+#: plugins/diagnostic/templates/diagnostic.html:45
+msgctxt "Megabytes of storage space"
+msgid "Used"
+msgstr "Ашигласан"
+
+#: plugins/diagnostic/templates/diagnostic.html:16
+msgctxt "Megabytes of storage space"
+msgid "Total"
+msgstr "Нийт"
+
+#: plugins/diagnostic/templates/diagnostic.html:20
+msgctxt "Computer memory (RAM)"
+msgid "Memory"
+msgstr "Санах ой"
+
+#: plugins/diagnostic/templates/diagnostic.html:24
+#: plugins/diagnostic/templates/diagnostic.html:75
+#: plugins/diagnostic/templates/diagnostic.html:80
+msgctxt "Megabytes of memory space"
+msgid "Free"
+msgstr "Үнэгүй"
+
+#: plugins/diagnostic/templates/diagnostic.html:25
+#: plugins/diagnostic/templates/diagnostic.html:74
+#: plugins/diagnostic/templates/diagnostic.html:80
+msgctxt "Megabytes of memory space"
+msgid "Used"
+msgstr "Ашигласан"
+
+#: plugins/diagnostic/templates/diagnostic.html:26
+msgctxt "Megabytes of memory space"
+msgid "Total"
+msgstr "Нийт"
+
+#: plugins/diagnostic/templates/diagnostic.html:33
+msgid "Note!"
+msgstr "Тэмдэглэл!"
+
+#: plugins/diagnostic/templates/diagnostic.html:33
+#, python-format
+msgid ""
+"These values might be relative to the virtualization environment in which "
+"the application is running, not necessarily the values of the your machine. "
+"See instructions for %(win_link)s and %(mac_link)s for changing these values "
+"in a Docker setup."
+msgstr ""
+"Эдгээр утга нь програмыг ажиллуулж буй виртуалчлах орчинтой харьцуулсан байж "
+"болох бөгөөд таны машины утга заавал байх албагүй. Эдгээр утгыг Docker "
+"тохиргоонд өөрчлөх талаар %(win_link)s ба %(mac_link)s зааврыг үзнэ үү."
+
+#: plugins/diagnostic/templates/diagnostic.html:47
+#: plugins/diagnostic/templates/diagnostic.html:82
+msgid "Disk Space"
+msgstr "Дискний зай"
+
+#: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
+msgid "Lightning Network"
+msgstr "Аянгын сүлжээ"
+
+#: plugins/measure/api.py:27
+msgid ""
+"No surface model available. From the Dashboard, select this task, press "
+"Edit, from the options make sure to check \"dsm\", then press Restart --> "
+"From DEM."
+msgstr ""
+"Гадаргуугийн загвар байхгүй байна. Хяналтын самбараас энэ даалгаврыг сонгоод "
+"Засах товчийг дарж, сонголтоос \"dsm\" -г шалгана уу, дараа нь Дахин "
+"эхлүүлэх -> ДЭМ-ээс дарна уу."
+
+#: plugins/posm-gcpi/plugin.py:8
+msgid "GCP Interface"
+msgstr "GCP интерфэйс"

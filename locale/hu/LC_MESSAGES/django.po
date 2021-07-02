@@ -1,0 +1,1650 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-25 17:42+0000\n"
+"PO-Revision-Date: 2021-06-01 08:34+0000\n"
+"Last-Translator: Zoltan Siki <siki1958@gmail.com>\n"
+"Language-Team: Hungarian <https://hosted.weblate.org/projects/webodm/webodm/"
+"hu/>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.7-dev\n"
+
+#: app/admin.py:52
+msgid "Enter custom CSS"
+msgstr "Egyedi CSS megadása"
+
+#: app/admin.py:53 app/models/theme.py:38
+msgid "CSS"
+msgstr "CSS"
+
+#: app/admin.py:56
+msgid "HTML that will be displayed above site header"
+msgstr "HTML, amely a webhely fejléce felett jelenik meg"
+
+#: app/admin.py:57 app/models/theme.py:39
+msgid "HTML (before header)"
+msgstr "HTML (a fejléc előtt)"
+
+#: app/admin.py:60
+msgid "HTML that will be displayed after site header"
+msgstr "HTML, amely a webhely fejlécét követően jelenik meg"
+
+#: app/admin.py:61 app/models/theme.py:40
+msgid "HTML (after header)"
+msgstr "HTML (a fejléc után)"
+
+#: app/admin.py:64
+msgid "HTML that will be displayed after the body tag"
+msgstr "HTML, amely a szövegtörzs után jelenik meg"
+
+#: app/admin.py:65 app/models/theme.py:41
+msgid "HTML (after body)"
+msgstr "HTML (a szövegtörzs után)"
+
+#: app/admin.py:68
+#, python-brace-format
+msgid ""
+"HTML that will be displayed in the footer. You can also use the special tags "
+"such as {ORGANIZATION} and {YEAR}."
+msgstr ""
+"A láblécben megjelenő HTML. Használhatja azokat a speciális címkéket is, "
+"mint az {ORGANIZATION} és az {YEAR}."
+
+#: app/admin.py:69 app/models/theme.py:42
+msgid "HTML (footer)"
+msgstr "HTML (lábléc)"
+
+#: app/admin.py:100 app/models/project.py:24
+msgid "Description"
+msgstr "Leírás"
+
+#: app/admin.py:106
+msgid "Version"
+msgstr "Verzió"
+
+#: app/admin.py:112
+msgid "Author"
+msgstr "Szerző"
+
+#: app/admin.py:233
+msgid "Actions"
+msgstr "Műveletek"
+
+#: app/api/formulas.py:12 app/api/formulas.py:16
+msgid ""
+"Normalized Difference Vegetation Index shows the amount of green vegetation."
+msgstr ""
+"Az NDVI (\"Normalized Difference Vegetation Index\" vagy \"normalizált "
+"vegetációs különbség index\") a zöld növényzet mennyiségét mutatja."
+
+#: app/api/formulas.py:20
+msgid ""
+"Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue "
+"and Green bands instead of only Red to isolate plant health."
+msgstr ""
+"Az ENDVI (\"Enhanced Normalized Difference Vegetation Index\" vagy "
+"\"továbbfejlesztett vegetációs különbség index\") olyan, mint az NDVI, de a "
+"növények egészségének elkülönítésére , de a vörös helyett a kék és a zöld "
+"sávot használja."
+
+#: app/api/formulas.py:24
+msgid "Visual Atmospheric Resistance Index shows the areas of vegetation."
+msgstr "A Visual Atmospheric Resistance index a növényzet területeit mutatja."
+
+#: app/api/formulas.py:29
+msgid ""
+"Excess Green Index emphasizes the greenness of leafy crops such as potatoes."
+msgstr ""
+"Az Excess Green index a leveles növények, például a burgonya zöldségét "
+"hangsúlyozza."
+
+#: app/api/formulas.py:33
+msgid ""
+"Burn Area Index hightlights burned land in the red to near-infrared spectrum."
+msgstr ""
+"Burn Area index kiemeli az égett területeket a vörös és a közeli infravörös "
+"spektrumban."
+
+#: app/api/formulas.py:37
+msgid "Green Leaf Index shows greens leaves and stems."
+msgstr "A Green Leaf index a zöld leveleket és a szárakat mutatja."
+
+#: app/api/formulas.py:42
+msgid ""
+"Green Normalized Difference Vegetation Index is similar to NDVI, but "
+"measures the green spectrum instead of red."
+msgstr ""
+"A Green Normalized Difference Vegetation index hasonlít az NDVI-re, de a "
+"zöld spektrumban mér a vörös helyett."
+
+#: app/api/formulas.py:46
+msgid ""
+"Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
+msgstr ""
+"A Green Ratio Vegetation index az erdőkben a fotoszintézis arányokra "
+"érzékeny."
+
+#: app/api/formulas.py:50
+msgid ""
+"Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
+"effects of soil areas using an adjustment factor (0.5)."
+msgstr ""
+"Soil Adjusted Index hasonló az NDVI-ra, de megpróbálja eltávolítani a talaj "
+"területek hatását egy kiigazító szorzóval (0.5)."
+
+#: app/api/formulas.py:54
+msgid ""
+"Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
+"for soil areas."
+msgstr ""
+
+#: app/api/formulas.py:58
+msgid ""
+"Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
+"more sensitive to vegetation."
+msgstr ""
+"Modified Simple Ratio a Simple Ratio (SR) index javítása hogy érzékenyebbé "
+"tegye a növényzetre."
+
+#: app/api/formulas.py:62
+msgid ""
+"Renormalized Difference Vegetation Index uses the difference between near-IR "
+"and red, plus NDVI to show areas of healthy vegetation."
+msgstr ""
+"Renormalized Difference Vegetation Index a közeli IR és vörös különbségét "
+"használja, plusz az NDVI-t az egészséges növényzet területének kimutatására."
+
+#: app/api/formulas.py:66
+msgid ""
+"Transformed Difference Vegetation Index highlights vegetation cover in urban "
+"environments."
+msgstr ""
+"Transformed Difference Vegetation Index kiemeli a növényzettakarót városi "
+"környezetben."
+
+#: app/api/formulas.py:70
+msgid ""
+"Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work "
+"better in areas with little vegetation where soil is visible."
+msgstr ""
+"Optimized Soil Adjusted Vegetation Index SAVI-n alapul, de jobban működik "
+"kevés növényzetet tartalmazó területen, ahol a talaj látható."
+
+#: app/api/formulas.py:74
+msgid "Leaf Area Index estimates foliage areas and predicts crop yields."
+msgstr "Leaf Area Index a lombos területet és a terméshozamot becsüli."
+
+#: app/api/formulas.py:79
+msgid ""
+"Enhanced Vegetation Index is useful in areas where NDVI might saturate, by "
+"using blue wavelengths to correct soil signals."
+msgstr ""
+
+#: app/api/tasks.py:179
+msgid "You need to upload at least 2 images before commit"
+msgstr "Legalább két képet szükséges feltölteni a jóváhagyás előtt"
+
+#: app/api/tasks.py:201
+msgid "No files uploaded"
+msgstr "Nincs feltöltött fájl"
+
+#: app/api/tasks.py:224
+msgid "Cannot create task, you need at least 2 images"
+msgstr "Nem lehet feladatot létrehozni, ehez legalább 2 képre van szükség"
+
+#: app/api/tasks.py:329 app/api/tasks.py:332 app/api/tasks.py:351
+#: app/api/tasks.py:354
+msgid "Asset does not exist"
+msgstr "Az eszköz nem létezik"
+
+#: app/api/tasks.py:370
+msgid "Imported Task"
+msgstr "Importált feladat"
+
+#: app/api/tasks.py:373
+msgid "Cannot create task, you need to upload 1 file"
+msgstr "Nem lehet feladatot létrehozni, 1 fájlt fel kell tölteni"
+
+#: app/api/tasks.py:376
+msgid "Cannot create task, either specify a URL or upload 1 file."
+msgstr ""
+"Nem lehet feladatot létrehozni, vagy adjon meg URL-t, vagy töltsön fel 1 "
+"fájlt."
+
+#: app/models/image_upload.py:10
+msgid "Task this image belongs to"
+msgstr "Feladat, amelyhez ez a kép tartozik"
+
+#: app/models/image_upload.py:10 app/models/task.py:260
+msgid "Task"
+msgstr "Feladat"
+
+#: app/models/image_upload.py:11
+msgid "File uploaded by a user"
+msgstr "A felhasználó által feltöltött fájl"
+
+#: app/models/image_upload.py:11
+msgid "Image"
+msgstr "Kép"
+
+#: app/models/image_upload.py:20
+msgid "Image Upload"
+msgstr "Kép feltöltése"
+
+#: app/models/image_upload.py:21
+msgid "Image Uploads"
+msgstr "Képek feltöltése"
+
+#: app/models/plugin.py:5
+msgid "Plugin name"
+msgstr "Bővítmény neve"
+
+#: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
+#: app/models/task.py:222 app/models/theme.py:16
+msgid "Name"
+msgstr "Név"
+
+#: app/models/plugin.py:6
+msgid "Whether this plugin is turned on."
+msgstr "A bővítmény be van-e kapcsolva."
+
+#: app/models/plugin.py:6
+msgid "Enabled"
+msgstr "Engedélyezve"
+
+#: app/models/plugin.py:20
+msgid "Plugin"
+msgstr "Bővítmény"
+
+#: app/models/plugin.py:21 app/templates/app/logged_in_base.html:98
+msgid "Plugins"
+msgstr "Bővítmények"
+
+#: app/models/plugin_datum.py:7
+#, fuzzy
+msgid "Setting key"
+msgstr "Beállító kulcs"
+
+#: app/models/plugin_datum.py:7
+msgid "Key"
+msgstr "Kulcs"
+
+#: app/models/plugin_datum.py:8
+msgid "The user this setting belongs to. If NULL, the setting is global."
+msgstr ""
+"A felhasználó, akihez a beállítás tartozik. Ha NULL, akkor a beállítás "
+"globális."
+
+#: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
+msgid "User"
+msgstr "Felhasználó"
+
+#: app/models/plugin_datum.py:9
+msgid "Integer value"
+msgstr "Egész érték"
+
+#: app/models/plugin_datum.py:10
+#, fuzzy
+msgid "Float value"
+msgstr "Lebegőpontos érték"
+
+#: app/models/plugin_datum.py:11
+msgid "Bool value"
+msgstr "Logikai érték"
+
+#: app/models/plugin_datum.py:12
+msgid "String value"
+msgstr "Szöveglánc"
+
+#: app/models/plugin_datum.py:13
+msgid "JSON value"
+msgstr "JSON érték"
+
+#: app/models/plugin_datum.py:19 app/models/plugin_datum.py:20
+msgid "Plugin Datum"
+msgstr "Modul dátum"
+
+#: app/models/preset.py:9
+msgid "The person who owns this preset"
+msgstr "A személy aki az alapbeállítás tulajdonosa"
+
+#: app/models/preset.py:9 app/models/project.py:22
+msgid "Owner"
+msgstr "Tulajdonos"
+
+#: app/models/preset.py:10
+msgid "A label used to describe the preset"
+msgstr "Az alapbeállítás leírására szolgáló címke"
+
+#: app/models/preset.py:11
+msgid "Options that define this preset (same format as in a Task's options)."
+msgstr ""
+"Beállítások, melyek ezt az alapbeállítást meghatározzák (ugyanaz a formátum "
+"mint a feladat beállításoknál)."
+
+#: app/models/preset.py:11 app/models/task.py:228
+msgid "Options"
+msgstr "Beállítások"
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
+msgid "Creation date"
+msgstr "Létrehozás dátuma"
+
+#: app/models/preset.py:13 app/models/project.py:25 app/models/task.py:237
+msgid "Created at"
+msgstr "Létrehozás ideje"
+
+#: app/models/preset.py:14
+msgid ""
+"Whether this preset is available to every user in the system or just to its "
+"owner."
+msgstr ""
+"Ez az alapbeállítás elérhető-e minden felhasználó számára vagy csak a "
+"tulajdonosának."
+
+#: app/models/preset.py:14
+msgid "System"
+msgstr "Rendszer"
+
+#: app/models/preset.py:20
+msgid "Preset"
+msgstr "Alapbeállítás"
+
+#: app/models/preset.py:21
+msgid "Presets"
+msgstr "Alapbeállítások"
+
+#: app/models/project.py:22
+msgid "The person who created the project"
+msgstr "A projektet létrehozó személy"
+
+#: app/models/project.py:23
+msgid "A label used to describe the project"
+msgstr "A projekt leírására használt címke"
+
+#: app/models/project.py:24
+msgid "More in-depth description of the project"
+msgstr "További részletes projekt leírás"
+
+#: app/models/project.py:26
+msgid ""
+"Whether this project has been marked for deletion. Projects that have "
+"running tasks need to wait for tasks to be properly cleaned up before they "
+"can be deleted."
+msgstr ""
+
+#: app/models/project.py:26
+msgid "Deleting"
+msgstr "Törlés"
+
+#: app/models/project.py:56 app/models/task.py:221
+msgid "Project"
+msgstr "Projekt"
+
+#: app/models/project.py:57
+msgid "Projects"
+msgstr "Projektek"
+
+#: app/models/setting.py:20
+msgid "The name of your application"
+msgstr "Az alkalmazásának a neve"
+
+#: app/models/setting.py:20
+msgid "App name"
+msgstr "Alkalmazásnév"
+
+#: app/models/setting.py:21
+msgid "A 512x512 logo of your application (.png or .jpeg)"
+msgstr "Az alkalmazásának egy 512x512 méretű logója (.png vagy .jpeg)"
+
+#: app/models/setting.py:21
+msgid "App logo"
+msgstr "Alkalmazás logó"
+
+#: app/models/setting.py:31
+msgid "The name of your organization"
+msgstr "A szervezetének a neve"
+
+#: app/models/setting.py:31
+msgid "Organization name"
+msgstr "Szervezet neve"
+
+#: app/models/setting.py:32
+msgid "The website URL of your organization"
+msgstr "A szervezetének honlap URL-je"
+
+#: app/models/setting.py:32
+msgid "Organization website"
+msgstr "Szervezet honlap"
+
+#: app/models/setting.py:33 app/models/theme.py:48 app/models/theme.py:49
+#: app/templates/app/logged_in_base.html:95
+msgid "Theme"
+msgstr "Téma"
+
+#: app/models/setting.py:34
+msgid "Active theme"
+msgstr "Aktív téma"
+
+#: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
+msgid "Application"
+msgstr "Alkalmazás"
+
+#: app/models/setting.py:76 app/models/setting.py:77
+msgid "Settings"
+msgstr "Beállítások"
+
+#: app/models/task.py:218
+msgid "Id"
+msgstr "Azonosító"
+
+#: app/models/task.py:220
+msgid "Identifier of the task (as returned by NodeODM API)"
+msgstr "A feladat azonosító (ahogy a NodeODM API visszaadta)"
+
+#: app/models/task.py:220
+msgid "UUID"
+msgstr "UUID"
+
+#: app/models/task.py:221
+msgid "Project that this task belongs to"
+msgstr "Projekt melyhez a feladat tartozik"
+
+#: app/models/task.py:222
+msgid "A label for the task"
+msgstr "Címke a feladathoz"
+
+#: app/models/task.py:223
+msgid ""
+"Number of milliseconds that elapsed since the beginning of this task (-1 "
+"indicates that no information is available)"
+msgstr ""
+"Eltelt ezredmásodpercek száma a feladat indítása óta (-1 jelzi, hogy nem áll "
+"rendelkezésre információ)"
+
+#: app/models/task.py:223
+msgid "Processing Time"
+msgstr "Feldolgozási idő"
+
+#: app/models/task.py:224
+msgid ""
+"Processing node assigned to this task (or null if this task has not been "
+"associated yet)"
+msgstr ""
+"Ehhez a feladathoz rendelt feldolgozási pont (vagy null, ha a feladatot még "
+"nem rendelték egyikhez sem)"
+
+#: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
+msgid "Processing Node"
+msgstr "Feldolgozási csomópont"
+
+#: app/models/task.py:225
+msgid ""
+"A flag indicating whether this task should be automatically assigned a "
+"processing node"
+msgstr ""
+"Egy jelző, hogy a feladatot automatikusan rendeljük-e egy feldolgozási "
+"ponthoz"
+
+#: app/models/task.py:225
+msgid "Auto Processing Node"
+msgstr "Auto feldolgozási pont"
+
+#: app/models/task.py:226
+msgid "Current status of the task"
+msgstr "Feladat aktuális státusza"
+
+#: app/models/task.py:226
+msgid "Status"
+msgstr "Állapot"
+
+#: app/models/task.py:227
+msgid "The last processing error received"
+msgstr "Az utoljára kapott feldolgozási hiba"
+
+#: app/models/task.py:227
+msgid "Last Error"
+msgstr "Utolsó hiba"
+
+#: app/models/task.py:228
+msgid "Options that are being used to process this task"
+msgstr "A feladat feldolgozásához használt beállítások"
+
+#: app/models/task.py:229
+msgid "List of available assets to download"
+msgstr "Elérhető eszközök listája a letöltéshez"
+
+#: app/models/task.py:229
+msgid "Available Assets"
+msgstr "Elérhető eszközök"
+
+#: app/models/task.py:230
+msgid "Console output of the processing node"
+msgstr "Feldolgozási pont konzol outputja"
+
+#: app/models/task.py:230
+msgid "Console Output"
+msgstr "Konzol output"
+
+#: app/models/task.py:232
+msgid "Extent of the orthophoto"
+msgstr "Ortofotó terjedelme"
+
+#: app/models/task.py:232
+msgid "Orthophoto Extent"
+msgstr "Ortofotó terjedelem"
+
+#: app/models/task.py:233
+msgid "DSM Extent"
+msgstr "DSM terjedelem"
+
+#: app/models/task.py:234
+msgid "DTM Extent"
+msgstr "DTM terjedelem"
+
+#: app/models/task.py:238
+msgid ""
+"A requested action to be performed on the task. The selected action will be "
+"performed by the worker at the next iteration."
+msgstr ""
+"A feladaton végrehajtandó kiválasztott  művelet. A kiválasztott művelet a "
+"feldolgozó a következő iterációban hajtja végre."
+
+#: app/models/task.py:238
+msgid "Pending Action"
+msgstr "Függőben lévő műveletek"
+
+#: app/models/task.py:240
+msgid "A flag indicating whether this task is available to the public"
+msgstr "Egy jelző, hogy a feladat nyilvános-e"
+
+#: app/models/task.py:240
+msgid "Public"
+msgstr "Nyilvános"
+
+#: app/models/task.py:241
+msgid ""
+"When set to a value different than -1, indicates that the images for this "
+"task have been / will be resized to the size specified here before "
+"processing."
+msgstr ""
+"Amikor -1-től eltérő értékre állítják, azt jelzi, hogy a feladat képeit "
+"átméreteztük vagy át fogjuk méretezni a feldolgozás előtt itt megadott "
+"méretre."
+
+#: app/models/task.py:241
+msgid "Resize To"
+msgstr "Átméretezés erre"
+
+#: app/models/task.py:244
+msgid ""
+"Value between 0 and 1 indicating the upload progress of this task's files to "
+"the processing node"
+msgstr ""
+"§ és 1 közötti érték , mely a feladathoz tartozó fájlok feldolgozási ponthoz "
+"feltöltésének előrehaladását jelzi."
+
+#: app/models/task.py:245
+msgid "Upload Progress"
+msgstr "Feltöltés folyamatban"
+
+#: app/models/task.py:248
+msgid ""
+"Value between 0 and 1 indicating the resize progress of this task's images"
+msgstr ""
+"0 és 1 közötti érték, jelzi a feladat képek átméretezésének előrehaladását"
+
+#: app/models/task.py:249
+msgid "Resize Progress"
+msgstr "Átméretezés folyamatban"
+
+#: app/models/task.py:252
+msgid ""
+"Value between 0 and 1 indicating the running progress (estimated) of this "
+"task"
+msgstr ""
+"0 és 1 közötti érték, jelzi a feladat futó feldolgozásának előrehaladását"
+
+#: app/models/task.py:253
+msgid "Running Progress"
+msgstr "Futás előrehaladás"
+
+#: app/models/task.py:255
+msgid "URL this task is imported from (only for imported tasks)"
+msgstr "URL ahonnan a feladatok importáltuk (csak importált feladatoknál)"
+
+#: app/models/task.py:255
+msgid "Import URL"
+msgstr "URL import"
+
+#: app/models/task.py:256
+msgid "Number of images associated with this task"
+msgstr "A feladathoz rendelt képek száma"
+
+#: app/models/task.py:256
+msgid "Images Count"
+msgstr "Képszám"
+
+#: app/models/task.py:257
+msgid ""
+"A flag indicating whether this task is currently waiting for information or "
+"files to be uploaded before being considered for processing."
+msgstr ""
+"Egy jelző, hogy ez a feladat aktuálisan információra vagy fájlok "
+"feltöltésére vár mielőtt feldolgozásra kerülne."
+
+#: app/models/task.py:257
+msgid "Partial"
+msgstr "Részleges"
+
+#: app/models/task.py:261
+msgid "Tasks"
+msgstr "Feladatok"
+
+#: app/models/task.py:270
+msgid "unnamed"
+msgstr "névtelen"
+
+#: app/models/task.py:373
+msgid "Importing assets..."
+msgstr "Eszközök importja..."
+
+#: app/models/task.py:412 app/models/task.py:680
+msgid "Invalid zip file"
+msgstr "Hibás zip fájl"
+
+#: app/models/task.py:506
+#, python-format
+msgid "Connection error: %(error)s"
+msgstr "Kapcsolódási hiba: %(error)s"
+
+#: app/models/task.py:586
+msgid "Cannot restart a task that has no processing node"
+msgstr "Nem tudom újraindítani a feldolgozási ponttal nem rendelkező feladatot"
+
+#: app/models/task.py:738
+#, python-format
+msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
+msgstr ""
+"Nem támogatott vetület %(code)s. Győződjön meg róla, hogy támogatott "
+"vetületet választott."
+
+#: app/models/task.py:748
+msgid "Done!"
+msgstr "Kész!"
+
+#: app/models/theme.py:16
+msgid "Name of theme"
+msgstr "Téma neve"
+
+#: app/models/theme.py:19
+msgid "Most text, icons, and borders."
+msgstr "A legtöbb szöveg, ikon vagy szegély."
+
+#: app/models/theme.py:19
+msgid "Primary"
+msgstr "Elsődleges"
+
+#: app/models/theme.py:20
+msgid "The main background color, and text color of some buttons."
+msgstr "A fő háttérszín és néhány gomb felirat színe."
+
+#: app/models/theme.py:20
+msgid "Secondary"
+msgstr "Másodlagos"
+
+#: app/models/theme.py:21
+msgid "Navigation links."
+msgstr "Navigáció linkek."
+
+#: app/models/theme.py:21
+msgid "Tertiary"
+msgstr "Harmadlagos"
+
+#: app/models/theme.py:23
+msgid "Primary button color."
+msgstr "Elsődleges gomb szín."
+
+#: app/models/theme.py:23
+msgid "Button Primary"
+msgstr "Elsődleges gomb"
+
+#: app/models/theme.py:24
+msgid "Default button color."
+msgstr "Alapértelmezett gomb szín."
+
+#: app/models/theme.py:24
+msgid "Button Default"
+msgstr "Alapértelemezett gomb"
+
+#: app/models/theme.py:25
+msgid "Delete button color."
+msgstr "Gomb szín törlés."
+
+#: app/models/theme.py:25
+msgid "Button Danger"
+msgstr "Veszély gomb"
+
+#: app/models/theme.py:27
+msgid "Background color of the site's header."
+msgstr "A weblap fejléc háttérszíne."
+
+#: app/models/theme.py:27
+msgid "Header Background"
+msgstr "Fejléc háttér"
+
+#: app/models/theme.py:28
+msgid "Text and icons in the site's header."
+msgstr "Szöveg és ikonok az oldal fejlécében."
+
+#: app/models/theme.py:28
+msgid "Header Primary"
+msgstr "Elsődleges fejléc"
+
+#: app/models/theme.py:30
+msgid "The color of most borders."
+msgstr "A szegélyek többségének színe."
+
+#: app/models/theme.py:30
+msgid "Border"
+msgstr "Szegély"
+
+#: app/models/theme.py:31
+msgid "The background color of panels and some borders."
+msgstr "Panelek és néhány szegély háttérszíne."
+
+#: app/models/theme.py:31
+msgid "Highlight"
+msgstr "Kiemelés"
+
+#: app/models/theme.py:33
+msgid "The border color of warning dialogs."
+msgstr "Figyelmeztetés dialóg szegély színe."
+
+#: app/models/theme.py:33
+msgid "Dialog Warning"
+msgstr "Figyelmeztetés párbeszédablak"
+
+#: app/models/theme.py:35
+msgid "The background color of failed notifications."
+msgstr "Sikertelen jelzés háttérszíne."
+
+#: app/models/theme.py:35
+msgid "Failed"
+msgstr "Hibás"
+
+#: app/models/theme.py:36
+msgid "The background color of success notifications."
+msgstr "A sikeres műveletek értesítésének háttérszíne."
+
+#: app/models/theme.py:36
+msgid "Success"
+msgstr "Sikeres"
+
+#: app/templates/app/404.html:6
+msgid "404 Page Not Found"
+msgstr "404 az oldalt nem találom"
+
+#: app/templates/app/404.html:7
+msgid "Are you sure the address is correct?"
+msgstr "Biztos, hogy helyes a cím?"
+
+#: app/templates/app/500.html:5
+msgid "500 Internal Server Error"
+msgstr "500 belső szerverhiba"
+
+#: app/templates/app/500.html:6
+msgid "Something happened. The server logs contain more information."
+msgstr "Valami történt. A szerver naplók további információt tartalmaznak."
+
+#: app/templates/app/about.html:94
+#, python-format
+msgid ""
+"This program is free software: you can redistribute it and/or modify it "
+"under the terms of the GNU Affero General Public License as published by the "
+"Free Software Foundation, either version 3 of the License, or (at your "
+"option) any later version. See %(link_start)sthe GNU Affero General Public "
+"License%(link_end)s for more details."
+msgstr ""
+"Ez a program szabad szoftver: továbbadhatja és/vagy módosíthatja a GNU "
+"Affero General Public License feltételei szerint, ahogy a Szabad Szoftver "
+"Alapítvány publikálta, a licenc 3  vagy választása szerint bármelyik későbbi "
+"verziója szerint. Lásd a %(link_start)sa GNU Affero General Public "
+"License%(link_end)s a további részletekért."
+
+#: app/templates/app/admin/404.html:4 app/templates/app/admin/404.html:8
+msgid "Page not found"
+msgstr "Az oldalt nem találom"
+
+#: app/templates/app/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Elnézést kérünk, de a kért oldalt nem találom."
+
+#: app/templates/app/admin/500.html:6 app/templates/app/admin/app_index.html:9
+#: app/templates/app/admin/auth/user/change_password.html:13
+#: app/templates/app/admin/base.html:19
+#: app/templates/app/admin/change_form.html:18
+#: app/templates/app/admin/change_list.html:31
+#: app/templates/app/admin/delete_confirmation.html:13
+#: app/templates/app/admin/delete_selected_confirmation.html:13
+#: app/templates/app/admin/invalid_setup.html:6
+#: app/templates/app/admin/object_history.html:6
+msgid "Home"
+msgstr "Kezdőlap"
+
+#: app/templates/app/admin/500.html:7
+msgid "Server error"
+msgstr "Szerver hiba"
+
+#: app/templates/app/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Szerver hiba (500)"
+
+#: app/templates/app/admin/500.html:14
+msgid "Server Error (500)"
+msgstr "Szerver hiba (500)"
+
+#: app/templates/app/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Hiba történt. Email-ben jelentettük a a weblap adminisztrátornak és "
+"hamarosan kijavítják. Köszönjük a türelmét."
+
+#: app/templates/app/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Kiválasztott művelet futtatása"
+
+#: app/templates/app/admin/actions.html:4
+msgid "Go"
+msgstr "Indítás"
+
+#: app/templates/app/admin/actions.html:10
+msgid "Click here to select the objects across all pages"
+msgstr "Kattintson ide objektumok minden lapon történő kiválasztásához"
+
+#: app/templates/app/admin/actions.html:10
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Mindent kiválaszt %(total_count)s %(module_name)s"
+
+#: app/templates/app/admin/actions.html:12
+msgid "Clear selection"
+msgstr "Kijelölés törlése"
+
+#: app/templates/app/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Először adj meg a felhasználó nevet és jelszót. Utána szerkeszthet további "
+"felhasználói beállításokat."
+
+#: app/templates/app/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Adja meg a felhasználó nevet és jelszót."
+
+#: app/templates/app/admin/auth/user/change_password.html:17
+#: app/templates/app/admin/auth/user/change_password.html:54
+msgid "Change password"
+msgstr "Jelszó változtatás"
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+msgid "Please correct the error below."
+msgstr "Kérem javítsa az alábbi hibát."
+
+#: app/templates/app/admin/auth/user/change_password.html:27
+#: app/templates/app/admin/change_form.html:47
+#: app/templates/app/admin/change_list.html:58
+#: app/templates/app/admin/login.html:21
+msgid "Please correct the errors below."
+msgstr "Kérjük javítsa az alábbi hibákat."
+
+#: app/templates/app/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Írja be az új jelszót a <strong>%(username)s</strong> felhasználóhoz."
+
+#: app/templates/app/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Django weblap admin"
+
+#: app/templates/app/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Django adminisztráció"
+
+#: app/templates/app/admin/change_form.html:21
+#: app/templates/app/admin/change_list.html:49
+#, python-format
+msgid "Add %(name)s"
+msgstr "Hozzáad %(name)s"
+
+#: app/templates/app/admin/change_form.html:33
+#: app/templates/app/admin/object_history.html:10
+msgid "History"
+msgstr "Előzmények"
+
+#: app/templates/app/admin/change_form.html:35
+#: app/templates/app/admin/edit_inline/stacked.html:14
+#: app/templates/app/admin/edit_inline/tabular.html:36
+msgid "View on site"
+msgstr "Megtekintés a honlapon"
+
+#: app/templates/app/admin/change_list.html:69
+msgid "Filter"
+msgstr "Szűrő"
+
+#: app/templates/app/admin/change_list_plugin.html:24
+msgid "Load Plugin (.zip)"
+msgstr "Modul betöltés (.zip)"
+
+#: app/templates/app/admin/change_list_plugin.html:28
+msgid "Manage Plugins"
+msgstr "Modulok kezelése"
+
+#: app/templates/app/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Eltávolítás a rendezésből"
+
+#: app/templates/app/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Rendezési prioritás: %(priority_number)s"
+
+#: app/templates/app/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Rendezés megfordítása"
+
+#: app/templates/app/admin/delete_confirmation.html:17
+#: app/templates/app/admin/related_widget_wrapper.html:23
+#: app/templates/app/admin/submit_line.html:6
+#: app/templates/app/processing_node.html:54
+msgid "Delete"
+msgstr "Törlés"
+
+#: app/templates/app/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Az %(object_name)s '%(escaped_object)s' törlése a kapcsolódó objektumok "
+"törlését eredményezné, de a bejelentkezésével nincs joga a következő "
+"objektum típusok törlésére:"
+
+#: app/templates/app/admin/delete_confirmation.html:30
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"A %(object_name)s '%(escaped_object)s' törlése a következő védett kapcsolódó "
+"objektumok törlését tenné szükségessé:"
+
+#: app/templates/app/admin/delete_confirmation.html:37
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Biztos, hogy törölni akarja a %(object_name)s \"%(escaped_object)s\"-t? A "
+"következő összes kapcsolódó elemet töröljük:"
+
+#: app/templates/app/admin/delete_confirmation.html:39
+#: app/templates/app/admin/delete_selected_confirmation.html:38
+msgid "Objects"
+msgstr "Objektumok"
+
+#: app/templates/app/admin/delete_confirmation.html:46
+#: app/templates/app/admin/delete_selected_confirmation.html:49
+msgid "Yes, I'm sure"
+msgstr "Igen, biztos vagyok benne"
+
+#: app/templates/app/admin/delete_confirmation.html:47
+#: app/templates/app/admin/delete_selected_confirmation.html:50
+msgid "No, take me back"
+msgstr "Nem, lépj vissza"
+
+#: app/templates/app/admin/delete_selected_confirmation.html:16
+msgid "Delete multiple objects"
+msgstr "Több objektum törlése"
+
+#: app/templates/app/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"A kiválasztott %(objects_name)s törlése kapcsolódó objektumok törlését "
+"eredményezné, de az ön bejelentkezésével nem kapott jogot a következő "
+"objektum típusok törlésére:"
+
+#: app/templates/app/admin/delete_selected_confirmation.html:29
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"A kiválasztott %(objects_name)s törlése magával vonná a következő védett "
+"kapcsolódó objektumok törlését:"
+
+#: app/templates/app/admin/delete_selected_confirmation.html:36
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Biztos, hogy törölni akarja a kiválasztott %(objects_name)s-t? A következő "
+"összes objektumot és a kapcsolódó elemeket töröljük:"
+
+#: app/templates/app/admin/edit_inline/stacked.html:12
+#: app/templates/app/admin/edit_inline/tabular.html:34
+#: app/templates/app/admin/index.html:37
+#: app/templates/app/admin/related_widget_wrapper.html:9
+msgid "Change"
+msgstr ""
+
+#: app/templates/app/admin/edit_inline/tabular.html:20
+msgid "Delete?"
+msgstr "Törli?"
+
+#: app/templates/app/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+#: app/templates/app/admin/includes/object_delete_summary.html:2
+msgid "Summary"
+msgstr "Összefoglaló"
+
+#: app/templates/app/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modellek a %(name)s alkalmazásban"
+
+#: app/templates/app/admin/index.html:31
+#: app/templates/app/admin/related_widget_wrapper.html:16
+msgid "Add"
+msgstr "Hozzáadás"
+
+#: app/templates/app/admin/index.html:47
+msgid "You don't have permission to edit anything."
+msgstr "Nincs engedélye a szerkesztéshez."
+
+#: app/templates/app/admin/index.html:55
+msgid "Recent actions"
+msgstr "Legutóbbi műveletek"
+
+#: app/templates/app/admin/index.html:56
+msgid "My actions"
+msgstr "Műveleteim"
+
+#: app/templates/app/admin/index.html:60
+msgid "None available"
+msgstr "Nem érhető el"
+
+#: app/templates/app/admin/index.html:74
+msgid "Unknown content"
+msgstr "Ismeretlen tartalom"
+
+#: app/templates/app/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Valami hibás az adatbázis telepítésében. Győződjön meg róla, hogy a "
+"megfelelő adatbázis táblákat létrehozta és az adatbázist a megfelelő "
+"felhasználó olvashatja."
+
+#: app/templates/app/admin/login.html:37
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Önt %(username)s felhasználóként hitelesítettük, nem jogosult ennek az "
+"oldalnak az elérésére. Be szeretne jelentkezni egy másik felhasználóként?"
+
+#: app/templates/app/admin/login.html:57
+msgid "Forgotten your password or username?"
+msgstr "Elfelejtette a jelszavát vagy felhasználó nevét?"
+
+#: app/templates/app/admin/login.html:61
+msgid "Log in"
+msgstr "Belépés"
+
+#: app/templates/app/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Dátum/időpont"
+
+#: app/templates/app/admin/object_history.html:24
+msgid "Action"
+msgstr "Művelet"
+
+#: app/templates/app/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+
+#: app/templates/app/admin/pagination.html:10
+#: app/templates/app/admin/search_form.html:9
+msgid "Show all"
+msgstr "Összes megjelenítése"
+
+#: app/templates/app/admin/pagination.html:11
+#: app/templates/app/admin/submit_line.html:3
+msgid "Save"
+msgstr "Mentés"
+
+#: app/templates/app/admin/popup_response.html:3
+msgid "Popup closing..."
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:8
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:15
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/related_widget_wrapper.html:22
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#: app/templates/app/admin/search_form.html:7
+msgid "Search"
+msgstr "Keresés"
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s eredmény"
+msgstr[1] "%(counter)s eredmény"
+
+#: app/templates/app/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s összesen"
+
+#: app/templates/app/admin/submit_line.html:8
+msgid "Save as new"
+msgstr "Mentés újként"
+
+#: app/templates/app/admin/submit_line.html:9
+msgid "Save and add another"
+msgstr "Mentés és másik hozzáadása"
+
+#: app/templates/app/admin/submit_line.html:10
+msgid "Save and continue editing"
+msgstr "Mentés és szerkesztés folytatása"
+
+#: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
+#: app/templates/app/welcome.html:227
+msgid "Welcome!"
+msgstr "Üdvözöljük!"
+
+#: app/templates/app/dashboard.html:16
+msgid "Add a Processing Node"
+msgstr "Feldolgozási pont hozzáadása"
+
+#: app/templates/app/dashboard.html:19
+#, python-format
+msgid ""
+"To get started, \"%(add_processing_node)s\". A processing node is a computer "
+"running an instance of %(nodeodm_link)s or some other software implementing "
+"this %(api_link)s."
+msgstr ""
+
+#: app/templates/app/dashboard.html:28
+msgid "Select Images and GCP"
+msgstr "Válassza ki a képeket és az illesztőpontokat"
+
+#: app/templates/app/dashboard.html:30
+#, python-format
+msgid ""
+"To create a map, press the \"%(upload_images)s\" button, or drag and drop "
+"some images into a project."
+msgstr ""
+"Egy térkép létrehozásához nyomja meg a \"%(upload_images)s\" gombot vagy "
+"dobjon képeket a projektbe."
+
+#: app/templates/app/dashboard.html:34
+msgid "You need at least 5 images"
+msgstr "Legalább 5 képre van szükség"
+
+#: app/templates/app/dashboard.html:35
+#, python-format
+msgid "Images must overlap by 65%% or more"
+msgstr "A képek között 65%%-os vagy nagyobb átfedés kell"
+
+#: app/templates/app/dashboard.html:36
+#, python-format
+msgid "For great 3D, images must overlap by 83%%"
+msgstr "Nagyszerű 3D-hez a képek között 83%% átfedés legyen"
+
+#: app/templates/app/dashboard.html:37
+#, python-format
+msgid ""
+"A %(link_start)sGCP File%(link_end)s is optional, but can increase "
+"georeferencing accuracy"
+msgstr ""
+"Egy %(link_start)sGCP fájl%(link_end)s opcionális, de növelheti a "
+"georeferálás pontosságát"
+
+#: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
+#: app/views/dev.py:83
+msgid "Developer Tools"
+msgstr "Fejlesztői eszközök"
+
+#: app/templates/app/dev_tools.html:9
+msgid "Close"
+msgstr "Lezárás"
+
+#: app/templates/app/dev_tools.html:14
+msgid "Current Locale:"
+msgstr "Aktuális hely:"
+
+#: app/templates/app/dev_tools.html:15
+msgid ""
+"To change locale, modify your browser's locale settings, then refresh the "
+"page."
+msgstr ""
+"Az aktuális hely módosításához módosítsa a böngészője helyi beállításait és "
+"frissítse az oldalt."
+
+#: app/templates/app/dev_tools.html:18
+msgid "Translation Files (.zip):"
+msgstr "Fordítási fájlok (.zip):"
+
+#: app/templates/app/dev_tools.html:22
+msgid "Download and Replace Translation Files"
+msgstr "Fordítási fájlok letöltése és lecserélése"
+
+#: app/templates/app/dev_tools.html:26
+msgid "Executing… do not refresh the page! This could take a while."
+msgstr "Dolgozom... ne frissítse az oldalt! Egy ideig eltarthat."
+
+#: app/templates/app/logged_in_base.html:15
+#, python-format
+msgid "Hello, %(user)s!"
+msgstr "Helló, %(user)s!"
+
+#: app/templates/app/logged_in_base.html:19
+msgid "Logout"
+msgstr "Kijelentkezés"
+
+#: app/templates/app/logged_in_base.html:33 app/views/app.py:46
+msgid "Dashboard"
+msgstr "Vezérlőpult"
+
+#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
+msgid "Processing Nodes"
+msgstr "Feldolgozási pont"
+
+#: app/templates/app/logged_in_base.html:69
+msgid "Add New"
+msgstr "Új hozzáadása"
+
+#: app/templates/app/logged_in_base.html:79
+msgid "Administration"
+msgstr "Adminisztráció"
+
+#: app/templates/app/logged_in_base.html:84
+msgid "Accounts"
+msgstr "Fiókok"
+
+#: app/templates/app/logged_in_base.html:87
+msgid "Groups"
+msgstr "Csoportok"
+
+#: app/templates/app/logged_in_base.html:92
+msgid "Brand"
+msgstr ""
+
+#: app/templates/app/logged_in_base.html:114 app/views/app.py:103
+msgid "About"
+msgstr "Névjegy"
+
+#: app/templates/app/processing_node.html:11 nodeodm/models.py:23
+msgid "Hostname"
+msgstr "Gépnév"
+
+#: app/templates/app/processing_node.html:15 nodeodm/models.py:24
+msgid "Port"
+msgstr ""
+
+#: app/templates/app/processing_node.html:19 nodeodm/models.py:25
+msgid "API Version"
+msgstr "API verzió"
+
+#: app/templates/app/processing_node.html:23 nodeodm/models.py:33
+msgid "Engine"
+msgstr "Motor"
+
+#: app/templates/app/processing_node.html:27 nodeodm/models.py:31
+msgid "Engine Version"
+msgstr "Motor verzió"
+
+#: app/templates/app/processing_node.html:31 nodeodm/models.py:27
+msgid "Queue Count"
+msgstr ""
+
+#: app/templates/app/processing_node.html:35
+msgid "Max Images Limit"
+msgstr "Max kép korlát"
+
+#: app/templates/app/processing_node.html:39 nodeodm/models.py:32
+msgid "Label"
+msgstr "Címke"
+
+#: app/templates/app/processing_node.html:43 nodeodm/models.py:26
+msgid "Last Refreshed"
+msgstr "Utoljára frissítve"
+
+#: app/templates/app/processing_node.html:44
+msgctxt "5 minutes ago"
+msgid "ago"
+msgstr "ezelőtt"
+
+#: app/templates/app/processing_node.html:47
+msgid "Options (JSON)"
+msgstr "Beállítások (JSON)"
+
+#: app/templates/app/processing_node.html:53
+msgid "Edit"
+msgstr "Szerkeszt"
+
+#: app/templates/app/welcome.html:224
+msgid "Uh oh! Could you please check the errors below?"
+msgstr "Hoppá! Ellenőrizné a lenti hibákat?"
+
+#: app/templates/app/welcome.html:237
+msgid "Create Account"
+msgstr "Fiók létrehozása"
+
+#: app/translations/plugin_manifest_autogenerated.py:4
+msgid "Compute volume, area and length measurements on Leaflet"
+msgstr "Térfogat számítás , terület és hosszmérés Leaflet-en"
+
+#: app/translations/plugin_manifest_autogenerated.py:5
+#: app/translations/plugin_manifest_autogenerated.py:6
+msgid "A plugin to create GCP files from images"
+msgstr "Modul a GCP fájlok létrehozására a képekből"
+
+#: app/translations/plugin_manifest_autogenerated.py:7
+msgid ""
+"A plugin to add a button for quickly opening OpenStreetMap's iD editor and "
+"setup a TMS basemap."
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:8
+msgid "A plugin to upload orthophotos to OpenAerialMap"
+msgstr "Modul az ortofotók feltöltéséhez az OpenAerialMap-ra"
+
+#: app/translations/plugin_manifest_autogenerated.py:9
+msgid "Display program version, memory and disk space usage statistics"
+msgstr "Program változat, memória és háttértár hely használat statisztika"
+
+#: app/translations/plugin_manifest_autogenerated.py:10
+msgid "Sync accounts from webodm.net"
+msgstr "Bejelentkezés szinkronizálása webodm.net-ről"
+
+#: app/translations/plugin_manifest_autogenerated.py:11
+msgid "Add a fullscreen button to the 2D map view"
+msgstr "Teljes képernyő gomb hozzáadása a 2D térkép nézethez"
+
+#: app/translations/plugin_manifest_autogenerated.py:12
+msgid "Compute, preview and export contours from DEMs"
+msgstr "Szintvonalak számítása, előnézete és exportálása a DEM-ből"
+
+#: app/translations/plugin_manifest_autogenerated.py:13
+msgid "Calculate and draw an elevation map based on a task's DEMs"
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:14
+msgid "Upload and tile ODM assets with Cesium ion."
+msgstr ""
+
+#: app/translations/plugin_manifest_autogenerated.py:15
+msgid "Import images from external sources directly"
+msgstr "Képek közvetlen importja külső forrásokból"
+
+#: app/translations/plugin_manifest_autogenerated.py:16
+msgid "Detect changes between two different tasks in the same project."
+msgstr ""
+"Változások észlelése két különböző feladat között ugyanabban a projektben."
+
+#: app/views/app.py:44
+msgid "First Project"
+msgstr "Első projekt"
+
+#: app/views/app.py:54 app/views/public.py:26
+msgid "Map"
+msgstr "Térkép"
+
+#: app/views/app.py:81
+msgid "3D Model Display"
+msgstr "3D modell megjelenítés"
+
+#: app/views/app.py:147
+msgid "Welcome"
+msgstr "Üdvözöljük"
+
+#: app/views/dev.py:59
+msgid "Cannot find locale/ folder in .zip archive"
+msgstr ""
+
+#: app/views/dev.py:76
+msgid "Translation files reloaded!"
+msgstr "Fordítási fájlt újratöltöttem!"
+
+#: app/views/dev.py:80
+msgid "Invalid action"
+msgstr "Hibás művelet"
+
+#: nodeodm/apps.py:8
+msgid "Node Management"
+msgstr "Csomópont kezelés"
+
+#: nodeodm/models.py:23
+msgid ""
+"Hostname or IP address where the node is located (can be an internal "
+"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
+"localhost. Find the IP address of your host machine by running ifconfig on "
+"Linux or by checking your network settings."
+msgstr ""
+
+#: nodeodm/models.py:24
+msgid "Port that connects to the node's API"
+msgstr ""
+
+#: nodeodm/models.py:25
+msgid "API version used by the node"
+msgstr "A csomópont által használt API verzió"
+
+#: nodeodm/models.py:26
+msgid "When was the information about this node last retrieved?"
+msgstr "Mikor kérdezték le legutoljára az információt erről a csomópontról?"
+
+#: nodeodm/models.py:27
+msgid ""
+"Number of tasks currently being processed by this node (as reported by the "
+"node itself)"
+msgstr ""
+"A feldolgozás alatt álló feladatok száma ezen a csomóponton (a csomópont "
+"jelentése alapján)"
+
+#: nodeodm/models.py:28
+msgid "Available Options"
+msgstr "Lehetséges beállítások"
+
+#: nodeodm/models.py:28
+msgid "Description of the options that can be used for processing"
+msgstr "A feldolgozáshoz használható beállítások leírása"
+
+#: nodeodm/models.py:29
+msgid "Token"
+msgstr ""
+
+#: nodeodm/models.py:29
+msgid ""
+"Token to use for authentication. If the node doesn't have authentication, "
+"you can leave this field blank."
+msgstr ""
+
+#: nodeodm/models.py:30
+msgid "Max Images"
+msgstr "Max képszám"
+
+#: nodeodm/models.py:30
+msgid "Maximum number of images accepted by this node."
+msgstr "A feldolgozási pont által elfogadott maximális képszám."
+
+#: nodeodm/models.py:31
+msgid "Engine version used by the node."
+msgstr "A csomópont által használt motor verziója."
+
+#: nodeodm/models.py:32
+msgid ""
+"Optional label for this node. When set, this label will be shown instead of "
+"the hostname:port name."
+msgstr ""
+
+#: nodeodm/models.py:33
+msgid "Engine used by the node."
+msgstr "A csomópont által használt motor."
+
+#: plugins/cesium-ion/api_views.py:170
+msgid "No matching enum type."
+msgstr ""
+
+#: plugins/contours/api.py:16
+msgid "No DSM layer is available."
+msgstr "Nincs DSM réteg."
+
+#: plugins/contours/api.py:18
+msgid "No DTM layer is available."
+msgstr "Nincs DTM réteg."
+
+#: plugins/contours/api.py:60
+msgid "Could not generate contour file. This might be a bug."
+msgstr ""
+
+#: plugins/diagnostic/plugin.py:36
+msgid "Diagnostic"
+msgstr "Diagnosztika"
+
+#: plugins/diagnostic/templates/diagnostic.html:6
+msgid "Diagnostic Information"
+msgstr "Diagnosztikai információk"
+
+#: plugins/diagnostic/templates/diagnostic.html:10
+msgid "Storage Space"
+msgstr "Háttértár"
+
+#: plugins/diagnostic/templates/diagnostic.html:14
+#: plugins/diagnostic/templates/diagnostic.html:40
+#: plugins/diagnostic/templates/diagnostic.html:45
+msgctxt "Megabytes of storage space"
+msgid "Free"
+msgstr "Szabad"
+
+#: plugins/diagnostic/templates/diagnostic.html:15
+#: plugins/diagnostic/templates/diagnostic.html:39
+#: plugins/diagnostic/templates/diagnostic.html:45
+msgctxt "Megabytes of storage space"
+msgid "Used"
+msgstr "Használt"
+
+#: plugins/diagnostic/templates/diagnostic.html:16
+msgctxt "Megabytes of storage space"
+msgid "Total"
+msgstr "Összes"
+
+#: plugins/diagnostic/templates/diagnostic.html:20
+msgctxt "Computer memory (RAM)"
+msgid "Memory"
+msgstr "Memória"
+
+#: plugins/diagnostic/templates/diagnostic.html:24
+#: plugins/diagnostic/templates/diagnostic.html:75
+#: plugins/diagnostic/templates/diagnostic.html:80
+msgctxt "Megabytes of memory space"
+msgid "Free"
+msgstr "Szabad"
+
+#: plugins/diagnostic/templates/diagnostic.html:25
+#: plugins/diagnostic/templates/diagnostic.html:74
+#: plugins/diagnostic/templates/diagnostic.html:80
+msgctxt "Megabytes of memory space"
+msgid "Used"
+msgstr "Használt"
+
+#: plugins/diagnostic/templates/diagnostic.html:26
+msgctxt "Megabytes of memory space"
+msgid "Total"
+msgstr "Összes"
+
+#: plugins/diagnostic/templates/diagnostic.html:33
+msgid "Note!"
+msgstr "Megjegyzés!"
+
+#: plugins/diagnostic/templates/diagnostic.html:33
+#, python-format
+msgid ""
+"These values might be relative to the virtualization environment in which "
+"the application is running, not necessarily the values of the your machine. "
+"See instructions for %(win_link)s and %(mac_link)s for changing these values "
+"in a Docker setup."
+msgstr ""
+"Ezek az értékek viszonyulhatnak ahhoz a virtualizációs környezethez, "
+"amelyben az alkalmazás fut, és nem feltétlenül a számítógép értékei. Olvassa "
+"el a %(win_link)s és %(mac_link)s vonatkozó utasításokat ezen értékek Docker-"
+"beállítások módosításához.."
+
+#: plugins/diagnostic/templates/diagnostic.html:47
+#: plugins/diagnostic/templates/diagnostic.html:82
+msgid "Disk Space"
+msgstr "Lemez méret"
+
+#: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
+msgid "Lightning Network"
+msgstr "Villám hálózat"
+
+#: plugins/measure/api.py:27
+msgid ""
+"No surface model available. From the Dashboard, select this task, press "
+"Edit, from the options make sure to check \"dsm\", then press Restart --> "
+"From DEM."
+msgstr ""
+"Nincs elérhető felületi modell. Az Irányítópulton válassza ki ezt a "
+"feladatot, nyomja meg a Szerkeszt gombot, az opciók közül ellenőrizze, hogy "
+"be van-e jelölve a \"dsm\", majd nyomja meg az Újraindítás -> A DEM-ből "
+"gombot."
+
+#: plugins/posm-gcpi/plugin.py:8
+msgid "GCP Interface"
+msgstr "GCP interfész"
