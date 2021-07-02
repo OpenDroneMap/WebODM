@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-19 04:24+0000\n"
-"PO-Revision-Date: 2021-03-25 08:29+0000\n"
+"POT-Creation-Date: 2021-07-02 00:20+0000\n"
+"PO-Revision-Date: 2021-06-10 14:32+0000\n"
 "Last-Translator: Park Jeongyong <kladess@gmail.com>\n"
 "Language-Team: Korean <https://hosted.weblate.org/projects/webodm/webodm/ko/"
 ">\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.5.2-dev\n"
+"X-Generator: Weblate 4.7-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
@@ -76,7 +76,57 @@ msgstr "버전"
 msgid "Author"
 msgstr "작성자"
 
+#: app/admin.py:144
+#, python-format
+msgid "Restart required. Please restart WebODM to enable %(plugin)s"
+msgstr ""
+
+#: app/admin.py:146
+#, python-format
+msgid "Cannot enable plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:154
+#, python-format
+msgid "Restart required. Please restart WebODM to fully disable %(plugin)s"
+msgstr ""
+
+#: app/admin.py:156
+#, python-format
+msgid "Cannot disable plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:164
+#, python-format
+msgid "Cannot delete plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:208
+msgid "Plugin added successfully"
+msgstr ""
+
+#: app/admin.py:210
+#, python-format
+msgid "Cannot load plugin: %(message)s"
+msgstr ""
+
+#: app/admin.py:216
+#, fuzzy
+#| msgid "You need to upload at least 2 images before commit"
+msgid "You need to upload a zip file"
+msgstr "결정하기 전에 최소 2장 의 이미지들을 업로드 하여야 합니다"
+
+#: app/admin.py:230
+msgid "Disable"
+msgstr ""
+
 #: app/admin.py:233
+#, fuzzy
+#| msgid "Enabled"
+msgid "Enable"
+msgstr "활성화됨"
+
+#: app/admin.py:238
 msgid "Actions"
 msgstr "행동"
 
@@ -122,57 +172,71 @@ msgid ""
 "Green Normalized Difference Vegetation Index is similar to NDVI, but "
 "measures the green spectrum instead of red."
 msgstr ""
+"녹색 정규화 식생 지수는 NDVI와 유사하지만 빨간색 대신 녹색 스펙트럼을 측정합"
+"니다."
 
 #: app/api/formulas.py:46
 msgid ""
 "Green Ratio Vegetation Index is sensitive to photosynthetic rates in forests."
-msgstr ""
+msgstr "녹색 비율 식생 지수는 산림의 광합성 비율에 민감합니다."
 
 #: app/api/formulas.py:50
 msgid ""
 "Soil Adjusted Vegetation Index is similar to NDVI but attempts to remove the "
 "effects of soil areas using an adjustment factor (0.5)."
 msgstr ""
+"토양 조정 식생 지수는 NDVI와 유사하지만 조정 계수 (0.5)를 사용하여 토양 영역"
+"의 영향을 제거하려고합니다."
 
 #: app/api/formulas.py:54
 msgid ""
 "Modified Non-Linear Index improves the Non-Linear Index algorithm to account "
 "for soil areas."
 msgstr ""
+"수정 된 비선형 인덱스는 토양 영역을 설명하기 위해 비선형 인덱스 알고리즘을 개"
+"선합니다."
 
 #: app/api/formulas.py:58
 msgid ""
 "Modified Simple Ratio is an improvement of the Simple Ratio (SR) index to be "
 "more sensitive to vegetation."
 msgstr ""
+"수정 단순 비율은 초목에 더 민감하도록 단순 비율 (SR) 지수를 개선 한 것입니다."
 
 #: app/api/formulas.py:62
 msgid ""
 "Renormalized Difference Vegetation Index uses the difference between near-IR "
 "and red, plus NDVI to show areas of healthy vegetation."
 msgstr ""
+"정규화된 차이 식물 지수는 IR과 빨간색의 차이를 사용하여 NDVI를 사용하여 건강"
+"한 식물 영역을 표시합니다."
 
 #: app/api/formulas.py:66
 msgid ""
 "Transformed Difference Vegetation Index highlights vegetation cover in urban "
 "environments."
 msgstr ""
+"Transformed Difference Vegetation Index는 도시 환경의 식생 커버를 강조합니다."
 
 #: app/api/formulas.py:70
 msgid ""
 "Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work "
 "better in areas with little vegetation where soil is visible."
 msgstr ""
+"최적화 된 토양 조정 식생 지수는 SAVI를 기반으로하지만 토양이 보이는 곳에서 식"
+"생이 거의없는 지역에서 더 잘 작동하는 경향이 있습니다."
 
 #: app/api/formulas.py:74
 msgid "Leaf Area Index estimates foliage areas and predicts crop yields."
-msgstr ""
+msgstr "잎 면적 지수는 잎 면적을 추정하고 작물 수확량을 예측합니다."
 
 #: app/api/formulas.py:79
 msgid ""
 "Enhanced Vegetation Index is useful in areas where NDVI might saturate, by "
 "using blue wavelengths to correct soil signals."
 msgstr ""
+"향상된 식물 지수는 파란색 파장을 사용하여 토양 신호를 수정하여 NDVI가 포화 "
+"될 수있는 지역에서 유용합니다."
 
 #: app/api/tasks.py:179
 msgid "You need to upload at least 2 images before commit"
@@ -206,9 +270,9 @@ msgstr ""
 
 #: app/models/image_upload.py:10
 msgid "Task this image belongs to"
-msgstr ""
+msgstr "이 이미지가 속한 작업"
 
-#: app/models/image_upload.py:10 app/models/task.py:260
+#: app/models/image_upload.py:10 app/models/task.py:261
 msgid "Task"
 msgstr "작업"
 
@@ -263,7 +327,7 @@ msgstr "키"
 
 #: app/models/plugin_datum.py:8
 msgid "The user this setting belongs to. If NULL, the setting is global."
-msgstr ""
+msgstr "이 설정에 속하는 사용자입니다. NULL인 경우 설정이 전역입니다."
 
 #: app/models/plugin_datum.py:8 app/templates/app/admin/object_history.html:23
 msgid "User"
@@ -307,7 +371,7 @@ msgstr "이 프리셋을 설명하기 위한 레이블"
 
 #: app/models/preset.py:11
 msgid "Options that define this preset (same format as in a Task's options)."
-msgstr ""
+msgstr "이 사전 설정을 정의하는 옵션(작업 옵션과 동일한 형식)."
 
 #: app/models/preset.py:11 app/models/task.py:228
 msgid "Options"
@@ -326,6 +390,8 @@ msgid ""
 "Whether this preset is available to every user in the system or just to its "
 "owner."
 msgstr ""
+"이 사전 설정이 시스템의 모든 사용자가 사용할 수 있는지 아니면 소유자만 사용"
+"할 수 있는지 여부입니다."
 
 #: app/models/preset.py:14
 msgid "System"
@@ -341,7 +407,7 @@ msgstr "사전 설정"
 
 #: app/models/project.py:22
 msgid "The person who created the project"
-msgstr ""
+msgstr "프로젝트를 만든 사람"
 
 #: app/models/project.py:23
 msgid "A label used to describe the project"
@@ -349,7 +415,7 @@ msgstr "이 프로젝트를 설명하기 위한 레이블"
 
 #: app/models/project.py:24
 msgid "More in-depth description of the project"
-msgstr ""
+msgstr "프로젝트에 대한 자세한 설명"
 
 #: app/models/project.py:26
 msgid ""
@@ -357,6 +423,8 @@ msgid ""
 "running tasks need to wait for tasks to be properly cleaned up before they "
 "can be deleted."
 msgstr ""
+"이 프로젝트가 삭제 표시되었는지 여부입니다. 실행중인 작업이있는 프로젝트는 삭"
+"제되기 전에 작업이 제대로 정리 될 때까지 기다려야합니다."
 
 #: app/models/project.py:26
 msgid "Deleting"
@@ -372,23 +440,23 @@ msgstr "프로젝트"
 
 #: app/models/setting.py:20
 msgid "The name of your application"
-msgstr ""
+msgstr "응용 프로그램의 이름"
 
 #: app/models/setting.py:20
 msgid "App name"
-msgstr ""
+msgstr "앱 이름"
 
 #: app/models/setting.py:21
 msgid "A 512x512 logo of your application (.png or .jpeg)"
-msgstr ""
+msgstr "응용 프로그램의 512x512 로고 (.png 또는 .jpeg)"
 
 #: app/models/setting.py:21
 msgid "App logo"
-msgstr ""
+msgstr "앱 로고"
 
 #: app/models/setting.py:31
 msgid "The name of your organization"
-msgstr ""
+msgstr "조직의 이름"
 
 #: app/models/setting.py:31
 msgid "Organization name"
@@ -396,7 +464,7 @@ msgstr "조직 이름"
 
 #: app/models/setting.py:32
 msgid "The website URL of your organization"
-msgstr ""
+msgstr "조직의 웹 사이트 URL"
 
 #: app/models/setting.py:32
 msgid "Organization website"
@@ -409,7 +477,7 @@ msgstr "테마"
 
 #: app/models/setting.py:34
 msgid "Active theme"
-msgstr ""
+msgstr "활성 테마"
 
 #: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
 msgid "Application"
@@ -425,25 +493,26 @@ msgstr "ID"
 
 #: app/models/task.py:220
 msgid "Identifier of the task (as returned by NodeODM API)"
-msgstr ""
+msgstr "작업 식별자 (NodeODM API에서 반환 됨)"
 
 #: app/models/task.py:220
 msgid "UUID"
-msgstr ""
+msgstr "UUID"
 
 #: app/models/task.py:221
 msgid "Project that this task belongs to"
-msgstr ""
+msgstr "이 작업이 속한 프로젝트"
 
 #: app/models/task.py:222
 msgid "A label for the task"
-msgstr ""
+msgstr "작업에 대한 레이블"
 
 #: app/models/task.py:223
 msgid ""
 "Number of milliseconds that elapsed since the beginning of this task (-1 "
 "indicates that no information is available)"
 msgstr ""
+"이 작업이 시작된 이후 경과 된 시간 (-1은 사용 가능한 정보가 없음을 나타냄)"
 
 #: app/models/task.py:223
 msgid "Processing Time"
@@ -454,8 +523,9 @@ msgid ""
 "Processing node assigned to this task (or null if this task has not been "
 "associated yet)"
 msgstr ""
+"이 작업에 할당 된 처리 노드 (또는이 작업이 아직 연결되지 않은 경우 null)"
 
-#: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
+#: app/models/task.py:224 app/views/app.py:115 nodeodm/models.py:34
 msgid "Processing Node"
 msgstr "프로세싱 노드"
 
@@ -463,15 +533,15 @@ msgstr "프로세싱 노드"
 msgid ""
 "A flag indicating whether this task should be automatically assigned a "
 "processing node"
-msgstr ""
+msgstr "이 작업에 처리 노드가 자동으로 할당되어야하는지 여부를 나타내는 플래그"
 
 #: app/models/task.py:225
 msgid "Auto Processing Node"
-msgstr ""
+msgstr "자동 처리 노드"
 
 #: app/models/task.py:226
 msgid "Current status of the task"
-msgstr ""
+msgstr "작업의 현재 상태"
 
 #: app/models/task.py:226
 msgid "Status"
@@ -479,61 +549,63 @@ msgstr "상태"
 
 #: app/models/task.py:227
 msgid "The last processing error received"
-msgstr ""
+msgstr "마지막으로 받은 처리 오류"
 
 #: app/models/task.py:227
 msgid "Last Error"
-msgstr ""
+msgstr "마지막 오류"
 
 #: app/models/task.py:228
 msgid "Options that are being used to process this task"
-msgstr ""
+msgstr "이 작업을 처리하는 데 사용되는 옵션"
 
 #: app/models/task.py:229
 msgid "List of available assets to download"
-msgstr ""
+msgstr "다운로드 할 수있는 자산 목록"
 
 #: app/models/task.py:229
 msgid "Available Assets"
-msgstr ""
+msgstr "사용 가능한 자산"
 
 #: app/models/task.py:230
 msgid "Console output of the processing node"
-msgstr ""
+msgstr "처리 노드의 콘솔 출력"
 
 #: app/models/task.py:230
 msgid "Console Output"
-msgstr ""
+msgstr "콘솔 출력"
 
 #: app/models/task.py:232
 msgid "Extent of the orthophoto"
-msgstr ""
+msgstr "정사 영상의 범위"
 
 #: app/models/task.py:232
 msgid "Orthophoto Extent"
-msgstr ""
+msgstr "정사 영상 범위"
 
 #: app/models/task.py:233
 msgid "DSM Extent"
-msgstr ""
+msgstr "DSM 범위"
 
 #: app/models/task.py:234
 msgid "DTM Extent"
-msgstr ""
+msgstr "DTM 범위"
 
 #: app/models/task.py:238
 msgid ""
 "A requested action to be performed on the task. The selected action will be "
 "performed by the worker at the next iteration."
 msgstr ""
+"작업에 대해 수행 할 요청 된 작업입니다. 선택한 작업은 다음 반복에서 작업자가 "
+"수행합니다."
 
 #: app/models/task.py:238
 msgid "Pending Action"
-msgstr ""
+msgstr "보류 중인 작업"
 
 #: app/models/task.py:240
 msgid "A flag indicating whether this task is available to the public"
-msgstr ""
+msgstr "이 작업을 대중에게 공개할 수 있는지 여부를 나타내는 플래그"
 
 #: app/models/task.py:240
 msgid "Public"
@@ -545,16 +617,19 @@ msgid ""
 "task have been / will be resized to the size specified here before "
 "processing."
 msgstr ""
+"-1과 다른 값으로 설정하면 이 작업의 이미지가 처리 하기 전에 여기에 지정된 크"
+"기로 크기 조정되었음을 나타냅니다."
 
 #: app/models/task.py:241
 msgid "Resize To"
-msgstr ""
+msgstr "크기 조정"
 
 #: app/models/task.py:244
 msgid ""
 "Value between 0 and 1 indicating the upload progress of this task's files to "
 "the processing node"
 msgstr ""
+"처리 노드에 대한이 작업의 파일 업로드 진행률을 나타내는 0에서 1 사이의 값"
 
 #: app/models/task.py:245
 msgid "Upload Progress"
@@ -563,89 +638,101 @@ msgstr "업로드 진행"
 #: app/models/task.py:248
 msgid ""
 "Value between 0 and 1 indicating the resize progress of this task's images"
-msgstr ""
+msgstr "이 작업 이미지의 크기 조정 진행률을 나타내는 0에서 1 사이의 값"
 
 #: app/models/task.py:249
 msgid "Resize Progress"
-msgstr ""
+msgstr "진행률 크기 조정"
 
 #: app/models/task.py:252
 msgid ""
 "Value between 0 and 1 indicating the running progress (estimated) of this "
 "task"
-msgstr ""
+msgstr "이 작업의 실행 중인 진행률(예상)을 나타내는 0에서 1 사이의 값"
 
 #: app/models/task.py:253
 msgid "Running Progress"
-msgstr ""
+msgstr "실행 중인 처리"
 
 #: app/models/task.py:255
 msgid "URL this task is imported from (only for imported tasks)"
-msgstr ""
+msgstr "이 작업을 가져온 URL (가져온 작업에만 해당)"
 
 #: app/models/task.py:255
 msgid "Import URL"
-msgstr ""
+msgstr "URL 가져 오기"
 
 #: app/models/task.py:256
 msgid "Number of images associated with this task"
-msgstr ""
+msgstr "이 작업과 관련된 이미지 수"
 
 #: app/models/task.py:256
 msgid "Images Count"
-msgstr ""
+msgstr "이미지 수"
 
 #: app/models/task.py:257
 msgid ""
 "A flag indicating whether this task is currently waiting for information or "
 "files to be uploaded before being considered for processing."
 msgstr ""
+"이 작업이 현재 처리 중인 것으로 간주되기 전에 정보 또는 파일이 업로드되기를 "
+"기다리고 있는지 여부를 나타내는 플래그입니다."
 
 #: app/models/task.py:257
 msgid "Partial"
 msgstr "부분적"
 
-#: app/models/task.py:261
+#: app/models/task.py:258
+msgid ""
+"Serialized potree scene information used to save/load measurements and "
+"camera view angle"
+msgstr ""
+
+#: app/models/task.py:258
+msgid "Potree Scene"
+msgstr ""
+
+#: app/models/task.py:262
 msgid "Tasks"
 msgstr "작업"
 
-#: app/models/task.py:270
+#: app/models/task.py:271
 msgid "unnamed"
 msgstr "이름 없음"
 
-#: app/models/task.py:373
+#: app/models/task.py:374
 msgid "Importing assets..."
-msgstr ""
+msgstr "자산 가져 오는 중 ..."
 
-#: app/models/task.py:412 app/models/task.py:680
+#: app/models/task.py:413 app/models/task.py:681
 msgid "Invalid zip file"
-msgstr ""
+msgstr "잘못된 zip 파일"
 
-#: app/models/task.py:506
+#: app/models/task.py:507
 #, python-format
 msgid "Connection error: %(error)s"
-msgstr ""
+msgstr "연결 오류 : %(error)s"
 
-#: app/models/task.py:586
+#: app/models/task.py:587
 msgid "Cannot restart a task that has no processing node"
-msgstr ""
+msgstr "처리 노드가없는 작업을 다시 시작할 수 없습니다"
 
-#: app/models/task.py:738
+#: app/models/task.py:739
 #, python-format
 msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
-msgstr ""
+msgstr "지원되지 않는 SRS %(code)s. 지원되는 SRS를 선택했는지 확인하십시오."
 
-#: app/models/task.py:748
+#: app/models/task.py:750
 msgid "Done!"
 msgstr "완료!"
 
 #: app/models/theme.py:16
 msgid "Name of theme"
-msgstr ""
+msgstr "테마명"
 
 #: app/models/theme.py:19
 msgid "Most text, icons, and borders."
-msgstr ""
+msgstr "대부분의 텍스트, 아이콘 및 테두리."
 
 #: app/models/theme.py:19
 msgid "Primary"
@@ -653,7 +740,7 @@ msgstr "기본"
 
 #: app/models/theme.py:20
 msgid "The main background color, and text color of some buttons."
-msgstr ""
+msgstr "일부 버튼의 기본 배경색 및 텍스트 색상입니다."
 
 #: app/models/theme.py:20
 msgid "Secondary"
@@ -661,31 +748,31 @@ msgstr "보조"
 
 #: app/models/theme.py:21
 msgid "Navigation links."
-msgstr ""
+msgstr "탐색 링크."
 
 #: app/models/theme.py:21
 msgid "Tertiary"
-msgstr ""
+msgstr "제 3기"
 
 #: app/models/theme.py:23
 msgid "Primary button color."
-msgstr ""
+msgstr "기본 버튼 색상."
 
 #: app/models/theme.py:23
 msgid "Button Primary"
-msgstr ""
+msgstr "버튼 기본"
 
 #: app/models/theme.py:24
 msgid "Default button color."
-msgstr ""
+msgstr "기본 버튼 색상."
 
 #: app/models/theme.py:24
 msgid "Button Default"
-msgstr ""
+msgstr "버튼 기본값"
 
 #: app/models/theme.py:25
 msgid "Delete button color."
-msgstr ""
+msgstr "단추 색상을 삭제합니다."
 
 #: app/models/theme.py:25
 msgid "Button Danger"
@@ -1118,7 +1205,7 @@ msgstr ""
 
 #: app/templates/app/admin/submit_line.html:8
 msgid "Save as new"
-msgstr ""
+msgstr "저장하고 새로 만들기"
 
 #: app/templates/app/admin/submit_line.html:9
 msgid "Save and add another"
@@ -1178,7 +1265,7 @@ msgid ""
 msgstr ""
 
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
-#: app/views/dev.py:83
+#: app/views/dev.py:81
 msgid "Developer Tools"
 msgstr "개발자 도구"
 
@@ -1193,7 +1280,7 @@ msgstr ""
 #: app/templates/app/dev_tools.html:15
 msgid ""
 "To change locale, modify your browser's locale settings, then refresh the "
-"page."
+"page, or use the set locale button below."
 msgstr ""
 
 #: app/templates/app/dev_tools.html:18
@@ -1204,7 +1291,15 @@ msgstr ""
 msgid "Download and Replace Translation Files"
 msgstr ""
 
-#: app/templates/app/dev_tools.html:26
+#: app/templates/app/dev_tools.html:27
+msgid "Set locale:"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:29
+msgid "Apply"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:33
 msgid "Executing… do not refresh the page! This could take a while."
 msgstr ""
 
@@ -1221,7 +1316,7 @@ msgstr "로그아웃"
 msgid "Dashboard"
 msgstr "대쉬보드"
 
-#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
+#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:35
 msgid "Processing Nodes"
 msgstr "프로세싱 노드"
 
@@ -1245,31 +1340,31 @@ msgstr "그룹"
 msgid "Brand"
 msgstr "브랜드"
 
-#: app/templates/app/logged_in_base.html:114 app/views/app.py:103
+#: app/templates/app/logged_in_base.html:114 app/views/app.py:105
 msgid "About"
 msgstr "소개"
 
-#: app/templates/app/processing_node.html:11 nodeodm/models.py:23
+#: app/templates/app/processing_node.html:11 nodeodm/models.py:21
 msgid "Hostname"
 msgstr "호스트 이름"
 
-#: app/templates/app/processing_node.html:15 nodeodm/models.py:24
+#: app/templates/app/processing_node.html:15 nodeodm/models.py:22
 msgid "Port"
 msgstr "포트 번호"
 
-#: app/templates/app/processing_node.html:19 nodeodm/models.py:25
+#: app/templates/app/processing_node.html:19 nodeodm/models.py:23
 msgid "API Version"
 msgstr "API 버전"
 
-#: app/templates/app/processing_node.html:23 nodeodm/models.py:33
+#: app/templates/app/processing_node.html:23 nodeodm/models.py:31
 msgid "Engine"
 msgstr "엔진"
 
-#: app/templates/app/processing_node.html:27 nodeodm/models.py:31
+#: app/templates/app/processing_node.html:27 nodeodm/models.py:29
 msgid "Engine Version"
 msgstr "엔진 버전"
 
-#: app/templates/app/processing_node.html:31 nodeodm/models.py:27
+#: app/templates/app/processing_node.html:31 nodeodm/models.py:25
 msgid "Queue Count"
 msgstr "대기열 개수"
 
@@ -1277,11 +1372,11 @@ msgstr "대기열 개수"
 msgid "Max Images Limit"
 msgstr "최대 이미지 개수 제한"
 
-#: app/templates/app/processing_node.html:39 nodeodm/models.py:32
+#: app/templates/app/processing_node.html:39 nodeodm/models.py:30
 msgid "Label"
 msgstr "레이블"
 
-#: app/templates/app/processing_node.html:43 nodeodm/models.py:26
+#: app/templates/app/processing_node.html:43 nodeodm/models.py:24
 msgid "Last Refreshed"
 msgstr "마지막 새로고침"
 
@@ -1359,19 +1454,23 @@ msgstr ""
 msgid "A plugin to create GCP files from images"
 msgstr "이미지로부터 GCP 파일을 생성하는 플러그인"
 
+#: app/translations/plugin_manifest_autogenerated.py:17
+msgid "Create short links when sharing task URLs"
+msgstr ""
+
 #: app/views/app.py:44
 msgid "First Project"
 msgstr ""
 
-#: app/views/app.py:54 app/views/public.py:26
+#: app/views/app.py:54 app/views/public.py:27
 msgid "Map"
 msgstr "지도"
 
-#: app/views/app.py:81
+#: app/views/app.py:82
 msgid "3D Model Display"
 msgstr ""
 
-#: app/views/app.py:147
+#: app/views/app.py:149
 msgid "Welcome"
 msgstr "환영 합니다"
 
@@ -1379,160 +1478,90 @@ msgstr "환영 합니다"
 msgid "Cannot find locale/ folder in .zip archive"
 msgstr ""
 
-#: app/views/dev.py:76
+#: app/views/dev.py:74
 msgid "Translation files reloaded!"
 msgstr ""
 
-#: app/views/dev.py:80
+#: app/views/dev.py:78
 msgid "Invalid action"
 msgstr ""
 
-#: nodeodm/apps.py:8
-msgid "Node Management"
-msgstr ""
-
-#: nodeodm/models.py:23
-msgid ""
-"Hostname or IP address where the node is located (can be an internal "
-"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
-"localhost. Find the IP address of your host machine by running ifconfig on "
-"Linux or by checking your network settings."
-msgstr ""
-
-#: nodeodm/models.py:24
-msgid "Port that connects to the node's API"
-msgstr ""
-
-#: nodeodm/models.py:25
-msgid "API version used by the node"
-msgstr ""
-
-#: nodeodm/models.py:26
-msgid "When was the information about this node last retrieved?"
-msgstr ""
-
-#: nodeodm/models.py:27
-msgid ""
-"Number of tasks currently being processed by this node (as reported by the "
-"node itself)"
-msgstr ""
-
-#: nodeodm/models.py:28
-msgid "Available Options"
-msgstr ""
-
-#: nodeodm/models.py:28
-msgid "Description of the options that can be used for processing"
-msgstr ""
-
-#: nodeodm/models.py:29
-msgid "Token"
-msgstr "토큰"
-
-#: nodeodm/models.py:29
-msgid ""
-"Token to use for authentication. If the node doesn't have authentication, "
-"you can leave this field blank."
-msgstr ""
-
-#: nodeodm/models.py:30
-msgid "Max Images"
-msgstr ""
-
-#: nodeodm/models.py:30
-msgid "Maximum number of images accepted by this node."
-msgstr ""
-
-#: nodeodm/models.py:31
-msgid "Engine version used by the node."
-msgstr ""
-
-#: nodeodm/models.py:32
-msgid ""
-"Optional label for this node. When set, this label will be shown instead of "
-"the hostname:port name."
-msgstr ""
-
-#: nodeodm/models.py:33
-msgid "Engine used by the node."
-msgstr ""
-
-#: plugins/cesiumion/api_views.py:159
+#: coreplugins/cesiumion/api_views.py:159
 msgid "No matching enum type."
 msgstr ""
 
-#: plugins/contours/api.py:16
+#: coreplugins/contours/api.py:16
 msgid "No DSM layer is available."
 msgstr ""
 
-#: plugins/contours/api.py:18
+#: coreplugins/contours/api.py:18
 msgid "No DTM layer is available."
 msgstr ""
 
-#: plugins/contours/api.py:60
+#: coreplugins/contours/api.py:60
 msgid "Could not generate contour file. This might be a bug."
 msgstr ""
 
-#: plugins/diagnostic/plugin.py:36
+#: coreplugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
 msgstr "진단용"
 
-#: plugins/diagnostic/templates/diagnostic.html:6
+#: coreplugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
 msgstr "진단용 정보"
 
-#: plugins/diagnostic/templates/diagnostic.html:10
+#: coreplugins/diagnostic/templates/diagnostic.html:10
 msgid "Storage Space"
 msgstr "저장소 공간"
 
-#: plugins/diagnostic/templates/diagnostic.html:14
-#: plugins/diagnostic/templates/diagnostic.html:40
-#: plugins/diagnostic/templates/diagnostic.html:45
+#: coreplugins/diagnostic/templates/diagnostic.html:14
+#: coreplugins/diagnostic/templates/diagnostic.html:40
+#: coreplugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
 msgstr "여유"
 
-#: plugins/diagnostic/templates/diagnostic.html:15
-#: plugins/diagnostic/templates/diagnostic.html:39
-#: plugins/diagnostic/templates/diagnostic.html:45
+#: coreplugins/diagnostic/templates/diagnostic.html:15
+#: coreplugins/diagnostic/templates/diagnostic.html:39
+#: coreplugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
 msgstr "사용 됨"
 
-#: plugins/diagnostic/templates/diagnostic.html:16
+#: coreplugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
 msgstr "전체"
 
-#: plugins/diagnostic/templates/diagnostic.html:20
+#: coreplugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
 msgstr "메모리"
 
-#: plugins/diagnostic/templates/diagnostic.html:24
-#: plugins/diagnostic/templates/diagnostic.html:75
-#: plugins/diagnostic/templates/diagnostic.html:80
+#: coreplugins/diagnostic/templates/diagnostic.html:24
+#: coreplugins/diagnostic/templates/diagnostic.html:75
+#: coreplugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Free"
 msgstr "여유"
 
-#: plugins/diagnostic/templates/diagnostic.html:25
-#: plugins/diagnostic/templates/diagnostic.html:74
-#: plugins/diagnostic/templates/diagnostic.html:80
+#: coreplugins/diagnostic/templates/diagnostic.html:25
+#: coreplugins/diagnostic/templates/diagnostic.html:74
+#: coreplugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Used"
 msgstr "사용 됨"
 
-#: plugins/diagnostic/templates/diagnostic.html:26
+#: coreplugins/diagnostic/templates/diagnostic.html:26
 msgctxt "Megabytes of memory space"
 msgid "Total"
 msgstr "전체"
 
-#: plugins/diagnostic/templates/diagnostic.html:33
+#: coreplugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
 msgstr "주의!"
 
-#: plugins/diagnostic/templates/diagnostic.html:33
+#: coreplugins/diagnostic/templates/diagnostic.html:33
 #, python-format
 msgid ""
 "These values might be relative to the virtualization environment in which "
@@ -1541,22 +1570,92 @@ msgid ""
 "in a Docker setup."
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:47
-#: plugins/diagnostic/templates/diagnostic.html:82
+#: coreplugins/diagnostic/templates/diagnostic.html:47
+#: coreplugins/diagnostic/templates/diagnostic.html:82
 msgid "Disk Space"
 msgstr "디스크 공간"
 
-#: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
+#: coreplugins/lightning/plugin.py:25 coreplugins/lightning/plugin.py:39
 msgid "Lightning Network"
 msgstr "라이트닝 네트워크"
 
-#: plugins/measure/api.py:27
+#: coreplugins/measure/api.py:27
 msgid ""
 "No surface model available. From the Dashboard, select this task, press "
 "Edit, from the options make sure to check \"dsm\", then press Restart --> "
 "From DEM."
 msgstr ""
 
-#: plugins/posm-gcpi/plugin.py:8
+#: coreplugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
 msgstr "GCP 인터페이스"
+
+#: nodeodm/apps.py:8
+msgid "Node Management"
+msgstr ""
+
+#: nodeodm/models.py:21
+msgid ""
+"Hostname or IP address where the node is located (can be an internal "
+"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
+"localhost. Find the IP address of your host machine by running ifconfig on "
+"Linux or by checking your network settings."
+msgstr ""
+
+#: nodeodm/models.py:22
+msgid "Port that connects to the node's API"
+msgstr ""
+
+#: nodeodm/models.py:23
+msgid "API version used by the node"
+msgstr ""
+
+#: nodeodm/models.py:24
+msgid "When was the information about this node last retrieved?"
+msgstr ""
+
+#: nodeodm/models.py:25
+msgid ""
+"Number of tasks currently being processed by this node (as reported by the "
+"node itself)"
+msgstr ""
+
+#: nodeodm/models.py:26
+msgid "Available Options"
+msgstr ""
+
+#: nodeodm/models.py:26
+msgid "Description of the options that can be used for processing"
+msgstr ""
+
+#: nodeodm/models.py:27
+msgid "Token"
+msgstr "토큰"
+
+#: nodeodm/models.py:27
+msgid ""
+"Token to use for authentication. If the node doesn't have authentication, "
+"you can leave this field blank."
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Max Images"
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Maximum number of images accepted by this node."
+msgstr ""
+
+#: nodeodm/models.py:29
+msgid "Engine version used by the node."
+msgstr ""
+
+#: nodeodm/models.py:30
+msgid ""
+"Optional label for this node. When set, this label will be shown instead of "
+"the hostname:port name."
+msgstr ""
+
+#: nodeodm/models.py:31
+msgid "Engine used by the node."
+msgstr ""

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-19 04:24+0000\n"
-"PO-Revision-Date: 2021-01-12 14:33+0000\n"
-"Last-Translator: Jurijs Jeskins <jurijs.jeshkins@gmail.com>\n"
+"POT-Creation-Date: 2021-07-02 00:20+0000\n"
+"PO-Revision-Date: 2021-06-27 11:33+0000\n"
+"Last-Translator: Artem <KovalevArtem.ru@gmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/webodm/webodm/ru/"
 ">\n"
 "Language: ru\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 4.4.1-dev\n"
+"X-Generator: Weblate 4.7.1-dev\n"
 
 #: app/admin.py:52
 msgid "Enter custom CSS"
@@ -37,7 +37,6 @@ msgid "HTML (before header)"
 msgstr "HTML (перед заголовком)"
 
 #: app/admin.py:60
-#, fuzzy
 msgid "HTML that will be displayed after site header"
 msgstr "HTML код, который будет показан под \"шапкой\" (хидером) сайта"
 
@@ -81,7 +80,57 @@ msgstr "Версия"
 msgid "Author"
 msgstr "Автор"
 
+#: app/admin.py:144
+#, python-format
+msgid "Restart required. Please restart WebODM to enable %(plugin)s"
+msgstr ""
+
+#: app/admin.py:146
+#, python-format
+msgid "Cannot enable plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:154
+#, python-format
+msgid "Restart required. Please restart WebODM to fully disable %(plugin)s"
+msgstr ""
+
+#: app/admin.py:156
+#, python-format
+msgid "Cannot disable plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:164
+#, python-format
+msgid "Cannot delete plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:208
+msgid "Plugin added successfully"
+msgstr ""
+
+#: app/admin.py:210
+#, python-format
+msgid "Cannot load plugin: %(message)s"
+msgstr ""
+
+#: app/admin.py:216
+#, fuzzy
+#| msgid "You need at least 5 images"
+msgid "You need to upload a zip file"
+msgstr "Необходимо как минимум 5 изображений"
+
+#: app/admin.py:230
+msgid "Disable"
+msgstr ""
+
 #: app/admin.py:233
+#, fuzzy
+#| msgid "Enabled"
+msgid "Enable"
+msgstr "Включено"
+
+#: app/admin.py:238
 msgid "Actions"
 msgstr "Действия"
 
@@ -206,7 +255,7 @@ msgstr ""
 msgid "Task this image belongs to"
 msgstr ""
 
-#: app/models/image_upload.py:10 app/models/task.py:260
+#: app/models/image_upload.py:10 app/models/task.py:261
 msgid "Task"
 msgstr "Задача"
 
@@ -220,7 +269,7 @@ msgstr "Изображение"
 
 #: app/models/image_upload.py:20
 msgid "Image Upload"
-msgstr ""
+msgstr "Загрузка изображений"
 
 #: app/models/image_upload.py:21
 msgid "Image Uploads"
@@ -228,7 +277,7 @@ msgstr ""
 
 #: app/models/plugin.py:5
 msgid "Plugin name"
-msgstr ""
+msgstr "Название плагина"
 
 #: app/models/plugin.py:5 app/models/preset.py:10 app/models/project.py:23
 #: app/models/task.py:222 app/models/theme.py:16
@@ -289,7 +338,7 @@ msgstr ""
 
 #: app/models/plugin_datum.py:19 app/models/plugin_datum.py:20
 msgid "Plugin Datum"
-msgstr ""
+msgstr "Данные плагинов"
 
 #: app/models/preset.py:9
 msgid "The person who owns this preset"
@@ -339,7 +388,7 @@ msgstr "Пресеты"
 
 #: app/models/project.py:22
 msgid "The person who created the project"
-msgstr ""
+msgstr "Человек, создавший проект"
 
 #: app/models/project.py:23
 msgid "A label used to describe the project"
@@ -347,7 +396,7 @@ msgstr ""
 
 #: app/models/project.py:24
 msgid "More in-depth description of the project"
-msgstr ""
+msgstr "Более подробное описание проекта"
 
 #: app/models/project.py:26
 msgid ""
@@ -358,7 +407,7 @@ msgstr ""
 
 #: app/models/project.py:26
 msgid "Deleting"
-msgstr ""
+msgstr "Удаление"
 
 #: app/models/project.py:56 app/models/task.py:221
 msgid "Project"
@@ -374,7 +423,7 @@ msgstr ""
 
 #: app/models/setting.py:20
 msgid "App name"
-msgstr ""
+msgstr "Название приложения"
 
 #: app/models/setting.py:21
 msgid "A 512x512 logo of your application (.png or .jpeg)"
@@ -382,7 +431,7 @@ msgstr ""
 
 #: app/models/setting.py:21
 msgid "App logo"
-msgstr ""
+msgstr "Логотип приложения"
 
 #: app/models/setting.py:31
 msgid "The name of your organization"
@@ -394,7 +443,7 @@ msgstr "Название организации"
 
 #: app/models/setting.py:32
 msgid "The website URL of your organization"
-msgstr ""
+msgstr "URL-адрес сайта вашей организации"
 
 #: app/models/setting.py:32
 msgid "Organization website"
@@ -407,7 +456,7 @@ msgstr "Тема"
 
 #: app/models/setting.py:34
 msgid "Active theme"
-msgstr ""
+msgstr "Активная тема"
 
 #: app/models/setting.py:73 app/templates/app/logged_in_base.html:101
 msgid "Application"
@@ -445,7 +494,7 @@ msgstr ""
 
 #: app/models/task.py:223
 msgid "Processing Time"
-msgstr ""
+msgstr "Время обработки"
 
 #: app/models/task.py:224
 msgid ""
@@ -453,7 +502,7 @@ msgid ""
 "associated yet)"
 msgstr ""
 
-#: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
+#: app/models/task.py:224 app/views/app.py:115 nodeodm/models.py:34
 msgid "Processing Node"
 msgstr ""
 
@@ -481,7 +530,7 @@ msgstr ""
 
 #: app/models/task.py:227
 msgid "Last Error"
-msgstr ""
+msgstr "Последняя ошибка"
 
 #: app/models/task.py:228
 msgid "Options that are being used to process this task"
@@ -591,7 +640,7 @@ msgstr ""
 
 #: app/models/task.py:256
 msgid "Images Count"
-msgstr ""
+msgstr "Количество изображений"
 
 #: app/models/task.py:257
 msgid ""
@@ -603,43 +652,53 @@ msgstr ""
 msgid "Partial"
 msgstr ""
 
-#: app/models/task.py:261
+#: app/models/task.py:258
+msgid ""
+"Serialized potree scene information used to save/load measurements and "
+"camera view angle"
+msgstr ""
+
+#: app/models/task.py:258
+msgid "Potree Scene"
+msgstr ""
+
+#: app/models/task.py:262
 msgid "Tasks"
 msgstr "Задачи"
 
-#: app/models/task.py:270
+#: app/models/task.py:271
 msgid "unnamed"
 msgstr ""
 
-#: app/models/task.py:373
+#: app/models/task.py:374
 msgid "Importing assets..."
 msgstr ""
 
-#: app/models/task.py:412 app/models/task.py:680
+#: app/models/task.py:413 app/models/task.py:681
 msgid "Invalid zip file"
 msgstr ""
 
-#: app/models/task.py:506
+#: app/models/task.py:507
 #, python-format
 msgid "Connection error: %(error)s"
 msgstr ""
 
-#: app/models/task.py:586
+#: app/models/task.py:587
 msgid "Cannot restart a task that has no processing node"
 msgstr ""
 
-#: app/models/task.py:738
+#: app/models/task.py:739
 #, python-format
 msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
 msgstr ""
 
-#: app/models/task.py:748
+#: app/models/task.py:750
 msgid "Done!"
 msgstr "Готово!"
 
 #: app/models/theme.py:16
 msgid "Name of theme"
-msgstr ""
+msgstr "Название темы"
 
 #: app/models/theme.py:19
 msgid "Most text, icons, and borders."
@@ -647,7 +706,7 @@ msgstr ""
 
 #: app/models/theme.py:19
 msgid "Primary"
-msgstr ""
+msgstr "Основной"
 
 #: app/models/theme.py:20
 msgid "The main background color, and text color of some buttons."
@@ -655,7 +714,7 @@ msgstr ""
 
 #: app/models/theme.py:20
 msgid "Secondary"
-msgstr ""
+msgstr "Вторичный"
 
 #: app/models/theme.py:21
 msgid "Navigation links."
@@ -663,7 +722,7 @@ msgstr ""
 
 #: app/models/theme.py:21
 msgid "Tertiary"
-msgstr ""
+msgstr "Третичный"
 
 #: app/models/theme.py:23
 msgid "Primary button color."
@@ -743,7 +802,7 @@ msgstr ""
 
 #: app/models/theme.py:36
 msgid "Success"
-msgstr ""
+msgstr "Успешно"
 
 #: app/templates/app/404.html:6
 msgid "404 Page Not Found"
@@ -797,11 +856,11 @@ msgstr "Ошибка сервера"
 
 #: app/templates/app/admin/500.html:11
 msgid "Server error (500)"
-msgstr ""
+msgstr "Ошибка сервера (500)"
 
 #: app/templates/app/admin/500.html:14
 msgid "Server Error (500)"
-msgstr ""
+msgstr "Ошибка сервера (500)"
 
 #: app/templates/app/admin/500.html:15
 msgid ""
@@ -824,7 +883,7 @@ msgstr ""
 #: app/templates/app/admin/actions.html:10
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Выбрать все %(total_count)s %(module_name)s"
 
 #: app/templates/app/admin/actions.html:12
 msgid "Clear selection"
@@ -838,7 +897,7 @@ msgstr ""
 
 #: app/templates/app/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "Введите имя пользователя и пароль."
 
 #: app/templates/app/admin/auth/user/change_password.html:17
 #: app/templates/app/admin/auth/user/change_password.html:54
@@ -876,7 +935,7 @@ msgstr ""
 #: app/templates/app/admin/change_list.html:49
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Добавить %(name)s"
 
 #: app/templates/app/admin/change_form.html:33
 #: app/templates/app/admin/object_history.html:10
@@ -891,15 +950,15 @@ msgstr ""
 
 #: app/templates/app/admin/change_list.html:69
 msgid "Filter"
-msgstr ""
+msgstr "Фильтр"
 
 #: app/templates/app/admin/change_list_plugin.html:24
 msgid "Load Plugin (.zip)"
-msgstr ""
+msgstr "Загрузить плагин (.zip)"
 
 #: app/templates/app/admin/change_list_plugin.html:28
 msgid "Manage Plugins"
-msgstr ""
+msgstr "Управление плагинами"
 
 #: app/templates/app/admin/change_list_results.html:17
 msgid "Remove from sorting"
@@ -951,7 +1010,7 @@ msgstr "Объекты"
 #: app/templates/app/admin/delete_confirmation.html:46
 #: app/templates/app/admin/delete_selected_confirmation.html:49
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "Да, я уверен"
 
 #: app/templates/app/admin/delete_confirmation.html:47
 #: app/templates/app/admin/delete_selected_confirmation.html:50
@@ -960,7 +1019,7 @@ msgstr ""
 
 #: app/templates/app/admin/delete_selected_confirmation.html:16
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Удалить несколько объектов"
 
 #: app/templates/app/admin/delete_selected_confirmation.html:22
 #, python-format
@@ -1020,11 +1079,11 @@ msgstr ""
 
 #: app/templates/app/admin/index.html:55
 msgid "Recent actions"
-msgstr ""
+msgstr "Недавние действия"
 
 #: app/templates/app/admin/index.html:56
 msgid "My actions"
-msgstr ""
+msgstr "Мои действия"
 
 #: app/templates/app/admin/index.html:60
 msgid "None available"
@@ -1050,11 +1109,11 @@ msgstr ""
 
 #: app/templates/app/admin/login.html:57
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "Забыли пароль или имя пользователя?"
 
 #: app/templates/app/admin/login.html:61
 msgid "Log in"
-msgstr ""
+msgstr "Войти"
 
 #: app/templates/app/admin/object_history.html:22
 msgid "Date/time"
@@ -1107,18 +1166,18 @@ msgstr "Поиск"
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(counter)s результат"
+msgstr[1] "%(counter)s результата"
+msgstr[2] "%(counter)s результатов"
 
 #: app/templates/app/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s всего"
 
 #: app/templates/app/admin/submit_line.html:8
 msgid "Save as new"
-msgstr ""
+msgstr "Сохранить как новый"
 
 #: app/templates/app/admin/submit_line.html:9
 msgid "Save and add another"
@@ -1126,7 +1185,7 @@ msgstr ""
 
 #: app/templates/app/admin/submit_line.html:10
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Сохранить и продолжить редактирование"
 
 #: app/templates/app/dashboard.html:15 app/templates/app/dashboard.html:27
 #: app/templates/app/welcome.html:227
@@ -1158,7 +1217,7 @@ msgstr ""
 
 #: app/templates/app/dashboard.html:34
 msgid "You need at least 5 images"
-msgstr ""
+msgstr "Необходимо как минимум 5 изображений"
 
 #: app/templates/app/dashboard.html:35
 #, python-format
@@ -1178,7 +1237,7 @@ msgid ""
 msgstr ""
 
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
-#: app/views/dev.py:83
+#: app/views/dev.py:81
 msgid "Developer Tools"
 msgstr "Инструменты разработчика"
 
@@ -1193,7 +1252,7 @@ msgstr ""
 #: app/templates/app/dev_tools.html:15
 msgid ""
 "To change locale, modify your browser's locale settings, then refresh the "
-"page."
+"page, or use the set locale button below."
 msgstr ""
 
 #: app/templates/app/dev_tools.html:18
@@ -1204,14 +1263,22 @@ msgstr ""
 msgid "Download and Replace Translation Files"
 msgstr ""
 
-#: app/templates/app/dev_tools.html:26
+#: app/templates/app/dev_tools.html:27
+msgid "Set locale:"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:29
+msgid "Apply"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:33
 msgid "Executing… do not refresh the page! This could take a while."
 msgstr ""
 
 #: app/templates/app/logged_in_base.html:15
 #, python-format
 msgid "Hello, %(user)s!"
-msgstr ""
+msgstr "Привет, %(user)s!"
 
 #: app/templates/app/logged_in_base.html:19
 msgid "Logout"
@@ -1221,7 +1288,7 @@ msgstr "Выйти"
 msgid "Dashboard"
 msgstr "Панель управления"
 
-#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
+#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:35
 msgid "Processing Nodes"
 msgstr ""
 
@@ -1231,7 +1298,7 @@ msgstr ""
 
 #: app/templates/app/logged_in_base.html:79
 msgid "Administration"
-msgstr ""
+msgstr "Администрирование"
 
 #: app/templates/app/logged_in_base.html:84
 msgid "Accounts"
@@ -1243,33 +1310,33 @@ msgstr "Группы"
 
 #: app/templates/app/logged_in_base.html:92
 msgid "Brand"
-msgstr ""
+msgstr "Бренд"
 
-#: app/templates/app/logged_in_base.html:114 app/views/app.py:103
+#: app/templates/app/logged_in_base.html:114 app/views/app.py:105
 msgid "About"
 msgstr ""
 
-#: app/templates/app/processing_node.html:11 nodeodm/models.py:23
+#: app/templates/app/processing_node.html:11 nodeodm/models.py:21
 msgid "Hostname"
-msgstr ""
+msgstr "Имя хоста"
 
-#: app/templates/app/processing_node.html:15 nodeodm/models.py:24
+#: app/templates/app/processing_node.html:15 nodeodm/models.py:22
 msgid "Port"
 msgstr "Порт"
 
-#: app/templates/app/processing_node.html:19 nodeodm/models.py:25
+#: app/templates/app/processing_node.html:19 nodeodm/models.py:23
 msgid "API Version"
-msgstr ""
+msgstr "Версия API"
 
-#: app/templates/app/processing_node.html:23 nodeodm/models.py:33
+#: app/templates/app/processing_node.html:23 nodeodm/models.py:31
 msgid "Engine"
 msgstr "Ядро"
 
-#: app/templates/app/processing_node.html:27 nodeodm/models.py:31
+#: app/templates/app/processing_node.html:27 nodeodm/models.py:29
 msgid "Engine Version"
 msgstr ""
 
-#: app/templates/app/processing_node.html:31 nodeodm/models.py:27
+#: app/templates/app/processing_node.html:31 nodeodm/models.py:25
 msgid "Queue Count"
 msgstr ""
 
@@ -1277,18 +1344,18 @@ msgstr ""
 msgid "Max Images Limit"
 msgstr ""
 
-#: app/templates/app/processing_node.html:39 nodeodm/models.py:32
+#: app/templates/app/processing_node.html:39 nodeodm/models.py:30
 msgid "Label"
-msgstr ""
+msgstr "Метка"
 
-#: app/templates/app/processing_node.html:43 nodeodm/models.py:26
+#: app/templates/app/processing_node.html:43 nodeodm/models.py:24
 msgid "Last Refreshed"
 msgstr ""
 
 #: app/templates/app/processing_node.html:44
 msgctxt "5 minutes ago"
 msgid "ago"
-msgstr ""
+msgstr "назад"
 
 #: app/templates/app/processing_node.html:47
 msgid "Options (JSON)"
@@ -1357,19 +1424,23 @@ msgstr ""
 msgid "A plugin to create GCP files from images"
 msgstr ""
 
-#: app/views/app.py:44
-msgid "First Project"
+#: app/translations/plugin_manifest_autogenerated.py:17
+msgid "Create short links when sharing task URLs"
 msgstr ""
 
-#: app/views/app.py:54 app/views/public.py:26
+#: app/views/app.py:44
+msgid "First Project"
+msgstr "Первый проект"
+
+#: app/views/app.py:54 app/views/public.py:27
 msgid "Map"
 msgstr "Карта"
 
-#: app/views/app.py:81
+#: app/views/app.py:82
 msgid "3D Model Display"
 msgstr ""
 
-#: app/views/app.py:147
+#: app/views/app.py:149
 msgid "Welcome"
 msgstr "Добро пожаловать"
 
@@ -1377,160 +1448,90 @@ msgstr "Добро пожаловать"
 msgid "Cannot find locale/ folder in .zip archive"
 msgstr ""
 
-#: app/views/dev.py:76
+#: app/views/dev.py:74
 msgid "Translation files reloaded!"
 msgstr ""
 
-#: app/views/dev.py:80
+#: app/views/dev.py:78
 msgid "Invalid action"
 msgstr ""
 
-#: nodeodm/apps.py:8
-msgid "Node Management"
-msgstr ""
-
-#: nodeodm/models.py:23
-msgid ""
-"Hostname or IP address where the node is located (can be an internal "
-"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
-"localhost. Find the IP address of your host machine by running ifconfig on "
-"Linux or by checking your network settings."
-msgstr ""
-
-#: nodeodm/models.py:24
-msgid "Port that connects to the node's API"
-msgstr ""
-
-#: nodeodm/models.py:25
-msgid "API version used by the node"
-msgstr ""
-
-#: nodeodm/models.py:26
-msgid "When was the information about this node last retrieved?"
-msgstr ""
-
-#: nodeodm/models.py:27
-msgid ""
-"Number of tasks currently being processed by this node (as reported by the "
-"node itself)"
-msgstr ""
-
-#: nodeodm/models.py:28
-msgid "Available Options"
-msgstr ""
-
-#: nodeodm/models.py:28
-msgid "Description of the options that can be used for processing"
-msgstr ""
-
-#: nodeodm/models.py:29
-msgid "Token"
-msgstr "Токен"
-
-#: nodeodm/models.py:29
-msgid ""
-"Token to use for authentication. If the node doesn't have authentication, "
-"you can leave this field blank."
-msgstr ""
-
-#: nodeodm/models.py:30
-msgid "Max Images"
-msgstr ""
-
-#: nodeodm/models.py:30
-msgid "Maximum number of images accepted by this node."
-msgstr ""
-
-#: nodeodm/models.py:31
-msgid "Engine version used by the node."
-msgstr ""
-
-#: nodeodm/models.py:32
-msgid ""
-"Optional label for this node. When set, this label will be shown instead of "
-"the hostname:port name."
-msgstr ""
-
-#: nodeodm/models.py:33
-msgid "Engine used by the node."
-msgstr ""
-
-#: plugins/cesiumion/api_views.py:159
+#: coreplugins/cesiumion/api_views.py:159
 msgid "No matching enum type."
 msgstr ""
 
-#: plugins/contours/api.py:16
+#: coreplugins/contours/api.py:16
 msgid "No DSM layer is available."
 msgstr ""
 
-#: plugins/contours/api.py:18
+#: coreplugins/contours/api.py:18
 msgid "No DTM layer is available."
 msgstr ""
 
-#: plugins/contours/api.py:60
+#: coreplugins/contours/api.py:60
 msgid "Could not generate contour file. This might be a bug."
 msgstr ""
 
-#: plugins/diagnostic/plugin.py:36
+#: coreplugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
 msgstr "Диагностика"
 
-#: plugins/diagnostic/templates/diagnostic.html:6
+#: coreplugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
-msgstr ""
+msgstr "Диагностическая информация"
 
-#: plugins/diagnostic/templates/diagnostic.html:10
+#: coreplugins/diagnostic/templates/diagnostic.html:10
 msgid "Storage Space"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:14
-#: plugins/diagnostic/templates/diagnostic.html:40
-#: plugins/diagnostic/templates/diagnostic.html:45
+#: coreplugins/diagnostic/templates/diagnostic.html:14
+#: coreplugins/diagnostic/templates/diagnostic.html:40
+#: coreplugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:15
-#: plugins/diagnostic/templates/diagnostic.html:39
-#: plugins/diagnostic/templates/diagnostic.html:45
+#: coreplugins/diagnostic/templates/diagnostic.html:15
+#: coreplugins/diagnostic/templates/diagnostic.html:39
+#: coreplugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
 msgstr "Используется"
 
-#: plugins/diagnostic/templates/diagnostic.html:16
+#: coreplugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
 msgstr "Итого"
 
-#: plugins/diagnostic/templates/diagnostic.html:20
+#: coreplugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
 msgstr "Память"
 
-#: plugins/diagnostic/templates/diagnostic.html:24
-#: plugins/diagnostic/templates/diagnostic.html:75
-#: plugins/diagnostic/templates/diagnostic.html:80
+#: coreplugins/diagnostic/templates/diagnostic.html:24
+#: coreplugins/diagnostic/templates/diagnostic.html:75
+#: coreplugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Free"
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:25
-#: plugins/diagnostic/templates/diagnostic.html:74
-#: plugins/diagnostic/templates/diagnostic.html:80
+#: coreplugins/diagnostic/templates/diagnostic.html:25
+#: coreplugins/diagnostic/templates/diagnostic.html:74
+#: coreplugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Used"
-msgstr ""
+msgstr "Используется"
 
-#: plugins/diagnostic/templates/diagnostic.html:26
+#: coreplugins/diagnostic/templates/diagnostic.html:26
 msgctxt "Megabytes of memory space"
 msgid "Total"
-msgstr ""
+msgstr "Всего"
 
-#: plugins/diagnostic/templates/diagnostic.html:33
+#: coreplugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
 msgstr "Заметки!"
 
-#: plugins/diagnostic/templates/diagnostic.html:33
+#: coreplugins/diagnostic/templates/diagnostic.html:33
 #, python-format
 msgid ""
 "These values might be relative to the virtualization environment in which "
@@ -1539,22 +1540,92 @@ msgid ""
 "in a Docker setup."
 msgstr ""
 
-#: plugins/diagnostic/templates/diagnostic.html:47
-#: plugins/diagnostic/templates/diagnostic.html:82
+#: coreplugins/diagnostic/templates/diagnostic.html:47
+#: coreplugins/diagnostic/templates/diagnostic.html:82
 msgid "Disk Space"
 msgstr ""
 
-#: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
+#: coreplugins/lightning/plugin.py:25 coreplugins/lightning/plugin.py:39
 msgid "Lightning Network"
 msgstr ""
 
-#: plugins/measure/api.py:27
+#: coreplugins/measure/api.py:27
 msgid ""
 "No surface model available. From the Dashboard, select this task, press "
 "Edit, from the options make sure to check \"dsm\", then press Restart --> "
 "From DEM."
 msgstr ""
 
-#: plugins/posm-gcpi/plugin.py:8
+#: coreplugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
+msgstr ""
+
+#: nodeodm/apps.py:8
+msgid "Node Management"
+msgstr ""
+
+#: nodeodm/models.py:21
+msgid ""
+"Hostname or IP address where the node is located (can be an internal "
+"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
+"localhost. Find the IP address of your host machine by running ifconfig on "
+"Linux or by checking your network settings."
+msgstr ""
+
+#: nodeodm/models.py:22
+msgid "Port that connects to the node's API"
+msgstr ""
+
+#: nodeodm/models.py:23
+msgid "API version used by the node"
+msgstr ""
+
+#: nodeodm/models.py:24
+msgid "When was the information about this node last retrieved?"
+msgstr ""
+
+#: nodeodm/models.py:25
+msgid ""
+"Number of tasks currently being processed by this node (as reported by the "
+"node itself)"
+msgstr ""
+
+#: nodeodm/models.py:26
+msgid "Available Options"
+msgstr ""
+
+#: nodeodm/models.py:26
+msgid "Description of the options that can be used for processing"
+msgstr ""
+
+#: nodeodm/models.py:27
+msgid "Token"
+msgstr "Токен"
+
+#: nodeodm/models.py:27
+msgid ""
+"Token to use for authentication. If the node doesn't have authentication, "
+"you can leave this field blank."
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Max Images"
+msgstr ""
+
+#: nodeodm/models.py:28
+msgid "Maximum number of images accepted by this node."
+msgstr ""
+
+#: nodeodm/models.py:29
+msgid "Engine version used by the node."
+msgstr ""
+
+#: nodeodm/models.py:30
+msgid ""
+"Optional label for this node. When set, this label will be shown instead of "
+"the hostname:port name."
+msgstr ""
+
+#: nodeodm/models.py:31
+msgid "Engine used by the node."
 msgstr ""

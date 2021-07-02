@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-24 01:30+0000\n"
-"PO-Revision-Date: 2021-01-17 11:32+0000\n"
+"PO-Revision-Date: 2021-04-27 07:37+0000\n"
 "Last-Translator: Anand Mahesh <manand881@gmail.com>\n"
 "Language-Team: Kannada <https://hosted.weblate.org/projects/webodm/react-ui/"
 "kn/>\n"
@@ -17,25 +17,25 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.5-dev\n"
+"X-Generator: Weblate 4.7-dev\n"
 
 #: app/static/app/js/Console.jsx:135
 #, python-format
 msgid "output truncated at %(count)s lines"
-msgstr ""
+msgstr "ನಲ್ಲಿ ಮೊಟಕುಗೊಳಿಸಲಾಗಿದೆ %(count)s ಸಾಲುಗಳು"
 
 #: app/static/app/js/Console.jsx:147 app/static/app/js/Console.jsx:155
 #: app/static/app/js/Console.jsx:165
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "ಪೂರ್ಣಪರದೆ ಟಾಗಲ್ ಮಾಡಿ"
 
 #: app/static/app/js/Console.jsx:148 app/static/app/js/Console.jsx:156
 msgid "Exit Fullscreen"
-msgstr ""
+msgstr "ಪೂರ್ಣಪರದೆ ನಿರ್ಗಮಿಸಿ"
 
 #: app/static/app/js/Console.jsx:162
 msgid "Download To File"
-msgstr ""
+msgstr "ಫೈಲ್‌ಗೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ"
 
 #: app/static/app/js/Dashboard.jsx:26
 msgid "Name field is required"
@@ -61,23 +61,23 @@ msgstr "ಸಸ್ಯ ಆರೋಗ್ಯ"
 
 #: app/static/app/js/MapView.jsx:75
 msgid "Surface Model"
-msgstr ""
+msgstr "ಮೇಲ್ಮೈ ಮಾದರಿ"
 
 #: app/static/app/js/MapView.jsx:80
 msgid "Terrain Model"
-msgstr ""
+msgstr "ಭೂಪ್ರದೇಶ ಮಾದರಿ"
 
 #: app/static/app/js/ModelView.jsx:42
 msgid "Show Model"
-msgstr ""
+msgstr "ಮಾದರಿ ತೋರಿಸು"
 
 #: app/static/app/js/ModelView.jsx:69
 msgid "Show Cameras"
-msgstr ""
+msgstr "ಕ್ಯಾಮೆರಾಗಳನ್ನು ತೋರಿಸಿ"
 
 #: app/static/app/js/ModelView.jsx:482
 msgid "Loading textured model..."
-msgstr ""
+msgstr "ಟೆಕ್ಸ್ಚರ್ಡ್ ಮಾದರಿಯನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ ..."
 
 #: app/static/app/js/classes/AssetDownloads.js:36
 msgid "Orthophoto (GeoTIFF)"
@@ -133,7 +133,7 @@ msgstr ""
 
 #: app/static/app/js/classes/AssetDownloads.js:49
 msgid "Camera Parameters"
-msgstr ""
+msgstr "ಕ್ಯಾಮೆರಾ ನಿಯತಾಂಕಗಳು"
 
 #: app/static/app/js/classes/AssetDownloads.js:50
 msgid "Camera Shots (GeoJSON)"
@@ -141,11 +141,11 @@ msgstr ""
 
 #: app/static/app/js/classes/AssetDownloads.js:53
 msgid "All Assets"
-msgstr ""
+msgstr "ಎಲ್ಲಾ ಸ್ವತ್ತುಗಳು"
 
 #: app/static/app/js/classes/Basemaps.js:9
 msgid "Google Maps Hybrid"
-msgstr ""
+msgstr "ಗೂಗಲ್ ನಕ್ಷೆಗಳು ಹೈಬ್ರಿಡ್"
 
 #: app/static/app/js/classes/Basemaps.js:17
 msgid "ESRI Satellite"
@@ -157,28 +157,28 @@ msgstr ""
 
 #: app/static/app/js/classes/PendingActions.js:11
 msgid "Canceling..."
-msgstr ""
+msgstr "ರದ್ದುಗೊಳಿಸಲಾಗುತ್ತಿದೆ ..."
 
 #: app/static/app/js/classes/PendingActions.js:14
 #: app/static/app/js/components/FormDialog.jsx:170
 msgid "Deleting..."
-msgstr ""
+msgstr "ಅಳಿಸಲಾಗುತ್ತಿದೆ ..."
 
 #: app/static/app/js/classes/PendingActions.js:17
 msgid "Restarting..."
-msgstr ""
+msgstr "ಮರುಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ ..."
 
 #: app/static/app/js/classes/PendingActions.js:20
 msgid "Resizing images..."
-msgstr ""
+msgstr "ಚಿತ್ರಗಳನ್ನು ಮರುಗಾತ್ರಗೊಳಿಸಲಾಗುತ್ತಿದೆ ..."
 
 #: app/static/app/js/classes/PendingActions.js:23
 msgid "Importing..."
-msgstr ""
+msgstr "ಆಮದು ಮಾಡಲಾಗುತ್ತಿದೆ ..."
 
 #: app/static/app/js/classes/PipelineSteps.js:7
 msgid "Load Dataset"
-msgstr ""
+msgstr "ಡೇಟಾಸೆಟ್ ಅನ್ನು ಲೋಡ್ ಮಾಡಿ"
 
 #: app/static/app/js/classes/PipelineSteps.js:12
 msgid "Structure From Motion / MVS"
@@ -206,11 +206,11 @@ msgstr ""
 
 #: app/static/app/js/classes/ResizeModes.js:4
 msgid "No"
-msgstr ""
+msgstr "ಇಲ್ಲ"
 
 #: app/static/app/js/classes/ResizeModes.js:5
 msgid "Yes"
-msgstr ""
+msgstr "ಹೌದು"
 
 #: app/static/app/js/classes/StatusCodes.js:11
 msgid "Queued"
@@ -218,7 +218,7 @@ msgstr ""
 
 #: app/static/app/js/classes/StatusCodes.js:15
 msgid "Running"
-msgstr ""
+msgstr "ಚಾಲನೆಯಲ್ಲಿದೆ"
 
 #: app/static/app/js/classes/StatusCodes.js:19
 msgid "Failed"
@@ -230,7 +230,7 @@ msgstr ""
 
 #: app/static/app/js/classes/StatusCodes.js:27
 msgid "Canceled"
-msgstr ""
+msgstr "ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ"
 
 #: app/static/app/js/classes/TempLayer.js:14
 #, python-format
@@ -249,7 +249,7 @@ msgstr ""
 
 #: app/static/app/js/components/AssetDownloadButtons.jsx:33
 msgid "Download Assets"
-msgstr ""
+msgstr "ಸ್ವತ್ತುಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ"
 
 #: app/static/app/js/components/EditPresetDialog.jsx:107
 #: app/static/app/js/components/EditTaskForm.jsx:523
@@ -264,15 +264,15 @@ msgstr "ಹೆಸರು"
 
 #: app/static/app/js/components/EditPresetDialog.jsx:121
 msgid "Search"
-msgstr ""
+msgstr "ಹುಡುಕಿ"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:10
 msgid "New Project"
-msgstr ""
+msgstr "ಹೊಸ ಯೋಜನೆ"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:11
 msgid "Create Project"
-msgstr ""
+msgstr "ಪ್ರಾಜೆಕ್ಟ್ ರಚಿಸಿ"
 
 #: app/static/app/js/components/EditProjectDialog.jsx:12
 msgid "Creating project..."
@@ -322,16 +322,16 @@ msgstr ""
 #: plugins/contours/public/ContoursPanel.jsx:273
 #: plugins/contours/public/ContoursPanel.jsx:292
 msgid "Custom"
-msgstr ""
+msgstr "ಕಸ್ಟಮ್"
 
 #: app/static/app/js/components/EditTaskForm.jsx:232
 #: app/static/app/js/components/EditTaskForm.jsx:353
 msgid "Default"
-msgstr ""
+msgstr "ಡೀಫಾಲ್ಟ್"
 
 #: app/static/app/js/components/EditTaskForm.jsx:437
 msgid "My Preset"
-msgstr ""
+msgstr "ನನ್ನ ಮೊದಲೇ"
 
 #: app/static/app/js/components/EditTaskForm.jsx:437
 #, python-format
@@ -359,7 +359,7 @@ msgstr ""
 
 #: app/static/app/js/components/EditTaskForm.jsx:501
 msgid "Retry"
-msgstr ""
+msgstr "ಮರುಪ್ರಯತ್ನಿಸಿ"
 
 #: app/static/app/js/components/EditTaskForm.jsx:524
 #: app/static/app/js/components/EditTaskForm.jsx:531
@@ -376,7 +376,7 @@ msgstr ""
 #: app/static/app/js/components/EditTaskPanel.jsx:82
 #: app/static/app/js/components/FormDialog.jsx:11
 msgid "Save"
-msgstr ""
+msgstr "ಉಳಿಸಿ"
 
 #: app/static/app/js/components/EditTaskForm.jsx:545
 #: app/static/app/js/components/FormDialog.jsx:173

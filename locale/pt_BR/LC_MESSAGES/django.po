@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-19 04:24+0000\n"
+"POT-Creation-Date: 2021-07-02 00:20+0000\n"
 "PO-Revision-Date: 2021-02-11 02:50+0000\n"
 "Last-Translator: Carlos Grohmann <carlos.grohmann@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
@@ -76,7 +76,57 @@ msgstr "Versão"
 msgid "Author"
 msgstr "Autor"
 
+#: app/admin.py:144
+#, python-format
+msgid "Restart required. Please restart WebODM to enable %(plugin)s"
+msgstr ""
+
+#: app/admin.py:146
+#, python-format
+msgid "Cannot enable plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:154
+#, python-format
+msgid "Restart required. Please restart WebODM to fully disable %(plugin)s"
+msgstr ""
+
+#: app/admin.py:156
+#, python-format
+msgid "Cannot disable plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:164
+#, python-format
+msgid "Cannot delete plugin %(plugin)s: %(message)s"
+msgstr ""
+
+#: app/admin.py:208
+msgid "Plugin added successfully"
+msgstr ""
+
+#: app/admin.py:210
+#, python-format
+msgid "Cannot load plugin: %(message)s"
+msgstr ""
+
+#: app/admin.py:216
+#, fuzzy
+#| msgid "You need to upload at least 2 images before commit"
+msgid "You need to upload a zip file"
+msgstr "Você precisa fazer upload de pelo menos 2 imagens antes de confirmar"
+
+#: app/admin.py:230
+msgid "Disable"
+msgstr ""
+
 #: app/admin.py:233
+#, fuzzy
+#| msgid "Enabled"
+msgid "Enable"
+msgstr "Ativado"
+
+#: app/admin.py:238
 msgid "Actions"
 msgstr "Ações"
 
@@ -233,7 +283,7 @@ msgstr ""
 msgid "Task this image belongs to"
 msgstr "Tarefa à qual esta imagem pertence"
 
-#: app/models/image_upload.py:10 app/models/task.py:260
+#: app/models/image_upload.py:10 app/models/task.py:261
 msgid "Task"
 msgstr "Tarefa"
 
@@ -492,7 +542,7 @@ msgstr ""
 "Nó de processamento designado para esta tarefa (ou nulo se esta tarefa ainda "
 "não foi associada)"
 
-#: app/models/task.py:224 app/views/app.py:113 nodeodm/models.py:36
+#: app/models/task.py:224 app/views/app.py:115 nodeodm/models.py:34
 msgid "Processing Node"
 msgstr "Nó de processamento"
 
@@ -657,39 +707,49 @@ msgstr ""
 msgid "Partial"
 msgstr "Parcial"
 
-#: app/models/task.py:261
+#: app/models/task.py:258
+msgid ""
+"Serialized potree scene information used to save/load measurements and "
+"camera view angle"
+msgstr ""
+
+#: app/models/task.py:258
+msgid "Potree Scene"
+msgstr ""
+
+#: app/models/task.py:262
 msgid "Tasks"
 msgstr "Tarefas"
 
-#: app/models/task.py:270
+#: app/models/task.py:271
 msgid "unnamed"
 msgstr "sem nome"
 
-#: app/models/task.py:373
+#: app/models/task.py:374
 msgid "Importing assets..."
 msgstr "Importando recursos ..."
 
-#: app/models/task.py:412 app/models/task.py:680
+#: app/models/task.py:413 app/models/task.py:681
 msgid "Invalid zip file"
 msgstr "Arquivo zip inválido"
 
-#: app/models/task.py:506
+#: app/models/task.py:507
 #, python-format
 msgid "Connection error: %(error)s"
 msgstr "Erro de conexão: %(error)s"
 
-#: app/models/task.py:586
+#: app/models/task.py:587
 msgid "Cannot restart a task that has no processing node"
 msgstr "Não é possível reiniciar uma tarefa que não possui nó de processamento"
 
-#: app/models/task.py:738
+#: app/models/task.py:739
 #, python-format
 msgid "Unsupported SRS %(code)s. Please make sure you picked a supported SRS."
 msgstr ""
 "SRS não suportado %(code)s. Por favor ceertifique-se que você escolheu um "
 "SRS suportado."
 
-#: app/models/task.py:748
+#: app/models/task.py:750
 msgid "Done!"
 msgstr "Feito!"
 
@@ -1270,7 +1330,7 @@ msgstr ""
 "a precisão do georreferenciamento"
 
 #: app/templates/app/dev_tools.html:6 app/templates/app/logged_in_base.html:110
-#: app/views/dev.py:83
+#: app/views/dev.py:81
 msgid "Developer Tools"
 msgstr "Ferramentas de desenvolvimento"
 
@@ -1283,9 +1343,13 @@ msgid "Current Locale:"
 msgstr "Localidade atual:"
 
 #: app/templates/app/dev_tools.html:15
+#, fuzzy
+#| msgid ""
+#| "To change locale, modify your browser's locale settings, then refresh the "
+#| "page."
 msgid ""
 "To change locale, modify your browser's locale settings, then refresh the "
-"page."
+"page, or use the set locale button below."
 msgstr ""
 "Para alterar a localidade, modifique as configurações de localidade do seu "
 "navegador e atualize a página."
@@ -1298,7 +1362,17 @@ msgstr "Arquivos de tradução (.zip):"
 msgid "Download and Replace Translation Files"
 msgstr "Baixar e substituir arquivos de tradução"
 
-#: app/templates/app/dev_tools.html:26
+#: app/templates/app/dev_tools.html:27
+#, fuzzy
+#| msgid "Current Locale:"
+msgid "Set locale:"
+msgstr "Localidade atual:"
+
+#: app/templates/app/dev_tools.html:29
+msgid "Apply"
+msgstr ""
+
+#: app/templates/app/dev_tools.html:33
 msgid "Executing… do not refresh the page! This could take a while."
 msgstr "Executando… não atualize a página! Isso pode demorar um pouco."
 
@@ -1315,7 +1389,7 @@ msgstr "Desconectar"
 msgid "Dashboard"
 msgstr "Painel de controle"
 
-#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:37
+#: app/templates/app/logged_in_base.html:59 nodeodm/models.py:35
 msgid "Processing Nodes"
 msgstr "Nós de processamento"
 
@@ -1339,31 +1413,31 @@ msgstr "Grupos"
 msgid "Brand"
 msgstr "Marca"
 
-#: app/templates/app/logged_in_base.html:114 app/views/app.py:103
+#: app/templates/app/logged_in_base.html:114 app/views/app.py:105
 msgid "About"
 msgstr "Sobre"
 
-#: app/templates/app/processing_node.html:11 nodeodm/models.py:23
+#: app/templates/app/processing_node.html:11 nodeodm/models.py:21
 msgid "Hostname"
 msgstr "Nome do host"
 
-#: app/templates/app/processing_node.html:15 nodeodm/models.py:24
+#: app/templates/app/processing_node.html:15 nodeodm/models.py:22
 msgid "Port"
 msgstr "Porta"
 
-#: app/templates/app/processing_node.html:19 nodeodm/models.py:25
+#: app/templates/app/processing_node.html:19 nodeodm/models.py:23
 msgid "API Version"
 msgstr "Versão da API"
 
-#: app/templates/app/processing_node.html:23 nodeodm/models.py:33
+#: app/templates/app/processing_node.html:23 nodeodm/models.py:31
 msgid "Engine"
 msgstr "Engine"
 
-#: app/templates/app/processing_node.html:27 nodeodm/models.py:31
+#: app/templates/app/processing_node.html:27 nodeodm/models.py:29
 msgid "Engine Version"
 msgstr "Versão da engine"
 
-#: app/templates/app/processing_node.html:31 nodeodm/models.py:27
+#: app/templates/app/processing_node.html:31 nodeodm/models.py:25
 msgid "Queue Count"
 msgstr "Contagem da fila"
 
@@ -1371,11 +1445,11 @@ msgstr "Contagem da fila"
 msgid "Max Images Limit"
 msgstr "Limite máximo de imagens"
 
-#: app/templates/app/processing_node.html:39 nodeodm/models.py:32
+#: app/templates/app/processing_node.html:39 nodeodm/models.py:30
 msgid "Label"
 msgstr "Rótulo"
 
-#: app/templates/app/processing_node.html:43 nodeodm/models.py:26
+#: app/templates/app/processing_node.html:43 nodeodm/models.py:24
 msgid "Last Refreshed"
 msgstr "Última atualização"
 
@@ -1454,19 +1528,23 @@ msgstr ""
 msgid "A plugin to create GCP files from images"
 msgstr "Um plugin para criar arquivos de GCP a partir de imagens"
 
+#: app/translations/plugin_manifest_autogenerated.py:17
+msgid "Create short links when sharing task URLs"
+msgstr ""
+
 #: app/views/app.py:44
 msgid "First Project"
 msgstr "Primeiro projeto"
 
-#: app/views/app.py:54 app/views/public.py:26
+#: app/views/app.py:54 app/views/public.py:27
 msgid "Map"
 msgstr "Mapa"
 
-#: app/views/app.py:81
+#: app/views/app.py:82
 msgid "3D Model Display"
 msgstr "Exibe o modelo 3D"
 
-#: app/views/app.py:147
+#: app/views/app.py:149
 msgid "Welcome"
 msgstr "Bem-vindo"
 
@@ -1474,171 +1552,91 @@ msgstr "Bem-vindo"
 msgid "Cannot find locale/ folder in .zip archive"
 msgstr "Não é possível encontrar pasta locale/no arquivo .zip"
 
-#: app/views/dev.py:76
+#: app/views/dev.py:74
 msgid "Translation files reloaded!"
 msgstr "Arquivos de tradução recarregados!"
 
-#: app/views/dev.py:80
+#: app/views/dev.py:78
 msgid "Invalid action"
 msgstr "Ação Inválida"
 
-#: nodeodm/apps.py:8
-msgid "Node Management"
-msgstr "Gerenciamento de nó"
-
-#: nodeodm/models.py:23
-msgid ""
-"Hostname or IP address where the node is located (can be an internal "
-"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
-"localhost. Find the IP address of your host machine by running ifconfig on "
-"Linux or by checking your network settings."
-msgstr ""
-"Nome do host ou endereço IP onde o nó está localizado (também pode ser um "
-"nome de host interno). Se você estiver usando o Docker, nunca será 127.0.0.1 "
-"ou localhost. Encontre o endereço IP de sua máquina host executando ifconfig "
-"no Linux ou verificando suas configurações de rede."
-
-#: nodeodm/models.py:24
-msgid "Port that connects to the node's API"
-msgstr "Porta que conecta à API do nó"
-
-#: nodeodm/models.py:25
-msgid "API version used by the node"
-msgstr "Versão da API utilizada pelo nó"
-
-#: nodeodm/models.py:26
-msgid "When was the information about this node last retrieved?"
-msgstr "Quando as informações sobre este nó foram recuperadas pela última vez?"
-
-#: nodeodm/models.py:27
-msgid ""
-"Number of tasks currently being processed by this node (as reported by the "
-"node itself)"
-msgstr ""
-"Número de tarefas atualmente sendo processadas por este nó (conforme "
-"relatado pelo próprio nó)"
-
-#: nodeodm/models.py:28
-msgid "Available Options"
-msgstr "Opções disponíveis"
-
-#: nodeodm/models.py:28
-msgid "Description of the options that can be used for processing"
-msgstr "Descrição das opções que podem ser usadas para processamento"
-
-#: nodeodm/models.py:29
-msgid "Token"
-msgstr "Token"
-
-#: nodeodm/models.py:29
-msgid ""
-"Token to use for authentication. If the node doesn't have authentication, "
-"you can leave this field blank."
-msgstr ""
-"Token a ser usado para autenticação. Se o nó não tiver autenticação, você "
-"pode deixar este campo em branco."
-
-#: nodeodm/models.py:30
-msgid "Max Images"
-msgstr "Número máximo de imagens"
-
-#: nodeodm/models.py:30
-msgid "Maximum number of images accepted by this node."
-msgstr "Número máximo de imagens aceitas por este nó."
-
-#: nodeodm/models.py:31
-msgid "Engine version used by the node."
-msgstr "Versão da engine usada pelo nó."
-
-#: nodeodm/models.py:32
-msgid ""
-"Optional label for this node. When set, this label will be shown instead of "
-"the hostname:port name."
-msgstr ""
-"Rótulo opcional para este nó. Quando definido, este rótulo será mostrado em "
-"vez de nome do host:nome da porta."
-
-#: nodeodm/models.py:33
-msgid "Engine used by the node."
-msgstr "Engine utilizada pelo nó."
-
-#: plugins/cesiumion/api_views.py:159
+#: coreplugins/cesiumion/api_views.py:159
 msgid "No matching enum type."
 msgstr "Nenhum tipo de enum correspondente."
 
-#: plugins/contours/api.py:16
+#: coreplugins/contours/api.py:16
 msgid "No DSM layer is available."
 msgstr "Nenhuma camada DSM está disponível."
 
-#: plugins/contours/api.py:18
+#: coreplugins/contours/api.py:18
 msgid "No DTM layer is available."
 msgstr "Nenhuma camada MDT está disponível."
 
-#: plugins/contours/api.py:60
+#: coreplugins/contours/api.py:60
 msgid "Could not generate contour file. This might be a bug."
 msgstr ""
 "Não foi possível gerar o arquivo de curvas de nível. Isso pode ser um bug."
 
-#: plugins/diagnostic/plugin.py:36
+#: coreplugins/diagnostic/plugin.py:36
 msgid "Diagnostic"
 msgstr "Diagnóstico"
 
-#: plugins/diagnostic/templates/diagnostic.html:6
+#: coreplugins/diagnostic/templates/diagnostic.html:6
 msgid "Diagnostic Information"
 msgstr "Informação diagnóstica"
 
-#: plugins/diagnostic/templates/diagnostic.html:10
+#: coreplugins/diagnostic/templates/diagnostic.html:10
 msgid "Storage Space"
 msgstr "Espaço de armazenamento"
 
-#: plugins/diagnostic/templates/diagnostic.html:14
-#: plugins/diagnostic/templates/diagnostic.html:40
-#: plugins/diagnostic/templates/diagnostic.html:45
+#: coreplugins/diagnostic/templates/diagnostic.html:14
+#: coreplugins/diagnostic/templates/diagnostic.html:40
+#: coreplugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Free"
 msgstr "Livre"
 
-#: plugins/diagnostic/templates/diagnostic.html:15
-#: plugins/diagnostic/templates/diagnostic.html:39
-#: plugins/diagnostic/templates/diagnostic.html:45
+#: coreplugins/diagnostic/templates/diagnostic.html:15
+#: coreplugins/diagnostic/templates/diagnostic.html:39
+#: coreplugins/diagnostic/templates/diagnostic.html:45
 msgctxt "Megabytes of storage space"
 msgid "Used"
 msgstr "Utilizado"
 
-#: plugins/diagnostic/templates/diagnostic.html:16
+#: coreplugins/diagnostic/templates/diagnostic.html:16
 msgctxt "Megabytes of storage space"
 msgid "Total"
 msgstr "Total"
 
-#: plugins/diagnostic/templates/diagnostic.html:20
+#: coreplugins/diagnostic/templates/diagnostic.html:20
 msgctxt "Computer memory (RAM)"
 msgid "Memory"
 msgstr "Memória"
 
-#: plugins/diagnostic/templates/diagnostic.html:24
-#: plugins/diagnostic/templates/diagnostic.html:75
-#: plugins/diagnostic/templates/diagnostic.html:80
+#: coreplugins/diagnostic/templates/diagnostic.html:24
+#: coreplugins/diagnostic/templates/diagnostic.html:75
+#: coreplugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Free"
 msgstr "Livre"
 
-#: plugins/diagnostic/templates/diagnostic.html:25
-#: plugins/diagnostic/templates/diagnostic.html:74
-#: plugins/diagnostic/templates/diagnostic.html:80
+#: coreplugins/diagnostic/templates/diagnostic.html:25
+#: coreplugins/diagnostic/templates/diagnostic.html:74
+#: coreplugins/diagnostic/templates/diagnostic.html:80
 msgctxt "Megabytes of memory space"
 msgid "Used"
 msgstr "Utilizado"
 
-#: plugins/diagnostic/templates/diagnostic.html:26
+#: coreplugins/diagnostic/templates/diagnostic.html:26
 msgctxt "Megabytes of memory space"
 msgid "Total"
 msgstr "Total"
 
-#: plugins/diagnostic/templates/diagnostic.html:33
+#: coreplugins/diagnostic/templates/diagnostic.html:33
 msgid "Note!"
 msgstr "Nota!"
 
-#: plugins/diagnostic/templates/diagnostic.html:33
+#: coreplugins/diagnostic/templates/diagnostic.html:33
 #, python-format
 msgid ""
 "These values might be relative to the virtualization environment in which "
@@ -1651,16 +1649,16 @@ msgstr ""
 "máquina. Consulte as instruções para %(win_link)s e %(mac_link)s para "
 "alterar esses valores em uma configuração do Docker."
 
-#: plugins/diagnostic/templates/diagnostic.html:47
-#: plugins/diagnostic/templates/diagnostic.html:82
+#: coreplugins/diagnostic/templates/diagnostic.html:47
+#: coreplugins/diagnostic/templates/diagnostic.html:82
 msgid "Disk Space"
 msgstr "Espaço em disco"
 
-#: plugins/lightning/plugin.py:25 plugins/lightning/plugin.py:39
+#: coreplugins/lightning/plugin.py:25 coreplugins/lightning/plugin.py:39
 msgid "Lightning Network"
 msgstr "Rede Lightning"
 
-#: plugins/measure/api.py:27
+#: coreplugins/measure/api.py:27
 msgid ""
 "No surface model available. From the Dashboard, select this task, press "
 "Edit, from the options make sure to check \"dsm\", then press Restart --> "
@@ -1670,6 +1668,86 @@ msgstr ""
 "esta tarefa, pressione Editar, nas opções certifique-se de marcar \"dsm\" e "
 "pressione reiniciar --> do MDE."
 
-#: plugins/posm-gcpi/plugin.py:8
+#: coreplugins/posm-gcpi/plugin.py:8
 msgid "GCP Interface"
 msgstr "Interface de GCPs"
+
+#: nodeodm/apps.py:8
+msgid "Node Management"
+msgstr "Gerenciamento de nó"
+
+#: nodeodm/models.py:21
+msgid ""
+"Hostname or IP address where the node is located (can be an internal "
+"hostname as well). If you are using Docker, this is never 127.0.0.1 or "
+"localhost. Find the IP address of your host machine by running ifconfig on "
+"Linux or by checking your network settings."
+msgstr ""
+"Nome do host ou endereço IP onde o nó está localizado (também pode ser um "
+"nome de host interno). Se você estiver usando o Docker, nunca será 127.0.0.1 "
+"ou localhost. Encontre o endereço IP de sua máquina host executando ifconfig "
+"no Linux ou verificando suas configurações de rede."
+
+#: nodeodm/models.py:22
+msgid "Port that connects to the node's API"
+msgstr "Porta que conecta à API do nó"
+
+#: nodeodm/models.py:23
+msgid "API version used by the node"
+msgstr "Versão da API utilizada pelo nó"
+
+#: nodeodm/models.py:24
+msgid "When was the information about this node last retrieved?"
+msgstr "Quando as informações sobre este nó foram recuperadas pela última vez?"
+
+#: nodeodm/models.py:25
+msgid ""
+"Number of tasks currently being processed by this node (as reported by the "
+"node itself)"
+msgstr ""
+"Número de tarefas atualmente sendo processadas por este nó (conforme "
+"relatado pelo próprio nó)"
+
+#: nodeodm/models.py:26
+msgid "Available Options"
+msgstr "Opções disponíveis"
+
+#: nodeodm/models.py:26
+msgid "Description of the options that can be used for processing"
+msgstr "Descrição das opções que podem ser usadas para processamento"
+
+#: nodeodm/models.py:27
+msgid "Token"
+msgstr "Token"
+
+#: nodeodm/models.py:27
+msgid ""
+"Token to use for authentication. If the node doesn't have authentication, "
+"you can leave this field blank."
+msgstr ""
+"Token a ser usado para autenticação. Se o nó não tiver autenticação, você "
+"pode deixar este campo em branco."
+
+#: nodeodm/models.py:28
+msgid "Max Images"
+msgstr "Número máximo de imagens"
+
+#: nodeodm/models.py:28
+msgid "Maximum number of images accepted by this node."
+msgstr "Número máximo de imagens aceitas por este nó."
+
+#: nodeodm/models.py:29
+msgid "Engine version used by the node."
+msgstr "Versão da engine usada pelo nó."
+
+#: nodeodm/models.py:30
+msgid ""
+"Optional label for this node. When set, this label will be shown instead of "
+"the hostname:port name."
+msgstr ""
+"Rótulo opcional para este nó. Quando definido, este rótulo será mostrado em "
+"vez de nome do host:nome da porta."
+
+#: nodeodm/models.py:31
+msgid "Engine used by the node."
+msgstr "Engine utilizada pelo nó."
