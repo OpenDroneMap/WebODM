@@ -7,6 +7,7 @@ import ClipboardInput from './ClipboardInput';
 import QRCode from 'qrcode.react';
 import update from 'immutability-helper';
 import $ from 'jquery';
+import PluginsAPI from '../classes/plugins/API';
 import { _ } from '../classes/gettext';
 
 class SharePopup extends React.Component{
