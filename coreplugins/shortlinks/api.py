@@ -3,10 +3,15 @@ import math
 from rest_framework import status
 from rest_framework.response import Response
 from app.plugins.views import TaskView
-from app.plugins import get_current_plugin
+from app.plugins import get_current_plugin, signals as plugin_signals
+from django.dispatch import receiver
 from app.plugins import GlobalDataStore
 from django.http import Http404
 from django.shortcuts import redirect
+
+import logging
+
+logger = logging.getLogger('app.logger')
 
 ds = GlobalDataStore('shortlinks')
 
@@ -56,3 +61,11 @@ def HandleShortLink(request, view_type, short_id):
         return redirect('/public/task/{}/{}/'.format(task_id, v))
     else:
         raise Http404()
+
+@receiver(plugin_signals.task_removed, dispatch_uid="shortlinks_on_task_removed")
+def shortlinks_cleanup(sender, task_id, **kwargs):
+    short_id = ds.get_string(task_id)
+    if short_id:
+        logger.info("Cleaning up shortlinks datastore for task {}".format(str(task_id)))
+        ds.del_key(task_id)
+        ds.del_key(short_id)

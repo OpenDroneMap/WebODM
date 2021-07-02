@@ -63,17 +63,13 @@ export default class SLCheckbox extends React.Component{
 
         if (error) return (<ErrorMessage bind={[this, "error"]} />);
 
-        return (<label className="slcheckbox">
-            {loading ? 
-              <i className="fa fa-sync fa-spin fa-fw"></i>
-            : ""}
-
+        return (<label className="slcheckbox" >
             <input 
-              className={this.props.sharePopup.state.togglingShare ? "hide" : ""}
-              type="checkbox" 
+              type="checkbox"
+              disabled={loading}
               checked={useShortLink}
               onChange={this.toggleShortLinks}
-               /> {_("Use Short Link")}
+               /> {_("Short Link")}
           </label>);
     }
 }

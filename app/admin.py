@@ -149,7 +149,9 @@ class PluginAdmin(admin.ModelAdmin):
 
     def plugin_disable(self, request, plugin_name, *args, **kwargs):
         try:
-            disable_plugin(plugin_name)
+            p = disable_plugin(plugin_name)
+            if p.requires_restart():
+                messages.warning(request, _("Restart required. Please restart WebODM to fully disable %(plugin)s") % {'plugin': plugin_name})
         except Exception as e:
             messages.warning(request, _("Cannot disable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name, 'message': str(e)})
 
