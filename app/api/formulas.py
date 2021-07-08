@@ -99,7 +99,7 @@ camera_filters = [
     'NRG',
     'NRB',
 
-    'RGBN',
+    'GRReN',
 
     'BGRNRe',
     'BGRReN',
