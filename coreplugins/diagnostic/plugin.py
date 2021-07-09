@@ -42,6 +42,7 @@ class Plugin(PluginBase):
             total_disk_space, used_disk_space, free_disk_space = shutil.disk_usage('./')
 
             template_args = {
+                'title': 'Diagnostic',
                 'total_disk_space': total_disk_space,
                 'used_disk_space': used_disk_space,
                 'free_disk_space': free_disk_space
