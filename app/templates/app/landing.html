@@ -8,23 +8,48 @@
         <div class="row">
             <div class="col-lg-5 my-auto">
                 <div class="header-content mx-auto">
-                    <h1 class="mb-5">Dronebox</h1>
-                    <h4 class="mb-5">An easy-to-use platform for drone mapping</h4>
-                    <a href="/dashboard" class="btn btn-fill btn-xl mb-3 mr-3">Open Dashboard</a>
-                    <a href="/register" class="btn btn-outline btn-xl mb-3 mr-3">Create Account</a>
+                    <h1 class="mb-5">{{ $t('page_main.header_title') }}</h1>
+                    <h4 class="mb-5">{{ $t('page_main.header_desc') }}</h4>
+                    <a href="/dashboard" class="btn btn-fill btn-xl mb-3 mr-3">{{ $t('page_main.tryIt_btn') }}</a>
+                    <!-- <a href="/register" class="btn btn-outline btn-xl mb-3 mr-3">Create Account</a> -->
                 </div>
             </div>
-            <div class="col-lg-7 my-auto">
-                <img src="/static/app/img/landing/img-display.png" class="img-fluid" alt="">
+            <div class="col-lg-7" style="display: flex; justify-content: center;">
+                <img src="/static/app/img/landing/img-header.png" class="img-fluid header-img-mobile" alt="">
                 <div class="button">
                     <!-- You can hook the "home button" to some JavaScript events or just remove it -->
                 </div>
             </div>
         </div>
     </div>
-
-    </div>
+    <img src="src/assets/images/img-header.png" class="img-fluid header-img" alt="">
 </header>
+
+<section class="stepWorks" id="stepwork">
+    <div class="container">
+        <div class="step-heading">
+            <div class="vertical-line"></div>
+            <h2>{{ $t('page_main.howIt_header') }}</h2>
+        </div>
+        <div class="row m-2">
+            <div class="row justify-content-center">
+                <div :key='"step-"+idx' class="col-lg-4 col-md-12 mb-4" v-for="(step, idx) in steps">
+                    <div class="step-card h-100">
+                        <div class="step-card-horizontal">
+                            <div class="step-card-img d-flex align-items-center justify-content-center">
+                                <img class="img-fluid" :src="step.img" alt="">
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h4>{{ step.title }}</h4>
+                                <p>{{ step.desc }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <section class="features" id="features">
     <div class="container">

@@ -5,6 +5,7 @@ var messages = {
     nav_menu_price: "Pricing",
     nav_menu_about: "About",
     nav_btn_login: "Sign In",
+    goto_dashboard: "Go to Dashboard",
     page_main: {
       header_title: "An easy-to-use platform for drone mapping",
       header_desc:
@@ -81,6 +82,7 @@ var messages = {
     nav_menu_price: "ราคา",
     nav_menu_about: "เกี่ยวกับ",
     nav_btn_login: "เข้าสู่ระบบ",
+    goto_dashboard: "แดชบอร์ด",
 
     page_main: {
       header_title: "แพลตฟอร์มที่ใช้งานง่ายสำหรับการทำ drone mapping",
