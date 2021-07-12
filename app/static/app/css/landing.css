@@ -1,0 +1,118 @@
+section.stepWorks {
+  background-color: white;
+  color: #3c3c3c;
+}
+section.stepWorks h4,
+.pricing-card h4 {
+  margin-top: 0;
+}
+.step-heading {
+  margin-bottom: 6rem;
+}
+.step-heading h2 {
+  font-size: 40px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-left: 20px;
+}
+.step-card h4,
+.pricing-card h4 {
+  font-size: 20px;
+  font-weight: 400;
+}
+.step-card p {
+  font-size: 16px;
+  font-weight: 200;
+}
+.step-card,
+.pricing-card {
+  position: relative;
+  flex-direction: column;
+  word-wrap: break-word;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: white;
+  box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.05);
+}
+.step-card-img {
+  border-radius: 15px 15px 0 0;
+  padding: 24px;
+  background: rgba(0, 184, 168, 0.05);
+}
+.step-card-img img {
+  height: 150px;
+}
+.pricing {
+  padding-top: 4rem;
+  padding-bottom: 6rem;
+  background-color: rgba(0, 184, 168, 0.05);
+}
+.price-header h3 {
+  color: #3c3c3c;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+  font-size: 36px;
+  font-weight: 400;
+}
+.pricing-card {
+  margin-top: 1rem;
+  padding: 24px;
+  padding-bottom: 0px;
+}
+.pricing-card h4,
+.price-value {
+  text-align: center;
+}
+.price-value {
+  color: rgba(0, 150, 136, 0.85);
+  font-weight: 400;
+  padding: 32px 0 32px 0;
+}
+.title-line {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 1rem;
+}
+.price-desc {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  line-height: 2rem;
+}
+header img.header-img {
+  display: none;
+}
+header img.header-img-mobile {
+  display: none;
+}
+@media (min-width: 992px) {
+  header img.header-img {
+    position: absolute;
+    top: 120px;
+    left: 42%;
+    max-width: 65%;
+    display: block;
+  }
+  header {
+    overflow-x: hidden;
+  }
+}
+@media (max-width: 1024px) {
+  header img.header-img {
+    top: 150px;
+    left: 45%;
+    max-width: 80%;
+  }
+}
+@media (max-width: 992px) {
+  header img.header-img-mobile {
+    display: block;
+  }
+  .step-card-horizontal {
+    display: flex;
+    flex: 1 1 auto;
+  }
+}
+@media (max-width: 767.98px) {
+    .step-card-horizontal {
+      display: block;
+    }
+  }
