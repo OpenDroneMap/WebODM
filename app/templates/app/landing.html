@@ -55,74 +55,17 @@
     <div class="container">
         <div class="section-heading">
             <div class="vertical-line"></div>
-            <h2>Features</h2>
+            <h2>{{ $t('page_main.feature_header') }}</h2>
         </div>
         <div class="row">
-            <div class="col-lg-4 col-md-6 mb-5">
+            <div :key='"feature-" + idx' class="col-lg-4 col-md-6 mb-5" v-for="(feature, idx) in features">
                 <div class="feature w-100 d-flex">
                     <div class="icon d-flex align-items-center justify-content-center">
-                        <img class="img-fluid" src="/static/app/img/landing/ic-ortho.svg" alt="">
+                        <img class="img-fluid" :src="feature.img" alt="">
                     </div>
                     <div class="text pl-4">
-                        <h4>Orthomosaics</h4>
-                        Stitched photos, orthorectified and georeferenced to make an accurate map.
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <div class="feature w-100 d-flex">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <img class="img-fluid" src="/static/app/img/landing/ic-eleva.svg" alt="">
-                    </div>
-                    <div class="text pl-4">
-                        <h4>Elevation Models</h4>
-                        Digital Elevation Model (DEM) is the digital representation of the land surface elevation
-                        with respect to any reference datum. Which consists of Digital Surface Model (DSM) and
-                        Digital Terrain Model (DTM)
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <div class="feature w-100 d-flex">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <img class="img-fluid" src="/static/app/img/landing/ic-gis.svg" alt="">
-                    </div>
-                    <div class="text pl-4">
-                        <h4>GIS Compatible</h4>
-                        Support GIS capabilities to enable further analysis in GIS software.
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <div class="feature w-100 d-flex">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <img class="img-fluid" src="/static/app/img/landing/ic-3d.svg" alt="">
-                    </div>
-                    <div class="text pl-4">
-                        <h4>3D Models</h4>
-                        Auto-generated 3D Models and point clouds data.
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <div class="feature w-100 d-flex">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <img class="img-fluid" src="/static/app/img/landing/ic-measure.svg" alt="">
-                    </div>
-                    <div class="text pl-4">
-                        <h4>Measurement</h4>
-                        Measure distance, area, and volume on maps with 2D/3D control.
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <div class="feature w-100 d-flex">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <img class="img-fluid" src="/static/app/img/landing/ic-drone.svg" alt="">
-                    </div>
-                    <div class="text pl-4">
-                        <h4>Drone flying guidance</h4>
-                        A recommendation for flying your drone to meet an ultimate map solution
+                        <h4>{{ feature.title }}</h4>
+                        <span>{{ feature.desc }}</span>
                     </div>
                 </div>
             </div>
