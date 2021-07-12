@@ -87,6 +87,27 @@
     </div>
 </section>
 
+<section class="pricing" id="prices">
+    <div class="container">
+        <div class="price-header text-center mb-4">
+            <h3>{{ $t('page_main.price_header') }}</h3>
+        </div>
+        <div class="row justify-content-center">
+            <div :key='"price-"+idx' class="col-lg-5 col-md-6 mb-4" v-for="(price, idx) in prices">
+                <div class="pricing-card card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h4 class="card-title">{{ price.title }}</h4>
+                        <h3 class="price-value">{{ price.value }}</h3>
+                        <div class="title-line"></div>
+                        <p class="price-desc" v-html="price.desc"></p>
+                        <a :href="price.link" target="_blank" class="mt-auto btn btn-download">{{
+                            price.btn}}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 {% endblock %}
 
