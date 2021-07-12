@@ -41,7 +41,7 @@
         <div class="row">
             <div class="footer-area col-lg-4 col-md-6 col-sm-6 col-xs-6 col-mb-12">
                 <div class="mb-3"><img src="/static/app/img/landing/logo-white.png" style="height:57px"></div>
-                An easy-to-use platform for drone mapping
+                {{ $t('page_main.header_title') }}
                 <div class="social-icon mt-3">
                     <a class="facebook">
                         <i class="fab fa-facebook-f white-text mr-md-5 fa-2x"> </i>
@@ -55,11 +55,12 @@
                 </div>
             </div>
             <div class="footer-area col-lg-2 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                <h5 class="mb-3">Quick Links</h5>
+                <h5 class="mb-3">{{ $t('footer_title_link') }}</h5>
                 <div class="quick-link">
-                    <div class="mb-3"><a href="#page-top">Home</a></div>
-                    <div class="mb-3"><a href="#examples">Examples</a></div>
-                    <div class="mb-3"><a href="about.html">About</a></div>
+                    <div class="mb-3"><a href="#page-top">{{ $t('footer_menu_home') }}</a></div>
+                    <div class="mb-3"><a href="#examples">{{ $t('nav_menu_exam') }}</a></div>
+                    <div class="mb-3"><a href="#prices">{{ $t('nav_menu_price') }}</a></div>
+                    <div class="mb-3"><a href="about.html">{{ $t('nav_menu_about') }}</a></div>
                 </div>
             </div>
             <div class="footer-area col-lg-3 col-md-6 col-sm-6 col-xs-6 col-mb-12">
@@ -70,7 +71,7 @@
                 </div>
             </div>
             <div class="footer-area col-lg-2 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                <h5 class="mb-3">Contact</h5>
+                <h5 class="mb-3">{{ $t('footer_title_contact') }}</h5>
                 <table>
                     <tr>
                         <td class="icon-col"><i class="fas fa-phone"></i></td>
@@ -82,12 +83,11 @@
                     </tr>
                     <tr>
                         <td class="icon-col"><i class="fas fa-map-marker"></i></td>
-                        <td class="info-contact">MAPEDIA Co., Ltd.</td>
+                        <td class="info-contact">{{ $t('footer_company') }}</td>
                     </tr>
                     <tr>
                         <td class="icon-col"></td>
-                        <td class="info-contact">3th Mahadhammaraja Building, Room TB-314, Naresuan University,
-                            Phitsanulok, Thailand 66000</td>
+                        <td class="info-contact">{{ $t('footer_address') }}</td>
                     </tr>
                 </table>
             </div>
