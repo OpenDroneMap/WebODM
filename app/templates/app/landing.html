@@ -74,69 +74,20 @@
 </section>
 
 <section class="examples-heading text-center" style="background: url('/static/app/img/landing/bg-exam.png') no-repeat center center" id="examples">
-    <div class="overlay"></div>
     <div class="container">
         <div class="row">
             <div class="col-xl-9 mx-auto">
-                <h2>Examples</h2>
-                <p>An easy-to-use platform to process Drone image</p>
+                <h2>{{ $t('page_main.exam_header') }}</h2>
+                <p>{{ $t('page_main.exam_desc') }}</p>
+                <a href="http://dronebox.io/public/task/f989cbe1-86b3-46c5-8165-c000dd08a721/map/"
+                    target="_blank" class="btn btn-download mt-3">{{ $t('page_main.exam_btn') }}</a>
             </div>
         </div>
+        <img class="img-fluid" src="/static/app/img/landing/img-example.png" alt="">
     </div>
 </section>
 
-<section class="examples" id="examples">
-    <div class="container">
-        <div class="row examples-content ">
-            <div id="first" class="col-lg-6 col-md-12 col-xs-12">
-                <div class="content-wrapper">
-                    <h2>Tha Pho</h2>
-                </div>
-                <div class="content">
-                    <p>
-                        Tha Pho Sub-District, Mueang Phitsanulok District, Phitsanulok, Thailand </p>
-                    <a href="https://drive.google.com/drive/folders/1RySANnG73QxhqDUgtQ3C6JktpgNUvEg3?usp=sharing"
-                        target="_blank" class="btn btn-download mt-3">Get It Free</a>
-                </div>
-            </div>
-            <div id="second" class="col-lg-6 col-md-12 col-xs-12">
-                <img class="img-fluid" src="/static/app/img/landing/img-exam1.jpg" alt="">
-            </div>
-        </div>
-        <div class="row examples-content">
-            <div class="col-lg-6 col-md-12 col-xs-12">
-                <img class="img-fluid" src="/static/app/img/landing/img-exam2.jpg" alt="">
-            </div>
-            <div class="col-lg-6 col-md-12 col-xs-12">
-                <div class="content-wrapper">
-                    <h2>Faculty of Science, Naresuan University</h2>
-                </div>
-                <div class="content">
-                    <p>
-                        Naresuan University, Mueang Phitsanulok District, Phitsanulok, Thailand </p>
-                    <a href="https://drive.google.com/drive/folders/1_IJiByUCGLEuzM1Ou0CM1J8lc98N56Dd?usp=sharing"
-                        target="_blank" class="btn btn-download mt-3">Get It Free</a>
-                </div>
-            </div>
-        </div>
-        <div class="row examples-content">
-            <div id="first" class="col-lg-6 col-md-12 col-xs-12">
-                <div class="content-wrapper">
-                    <h2>Suranari</h2>
-                </div>
-                <div class="content">
-                    <p>
-                        Mueang Nakhon Ratchasima District, Nakhon Ratchasima, Thailand </p>
-                    <a href="https://drive.google.com/drive/folders/1OHivb3arKV5vdQPcE-A-lLzFFzzzN6sD?usp=sharing"
-                        target="_blank" class="btn btn-download mt-3">Get It Free</a>
-                </div>
-            </div>
-            <div id="second" class="col-lg-6 col-md-12 col-xs-12">
-                <img class="img-fluid" src="/static/app/img/landing/img-exam3.jpg" alt="">
-            </div>
-        </div>
-    </div>
-</section>
+
 {% endblock %}
 
 {% block page-script %}
