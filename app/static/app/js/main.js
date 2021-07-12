@@ -8,17 +8,17 @@ $(function () {
       steps: function () {
         return [
           {
-            img: "src/assets/images/img_step1.svg",
+            img: "/static/app/img/landing/img_step1.svg",
             title: this.$t("page_main.howIt1_title"),
             desc: this.$t("page_main.howIt1_desc"),
           },
           {
-            img: "src/assets/images/img_step2.svg",
+            img: "/static/app/img/landing/img_step2.svg",
             title: this.$t("page_main.howIt2_title"),
             desc: this.$t("page_main.howIt2_desc"),
           },
           {
-            img: "src/assets/images/img_step3.svg",
+            img: "/static/app/img/landing/img_step3.svg",
             title: this.$t("page_main.howIt3_title"),
             desc: this.$t("page_main.howIt3_desc"),
           },
@@ -27,32 +27,32 @@ $(function () {
       features: function () {
         return [
           {
-            img: "src/assets/images/ic-ortho.svg",
+            img: "/static/app/img/landing/ic-ortho.svg",
             title: this.$t("page_main.feature1_title"),
             desc: this.$t("page_main.feature1_desc"),
           },
           {
-            img: "src/assets/images/ic-eleva.svg",
+            img: "/static/app/img/landing/ic-eleva.svg",
             title: this.$t("page_main.feature2_title"),
             desc: this.$t("page_main.feature2_desc"),
           },
           {
-            img: "src/assets/images/ic-gis.svg",
+            img: "/static/app/img/landing/ic-gis.svg",
             title: this.$t("page_main.feature3_title"),
             desc: this.$t("page_main.feature3_desc"),
           },
           {
-            img: "src/assets/images/ic-3d.svg",
+            img: "/static/app/img/landing/ic-3d.svg",
             title: this.$t("page_main.feature4_title"),
             desc: this.$t("page_main.feature4_desc"),
           },
           {
-            img: "src/assets/images/ic-measure.svg",
+            img: "/static/app/img/landing/ic-measure.svg",
             title: this.$t("page_main.feature5_title"),
             desc: this.$t("page_main.feature5_desc"),
           },
           {
-            img: "src/assets/images/ic-drone.svg",
+            img: "/static/app/img/landing/ic-drone.svg",
             title: this.$t("page_main.feature6_title"),
             desc: this.$t("page_main.feature6_desc"),
           },
