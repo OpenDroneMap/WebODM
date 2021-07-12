@@ -3,21 +3,24 @@
 
 {% block navbar-top-links %}
 <ul class="navbar-nav ml-auto">
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link" href="/docs">Documentation</a>
+    </li> -->
+    <li class="nav-item">
+        <a class="nav-link" href="#examples">{{$t("nav_menu_exam")}}</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#examples">Examples</a>
+        <a class="nav-link" href="#prices">{{$t("nav_menu_price")}}</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/about">About</a>
+        <a class="nav-link" href="/about">{{$t("nav_menu_about")}}</a>
     </li>
 </ul>
 <a class="btn navbar-btn" href="/dashboard">
     {% if user.is_authenticated %}
-    Go to dashboard
+    {{$t("goto_dashboard")}}
     {% else %}
-    Sign In
+    {{$t("nav_btn_login")}}
     {% endif %}
 </a>
 {% endblock %}
