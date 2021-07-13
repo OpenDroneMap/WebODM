@@ -1,16 +1,17 @@
 /* Steps*/
 section.stepWorks {
   background-color: white;
-  color: #3c3c3c;
 }
 section.stepWorks h4,
 .pricing-card h4 {
+  color: #3c3c3c;
   margin-top: 0;
 }
 .step-heading {
   margin-bottom: 6rem;
 }
 .step-heading h2 {
+  color: #3c3c3c;
   font-size: 40px;
   font-weight: 400;
   margin-top: 0;
@@ -45,7 +46,7 @@ section.stepWorks h4,
 }
 
 /* Pricing*/
-.pricing {
+section.pricing  {
   padding-top: 4rem;
   padding-bottom: 6rem;
   background-color: rgba(0, 184, 168, 0.05);
