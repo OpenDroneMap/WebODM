@@ -6,8 +6,8 @@
   });
 
   // Transparent navbar
-  var navbarTopDetect = function () {
-    if ($("#mainNav").offset().top > 100) {
+  function navbarTopDetect () {
+    if ($("#mainNav").offset().top > 72) {
       $("#mainNav").removeClass("navbar-top");
     } else {
       $("#mainNav").addClass("navbar-top");
