@@ -1,6 +1,6 @@
 $(function () {
   var app = new Vue({
-    el: "#app",
+    el: "#landing-app",
     i18n,
     data: {},
     methods: {},

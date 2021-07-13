@@ -7,20 +7,20 @@
         <a class="nav-link" href="/docs">Documentation</a>
     </li> -->
     <li class="nav-item">
-        <a class="nav-link" href="#examples">{{$t("nav_menu_exam")}}</a>
+        <a class="nav-link" href="#examples" v-text='$t("nav_menu_exam")'></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#prices">{{$t("nav_menu_price")}}</a>
+        <a class="nav-link" href="#prices" v-text='$t("nav_menu_price")'></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/about">{{$t("nav_menu_about")}}</a>
+        <a class="nav-link" href="/about" v-text='$t("nav_menu_about")'></a>
     </li>
 </ul>
 <a class="btn navbar-btn" href="/dashboard">
     {% if user.is_authenticated %}
-    {{$t("goto_dashboard")}}
+    <span v-text='$t("goto_dashboard")'></span>
     {% else %}
-    {{$t("nav_btn_login")}}
+    <span v-text='$t("nav_btn_login")'></span>
     {% endif %}
 </a>
 {% endblock %}
@@ -41,7 +41,7 @@
         <div class="row">
             <div class="footer-area col-lg-4 col-md-6 col-sm-6 col-xs-6 col-mb-12">
                 <div class="mb-3"><img src="/static/app/img/landing/logo-white.png" style="height:57px"></div>
-                {{ $t('page_main.header_title') }}
+                <span v-text="$t('page_main.header_title')"></span>
                 <div class="social-icon mt-3">
                     <a class="facebook">
                         <i class="fab fa-facebook-f white-text mr-md-5 fa-2x"> </i>
@@ -55,12 +55,12 @@
                 </div>
             </div>
             <div class="footer-area col-lg-2 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                <h5 class="mb-3">{{ $t('footer_title_link') }}</h5>
+                <h5 class="mb-3" v-html="$t('footer_title_link')"></h5>
                 <div class="quick-link">
-                    <div class="mb-3"><a href="#page-top">{{ $t('footer_menu_home') }}</a></div>
-                    <div class="mb-3"><a href="#examples">{{ $t('nav_menu_exam') }}</a></div>
-                    <div class="mb-3"><a href="#prices">{{ $t('nav_menu_price') }}</a></div>
-                    <div class="mb-3"><a href="about.html">{{ $t('nav_menu_about') }}</a></div>
+                    <div class="mb-3"><a href="#page-top" v-html="$t('footer_menu_home')"></a></div>
+                    <div class="mb-3"><a href="#examples" v-html="$t('nav_menu_exam')"></a></div>
+                    <div class="mb-3"><a href="#prices" v-html="$t('nav_menu_price')"></a></div>
+                    <div class="mb-3"><a href="about.html" v-html="$t('nav_menu_about')"></a></div>
                 </div>
             </div>
             <div class="footer-area col-lg-3 col-md-6 col-sm-6 col-xs-6 col-mb-12">
@@ -71,7 +71,7 @@
                 </div>
             </div>
             <div class="footer-area col-lg-2 col-md-6 col-sm-6 col-xs-6 col-mb-12">
-                <h5 class="mb-3">{{ $t('footer_title_contact') }}</h5>
+                <h5 class="mb-3" v-text="$t('footer_title_contact')"></h5>
                 <table>
                     <tr>
                         <td class="icon-col"><i class="fas fa-phone"></i></td>
@@ -83,11 +83,11 @@
                     </tr>
                     <tr>
                         <td class="icon-col"><i class="fas fa-map-marker"></i></td>
-                        <td class="info-contact">{{ $t('footer_company') }}</td>
+                        <td class="info-contact" v-text="$t('footer_company')"></td>
                     </tr>
                     <tr>
                         <td class="icon-col"></td>
-                        <td class="info-contact">{{ $t('footer_address') }}</td>
+                        <td class="info-contact" v-text="$t('footer_address')"></td>
                     </tr>
                 </table>
             </div>

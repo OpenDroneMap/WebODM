@@ -1,114 +1,116 @@
 {% extends 'landing_base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block page-wrapper %}
-<header class="masthead bg-header" style="background-image: url('/static/app/img/landing/bg-screen.jpeg')">
-    <div class="overlay"></div>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-5 my-auto">
-                <div class="header-content mx-auto">
-                    <h1 class="mb-5">{{ $t('page_main.header_title') }}</h1>
-                    <h4 class="mb-5">{{ $t('page_main.header_desc') }}</h4>
-                    <a href="/dashboard" class="btn btn-fill btn-xl mb-3 mr-3">{{ $t('page_main.tryIt_btn') }}</a>
-                    <!-- <a href="/register" class="btn btn-outline btn-xl mb-3 mr-3">Create Account</a> -->
+<div id="landing-app">
+    <header class="masthead bg-header" style="background-image: url('/static/app/img/landing/bg-screen.jpeg')">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 my-auto">
+                    <div class="header-content mx-auto">
+                        <h1 class="mb-5" v-html="$t('page_main.header_title')"></h1>
+                        <h4 class="mb-5" v-html="$t('page_main.header_desc')"></h4>
+                        <a href="/dashboard" class="btn btn-fill btn-xl mb-3 mr-3" v-html="$t('page_main.tryIt_btn')"></a>
+                        <!-- <a href="/register" class="btn btn-outline btn-xl mb-3 mr-3">Create Account</a> -->
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-7" style="display: flex; justify-content: center;">
-                <img src="/static/app/img/landing/img-header.png" class="img-fluid header-img-mobile" alt="">
-                <div class="button">
-                    <!-- You can hook the "home button" to some JavaScript events or just remove it -->
+                <div class="col-lg-7" style="display: flex; justify-content: center;">
+                    <img src="/static/app/img/landing/img-header.png" class="img-fluid header-img-mobile" alt="">
+                    <div class="button">
+                        <!-- You can hook the "home button" to some JavaScript events or just remove it -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <img src="src/assets/images/img-header.png" class="img-fluid header-img" alt="">
-</header>
+        <img src="src/assets/images/img-header.png" class="img-fluid header-img" alt="">
+    </header>
 
-<section class="stepWorks" id="stepwork">
-    <div class="container">
-        <div class="step-heading">
-            <div class="vertical-line"></div>
-            <h2>{{ $t('page_main.howIt_header') }}</h2>
-        </div>
-        <div class="row m-2">
-            <div class="row justify-content-center">
-                <div :key='"step-"+idx' class="col-lg-4 col-md-12 mb-4" v-for="(step, idx) in steps">
-                    <div class="step-card h-100">
-                        <div class="step-card-horizontal">
-                            <div class="step-card-img d-flex align-items-center justify-content-center">
-                                <img class="img-fluid" :src="step.img" alt="">
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <h4>{{ step.title }}</h4>
-                                <p>{{ step.desc }}</p>
+    <section class="stepWorks" id="stepwork">
+        <div class="container">
+            <div class="step-heading">
+                <div class="vertical-line"></div>
+                <h2 v-html="$t('page_main.howIt_header')"></h2>
+            </div>
+            <div class="row m-2">
+                <div class="row justify-content-center">
+                    <div :key='"step-"+idx' class="col-lg-4 col-md-12 mb-4" v-for="(step, idx) in steps">
+                        <div class="step-card h-100">
+                            <div class="step-card-horizontal">
+                                <div class="step-card-img d-flex align-items-center justify-content-center">
+                                    <img class="img-fluid" :src="step.img" alt="">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h4 v-html="step.title"></h4>
+                                    <p v-html="step.desc"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="features" id="features">
-    <div class="container">
-        <div class="section-heading">
-            <div class="vertical-line"></div>
-            <h2>{{ $t('page_main.feature_header') }}</h2>
-        </div>
-        <div class="row">
-            <div :key='"feature-" + idx' class="col-lg-4 col-md-6 mb-5" v-for="(feature, idx) in features">
-                <div class="feature w-100 d-flex">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <img class="img-fluid" :src="feature.img" alt="">
-                    </div>
-                    <div class="text pl-4">
-                        <h4>{{ feature.title }}</h4>
-                        <span>{{ feature.desc }}</span>
-                    </div>
-                </div>
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-heading">
+                <div class="vertical-line"></div>
+                <h2 v-html="$t('page_main.feature_header')"></h2>
             </div>
-        </div>
-    </div>
-</section>
-
-<section class="examples-heading text-center" style="background: url('/static/app/img/landing/bg-exam.png') no-repeat center center" id="examples">
-    <div class="container">
-        <div class="row">
-            <div class="col-xl-9 mx-auto">
-                <h2>{{ $t('page_main.exam_header') }}</h2>
-                <p>{{ $t('page_main.exam_desc') }}</p>
-                <a href="http://dronebox.io/public/task/f989cbe1-86b3-46c5-8165-c000dd08a721/map/"
-                    target="_blank" class="btn btn-download mt-3">{{ $t('page_main.exam_btn') }}</a>
-            </div>
-        </div>
-        <img class="img-fluid" src="/static/app/img/landing/img-example.png" alt="">
-    </div>
-</section>
-
-<section class="pricing" id="prices">
-    <div class="container">
-        <div class="price-header text-center mb-4">
-            <h3>{{ $t('page_main.price_header') }}</h3>
-        </div>
-        <div class="row justify-content-center">
-            <div :key='"price-"+idx' class="col-lg-5 col-md-6 mb-4" v-for="(price, idx) in prices">
-                <div class="pricing-card card h-100">
-                    <div class="card-body d-flex flex-column">
-                        <h4 class="card-title">{{ price.title }}</h4>
-                        <h3 class="price-value">{{ price.value }}</h3>
-                        <div class="title-line"></div>
-                        <p class="price-desc" v-html="price.desc"></p>
-                        <a :href="price.link" target="_blank" class="mt-auto btn btn-download">{{
-                            price.btn}}</a>
+            <div class="row">
+                <div :key='"feature-" + idx' class="col-lg-4 col-md-6 mb-5" v-for="(feature, idx) in features">
+                    <div class="feature w-100 d-flex">
+                        <div class="icon d-flex align-items-center justify-content-center">
+                            <img class="img-fluid" :src="feature.img" alt="">
+                        </div>
+                        <div class="text pl-4">
+                            <h4 v-html="feature.title"></h4>
+                            <span v-html="feature.desc"></span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
+    <section class="examples-heading text-center" style="background: url('/static/app/img/landing/bg-exam.png') no-repeat center center" id="examples">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto">
+                    <h2 v-html="$t('page_main.exam_header')"></h2>
+                    <p v-html="$t('page_main.exam_desc')"></p>
+                    <a href="http://dronebox.io/public/task/f989cbe1-86b3-46c5-8165-c000dd08a721/map/"
+                        target="_blank" class="btn btn-download mt-3" v-html="$t('page_main.exam_btn')"></a>
+                </div>
+            </div>
+            <img class="img-fluid" src="/static/app/img/landing/img-example.png" alt="">
+        </div>
+    </section>
+
+    <section class="pricing" id="prices">
+        <div class="container">
+            <div class="price-header text-center mb-4">
+                <h3 v-html="$t('page_main.price_header')"></h3>
+            </div>
+            <div class="row justify-content-center">
+                <div :key='"price-"+idx' class="col-lg-5 col-md-6 mb-4" v-for="(price, idx) in prices">
+                    <div class="pricing-card card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h4 class="card-title" v-html="price.title"></h4>
+                            <h3 class="price-value" v-html="price.value"></h3>
+                            <div class="title-line"></div>
+                            <p class="price-desc" v-html="price.desc"></p>
+                            <a :href="price.link" target="_blank" class="mt-auto btn btn-download">
+                                <span v-html="price.btn"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 {% endblock %}
 
 {% block page-script %}
