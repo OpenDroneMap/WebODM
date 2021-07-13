@@ -32,10 +32,10 @@
         // `this` points to the vm instance
         return this.$i18n.locale === "th"
           ? {
-              img: "src/assets/images/flag-th.png",
+              img: "/static/app/img/landing/flag-th.png",
             }
           : {
-              img: "src/assets/images/flag-eng.png",
+              img: "/static/app/img/landing/flag-eng.png",
             };
       },
     },
