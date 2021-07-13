@@ -40,4 +40,9 @@
       },
     },
   });
+
+  var footerApp = new Vue({
+    i18n,
+    el: "#app-landing-footer"
+  })
 })(jQuery); // End of use strict
