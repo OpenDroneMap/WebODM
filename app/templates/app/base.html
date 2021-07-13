@@ -85,6 +85,15 @@
     <script src="{% static 'app/js/lang.js' %}"></script>
     <script src="{% static 'app/js/theme.js' %}"></script>
     {% block page-script %}{% endblock %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P8KMG4HBLV"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-P8KMG4HBLV');
+    </script>
 </body>
 
 {{ SETTINGS.theme.html_after_body|safe }}
