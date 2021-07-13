@@ -113,8 +113,10 @@ section.examples-new p {
     position: absolute;
     top: 120px;
     left: 42%;
-    max-width: 65%;
+    /* max-width: 65%; */
     display: block;
+    max-height: 640px;
+    right: -100px;
   }
   header {
     overflow-x: hidden;
@@ -140,4 +142,13 @@ section.examples-new p {
   .step-card-horizontal {
     display: block;
   }
+}
+
+
+section#features {
+  background-color: #f8f8f8;
+}
+
+section#features .feature .icon {
+  background-color: white !important;
 }
