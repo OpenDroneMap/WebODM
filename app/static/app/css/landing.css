@@ -1,3 +1,4 @@
+/* Steps*/
 section.stepWorks {
   background-color: white;
   color: #3c3c3c;
@@ -42,6 +43,8 @@ section.stepWorks h4,
 .step-card-img img {
   height: 150px;
 }
+
+/* Pricing*/
 .pricing {
   padding-top: 4rem;
   padding-bottom: 6rem;
@@ -77,12 +80,33 @@ section.stepWorks h4,
   padding-bottom: 1rem;
   line-height: 2rem;
 }
+
+/* Header*/
 header img.header-img {
   display: none;
 }
 header img.header-img-mobile {
   display: none;
 }
+
+/* Example*/
+section.examples-new {
+  position: relative;
+  color: #3c3c3c;
+}
+section.examples-new h2 {
+  font-size: 40px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+section.examples-new p {
+  font-size: 20px;
+  display: block;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
 @media (min-width: 992px) {
   header img.header-img {
     position: absolute;
