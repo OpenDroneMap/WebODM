@@ -46,7 +46,7 @@ section.stepWorks h4,
 }
 
 /* Pricing*/
-section.pricing  {
+section.pricing {
   padding-top: 4rem;
   padding-bottom: 6rem;
   background-color: rgba(0, 184, 168, 0.05);
@@ -137,7 +137,7 @@ section.examples-new p {
   }
 }
 @media (max-width: 767.98px) {
-    .step-card-horizontal {
-      display: block;
-    }
+  .step-card-horizontal {
+    display: block;
   }
+}
