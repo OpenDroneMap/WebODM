@@ -7,19 +7,19 @@ var messages = {
     nav_btn_login: "Sign In",
     goto_dashboard: "Go to Dashboard",
     page_main: {
-      header_title: "An easy-to-use platform for drone mapping",
+      header_title: "Cloud-based image platform for drone pilots",
       header_desc:
-        "We help users from novice to experts. and companies Get good experience in drone mapping and provides a guideline on flying Drone. to be used in various tasks relating to maps as efficiently as possible",
-      tryIt_btn: "Try it free",
-      howIt_header: "How it work",
-      howIt1_title: "Upload images",
+        "Dronebox is helps beginner and expert pilots manage, combine and share map-based drone photography quickly and easily.",
+      tryIt_btn: "Try it for free",
+      howIt_header: "How it works",
+      howIt1_title: "1. Upload images",
       howIt1_desc:
-        "Select an image from a drone flying or a GCP file (Ground Control Point)",
-      howIt2_title: "Data Processing",
-      howIt2_desc: "The system will process the data through the cloud.",
-      howIt3_title: "Professional Results",
+        "Select images captured by a drone (with optional Ground Control Point file for increased precision)",
+      howIt2_title: "2. Image processing",
+      howIt2_desc: "Wait for Dronebox to process the images in the cloud",
+      howIt3_title: "3. Analyse results",
       howIt3_desc:
-        "Results and quality from processing equivalent others commercial provider",
+        "View your images stitched together on a 2D map or visualize the 3D point cloud",
       feature_header: "Features",
       feature1_title: "Orthomosaics",
       feature1_desc:
@@ -41,16 +41,16 @@ var messages = {
       exam_header: "Example",
       exam_desc:
         "An example of a drone mapping dataset that displays an Orthophoto, Plant Health, Serface Model and a 3D Models.",
-      exam_btn: "Try It",
+      exam_btn: "Explore Example",
       price_header: "Pricing",
       price1_title: "Starter Plan",
       price1_value: "Free",
       price1_desc:
-        "- Unlimited project creation<br/>- Upload up to 300 images/project<br/>- Support Ground Control Point (GCP) files<br/>- Unlimited processing tasks<br/>- Able to download data for use with GIS programs",
+        "- Unlimited project creation<br/>- Upload up to 300 images/project<br/>- Support Ground Control Point (GCP) files<br/>- Unlimited processing tasks (shared server)<br/>- Able to download data for use with GIS programs",
       price2_title: "Professional Plan",
       price2_value: "Contact Us",
       price2_desc:
-        "- Unlimited project creation <br/>- No limit on uploading images. <br/>- Support Ground Control Point (GCP) files <br/> - Unlimited processing tasks <br/>- Scalable Cloud Computing <br/>- No Resource Sharing <br/>- Data and processing are private. <br/>- Data can be downloaded for use with GIS applications <br/>- API access supported",
+        "- Unlimited project creation <br/>- No limit on uploading images. <br/>- Support Ground Control Point (GCP) files <br/> - Unlimited processing tasks<br/>- Scalable Cloud Computing <br/>- No Resource Sharing <br/>- Data and processing are private. <br/>- Data can be downloaded for use with GIS applications <br/>- API access supported",
     },
     page_about: {
       header_title: "About us",
@@ -124,11 +124,11 @@ var messages = {
       price1_title: "แพคเกจเริ่มต้น",
       price1_value: "ทดลองใช้งานฟรี",
       price1_desc:
-        "- ไม่จำกัดการสร้างโปรเจ็ค <br/>- อัพโหลดภาพไม่เกิน 300 ภาพ/โปรเจ็ค <br/>- รองรับไฟล์ Ground Control Point (GCP) <br/>- ไม่จำกัด Task ในการประมวลผล <br/>- สามารถดาวน์โหลดข้อมูลเพื่อใช้ร่วมกับโปรแกรมด้าน GIS ได้",
+        "- ไม่จำกัดการสร้างโปรเจ็ค <br/>- อัพโหลดภาพไม่เกิน 300 ภาพ/โปรเจ็ค <br/>- รองรับไฟล์ Ground Control Point (GCP) <br/>- ไม่จำกัด Task ในการประมวลผล (shared server) <br/>- สามารถดาวน์โหลดข้อมูลเพื่อใช้ร่วมกับโปรแกรมด้าน GIS ได้",
       price2_title: "แพคเกจสำหรับมืออาชีพ",
       price2_value: "ติดต่อเรา",
       price2_desc:
-        "- ไม่จำกัดการสร้างโปรเจ็ค <br/>- ไม่จำกัดการอัพโหลดภาพ <br/>- รองรับไฟล์ Ground Control Point (GCP) <br/>- ไม่จำกัด Task ในการประมวลผล <br/>- สามารถปรับขนาดของระบบประมวลผลได้บนคลาวด์ <br/>- ไม่มีการแชร์ทรัพยากรร่วมกับคนอื่น <br/>- ข้อมูลและการประมวลผลเป็นแบบส่วนตัว <br/>- สามารถดาวน์โหลดข้อมูลเพื่อใช้ร่วมกับโปรแกรมด้าน GIS ได้ <br/>- รองรับการเข้าถึง API",
+        "- ไม่จำกัดการสร้างโปรเจ็ค <br/>- ไม่จำกัดการอัพโหลดภาพ <br/>- รองรับไฟล์ Ground Control Point (GCP) <br/>- ไม่จำกัด Task ในการประมวลผล<br/>- สามารถปรับขนาดของระบบประมวลผลได้บนคลาวด์ <br/>- ไม่มีการแชร์ทรัพยากรร่วมกับคนอื่น <br/>- ข้อมูลและการประมวลผลเป็นแบบส่วนตัว <br/>- สามารถดาวน์โหลดข้อมูลเพื่อใช้ร่วมกับโปรแกรมด้าน GIS ได้ <br/>- รองรับการเข้าถึง API",
     },
     page_about: {
       header_title: "เกี่ยวกับ",
