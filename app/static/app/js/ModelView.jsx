@@ -357,8 +357,18 @@ class ModelView extends React.Component {
             sceneData.pointclouds = localSceneData.pointclouds;
             sceneData.settings = localSceneData.settings;
 
+            for (let k in localSceneData){
+                if (k !== 'pointclouds' && k !== 'settings'){
+                    sceneData[k] = sceneData[k] || localSceneData[k];
+                }
+            }
+
             // Load
-            Potree.loadProject(viewer, sceneData);
+            const potreeLoadProject = () => {
+                Potree.loadProject(viewer, sceneData);
+                viewer.removeEventListener("update", potreeLoadProject);
+            };
+            viewer.addEventListener("update", potreeLoadProject);
 
             // Every 3 seconds, check if the scene has changed
             // if it has, save the changes server-side

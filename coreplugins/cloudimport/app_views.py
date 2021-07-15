@@ -51,7 +51,6 @@ def HomeView(plugin):
 
 
 def LoadButtonsView(plugin):
-    @login_required
     def view(request):
 
         return render(
