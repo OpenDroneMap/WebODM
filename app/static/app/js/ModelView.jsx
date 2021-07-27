@@ -279,6 +279,7 @@ class ModelView extends React.Component {
       // scene updates when these change.
       delete json.view;
       delete json.settings;
+      delete json.cameraAnimations;
 
       return json;
   }
@@ -353,12 +354,14 @@ class ModelView extends React.Component {
             if (!sceneData.view || !sceneData.view.position){
                 sceneData.view = localSceneData.view;
             }
-            
-            sceneData.pointclouds = localSceneData.pointclouds;
-            sceneData.settings = localSceneData.settings;
 
+            const keepKeys = ['pointclouds', 'settings', 'cameraAnimations'];
+            for (let k of keepKeys){
+                sceneData[k] = localSceneData[k];
+            }
+            
             for (let k in localSceneData){
-                if (k !== 'pointclouds' && k !== 'settings'){
+                if (keepKeys.indexOf(k) === -1){
                     sceneData[k] = sceneData[k] || localSceneData[k];
                 }
             }
