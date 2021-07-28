@@ -314,9 +314,11 @@ class ModelView extends React.Component {
           $("#cameras_container").hide();
       }
 
-      const $scv = $("<div id='set-camera-view'></div>");
-      $scv.prependTo($("#scene_export").parent());
-      window.ReactDOM.render(<SetCameraView viewer={viewer} task={this.props.task} />, $scv.get(0));
+      if (!this.props.public){
+          const $scv = $("<div id='set-camera-view'></div>");
+          $scv.prependTo($("#scene_export").parent());
+          window.ReactDOM.render(<SetCameraView viewer={viewer} task={this.props.task} />, $scv.get(0));
+      }
     });
 
     viewer.scene.scene.add( new THREE.AmbientLight( 0x404040, 2.0 ) ); // soft white light );
