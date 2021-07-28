@@ -94,6 +94,11 @@ class GetShortLink(TaskView):
 
             short_id = gen_short_string(counter)
 
+            # Check for conflicts
+            while shortlinks['i'].get(short_id) is not None:
+                counter += 1
+                short_id = gen_short_string(counter)
+
             # task_id --> short id
             shortlinks['t'][task_id] = short_id
 
