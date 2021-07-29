@@ -525,7 +525,7 @@ class TaskListItem extends React.Component {
                 </div> : ""}
                 {stats && stats.pointcloud && stats.pointcloud.points ? 
                 <div className="labels">
-                    <strong>{_("Reconstructed Points:")} </strong> {stats.pointcloud.points}<br/>
+                    <strong>{_("Reconstructed Points:")} </strong> {stats.pointcloud.points.toLocaleString()}<br/>
                 </div> : ""}
               </div> 
               
