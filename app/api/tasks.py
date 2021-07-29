@@ -40,12 +40,16 @@ class TaskSerializer(serializers.ModelSerializer):
     processing_node = serializers.PrimaryKeyRelatedField(queryset=ProcessingNode.objects.all()) 
     processing_node_name = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
+    statistics = serializers.SerializerMethodField()
 
     def get_processing_node_name(self, obj):
         if obj.processing_node is not None:
             return str(obj.processing_node)
         else:
             return None
+
+    def get_statistics(self, obj):
+        return obj.get_statistics()
 
     def get_can_rerun_from(self, obj):
         """
