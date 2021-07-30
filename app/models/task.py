@@ -347,6 +347,35 @@ class Task(models.Model):
 
         return False
 
+    def get_statistics(self):
+        """
+        Parse ODM's stats.json if available
+        """
+        stats_json = self.assets_path("odm_report", "stats.json")
+        if os.path.exists(stats_json):
+            try:
+                with open(stats_json) as f:
+                    j = json.loads(f.read())
+            except Exception as e:
+                logger.warning("Malformed JSON {}: {}".format(stats_json, str(e)))
+                return {}
+
+            points = None
+            if j.get('point_cloud_statistics', {}).get('dense', False):
+                points = j.get('point_cloud_statistics', {}).get('stats', {}).get('statistic', [{}])[0].get('count')
+            else:
+                points = j.get('reconstruction_statistics', {}).get('reconstructed_points_count')
+                        
+            return {
+                'pointcloud':{
+                    'points': points,
+                },
+                'gsd': j.get('odm_processing_statistics', {}).get('average_gsd'),
+                'area': j.get('processing_statistics', {}).get('area')
+            }
+        else:
+            return {}
+
     def get_asset_download_path(self, asset):
         """
         Get the path to an asset download

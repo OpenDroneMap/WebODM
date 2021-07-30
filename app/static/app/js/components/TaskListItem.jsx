@@ -484,6 +484,8 @@ class TaskListItem extends React.Component {
                   </div>);
             })}
           </div>);
+
+      const stats = task.statistics;
     
       expanded = (
         <div className="expanded-panel">
@@ -512,7 +514,19 @@ class TaskListItem extends React.Component {
                     <strong>{_("Options:")} </strong> {this.optionsToList(task.options)}<br/>
                   </div>
                 : ""}
-                {/* TODO: List of images? */}
+
+                {stats && stats.gsd ? 
+                <div className="labels">
+                    <strong>{_("Average GSD:")} </strong> {stats.gsd.toFixed(2)} cm<br/>
+                </div> : ""}
+                {stats && stats.area ? 
+                <div className="labels">
+                    <strong>{_("Area:")} </strong> {stats.area.toFixed(2)} m&sup2;<br/>
+                </div> : ""}
+                {stats && stats.pointcloud && stats.pointcloud.points ? 
+                <div className="labels">
+                    <strong>{_("Reconstructed Points:")} </strong> {stats.pointcloud.points.toLocaleString()}<br/>
+                </div> : ""}
               </div> 
               
               {this.state.view === 'console' ?
