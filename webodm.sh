@@ -82,6 +82,10 @@ case $key in
     export WO_DEBUG=YES
     shift # past argument
     ;;
+    --dev-watch-plugins)
+    export WO_DEV_WATCH_PLUGINS=YES
+    shift # past argument
+    ;;
     --dev)
     export WO_DEBUG=YES
     export WO_DEV=YES
@@ -148,6 +152,7 @@ usage(){
   echo "	--ssl-insecure-port-redirect	<port>	Insecure port number to redirect from when SSL is enabled (default: $DEFAULT_SSL_INSECURE_PORT_REDIRECT)"
   echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--dev	Enable development mode. In development mode you can make modifications to WebODM source files and changes will be reflected live. (default: disabled)"
+  echo "	--dev-watch-plugins	Automatically build plugins while in dev mode. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
   exit

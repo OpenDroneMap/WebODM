@@ -95,6 +95,10 @@ class FormDialog extends React.Component {
     hide(){
         this.setState({showModal: false});
         if (this.props.onHide) this.props.onHide();
+        if (this.serverRequest){
+            this.serverRequest.abort();
+            this.serverRequest = null;
+        }
     }
 
     handleSave(e){
@@ -105,13 +109,20 @@ class FormDialog extends React.Component {
         let formData = {};
         if (this.props.getFormData) formData = this.props.getFormData();
 
-        this.props.saveAction(formData).fail(e => {
-            this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Could not apply changes")});
-        }).always(() => {
+        this.serverRequest = this.props.saveAction(formData);
+        if (this.serverRequest){
+            this.serverRequest.fail(e => {
+                this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Could not apply changes")});
+            }).always(() => {
+                this.setState({saving: false});
+                this.serverRequest = null;
+            }).done(() => {
+                this.hide();
+            });
+        }else{
             this.setState({saving: false});
-        }).done(() => {
             this.hide();
-        });
+        }
     }
 
     handleDelete(){

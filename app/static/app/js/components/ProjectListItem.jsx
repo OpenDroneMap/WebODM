@@ -20,7 +20,8 @@ class ProjectListItem extends React.Component {
   static propTypes = {
       history: PropTypes.object.isRequired,
       data: PropTypes.object.isRequired, // project json
-      onDelete: PropTypes.func
+      onDelete: PropTypes.func,
+      onTaskMoved: PropTypes.func,
   }
 
   constructor(props){
@@ -305,8 +306,9 @@ class ProjectListItem extends React.Component {
     this.refresh();
   }
 
-  taskMoved(){
-      this.refresh();
+  taskMoved(task){
+    this.refresh();
+    if (this.props.onTaskMoved) this.props.onTaskMoved(task);
   }
 
   handleDelete(){
@@ -575,7 +577,7 @@ class ProjectListItem extends React.Component {
                 ref={this.setRef("taskList")} 
                 source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
                 onDelete={this.taskDeleted}
-                onMove={this.taskMoved}
+                onTaskMoved={this.taskMoved}
                 hasPermission={this.hasPermission}
                 history={this.props.history}
             /> : ""}

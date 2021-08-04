@@ -10,7 +10,7 @@ class TaskList extends React.Component {
       history: PropTypes.object.isRequired,
       source: PropTypes.string.isRequired, // URL where to load task list
       onDelete: PropTypes.func,
-      onMove: PropTypes.func,
+      onTaskMoved: PropTypes.func,
       hasPermission: PropTypes.func.isRequired
   }
 
@@ -71,11 +71,9 @@ class TaskList extends React.Component {
     if (this.props.onDelete) this.props.onDelete(id);
   }
 
-  moveTask(id){
-    this.setState({
-        tasks: this.state.tasks.filter(t => t.id !== id)
-    });
-    if (this.props.onMove) this.props.onMove(id); 
+  moveTask = (task) => {
+    this.refresh();
+    if (this.props.onTaskMoved) this.props.onTaskMoved(task);
   }
 
   render() {
@@ -85,7 +83,7 @@ class TaskList extends React.Component {
     }else if (this.state.error){
       message = (<span>{interpolate(_("Error: %(error)s"), {error: this.state.error})} <a href="javascript:void(0);" onClick={this.retry}>{_("Try again")}</a></span>);
     }else if (this.state.tasks.length === 0){
-      message = (<span>{_("This project has no tasks. Create one by uploading some images!")}</span>);
+      message = (<span></span>);
     }
 
     return (

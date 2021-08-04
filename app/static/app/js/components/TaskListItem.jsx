@@ -370,6 +370,18 @@ class TaskListItem extends React.Component {
     };
   }
 
+  moveTaskAction = (formData) => {
+    if (formData.project !== this.state.task.project){
+        return $.ajax({
+            url: `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/`,
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            type: 'PATCH'
+          }).done(this.props.onMove);
+    }else return false;
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -626,10 +638,9 @@ class TaskListItem extends React.Component {
     }
 
     // Ability to change options
-    const canAddDelPerms = this.props.hasPermission("add") && this.props.hasPermission("delete");
     const editable = [statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1;
 
-    if (canAddDelPerms){
+    if (this.props.hasPermission("change")){
         if (editable || (!task.processing_node)){
             taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
         }
@@ -661,7 +672,7 @@ class TaskListItem extends React.Component {
                 task={task}
                 ref={(domNode) => { this.moveTaskDialog = domNode; }}
                 onHide={() => this.setState({showMoveDialog: false})}
-                saveAction={() => {}}
+                saveAction={this.moveTaskAction}
             />
         : ""}
         <div className="row">

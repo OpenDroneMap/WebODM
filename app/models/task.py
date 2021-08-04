@@ -310,9 +310,6 @@ class Task(models.Model):
             self.move_assets(self.__original_project_id, self.project.id)
             self.__original_project_id = self.project.id
 
-        # Autovalidate on save
-        self.full_clean()
-
         super(Task, self).save(*args, **kwargs)
 
     def assets_path(self, *args):

@@ -27,7 +27,7 @@ class MoveTaskDialog extends React.Component {
         super(props);
 
         this.state = {
-          projectId: props.task.project.id,
+          projectId: props.task.project,
           projects: [],
           loading: true
         };
@@ -37,7 +37,7 @@ class MoveTaskDialog extends React.Component {
     }
 
     getFormData(){
-      return this.state;
+      return {project: this.state.projectId};
     }
 
     onShow(){
@@ -82,20 +82,22 @@ class MoveTaskDialog extends React.Component {
                 getFormData={this.getFormData}
                 onShow={this.onShow}
                 ref={(domNode) => { this.dialog = domNode; }}>
-              {!this.state.loading ? 
-              <div className="form-group">
-                <label className="col-sm-2 control-label">{_("Project")}</label>
-                <div className="col-sm-10">
-                    <select className="form-control" 
-                            value={this.state.projectId}
-                            onChange={this.handleProjectChange}>
-                        {this.state.projects.map(p => 
-                        <option value={p.id} key={p.id}>{p.name}</option>
-                        )}
-                    </select>
+              <div style={{minHeight: '50px'}}>
+                {!this.state.loading ? 
+                <div className="form-group">
+                    <label className="col-sm-2 control-label">{_("Project")}</label>
+                    <div className="col-sm-10">
+                        <select className="form-control" 
+                                value={this.state.projectId}
+                                onChange={this.handleProjectChange}>
+                            {this.state.projects.map(p => 
+                            <option value={p.id} key={p.id}>{p.name}</option>
+                            )}
+                        </select>
+                    </div>
                 </div>
+                : <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>}
               </div>
-              : <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>}
             </FormDialog>
         );
     }

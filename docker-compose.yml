@@ -32,6 +32,7 @@ services:
       - WO_DEBUG
       - WO_BROKER
       - WO_DEV
+      - WO_DEV_WATCH_PLUGINS
     restart: unless-stopped
     oom_score_adj: 0
   broker:
