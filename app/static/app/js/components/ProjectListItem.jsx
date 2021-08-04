@@ -47,6 +47,7 @@ class ProjectListItem extends React.Component {
     this.handleEditProject = this.handleEditProject.bind(this);
     this.updateProject = this.updateProject.bind(this);
     this.taskDeleted = this.taskDeleted.bind(this);
+    this.taskMoved = this.taskMoved.bind(this);
     this.hasPermission = this.hasPermission.bind(this);
   }
 
@@ -302,6 +303,10 @@ class ProjectListItem extends React.Component {
 
   taskDeleted(){
     this.refresh();
+  }
+
+  taskMoved(){
+      this.refresh();
   }
 
   handleDelete(){
@@ -570,6 +575,8 @@ class ProjectListItem extends React.Component {
                 ref={this.setRef("taskList")} 
                 source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
                 onDelete={this.taskDeleted}
+                onMove={this.taskMoved}
+                hasPermission={this.hasPermission}
                 history={this.props.history}
             /> : ""}
 

@@ -9,6 +9,7 @@ import AssetDownloadButtons from './AssetDownloadButtons';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import TaskPluginActionButtons from './TaskPluginActionButtons';
+import MoveTaskDialog from './MoveTaskDialog';
 import PipelineSteps from '../classes/PipelineSteps';
 import Css from '../classes/Css';
 import Trans from './Trans';
@@ -19,7 +20,9 @@ class TaskListItem extends React.Component {
       history: PropTypes.object.isRequired,
       data: PropTypes.object.isRequired, // task json
       refreshInterval: PropTypes.number, // how often to refresh info
-      onDelete: PropTypes.func
+      onDelete: PropTypes.func,
+      onMove: PropTypes.func,
+      hasPermission: PropTypes.func
   }
 
   constructor(props){
@@ -37,7 +40,8 @@ class TaskListItem extends React.Component {
       memoryError: false,
       friendlyTaskError: "",
       pluginActionButtons: [],
-      view: "basic"
+      view: "basic",
+      showMoveDialog: false
     }
 
     for (let k in props.data){
@@ -271,6 +275,10 @@ class TaskListItem extends React.Component {
     this.setAutoRefresh();
   }
 
+  handleMoveTask = () => {
+    this.setState({showMoveDialog: true});
+  }
+
   getRestartSubmenuItems(){
     const { task } = this.state;
 
@@ -406,21 +414,6 @@ class TaskListItem extends React.Component {
         });
       }
 
-      // Ability to change options
-      if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 ||
-          (!task.processing_node)){
-        addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
-          this.startEditing();
-        }, {
-          className: "inline"
-        });
-      }
-
-      if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
-          (task.processing_node || imported)){
-        addActionButton(_("Cancel"), "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: _("Cannot cancel task.")}));
-      }
-
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node &&
             !imported){
@@ -434,11 +427,6 @@ class TaskListItem extends React.Component {
             subItems: this.getRestartSubmenuItems()
           });
       }
-
-      addActionButton(_("Delete"), "btn-danger", "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
-        confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
-        defaultError: _("Cannot delete task.")
-      }));
 
       const disabled = this.state.actionButtonsDisabled || 
                     ([pendingActions.CANCEL,
@@ -580,6 +568,8 @@ class TaskListItem extends React.Component {
         </div>;
       }
     }
+    
+    let statusIcon = statusCodes.icon(task.status);
 
     // @param type {String} one of: ['neutral', 'done', 'error']
     const getStatusLabel = (text, type = 'neutral', progress = 100) => {
@@ -589,11 +579,10 @@ class TaskListItem extends React.Component {
       return (<div 
             className={"status-label theme-border-primary " + type} 
             style={{background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)`}}
-            title={text}>{text}</div>);
+            title={text}><i className={statusIcon}></i> {text}</div>);
     }
 
     let statusLabel = "";
-    let statusIcon = statusCodes.icon(task.status);
     let showEditLink = false;
 
     if (task.last_error){
@@ -624,8 +613,57 @@ class TaskListItem extends React.Component {
       statusLabel = getStatusLabel(status, type, progress);
     }
 
+    const taskActions = [];
+    const addTaskAction = (label, icon, onClick) => {
+        taskActions.push(
+            <li key={label}><a href="javascript:void(0)" onClick={onClick}><i className={icon}></i>{label}</a></li>
+        );
+    };
+
+    if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
+        (task.processing_node || imported) && this.props.hasPermission("change")){
+        addTaskAction(_("Cancel"), "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: _("Cannot cancel task.")}));
+    }
+
+    // Ability to change options
+    const canAddDelPerms = this.props.hasPermission("add") && this.props.hasPermission("delete");
+    const editable = [statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1;
+
+    if (canAddDelPerms){
+        if (editable || (!task.processing_node)){
+            taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
+        }
+
+        if (editable){
+            taskActions.push(
+                <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Move")}</a></li>,
+                <li key="duplicate"><a href="javascript:void(0)"><i className="fa fa-copy"></i>{_("Duplicate")}</a></li>
+            );
+        }
+    }
+
+
+    if (this.props.hasPermission("delete")){
+        taskActions.push(
+            <li key="sep" role="separator" className="divider"></li>,
+        );
+    
+        addTaskAction(_("Delete"), "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
+            confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
+            defaultError: _("Cannot delete task.")
+        }));
+    }
+
     return (
       <div className="task-list-item">
+        {this.state.showMoveDialog ? 
+            <MoveTaskDialog 
+                task={task}
+                ref={(domNode) => { this.moveTaskDialog = domNode; }}
+                onHide={() => this.setState({showMoveDialog: false})}
+                saveAction={() => {}}
+            />
+        : ""}
         <div className="row">
           <div className="col-sm-5 name">
             <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
@@ -642,9 +680,16 @@ class TaskListItem extends React.Component {
               : statusLabel}
           </div>
           <div className="col-sm-1 text-right">
-            <div className="status-icon">
-              <i className={statusIcon}></i>
-            </div>
+            {taskActions.length > 0 ? 
+                <div className="btn-group">
+                <button disabled={this.state.actionButtonsDisabled} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i className="fa fa-ellipsis-h"></i>
+                </button>
+                <ul className="dropdown-menu dropdown-menu-right">
+                    {taskActions}
+                </ul>
+                </div>
+            : ""}
           </div>
         </div>
         {expanded}

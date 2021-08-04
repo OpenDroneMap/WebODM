@@ -9,7 +9,9 @@ class TaskList extends React.Component {
   static propTypes = {
       history: PropTypes.object.isRequired,
       source: PropTypes.string.isRequired, // URL where to load task list
-      onDelete: PropTypes.func
+      onDelete: PropTypes.func,
+      onMove: PropTypes.func,
+      hasPermission: PropTypes.func.isRequired
   }
 
   constructor(props){
@@ -69,6 +71,13 @@ class TaskList extends React.Component {
     if (this.props.onDelete) this.props.onDelete(id);
   }
 
+  moveTask(id){
+    this.setState({
+        tasks: this.state.tasks.filter(t => t.id !== id)
+    });
+    if (this.props.onMove) this.props.onMove(id); 
+  }
+
   render() {
     let message = "";
     if (this.state.loading){
@@ -88,7 +97,9 @@ class TaskList extends React.Component {
             data={task} 
             key={task.id} 
             refreshInterval={3000} 
-            onDelete={this.deleteTask} 
+            onDelete={this.deleteTask}
+            onMove={this.moveTask}
+            hasPermission={this.props.hasPermission}
             history={this.props.history} />
         ))}
       </div>

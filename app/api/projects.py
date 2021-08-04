@@ -37,3 +37,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     queryset = models.Project.objects.prefetch_related('task_set').filter(deleting=False).order_by('-created_at')
     ordering_fields = '__all__'
+
+    # Disable pagination when not requesting any page
+    def paginate_queryset(self, queryset):
+        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
+            return None
+        return super().paginate_queryset(queryset)

@@ -17,7 +17,7 @@ class FormDialog extends React.Component {
 
     static propTypes = {
         getFormData: PropTypes.func.isRequired,
-        reset: PropTypes.func.isRequired,
+        reset: PropTypes.func,
         saveAction: PropTypes.func.isRequired,
         onShow: PropTypes.func,
         onHide: PropTypes.func,
@@ -88,7 +88,7 @@ class FormDialog extends React.Component {
     }
 
     show(){
-        this.props.reset();
+        if (this.props.reset) this.props.reset();
         this.setState({showModal: true, saving: false, error: ""});
     }
 
