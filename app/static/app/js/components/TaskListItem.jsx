@@ -393,6 +393,10 @@ class TaskListItem extends React.Component {
     if (!task.processing_node && !imported) status = _("Waiting for a node...");
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
+    const disabled = this.state.actionButtonsDisabled || 
+                    ([pendingActions.CANCEL,
+                      pendingActions.REMOVE, 
+                      pendingActions.RESTART].indexOf(task.pending_action) !== -1);
 
     let expanded = "";
     if (this.state.expanded){
@@ -439,11 +443,6 @@ class TaskListItem extends React.Component {
             subItems: this.getRestartSubmenuItems()
           });
       }
-
-      const disabled = this.state.actionButtonsDisabled || 
-                    ([pendingActions.CANCEL,
-                      pendingActions.REMOVE, 
-                      pendingActions.RESTART].indexOf(task.pending_action) !== -1);
 
       actionButtons = (<div className="action-buttons">
             {task.status === statusCodes.COMPLETED ?
@@ -693,7 +692,7 @@ class TaskListItem extends React.Component {
           <div className="col-sm-1 text-right">
             {taskActions.length > 0 ? 
                 <div className="btn-group">
-                <button disabled={this.state.actionButtonsDisabled} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button disabled={disabled} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i className="fa fa-ellipsis-h"></i>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-right">
