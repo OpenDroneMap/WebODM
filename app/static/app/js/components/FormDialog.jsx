@@ -181,7 +181,7 @@ class FormDialog extends React.Component {
                                         <i className="fa fa-circle-notch fa-spin"></i> {_("Deleting...")}
                                     </span>
                                 :   <span>
-                                        <i className="glyphicon glyphicon-trash"></i> {_("Delete")}
+                                        <i className="fa fa-trash"></i> {_("Delete")}
                                     </span>}
                             </button>
                         </div>

@@ -397,6 +397,7 @@ class TaskListItem extends React.Component {
                     ([pendingActions.CANCEL,
                       pendingActions.REMOVE, 
                       pendingActions.RESTART].indexOf(task.pending_action) !== -1);
+    const editable = this.props.hasPermission("change") && [statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1;
 
     let expanded = "";
     if (this.state.expanded){
@@ -430,8 +431,17 @@ class TaskListItem extends React.Component {
         });
       }
 
+      if (editable || (!task.processing_node)){
+        addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
+          this.startEditing();
+        }, {
+          className: "inline"
+        });
+      }
+
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node &&
+            this.props.hasPermission("change") &&
             !imported){
           // By default restart reruns every pipeline
           // step from the beginning
@@ -442,6 +452,13 @@ class TaskListItem extends React.Component {
           addActionButton(_("Restart"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
             subItems: this.getRestartSubmenuItems()
           });
+      }
+
+      if (this.props.hasPermission("delete")){
+          addActionButton(_("Delete"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
+            confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
+            defaultError: _("Cannot delete task.")
+          }));
       }
 
       actionButtons = (<div className="action-buttons">
@@ -637,19 +654,15 @@ class TaskListItem extends React.Component {
     }
 
     // Ability to change options
-    const editable = [statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1;
+    if (editable || (!task.processing_node)){
+        taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
+    }
 
-    if (this.props.hasPermission("change")){
-        if (editable || (!task.processing_node)){
-            taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
-        }
-
-        if (editable){
-            taskActions.push(
-                <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Move")}</a></li>,
-                <li key="duplicate"><a href="javascript:void(0)"><i className="fa fa-copy"></i>{_("Duplicate")}</a></li>
-            );
-        }
+    if (editable){
+        taskActions.push(
+            <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Move")}</a></li>,
+            <li key="duplicate"><a href="javascript:void(0)"><i className="fa fa-copy"></i>{_("Duplicate")}</a></li>
+        );
     }
 
 
@@ -658,7 +671,7 @@ class TaskListItem extends React.Component {
             <li key="sep" role="separator" className="divider"></li>,
         );
     
-        addTaskAction(_("Delete"), "glyphicon glyphicon-trash", this.genActionApiCall("remove", {
+        addTaskAction(_("Delete"), "fa fa-trash", this.genActionApiCall("remove", {
             confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
             defaultError: _("Cannot delete task.")
         }));
