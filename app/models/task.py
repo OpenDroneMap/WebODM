@@ -310,6 +310,27 @@ class Task(models.Model):
             self.move_assets(self.__original_project_id, self.project.id)
             self.__original_project_id = self.project.id
 
+        # Manually validate the fields we want,
+        # since Django's clean_fields() method obliterates 
+        # our foreign keys without explanation :/
+        errors = {}
+        for f in self._meta.fields:
+            if f.attname in ["options"]:
+                raw_value = getattr(self, f.attname)
+                if f.blank and raw_value in f.empty_values:
+                    continue
+
+                try:
+                    setattr(self, f.attname, f.clean(raw_value, self))
+                except ValidationError as e:
+                    errors[f.name] = e.error_list
+                    
+        if errors:
+            raise ValidationError(errors)
+
+        self.clean()
+        self.validate_unique()
+
         super(Task, self).save(*args, **kwargs)
 
     def assets_path(self, *args):
