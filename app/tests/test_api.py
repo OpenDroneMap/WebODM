@@ -48,10 +48,14 @@ class TestApi(BootTestCase):
         client.login(username="testuser", password="test1234")
         res = client.get('/api/projects/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(res.data["results"]) > 0)
+        self.assertTrue(len(res.data) > 0)
+
+        res = client.get('/api/projects/?page=1')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data['results']) > 0)
 
         # Can sort
-        res = client.get('/api/projects/?ordering=-created_at')
+        res = client.get('/api/projects/?ordering=-created_at&page=1')
         last_project = Project.objects.filter(owner=user).latest('created_at')
         self.assertTrue(res.data["results"][0]['id'] == last_project.id)
 
@@ -65,12 +69,12 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Can filter
-        res = client.get('/api/projects/?name=999')
+        res = client.get('/api/projects/?name=999&page=1')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) == 0)
 
         # Cannot list somebody else's project without permission
-        res = client.get('/api/projects/?id={}'.format(other_project.id))
+        res = client.get('/api/projects/?id={}&page=1'.format(other_project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data["results"]) == 0)
 
