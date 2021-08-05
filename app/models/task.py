@@ -373,6 +373,41 @@ class Task(models.Model):
         else:
             return {}
 
+    def duplicate(self):
+        try:
+            with transaction.atomic():
+                task = Task.objects.get(pk=self.pk)
+                task.pk = None
+                task.name = gettext('Copy of %(task)s') % {'task': self.name}
+                task.created_at = timezone.now()
+                task.save()
+                task.refresh_from_db()
+
+                logger.info("Duplicating {} to {}".format(self, task))
+
+                for img in self.imageupload_set.all():
+                    img.pk = None
+                    img.task = task
+
+                    prev_name = img.image.name
+                    img.image.name = assets_directory_path(task.id, task.project.id,
+                                                            os.path.basename(img.image.name))
+                    
+                    img.save()
+
+                try:
+                    # Try to use hard links first
+                    shutil.copytree(self.task_path(), task.task_path(), copy_function=os.link)
+                except Exception as e:
+                    logger.warning("Cannot duplicate task using hard links, will use normal copy instead: {}".format(str(e)))
+                    shutil.copytree(self.task_path(), task.task_path())
+            
+            return task
+        except Exception as e:
+            logger.warning("Cannot duplicate task: {}".format(str(e)))
+        
+        return False
+        
     def get_asset_download_path(self, asset):
         """
         Get the path to an asset download

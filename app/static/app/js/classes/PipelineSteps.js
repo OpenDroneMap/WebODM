@@ -51,6 +51,11 @@ export default {
                 action: "odm_report",
                 label: _("Report"),
                 icon: "far fa-file-alt"
+            },
+            {
+                action: "odm_postprocess",
+                label: _("Postprocess"),
+                icon: "fa fa-cog"
             }
         ];
     }

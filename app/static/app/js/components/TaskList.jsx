@@ -97,6 +97,7 @@ class TaskList extends React.Component {
             refreshInterval={3000} 
             onDelete={this.deleteTask}
             onMove={this.moveTask}
+            onDuplicate={this.refresh}
             hasPermission={this.props.hasPermission}
             history={this.props.history} />
         ))}

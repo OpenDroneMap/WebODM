@@ -210,6 +210,23 @@ class TaskViewSet(viewsets.ViewSet):
 
         return Response({'success': True}, status=status.HTTP_200_OK)
 
+    @detail_route(methods=['post'])
+    def duplicate(self, request, pk=None, project_pk=None):
+        """
+        Duplicate a task
+        """
+        get_and_check_project(request, project_pk, ('change_project', ))
+        try:
+            task = self.queryset.get(pk=pk, project=project_pk)
+        except (ObjectDoesNotExist, ValidationError):
+            raise exceptions.NotFound()
+
+        new_task = task.duplicate()
+        if new_task:
+            return Response({'success': True, 'task': TaskSerializer(new_task).data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': _("Cannot duplicate task")}, status=status.HTTP_200_OK)
+
     def create(self, request, project_pk=None):
         project = get_and_check_project(request, project_pk, ('change_project', ))
 

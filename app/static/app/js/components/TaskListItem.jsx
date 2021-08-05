@@ -22,6 +22,7 @@ class TaskListItem extends React.Component {
       refreshInterval: PropTypes.number, // how often to refresh info
       onDelete: PropTypes.func,
       onMove: PropTypes.func,
+      onDuplicate: PropTypes.func,
       hasPermission: PropTypes.func
   }
 
@@ -41,7 +42,8 @@ class TaskListItem extends React.Component {
       friendlyTaskError: "",
       pluginActionButtons: [],
       view: "basic",
-      showMoveDialog: false
+      showMoveDialog: false,
+      actionLoading: false,
     }
 
     for (let k in props.data){
@@ -198,11 +200,12 @@ class TaskListItem extends React.Component {
         ).done(json => {
             if (json.success){
               this.refresh();
-              if (options.success !== undefined) options.success();
+              if (options.success !== undefined) options.success(json);
             }else{
               this.setState({
                 actionError: json.error || options.defaultError || _("Cannot complete operation."),
-                actionButtonsDisabled: false
+                actionButtonsDisabled: false,
+                expanded: true
               });
             }
         })
@@ -211,6 +214,9 @@ class TaskListItem extends React.Component {
               actionError: options.defaultError || _("Cannot complete operation."),
               actionButtonsDisabled: false
             });
+        })
+        .always(() => {
+            if (options.always !== undefined) options.always();
         });
       }
 
@@ -277,6 +283,19 @@ class TaskListItem extends React.Component {
 
   handleMoveTask = () => {
     this.setState({showMoveDialog: true});
+  }
+
+  handleDuplicateTask = () => {
+    this.setState({actionLoading: true});
+    this.genActionApiCall("duplicate", { 
+        success: (json) => {
+            if (json.task){
+                if (this.props.onDuplicate) this.props.onDuplicate(json.task);
+            }
+        },
+        always: () => {
+            this.setState({actionLoading: false});
+        }})();
   }
 
   getRestartSubmenuItems(){
@@ -398,6 +417,7 @@ class TaskListItem extends React.Component {
                       pendingActions.REMOVE, 
                       pendingActions.RESTART].indexOf(task.pending_action) !== -1);
     const editable = this.props.hasPermission("change") && [statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1;
+    const actionLoading = this.state.actionLoading;
 
     let expanded = "";
     if (this.state.expanded){
@@ -437,6 +457,11 @@ class TaskListItem extends React.Component {
         }, {
           className: "inline"
         });
+      }
+
+      if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
+         (task.processing_node || imported) && this.props.hasPermission("change")){
+        addActionButton(_("Cancel"), "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: _("Cannot cancel task.")}));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
@@ -533,11 +558,11 @@ class TaskListItem extends React.Component {
 
                 {stats && stats.gsd ? 
                 <div className="labels">
-                    <strong>{_("Average GSD:")} </strong> {stats.gsd.toFixed(2)} cm<br/>
+                    <strong>{_("Average GSD:")} </strong> {parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm<br/>
                 </div> : ""}
                 {stats && stats.area ? 
                 <div className="labels">
-                    <strong>{_("Area:")} </strong> {stats.area.toFixed(2)} m&sup2;<br/>
+                    <strong>{_("Area:")} </strong> {parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;<br/>
                 </div> : ""}
                 {stats && stats.pointcloud && stats.pointcloud.points ? 
                 <div className="labels">
@@ -661,7 +686,7 @@ class TaskListItem extends React.Component {
     if (editable){
         taskActions.push(
             <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Move")}</a></li>,
-            <li key="duplicate"><a href="javascript:void(0)"><i className="fa fa-copy"></i>{_("Duplicate")}</a></li>
+            <li key="duplicate"><a href="javascript:void(0)" onClick={this.handleDuplicateTask}><i className="fa fa-copy"></i>{_("Duplicate")}</a></li>
         );
     }
 
@@ -676,6 +701,9 @@ class TaskListItem extends React.Component {
             defaultError: _("Cannot delete task.")
         }));
     }
+
+    let taskActionsIcon = "fa-ellipsis-h";
+    if (actionLoading) taskActionsIcon = "fa-circle-notch fa-spin fa-fw";
 
     return (
       <div className="task-list-item">
@@ -705,8 +733,8 @@ class TaskListItem extends React.Component {
           <div className="col-sm-1 text-right">
             {taskActions.length > 0 ? 
                 <div className="btn-group">
-                <button disabled={disabled} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i className="fa fa-ellipsis-h"></i>
+                <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i className={"fa " + taskActionsIcon}></i>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-right">
                     {taskActions}
