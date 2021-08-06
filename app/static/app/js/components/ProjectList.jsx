@@ -91,6 +91,10 @@ class ProjectList extends Paginated {
         }
     }
 
+    handleProjectDuplicated = () => {
+        this.refresh();
+    }
+
     render() {
         if (this.state.loading){
             return (<div className="project-list text-center"><i className="fa fa-sync fa-spin fa-2x fa-fw"></i></div>);
@@ -106,6 +110,7 @@ class ProjectList extends Paginated {
                                 data={p} 
                                 onDelete={this.handleDelete}
                                 onTaskMoved={this.handleTaskMoved}
+                                onProjectDuplicated={this.handleProjectDuplicated}
                                 history={this.props.history} /> 
                         ))}
                     </ul>

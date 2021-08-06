@@ -165,6 +165,21 @@ class TestApi(BootTestCase):
         res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, other_task.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
+        # Cannot duplicate a project we have no access to
+        res = client.post('/api/projects/{}/duplicate/'.format(other_project.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can duplicate a project we have access to
+        res = client.post('/api/projects/{}/duplicate/'.format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data.get('success'))
+        new_project_id = res.data['project']['id']
+        self.assertNotEqual(new_project_id, project.id)
+
+        # Tasks have been duplicated
+        duplicated_project = Project.objects.get(pk=new_project_id)
+        self.assertEqual(project.task_set.count(), duplicated_project.task_set.count())
+
         # Cannot access task details for a task that doesn't exist
         res = client.get('/api/projects/{}/tasks/4004d1e9-ed2c-4983-8b93-fc7577ee6d89/'.format(project.id))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)

@@ -140,6 +140,25 @@ class FormDialog extends React.Component {
     }
 
     render(){
+        let leftButtons = [];
+        if (this.props.deleteAction){
+            leftButtons.push(<button 
+                disabled={this.state.deleting}
+                className="btn btn-danger" 
+                onClick={this.handleDelete}>
+                {this.state.deleting ? 
+                    <span>
+                        <i className="fa fa-circle-notch fa-spin"></i> {_("Deleting...")}
+                    </span>
+                :   <span>
+                        <i className="fa fa-trash"></i> {_("Delete")}
+                    </span>}
+            </button>);
+        }
+        if (this.props.leftButtons){
+            leftButtons = leftButtons.concat(this.props.leftButtons);
+        } 
+
         return (
             <div ref={this.setModal}
                 className="modal form-dialog" tabIndex="-1"
@@ -170,20 +189,10 @@ class FormDialog extends React.Component {
                                 </span>}
                         </button>
                     </div>
-                    {this.props.deleteAction ?
+                    
+                    {leftButtons.length > 0 ?
                         <div className="text-left">
-                            <button 
-                                disabled={this.state.deleting}
-                                className="btn btn-danger" 
-                                onClick={this.handleDelete}>
-                                {this.state.deleting ? 
-                                    <span>
-                                        <i className="fa fa-circle-notch fa-spin"></i> {_("Deleting...")}
-                                    </span>
-                                :   <span>
-                                        <i className="fa fa-trash"></i> {_("Delete")}
-                                    </span>}
-                            </button>
+                            {leftButtons}
                         </div>
                     : ""}
                   </div>

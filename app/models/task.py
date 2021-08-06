@@ -324,7 +324,7 @@ class Task(models.Model):
                     setattr(self, f.attname, f.clean(raw_value, self))
                 except ValidationError as e:
                     errors[f.name] = e.error_list
-                    
+
         if errors:
             raise ValidationError(errors)
 
@@ -394,12 +394,13 @@ class Task(models.Model):
         else:
             return {}
 
-    def duplicate(self):
+    def duplicate(self, set_new_name=True):
         try:
             with transaction.atomic():
                 task = Task.objects.get(pk=self.pk)
                 task.pk = None
-                task.name = gettext('Copy of %(task)s') % {'task': self.name}
+                if set_new_name:
+                    task.name = gettext('Copy of %(task)s') % {'task': self.name}
                 task.created_at = timezone.now()
                 task.save()
                 task.refresh_from_db()
@@ -416,13 +417,15 @@ class Task(models.Model):
                     
                     img.save()
 
-                try:
-                    # Try to use hard links first
-                    shutil.copytree(self.task_path(), task.task_path(), copy_function=os.link)
-                except Exception as e:
-                    logger.warning("Cannot duplicate task using hard links, will use normal copy instead: {}".format(str(e)))
-                    shutil.copytree(self.task_path(), task.task_path())
-            
+                if os.path.isdir(self.task_path()):
+                    try:
+                        # Try to use hard links first
+                        shutil.copytree(self.task_path(), task.task_path(), copy_function=os.link)
+                    except Exception as e:
+                        logger.warning("Cannot duplicate task using hard links, will use normal copy instead: {}".format(str(e)))
+                        shutil.copytree(self.task_path(), task.task_path())
+                else:
+                    logger.warning("Task {} doesn't have folder, will skip copying".format(self))
             return task
         except Exception as e:
             logger.warning("Cannot duplicate task: {}".format(str(e)))

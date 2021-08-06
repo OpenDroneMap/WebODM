@@ -22,6 +22,7 @@ class ProjectListItem extends React.Component {
       data: PropTypes.object.isRequired, // project json
       onDelete: PropTypes.func,
       onTaskMoved: PropTypes.func,
+      onProjectDuplicated: PropTypes.func
   }
 
   constructor(props){
@@ -481,8 +482,11 @@ class ProjectListItem extends React.Component {
           saveLabel={_("Save Changes")}
           savingLabel={_("Saving changes...")}
           saveIcon="far fa-edit"
+          showDuplicate={true}
+          onDuplicated={this.props.onProjectDuplicated}
           projectName={data.name}
           projectDescr={data.description}
+          projectId={data.id}
           saveAction={this.updateProject}
           deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
         />
