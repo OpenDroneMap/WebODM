@@ -292,6 +292,10 @@ class TestApiTask(BootTransactionTestCase):
             res = client.get("/api/projects/{}/tasks/{}/images/download/tiny_drone_image.jpg".format(other_project.id, other_task.id))
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
+            # Cannot duplicate a task we have no access to
+            res = client.post("/api/projects/{}/tasks/{}/duplicate/".format(other_project.id, other_task.id))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
             # Cannot export orthophoto
             res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
                 'formula': 'NDVI',
@@ -897,6 +901,21 @@ class TestApiTask(BootTransactionTestCase):
             self.assertFalse('orthophoto.tif' in res.data['available_assets'])
             self.assertFalse('orthophoto_tiles.zip' in res.data['available_assets'])
             self.assertTrue('textured_model.zip' in res.data['available_assets'])
+
+        # Can duplicate a task
+        res = client.post("/api/projects/{}/tasks/{}/duplicate/".format(project.id, task.id))
+        self.assertTrue(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data['success'])
+        new_task_id = res.data['task']['id']
+        self.assertNotEqual(res.data['task']['id'], task.id)
+        
+        new_task = Task.objects.get(pk=new_task_id)
+
+        # New task has same number of image uploads
+        self.assertEqual(task.imageupload_set.count(), new_task.imageupload_set.count())
+        
+        # Directories have been created
+        self.assertTrue(os.path.exists(new_task.task_path()))
 
         image1.close()
         image2.close()

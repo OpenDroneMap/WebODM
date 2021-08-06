@@ -6,7 +6,7 @@ const taskMock = require('../../tests/utils/MockLoader').load("task.json");
 
 describe('<TaskListItem />', () => {
   it('renders without exploding', () => {
-  	const wrapper = shallow(<TaskListItem history={createHistory()} data={taskMock} />);
+  	const wrapper = shallow(<TaskListItem history={createHistory()} data={taskMock} hasPermission={() => true} />);
     expect(wrapper.exists()).toBe(true);
   })
 });

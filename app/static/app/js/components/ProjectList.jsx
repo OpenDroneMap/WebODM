@@ -85,6 +85,16 @@ class ProjectList extends Paginated {
         });
     }
 
+    handleTaskMoved = (task) => {
+        if (this["projectListItem_" + task.project]){
+            this["projectListItem_" + task.project].newTaskAdded();
+        }
+    }
+
+    handleProjectDuplicated = () => {
+        this.refresh();
+    }
+
     render() {
         if (this.state.loading){
             return (<div className="project-list text-center"><i className="fa fa-sync fa-spin fa-2x fa-fw"></i></div>);
@@ -95,9 +105,12 @@ class ProjectList extends Paginated {
                     <ul className={"list-group project-list " + (this.state.refreshing ? "refreshing" : "")}>
                         {this.state.projects.map(p => (
                             <ProjectListItem 
+                                ref={(domNode) => { this["projectListItem_" + p.id] = domNode }}
                                 key={p.id} 
                                 data={p} 
-                                onDelete={this.handleDelete} 
+                                onDelete={this.handleDelete}
+                                onTaskMoved={this.handleTaskMoved}
+                                onProjectDuplicated={this.handleProjectDuplicated}
                                 history={this.props.history} /> 
                         ))}
                     </ul>

@@ -310,8 +310,26 @@ class Task(models.Model):
             self.move_assets(self.__original_project_id, self.project.id)
             self.__original_project_id = self.project.id
 
-        # Autovalidate on save
-        self.full_clean()
+        # Manually validate the fields we want,
+        # since Django's clean_fields() method obliterates 
+        # our foreign keys without explanation :/
+        errors = {}
+        for f in self._meta.fields:
+            if f.attname in ["options"]:
+                raw_value = getattr(self, f.attname)
+                if f.blank and raw_value in f.empty_values:
+                    continue
+
+                try:
+                    setattr(self, f.attname, f.clean(raw_value, self))
+                except ValidationError as e:
+                    errors[f.name] = e.error_list
+
+        if errors:
+            raise ValidationError(errors)
+
+        self.clean()
+        self.validate_unique()
 
         super(Task, self).save(*args, **kwargs)
 
@@ -376,6 +394,44 @@ class Task(models.Model):
         else:
             return {}
 
+    def duplicate(self, set_new_name=True):
+        try:
+            with transaction.atomic():
+                task = Task.objects.get(pk=self.pk)
+                task.pk = None
+                if set_new_name:
+                    task.name = gettext('Copy of %(task)s') % {'task': self.name}
+                task.created_at = timezone.now()
+                task.save()
+                task.refresh_from_db()
+
+                logger.info("Duplicating {} to {}".format(self, task))
+
+                for img in self.imageupload_set.all():
+                    img.pk = None
+                    img.task = task
+
+                    prev_name = img.image.name
+                    img.image.name = assets_directory_path(task.id, task.project.id,
+                                                            os.path.basename(img.image.name))
+                    
+                    img.save()
+
+                if os.path.isdir(self.task_path()):
+                    try:
+                        # Try to use hard links first
+                        shutil.copytree(self.task_path(), task.task_path(), copy_function=os.link)
+                    except Exception as e:
+                        logger.warning("Cannot duplicate task using hard links, will use normal copy instead: {}".format(str(e)))
+                        shutil.copytree(self.task_path(), task.task_path())
+                else:
+                    logger.warning("Task {} doesn't have folder, will skip copying".format(self))
+            return task
+        except Exception as e:
+            logger.warning("Cannot duplicate task: {}".format(str(e)))
+        
+        return False
+        
     def get_asset_download_path(self, asset):
         """
         Get the path to an asset download

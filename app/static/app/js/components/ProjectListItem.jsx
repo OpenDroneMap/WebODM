@@ -20,7 +20,9 @@ class ProjectListItem extends React.Component {
   static propTypes = {
       history: PropTypes.object.isRequired,
       data: PropTypes.object.isRequired, // project json
-      onDelete: PropTypes.func
+      onDelete: PropTypes.func,
+      onTaskMoved: PropTypes.func,
+      onProjectDuplicated: PropTypes.func
   }
 
   constructor(props){
@@ -47,6 +49,7 @@ class ProjectListItem extends React.Component {
     this.handleEditProject = this.handleEditProject.bind(this);
     this.updateProject = this.updateProject.bind(this);
     this.taskDeleted = this.taskDeleted.bind(this);
+    this.taskMoved = this.taskMoved.bind(this);
     this.hasPermission = this.hasPermission.bind(this);
   }
 
@@ -304,6 +307,11 @@ class ProjectListItem extends React.Component {
     this.refresh();
   }
 
+  taskMoved(task){
+    this.refresh();
+    if (this.props.onTaskMoved) this.props.onTaskMoved(task);
+  }
+
   handleDelete(){
     return $.ajax({
           url: `/api/projects/${this.state.data.id}/`,
@@ -474,8 +482,11 @@ class ProjectListItem extends React.Component {
           saveLabel={_("Save Changes")}
           savingLabel={_("Saving changes...")}
           saveIcon="far fa-edit"
+          showDuplicate={true}
+          onDuplicated={this.props.onProjectDuplicated}
           projectName={data.name}
           projectDescr={data.description}
+          projectId={data.id}
           saveAction={this.updateProject}
           deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
         />
@@ -570,6 +581,8 @@ class ProjectListItem extends React.Component {
                 ref={this.setRef("taskList")} 
                 source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
                 onDelete={this.taskDeleted}
+                onTaskMoved={this.taskMoved}
+                hasPermission={this.hasPermission}
                 history={this.props.history}
             /> : ""}
 

@@ -123,7 +123,7 @@ def build_plugins():
 
         # Check for webpack.config.js (if we need to build it)
         if plugin.path_exists("public/webpack.config.js"):
-            if settings.DEV and webpack_watch_process_count() <= 2:
+            if settings.DEV and webpack_watch_process_count() <= 2 and settings.DEV_WATCH_PLUGINS:
                 logger.info("Running webpack with watcher for {}".format(plugin.get_name()))
                 subprocess.Popen(['webpack-cli', '--watch'], cwd=plugin.get_path("public"))
             elif not plugin.path_exists("public/build"):
