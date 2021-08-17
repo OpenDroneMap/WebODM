@@ -208,6 +208,13 @@ class TaskViewSet(viewsets.ViewSet):
             for image in files:
                 models.ImageUpload.objects.create(task=task, image=image)
 
+        task.images_count = models.ImageUpload.objects.filter(task=task).count()
+        # Update other parameters such as processing node, task name, etc.
+        print(f"Amount of images currently in task: {task.images_count}")
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
         return Response({'success': True}, status=status.HTTP_200_OK)
 
     @detail_route(methods=['post'])
