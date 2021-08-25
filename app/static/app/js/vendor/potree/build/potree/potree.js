@@ -56837,7 +56837,7 @@
 				this.projection = info.srs.authority + ':' + info.srs.horizontal;
 			}
 
-			if (info.srs.wkt) {
+			if (info.srs && info.srs.wkt) {
 				if (!this.projection) this.projection = info.srs.wkt;
 				else this.fallbackProjection = info.srs.wkt;
 			}
