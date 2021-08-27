@@ -26,7 +26,11 @@ algos = {
     },
     'EXG': {
         'expr': '(2 * G) - (R + B)',
-        'help': _('Excess Green Index emphasizes the greenness of leafy crops such as potatoes.',)
+        'help': _('Excess Green Index (derived from only the RGB bands) emphasizes the greenness of leafy crops such as potatoes.')
+    },
+    'TGI': {
+        'expr': '(G - 0.39) * (R - 0.61) * B',
+        'help': _('Triangular Greenness Index (derived from only the RGB bands) performs similarly to EXG but with improvements over certain environments.')
     },
     'BAI': {
         'expr': '1.0 / (((0.1 - R) ** 2) + ((0.06 - N) ** 2))',
