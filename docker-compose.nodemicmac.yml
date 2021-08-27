@@ -2,7 +2,7 @@
 # a default processing node instance. This is best for users
 # who are just getting started with WebODM.
 
-version: '2.1'
+version: '3.9'
 services:
   webapp:
     depends_on:
