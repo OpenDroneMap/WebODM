@@ -21,6 +21,9 @@ RUN apt-get -qq update && apt-get -qq install -y nodejs
 RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin libgdal-dev python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-12 gettext
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
 
+# Force usage of proj.db version 6
+RUN apt-get install -qq -y proj-data=6* --allow-downgrades
+
 # Install pip reqs
 ADD requirements.txt /webodm/
 RUN pip install -r requirements.txt
