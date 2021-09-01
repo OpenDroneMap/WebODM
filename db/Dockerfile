@@ -81,12 +81,12 @@ RUN set -ex; \
 	cd /staging/postgis-$POSTGIS_VERSION; \
 	./configure --with-pgconfig=/usr/local/pgsql/bin/pg_config; \
 	make -j$(nproc); \
-	make install; \
-	cd /; \
-	rm -fr /staging; \
+	make install
+
+RUN set -ex; \
 	apt-get remove -y gcc build-essential wget; \
 	apt-get clean; \
-	rm -rf /var/lib/apt/lists/*;
+	rm -fr /var/lib/apt/lists/* /staging;
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/docker-entrypoint.sh / # backwards compat
