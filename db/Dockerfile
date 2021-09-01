@@ -45,7 +45,7 @@ RUN set -ex; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends wget gcc build-essential libproj-dev libgeos-dev libxml2-dev; \ 
 	cd /staging; \
-	wget --no-check-certificate -q https://ftp.postgresql.org/pub/source/v$PG_VERSION/postgresql-$PG_VERSION.tar.gz
+	wget --no-check-certificate -q https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.2/postgresql-$PG_VERSION.tar.gz
 
 RUN set -ex; \
 	cd /staging; \
@@ -72,7 +72,7 @@ RUN set -ex; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends libgdal-dev libjson-c-dev; \
 	cd /staging; \
-	wget --no-check-certificate -q https://download.osgeo.org/postgis/source/postgis-$POSTGIS_VERSION.tar.gz; \
+	wget --no-check-certificate -q https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.2/postgis-$POSTGIS_VERSION.tar.gz; \
 	wget --no-check-certificate -q -O /usr/include/json-c/json_object_private.h https://raw.githubusercontent.com/json-c/json-c/json-c-0.13/json_object_private.h; \
 	tar -zxf postgis-$POSTGIS_VERSION.tar.gz; \
 	sed -i 's/#error.*/#define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H 1/' /usr/include/proj_api.h
@@ -80,7 +80,7 @@ RUN set -ex; \
 RUN set -ex; \
 	cd /staging/postgis-$POSTGIS_VERSION; \
 	./configure --with-pgconfig=/usr/local/pgsql/bin/pg_config; \
-	make -j$(nproc); \
+	make; \
 	make install
 
 RUN set -ex; \
