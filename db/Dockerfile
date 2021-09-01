@@ -2,6 +2,7 @@ FROM ubuntu:20.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV POSTGRES_PASSWORD postgres
+ENV POSTGRES_HOST_AUTH_METHOD trust
 
 # Setup system
 RUN apt-get update
@@ -35,7 +36,7 @@ RUN mkdir /docker-entrypoint-initdb.d
 
 ENV PG_MAJOR 9.5
 ENV PG_VERSION 9.5.25
-ENV POSTGIS_VERSION 2.3.0
+ENV POSTGIS_VERSION 2.3.2
 ENV PATH $PATH:/usr/local/pgsql/bin
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -43,7 +44,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN set -ex; \
 	mkdir /staging; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends wget gcc build-essential libproj-dev libgeos-dev libxml2-dev; \ 
+	apt-get install -y --no-install-recommends wget gcc build-essential libproj-dev libgeos-dev libxml2-dev zlib1g-dev libreadline-dev; \ 
 	cd /staging; \
 	wget --no-check-certificate -q https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.2/postgresql-$PG_VERSION.tar.gz
 
@@ -51,7 +52,7 @@ RUN set -ex; \
 	cd /staging; \
 	tar -zxf postgresql-$PG_VERSION.tar.gz; \
 	cd postgresql-$PG_VERSION; \
-	./configure --without-readline --without-zlib; \
+	./configure; \
 	make -j$(nproc); \
 	make install; \
 	postgres --version
@@ -81,7 +82,8 @@ RUN set -ex; \
 	cd /staging/postgis-$POSTGIS_VERSION; \
 	./configure --with-pgconfig=/usr/local/pgsql/bin/pg_config; \
 	make; \
-	make install
+	make install; \
+	sed -i '1d' /usr/local/pgsql/share/extension/postgis--$POSTGIS_VERSION.sql
 
 RUN set -ex; \
 	apt-get remove -y gcc build-essential wget; \
