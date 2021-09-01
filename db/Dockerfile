@@ -87,8 +87,9 @@ RUN set -ex; \
 
 RUN set -ex; \
 	apt-get remove -y gcc build-essential wget; \
+	apt-get autoremove -y; \
 	apt-get clean; \
-	rm -fr /var/lib/apt/lists/* /staging;
+	rm -fr /var/lib/apt/lists/* /staging /usr/include;
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/docker-entrypoint.sh / # backwards compat
