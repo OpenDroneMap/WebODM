@@ -22,7 +22,7 @@ RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
 
 # Force usage of proj.db version 6
-RUN apt-get install -qq -y proj-data=6* --allow-downgrades
+RUN rm -fr /usr/share/proj && mkdir /usr/share/proj && wget --no-check-certificate https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.2/proj-data_6.3.1-1.tar.xz -O - | tar -Jx
 
 # Install pip reqs
 ADD requirements.txt /webodm/
