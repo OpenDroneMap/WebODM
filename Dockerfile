@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:21.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV PYTHONUNBUFFERED 1
@@ -9,21 +9,18 @@ ENV PROJ_LIB=/usr/share/proj
 RUN mkdir /webodm
 WORKDIR /webodm
 
-RUN apt-get -qq update && apt-get install -y software-properties-common tzdata
-RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
-
 # Install Node.js
 RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget curl
 RUN wget --no-check-certificate https://deb.nodesource.com/setup_12.x -O /tmp/node.sh && bash /tmp/node.sh
 RUN apt-get -qq update && apt-get -qq install -y nodejs
 
 # Install Python3, GDAL, nginx, letsencrypt, psql
-RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin libgdal-dev python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-12 gettext
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
+RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin libgdal-dev python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-13 gettext tzdata
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2
 
 # Install pip reqs
 ADD requirements.txt /webodm/
-RUN pip install -r requirements.txt
+RUN pip install -U pip && pip install -r requirements.txt "boto3==1.14.14"
 
 ADD . /webodm/
 
