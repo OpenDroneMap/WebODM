@@ -186,7 +186,6 @@ check_command(){
 
 environment_check(){
 	check_command "docker" "https://www.docker.com/"
-	check_command "git" "https://git-scm.com/downloads"
 	check_command "docker-compose" "Run \033[1mpip install docker-compose\033[0m" "pip install docker-compose"
 }
 
@@ -358,7 +357,13 @@ elif [[ $1 = "rebuild" ]]; then
 elif [[ $1 = "update" ]]; then
 	down
 	echo "Updating WebODM..."
-	run "git pull origin master"
+
+	hash git 2>/dev/null || git_not_found=true 
+	if [[ $git_not_found ]]; then
+		echo "Skipping source update (git not found)"
+	else
+		run "git pull origin master"
+	fi
 
 	command="docker-compose -f docker-compose.yml"
 
