@@ -362,7 +362,11 @@ elif [[ $1 = "update" ]]; then
 	if [[ $git_not_found ]]; then
 		echo "Skipping source update (git not found)"
 	else
-		run "git pull origin master"
+		if [[ -d .git ]]; then
+			run "git pull origin master"
+		else
+			echo "Skipping source update (.git directory not found)"
+		fi
 	fi
 
 	command="docker-compose -f docker-compose.yml"
