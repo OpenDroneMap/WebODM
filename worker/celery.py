@@ -5,6 +5,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'webodm.settings')
 
 app = Celery('tasks')
 app.config_from_object('django.conf:settings', namespace='CELERY')
+app.conf.result_backend_transport_options = {
+    'retry_policy': {
+       'timeout': 5.0
+    }
+}
 
 app.conf.beat_schedule = {
     'update-nodes-info': {
