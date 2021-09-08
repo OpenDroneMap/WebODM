@@ -37,6 +37,7 @@ const api = {
       new AssetDownload(_("Orthophoto (PNG)"),"orthophoto.png","far fa-image"),
       new AssetDownload(_("Orthophoto (MBTiles)"),"orthophoto.mbtiles","far fa-image"),
       new AssetDownload(_("Orthophoto (Tiles)"),"orthophoto_tiles.zip","fa fa-table"),
+      new AssetDownload(_("Orthophoto (KMZ)"),"orthophoto.kmz","fa fa-globe"),
       new AssetDownload(_("Terrain Model (GeoTIFF)"),"dtm.tif","fa fa-chart-area"),
       new AssetDownload(_("Terrain Model (Tiles)"),"dtm_tiles.zip","fa fa-table"),
       new AssetDownload(_("Surface Model (GeoTIFF)"),"dsm.tif","fa fa-chart-area"),
