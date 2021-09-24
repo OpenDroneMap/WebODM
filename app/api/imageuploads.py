@@ -82,7 +82,7 @@ class Thumbnail(TaskNestedView):
                     'x': coords[0],
                     'y': coords[1],
                     'color': hex2rgb(point_colors[i]) if i < len(point_colors) else (255, 255, 255),
-                    'radius': float(point_radiuses[i]) if i < len(point_radiuses) else 1,
+                    'radius': float(point_radiuses[i]) if i < len(point_radiuses) else 1.0,
                 })
 
                 i += 1
@@ -100,8 +100,9 @@ class Thumbnail(TaskNestedView):
             for p in points:
                 d = ImageDraw.Draw(img)
                 r = p['radius']
+
                 d.ellipse([(p['x'] * w - r, p['y'] * h - r), 
-                           (p['x'] * w + r, p['y'] * h + r)], outline=p['color'], width=max(1.0, math.floor(r / 3.0)))
+                           (p['x'] * w + r, p['y'] * h + r)], outline=p['color'], width=int(max(1.0, math.floor(r / 3.0))))
             
             # Move image center
             if center_x != 0.5 or center_y != 0.5:
