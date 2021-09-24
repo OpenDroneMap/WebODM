@@ -61,12 +61,12 @@ class GCPPopup extends React.Component {
     componentDidMount(){
         const { feature } = this.props;
 
-        if (this.image) this.image.addEventListener("fullscreenchange", this.onFullscreenChange);
+        document.addEventListener("fullscreenchange", this.onFullscreenChange);
         if (feature.properties.observations) this.selectShot(feature.properties.observations[0].shot_id);
     }
 
     componentWillUnmount(){
-        if (this.image) this.image.removeEventListener("fullscreenchange", this.onFullscreenChange);
+        document.removeEventListener("fullscreenchange", this.onFullscreenChange);
     }
 
     onFullscreenChange = (e) => {
@@ -91,7 +91,7 @@ class GCPPopup extends React.Component {
             this.setState({ loading: true, expandGCPImage: true});
         }else{
             document.exitFullscreen();
-            this.setState({ expandGCPImage: false });
+            this.setState({ loading: true, expandGCPImage: false });
         }
     }
 
@@ -115,7 +115,8 @@ class GCPPopup extends React.Component {
         }
 
         const imgStyle = {
-            borderRadius: "4px"
+            borderRadius: "4px",
+            minHeight: "32px"
         };
 
         return (<div className="gcp-popup">

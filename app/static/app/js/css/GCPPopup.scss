@@ -30,6 +30,9 @@
             opacity: 0.2;
         }
         &.fullscreen{
+            &.loading{
+                opacity: 1;
+            }
             display: flex;
             align-items: center;
             justify-content: center;

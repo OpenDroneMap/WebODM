@@ -31,7 +31,6 @@ def hex2rgb(hex_color):
     Adapted from https://stackoverflow.com/questions/29643352/converting-hex-to-rgb-value-in-python/29643643
     """
     hex_color = hex_color.lstrip('#')
-    print(hex_color)
     if len(hex_color) != 6:
         return tuple((255, 255, 255))
     try:
