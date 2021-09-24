@@ -13,6 +13,7 @@ import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 import ImagePopup from './ImagePopup';
+import GCPPopup from './GCPPopup';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
@@ -264,6 +265,57 @@ class Map extends React.Component {
                 }));
 
                 this.addedCameraShots = true;
+            }
+
+            // Add ground control points layer if available
+            if (meta.task && meta.task.ground_control_points && !this.addedGroundControlPoints){
+                const gcpMarker = L.AwesomeMarkers.icon({
+                    icon: 'dot-circle',
+                    markerColor: 'blue',
+                    prefix: 'fa'
+                });
+
+                const gcpLayer = new L.GeoJSON.AJAX(meta.task.ground_control_points, {
+                    style: function (feature) {
+                      return {
+                        opacity: 1,
+                        fillOpacity: 0.7,
+                        color: "#000000"
+                      }
+                    },
+                    pointToLayer: function (feature, latlng) {
+                      return new L.marker(latlng, {
+                        icon: gcpMarker
+                      });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties && feature.properties.observations) {
+                            // TODO!
+                            let root = null;
+                            const lazyrender = () => {
+                                if (!root) root = document.createElement("div");
+                                ReactDOM.render(<GCPPopup task={meta.task} feature={feature}/>, root);
+                                return root;
+                            }
+
+                            layer.bindPopup(L.popup(
+                                {
+                                    lazyrender,
+                                    maxHeight: 450,
+                                    minWidth: 320
+                                }));
+                        }
+                    }
+                });
+                gcpLayer[Symbol.for("meta")] = {name: name + " " + _("(GCPs)"), icon: "far fa-dot-circle fa-fw"};
+
+                this.setState(update(this.state, {
+                    overlays: {$push: [gcpLayer]}
+                }));
+
+                gcpLayer.addTo(this.map); // TODO REMOVE
+
+                this.addedGroundControlPoints = true;
             }
 
             done();

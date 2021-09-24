@@ -196,6 +196,7 @@ class Task(models.Model):
             'cameras.json': 'cameras.json',
             'shots.geojson': os.path.join('odm_report', 'shots.geojson'),
             'report.pdf': os.path.join('odm_report', 'report.pdf'),
+            'ground_control_points.geojson': os.path.join('odm_georeferencing', 'ground_control_points.geojson'),
     }
 
     STATUS_CODES = (
@@ -860,6 +861,9 @@ class Task(models.Model):
         camera_shots = ''
         if 'shots.geojson' in self.available_assets: camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)
 
+        ground_control_points = ''
+        if 'ground_control_points.geojson' in self.available_assets: ground_control_points = '/api/projects/{}/tasks/{}/download/ground_control_points.geojson'.format(self.project.id, self.id)
+
         return {
             'tiles': [{'url': self.get_tile_base_url(t), 'type': t} for t in types],
             'meta': {
@@ -867,7 +871,8 @@ class Task(models.Model):
                     'id': str(self.id),
                     'project': self.project.id,
                     'public': self.public,
-                    'camera_shots': camera_shots
+                    'camera_shots': camera_shots,
+                    'ground_control_points': ground_control_points
                 }
             }
         }
