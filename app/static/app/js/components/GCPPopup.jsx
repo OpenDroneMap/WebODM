@@ -18,7 +18,7 @@ class GCPPopup extends React.Component {
             loading: true,
             expandGCPImage: false,
             selectedShot: "",
-            zoom: 3
+            zoom: 4
         }
     }
 
@@ -55,7 +55,7 @@ class GCPPopup extends React.Component {
         const annotated = this.getAnnotationCoords(selectedShot);
         const reprojected = this.getReprojectedCoords(selectedShot);
     
-        return `/api/projects/${task.project}/tasks/${task.id}/images/thumbnail/${selectedShot}?size=${size}&center_x=${annotated[0]}&center_y=${annotated[1]}&draw_point=${annotated[0]},${annotated[1]}&point_color=f29900&point_radius=1.5&draw_point=${reprojected[0]},${reprojected[1]}&&point_color=00ff00&point_radius=1.5&zoom=${zoom}`;
+        return `/api/projects/${task.project}/tasks/${task.id}/images/thumbnail/${selectedShot}?size=${size}&center_x=${annotated[0]}&center_y=${annotated[1]}&draw_point=${annotated[0]},${annotated[1]}&point_color=f29900&point_radius=2&draw_point=${reprojected[0]},${reprojected[1]}&&point_color=00ff00&point_radius=2&zoom=${zoom}`;
     }
 
     componentDidMount(){
@@ -86,7 +86,7 @@ class GCPPopup extends React.Component {
     }
 
     canZoomIn = () => {
-        return this.state.zoom < 5 && !this.state.loading;
+        return this.state.zoom < 10 && !this.state.loading;
     }
 
     canZoomOut = () => {

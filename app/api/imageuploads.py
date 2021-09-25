@@ -88,7 +88,7 @@ class Thumbnail(TaskNestedView):
                 i += 1
             
             zoom = float(self.request.query_params.get('zoom', '1'))
-            if zoom < 0.2 or zoom > 6:
+            if zoom < 0.1 or zoom > 10:
                 raise ValueError()
 
         except ValueError:
@@ -112,30 +112,35 @@ class Thumbnail(TaskNestedView):
             
             # Scale
             scale_factor = 1
-            if zoom != 1:
-                scale_factor = (2 ** zoom)
-                img = ImageOps.scale(img, scale_factor, Image.NEAREST)
-            sw, sh = img.size
+            off_x = 0
+            off_y = 0
 
-             # Draw points
+            if zoom != 1:
+                scale_factor = (2 ** (zoom - 1))
+                off_x = w / 2.0 - w / scale_factor / 2.0
+                off_y = h / 2.0 - h / scale_factor / 2.0
+                win = img.crop((off_x, off_y, 
+                                off_x + (w / scale_factor),
+                                off_y + (h / scale_factor)
+                    ))
+                img = ImageOps.scale(win, scale_factor, Image.NEAREST)
+
+            sw, sh = w * scale_factor, h * scale_factor
+
+            # Draw points
             for p in points:
                 d = ImageDraw.Draw(img)
-                r = p['radius'] * zoom * max(w, h) / 100.0
+                r = p['radius'] * max(w, h) / 100.0
                 
-                x = (p['x'] + (0.5 - center_x)) * sw
-                y = (p['y'] + (0.5 - center_y)) * sh
+                sx = (p['x'] + (0.5 - center_x)) * sw
+                sy = (p['y'] + (0.5 - center_y)) * sh
+                #x = sx / scale_factor
+                #y = sy / scale_factor
+                x = sx - off_x * scale_factor
+                y = sy - off_y * scale_factor
                 d.ellipse([(x - r, y - r), 
                            (x + r, y + r)], outline=p['color'], width=int(max(1.0, math.floor(r / 3.0))))
             
-            # Crop
-            if scale_factor != 1:
-                img = img.crop((
-                    sw / 2.0 - w,
-                    sh / 2.0 - h,
-                    sw / 2.0 + w,
-                    sh / 2.0 + h
-                ))
-
             img.thumbnail((thumb_size, thumb_size))
             output = io.BytesIO()
             img.save(output, format='JPEG', quality=quality)
