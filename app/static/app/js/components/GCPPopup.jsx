@@ -18,7 +18,7 @@ class GCPPopup extends React.Component {
             loading: true,
             expandGCPImage: false,
             selectedShot: "",
-            zoom: 1
+            zoom: 3
         }
     }
 
@@ -55,7 +55,7 @@ class GCPPopup extends React.Component {
         const annotated = this.getAnnotationCoords(selectedShot);
         const reprojected = this.getReprojectedCoords(selectedShot);
     
-        return `/api/projects/${task.project}/tasks/${task.id}/images/thumbnail/${selectedShot}?size=${size}&center_x=${annotated[0]}&center_y=${annotated[1]}&draw_point=${annotated[0]},${annotated[1]}&point_color=f29900&point_radius=20&draw_point=${reprojected[0]},${reprojected[1]}&&point_color=00ff00&point_radius=20`;
+        return `/api/projects/${task.project}/tasks/${task.id}/images/thumbnail/${selectedShot}?size=${size}&center_x=${annotated[0]}&center_y=${annotated[1]}&draw_point=${annotated[0]},${annotated[1]}&point_color=f29900&point_radius=1.5&draw_point=${reprojected[0]},${reprojected[1]}&&point_color=00ff00&point_radius=1.5&zoom=${zoom}`;
     }
 
     componentDidMount(){
@@ -63,10 +63,12 @@ class GCPPopup extends React.Component {
 
         document.addEventListener("fullscreenchange", this.onFullscreenChange);
         if (feature.properties.observations) this.selectShot(feature.properties.observations[0].shot_id);
+        if (this.imageContainer) this.imageContainer.addEventListener("mousewheel", this.onImageWheel); // onWheel doesn't work :/
     }
 
     componentWillUnmount(){
         document.removeEventListener("fullscreenchange", this.onFullscreenChange);
+        if (this.imageContainer) this.imageContainer.removeEventListener("mousewheel", this.onImageWheel);
     }
 
     onFullscreenChange = (e) => {
@@ -81,6 +83,34 @@ class GCPPopup extends React.Component {
 
     imageOnLoad = () => {
         this.setState({loading: false});
+    }
+
+    canZoomIn = () => {
+        return this.state.zoom < 5 && !this.state.loading;
+    }
+
+    canZoomOut = () => {
+        return this.state.zoom > 1 && !this.state.loading;
+    }
+
+    zoomIn = () => {
+        if (this.canZoomIn()){
+            this.setState({loading: true, zoom: this.state.zoom + 1});
+        }
+    }
+
+    zoomOut = () => {
+        if (this.canZoomOut()){
+            this.setState({loading: true, zoom: this.state.zoom - 1});
+        }
+    }
+
+    onImageWheel = e => {
+        if (e.deltaY > 0){
+            this.zoomIn();
+        }else{
+            this.zoomOut();
+        }
     }
 
     onImgClick = () => {
@@ -125,7 +155,7 @@ class GCPPopup extends React.Component {
                 {shotLinks}
             </div>
 
-            <div className="image-container">
+            <div className="image-container" ref={(domNode) => this.imageContainer = domNode }>
                 {loading ? <div className="spinner"><i className="fa fa-circle-notch fa-spin fa-fw"></i></div> : ""}
                 {error ? <div style={{marginTop: "8px"}}>{error}</div> : ""}
                 

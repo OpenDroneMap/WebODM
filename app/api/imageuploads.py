@@ -6,7 +6,7 @@ from .tasks import TaskNestedView
 from rest_framework import exceptions
 from app.models import ImageUpload
 from app.models.task import assets_directory_path
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 from django.http import HttpResponse
 from .tasks import download_file_response
 import numpy as np
@@ -86,6 +86,10 @@ class Thumbnail(TaskNestedView):
                 })
 
                 i += 1
+            
+            zoom = float(self.request.query_params.get('zoom', '1'))
+            if zoom < 0.2 or zoom > 6:
+                raise ValueError()
 
         except ValueError:
             raise exceptions.ValidationError("Invalid query parameters")
@@ -95,14 +99,7 @@ class Thumbnail(TaskNestedView):
                 img = normalize(img)
                 img = img.convert('RGB')
             w, h = img.size
-            
-            # Draw points
-            for p in points:
-                d = ImageDraw.Draw(img)
-                r = p['radius']
-
-                d.ellipse([(p['x'] * w - r, p['y'] * h - r), 
-                           (p['x'] * w + r, p['y'] * h + r)], outline=p['color'], width=int(max(1.0, math.floor(r / 3.0))))
+            thumb_size = min(max(w, h), thumb_size)
             
             # Move image center
             if center_x != 0.5 or center_y != 0.5:
@@ -113,6 +110,32 @@ class Thumbnail(TaskNestedView):
                         h * (center_y + 0.5)
                     ))
             
+            # Scale
+            scale_factor = 1
+            if zoom != 1:
+                scale_factor = (2 ** zoom)
+                img = ImageOps.scale(img, scale_factor, Image.NEAREST)
+            sw, sh = img.size
+
+             # Draw points
+            for p in points:
+                d = ImageDraw.Draw(img)
+                r = p['radius'] * zoom * max(w, h) / 100.0
+                
+                x = (p['x'] + (0.5 - center_x)) * sw
+                y = (p['y'] + (0.5 - center_y)) * sh
+                d.ellipse([(x - r, y - r), 
+                           (x + r, y + r)], outline=p['color'], width=int(max(1.0, math.floor(r / 3.0))))
+            
+            # Crop
+            if scale_factor != 1:
+                img = img.crop((
+                    sw / 2.0 - w,
+                    sh / 2.0 - h,
+                    sw / 2.0 + w,
+                    sh / 2.0 + h
+                ))
+
             img.thumbnail((thumb_size, thumb_size))
             output = io.BytesIO()
             img.save(output, format='JPEG', quality=quality)
