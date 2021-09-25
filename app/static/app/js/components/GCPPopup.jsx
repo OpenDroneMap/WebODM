@@ -166,6 +166,10 @@ class GCPPopup extends React.Component {
                 </div> : ""}
             </div>
 
+            <div className="btn-group zoom-buttons">
+                <button onClick={this.zoomOut} disabled={!this.canZoomOut()} type="button" className="btn btn-xs btn-default" title="-">-</button>
+                <button onClick={this.zoomIn} disabled={!this.canZoomIn()} type="button" className="btn btn-xs btn-default" title="+">+</button>
+            </div>
 
             <div>
                 <strong>{_("Horizontal error:")}</strong> {Math.abs(Math.max(feature.properties.error[0], feature.properties.error[1])).toFixed(3)} {_("(meters)")}
