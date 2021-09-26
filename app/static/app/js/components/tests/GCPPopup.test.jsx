@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import ImagePopup from '../GCPPopup';
+import GCPPopup from '../GCPPopup';
 
 describe('<GCPPopup />', () => {
     it('renders without exploding', () => {
