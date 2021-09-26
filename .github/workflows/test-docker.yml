@@ -14,6 +14,6 @@ jobs:
      
     - name: Build and Test
       run: |
-        docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build -d
+        docker-compose -f docker-compose.yml -f docker-compose.build.yml up --build --build-arg TEST_BUILD=ON -d
         sleep 30
         docker-compose exec -T webapp /webodm/webodm.sh test

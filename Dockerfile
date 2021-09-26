@@ -1,6 +1,7 @@
 FROM ubuntu:21.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
+ARG TEST_BUILD
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH $PYTHONPATH:/webodm
 ENV PROJ_LIB=/usr/share/proj
@@ -20,7 +21,7 @@ RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget cu
     pip install -U pip && pip install -r requirements.txt "boto3==1.14.14" && \
     # Setup cron
     ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && chmod 0644 /webodm/nginx/crontab && service cron start && chmod +x /webodm/nginx/letsencrypt-autogen.sh && \
-    cd /webodm/nodeodm/external/NodeODM && npm install --quiet && cd /webodm && \
+    /webodm/nodeodm/setup.sh && /webodm/nodeodm/cleanup.sh && cd /webodm && \
     npm install --quiet -g webpack@4.16.5 && npm install --quiet -g webpack-cli@4.2.0 && npm install --quiet && webpack --mode production && \
     echo "UTC" > /etc/timezone && \
     python manage.py collectstatic --noinput && \
