@@ -362,6 +362,7 @@ class TestApiTask(BootTransactionTestCase):
             # Can download assets
             for asset in list(task.ASSETS_MAP.keys()):
                 res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
+                print("DOWLOAD: " + asset)
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
 
             # We can stream downloads
@@ -414,6 +415,14 @@ class TestApiTask(BootTransactionTestCase):
                 self.assertEqual(i.height, 3)
 
             res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg?size=9999999".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            with Image.open(io.BytesIO(res.content)) as i:
+                # Thumbnail has been resized to the max allowed (oringinal image size)
+                self.assertEqual(i.width, 48)
+                self.assertEqual(i.height, 36)
+
+            # Can plot points, recenter thumbnails, zoom
+            res = client.get("/api/projects/{}/tasks/{}/images/thumbnail/tiny_drone_image.jpg?size=9999999&center_x=0.3&center_y=0.2&draw_point=0.4,0.4&point_color=ff0000&point_radius=3&zoom=2".format(project.id, task.id))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
             with Image.open(io.BytesIO(res.content)) as i:
                 # Thumbnail has been resized to the max allowed (oringinal image size)

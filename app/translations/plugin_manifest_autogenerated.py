@@ -15,3 +15,4 @@ _("A plugin to add a button for quickly opening OpenStreetMap's iD editor and se
 _("A plugin to create GCP files from images")
 _("A plugin to create GCP files from images")
 _("Create short links when sharing task URLs")
+_("Create editable short links when sharing task URLs")

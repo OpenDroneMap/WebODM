@@ -210,7 +210,6 @@ class TaskViewSet(viewsets.ViewSet):
 
         task.images_count = models.ImageUpload.objects.filter(task=task).count()
         # Update other parameters such as processing node, task name, etc.
-        print(f"Amount of images currently in task: {task.images_count}")
         serializer = TaskSerializer(task, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()

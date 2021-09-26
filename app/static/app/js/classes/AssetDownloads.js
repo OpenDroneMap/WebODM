@@ -49,7 +49,9 @@ const api = {
       new AssetDownload(_("Textured Model"),"textured_model.zip","fab fa-connectdevelop"),
       new AssetDownload(_("Camera Parameters"),"cameras.json","fa fa-camera"),
       new AssetDownload(_("Camera Shots (GeoJSON)"),"shots.geojson","fa fa-camera"),
+      new AssetDownload(_("Ground Control Points (GeoJSON)"),"ground_control_points.geojson","far fa-dot-circle"),
       new AssetDownload(_("Quality Report"),"report.pdf","far fa-file-pdf"),
+      
       
       
       new AssetDownloadSeparator(),

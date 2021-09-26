@@ -59,9 +59,6 @@ def dev_tools(request, action):
                     raise Exception(_("Cannot find locale/ folder in .zip archive"))
                 
                 webodm_locale_dir = os.path.join(settings.BASE_DIR, "locale")
-                if os.path.isdir(webodm_locale_dir):
-                    logger.info("Removing %s" % webodm_locale_dir)
-                    shutil.rmtree(webodm_locale_dir)
 
                 for locale_path in locale_paths:
                     logger.info("Found locale at %s" % locale_path)
