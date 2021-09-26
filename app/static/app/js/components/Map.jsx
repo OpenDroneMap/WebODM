@@ -313,8 +313,6 @@ class Map extends React.Component {
                     overlays: {$push: [gcpLayer]}
                 }));
 
-                gcpLayer.addTo(this.map); // TODO REMOVE
-
                 this.addedGroundControlPoints = true;
             }
 

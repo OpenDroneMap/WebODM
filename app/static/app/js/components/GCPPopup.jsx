@@ -126,7 +126,7 @@ class GCPPopup extends React.Component {
     }
 
     render(){
-        const { error, loading, expandGCPImage, selectedShot, zoom } = this.state;
+        const { error, loading, expandGCPImage, selectedShot } = this.state;
         const { feature, task } = this.props;
         
         const downloadGCPLink =  `/api/projects/${task.project}/tasks/${task.id}/download/ground_control_points.geojson`;

@@ -134,10 +134,9 @@ class Thumbnail(TaskNestedView):
                 
                 sx = (p['x'] + (0.5 - center_x)) * sw
                 sy = (p['y'] + (0.5 - center_y)) * sh
-                #x = sx / scale_factor
-                #y = sy / scale_factor
                 x = sx - off_x * scale_factor
                 y = sy - off_y * scale_factor
+
                 d.ellipse([(x - r, y - r), 
                            (x + r, y + r)], outline=p['color'], width=int(max(1.0, math.floor(r / 3.0))))
             
