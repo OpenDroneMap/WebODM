@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+set -euxo
+
+export WEBODM_VERSION=1.9.7
+export WEBODM_USER=odm
+export WEBODM_USER_HOME="/home/${WEBODM_USER}"
+export WEBODM_DIR=/opt/WebODM
+export WEBODM_VENV_DIR="${WEBODM_DIR}/python3-venv"
+export NODEODM_DIR=/opt/nodeodm
+
+function deleteUser() {
+    if grep -q "^${WEBODM_USER}:" /etc/passwd; then
+        userdel "${WEBODM_USER}"
+    fi
+}
+
+function deleteUserHome() {
+    if [ -d "${WEBODM_USER_HOME}" ]; then
+        rm -Rf "${WEBODM_USER_HOME}"
+    fi
+}
+
+function deleteVenv() {
+    if [ -d "${WEBODM_VENV_DIR}" ]; then
+        rm -Rf "${WEBODM_VENV_DIR}"
+    fi
+}
+
+function stopService() {
+    UNIT_NAME="webodm-docker.service"
+    set +e
+    systemctl is-active -q "${UNIT_NAME}"
+    if [ "${?}" -eq 0 ]; then
+        set -e
+        systemctl stop "${UNIT_NAME}"
+    else
+        set -e
+    fi
+    systemctl disable "${UNIT_NAME}"
+    systemctl daemon-reload
+
+    /opt/WebODM/webodm.sh down
+}
+
+function purge() {
+    stopService
+    deleteUser
+    deleteVenv
+    deleteUserHome
+}
+
+function abortInstall() {
+    purge
+}
+
+case $1 in
+    abort-install)
+        abortInstall
+        ;;
+    remove)
+        exit 0
+        ;;
+    purge)
+        purge
+        ;;
+    default)
+        exit 1
+        ;;
+esac

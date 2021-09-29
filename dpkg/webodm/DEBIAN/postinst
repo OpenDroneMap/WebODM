@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+set -euxo
+
+export WEBODM_VERSION=1.9.7
+export WEBODM_USER=odm
+export WEBODM_USER_HOME="/home/${WEBODM_USER}"
+export WEBODM_DIR=/opt/WebODM
+export WEBODM_VENV_DIR="${WEBODM_DIR}/python3-venv"
+export NODEODM_DIR=/opt/nodeodm
+
+function addNodeODMGPUIntelDockerGroups() {
+    DOCKER_COMPOSE_FILE="${WEBODM_DIR}/docker-compose.nodeodm.gpu.intel.yml"
+    for gid in $(id -G "${WEBODM_USER}"); do
+        echo "Checking gid ${gid}."
+        SED_SEARCH="/^\s\{4\}group_add/{:start /${gid}$/!"
+        SED_SEARCH="${SED_SEARCH}{N;b start};/${gid}$/p}"
+        # SED_OUT=$(sed -n '/^\s\{4\}group_add/{:start /$gid$/!{N;b start};/10/p}' "${DOCKER_COMPOSE_FILE}")
+        SED_OUT=$(sed -n "${SED_SEARCH}" "${DOCKER_COMPOSE_FILE}")
+        if [ -z "${SED_OUT}" ]; then
+            echo "Adding gid ${gid}."
+            echo "SED_OUT: ${SED_OUT}"
+            sed -i "/^\s\{4\}image/a \ \ \ \ group_add:\n\ \ \ \ \ \ - ${gid}" "${DOCKER_COMPOSE_FILE}"
+        fi
+    done
+}
+
+function buildNodeODMGPUIntelDockerImage() {
+    cd "${NODEODM_DIR}"
+
+    # We won't have to do this after the image is on Docker Hub.
+    docker build -f Dockerfile.gpu -t opendronemap/nodeodm:gpu .
+
+    # This will continue to be necessary, since it needs to bake in the actual
+    # render group id on this system.
+    RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
+    docker build -f Dockerfile.gpu.intel -t opendronemap/nodeodm:gpu.intel --build-arg RENDER_GROUP_ID="${RENDER_GROUP_ID}" .
+}
+
+function createGroup() {
+    if [ "${GPU_INTEL}" = true ]; then
+        if ! grep -q "^render:" /etc/group; then
+            groupadd render
+        fi
+    fi
+}
+
+function createUser() {
+    if ! grep -q "^${WEBODM_USER}:" /etc/passwd; then
+        if [ "${GPU_INTEL}" = true ]; then
+            useradd -m -d "${WEBODM_USER_HOME}" -s /bin/bash -G docker,video,render "${WEBODM_USER}"
+        else
+            useradd -m -d "${WEBODM_USER_HOME}" -s /bin/bash -G docker "${WEBODM_USER}"
+        fi
+
+        chown "${WEBODM_USER}":"${WEBODM_USER}" "${WEBODM_USER_HOME}"
+    fi
+
+    PROFILE_PATH="/home/odm/.profile"
+    if [ ! -f "${PROFILE_PATH}" ]; then
+        touch "${PROFILE_PATH}"
+        chmod odm:odm "${PROFILE_PATH}"
+    fi
+
+    if ! grep -q "PATH.*home\/odm\/\.local\/bin" "${PROFILE_PATH}"; then
+        echo "export PATH=\"/home/odm/.local/bin:${PATH}\"" >> "${PROFILE_PATH}"
+    fi
+}
+
+function createVenv() {
+    if [ ! -d "${WEBODM_VENV_DIR}" ]; then
+        mkdir "${WEBODM_VENV_DIR}"
+        python3 -m venv "${WEBODM_VENV_DIR}"
+    fi
+}
+
+function detectGPUs() {
+    source "${WEBODM_DIR}/detect_gpus.sh"
+}
+
+function enableService() {
+    systemctl enable "${WEBODM_DIR}/service/webodm-docker.service"
+}
+
+function installPythonDockerCompose() {
+    su "${WEBODM_USER}" -c "python3 -m pip install --upgrade docker-compose"
+}
+
+function setFilePermissions() {
+    chown -R "${WEBODM_USER}:${WEBODM_USER}" "${WEBODM_DIR}"
+}
+
+function upgradePythonPip() {
+    su "${WEBODM_USER}" -c "python3 -m pip install --upgrade pip"
+}
+
+####
+
+function startService() {
+    systemctl daemon-reload
+    systemctl restart webodm-docker.service
+}
+
+function abortRemove() {
+    echo "Unable to remove webodm."
+}
+
+function configure() {
+    detectGPUs
+    createGroup
+    createUser
+
+    if [ "${GPU_INTEL}" = true ]; then
+        buildNodeODMGPUIntelDockerImage
+        addNodeODMGPUIntelDockerGroups
+    fi
+
+    createVenv
+    setFilePermissions
+    upgradePythonPip
+    installPythonDockerCompose
+    enableService
+    startService
+}
+
+case $1 in
+    abort-remove)
+        abortRemove
+        ;;
+    configure)
+        configure
+        ;;
+    default)
+        exit 1
+        ;;
+esac
+

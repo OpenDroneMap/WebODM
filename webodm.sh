@@ -220,7 +220,16 @@ start(){
 	command="docker-compose -f docker-compose.yml"
 
     if [[ $default_nodes > 0 ]]; then
-        command+=" -f docker-compose.nodeodm.yml"
+		source "${__dirname}/detect_gpus.sh"
+		set +ux
+
+		if [ "${GPU_NVIDIA}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+		elif [ "${GPU_INTEL}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+		else
+			command+=" -f docker-compose.nodeodm.yml"
+		fi
     fi
 
     if [[ $load_micmac_node = true ]]; then
@@ -283,7 +292,22 @@ start(){
 }
 
 down(){
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml -f docker-compose.nodemicmac.yml down --remove-orphans"
+	source "${__dirname}/detect_gpus.sh"
+	set +ux
+
+	command="docker-compose -f docker-compose.yml"
+
+	if [ "${GPU_NVIDIA}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+	elif [ "${GPU_INTEL}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+	else
+		command+=" -f docker-compose.nodeodm.yml"
+	fi
+
+	command+=" -f docker-compose.nodemicmac.yml down --remove-orphans"
+
+	run "${command}"
 }
 
 rebuild(){
@@ -340,7 +364,21 @@ if [[ $1 = "start" ]]; then
 elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml -f docker-compose.nodemicmac.yml stop"
+
+	source "${__dirname}/detect_gpus.sh"
+	set +ux
+	command="docker-compose -f docker-compose.yml"
+
+	if [ "${GPU_NVIDIA}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+	elif [ "${GPU_INTEL}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+	else
+		command+=" -f docker-compose.nodeodm.yml"
+	fi
+
+	command+=" -f docker-compose.nodemicmac.yml stop"
+	run "${command}"
 elif [[ $1 = "restart" ]]; then
 	environment_check
 	echo "Restarting WebODM..."
@@ -372,7 +410,16 @@ elif [[ $1 = "update" ]]; then
 	command="docker-compose -f docker-compose.yml"
 
 	if [[ $default_nodes > 0 ]]; then
-		command+=" -f docker-compose.nodeodm.yml"
+		source "${__dirname}/detect_gpus.sh"
+		set +ux
+
+		if [ "${GPU_NVIDIA}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+		elif [ "${GPU_INTEL}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+		else
+			command+=" -f docker-compose.nodeodm.yml"
+		fi
 	fi
 
 	if [[ $load_micmac_node = true ]]; then
