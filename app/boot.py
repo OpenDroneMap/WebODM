@@ -106,20 +106,27 @@ def add_default_presets():
         Preset.objects.update_or_create(name='Volume Analysis', system=True,
                                         defaults={'options': [{'name': 'dsm', 'value': True},
                                                               {'name': 'dem-resolution', 'value': '2'},
-                                                              {'name': 'pc-quality', 'value': 'high'}]})
+                                                              {'name': 'pc-geometric', 'value': True},
+                                                              {'name': 'pc-quality', 'value': 'high'},
+                                                              {'name': 'use-3dmesh', 'value': True},]})
         Preset.objects.update_or_create(name='3D Model', system=True,
                                         defaults={'options': [{'name': 'mesh-octree-depth', 'value': "12"},
                                                               {'name': 'use-3dmesh', 'value': True},
+                                                              {'name': 'pc-geometric', 'value': True},
                                                               {'name': 'pc-quality', 'value': 'high'},
                                                               {'name': 'mesh-size', 'value': '300000'}]})
         Preset.objects.update_or_create(name='Buildings', system=True,
                                         defaults={'options': [{'name': 'mesh-size', 'value': '300000'},
+                                                              {'name': 'pc-geometric', 'value': True},
                                                               {'name': 'pc-quality', 'value': 'high'}]})
         Preset.objects.update_or_create(name='Point of Interest', system=True,
                                         defaults={'options': [{'name': 'mesh-size', 'value': '300000'},
+                                                              {'name': 'pc-geometric', 'value': True},
                                                               {'name': 'use-3dmesh', 'value': True}]})
         Preset.objects.update_or_create(name='Forest', system=True,
                                         defaults={'options': [{'name': 'min-num-features', 'value': '18000'},
+                                                              {'name': 'use-3dmesh', 'value': True},
+                                                              {'name': 'pc-geometric', 'value': True},
                                                               {'name': 'feature-quality', 'value': 'ultra'}]})
         Preset.objects.update_or_create(name='DSM + DTM', system=True,
                                         defaults={
