@@ -117,6 +117,7 @@ def add_default_presets():
                                                               {'name': 'mesh-size', 'value': '300000'}]})
         Preset.objects.update_or_create(name='Buildings', system=True,
                                         defaults={'options': [{'name': 'mesh-size', 'value': '300000'},
+                                                              {'name': 'pc-geometric', 'value': True},
                                                               {'name': 'pc-quality', 'value': 'high'}]})
         Preset.objects.update_or_create(name='Point of Interest', system=True,
                                         defaults={'options': [{'name': 'mesh-size', 'value': '300000'},
