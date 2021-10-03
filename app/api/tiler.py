@@ -157,8 +157,6 @@ class Metadata(TaskNestedView):
                     }
                     stats = {b: ImageStatistics(**s) for b, s in stats.items()}
                     metadata = RioMetadata(statistics=stats, **src.info().dict())
-                    print(metadata)
-                    print(metadata.json())
                 info = json.loads(metadata.json())
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata

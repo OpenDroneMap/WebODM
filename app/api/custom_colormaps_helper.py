@@ -1,6 +1,5 @@
 import matplotlib
 import numpy
-
 def generate_discrete_color_map_from_list_of_hex(list_of_hex_colors):
     colormap = matplotlib.colors.ListedColormap(list_of_hex_colors)
     color_map_dict = extract_colormap_dict_from_arr(colormap)
@@ -15,6 +14,7 @@ def extract_colormap_dict_from_arr(colormap):
     cmap_uint8 = (cmap_vals * 255).astype('uint8')
     ndvi_dict = {idx: value.tolist() for idx, value in enumerate(cmap_uint8)}
     return ndvi_dict
+
 ndvi_arr = [
     '#AD0028',
     '#C5142A',
