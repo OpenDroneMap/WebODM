@@ -14,7 +14,7 @@ from rio_tiler.profiles import img_profiles
 from rio_tiler.colormap import cmap as colormap
 from rio_tiler.io import COGReader
 import numpy as np
-from colormaps import custom_colormaps
+from custom_colormaps import custom_colormaps
 from app.raster_utils import export_raster_index
 from .hsvblend import hsv_blend
 from .hillshade import LightSource

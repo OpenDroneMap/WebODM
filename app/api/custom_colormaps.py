@@ -35,7 +35,7 @@ x = numpy.linspace(0, 1, 256)
 cmap_vals = ndvi(x)[:, :]
 cmap_uint8 = (cmap_vals * 255).astype('uint8')
 ndvi_dict = {idx: value.tolist() for idx, value in enumerate(cmap_uint8)}
-c
+
 custom_colormaps = [{"discrete_ndvi": {
             0: [174, 0, 40, 255],
             1: [174, 0, 40, 255],
