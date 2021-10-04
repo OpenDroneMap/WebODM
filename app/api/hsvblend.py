@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib
 
 #******************************************************************************
 #  Copyright (c) 2009, Frank Warmerdam
@@ -95,8 +94,10 @@ def hsv_to_rgb( hsv ):
 
 def hsv_blend(rgb_tile, intensity):
     rgb = rgb_tile.data_as_image()
-    hsv = matplotlib.colors.rgb_to_hsv(rgb)
-
+    hsv = rgb_to_hsv(rgb[0], rgb[1], rgb[2])
+    print(hsv[0].shape)
+    print(hsv[1].shape)
+    print(intensity.shape)
     #replace v with hillshade
     hsv_adjusted = np.asarray( [hsv[0], hsv[1], intensity] )
 

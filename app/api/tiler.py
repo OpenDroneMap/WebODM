@@ -348,6 +348,7 @@ class Tiles(TaskNestedView):
                 else:
                     tile = src.tile(x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata,
                                     padding=padding, resampling_method=resampling)
+
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
         if color_map:
