@@ -152,7 +152,7 @@ class Metadata(TaskNestedView):
                     data.mask = mask == 0
                     expression_bloc = expr.lower().split(",")
                     stats = {
-                        f"{expression_bloc[b]}": raster_stats(data[b], percentiles=(2, 98))
+                        f"{expression_bloc[b]}": raster_stats(data[b], percentiles=(pmin, pmax), bins=255, range=hrange)
                         for b in range(data.shape[0])
                     }
                     stats = {b: ImageStatistics(**s) for b, s in stats.items()}
