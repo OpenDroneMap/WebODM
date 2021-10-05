@@ -123,16 +123,16 @@ class Metadata(TaskNestedView):
         if formula == '': formula = None
         if bands == '': bands = None
         if defined_range == '': defined_range = None
-
         try:
             expr, hrange = lookup_formula(formula, bands)
+            new_range = tuple(map(float, defined_range.split(",")[:2]))
             if defined_range is not None:
-                new_range = tuple(map(float, defined_range.split(",")[:2]))
                 #Validate rescaling range
-                if new_range[0] < hrange[0] or new_range[1] > hrange[1]:
+                if hrange is not None and (new_range[0] < hrange[0] or new_range[1] > hrange[1]):
                     pass
                 else:
                     hrange = new_range
+
         except ValueError as e:
             raise exceptions.ValidationError(str(e))
         pmin, pmax = 2.0, 98.0
