@@ -1,10 +1,9 @@
 Package: WebODM
-Version: 1.9.7-3
+Version: 1.9.7-1
 Section: base
 Priority: optional
 Architecture: all
 Depends: docker.io | docker-ce,
-  docker-compose,
   ocl-icd-libopencl1,
   clinfo,
   python3,

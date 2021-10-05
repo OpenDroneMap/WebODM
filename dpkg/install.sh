@@ -5,7 +5,7 @@ set -ux
 HERE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 WEBODM_VERSION=1.9.7
-WEBODM_DPKG_VERSION=3
+WEBODM_DPKG_VERSION=1
 WEBODM_DPKG_NAME="webodm_${WEBODM_VERSION}-${WEBODM_DPKG_VERSION}"
 
 function aptFixInstall() {
@@ -17,12 +17,6 @@ function aptFixInstall() {
 function ensureDocker() {
     if ! command -v docker &> /dev/null; then
         sudo apt install docker.io
-    fi
-}
-
-function ensureDockerCompose() {
-    if ! command -v docker-compose &> /dev/null; then
-        sudo apt install docker-compose
     fi
 }
 
@@ -114,19 +108,18 @@ function ensureNVIDIAOpenCL() {
 function ensureOpenCL() {
     source "${HERE}/detect_gpus.sh"
 
+    if [ "${GPU_NVIDIA}" = true ]; then
+        ensureNVIDIAOpenCL
+    fi
+
     if [ "${GPU_INTEL}" = true ]; then
         ensureIntelOpenCL
     fi
-
-    # if [ "${GPU_NVIDIA}" = true ]; then
-    #     ensureNVIDIAOpenCL
-    # fi
 }
 
 function install() {
     ensureOpenCL
     ensureDocker
-    ensureDockerCompose
     sudo dpkg -i "${HERE}/${WEBODM_DPKG_NAME}.deb"
 }
 

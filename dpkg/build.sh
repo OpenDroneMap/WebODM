@@ -5,7 +5,7 @@ set -euxo
 HERE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 WEBODM_VERSION=1.9.7
-WEBODM_DPKG_VERSION=3
+WEBODM_DPKG_VERSION=1
 WEBODM_DPKG_NAME="webodm_${WEBODM_VERSION}-${WEBODM_DPKG_VERSION}"
 
 BUILD_DIR="${HERE}/build"
@@ -13,13 +13,34 @@ DEB_DIR="${HERE}/deb"
 WEBODM_DIR="${HERE}/${WEBODM_DPKG_NAME}/opt/WebODM"
 NODEODM_DIR="${HERE}/${WEBODM_DPKG_NAME}/opt/nodeodm"
 
+function build() {
+    prepareBuildDir
+    prepareDebDir
+    prepareNodeODMDir
+    prepareWebODMDir
+    moveToBuildDir
+    buildDeb
+    bundle
+}
+
+function buildDeb() {
+    dpkg-deb --build "${WEBODM_DPKG_NAME}"
+}
+
+function bundle() {
+    mkdir -p "${DEB_DIR}/${WEBODM_DPKG_NAME}"
+    cp "${HERE}/install.sh" "${DEB_DIR}/${WEBODM_DPKG_NAME}/"
+    cp "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/WebODM/detect_gpus.sh" "${DEB_DIR}/${WEBODM_DPKG_NAME}/"
+    cp "${WEBODM_DPKG_NAME}.deb" "${DEB_DIR}/${WEBODM_DPKG_NAME}/"
+}
+
 function moveToBuildDir() {
     cd "${BUILD_DIR}/${WEBODM_DPKG_NAME}"
 }
 
 function prepareBuildDir() {
-    if [ -d "${BUILD_DIR}" ]; then
-        rm -Rf "${BUILD_DIR}"
+    if [ -d "${BUILD_DIR}/${WEBODM_DPKG_NAME}" ]; then
+        rm -Rf "${BUILD_DIR}/${WEBODM_DPKG_NAME}"
     fi
 
     mkdir -p "${BUILD_DIR}/${WEBODM_DPKG_NAME}"
@@ -34,6 +55,11 @@ function prepareDebDir() {
     mkdir -p "${DEB_DIR}"
 }
 
+function prepareNodeODMDir() {
+    # This can go away when we can pull the image from Docker Hub.
+    git clone -b bkd/gpu https://github.com/airmap/nodeodm.git "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/nodeodm"
+}
+
 function prepareWebODMDir() {
     TMP_DIR="/tmp/WebODM"
     if [ -d "${BUILD_DIR}" ]; then
@@ -44,26 +70,4 @@ function prepareWebODMDir() {
     mv "${TMP_DIR}" "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/"
 }
 
-function prepareNodeODMDir() {
-    # This can go away when we can pull the image from Docker Hub.
-    git clone -b bkd/gpu https://github.com/airmap/nodeodm.git "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/nodeodm"
-}
-
-function build() {
-    dpkg-deb --build "${WEBODM_DPKG_NAME}"
-}
-
-function bundle() {
-    mkdir -p "${DEB_DIR}/${WEBODM_DPKG_NAME}"
-    cp "${HERE}/install.sh" "${DEB_DIR}/${WEBODM_DPKG_NAME}/"
-    cp "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/WebODM/detect_gpus.sh" "${DEB_DIR}/${WEBODM_DPKG_NAME}/"
-    cp "${WEBODM_DPKG_NAME}.deb" "${DEB_DIR}/${WEBODM_DPKG_NAME}/"
-}
-
-prepareBuildDir
-prepareDebDir
-prepareNodeODMDir
-prepareWebODMDir
-moveToBuildDir
 build
-bundle
