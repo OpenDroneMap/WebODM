@@ -575,7 +575,7 @@ class TestApiTask(BootTransactionTestCase):
 
                 # Min/max values are what we expect them to be
                 self.assertEqual(len(metadata['statistics']), 1)
-                self.assertEqual(round(metadata['statistics']['1']['min'], 2), 156.92)
+                self.assertEqual(round(metadata['statistics']['1']['min'], 2), 156.91)
                 self.assertEqual(round(metadata['statistics']['1']['max'], 2), 164.88)
 
             # Can access individual tiles
