@@ -309,12 +309,12 @@ class Tiles(TaskNestedView):
             nodata = np.nan if nodata == "nan" else float(nodata)
         tilesize = scale * 256
         url = get_raster_path(task, tile_type)
+        if not os.path.isfile(url):
+            raise exceptions.NotFound()
+
         with COGReader(url) as src:
             if not src.tile_exists(z, x, y):
                 raise exceptions.NotFound("Outside of bounds")
-
-        if not os.path.isfile(url):
-            raise exceptions.NotFound()
 
         with COGReader(url) as src:
             minzoom, maxzoom = get_zoom_safe(src)
