@@ -484,8 +484,8 @@ class TestApiTask(BootTransactionTestCase):
             for f in fields:
                 self.assertTrue(f in metadata)
 
-            self.assertEqual(metadata['minzoom'], 17 - ZOOM_EXTRA_LEVELS)
-            self.assertEqual(metadata['maxzoom'], 17 + ZOOM_EXTRA_LEVELS)
+            self.assertEqual(metadata['minzoom'], 18 - ZOOM_EXTRA_LEVELS)
+            self.assertEqual(metadata['maxzoom'], 18 + ZOOM_EXTRA_LEVELS)
 
             # Colormaps and algorithms should be empty lists
             self.assertEqual(metadata['algorithms'], [])

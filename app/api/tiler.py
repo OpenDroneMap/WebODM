@@ -25,7 +25,7 @@ from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster_index
 
-ZOOM_EXTRA_LEVELS = 2
+ZOOM_EXTRA_LEVELS = 3
 
 for custom_colormap in custom_colormaps:
     colormap = colormap.register(custom_colormap)
@@ -159,7 +159,7 @@ class Metadata(TaskNestedView):
                     data.mask = mask == 0
                     expression_bloc = expr.lower().split(",")
                     stats = {
-                        f"{expression_bloc[b]}": raster_stats(data[b], percentiles=(pmin, pmax), bins=255, range=hrange)
+                        str(b + 1): raster_stats(data[b], percentiles=(pmin, pmax), bins=255, range=hrange)
                         for b in range(data.shape[0])
                     }
                     stats = {b: ImageStatistics(**s) for b, s in stats.items()}
