@@ -118,18 +118,25 @@ class Metadata(TaskNestedView):
         task = self.get_and_check_task(request, pk)
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
+        defined_range = self.request.query_params.get('range')
 
         if formula == '': formula = None
         if bands == '': bands = None
+        if defined_range == '': defined_range = None
 
         try:
             expr, hrange = lookup_formula(formula, bands)
+            if defined_range is not None:
+                new_range = tuple(map(float, defined_range.split(",")[:2]))
+                #Validate rescaling range
+                if new_range[0] < hrange[0] or new_range[1] > hrange[1]:
+                    pass
+                else:
+                    hrange = new_range
         except ValueError as e:
             raise exceptions.ValidationError(str(e))
-
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
-
         if not os.path.isfile(raster_path):
             raise exceptions.NotFound()
         try:
@@ -141,11 +148,10 @@ class Metadata(TaskNestedView):
                 # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
                 if tile_type == 'orthophoto':
                     nodata = 0
-
                 # info = src.metadata(pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr,
                 #                      nodata=nodata)
                 histogram_options = {"bins": 255, "range": hrange}
-                metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata)
+
                 if expr is not None:
                     data, mask = src.preview(expression=expr)
                     data = numpy.ma.array(data)
@@ -157,11 +163,12 @@ class Metadata(TaskNestedView):
                     }
                     stats = {b: ImageStatistics(**s) for b, s in stats.items()}
                     metadata = RioMetadata(statistics=stats, **src.info().dict())
+                else:
+                    metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata)
                 info = json.loads(metadata.json())
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata
             raise exceptions.ValidationError("Cannot retrieve raster metadata: %s" % str(e))
-
         # Override min/max
         if hrange:
             for b in info['statistics']:
@@ -218,7 +225,7 @@ class Metadata(TaskNestedView):
 
 
 def get_elevation_tiles(elevation_tile, url, x, y, z, tilesize, nodata, resampling, padding):
-    tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation_tile.dtype)
+    tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation_tile.data.dtype)
     with COGReader(url) as src:
         try:
             left, _ = src.tile(x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
@@ -244,7 +251,7 @@ def get_elevation_tiles(elevation_tile, url, x, y, z, tilesize, nodata, resampli
             tile[0:tilesize, tilesize:tilesize * 2] = top
         except TileOutsideBounds:
             pass
-    tile[tilesize:tilesize * 2, tilesize:tilesize * 2] = elevation_tile.data
+    tile[tilesize:tilesize * 2, tilesize:tilesize * 2] = elevation_tile.data[0]
     return tile
 
 
@@ -265,6 +272,7 @@ class Tiles(TaskNestedView):
 
         indexes = None
         nodata = None
+        rgb_tile = None
 
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
@@ -338,7 +346,7 @@ class Tiles(TaskNestedView):
         if tile_type in ["dsm", "dtm"]:
             resampling = "bilinear"
             padding = 16
-            rgb_tile = None
+
         try:
             with COGReader(url) as src:
                 if expr is not None:
@@ -373,13 +381,13 @@ class Tiles(TaskNestedView):
             ls = LightSource(azdeg=315, altdeg=45)
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
-            elevation = get_elevation_tiles(tile.data[0], url, x, y, z, tilesize, nodata, resampling, padding)
+            elevation = get_elevation_tiles(tile, url, x, y, z, tilesize, nodata, resampling, padding)
             intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
             intensity = intensity[tilesize:tilesize * 2, tilesize:tilesize * 2]
         if intensity is not None:
             # Quick check
             intensity = intensity * 255.0
-            rgb_tile = hsv_blend(tile, intensity)
+            rgb_tile = hsv_blend(tile.post_process(color_map=color_map).data_as_image(), intensity)
         options = img_profiles.get(driver, {})
         rescale_arr = tuple(map(float, rescale.split(",")))
 
