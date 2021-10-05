@@ -94,7 +94,9 @@ def hsv_to_rgb( hsv ):
 
 def hsv_blend(rgb, intensity):
     hsv = rgb_to_hsv(rgb[0], rgb[1], rgb[2])
+
     #replace v with hillshade
     hsv_adjusted = np.asarray( [hsv[0], hsv[1], intensity] )
+
     #convert back to RGB
     return hsv_to_rgb( hsv_adjusted )

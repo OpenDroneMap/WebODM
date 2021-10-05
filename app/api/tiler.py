@@ -1,17 +1,18 @@
 import json
 import numpy
+import rio_tiler.utils
 from rasterio.enums import ColorInterp
 import urllib
 import os
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.utils import has_alpha_band, \
-    non_alpha_indexes, render
+    non_alpha_indexes, render, mapzen_elevation_rgb
 from rio_tiler.utils import _stats as raster_stats
 from rio_tiler.models import ImageStatistics, ImageData
 from rio_tiler.models import Metadata as RioMetadata
 from rio_tiler.profiles import img_profiles
-from rio_tiler.colormap import cmap as colormap
+from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.io import COGReader
 import numpy as np
 from .custom_colormaps_helper import custom_colormaps
@@ -224,8 +225,8 @@ class Metadata(TaskNestedView):
         return Response(info)
 
 
-def get_elevation_tiles(elevation_tile, url, x, y, z, tilesize, nodata, resampling, padding):
-    tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation_tile.data.dtype)
+def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata, resampling, padding):
+    tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
     with COGReader(url) as src:
         try:
             left, _ = src.tile(x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
@@ -233,6 +234,7 @@ def get_elevation_tiles(elevation_tile, url, x, y, z, tilesize, nodata, resampli
             tile[tilesize:tilesize * 2, 0:tilesize] = left
         except TileOutsideBounds:
             pass
+
         try:
             right, _ = src.tile(x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
                                 resampling_method=resampling, padding=padding)
@@ -251,7 +253,7 @@ def get_elevation_tiles(elevation_tile, url, x, y, z, tilesize, nodata, resampli
             tile[0:tilesize, tilesize:tilesize * 2] = top
         except TileOutsideBounds:
             pass
-    tile[tilesize:tilesize * 2, tilesize:tilesize * 2] = elevation_tile.data[0]
+    tile[tilesize:tilesize * 2, tilesize:tilesize * 2] = elevation
     return tile
 
 
@@ -365,6 +367,8 @@ class Tiles(TaskNestedView):
             except FileNotFoundError:
                 raise exceptions.ValidationError("Not a valid color_map value")
         intensity = None
+        rescale_arr = tuple(map(float, rescale.split(",")))
+        options = img_profiles.get(driver, {})
         if hillshade is not None:
             try:
                 hillshade = float(hillshade)
@@ -381,27 +385,26 @@ class Tiles(TaskNestedView):
             ls = LightSource(azdeg=315, altdeg=45)
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
-            elevation = get_elevation_tiles(tile, url, x, y, z, tilesize, nodata, resampling, padding)
+            elevation = get_elevation_tiles(tile.data[0], url, x, y, z, tilesize, nodata, resampling, padding)
             intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
             intensity = intensity[tilesize:tilesize * 2, tilesize:tilesize * 2]
-        if intensity is not None:
-            # Quick check
-            intensity = intensity * 255.0
-            rgb_tile = hsv_blend(tile.post_process(color_map=color_map).data_as_image(), intensity)
-        options = img_profiles.get(driver, {})
-        rescale_arr = tuple(map(float, rescale.split(",")))
 
-        if color_map is not None and isinstance(color_map, dict):
-            return HttpResponse(
-                tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, colormap=color_map, **options),
-                content_type="image/{}".format(ext)
-            )
-        elif color_map is not None:
-            if rgb_tile is not None:
+        if intensity is not None:
+            rgb = tile.post_process(in_range=(rescale_arr,))
+            if colormap:
+                rgb, _ = apply_cmap(rgb.data, colormap.get(color_map))
+            if rgb.data.shape[0] != 3:
+                raise exceptions.ValidationError(
+                    "Cannot process tile: intensity image provided, but no RGB data was computed.")
+            intensity = intensity * 255.0
+            rgb = hsv_blend(rgb, intensity)
+            if rgb is not None:
                 return HttpResponse(
-                    render(rgb_tile,img_format=driver, colormap=colormap.get(color_map), **options),
+                    render(rgb, tile.mask, img_format=driver, **options),
                     content_type="image/{}".format(ext)
                 )
+
+        if color_map is not None:
             return HttpResponse(
                 tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, colormap=colormap.get(color_map),
                                                                   **options),
