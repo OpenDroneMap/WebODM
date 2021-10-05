@@ -220,8 +220,10 @@ start(){
 	command="docker-compose -f docker-compose.yml"
 
     if [[ $default_nodes > 0 ]]; then
-		source "${__dirname}/detect_gpus.sh"
-		set +ux
+		if [ "${platform}" = "Linux" ]; then
+			source "${__dirname}/detect_gpus.sh"
+			set +ux
+		fi
 
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
@@ -292,8 +294,10 @@ start(){
 }
 
 down(){
-	source "${__dirname}/detect_gpus.sh"
-	set +ux
+	if [ "${platform}" = "Linux" ]; then
+		source "${__dirname}/detect_gpus.sh"
+		set +ux
+	fi
 
 	command="docker-compose -f docker-compose.yml"
 
@@ -365,8 +369,11 @@ elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
 
-	source "${__dirname}/detect_gpus.sh"
-	set +ux
+	if [ "${platform}" = "Linux" ]; then
+		source "${__dirname}/detect_gpus.sh"
+		set +ux
+	fi
+
 	command="docker-compose -f docker-compose.yml"
 
 	if [ "${GPU_NVIDIA}" = true ]; then
@@ -410,8 +417,10 @@ elif [[ $1 = "update" ]]; then
 	command="docker-compose -f docker-compose.yml"
 
 	if [[ $default_nodes > 0 ]]; then
-		source "${__dirname}/detect_gpus.sh"
-		set +ux
+		if [ "${platform}" = "Linux" ]; then
+			source "${__dirname}/detect_gpus.sh"
+			set +ux
+		fi
 
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
