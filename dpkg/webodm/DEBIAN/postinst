@@ -7,46 +7,15 @@ export WEBODM_USER=odm
 export WEBODM_USER_HOME="/home/${WEBODM_USER}"
 export WEBODM_DIR=/opt/WebODM
 export WEBODM_VENV_DIR="${WEBODM_DIR}/python3-venv"
-export NODEODM_DIR=/opt/NodeODM
 
 function abortRemove() {
     echo "Unable to remove webodm."
-}
-
-function addNodeODMGPUIntelDockerGroups() {
-    DOCKER_COMPOSE_FILE="${WEBODM_DIR}/docker-compose.nodeodm.gpu.intel.yml"
-    for gid in $(id -G "${WEBODM_USER}"); do
-        SED_SEARCH="/^\s\{4\}group_add/{:start /${gid}$/!"
-        SED_SEARCH="${SED_SEARCH}{N;b start};/${gid}$/p}"
-        SED_OUT=$(sed -n "${SED_SEARCH}" "${DOCKER_COMPOSE_FILE}")
-        if [ -z "${SED_OUT}" ]; then
-            sed -i "/^\s\{4\}image/a \ \ \ \ group_add:\n\ \ \ \ \ \ - ${gid}" "${DOCKER_COMPOSE_FILE}"
-        fi
-    done
-}
-
-function buildNodeODMGPUIntelDockerImage() {
-    cd "${NODEODM_DIR}"
-
-    # We won't have to do this after the image is on Docker Hub.
-    docker build -f Dockerfile.gpu -t opendronemap/nodeodm:gpu .
-
-    # This will continue to be necessary, since it needs to bake in the actual
-    # render group id on this system.
-    RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
-    docker build -f Dockerfile.gpu.intel -t opendronemap/nodeodm:gpu.intel --build-arg RENDER_GROUP_ID="${RENDER_GROUP_ID}" .
 }
 
 function configure() {
     detectGPUs
     createGroup
     createUser
-
-    if [ "${GPU_INTEL}" = true ]; then
-        buildNodeODMGPUIntelDockerImage
-        addNodeODMGPUIntelDockerGroups
-    fi
-
     createVenv
     setFilePermissions
     upgradePythonPip

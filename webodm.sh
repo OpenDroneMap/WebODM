@@ -43,6 +43,30 @@ while [[ $# -gt 0 ]]
 do
 key="$1"
 
+detect_gpus(){
+	export GPU_AMD=false
+	export GPU_INTEL=false
+	export GPU_NVIDIA=false
+
+	if [ "${platform}" = "Linux" ]; then
+		source "${__dirname}/detect_gpus.sh"
+		set +ux
+	fi
+}
+
+prepare_intel_gpu_image(){
+	if [ "${GPU_INTEL}" = true ]; then
+		# curl -O https://raw.githubusercontent.com/OpenDroneMap/NodeODM/master/Dockerfile.gpu.intel
+		curl -O https://raw.githubusercontent.com/airmap/NodeODM/bkd/gpu-intel-workflow/Dockerfile.gpu.intel.local
+		RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
+		docker build -f Dockerfile.gpu.intel.local -t opendronemap/nodeodm:gpu.intel.local --build-arg RENDER_GROUP_ID="${RENDER_GROUP_ID}" .
+		rm Dockerfile.gpu.intel
+	fi
+}
+
+detect_gpus
+prepare_intel_gpu_image
+
 case $key in
     --port)
     export WO_PORT="$2"
@@ -220,11 +244,6 @@ start(){
 	command="docker-compose -f docker-compose.yml"
 
     if [[ $default_nodes > 0 ]]; then
-		if [ "${platform}" = "Linux" ]; then
-			source "${__dirname}/detect_gpus.sh"
-			set +ux
-		fi
-
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
 		elif [ "${GPU_INTEL}" = true ]; then
@@ -294,11 +313,6 @@ start(){
 }
 
 down(){
-	if [ "${platform}" = "Linux" ]; then
-		source "${__dirname}/detect_gpus.sh"
-		set +ux
-	fi
-
 	command="docker-compose -f docker-compose.yml"
 
 	if [ "${GPU_NVIDIA}" = true ]; then
@@ -369,11 +383,6 @@ elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
 
-	if [ "${platform}" = "Linux" ]; then
-		source "${__dirname}/detect_gpus.sh"
-		set +ux
-	fi
-
 	command="docker-compose -f docker-compose.yml"
 
 	if [ "${GPU_NVIDIA}" = true ]; then
@@ -417,11 +426,6 @@ elif [[ $1 = "update" ]]; then
 	command="docker-compose -f docker-compose.yml"
 
 	if [[ $default_nodes > 0 ]]; then
-		if [ "${platform}" = "Linux" ]; then
-			source "${__dirname}/detect_gpus.sh"
-			set +ux
-		fi
-
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
 		elif [ "${GPU_INTEL}" = true ]; then

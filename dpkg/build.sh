@@ -11,12 +11,10 @@ WEBODM_DPKG_NAME="webodm_${WEBODM_VERSION}-${WEBODM_DPKG_VERSION}"
 BUILD_DIR="${HERE}/build"
 DEB_DIR="${HERE}/deb"
 WEBODM_DIR="${HERE}/${WEBODM_DPKG_NAME}/opt/WebODM"
-NODEODM_DIR="${HERE}/${WEBODM_DPKG_NAME}/opt/NodeODM"
 
 function build() {
     prepareBuildDir
     prepareDebDir
-    prepareNodeODMDir
     prepareWebODMDir
     moveToBuildDir
     buildDeb
@@ -53,11 +51,6 @@ function prepareDebDir() {
     fi
 
     mkdir -p "${DEB_DIR}"
-}
-
-function prepareNodeODMDir() {
-    # This can go away when we can pull the image from Docker Hub.
-    git clone https://github.com/OpenDroneMap/NodeODM.git "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/NodeODM"
 }
 
 function prepareWebODMDir() {

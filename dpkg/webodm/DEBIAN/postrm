@@ -7,7 +7,6 @@ export WEBODM_USER=odm
 export WEBODM_USER_HOME="/home/${WEBODM_USER}"
 export WEBODM_DIR=/opt/WebODM
 export WEBODM_VENV_DIR="${WEBODM_DIR}/python3-venv"
-export NODEODM_DIR=/opt/NodeODM
 
 function abortInstall() {
     purge
