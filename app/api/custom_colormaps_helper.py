@@ -1,19 +1,14 @@
-import matplotlib
-import numpy
-def generate_discrete_color_map_from_list_of_hex(list_of_hex_colors):
-    colormap = matplotlib.colors.ListedColormap(list_of_hex_colors)
-    color_map_dict = extract_colormap_dict_from_arr(colormap)
-    return color_map_dict
-def generate_linerar_segmented_color_map_from_list_of_hex(list_of_hex_colors, name_of_colormap="default_name", N=256):
-    colormap = matplotlib.colors.LinearSegmentedColormap.from_list(name_of_colormap, list_of_hex_colors, N)
-    color_map_dict = extract_colormap_dict_from_arr(colormap)
-    return color_map_dict
-def extract_colormap_dict_from_arr(colormap):
-    x = numpy.linspace(0, 1, 256)
-    cmap_vals = colormap(x)[:, :]
-    cmap_uint8 = (cmap_vals * 255).astype('uint8')
-    ndvi_dict = {idx: value.tolist() for idx, value in enumerate(cmap_uint8)}
-    return ndvi_dict
+import math
+from .common import hex2rgb
+
+def discrete_cmap_from_hex(hex_colors):
+    rgb_colors = [hex2rgb(h, with_alpha=True) for h in hex_colors]
+    res = {}
+    for x in range(0, 255):
+        idx = math.floor(x / 256.0 * len(rgb_colors))
+        res[x] = rgb_colors[idx]
+    return res
+
 
 ndvi_arr = [
     '#AD0028',
@@ -46,7 +41,7 @@ contrast_ndvi_arr = [
 ]
 
 custom_colormaps = [
-    {"discrete_ndvi": generate_discrete_color_map_from_list_of_hex(contrast_ndvi_arr)},
-    {"better_discrete_ndvi": generate_discrete_color_map_from_list_of_hex(ndvi_arr)},
+    {"discrete_ndvi": discrete_cmap_from_hex(contrast_ndvi_arr)},
+    {"better_discrete_ndvi": discrete_cmap_from_hex(ndvi_arr)},
     #add custom maps here
 ]
