@@ -11,7 +11,7 @@ WEBODM_DPKG_NAME="webodm_${WEBODM_VERSION}-${WEBODM_DPKG_VERSION}"
 BUILD_DIR="${HERE}/build"
 DEB_DIR="${HERE}/deb"
 WEBODM_DIR="${HERE}/${WEBODM_DPKG_NAME}/opt/WebODM"
-NODEODM_DIR="${HERE}/${WEBODM_DPKG_NAME}/opt/nodeodm"
+NODEODM_DIR="${HERE}/${WEBODM_DPKG_NAME}/opt/NodeODM"
 
 function build() {
     prepareBuildDir
@@ -57,7 +57,7 @@ function prepareDebDir() {
 
 function prepareNodeODMDir() {
     # This can go away when we can pull the image from Docker Hub.
-    git clone -b bkd/gpu https://github.com/airmap/nodeodm.git "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/nodeodm"
+    git clone https://github.com/OpenDroneMap/NodeODM.git "${BUILD_DIR}/${WEBODM_DPKG_NAME}/${WEBODM_DPKG_NAME}/opt/NodeODM"
 }
 
 function prepareWebODMDir() {
