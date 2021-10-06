@@ -9,6 +9,7 @@ from app.models.task import assets_directory_path
 from PIL import Image, ImageDraw, ImageOps
 from django.http import HttpResponse
 from .tasks import download_file_response
+from .common import hex2rgb
 import numpy as np
 
 def normalize(img):
@@ -25,18 +26,6 @@ def normalize(img):
         arr *= (255.0/(maxval-minval))
 
     return Image.fromarray(arr)
-
-def hex2rgb(hex_color):
-    """
-    Adapted from https://stackoverflow.com/questions/29643352/converting-hex-to-rgb-value-in-python/29643643
-    """
-    hex_color = hex_color.lstrip('#')
-    if len(hex_color) != 6:
-        return tuple((255, 255, 255))
-    try:
-        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-    except ValueError:
-        return tuple((255, 255, 255))
 
 class Thumbnail(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, image_filename=""):

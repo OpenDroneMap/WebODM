@@ -1,17 +1,22 @@
-import rasterio
+import json
+import numpy
+import rio_tiler.utils
 from rasterio.enums import ColorInterp
 import urllib
 import os
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
-from rio_tiler.mercator import get_zooms
-from rio_tiler import main
-from rio_tiler.utils import array_to_image, get_colormap, expression, linear_rescale, _chunks, _apply_discrete_colormap, has_alpha_band, \
-    non_alpha_indexes
+from rio_tiler.utils import has_alpha_band, \
+    non_alpha_indexes, render, mapzen_elevation_rgb
+from rio_tiler.utils import _stats as raster_stats
+from rio_tiler.models import ImageStatistics, ImageData
+from rio_tiler.models import Metadata as RioMetadata
 from rio_tiler.profiles import img_profiles
-
+from rio_tiler.colormap import cmap as colormap, apply_cmap
+from rio_tiler.io import COGReader
+from rio_tiler.errors import InvalidColorMapName
 import numpy as np
-
+from .custom_colormaps_helper import custom_colormaps
 from app.raster_utils import export_raster_index
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
@@ -21,14 +26,17 @@ from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster_index
 
-ZOOM_EXTRA_LEVELS = 2
+ZOOM_EXTRA_LEVELS = 3
+
+for custom_colormap in custom_colormaps:
+    colormap = colormap.register(custom_colormap)
 
 def get_zoom_safe(src_dst):
-    minzoom, maxzoom = get_zooms(src_dst)
+    minzoom, maxzoom = src_dst.spatial_info["minzoom"], src_dst.spatial_info["maxzoom"]
     if maxzoom < minzoom:
         maxzoom = minzoom
-
     return minzoom, maxzoom
+
 
 def get_tile_url(task, tile_type, query_params):
     url = '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
@@ -43,13 +51,13 @@ def get_tile_url(task, tile_type, query_params):
 
     return url
 
+
 def get_extent(task, tile_type):
     extent_map = {
         'orthophoto': task.orthophoto_extent,
         'dsm': task.dsm_extent,
         'dtm': task.dtm_extent,
     }
-
     if not tile_type in extent_map:
         raise exceptions.NotFound()
 
@@ -60,46 +68,10 @@ def get_extent(task, tile_type):
 
     return extent
 
+
 def get_raster_path(task, tile_type):
     return task.get_asset_download_path(tile_type + ".tif")
 
-
-def rescale_tile(tile, mask, rescale = None):
-    if rescale:
-        try:
-            rescale_arr = list(map(float, rescale.split(",")))
-        except ValueError:
-            raise exceptions.ValidationError("Invalid rescale value")
-
-        rescale_arr = list(_chunks(rescale_arr, 2))
-        if len(rescale_arr) != tile.shape[0]:
-            rescale_arr = ((rescale_arr[0]),) * tile.shape[0]
-
-        for bdx in range(tile.shape[0]):
-            if mask is not None:
-                tile[bdx] = np.where(
-                    mask,
-                    linear_rescale(
-                        tile[bdx], in_range=rescale_arr[bdx], out_range=[0, 255]
-                    ),
-                    0,
-                )
-            else:
-                tile[bdx] = linear_rescale(
-                    tile[bdx], in_range=rescale_arr[bdx], out_range=[0, 255]
-                )
-        tile = tile.astype(np.uint8)
-
-    return tile, mask
-
-
-def apply_colormap(tile, color_map = None):
-    if color_map is not None and isinstance(color_map, dict):
-        tile = _apply_discrete_colormap(tile, color_map)
-    elif color_map is not None:
-        tile = np.transpose(color_map[tile][0], [2, 0, 1]).astype(np.uint8)
-
-    return tile
 
 class TileJson(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, tile_type=""):
@@ -112,8 +84,8 @@ class TileJson(TaskNestedView):
         if not os.path.isfile(raster_path):
             raise exceptions.NotFound()
 
-        with rasterio.open(raster_path) as src_dst:
-            minzoom, maxzoom = get_zoom_safe(src_dst)
+        with COGReader(raster_path) as src:
+            minzoom, maxzoom = get_zoom_safe(src)
 
         return Response({
             'tilejson': '2.1.0',
@@ -125,6 +97,7 @@ class TileJson(TaskNestedView):
             'maxzoom': maxzoom + ZOOM_EXTRA_LEVELS,
             'bounds': get_extent(task, tile_type).extent
         })
+
 
 class Bounds(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, tile_type=""):
@@ -138,46 +111,66 @@ class Bounds(TaskNestedView):
             'bounds': get_extent(task, tile_type).extent
         })
 
+
 class Metadata(TaskNestedView):
     def get(self, request, pk=None, project_pk=None, tile_type=""):
         """
         Get the metadata for this tasks's asset type
         """
         task = self.get_and_check_task(request, pk)
-
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
+        defined_range = self.request.query_params.get('range')
 
         if formula == '': formula = None
         if bands == '': bands = None
-
+        if defined_range == '': defined_range = None
         try:
             expr, hrange = lookup_formula(formula, bands)
+            if defined_range is not None:
+                new_range = tuple(map(float, defined_range.split(",")[:2]))
+                #Validate rescaling range
+                if hrange is not None and (new_range[0] < hrange[0] or new_range[1] > hrange[1]):
+                    pass
+                else:
+                    hrange = new_range
+
         except ValueError as e:
             raise exceptions.ValidationError(str(e))
-
         pmin, pmax = 2.0, 98.0
         raster_path = get_raster_path(task, tile_type)
-
         if not os.path.isfile(raster_path):
             raise exceptions.NotFound()
-
         try:
-            with rasterio.open(raster_path, "r") as src:
-                band_count = src.meta['count']
-                if has_alpha_band(src):
+            with COGReader(raster_path) as src:
+                band_count = src.metadata()['count']
+                if has_alpha_band(src.dataset):
                     band_count -= 1
-
                 nodata = None
                 # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
                 if tile_type == 'orthophoto':
                     nodata = 0
+                # info = src.metadata(pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr,
+                #                      nodata=nodata)
+                histogram_options = {"bins": 255, "range": hrange}
 
-                info = main.metadata(src, pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr, nodata=nodata)
+                if expr is not None:
+                    data, mask = src.preview(expression=expr)
+                    data = numpy.ma.array(data)
+                    data.mask = mask == 0
+                    expression_bloc = expr.lower().split(",")
+                    stats = {
+                        str(b + 1): raster_stats(data[b], percentiles=(pmin, pmax), bins=255, range=hrange)
+                        for b in range(data.shape[0])
+                    }
+                    stats = {b: ImageStatistics(**s) for b, s in stats.items()}
+                    metadata = RioMetadata(statistics=stats, **src.info().dict())
+                else:
+                    metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata)
+                info = json.loads(metadata.json())
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata
             raise exceptions.ValidationError("Cannot retrieve raster metadata: %s" % str(e))
-
         # Override min/max
         if hrange:
             for b in info['statistics']:
@@ -192,6 +185,9 @@ class Metadata(TaskNestedView):
             "rdylgn_r": "RdYlGn (Reverse)",
             "spectral": "Spectral",
             "spectral_r": "Spectral (Reverse)",
+            "discrete_ndvi": "Contrast NDVI",
+            "better_discrete_ndvi": "Custom NDVI Index",
+            "rplumbo": "Rplumbo (Better NDVI)",
             "pastel1": "Pastel",
         }
 
@@ -200,7 +196,8 @@ class Metadata(TaskNestedView):
         if tile_type in ['dsm', 'dtm']:
             colormaps = ['jet', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
-            colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r']
+            colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r', 'rplumbo', 'discrete_ndvi',
+                         'better_discrete_ndvi']
             algorithms = *get_algorithm_list(band_count),
 
         info['color_maps'] = []
@@ -211,13 +208,12 @@ class Metadata(TaskNestedView):
                 try:
                     info['color_maps'].append({
                         'key': cmap,
-                        'color_map': get_colormap(cmap, format="gdal"),
+                        'color_map': colormap.get(cmap).values(),
                         'label': cmap_labels.get(cmap, cmap)
                     })
                 except FileNotFoundError:
                     raise exceptions.ValidationError("Not a valid color_map value: %s" % cmap)
 
-        del info['address']
         info['name'] = task.name
         info['scheme'] = 'xyz'
         info['tiles'] = [get_tile_url(task, tile_type, self.request.query_params)]
@@ -226,42 +222,39 @@ class Metadata(TaskNestedView):
             info['maxzoom'] = info['minzoom']
         info['maxzoom'] += ZOOM_EXTRA_LEVELS
         info['minzoom'] -= ZOOM_EXTRA_LEVELS
-
+        info['bounds'] = {'value': src.bounds, 'crs': src.dataset.crs}
         return Response(info)
+
 
 def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata, resampling, padding):
     tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
+    with COGReader(url) as src:
+        try:
+            left, _ = src.tile(x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
+                               resampling_method=resampling, padding=padding)
+            tile[tilesize:tilesize * 2, 0:tilesize] = left
+        except TileOutsideBounds:
+            pass
 
-    try:
-        left, _ = main.tile(url, x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                            resampling_method=resampling, tile_edge_padding=padding)
-        tile[tilesize:tilesize*2,0:tilesize] = left
-    except TileOutsideBounds:
-        pass
-
-    try:
-        right, _ = main.tile(url, x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                             resampling_method=resampling, tile_edge_padding=padding)
-        tile[tilesize:tilesize*2,tilesize*2:tilesize*3] = right
-    except TileOutsideBounds:
-        pass
-
-    try:
-        bottom, _ = main.tile(url, x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                              resampling_method=resampling, tile_edge_padding=padding)
-        tile[tilesize*2:tilesize*3,tilesize:tilesize*2] = bottom
-    except TileOutsideBounds:
-        pass
-
-    try:
-        top, _ = main.tile(url, x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                           resampling_method=resampling, tile_edge_padding=padding)
-        tile[0:tilesize,tilesize:tilesize*2] = top
-    except TileOutsideBounds:
-        pass
-
-    tile[tilesize:tilesize*2,tilesize:tilesize*2] = elevation
-
+        try:
+            right, _ = src.tile(x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
+                                resampling_method=resampling, padding=padding)
+            tile[tilesize:tilesize * 2, tilesize * 2:tilesize * 3] = right
+        except TileOutsideBounds:
+            pass
+        try:
+            bottom, _ = src.tile(x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
+                                 resampling_method=resampling, padding=padding)
+            tile[tilesize * 2:tilesize * 3, tilesize:tilesize * 2] = bottom
+        except TileOutsideBounds:
+            pass
+        try:
+            top, _ = src.tile(x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
+                              resampling_method=resampling, padding=padding)
+            tile[0:tilesize, tilesize:tilesize * 2] = top
+        except TileOutsideBounds:
+            pass
+    tile[tilesize:tilesize * 2, tilesize:tilesize * 2] = elevation
     return tile
 
 
@@ -282,6 +275,7 @@ class Tiles(TaskNestedView):
 
         indexes = None
         nodata = None
+        rgb_tile = None
 
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
@@ -302,6 +296,8 @@ class Tiles(TaskNestedView):
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
             rescale = "0,1000"
+        if tile_type == 'orthophoto' and rescale is None:
+            rescale = "0,255"
 
         if tile_type in ['dsm', 'dtm'] and color_map is None:
             color_map = "gray"
@@ -315,67 +311,73 @@ class Tiles(TaskNestedView):
         if nodata is not None:
             nodata = np.nan if nodata == "nan" else float(nodata)
         tilesize = scale * 256
-
         url = get_raster_path(task, tile_type)
-
         if not os.path.isfile(url):
             raise exceptions.NotFound()
 
-        with rasterio.open(url) as src:
+        with COGReader(url) as src:
+            if not src.tile_exists(z, x, y):
+                raise exceptions.NotFound("Outside of bounds")
+
+        with COGReader(url) as src:
             minzoom, maxzoom = get_zoom_safe(src)
-            has_alpha = has_alpha_band(src)
+            has_alpha = has_alpha_band(src.dataset)
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
-
             # Handle N-bands datasets for orthophotos (not plant health)
             if tile_type == 'orthophoto' and expr is None:
-                ci = src.colorinterp
-
+                ci = src.dataset.colorinterp
                 # More than 4 bands?
                 if len(ci) > 4:
                     # Try to find RGBA band order
                     if ColorInterp.red in ci and \
-                        ColorInterp.green in ci and \
-                        ColorInterp.blue in ci:
+                            ColorInterp.green in ci and \
+                            ColorInterp.blue in ci:
                         indexes = (ci.index(ColorInterp.red) + 1,
                                    ci.index(ColorInterp.green) + 1,
                                    ci.index(ColorInterp.blue) + 1,)
                     else:
                         # Fallback to first three
-                        indexes = (1, 2, 3, )
+                        indexes = (1, 2, 3,)
                 elif has_alpha:
-                    indexes = non_alpha_indexes(src)
-            
+                    indexes = non_alpha_indexes(src.dataset)
+
             # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
-            if nodata is None and tile_type =='orthophoto':
+            if nodata is None and tile_type == 'orthophoto':
                 nodata = 0
 
-        resampling="nearest"
-        padding=0
+        resampling = "nearest"
+        padding = 0
         if tile_type in ["dsm", "dtm"]:
-            resampling="bilinear"
-            padding=16
+            resampling = "bilinear"
+            padding = 16
 
         try:
-            if expr is not None:
-                tile, mask = expression(
-                    url, x, y, z, expr=expr, tilesize=tilesize, nodata=nodata, tile_edge_padding=padding, resampling_method=resampling
-                )
-            else:
-                tile, mask = main.tile(
-                    url, x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata, tile_edge_padding=padding, resampling_method=resampling
-                )
+            with COGReader(url) as src:
+                if expr is not None:
+                    tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
+                                    padding=padding,
+                                    resampling_method=resampling)
+                else:
+                    tile = src.tile(x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata,
+                                    padding=padding, resampling_method=resampling)
+
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
 
         if color_map:
             try:
-                color_map = get_colormap(color_map, format="gdal")
-            except FileNotFoundError:
+                colormap.get(color_map)
+            except InvalidColorMapName:
                 raise exceptions.ValidationError("Not a valid color_map value")
-
+        
         intensity = None
+        try:
+            rescale_arr = list(map(float, rescale.split(",")))
+        except ValueError:
+            raise exceptions.ValidationError("Invalid rescale value")
 
+        options = img_profiles.get(driver, {})
         if hillshade is not None:
             try:
                 hillshade = float(hillshade)
@@ -383,39 +385,45 @@ class Tiles(TaskNestedView):
                     hillshade = 1.0
             except ValueError:
                 raise exceptions.ValidationError("Invalid hillshade value")
-
-            if tile.shape[0] != 1:
-                raise exceptions.ValidationError("Cannot compute hillshade of non-elevation raster (multiple bands found)")
-
+            if tile.data.shape[0] != 1:
+                raise exceptions.ValidationError(
+                    "Cannot compute hillshade of non-elevation raster (multiple bands found)")
             delta_scale = (maxzoom + ZOOM_EXTRA_LEVELS + 1 - z) * 4
-            dx = src.meta["transform"][0] * delta_scale
-            dy = -src.meta["transform"][4] * delta_scale
-
+            dx = src.dataset.meta["transform"][0] * delta_scale
+            dy = -src.dataset.meta["transform"][4] * delta_scale
             ls = LightSource(azdeg=315, altdeg=45)
-
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
-            elevation = get_elevation_tiles(tile[0], url, x, y, z, tilesize, nodata, resampling, padding)
+            elevation = get_elevation_tiles(tile.data[0], url, x, y, z, tilesize, nodata, resampling, padding)
             intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
-            intensity = intensity[tilesize:tilesize*2,tilesize:tilesize*2]
-
-
-        rgb, rmask = rescale_tile(tile, mask, rescale=rescale)
-        rgb = apply_colormap(rgb, color_map)
+            intensity = intensity[tilesize:tilesize * 2, tilesize:tilesize * 2]
 
         if intensity is not None:
-            # Quick check
-            if rgb.shape[0] != 3:
-                raise exceptions.ValidationError("Cannot process tile: intensity image provided, but no RGB data was computed.")
-
+            rgb = tile.post_process(in_range=(rescale_arr,))
+            if colormap:
+                rgb, _ = apply_cmap(rgb.data, colormap.get(color_map))
+            if rgb.data.shape[0] != 3:
+                raise exceptions.ValidationError(
+                    "Cannot process tile: intensity image provided, but no RGB data was computed.")
             intensity = intensity * 255.0
             rgb = hsv_blend(rgb, intensity)
+            if rgb is not None:
+                return HttpResponse(
+                    render(rgb, tile.mask, img_format=driver, **options),
+                    content_type="image/{}".format(ext)
+                )
 
-        options = img_profiles.get(driver, {})
+        if color_map is not None:
+            return HttpResponse(
+                tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, colormap=colormap.get(color_map),
+                                                                  **options),
+                content_type="image/{}".format(ext)
+            )
         return HttpResponse(
-            array_to_image(rgb, rmask, img_format=driver, **options),
+            tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, **options),
             content_type="image/{}".format(ext)
         )
+
 
 class Export(TaskNestedView):
     def post(self, request, pk=None, project_pk=None):
