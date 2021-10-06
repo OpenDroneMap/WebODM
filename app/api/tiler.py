@@ -14,6 +14,7 @@ from rio_tiler.models import Metadata as RioMetadata
 from rio_tiler.profiles import img_profiles
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.io import COGReader
+from rio_tiler.errors import InvalidColorMapName
 import numpy as np
 from .custom_colormaps_helper import custom_colormaps
 from app.raster_utils import export_raster_index
@@ -183,10 +184,10 @@ class Metadata(TaskNestedView):
             "rdylgn": "RdYlGn",
             "rdylgn_r": "RdYlGn (Reverse)",
             "spectral": "Spectral",
+            "spectral_r": "Spectral (Reverse)",
             "discrete_ndvi": "Contrast NDVI",
             "better_discrete_ndvi": "Custom NDVI Index",
             "rplumbo": "Rplumbo (Better NDVI)",
-            "spectral_r": "Spectral (Reverse)",
             "pastel1": "Pastel",
         }
 
@@ -363,13 +364,19 @@ class Tiles(TaskNestedView):
 
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
+
         if color_map:
             try:
                 colormap.get(color_map)
-            except FileNotFoundError:
+            except InvalidColorMapName:
                 raise exceptions.ValidationError("Not a valid color_map value")
+        
         intensity = None
-        rescale_arr = tuple(map(float, rescale.split(",")))
+        try:
+            rescale_arr = list(map(float, rescale.split(",")))
+        except ValueError:
+            raise exceptions.ValidationError("Invalid rescale value")
+
         options = img_profiles.get(driver, {})
         if hillshade is not None:
             try:
