@@ -295,6 +295,8 @@ class Tiles(TaskNestedView):
 
         if tile_type in ['dsm', 'dtm'] and rescale is None:
             rescale = "0,1000"
+        if tile_type == 'orthophoto' and rescale is None:
+            rescale = "0,255"
 
         if tile_type in ['dsm', 'dtm'] and color_map is None:
             color_map = "gray"
