@@ -3,11 +3,7 @@ from .common import hex2rgb
 
 def discrete_cmap_from_hex(hex_colors):
     rgb_colors = [hex2rgb(h, with_alpha=True) for h in hex_colors]
-    res = {}
-    for x in range(0, 255):
-        idx = math.floor(x / 256.0 * len(rgb_colors))
-        res[x] = rgb_colors[idx]
-    return res
+    return {x: rgb_colors[math.floor(x / 256.0 * len(rgb_colors))] for x in range(0, 255)}
 
 
 ndvi_arr = [
