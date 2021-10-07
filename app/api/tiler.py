@@ -123,7 +123,7 @@ class Metadata(TaskNestedView):
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
         defined_range = self.request.query_params.get('range')
-        boundaries_feature = self.request.headers.get('boundaries')
+        boundaries_feature = self.request.query_params.get('boundaries')
 
         if formula == '': formula = None
         if bands == '': bands = None
