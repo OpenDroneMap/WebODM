@@ -124,12 +124,11 @@ class Metadata(TaskNestedView):
         bands = self.request.query_params.get('bands')
         defined_range = self.request.query_params.get('range')
         boundaries_feature = self.request.query_params.get('boundaries')
-
         if formula == '': formula = None
         if bands == '': bands = None
         if defined_range == '': defined_range = None
         if boundaries_feature == '': boundaries_feature = None
-        else:
+        if boundaries_feature is not None:
             boundaries_feature = json.loads(boundaries_feature)
         try:
             expr, hrange = lookup_formula(formula, bands)
@@ -151,7 +150,7 @@ class Metadata(TaskNestedView):
             with COGReader(raster_path) as src:
                 band_count = src.metadata()['count']
                 if boundaries_feature is not None:
-                    boundaries_cutline = create_cutline(src.dataset, boundaries_feature, geometry_crs="epsg:4326")
+                    boundaries_cutline = create_cutline(src.dataset, geometry=boundaries_feature, geometry_crs="epsg:4326")
                     boundaries_bbox = featureBounds(boundaries_feature)
                 else:
                     boundaries_cutline = None
@@ -298,10 +297,9 @@ class Tiles(TaskNestedView):
         color_map = self.request.query_params.get('color_map')
         hillshade = self.request.query_params.get('hillshade')
         boundaries_feature = self.request.query_params.get('boundaries')
-
         if boundaries_feature == '':
             boundaries_feature = None
-        else:
+        if boundaries_feature is not None:
             boundaries_feature = json.loads(boundaries_feature)
 
 
@@ -347,11 +345,9 @@ class Tiles(TaskNestedView):
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
             if boundaries_feature is not None:
-                boundaries_cutline = create_cutline(src.dataset, boundaries_feature, geometry_crs="epsg:4326")
-                boundaries_bbox = featureBounds(boundaries_feature)
+                boundaries_cutline = create_cutline(src.dataset, geometry=boundaries_feature, geometry_crs="epsg:4326")
             else:
                 boundaries_cutline = None
-                boundaries_bbox = None
             # Handle N-bands datasets for orthophotos (not plant health)
             if tile_type == 'orthophoto' and expr is None:
                 ci = src.dataset.colorinterp
