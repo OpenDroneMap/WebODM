@@ -3,6 +3,7 @@ import base64
 import numpy
 import rio_tiler.utils
 from rasterio.enums import ColorInterp
+from rasterio.crs import CRS
 from rasterio.features import bounds as featureBounds
 import urllib
 import os
@@ -150,7 +151,7 @@ class Metadata(TaskNestedView):
             with COGReader(raster_path) as src:
                 band_count = src.metadata()['count']
                 if boundaries_feature is not None:
-                    boundaries_cutline = create_cutline(src.dataset, geometry=boundaries_feature, geometry_crs="epsg:4326")
+                    boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                     boundaries_bbox = featureBounds(boundaries_feature)
                 else:
                     boundaries_cutline = None
@@ -178,7 +179,7 @@ class Metadata(TaskNestedView):
                 else:
                     if (boundaries_cutline is not None) and (boundaries_bbox is not None):
                         metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata
-                                                , bounds=boundaries_bbox, vrt_options={'cutline': boundaries_bbox})
+                                                , bounds=boundaries_bbox, vrt_options={'cutline': boundaries_cutline})
                     else:
                         metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata)
                 info = json.loads(metadata.json())
@@ -216,7 +217,6 @@ class Metadata(TaskNestedView):
 
         info['color_maps'] = []
         info['algorithms'] = algorithms
-
         if colormaps:
             for cmap in colormaps:
                 try:
@@ -345,7 +345,7 @@ class Tiles(TaskNestedView):
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
             if boundaries_feature is not None:
-                boundaries_cutline = create_cutline(src.dataset, geometry=boundaries_feature, geometry_crs="epsg:4326")
+                boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
             else:
                 boundaries_cutline = None
             # Handle N-bands datasets for orthophotos (not plant health)
