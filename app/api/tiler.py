@@ -130,7 +130,7 @@ class Metadata(TaskNestedView):
         if defined_range == '': defined_range = None
         if boundaries_feature == '': boundaries_feature = None
         else:
-            boundaries_feature = json.load(boundaries_feature)
+            boundaries_feature = json.loads(boundaries_feature)
         try:
             expr, hrange = lookup_formula(formula, bands)
             if defined_range is not None:
@@ -302,7 +302,7 @@ class Tiles(TaskNestedView):
         if boundaries_feature == '':
             boundaries_feature = None
         else:
-            boundaries_feature = json.load(boundaries_feature)
+            boundaries_feature = json.loads(boundaries_feature)
 
 
         if formula == '': formula = None
