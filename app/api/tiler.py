@@ -297,6 +297,13 @@ class Tiles(TaskNestedView):
         rescale = self.request.query_params.get('rescale')
         color_map = self.request.query_params.get('color_map')
         hillshade = self.request.query_params.get('hillshade')
+        boundaries_feature = self.request.query_params.get('boundaries')
+
+        if boundaries_feature == '':
+            boundaries_feature = None
+        else:
+            boundaries_feature = json.load(boundaries_feature)
+
 
         if formula == '': formula = None
         if bands == '': bands = None
@@ -339,6 +346,12 @@ class Tiles(TaskNestedView):
             has_alpha = has_alpha_band(src.dataset)
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
+            if boundaries_feature is not None:
+                boundaries_cutline = create_cutline(src.dataset, boundaries_feature, geometry_crs="epsg:4326")
+                boundaries_bbox = featureBounds(boundaries_feature)
+            else:
+                boundaries_cutline = None
+                boundaries_bbox = None
             # Handle N-bands datasets for orthophotos (not plant health)
             if tile_type == 'orthophoto' and expr is None:
                 ci = src.dataset.colorinterp
@@ -370,12 +383,22 @@ class Tiles(TaskNestedView):
         try:
             with COGReader(url) as src:
                 if expr is not None:
-                    tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
-                                    padding=padding,
-                                    resampling_method=resampling)
+                    if boundaries_cutline is not None:
+                        tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
+                                        padding=padding,
+                                        resampling_method=resampling, vrt_options={'cutline': boundaries_cutline})
+                    else:
+                        tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
+                                        padding=padding,
+                                        resampling_method=resampling)
                 else:
-                    tile = src.tile(x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata,
-                                    padding=padding, resampling_method=resampling)
+                    if boundaries_cutline is not None:
+                        tile = src.tile(x, y, z, tilesize=tilesize, nodata=nodata,
+                                        padding=padding,
+                                        resampling_method=resampling, vrt_options={'cutline': boundaries_cutline})
+                    else:
+                        tile = src.tile(x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata,
+                                        padding=padding, resampling_method=resampling)
 
         except TileOutsideBounds:
             raise exceptions.NotFound("Outside of bounds")
