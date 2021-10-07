@@ -1,13 +1,15 @@
 import json
+import base64
 import numpy
 import rio_tiler.utils
 from rasterio.enums import ColorInterp
+from rasterio.features import bounds as featureBounds
 import urllib
 import os
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.utils import has_alpha_band, \
-    non_alpha_indexes, render, mapzen_elevation_rgb
+    non_alpha_indexes, render, create_cutline
 from rio_tiler.utils import _stats as raster_stats
 from rio_tiler.models import ImageStatistics, ImageData
 from rio_tiler.models import Metadata as RioMetadata
@@ -121,10 +123,14 @@ class Metadata(TaskNestedView):
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
         defined_range = self.request.query_params.get('range')
+        boundaries_feature = self.request.headers.get('boundaries')
 
         if formula == '': formula = None
         if bands == '': bands = None
         if defined_range == '': defined_range = None
+        if boundaries_feature == '': boundaries_feature = None
+        else:
+            boundaries_feature = json.load(boundaries_feature)
         try:
             expr, hrange = lookup_formula(formula, bands)
             if defined_range is not None:
@@ -144,21 +150,26 @@ class Metadata(TaskNestedView):
         try:
             with COGReader(raster_path) as src:
                 band_count = src.metadata()['count']
+                if boundaries_feature is not None:
+                    boundaries_cutline = create_cutline(src.dataset, boundaries_feature, geometry_crs="epsg:4326")
+                    boundaries_bbox = featureBounds(boundaries_feature)
+                else:
+                    boundaries_cutline = None
+                    boundaries_bbox = None
                 if has_alpha_band(src.dataset):
                     band_count -= 1
                 nodata = None
                 # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
                 if tile_type == 'orthophoto':
                     nodata = 0
-                # info = src.metadata(pmin=pmin, pmax=pmax, histogram_bins=255, histogram_range=hrange, expr=expr,
-                #                      nodata=nodata)
                 histogram_options = {"bins": 255, "range": hrange}
-
                 if expr is not None:
-                    data, mask = src.preview(expression=expr)
+                    if boundaries_cutline is not None:
+                        data, mask = src.preview(expression=expr, vrt_options={'cutline': boundaries_cutline})
+                    else:
+                        data, mask = src.preview(expression=expr)
                     data = numpy.ma.array(data)
                     data.mask = mask == 0
-                    expression_bloc = expr.lower().split(",")
                     stats = {
                         str(b + 1): raster_stats(data[b], percentiles=(pmin, pmax), bins=255, range=hrange)
                         for b in range(data.shape[0])
@@ -166,7 +177,11 @@ class Metadata(TaskNestedView):
                     stats = {b: ImageStatistics(**s) for b, s in stats.items()}
                     metadata = RioMetadata(statistics=stats, **src.info().dict())
                 else:
-                    metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata)
+                    if (boundaries_cutline is not None) and (boundaries_bbox is not None):
+                        metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata
+                                                , bounds=boundaries_bbox, vrt_options={'cutline': boundaries_bbox})
+                    else:
+                        metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata)
                 info = json.loads(metadata.json())
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata
