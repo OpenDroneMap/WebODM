@@ -20,6 +20,7 @@ fi
 
 default_nodes=1
 dev_mode=false
+gpu=false
 
 # define realpath replacement function
 if [[ $platform = "MacOS / OSX" ]]; then
@@ -42,28 +43,6 @@ POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
 key="$1"
-
-detect_gpus(){
-	export GPU_AMD=false
-	export GPU_INTEL=false
-	export GPU_NVIDIA=false
-
-	if [ "${platform}" = "Linux" ]; then
-		source "${__dirname}/detect_gpus.sh"
-		set +ux
-	fi
-}
-
-prepare_intel_render_group(){
-	if [ "${GPU_INTEL}" = true ]; then
-		export RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
-	else
-		export RENDER_GROUP_ID=0
-	fi
-}
-
-detect_gpus
-prepare_intel_render_group
 
 case $key in
     --port)
@@ -112,6 +91,10 @@ case $key in
     export WO_DEBUG=YES
     export WO_DEV=YES
     dev_mode=true
+    shift # past argument
+    ;;    
+	--gpu)
+    gpu=true
     shift # past argument
     ;;
 	--broker)
@@ -177,8 +160,56 @@ usage(){
   echo "	--dev-watch-plugins	Automatically build plugins while in dev mode. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
+  echo "	--gpu	Use GPU NodeODM nodes (Linux only) (default: disabled)"
   exit
 }
+
+detect_gpus(){
+	export GPU_AMD=false
+	export GPU_INTEL=false
+	export GPU_NVIDIA=false
+
+	if [ "${platform}" = "Linux" ]; then
+		set +e
+		lspci | grep 'VGA.*NVIDIA'
+		if [ "${?}" -eq 0 ]; then
+			export GPU_NVIDIA=true
+			set -e
+			return
+		fi
+
+		lspci | grep "VGA.*Intel"
+		if [ "${?}" -eq 0 ]; then
+			export GPU_INTEL=true
+			set -e
+			return
+		fi
+
+		# Total guess.  Need to look into AMD.
+		lspci | grep "VGA.*AMD"
+		if [ "${?}" -eq 0 ]; then
+			export GPU_INTEL=true
+			set -e
+		fi
+	else
+		echo "Warning: GPU support is not available for $platform"
+	fi
+}
+
+prepare_intel_render_group(){
+	if [ "${platform}" = "Linux" ]; then
+		if [ "${GPU_INTEL}" = true ]; then
+			export RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
+		else
+			export RENDER_GROUP_ID=0
+		fi
+	fi
+}
+
+if [[ $gpu = true ]]; then
+	detect_gpus
+	prepare_intel_render_group
+fi
 
 # $1 = command | $2 = help_text | $3 = install_command (optional)
 check_command(){
