@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -euxo
+
+export WEBODM_VERSION=1.9.7
+export WEBODM_USER=odm
+export WEBODM_USER_HOME="/home/${WEBODM_USER}"
+export WEBODM_DIR=/opt/WebODM
+export WEBODM_VENV_DIR="${WEBODM_DIR}/python3-venv"
+
+function abortInstall() {
+    purge
+}
+
+function deleteUser() {
+    if grep -q "^${WEBODM_USER}:" /etc/passwd; then
+        userdel "${WEBODM_USER}"
+    fi
+}
+
+function deleteUserHome() {
+    if [ -d "${WEBODM_USER_HOME}" ]; then
+        rm -Rf "${WEBODM_USER_HOME}"
+    fi
+}
+
+function purge() {
+    stopService
+    deleteUser
+    deleteUserHome
+}
+
+
+case $1 in
+    abort-install)
+        abortInstall
+        ;;
+    remove)
+        exit 0
+        ;;
+    purge)
+        purge
+        ;;
+    default)
+        exit 1
+        ;;
+esac

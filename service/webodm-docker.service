@@ -8,6 +8,7 @@ Type=forking
 User=odm
 Group=odm
 WorkingDirectory=/opt/WebODM
+Environment=PATH=/home/odm/.local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/bin/bash -c 'screen -dmS webodm /opt/WebODM/webodm.sh start'
 ExecStop=/bin/bash -c '/opt/WebODM/webodm.sh stop'
 Restart=on-failure

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -euxo
+
+export WEBODM_VERSION=1.9.7
+export WEBODM_USER=odm
+export WEBODM_USER_HOME="/home/${WEBODM_USER}"
+export WEBODM_DIR=/opt/WebODM
+export WEBODM_VENV_DIR="${WEBODM_DIR}/python3-venv"
+
+function remove() {
+    stopService
+}
+
+function stopService() {
+    UNIT_NAME="webodm-docker.service"
+    set +e
+
+    systemctl is-active -q "${UNIT_NAME}"
+    if [ "${?}" -eq 1 ]; then
+        set -e
+        systemctl stop "${UNIT_NAME}"
+        systemctl disable "${UNIT_NAME}"
+    else
+        set -e
+    fi
+
+    systemctl daemon-reload
+
+    if [ -f "${WEBODM_DIR}/webodm.sh" ]; then
+        "${WEBODM_DIR}/webodm.sh" down
+    fi
+}
+
+case $1 in
+    remove)
+        remove
+        ;;
+    default)
+        exit 1
+        ;;
+esac

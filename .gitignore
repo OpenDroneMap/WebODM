@@ -98,3 +98,7 @@ package-lock.json
 .cronenv
 .initialized
 .DS_Store
+
+# Debian builds
+dpkg/build
+dpkg/deb

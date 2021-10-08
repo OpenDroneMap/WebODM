@@ -1,0 +1,21 @@
+# Chaining this file to the main docker-compose file adds
+# a default processing node instance. This is best for users
+# who are just getting started with WebODM.
+
+version: '2.1'
+services:
+  webapp:
+    depends_on:
+      - node-odm
+    environment:
+      - WO_DEFAULT_NODES
+  node-odm:
+    environment:
+      - RENDER_GROUP_ID
+    image: opendronemap/nodeodm:gpu.intel
+    devices:
+      - "/dev/dri"
+    ports:
+      - "3000"
+    restart: unless-stopped
+    oom_score_adj: 500
