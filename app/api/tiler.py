@@ -299,8 +299,10 @@ class Tiles(TaskNestedView):
         if boundaries_feature == '':
             boundaries_feature = None
         if boundaries_feature is not None:
-            boundaries_feature = json.loads(boundaries_feature)
-
+            try:
+                boundaries_feature = json.loads(boundaries_feature)
+            except json.JSONDecodeError:
+                raise exceptions.ValidationError("Invalid boundaries parameter")
 
         if formula == '': formula = None
         if bands == '': bands = None
@@ -344,7 +346,10 @@ class Tiles(TaskNestedView):
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
             if boundaries_feature is not None:
-                boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
+                try:
+                    boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
+                except:
+                    raise exceptions.ValidationError("Invalid boundaries")
             else:
                 boundaries_cutline = None
             # Handle N-bands datasets for orthophotos (not plant health)
