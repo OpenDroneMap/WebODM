@@ -10,7 +10,9 @@ services:
     environment:
       - WO_DEFAULT_NODES
   node-odm:
-    image: opendronemap/nodeodm:gpu.intel.local
+    environment:
+      - RENDER_GROUP_ID
+    image: opendronemap/nodeodm:gpu.intel
     devices:
       - "/dev/dri"
     ports:

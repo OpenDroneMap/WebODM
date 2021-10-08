@@ -54,17 +54,16 @@ detect_gpus(){
 	fi
 }
 
-prepare_intel_gpu_image(){
+prepare_intel_render_group(){
 	if [ "${GPU_INTEL}" = true ]; then
-		curl -O https://raw.githubusercontent.com/OpenDroneMap/NodeODM/master/Dockerfile.gpu.intel.local
-		RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
-		docker build -f Dockerfile.gpu.intel.local -t opendronemap/nodeodm:gpu.intel.local --build-arg RENDER_GROUP_ID="${RENDER_GROUP_ID}" .
-		rm Dockerfile.gpu.intel
+		export RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
+	else
+		export RENDER_GROUP_ID=0
 	fi
 }
 
 detect_gpus
-prepare_intel_gpu_image
+prepare_intel_render_group
 
 case $key in
     --port)
