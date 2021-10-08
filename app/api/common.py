@@ -41,3 +41,24 @@ def path_traversal_check(unsafe_path, known_safe_path):
 
     # Passes the check
     return unsafe_path
+
+def hex2rgb(hex_color, with_alpha=False):
+    """
+    Adapted from https://stackoverflow.com/questions/29643352/converting-hex-to-rgb-value-in-python/29643643
+    """
+    hex_color = hex_color.lstrip('#')
+    if len(hex_color) != 6:
+        if with_alpha:
+            return tuple((255, 255, 255, 255))
+        else:
+            return tuple((255, 255, 255))
+    try:
+        v = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+        if with_alpha:
+            v += (255, )
+        return v
+    except ValueError:
+        if with_alpha:
+            return tuple((255, 255, 255, 255))
+        else:
+            return tuple((255, 255, 255))
