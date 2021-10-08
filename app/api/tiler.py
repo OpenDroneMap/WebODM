@@ -1,5 +1,4 @@
 import json
-import base64
 import numpy
 import rio_tiler.utils
 from rasterio.enums import ColorInterp
