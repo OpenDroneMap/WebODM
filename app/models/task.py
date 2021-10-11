@@ -467,7 +467,7 @@ class Task(models.Model):
         if self.import_url and not os.path.exists(zip_path):
             if self.import_url.startswith("file://") and os.path.exists(self.import_url.replace("file://", "")):
                 #check is file placed in shared media folder in /imports directory
-                if self.import_url.startswith(f"file://{settings.MEDIA_ROOT}/imports/"):
+                if self.import_url.startswith(f"file://{settings.MEDIA_ROOT}/imports/") and self.import_url.endswith(".zip"):
                     copyfile(self.import_url.replace("file://", ""), zip_path)
             else:
                 try:
