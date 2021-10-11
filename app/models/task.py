@@ -12,14 +12,14 @@ import piexif
 import re
 
 import zipfile
-
+from shutil import copyfile
 import requests
 from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, SuspiciousFileOperation
 from django.db import models
 from django.db import transaction
 from django.db import connection
@@ -31,6 +31,7 @@ from django.contrib.gis.db.models.fields import GeometryField
 
 from app.cogeo import assure_cogeo
 from app.testwatch import testWatch
+from app.api.common import path_traversal_check
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -462,35 +463,48 @@ class Task(models.Model):
         self.save()
 
         zip_path = self.assets_path("all.zip")
-
+        # Import assets file from mounted system volume (media-dir)/imports by relative path.
+        # Import file from relative path.
         if self.import_url and not os.path.exists(zip_path):
-            try:
-                # TODO: this is potentially vulnerable to a zip bomb attack
-                #       mitigated by the fact that a valid account is needed to
-                #       import tasks
-                logger.info("Importing task assets from {} for {}".format(self.import_url, self))
-                download_stream = requests.get(self.import_url, stream=True, timeout=10)
-                content_length = download_stream.headers.get('content-length')
-                total_length = int(content_length) if content_length is not None else None
-                downloaded = 0
-                last_update = 0
+            if self.import_url.startswith("file://"):
+                imports_folder_path = os.path.join(settings.MEDIA_ROOT, "imports")
+                unsafe_path_to_import_file = os.path.join(settings.MEDIA_ROOT, "imports", self.import_url.replace("file://", ""))
+                # check is file placed in shared media folder in /imports directory without traversing
+                try:
+                    checked_path_to_file = path_traversal_check(unsafe_path_to_import_file, imports_folder_path)
+                    if os.path.isfile(checked_path_to_file):
+                        copyfile(checked_path_to_file, zip_path)
+                except SuspiciousFileOperation as e:
+                    logger.error("Error due importing assets from {} for {} in cause of path checking error".format(self.import_url, self))
+                    raise NodeServerError(e)
+            else:
+                try:
+                    # TODO: this is potentially vulnerable to a zip bomb attack
+                    #       mitigated by the fact that a valid account is needed to
+                    #       import tasks
+                    logger.info("Importing task assets from {} for {}".format(self.import_url, self))
+                    download_stream = requests.get(self.import_url, stream=True, timeout=10)
+                    content_length = download_stream.headers.get('content-length')
+                    total_length = int(content_length) if content_length is not None else None
+                    downloaded = 0
+                    last_update = 0
 
-                with open(zip_path, 'wb') as fd:
-                    for chunk in download_stream.iter_content(4096):
-                        downloaded += len(chunk)
+                    with open(zip_path, 'wb') as fd:
+                        for chunk in download_stream.iter_content(4096):
+                            downloaded += len(chunk)
 
-                        if time.time() - last_update >= 2:
-                            # Update progress
-                            if total_length is not None:
-                                Task.objects.filter(pk=self.id).update(running_progress=(float(downloaded) / total_length) * 0.9)
+                            if time.time() - last_update >= 2:
+                                # Update progress
+                                if total_length is not None:
+                                    Task.objects.filter(pk=self.id).update(running_progress=(float(downloaded) / total_length) * 0.9)
 
-                            self.check_if_canceled()
-                            last_update = time.time()
+                                self.check_if_canceled()
+                                last_update = time.time()
 
-                        fd.write(chunk)
+                            fd.write(chunk)
 
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
-                raise NodeServerError(e)
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                    raise NodeServerError(e)
 
         self.refresh_from_db()
 
