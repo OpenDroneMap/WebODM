@@ -31,6 +31,7 @@ from django.contrib.gis.db.models.fields import GeometryField
 
 from app.cogeo import assure_cogeo
 from app.testwatch import testWatch
+from app.api.common import path_traversal_check
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -462,13 +463,16 @@ class Task(models.Model):
         self.save()
 
         zip_path = self.assets_path("all.zip")
-        # Import assets file from mounted system volume (media-dir), or from inside docker container.
+        # Import assets file from mounted system volume (media-dir)/imports, or from inside docker container.
         # Import file from system in case of system installation.
         if self.import_url and not os.path.exists(zip_path):
-            if self.import_url.startswith("file://") and os.path.exists(self.import_url.replace("file://", "")):
-                #check is file placed in shared media folder in /imports directory
-                if self.import_url.startswith(f"file://{settings.MEDIA_ROOT}/imports/") and self.import_url.endswith(".zip"):
-                    copyfile(self.import_url.replace("file://", ""), zip_path)
+            if self.import_url.startswith("file://"):
+                imports_folder_path = os.path.join(settings.MEDIA_ROOT, "imports")
+                unsafe_path_to_import_file = os.path.join(settings.MEDIA_ROOT, "imports", self.import_url.replace("file://", ""))
+                # check is file placed in shared media folder in /imports directory without traversing
+                checked_path_to_file = path_traversal_check(unsafe_path_to_import_file, imports_folder_path)
+                if os.path.isfile(checked_path_to_file):
+                    copyfile(checked_path_to_file, zip_path)
             else:
                 try:
                     # TODO: this is potentially vulnerable to a zip bomb attack
