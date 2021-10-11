@@ -19,7 +19,7 @@ from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, SuspiciousFileOperation
 from django.db import models
 from django.db import transaction
 from django.db import connection
@@ -463,16 +463,19 @@ class Task(models.Model):
         self.save()
 
         zip_path = self.assets_path("all.zip")
-        # Import assets file from mounted system volume (media-dir)/imports, or from inside docker container.
-        # Import file from system in case of system installation.
+        # Import assets file from mounted system volume (media-dir)/imports by relative path.
+        # Import file from relative path.
         if self.import_url and not os.path.exists(zip_path):
             if self.import_url.startswith("file://"):
                 imports_folder_path = os.path.join(settings.MEDIA_ROOT, "imports")
                 unsafe_path_to_import_file = os.path.join(settings.MEDIA_ROOT, "imports", self.import_url.replace("file://", ""))
                 # check is file placed in shared media folder in /imports directory without traversing
-                checked_path_to_file = path_traversal_check(unsafe_path_to_import_file, imports_folder_path)
-                if os.path.isfile(checked_path_to_file):
-                    copyfile(checked_path_to_file, zip_path)
+                try:
+                    checked_path_to_file = path_traversal_check(unsafe_path_to_import_file, imports_folder_path)
+                    if os.path.isfile(checked_path_to_file):
+                        copyfile(checked_path_to_file, zip_path)
+                except SuspiciousFileOperation as e:
+                    raise NodeServerError(e)
             else:
                 try:
                     # TODO: this is potentially vulnerable to a zip bomb attack
