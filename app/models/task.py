@@ -12,7 +12,7 @@ import piexif
 import re
 
 import zipfile
-
+from shutil import copyfile
 import requests
 from PIL import Image
 from django.contrib.gis.gdal import GDALRaster
@@ -462,35 +462,39 @@ class Task(models.Model):
         self.save()
 
         zip_path = self.assets_path("all.zip")
-
+        # Import assets file from mounted system volume (media-dir), or from inside docker container.
+        # Import file from system in case of system installation.
         if self.import_url and not os.path.exists(zip_path):
-            try:
-                # TODO: this is potentially vulnerable to a zip bomb attack
-                #       mitigated by the fact that a valid account is needed to
-                #       import tasks
-                logger.info("Importing task assets from {} for {}".format(self.import_url, self))
-                download_stream = requests.get(self.import_url, stream=True, timeout=10)
-                content_length = download_stream.headers.get('content-length')
-                total_length = int(content_length) if content_length is not None else None
-                downloaded = 0
-                last_update = 0
+            if "file://" in self.import_url and os.path.exists(self.import_url.replace("file://", "")):
+                copyfile(self.import_url.replace("file://", ""), zip_path)
+            else:
+                try:
+                    # TODO: this is potentially vulnerable to a zip bomb attack
+                    #       mitigated by the fact that a valid account is needed to
+                    #       import tasks
+                    logger.info("Importing task assets from {} for {}".format(self.import_url, self))
+                    download_stream = requests.get(self.import_url, stream=True, timeout=10)
+                    content_length = download_stream.headers.get('content-length')
+                    total_length = int(content_length) if content_length is not None else None
+                    downloaded = 0
+                    last_update = 0
 
-                with open(zip_path, 'wb') as fd:
-                    for chunk in download_stream.iter_content(4096):
-                        downloaded += len(chunk)
+                    with open(zip_path, 'wb') as fd:
+                        for chunk in download_stream.iter_content(4096):
+                            downloaded += len(chunk)
 
-                        if time.time() - last_update >= 2:
-                            # Update progress
-                            if total_length is not None:
-                                Task.objects.filter(pk=self.id).update(running_progress=(float(downloaded) / total_length) * 0.9)
+                            if time.time() - last_update >= 2:
+                                # Update progress
+                                if total_length is not None:
+                                    Task.objects.filter(pk=self.id).update(running_progress=(float(downloaded) / total_length) * 0.9)
 
-                            self.check_if_canceled()
-                            last_update = time.time()
+                                self.check_if_canceled()
+                                last_update = time.time()
 
-                        fd.write(chunk)
+                            fd.write(chunk)
 
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
-                raise NodeServerError(e)
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                    raise NodeServerError(e)
 
         self.refresh_from_db()
 
