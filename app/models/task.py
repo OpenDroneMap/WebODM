@@ -475,6 +475,7 @@ class Task(models.Model):
                     if os.path.isfile(checked_path_to_file):
                         copyfile(checked_path_to_file, zip_path)
                 except SuspiciousFileOperation as e:
+                    logger.error("Error due importing assets from {} for {} in cause of path checking error".format(self.import_url, self))
                     raise NodeServerError(e)
             else:
                 try:
