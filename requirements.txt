@@ -37,14 +37,14 @@ pip-autoremove==0.9.0
 psycopg2==2.8.6
 psycopg2-binary==2.8.6
 PyJWT==1.5.3
-pyodm==1.5.8
-requests==2.26.0
+pyodm==1.5.9
 urllib3==1.26.7
 pyparsing==2.4.7
 pytz==2020.1
 rcssmin==1.0.6
 redis==3.2.0
 requests-toolbelt==0.9.1
+requests>=2.21.0
 rfc3987==1.3.7
 rjsmin==1.0.12
 simplejson==3.10.0
