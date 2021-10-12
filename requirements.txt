@@ -38,7 +38,6 @@ psycopg2==2.8.6
 psycopg2-binary==2.8.6
 PyJWT==1.5.3
 pyodm==1.5.9
-urllib3==1.26.7
 pyparsing==2.4.7
 pytz==2020.1
 rcssmin==1.0.6
