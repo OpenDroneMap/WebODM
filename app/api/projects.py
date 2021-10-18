@@ -70,9 +70,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         result = []
 
-        perms = get_users_with_perms(project, attach_perms=True)
+        perms = get_users_with_perms(project, attach_perms=True, with_group_users=False)
         for user in perms:
-            result.append({'user': user.username,
+            result.append({'username': user.username,
                            'owner': project.owner == user,
                            'permissions': normalized_perm_names(perms[user])})
         

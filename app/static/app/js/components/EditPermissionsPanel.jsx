@@ -25,7 +25,8 @@ class EditPermissionsPanel extends React.Component {
       error: "",
       loading: false,
       permissions: [],
-      validUsernames: []
+      validUsernames: {},
+      validatingUser: false
     };
 
     this.backgroundFailedColor = Css.getValue('btn-danger', 'backgroundColor');
@@ -36,7 +37,8 @@ class EditPermissionsPanel extends React.Component {
 
     this.permsRequest = 
       $.getJSON(`/api/projects/${this.props.projectId}/permissions/`, json => {
-        let validUsernames = json.map(p => p.user);
+        let validUsernames = {};
+        json.forEach(p => validUsernames[p.username] = true);
         this.setState({validUsernames, permissions: json});
       })
       .fail(() => {
@@ -47,12 +49,43 @@ class EditPermissionsPanel extends React.Component {
       });
   }
 
+  validateUsername = (username) => {
+      if (this.validateReq){
+        this.validateReq.abort();
+        this.validateReq = null;  
+      }
+
+      if (this.validateTimeout){
+          clearTimeout(this.validateTimeout);
+          this.validateTimeout = null;
+      }
+
+      this.setState({validatingUser: true});
+
+      this.validateTimeout = setTimeout(() => {
+        this.validateReq = $.getJSON(`/api/users/?limit=30&search=${encodeURIComponent(username)}`)
+          .done((json) => {
+            json.forEach(u => {
+                this.state.validUsernames[u.username] = true;
+            });
+
+            this.setState({validUsernames: this.state.validUsernames});
+          }).fail(() => {
+
+          }).always(() => {
+            this.setState({validatingUser: false});
+          });
+      }, 300);
+  }
+
   componentDidMount(){
       if (!this.props.lazyLoad) this.loadPermissions();
   }
 
   componentWillUnmount(){
       if (this.permsRequest) this.permsRequest.abort();
+      if (this.validateReq) this.validateReq.abort();
+      if (this.validateTimeout) clearTimeout(this.validateTimeout);
   }
 
   handleChangePermissionRole = e => {
@@ -61,7 +94,9 @@ class EditPermissionsPanel extends React.Component {
 
   handleChangePermissionUser = perm => {
     return e => {
-        perm.user = e.target.value;
+        perm.username = e.target.value;
+
+        this.validateUsername(perm.username);
         
         // Update
         this.setState({permissions: this.state.permissions});
@@ -87,13 +122,13 @@ class EditPermissionsPanel extends React.Component {
   }
 
   getColorFor = (username) => {
-    if (this.state.validUsernames.indexOf(username) !== -1) return "";
+    if (this.state.validatingUser || this.state.validUsernames[username]) return "";
     else return this.backgroundFailedColor;
   }
 
   addNewPermission = () => {
     this.setState(update(this.state, {
-        permissions: {$push: [{user: "", permissions: ["view"]}]}
+        permissions: {$push: [{username: "", permissions: ["view"]}]}
     }));
 
     setTimeout(() => {
@@ -110,18 +145,19 @@ class EditPermissionsPanel extends React.Component {
   }
 
   render() {
-    const permissions = this.state.permissions.map((p, i) => <div key={i}>
+    const permissions = this.state.permissions.map((p, i) => <form autoComplete="off" key={i}>
         <div className="permission">
             <div className="username-container">
                 <i className="fa fa-user user-indicator"/>
                 <input 
-                    style={{color: this.getColorFor(p.user)}}
+                    style={{color: this.getColorFor(p.username)}}
                     onChange={this.handleChangePermissionUser(p)} 
-                    type="text" 
+                    type="text"
+                    autoComplete="off"
                     disabled={p.owner} 
-                    value={p.user} 
+                    value={p.username} 
                     className="form-control username" 
-                    placeholder={_("Username / e-mail")}
+                    placeholder={_("Username")}
                     ref={(domNode) => this.lastTextbox = domNode} />
             </div>
             <div className="remove">
@@ -133,7 +169,7 @@ class EditPermissionsPanel extends React.Component {
                 </select>
             </div>
         </div>
-    </div>);
+    </form>);
 
     return (
       <div className="edit-permissions-panel">
