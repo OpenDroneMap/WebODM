@@ -144,7 +144,8 @@ class FormDialog extends React.Component {
         if (this.props.deleteAction){
             leftButtons.push(<button 
                 disabled={this.state.deleting}
-                className="btn btn-danger" 
+                className="btn btn-danger"
+                key="delete" 
                 onClick={this.handleDelete}>
                 {this.state.deleting ? 
                     <span>

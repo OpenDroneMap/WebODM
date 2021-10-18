@@ -1,4 +1,4 @@
-from guardian.shortcuts import get_perms
+from guardian.shortcuts import get_perms, get_users_with_perms
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
@@ -8,6 +8,9 @@ from app import models
 from .tasks import TaskIDsSerializer
 from .common import get_and_check_project
 from django.utils.translation import gettext as _
+
+def normalized_perm_names(perms):
+    return list(map(lambda p: p.replace("_project", ""),perms))
 
 class ProjectSerializer(serializers.ModelSerializer):
     tasks = TaskIDsSerializer(many=True, read_only=True)
@@ -19,7 +22,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_permissions(self, obj):
         if 'request' in self.context:
-            return list(map(lambda p: p.replace("_project", ""), get_perms(self.context['request'].user, obj)))
+            return normalized_perm_names(get_perms(self.context['request'].user, obj))
         else:
             # Cannot list permissions, no user is associated with request (happens when serializing ui test mocks)
             return []
@@ -60,3 +63,17 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response({'success': True, 'project': ProjectSerializer(new_project).data}, status=status.HTTP_200_OK)
         else:
             return Response({'error': _("Cannot duplicate project")}, status=status.HTTP_200_OK)
+
+    @detail_route(methods=['get'])
+    def permissions(self, request, pk=None):
+        project = get_and_check_project(request, pk, ('change_project', ))
+
+        result = []
+
+        perms = get_users_with_perms(project, attach_perms=True)
+        for user in perms:
+            result.append({'user': user.username,
+                           'owner': project.owner == user,
+                           'permissions': normalized_perm_names(perms[user])})
+        
+        return Response(result, status=status.HTTP_200_OK)
