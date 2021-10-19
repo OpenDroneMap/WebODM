@@ -27,8 +27,8 @@ tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
 tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')
 
 admin_router = routers.DefaultRouter()
-admin_router.register(r'admin/users', UserViewSet, basename='user')
-admin_router.register(r'admin/groups', GroupViewSet, basename='group')
+admin_router.register(r'admin/users', UserViewSet, base_name='admin-users')
+admin_router.register(r'admin/groups', GroupViewSet, base_name='admin-groups')
 
 urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),

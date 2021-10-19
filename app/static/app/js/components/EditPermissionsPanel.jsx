@@ -26,10 +26,14 @@ class EditPermissionsPanel extends React.Component {
       loading: false,
       permissions: [],
       validUsernames: {},
-      validatingUser: false
+      validatingUser: false,
+      validationUnavailable: false
     };
 
     this.backgroundFailedColor = Css.getValue('btn-danger', 'backgroundColor');
+    this.autocompleteBorderColor = Css.getValue('btn-default', 'backgroundColor');
+    this.backgroundColor = Css.getValue('theme-secondary', 'backgroundColor');
+    this.highlightColor = Css.getValue('theme-background-highlight', 'backgroundColor');
   }
 
   loadPermissions = () => {
@@ -49,7 +53,7 @@ class EditPermissionsPanel extends React.Component {
       });
   }
 
-  validateUsername = (username) => {
+  autocomplete = (perm) => {
       if (this.validateReq){
         this.validateReq.abort();
         this.validateReq = null;  
@@ -60,18 +64,29 @@ class EditPermissionsPanel extends React.Component {
           this.validateTimeout = null;
       }
 
+      
+      // Empty case
+      if (perm.username === ""){
+          delete(perm.autocomplete);
+          this.setState({permissions: this.state.permissions});
+          return;
+      }
+        
       this.setState({validatingUser: true});
-
       this.validateTimeout = setTimeout(() => {
-        this.validateReq = $.getJSON(`/api/users/?limit=30&search=${encodeURIComponent(username)}`)
+        this.validateReq = $.getJSON(`/api/users/?limit=30&search=${encodeURIComponent(perm.username)}`)
           .done((json) => {
             json.forEach(u => {
                 this.state.validUsernames[u.username] = true;
             });
+            
+            this.state.permissions.forEach(p => delete(p.autocomplete));
+            perm.autocomplete = json;
 
-            this.setState({validUsernames: this.state.validUsernames});
+            this.setState({validUsernames: this.state.validUsernames, permissions: this.state.permissions});
           }).fail(() => {
-
+            // Perhaps the user API is not enabled
+            this.setState({validationUnavailable: true});
           }).always(() => {
             this.setState({validatingUser: false});
           });
@@ -88,15 +103,18 @@ class EditPermissionsPanel extends React.Component {
       if (this.validateTimeout) clearTimeout(this.validateTimeout);
   }
 
-  handleChangePermissionRole = e => {
-
+  handleChangePermissionRole = perm => {
+    return e => {
+        perm.permissions = this.extendedPermissions(e.target.value);
+        this.setState({permissions: this.state.permissions});
+    }
   }
 
   handleChangePermissionUser = perm => {
     return e => {
         perm.username = e.target.value;
 
-        this.validateUsername(perm.username);
+        this.autocomplete(perm);
         
         // Update
         this.setState({permissions: this.state.permissions});
@@ -111,6 +129,14 @@ class EditPermissionsPanel extends React.Component {
       else return "";
   }
 
+  extendedPermissions = simPerm => {
+      if (simPerm == "rw"){
+          return ["add", "change", "delete", "view"];
+      }else if (simPerm == "r"){
+          return ["view"];
+      }else return [];
+  }
+
   permissionLabel = simPerm => {
       if (simPerm === "rw") return _("Read/Write");
       else if (simPerm === "r") return _("Read");
@@ -122,7 +148,7 @@ class EditPermissionsPanel extends React.Component {
   }
 
   getColorFor = (username) => {
-    if (this.state.validatingUser || this.state.validUsernames[username]) return "";
+    if (this.state.validationUnavailable || this.state.validatingUser || this.state.validUsernames[username]) return "";
     else return this.backgroundFailedColor;
   }
 
@@ -144,6 +170,31 @@ class EditPermissionsPanel extends React.Component {
       }
   }
 
+  acOnMouseEnter = e => {
+    e.target.style.backgroundColor = this.highlightColor;
+  }
+
+  acOnMouseLeave = e => {
+    e.target.style.backgroundColor = "";
+  }
+
+  acOnClick = (perm, acEntry) => {
+    return e => {
+        perm.username = acEntry.username;
+        delete(perm.autocomplete);
+        this.setState({permissions: this.state.permissions});
+    }
+  }
+
+  onBlur = perm => {
+    return e => {
+        setTimeout(() => {
+            delete(perm.autocomplete);
+            this.setState({permissions: this.state.permissions});
+        }, 150);
+    }
+  }
+
   render() {
     const permissions = this.state.permissions.map((p, i) => <form autoComplete="off" key={i}>
         <div className="permission">
@@ -154,17 +205,24 @@ class EditPermissionsPanel extends React.Component {
                     onChange={this.handleChangePermissionUser(p)} 
                     type="text"
                     autoComplete="off"
+                    onBlur={this.onBlur(p)}
                     disabled={p.owner} 
                     value={p.username} 
                     className="form-control username" 
                     placeholder={_("Username")}
                     ref={(domNode) => this.lastTextbox = domNode} />
+                {p.autocomplete ? <div className="autocomplete" style={{borderColor: this.autocompleteBorderColor, backgroundColor: this.backgroundColor}}>
+                    {p.autocomplete.map(ac => <div key={ac.username} onClick={this.acOnClick(p, ac)} className="ac-entry" onMouseEnter={this.acOnMouseEnter} onMouseLeave={this.acOnMouseLeave} style={{borderColor: this.autocompleteBorderColor}}>
+                        <div className="ac-user">{ac.username}</div>
+                        <div className="ac-email">{ac.email}</div>
+                    </div>)}
+                </div> : ""}
             </div>
             <div className="remove">
                 {!p.owner ? <a onClick={this.handleDeletePermission(p)}><i className="fa fa-times"></i></a> : ""}
             </div>
             <div className="role-container">
-                <select disabled={p.owner} className="form-control" value={this.simplifiedPermission(p.permissions)} onChange={this.handleChangePermissionRole}>
+                <select disabled={p.owner} className="form-control" value={this.simplifiedPermission(p.permissions)} onChange={this.handleChangePermissionRole(p)}>
                     {this.allPermissions().map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
                 </select>
             </div>
