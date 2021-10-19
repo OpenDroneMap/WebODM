@@ -6,7 +6,7 @@ from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskDownloads, TaskAssets, TaskAssetsImport
 from .imageuploads import Thumbnail, ImageDownload
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
-from .admin import UserViewSet, GroupViewSet
+from .admin import AdminUserViewSet, AdminGroupViewSet
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
 from .tiler import TileJson, Bounds, Metadata, Tiles, Export
@@ -27,8 +27,8 @@ tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
 tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')
 
 admin_router = routers.DefaultRouter()
-admin_router.register(r'admin/users', UserViewSet, base_name='admin-users')
-admin_router.register(r'admin/groups', GroupViewSet, base_name='admin-groups')
+admin_router.register(r'admin/users', AdminUserViewSet, base_name='admin-users')
+admin_router.register(r'admin/groups', AdminGroupViewSet, base_name='admin-groups')
 
 urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
