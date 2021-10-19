@@ -65,10 +65,16 @@ class EditProjectDialog extends React.Component {
     }
 
     getFormData(){
-      return {
+      const res = {
           name: this.state.name,
           descr: this.state.descr,
       };
+      
+      if (this.editPermissionsPanel){
+          res.permissions = this.editPermissionsPanel.getPermissions();
+      }
+
+      return res;
     }
 
     onShow(){

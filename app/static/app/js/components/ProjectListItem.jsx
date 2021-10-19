@@ -378,14 +378,15 @@ class ProjectListItem extends React.Component {
 
   updateProject(project){
     return $.ajax({
-        url: `/api/projects/${this.state.data.id}/`,
+        url: `/api/projects/${this.state.data.id}/edit/`,
         contentType: 'application/json',
         data: JSON.stringify({
           name: project.name,
           description: project.descr,
+          permissions: project.permissions
         }),
         dataType: 'json',
-        type: 'PATCH'
+        type: 'POST'
       }).done(() => {
         this.refresh();
       });

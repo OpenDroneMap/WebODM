@@ -1,8 +1,10 @@
-from guardian.shortcuts import get_perms, get_users_with_perms
+from guardian.shortcuts import get_perms, get_users_with_perms, assign_perm, remove_perm
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
+from django.contrib.auth.models import User
 
 from app import models
 from .tasks import TaskIDsSerializer
@@ -77,3 +79,53 @@ class ProjectViewSet(viewsets.ModelViewSet):
                            'permissions': normalized_perm_names(perms[user])})
         
         return Response(result, status=status.HTTP_200_OK)
+    
+    @detail_route(methods=['post'])
+    def edit(self, request, pk=None):
+        project = get_and_check_project(request, pk, ('change_project', ))
+
+        try:
+            with transaction.atomic():
+                project.name = request.data.get('name')
+                project.description = request.data.get('description')
+                project.save()
+
+                form_perms = request.data.get('permissions')
+                if form_perms is not None:
+                    # Build perms map (ignore owners, empty usernames)
+                    perms_map = {}
+                    for perm in form_perms:
+                        if not perm.get('owner') and perm.get('username'):
+                            perms_map[perm['username']] = perm['permissions']
+
+                    db_perms = get_users_with_perms(project, attach_perms=True, with_group_users=False)
+                    
+                    # Check users to remove
+                    for user in db_perms:
+
+                        # Never modify owner permissions
+                        if project.owner == user:
+                            continue
+                        
+                        if perms_map.get(user.username) is None:
+                            for p in db_perms[user]:
+                                remove_perm(p, user, project)
+                    
+                    # Check users to add/edit
+                    for username in perms_map:
+                        for p in ["add", "change", "delete", "view"]:
+                            perm = p + "_project"
+                            user = User.objects.get(username=username)
+
+                            # Has permission in database but not in form?
+                            if user.has_perm(perm, project) and not p in perms_map[username]:
+                                remove_perm(perm, user, project)
+                            
+                            # Has permission in form but not in database?
+                            elif p in perms_map[username] and not user.has_perm(perm, project):
+                                assign_perm(perm, user, project)
+
+        except User.DoesNotExist as e:
+            return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'success': True}, status=status.HTTP_200_OK)

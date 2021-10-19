@@ -53,6 +53,12 @@ class EditPermissionsPanel extends React.Component {
       });
   }
 
+  getPermissions = () => {
+      // Cleanup temporary objects then return
+      this.state.permissions.forEach(perm => delete(perm.autocomplete));
+      return this.state.permissions;
+  }
+
   autocomplete = (perm) => {
       if (this.validateReq){
         this.validateReq.abort();
