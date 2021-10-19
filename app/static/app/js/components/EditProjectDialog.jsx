@@ -2,6 +2,7 @@ import React from 'react';
 import FormDialog from './FormDialog';
 import PropTypes from 'prop-types';
 import ErrorMessage from './ErrorMessage';
+import EditPermissionsPanel from './EditPermissionsPanel';
 import { _ } from '../classes/gettext';
 
 class EditProjectDialog extends React.Component {
@@ -16,6 +17,7 @@ class EditProjectDialog extends React.Component {
         deleteWarning: _("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?"),
         show: false,
         showDuplicate: false,
+        showPermissions: false,
         onDuplicated: () => {}
     };
 
@@ -33,6 +35,7 @@ class EditProjectDialog extends React.Component {
         deleteWarning: PropTypes.string,
         show: PropTypes.bool,
         showDuplicate: PropTypes.bool,
+        showPermissions: PropTypes.bool,
         onDuplicated: PropTypes.func
     };
 
@@ -62,13 +65,20 @@ class EditProjectDialog extends React.Component {
     }
 
     getFormData(){
-      return {
+      const res = {
           name: this.state.name,
           descr: this.state.descr,
       };
+      
+      if (this.editPermissionsPanel){
+          res.permissions = this.editPermissionsPanel.getPermissions();
+      }
+
+      return res;
     }
 
     onShow(){
+      this.editPermissionsPanel.loadPermissions();
       this.nameInput.focus();
     }
 
@@ -123,7 +133,7 @@ class EditProjectDialog extends React.Component {
                 getFormData={this.getFormData}
                 reset={this.reset}
                 onShow={this.onShow}
-                leftButtons={this.props.showDuplicate ? [<button disabled={this.duplicating} onClick={this.handleDuplicate} className="btn btn-default"><i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i> Duplicate</button>] : undefined}
+                leftButtons={this.props.showDuplicate ? [<button key="duplicate" disabled={this.duplicating} onClick={this.handleDuplicate} className="btn btn-default"><i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i> Duplicate</button>] : undefined}
                 ref={(domNode) => { this.dialog = domNode; }}>
               <ErrorMessage bind={[this, "error"]} />
               <div className="form-group">
@@ -138,6 +148,12 @@ class EditProjectDialog extends React.Component {
                   <textarea className="form-control" rows="3" value={this.state.descr} onChange={this.handleChange('descr')} />
                 </div>
               </div>
+              {this.props.showPermissions ? 
+                <EditPermissionsPanel 
+                    projectId={this.props.projectId}
+                    lazyLoad={true}
+                    ref={(domNode) => { this.editPermissionsPanel = domNode; }} />
+              : ""}
             </FormDialog>
         );
     }

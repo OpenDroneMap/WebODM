@@ -112,7 +112,7 @@ class FormDialog extends React.Component {
         this.serverRequest = this.props.saveAction(formData);
         if (this.serverRequest){
             this.serverRequest.fail(e => {
-                this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Could not apply changes")});
+                this.setState({error: e.message || (e.responseJSON || {}).detail || (e.responseJSON || {}).error || e.responseText || _("Could not apply changes")});
             }).always(() => {
                 this.setState({saving: false});
                 this.serverRequest = null;
@@ -144,7 +144,8 @@ class FormDialog extends React.Component {
         if (this.props.deleteAction){
             leftButtons.push(<button 
                 disabled={this.state.deleting}
-                className="btn btn-danger" 
+                className="btn btn-danger"
+                key="delete" 
                 onClick={this.handleDelete}>
                 {this.state.deleting ? 
                     <span>

@@ -6,25 +6,26 @@ from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskDownloads, TaskAssets, TaskAssetsImport
 from .imageuploads import Thumbnail, ImageDownload
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
-from .admin import UserViewSet, GroupViewSet
+from .admin import AdminUserViewSet, AdminGroupViewSet
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
 from .tiler import TileJson, Bounds, Metadata, Tiles, Export
 from .potree import Scene, CameraView
 from .workers import CheckTask, GetTaskResult
+from .users import UsersList
+from webodm import settings
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet)
 router.register(r'processingnodes', ProcessingNodeViewSet)
 router.register(r'presets', PresetViewSet, base_name='presets')
 
-
 tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
 tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')
 
 admin_router = routers.DefaultRouter()
-admin_router.register(r'admin/users', UserViewSet, basename='user')
-admin_router.register(r'admin/groups', GroupViewSet, basename='group')
+admin_router.register(r'admin/users', AdminUserViewSet, base_name='admin-users')
+admin_router.register(r'admin/groups', AdminGroupViewSet, base_name='admin-groups')
 
 urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
@@ -57,3 +58,7 @@ urlpatterns = [
 
     url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler)
 ]
+
+if settings.ENABLE_USERS_API:
+    urlpatterns.append(url(r'users', UsersList.as_view()))
+

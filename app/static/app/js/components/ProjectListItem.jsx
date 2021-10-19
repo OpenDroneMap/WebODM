@@ -378,14 +378,15 @@ class ProjectListItem extends React.Component {
 
   updateProject(project){
     return $.ajax({
-        url: `/api/projects/${this.state.data.id}/`,
+        url: `/api/projects/${this.state.data.id}/edit/`,
         contentType: 'application/json',
         data: JSON.stringify({
           name: project.name,
           description: project.descr,
+          permissions: project.permissions
         }),
         dataType: 'json',
-        type: 'PATCH'
+        type: 'POST'
       }).done(() => {
         this.refresh();
       });
@@ -469,27 +470,31 @@ class ProjectListItem extends React.Component {
   render() {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
+    const canEdit = this.hasPermission("change");
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
          href="javascript:void(0);"
          ref={this.setRef("dropzone")}
          >
-
-        <EditProjectDialog 
-          ref={(domNode) => { this.editProjectDialog = domNode; }}
-          title={_("Edit Project")}
-          saveLabel={_("Save Changes")}
-          savingLabel={_("Saving changes...")}
-          saveIcon="far fa-edit"
-          showDuplicate={true}
-          onDuplicated={this.props.onProjectDuplicated}
-          projectName={data.name}
-          projectDescr={data.description}
-          projectId={data.id}
-          saveAction={this.updateProject}
-          deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
-        />
+        
+        {canEdit ? 
+            <EditProjectDialog 
+            ref={(domNode) => { this.editProjectDialog = domNode; }}
+            title={_("Edit Project")}
+            saveLabel={_("Save Changes")}
+            savingLabel={_("Saving changes...")}
+            saveIcon="far fa-edit"
+            showDuplicate={true}
+            onDuplicated={this.props.onProjectDuplicated}
+            projectName={data.name}
+            projectDescr={data.description}
+            projectId={data.id}
+            saveAction={this.updateProject}
+            showPermissions={this.hasPermission("change")}
+            deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
+            />
+        : ""}
 
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
@@ -541,9 +546,11 @@ class ProjectListItem extends React.Component {
               </span>
               : ""}
 
-            <i className='far fa-edit'>
-            </i> <a href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
-            </a>
+            {canEdit ? 
+                [<i key="edit-icon" className='far fa-edit'>
+                </i>,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
+                </a>]
+            : ""}
           </div>
         </div>
         <i className="drag-drop-icon fa fa-inbox"></i>

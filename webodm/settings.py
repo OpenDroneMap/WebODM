@@ -69,6 +69,12 @@ SINGLE_USER_MODE = False
 # URL to redirect to if there are no processing nodes when visiting the dashboard
 PROCESSING_NODES_ONBOARDING = None
 
+# Enable the /api/users endpoint which is used for autocompleting
+# usernames when handling project permissions. This can be disabled
+# for security reasons if you don't want to let authenticated users
+# retrieve the user list. 
+ENABLE_USERS_API = True
+
 # Enable desktop mode. In desktop mode some styling changes
 # are applied to make the application look nicer on desktop
 # as well as disabling certain features (e.g. sharing)

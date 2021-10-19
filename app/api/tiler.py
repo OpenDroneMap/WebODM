@@ -192,6 +192,7 @@ class Metadata(TaskNestedView):
                 info['statistics'][b]['max'] = hrange[1]
 
         cmap_labels = {
+            "viridis": "Viridis",
             "jet": "Jet",
             "terrain": "Terrain",
             "gist_earth": "Earth",
@@ -208,7 +209,7 @@ class Metadata(TaskNestedView):
         colormaps = []
         algorithms = []
         if tile_type in ['dsm', 'dtm']:
-            colormaps = ['jet', 'terrain', 'gist_earth', 'pastel1']
+            colormaps = ['viridis', 'jet', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r', 'rplumbo', 'discrete_ndvi',
                          'better_discrete_ndvi']

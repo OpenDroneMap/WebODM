@@ -640,7 +640,7 @@ class TaskListItem extends React.Component {
 
     if (task.last_error){
       statusLabel = getStatusLabel(task.last_error, 'error');
-    }else if (!task.processing_node && !imported){
+    }else if (!task.processing_node && !imported && this.props.hasPermission("change")){
       statusLabel = getStatusLabel(_("Set a processing node"));
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;
@@ -679,7 +679,7 @@ class TaskListItem extends React.Component {
     }
 
     // Ability to change options
-    if (editable || (!task.processing_node)){
+    if (editable || (!task.processing_node && this.props.hasPermission("change"))){
         taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
     }
 
