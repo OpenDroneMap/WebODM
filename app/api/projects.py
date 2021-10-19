@@ -78,6 +78,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                            'owner': project.owner == user,
                            'permissions': normalized_perm_names(perms[user])})
         
+        result.sort(key=lambda r: r['owner'], reverse=True)
         return Response(result, status=status.HTTP_200_OK)
     
     @detail_route(methods=['post'])
@@ -116,6 +117,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
                         for p in ["add", "change", "delete", "view"]:
                             perm = p + "_project"
                             user = User.objects.get(username=username)
+
+                            # Skip owners
+                            if project.owner == user:
+                                continue
 
                             # Has permission in database but not in form?
                             if user.has_perm(perm, project) and not p in perms_map[username]:

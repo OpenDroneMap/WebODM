@@ -87,7 +87,8 @@ class EditPermissionsPanel extends React.Component {
             });
             
             this.state.permissions.forEach(p => delete(p.autocomplete));
-            perm.autocomplete = json;
+        
+            if (this.textFocused) perm.autocomplete = json;
 
             this.setState({validUsernames: this.state.validUsernames, permissions: this.state.permissions});
           }).fail(() => {
@@ -192,12 +193,15 @@ class EditPermissionsPanel extends React.Component {
     }
   }
 
+  onFocus = e => {
+    this.textFocused = true;
+  }
+
   onBlur = perm => {
     return e => {
-        setTimeout(() => {
-            delete(perm.autocomplete);
-            this.setState({permissions: this.state.permissions});
-        }, 150);
+        delete(perm.autocomplete);
+        this.setState({permissions: this.state.permissions});
+        this.textFocused = false;
     }
   }
 
@@ -211,14 +215,15 @@ class EditPermissionsPanel extends React.Component {
                     onChange={this.handleChangePermissionUser(p)} 
                     type="text"
                     autoComplete="off"
+                    onFocus={this.onFocus}
                     onBlur={this.onBlur(p)}
                     disabled={p.owner} 
                     value={p.username} 
                     className="form-control username" 
                     placeholder={_("Username")}
                     ref={(domNode) => this.lastTextbox = domNode} />
-                {p.autocomplete ? <div className="autocomplete" style={{borderColor: this.autocompleteBorderColor, backgroundColor: this.backgroundColor}}>
-                    {p.autocomplete.map(ac => <div key={ac.username} onClick={this.acOnClick(p, ac)} className="ac-entry" onMouseEnter={this.acOnMouseEnter} onMouseLeave={this.acOnMouseLeave} style={{borderColor: this.autocompleteBorderColor}}>
+                {p.autocomplete && p.autocomplete.length > 0 ? <div className="autocomplete" style={{borderColor: this.autocompleteBorderColor, backgroundColor: this.backgroundColor}}>
+                    {p.autocomplete.map(ac => <div key={ac.username} onMouseDown={this.acOnClick(p, ac)} className="ac-entry" onMouseEnter={this.acOnMouseEnter} onMouseLeave={this.acOnMouseLeave} style={{borderColor: this.autocompleteBorderColor}}>
                         <div className="ac-user">{ac.username}</div>
                         <div className="ac-email">{ac.email}</div>
                     </div>)}
