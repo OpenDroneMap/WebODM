@@ -12,16 +12,13 @@ from rest_framework_jwt.views import obtain_jwt_token
 from .tiler import TileJson, Bounds, Metadata, Tiles, Export
 from .potree import Scene, CameraView
 from .workers import CheckTask, GetTaskResult
-from .users import UserViewSet
+from .users import UsersList
 from webodm import settings
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet)
 router.register(r'processingnodes', ProcessingNodeViewSet)
 router.register(r'presets', PresetViewSet, base_name='presets')
-
-if settings.ENABLE_USERS_API:
-    router.register(r'users', UserViewSet, base_name='users')
 
 tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
 tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')
@@ -61,3 +58,7 @@ urlpatterns = [
 
     url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler)
 ]
+
+if settings.ENABLE_USERS_API:
+    urlpatterns.append(url(r'users', UsersList.as_view()))
+

@@ -86,8 +86,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         try:
             with transaction.atomic():
-                project.name = request.data.get('name')
-                project.description = request.data.get('description')
+                project.name = request.data.get('name', '')
+                project.description = request.data.get('description', '')
                 project.save()
 
                 form_perms = request.data.get('permissions')
@@ -127,5 +127,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         except User.DoesNotExist as e:
             return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
+        except AttributeError as e:
+            return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)
