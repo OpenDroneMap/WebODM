@@ -91,9 +91,11 @@ class EditPermissionsPanel extends React.Component {
             if (this.textFocused) perm.autocomplete = json;
 
             this.setState({validUsernames: this.state.validUsernames, permissions: this.state.permissions});
-          }).fail(() => {
+          }).fail(jqXHR => {
             // Perhaps the user API is not enabled
-            this.setState({validationUnavailable: true});
+            if (jqXHR.statusText !== "abort"){
+                this.setState({validationUnavailable: true});
+            }
           }).always(() => {
             this.setState({validatingUser: false});
           });
