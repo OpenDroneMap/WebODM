@@ -13,7 +13,7 @@ class Plugin(PluginBase):
 
     def root_mount_points(self):
         return [
-            MountPoint(r'^s(?P<view_type>[m3])/(?P<username>[^/.]+)/(?P<short_id>[A-Za-z0-9_-]+)/?$', HandleShortLink)
+            MountPoint(r'^s(?P<view_type>[m3])/(?P<username>[^/]+)/(?P<short_id>[A-Za-z0-9_-]+)/?$', HandleShortLink)
         ]
 
     def api_mount_points(self):
