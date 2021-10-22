@@ -78,7 +78,8 @@ class EditProjectDialog extends React.Component {
     }
 
     onShow(){
-      this.editPermissionsPanel.loadPermissions();
+
+      if (this.editPermissionsPanel) this.editPermissionsPanel.loadPermissions();
       this.nameInput.focus();
     }
 
