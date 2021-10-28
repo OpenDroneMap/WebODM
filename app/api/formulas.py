@@ -20,8 +20,8 @@ algos = {
         'help': _('Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue and Green bands instead of only Red to isolate plant health.')
     },
     'vNDVI':{
-        'expr': '0.5268*((R ^ -0.1294) * (G ^ 0.3389) * (B ^ -0.3118))
-        'help': _('Visible NDVI is an un-normalized index for RGB sensors using constants derived from citrus, grape, and sugarcane crop data.")
+        'expr': '0.5268*((R ^ -0.1294) * (G ^ 0.3389) * (B ^ -0.3118))',
+        'help': _('Visible NDVI is an un-normalized index for RGB sensors using constants derived from citrus, grape, and sugarcane crop data.')
     },
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
