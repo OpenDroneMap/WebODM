@@ -6,6 +6,7 @@ from rasterio.crs import CRS
 from rasterio.features import bounds as featureBounds
 import urllib
 import os
+import re
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.utils import has_alpha_band, \
@@ -27,6 +28,7 @@ from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster_index
+from django.utils.translation import gettext as _
 
 ZOOM_EXTRA_LEVELS = 3
 
@@ -303,7 +305,7 @@ class Tiles(TaskNestedView):
             try:
                 boundaries_feature = json.loads(boundaries_feature)
             except json.JSONDecodeError:
-                raise exceptions.ValidationError("Invalid boundaries parameter")
+                raise exceptions.ValidationError(_("Invalid boundaries parameter"))
 
         if formula == '': formula = None
         if bands == '': bands = None
@@ -339,7 +341,7 @@ class Tiles(TaskNestedView):
 
         with COGReader(url) as src:
             if not src.tile_exists(z, x, y):
-                raise exceptions.NotFound("Outside of bounds")
+                raise exceptions.NotFound(_("Outside of bounds"))
 
         with COGReader(url) as src:
             minzoom, maxzoom = get_zoom_safe(src)
@@ -350,7 +352,7 @@ class Tiles(TaskNestedView):
                 try:
                     boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                 except:
-                    raise exceptions.ValidationError("Invalid boundaries")
+                    raise exceptions.ValidationError(_("Invalid boundaries"))
             else:
                 boundaries_cutline = None
             # Handle N-bands datasets for orthophotos (not plant health)
@@ -402,19 +404,19 @@ class Tiles(TaskNestedView):
                                         padding=padding, resampling_method=resampling)
 
         except TileOutsideBounds:
-            raise exceptions.NotFound("Outside of bounds")
+            raise exceptions.NotFound(_("Outside of bounds"))
 
         if color_map:
             try:
                 colormap.get(color_map)
             except InvalidColorMapName:
-                raise exceptions.ValidationError("Not a valid color_map value")
+                raise exceptions.ValidationError(_("Not a valid color_map value"))
         
         intensity = None
         try:
             rescale_arr = list(map(float, rescale.split(",")))
         except ValueError:
-            raise exceptions.ValidationError("Invalid rescale value")
+            raise exceptions.ValidationError(_("Invalid rescale value"))
 
         options = img_profiles.get(driver, {})
         if hillshade is not None:
@@ -423,10 +425,10 @@ class Tiles(TaskNestedView):
                 if hillshade <= 0:
                     hillshade = 1.0
             except ValueError:
-                raise exceptions.ValidationError("Invalid hillshade value")
+                raise exceptions.ValidationError(_("Invalid hillshade value"))
             if tile.data.shape[0] != 1:
                 raise exceptions.ValidationError(
-                    "Cannot compute hillshade of non-elevation raster (multiple bands found)")
+                    _("Cannot compute hillshade of non-elevation raster (multiple bands found)"))
             delta_scale = (maxzoom + ZOOM_EXTRA_LEVELS + 1 - z) * 4
             dx = src.dataset.meta["transform"][0] * delta_scale
             dy = -src.dataset.meta["transform"][4] * delta_scale
@@ -443,7 +445,7 @@ class Tiles(TaskNestedView):
                 rgb, _ = apply_cmap(rgb.data, colormap.get(color_map))
             if rgb.data.shape[0] != 3:
                 raise exceptions.ValidationError(
-                    "Cannot process tile: intensity image provided, but no RGB data was computed.")
+                    _("Cannot process tile: intensity image provided, but no RGB data was computed."))
             intensity = intensity * 255.0
             rgb = hsv_blend(rgb, intensity)
             if rgb is not None:
@@ -465,38 +467,67 @@ class Tiles(TaskNestedView):
 
 
 class Export(TaskNestedView):
-    def post(self, request, pk=None, project_pk=None):
+    def post(self, request, pk=None, project_pk=None, asset_type=None):
         """
-        Export an orthophoto after applying a formula
+        Export assets (orthophoto, DEMs, etc.) after applying scaling
+        formulas, shading, reprojections
         """
         task = self.get_and_check_task(request, pk)
 
         formula = request.data.get('formula')
         bands = request.data.get('bands')
-        # rescale = request.data.get('rescale')
+        rescale = request.data.get('rescale')
+        export_format = request.data.get('format', 'gtiff')
+        epsg = request.data.get('epsg')
+        color_map = request.data.get('color_map')
+        hillshade = request.data.get('hillshade')
 
         if formula == '': formula = None
         if bands == '': bands = None
-        # if rescale == '': rescale = None
+        if rescale == '': rescale = None
+        if epsg == '': epsg = None
 
-        if not formula:
-            raise exceptions.ValidationError("You need to specify a formula parameter")
+        expr = None
 
-        if not bands:
-            raise exceptions.ValidationError("You need to specify a bands parameter")
+        if not export_format in ['gtiff', 'gtiff-rgb', 'jpg']:
+            raise exceptions.ValidationError(_("Unsupported format: %(format)") % {'format': export_format})
+        
+        extensions = {
+            'gtiff': 'tif',
+            'gtiff-rgb': 'tif',
+            'jpg': 'jpg'
+        }
 
-        try:
-            expr, _ = lookup_formula(formula, bands)
-        except ValueError as e:
-            raise exceptions.ValidationError(str(e))
+        if epsg is not None:
+            try:
+                epsg = int(epsg)
+            except ValueError:
+                raise exception.ValidationError(_("Invalid EPSG code: %(epsg)") % {'epsg': epsg})
 
-        # if formula is not None and rescale is None:
-        #     rescale = "-1,1"
+        if formula and bands:
+            try:
+                expr, _ = lookup_formula(formula, bands)
+            except ValueError as e:
+                raise exceptions.ValidationError(str(e))
+        
+        if export_format == 'gtiff-rgb' or export_format == 'jpg':
+            if formula is not None and rescale is None:
+                rescale = "-1,1"
 
-        url = get_raster_path(task, "orthophoto")
+        url = get_raster_path(task, asset_type)
 
         if not os.path.isfile(url):
             raise exceptions.NotFound()
+        
+        # Strip unsafe chars, append suffix
+        filename = "{}.{}".format(
+                        re.sub(r'[^0-9a-zA-Z-_]+', '', task.name.replace(" ", "-").replace("/", "-")) + "-" + asset_type,
+                        extensions[export_format]
+                    )
 
-        celery_task_id = export_raster_index.delay(url, expr).task_id
-        return Response({'celery_task_id': celery_task_id})
+        # Shortcut the process if no processing is required
+        if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None:
+            return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
+        else:
+            celery_task_id = export_raster_index.delay(url, expr).task_id
+            return Response({'celery_task_id': celery_task_id, 'filename': filename})

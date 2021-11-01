@@ -107,6 +107,7 @@ export default class ExportAssetPanel extends React.Component {
                     });
                 }else if (result.url){
                     // Simple download
+                    this.setState({exporting: false});
                     window.location.href = `${result.url}?filename=${result.filename}`;
                 }else if (result.error){
                     this.setState({exporting: false, error: result.error});

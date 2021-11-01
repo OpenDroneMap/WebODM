@@ -313,8 +313,10 @@ class TaskNestedView(APIView):
         return task
 
 
-def download_file_response(request, filePath, content_disposition):
+def download_file_response(request, filePath, content_disposition, download_filename=None):
     filename = os.path.basename(filePath)
+    if download_filename is None: 
+        download_filename = filename
     filesize = os.stat(filePath).st_size
     file = open(filePath, "rb")
 
@@ -328,7 +330,7 @@ def download_file_response(request, filePath, content_disposition):
                                 content_type=(mimetypes.guess_type(filename)[0] or "application/zip"))
 
     response['Content-Type'] = mimetypes.guess_type(filename)[0] or "application/zip"
-    response['Content-Disposition'] = "{}; filename={}".format(content_disposition, filename)
+    response['Content-Disposition'] = "{}; filename={}".format(content_disposition, download_filename)
     response['Content-Length'] = filesize
 
     # For testing
@@ -354,11 +356,13 @@ class TaskDownloads(TaskNestedView):
             asset_path = task.get_asset_download_path(asset)
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
-
+            
         if not os.path.exists(asset_path):
             raise exceptions.NotFound(_("Asset does not exist"))
+            
+        print(request.GET.get('filename'))
 
-        return download_file_response(request, asset_path, 'attachment')
+        return download_file_response(request, asset_path, 'attachment', download_filename=request.GET.get('filename'))
 
 """
 Raw access to the task's asset folder resources
