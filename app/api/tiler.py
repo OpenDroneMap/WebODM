@@ -20,14 +20,14 @@ from rio_tiler.io import COGReader
 from rio_tiler.errors import InvalidColorMapName
 import numpy as np
 from .custom_colormaps_helper import custom_colormaps
-from app.raster_utils import export_raster_index
+from app.raster_utils import export_raster, extension_for_export_format
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
-from worker.tasks import export_raster_index
+from worker.tasks import export_raster
 from django.utils.translation import gettext as _
 
 ZOOM_EXTRA_LEVELS = 3
@@ -489,15 +489,9 @@ class Export(TaskNestedView):
 
         expr = None
 
-        if not export_format in ['gtiff', 'gtiff-rgb', 'jpg']:
+        if not export_format in ['gtiff', 'gtiff-rgb', 'jpg', 'png']:
             raise exceptions.ValidationError(_("Unsupported format: %(format)") % {'format': export_format})
         
-        extensions = {
-            'gtiff': 'tif',
-            'gtiff-rgb': 'tif',
-            'jpg': 'jpg'
-        }
-
         if epsg is not None:
             try:
                 epsg = int(epsg)
@@ -510,9 +504,12 @@ class Export(TaskNestedView):
             except ValueError as e:
                 raise exceptions.ValidationError(str(e))
         
-        if export_format == 'gtiff-rgb' or export_format == 'jpg':
+        if export_format in ['gtiff-rgb', 'jpg', 'png']:
             if formula is not None and rescale is None:
                 rescale = "-1,1"
+        
+        if export_format == 'gtiff':
+            rescale = None
 
         url = get_raster_path(task, asset_type)
 
@@ -520,14 +517,16 @@ class Export(TaskNestedView):
             raise exceptions.NotFound()
         
         # Strip unsafe chars, append suffix
-        filename = "{}.{}".format(
+        extension = extension_for_export_format(export_format)
+        filename = "{}{}.{}".format(
                         re.sub(r'[^0-9a-zA-Z-_]+', '', task.name.replace(" ", "-").replace("/", "-")) + "-" + asset_type,
-                        extensions[export_format]
+                        "-{}".format(formula) if expr is not None else "",
+                        extension
                     )
 
         # Shortcut the process if no processing is required
         if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None:
             return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
         else:
-            celery_task_id = export_raster_index.delay(url, expr).task_id
+            celery_task_id = export_raster.delay(url, epsg=epsg, expression=expr, format=export_format).task_id
             return Response({'celery_task_id': celery_task_id, 'filename': filename})

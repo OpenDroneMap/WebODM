@@ -360,8 +360,6 @@ class TaskDownloads(TaskNestedView):
         if not os.path.exists(asset_path):
             raise exceptions.NotFound(_("Asset does not exist"))
             
-        print(request.GET.get('filename'))
-
         return download_file_response(request, asset_path, 'attachment', download_filename=request.GET.get('filename'))
 
 """

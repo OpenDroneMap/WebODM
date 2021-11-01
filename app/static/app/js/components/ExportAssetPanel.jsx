@@ -9,10 +9,11 @@ import Workers from '../classes/Workers';
 
 export default class ExportAssetPanel extends React.Component {
   static defaultProps = {
-      exportFormats: ["gtiff", "gtiff-rgb", "jpg"],
+      exportFormats: ["gtiff", "gtiff-rgb", "jpg", "png"],
       asset: "",
       exportParams: {},
-      task: null
+      task: null,
+      dropUp: false
   };
   static propTypes = {
       exportFormats: PropTypes.arrayOf(PropTypes.string),
@@ -21,7 +22,8 @@ export default class ExportAssetPanel extends React.Component {
           PropTypes.func,
           PropTypes.object
       ]),
-      task: PropTypes.object.isRequired
+      task: PropTypes.object.isRequired,
+      dropUp: PropTypes.bool
   }
 
   constructor(props){
@@ -38,6 +40,10 @@ export default class ExportAssetPanel extends React.Component {
         },
         'jpg': {
             label: _("JPEG (RGB)"),
+            icon: "fas fa-palette"
+        },
+        'png': {
+            label: _("PNG (RGB)"),
             icon: "fas fa-palette"
         }
     };
@@ -160,7 +166,7 @@ export default class ExportAssetPanel extends React.Component {
         <div className="row form-group form-inline">
             <label className="col-sm-3 control-label">{_("Export:")}</label>
             <div className="col-sm-9">
-                <div className="btn-group dropup">
+                <div className={"btn-group " + (this.props.dropUp ?  "dropup" : "")}>
                     <button onClick={this.handleExport(exportFormats[0])}
                         disabled={disabled} type="button" className="btn btn-sm btn-primary btn-export">
                         {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {this.efInfo[exportFormats[0]].label}
