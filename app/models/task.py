@@ -12,6 +12,7 @@ import piexif
 import re
 
 import zipfile
+import rasterio
 from shutil import copyfile
 import requests
 from PIL import Image
@@ -259,6 +260,7 @@ class Task(models.Model):
     images_count = models.IntegerField(null=False, blank=True, default=0, help_text=_("Number of images associated with this task"), verbose_name=_("Images Count"))
     partial = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing."), verbose_name=_("Partial"))
     potree_scene = fields.JSONField(default=dict, blank=True, help_text=_("Serialized potree scene information used to save/load measurements and camera view angle"), verbose_name=_("Potree Scene"))
+    epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("EPSG code of the dataset (if georeferenced)"), verbose_name="EPSG")
 
     class Meta:
         verbose_name = _("Task")
@@ -846,6 +848,7 @@ class Task(models.Model):
                 logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
         self.update_available_assets_field()
+        self.update_epsg_field()
         self.potree_scene = {}
         self.running_progress = 1.0
         self.console_output += gettext("Done!") + "\n"
@@ -886,7 +889,8 @@ class Task(models.Model):
                     'project': self.project.id,
                     'public': self.public,
                     'camera_shots': camera_shots,
-                    'ground_control_points': ground_control_points
+                    'ground_control_points': ground_control_points,
+                    'epsg': self.epsg
                 }
             }
         }
@@ -926,6 +930,27 @@ class Task(models.Model):
         """
         all_assets = list(self.ASSETS_MAP.keys())
         self.available_assets = [asset for asset in all_assets if self.is_asset_available_slow(asset)]
+        if commit: self.save()
+
+    
+    def update_epsg_field(self, commit=False):
+        """
+        Updates the epsg field with the correct value
+        :param commit: when True also saves the model, otherwise the user should manually call save()
+        """
+        epsg = None
+        for asset in ['orthophoto.tif', 'dsm.tif', 'dtm.tif']:
+            asset_path = self.assets_path(self.ASSETS_MAP[asset])
+            if os.path.isfile(asset_path):
+                try:
+                    with rasterio.open(asset_path) as f:
+                        if f.crs is not None:
+                            epsg = f.crs.to_epsg()
+                            break # We assume all assets are in the same CRS
+                except Exception as e:
+                    logger.warning(e)
+        self.epsg = epsg
+
         if commit: self.save()
 
 

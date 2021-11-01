@@ -287,8 +287,8 @@ export default class ContoursPanel extends React.Component {
           <label className="col-sm-3 control-label">{_("Projection:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
-              <option value="4326">WGS84 (EPSG:4326)</option>
-              <option value="3857">Web Mercator (EPSG:3857)</option>
+              <option value="4326">{_("Lat/Lon")} (EPSG:4326)</option>
+              <option value="3857">{_("Web Mercator")} (EPSG:3857)</option>
               <option value="custom">{_("Custom")} EPSG</option>
             </select>
           </div>
