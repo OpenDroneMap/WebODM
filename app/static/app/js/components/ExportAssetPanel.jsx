@@ -9,7 +9,7 @@ import Workers from '../classes/Workers';
 
 export default class ExportAssetPanel extends React.Component {
   static defaultProps = {
-      exportFormats: ["gtiff", "gtiff-rgb", "jpg", "png"],
+      exportFormats: ["gtiff-rgb", "gtiff", "jpg", "png"],
       asset: "",
       exportParams: {},
       task: null,
@@ -30,13 +30,13 @@ export default class ExportAssetPanel extends React.Component {
     super(props);
 
     this.efInfo = {
-        'gtiff': {
-            label: _("GeoTIFF (Raw)"),
-            icon: "far fa-image"
-        },
         'gtiff-rgb': {
             label: _("GeoTIFF (RGB)"),
             icon: "fas fa-palette"
+        },
+        'gtiff': {
+            label: _("GeoTIFF (Raw)"),
+            icon: "far fa-image"
         },
         'jpg': {
             label: _("JPEG (RGB)"),
@@ -169,7 +169,7 @@ export default class ExportAssetPanel extends React.Component {
                 <div className={"btn-group " + (this.props.dropUp ?  "dropup" : "")}>
                     <button onClick={this.handleExport(exportFormats[0])}
                         disabled={disabled} type="button" className="btn btn-sm btn-primary btn-export">
-                        {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {this.efInfo[exportFormats[0]].label}
+                        {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exporting...") : this.efInfo[exportFormats[0]].label}
                     </button>
                     <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
                     <ul className="dropdown-menu pull-right">

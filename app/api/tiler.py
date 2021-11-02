@@ -510,6 +510,13 @@ class Export(TaskNestedView):
         
         if export_format == 'gtiff':
             rescale = None
+        
+        if rescale is not None:
+            rescale = rescale.replace("%2C", ",")
+            try:
+                rescale = list(map(float, rescale.split(",")))
+            except ValueError:
+                raise exception.ValidationError(_("Invalid rescale value: %(value)") % {'value': rescale})
 
         url = get_raster_path(task, asset_type)
 
@@ -528,5 +535,5 @@ class Export(TaskNestedView):
         if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None:
             return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
         else:
-            celery_task_id = export_raster.delay(url, epsg=epsg, expression=expr, format=export_format).task_id
+            celery_task_id = export_raster.delay(url, epsg=epsg, expression=expr, format=export_format, rescale=rescale, color_map=color_map).task_id
             return Response({'celery_task_id': celery_task_id, 'filename': filename})
