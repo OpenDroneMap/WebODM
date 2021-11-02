@@ -1,6 +1,9 @@
 # Export a raster index after applying a band expression
 import rasterio
 import re
+import logging
+import os
+import subprocess
 import numpy as np
 import numexpr as ne
 from rasterio.enums import ColorInterp
@@ -10,7 +13,6 @@ from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
 from rasterio.warp import calculate_default_transform, reproject, Resampling
-import logging
 
 logger = logging.getLogger('app.logger')
 
@@ -21,7 +23,8 @@ def extension_for_export_format(export_format):
         'gtiff': 'tif',
         'gtiff-rgb': 'tif',
         'jpg': 'jpg',
-        'png': 'png'
+        'png': 'png',
+        'kmz': 'kmz'
     }
     return extensions.get(export_format, 'tif')
 
@@ -33,6 +36,8 @@ def export_raster(input, output, **opts):
     color_map = opts.get('color_map')
     hillshade = opts.get('hillshade')
     dem = opts.get('dem')
+    name = opts.get('name', 'raster') # KMZ specific
+    asset_type = opts.get('asset_type', 'raster') # KMZ specific
     
     with rasterio.open(input) as src:
         profile = src.meta.copy()
@@ -43,6 +48,18 @@ def export_raster(input, output, **opts):
         with_alpha = True
         rgb = False
         indexes = src.indexes
+        output_raster = output
+        jpg_background = 255 # white
+
+        # KMZ is special, we just export it as jpg with EPSG:4326
+        # and then call GDAL to tile/package it
+        kmz = export_format == "kmz"
+        if kmz:
+            export_format = "jpg"
+            epsg = 4326
+            path_base, _ = os.path.splitext(output)
+            output_raster = path_base + ".jpg"
+            jpg_background = 0 # black
 
         if export_format == "jpg":
             driver = "JPEG"
@@ -95,7 +112,7 @@ def export_raster(input, output, **opts):
             if not skip_rescale and rescale is not None:
                 arr = linear_rescale(arr, in_range=rescale)
             if not skip_alpha and not with_alpha:
-                arr[mask==0] = 255 # Set white background
+                arr[mask==0] = jpg_background
             if not skip_type and rgb and arr.dtype != np.uint8:
                 arr = arr.astype(np.uint8)
 
@@ -173,7 +190,7 @@ def export_raster(input, output, **opts):
             # Make sure this is float32
             arr = arr.astype(np.float32)
 
-            with rasterio.open(output, 'w', **profile) as dst:
+            with rasterio.open(output_raster, 'w', **profile) as dst:
                 # Apply colormap?
                 if rgb and cmap is not None:
                     rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
@@ -190,7 +207,7 @@ def export_raster(input, output, **opts):
                     write_band(process(arr)[0], dst, 1)
         elif dem:
             # Apply hillshading, colormaps to elevation
-            with rasterio.open(output, 'w', **profile) as dst:
+            with rasterio.open(output_raster, 'w', **profile) as dst:
                 arr = src.read()
 
                 intensity = None
@@ -221,7 +238,7 @@ def export_raster(input, output, **opts):
                     write_band(process(arr)[0], dst, 1)
         else:
             # Copy bands as-is
-            with rasterio.open(output, 'w', **profile) as dst:
+            with rasterio.open(output_raster, 'w', **profile) as dst:
                 band_num = 1
                 for idx in indexes:
                     ci = src.colorinterp[idx - 1]
@@ -234,3 +251,8 @@ def export_raster(input, output, **opts):
                     else:
                         write_band(process(arr), dst, band_num)
                         band_num += 1
+
+        if kmz:
+            subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
+                                        "-co", "Name={}".format(name),
+                                        "-co", "FORMAT=JPEG", output_raster, output])

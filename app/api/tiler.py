@@ -246,26 +246,26 @@ def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata, resampling, p
     tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
     with COGReader(url) as src:
         try:
-            left, _ = src.tile(x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
+            left, _discard_ = src.tile(x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
                                resampling_method=resampling, padding=padding)
             tile[tilesize:tilesize * 2, 0:tilesize] = left
         except TileOutsideBounds:
             pass
 
         try:
-            right, _ = src.tile(x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
+            right, _discard_ = src.tile(x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
                                 resampling_method=resampling, padding=padding)
             tile[tilesize:tilesize * 2, tilesize * 2:tilesize * 3] = right
         except TileOutsideBounds:
             pass
         try:
-            bottom, _ = src.tile(x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
+            bottom, _discard_ = src.tile(x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
                                  resampling_method=resampling, padding=padding)
             tile[tilesize * 2:tilesize * 3, tilesize:tilesize * 2] = bottom
         except TileOutsideBounds:
             pass
         try:
-            top, _ = src.tile(x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
+            top, _discard_ = src.tile(x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
                               resampling_method=resampling, padding=padding)
             tile[0:tilesize, tilesize:tilesize * 2] = top
         except TileOutsideBounds:
@@ -314,7 +314,7 @@ class Tiles(TaskNestedView):
         if hillshade == '' or hillshade == '0': hillshade = None
 
         try:
-            expr, _ = lookup_formula(formula, bands)
+            expr, _discard_ = lookup_formula(formula, bands)
         except ValueError as e:
             raise exceptions.ValidationError(str(e))
 
@@ -442,7 +442,7 @@ class Tiles(TaskNestedView):
         if intensity is not None:
             rgb = tile.post_process(in_range=(rescale_arr,))
             if colormap:
-                rgb, _ = apply_cmap(rgb.data, colormap.get(color_map))
+                rgb, _discard_ = apply_cmap(rgb.data, colormap.get(color_map))
             if rgb.data.shape[0] != 3:
                 raise exceptions.ValidationError(
                     _("Cannot process tile: intensity image provided, but no RGB data was computed."))
@@ -486,21 +486,23 @@ class Export(TaskNestedView):
         if bands == '': bands = None
         if rescale == '': rescale = None
         if epsg == '': epsg = None
+        if color_map == '': color_map = None
+        if hillshade == '': hillshade = None
 
         expr = None
 
-        if not export_format in ['gtiff', 'gtiff-rgb', 'jpg', 'png']:
-            raise exceptions.ValidationError(_("Unsupported format: %(format)") % {'format': export_format})
+        if not export_format in ['gtiff', 'gtiff-rgb', 'jpg', 'png', 'kmz']:
+            raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
         
         if epsg is not None:
             try:
                 epsg = int(epsg)
             except ValueError:
-                raise exception.ValidationError(_("Invalid EPSG code: %(epsg)") % {'epsg': epsg})
+                raise exceptions.ValidationError(_("Invalid EPSG code: %(value)s") % {'value': epsg})
 
         if formula and bands:
             try:
-                expr, _ = lookup_formula(formula, bands)
+                expr, _discard_ = lookup_formula(formula, bands)
             except ValueError as e:
                 raise exceptions.ValidationError(str(e))
         
@@ -516,7 +518,7 @@ class Export(TaskNestedView):
             try:
                 rescale = list(map(float, rescale.split(",")))
             except ValueError:
-                raise exception.ValidationError(_("Invalid rescale value: %(value)") % {'value': rescale})
+                raise exceptions.ValidationError(_("Invalid rescale value: %(value)s") % {'value': rescale})
         
         if hillshade is not None:
             try:
@@ -524,7 +526,7 @@ class Export(TaskNestedView):
                 if hillshade < 0:
                     raise Exception("Hillshade must be > 0")
             except:
-                raise exception.ValidationError(_("Invalid hillshade value: %(value)") % {'value': hillshade})
+                raise exceptions.ValidationError(_("Invalid hillshade value: %(value)s") % {'value': hillshade})
 
         url = get_raster_path(task, asset_type)
 
@@ -549,5 +551,7 @@ class Export(TaskNestedView):
                                                     rescale=rescale, 
                                                     color_map=color_map,
                                                     hillshade=hillshade,
-                                                    dem=asset_type in ['dsm', 'dtm']).task_id
+                                                    dem=asset_type in ['dsm', 'dtm'],
+                                                    name=task.name,
+                                                    asset_type=asset_type).task_id
             return Response({'celery_task_id': celery_task_id, 'filename': filename})
