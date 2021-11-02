@@ -7,10 +7,14 @@ from rasterio.enums import ColorInterp
 from rio_tiler.utils import has_alpha_band, linear_rescale
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
+from app.api.hsvblend import hsv_blend
+from app.api.hillshade import LightSource
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 import logging
 
 logger = logging.getLogger('app.logger')
+
+ZOOM_EXTRA_LEVELS = 3
 
 def extension_for_export_format(export_format):
     extensions = {
@@ -27,6 +31,8 @@ def export_raster(input, output, **opts):
     export_format = opts.get('format')
     rescale = opts.get('rescale')
     color_map = opts.get('color_map')
+    hillshade = opts.get('hillshade')
+    dem = opts.get('dem')
     
     with rasterio.open(input) as src:
         profile = src.meta.copy()
@@ -41,18 +47,19 @@ def export_raster(input, output, **opts):
         if export_format == "jpg":
             driver = "JPEG"
             profile.update(quality=70)
-            max_bands = 3
+            band_count = 3
             with_alpha = False
             rgb = True
         elif export_format == "png":
             driver = "PNG"
-            max_bands = 3
+            band_count = 4
             rgb = True
         elif export_format == "gtiff-rgb":
-            max_bands = 3
+            band_count = 4
             rgb = True
-        
-        band_count = min(src.count, max_bands + (1 if with_alpha else 0))
+        else:
+            band_count = src.count
+
         if rgb and rescale is None:
             rescale = [0,255]
 
@@ -82,7 +89,7 @@ def export_raster(input, output, **opts):
                 cmap = colormap.get(color_map)
             except InvalidColorMapName:
                 logger.warning("Invalid colormap {}".format(color_map))
-        
+
 
         def process(arr, skip_rescale=False, skip_alpha=False, skip_type=False):
             if not skip_rescale and rescale is not None:
@@ -97,6 +104,9 @@ def export_raster(input, output, **opts):
         profile.update(driver=driver, count=band_count)
         if rgb:
             profile.update(dtype=rasterio.uint8)
+
+        if dem and rgb and profile.get('nodata') is not None:
+            profile.update(nodata=None)
 
         # Define write band function
         # Reprojection needed?
@@ -168,6 +178,37 @@ def export_raster(input, output, **opts):
                 if rgb and cmap is not None:
                     rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
 
+                    band_num = 1
+                    for b in rgb_data:
+                        write_band(process(b, skip_rescale=True), dst, band_num)
+                        band_num += 1
+
+                    if with_alpha:
+                        write_band(mask, dst, band_num)
+                else:
+                    # Raw
+                    write_band(process(arr)[0], dst, 1)
+        elif dem:
+            # Apply hillshading, colormaps to elevation
+            with rasterio.open(output, 'w', **profile) as dst:
+                arr = src.read()
+
+                intensity = None
+                if hillshade is not None and hillshade > 0:
+                    delta_scale = (ZOOM_EXTRA_LEVELS + 1) * 4
+                    dx = src.meta["transform"][0] * delta_scale
+                    dy = -src.meta["transform"][4] * delta_scale
+                    ls = LightSource(azdeg=315, altdeg=45)
+                    intensity = ls.hillshade(arr[0], dx=dx, dy=dy, vert_exag=hillshade)
+                    intensity = intensity * 255.0
+
+                # Apply colormap?
+                if rgb and cmap is not None:
+                    rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
+
+                    if intensity is not None:
+                        rgb_data = hsv_blend(rgb_data, intensity)
+                        
                     band_num = 1
                     for b in rgb_data:
                         write_band(process(b, skip_rescale=True), dst, band_num)

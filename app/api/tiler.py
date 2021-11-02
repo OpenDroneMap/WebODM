@@ -20,7 +20,7 @@ from rio_tiler.io import COGReader
 from rio_tiler.errors import InvalidColorMapName
 import numpy as np
 from .custom_colormaps_helper import custom_colormaps
-from app.raster_utils import export_raster, extension_for_export_format
+from app.raster_utils import export_raster, extension_for_export_format, ZOOM_EXTRA_LEVELS
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list
@@ -30,10 +30,10 @@ from rest_framework.response import Response
 from worker.tasks import export_raster
 from django.utils.translation import gettext as _
 
-ZOOM_EXTRA_LEVELS = 3
 
 for custom_colormap in custom_colormaps:
     colormap = colormap.register(custom_colormap)
+
 
 def get_zoom_safe(src_dst):
     minzoom, maxzoom = src_dst.spatial_info["minzoom"], src_dst.spatial_info["maxzoom"]
@@ -517,6 +517,14 @@ class Export(TaskNestedView):
                 rescale = list(map(float, rescale.split(",")))
             except ValueError:
                 raise exception.ValidationError(_("Invalid rescale value: %(value)") % {'value': rescale})
+        
+        if hillshade is not None:
+            try:
+                hillshade = float(hillshade)
+                if hillshade < 0:
+                    raise Exception("Hillshade must be > 0")
+            except:
+                raise exception.ValidationError(_("Invalid hillshade value: %(value)") % {'value': hillshade})
 
         url = get_raster_path(task, asset_type)
 
@@ -535,5 +543,11 @@ class Export(TaskNestedView):
         if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None:
             return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
         else:
-            celery_task_id = export_raster.delay(url, epsg=epsg, expression=expr, format=export_format, rescale=rescale, color_map=color_map).task_id
+            celery_task_id = export_raster.delay(url, epsg=epsg, 
+                                                    expression=expr, 
+                                                    format=export_format, 
+                                                    rescale=rescale, 
+                                                    color_map=color_map,
+                                                    hillshade=hillshade,
+                                                    dem=asset_type in ['dsm', 'dtm']).task_id
             return Response({'celery_task_id': celery_task_id, 'filename': filename})
