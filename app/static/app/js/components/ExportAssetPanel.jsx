@@ -13,7 +13,8 @@ export default class ExportAssetPanel extends React.Component {
       asset: "",
       exportParams: {},
       task: null,
-      dropUp: false
+      dropUp: false,
+      selectorOnly: false
   };
   static propTypes = {
       exportFormats: PropTypes.arrayOf(PropTypes.string),
@@ -23,7 +24,8 @@ export default class ExportAssetPanel extends React.Component {
           PropTypes.object
       ]),
       task: PropTypes.object.isRequired,
-      dropUp: PropTypes.bool
+      dropUp: PropTypes.bool,
+      selectorOnly: PropTypes.bool
   }
 
   constructor(props){
@@ -71,7 +73,6 @@ export default class ExportAssetPanel extends React.Component {
     this.setState({format: e.target.value});
   }
 
-
   handleSelectEpsg = e => {
     this.setState({epsg: e.target.value});
   }
@@ -95,7 +96,9 @@ export default class ExportAssetPanel extends React.Component {
   }
 
   handleExport = (format) => {
-    return () => {
+    if (!format) format = this.state.format;
+
+    return (cb) => {
         const { task } = this.props;
         this.setState({exporting: true, error: ""});
         const data = this.getExportParams(format);
@@ -109,23 +112,35 @@ export default class ExportAssetPanel extends React.Component {
             }).done(result => {
                 if (result.celery_task_id){
                     Workers.waitForCompletion(result.celery_task_id, error => {
-                        if (error) this.setState({exporting: false, error});
-                        else{
+                        if (error){
+                            this.setState({exporting: false, error});
+                            if (cb !== undefined) cb(new Error(error));
+                        }else{
                             this.setState({exporting: false});
                             Workers.downloadFile(result.celery_task_id, result.filename);
+                            if (cb !== undefined) cb();
                         }
                     });
                 }else if (result.url){
                     // Simple download
                     this.setState({exporting: false});
                     window.location.href = `${result.url}?filename=${result.filename}`;
+                    if (cb !== undefined) cb();
                 }else if (result.error){
                     this.setState({exporting: false, error: result.error});
+                    if (cb !== undefined) cb(new Error(result.error));
                 }else{
-                    this.setState({exporting: false, error: interpolate(_("Invalid JSON response: %(error)s"), {error: JSON.stringify(result)})});
+                    let error = interpolate(_("Invalid JSON response: %(error)s"), {error: JSON.stringify(result)});
+
+                    this.setState({exporting: false, error});
+                    if (cb !== undefined) cb(new Error(error));
                 }
+
+                
             }).fail(error => {
-                this.setState({exporting: false, error: (error.responseJSON || {})[0] || JSON.stringify(error)});
+                error = (error.responseJSON || {})[0] || JSON.stringify(error);
+                this.setState({exporting: false, error});
+                if (cb !== undefined) cb(new Error(error));
             });
     }
   }
@@ -135,7 +150,7 @@ export default class ExportAssetPanel extends React.Component {
   }
 
   render(){
-    const {epsg, customEpsg, exporting} = this.state;
+    const {epsg, customEpsg, exporting, format } = this.state;
     const { exportFormats } = this.props;
     const utmEPSG = this.props.task.epsg;
 
@@ -162,30 +177,43 @@ export default class ExportAssetPanel extends React.Component {
   : ""}
   </div>) : "";
 
-    return (<div className="export-asset-panel">
-        <ErrorMessage bind={[this, "error"]} />
-
-        {projection}
-
-        <div className="row form-group form-inline">
-            <label className="col-sm-3 control-label">{_("Export:")}</label>
-            <div className="col-sm-9">
-                <div className={"btn-group " + (this.props.dropUp ?  "dropup" : "")}>
-                    <button onClick={this.handleExport(exportFormats[0])}
-                        disabled={disabled} type="button" className="btn btn-sm btn-primary btn-export">
-                        {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exporting...") : this.efInfo[exportFormats[0]].label}
-                    </button>
-                    <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
-                    <ul className="dropdown-menu pull-right">
-                    {exportFormats.map(ef => <li key={ef}>
-                            <a href="javascript:void(0);" onClick={this.handleExport(ef)}>
-                                <i className={this.efInfo[ef].icon + " fa-fw"}></i> {this.efInfo[ef].label}
-                            </a>
-                        </li>)}
-                    </ul>
-                </div>
+  let exportSelector = null;
+  if (this.props.selectorOnly){
+    exportSelector = (<div className="row form-group form-inline">
+        <label className="col-sm-3 control-label">{_("Format:")}</label>
+        <div className="col-sm-9 ">
+        <select className="form-control" value={format} onChange={this.handleSelectFormat}>
+            {exportFormats.map(ef => <option key={ef} value={ef}>{this.efInfo[ef].label}</option>)}
+        </select>
+        </div>
+    </div>);
+  }else{
+    exportSelector = (<div className="row form-group form-inline">
+        <label className="col-sm-3 control-label">{_("Export:")}</label>
+        <div className="col-sm-9">
+            <div className={"btn-group " + (this.props.dropUp ?  "dropup" : "")}>
+                <button onClick={this.handleExport(exportFormats[0])}
+                    disabled={disabled} type="button" className="btn btn-sm btn-primary btn-export">
+                    {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exporting...") : this.efInfo[exportFormats[0]].label}
+                </button>
+                <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
+                <ul className="dropdown-menu pull-right">
+                {exportFormats.map(ef => <li key={ef}>
+                        <a href="javascript:void(0);" onClick={this.handleExport(ef)}>
+                            <i className={this.efInfo[ef].icon + " fa-fw"}></i> {this.efInfo[ef].label}
+                        </a>
+                    </li>)}
+                </ul>
             </div>
         </div>
+    </div>);
+  }
+
+    return (<div className="export-asset-panel">
+        {!this.props.selectorOnly ? <ErrorMessage bind={[this, "error"]} /> : ""}
+
+        {projection}
+        {exportSelector}
     </div>);
   }
 }

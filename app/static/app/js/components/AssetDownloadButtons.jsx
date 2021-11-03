@@ -2,6 +2,7 @@ import React from 'react';
 import '../css/AssetDownloadButtons.scss';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
+import ExportAssetDialog from './ExportAssetDialog';
 import { _ } from '../classes/gettext';
 
 class AssetDownloadButtons extends React.Component {
@@ -23,12 +24,30 @@ class AssetDownloadButtons extends React.Component {
 
     constructor(props){
         super();
+
+        this.state = {
+            exportDialogProps: null
+        }
+    }
+
+    onHide = () => {
+        this.setState({exportDialogProps: null});
     }
 
     render(){
         const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
 
         return (<div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
+          
+          {this.state.exportDialogProps ? 
+            <ExportAssetDialog task={this.props.task}
+                               asset={this.state.exportDialogProps.asset}
+                               exportFormats={this.state.exportDialogProps.exportFormats}  
+                               onHide={this.onHide}
+                               assetLabel={this.state.exportDialogProps.assetLabel}
+            /> 
+            : ""}
+
           <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
             <i className="glyphicon glyphicon-download"></i>{this.props.showLabel ? " " + _("Download Assets") : ""}
           </button>
@@ -38,12 +57,23 @@ class AssetDownloadButtons extends React.Component {
           </button> : ""}
           <ul className="dropdown-menu">
             {assetDownloads.map((asset, i) => {
-                if (!asset.separator){
-                    return (<li key={i}>
-                            <a href={asset.downloadUrl(this.props.task.project, this.props.task.id)}><i className={asset.icon + " fa-fw"}></i> {asset.label}</a>
-                        </li>);
-                }else{
+                if (asset.separator){
                     return (<li key={i} className="divider"></li>);
+                }else{
+                    let onClick = undefined;
+                    if (asset.exportFormats){
+                        onClick = e => {
+                            e.preventDefault();
+                            this.setState({exportDialogProps: {
+                                asset: asset.exportId(),
+                                exportFormats: asset.exportFormats,
+                                assetLabel: asset.label
+                            }});
+                        }
+                    }
+                    return (<li key={i}>
+                            <a href={asset.downloadUrl(this.props.task.project, this.props.task.id)} onClick={onClick}><i className={asset.icon + " fa-fw"}></i> {asset.label}</a>
+                        </li>);
                 }
             })}
           </ul>

@@ -12,6 +12,7 @@ from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
+from rio_tiler.io import COGReader
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 logger = logging.getLogger('app.logger')
@@ -35,11 +36,13 @@ def export_raster(input, output, **opts):
     rescale = opts.get('rescale')
     color_map = opts.get('color_map')
     hillshade = opts.get('hillshade')
-    dem = opts.get('dem')
+    asset_type = opts.get('asset_type')
     name = opts.get('name', 'raster') # KMZ specific
-    asset_type = opts.get('asset_type', 'raster') # KMZ specific
+
+    dem = asset_type in ['dsm', 'dtm']
     
-    with rasterio.open(input) as src:
+    with COGReader(input) as ds_src:
+        src = ds_src.dataset
         profile = src.meta.copy()
 
         # Output format
@@ -78,7 +81,12 @@ def export_raster(input, output, **opts):
             band_count = src.count
 
         if rgb and rescale is None:
-            rescale = [0,255]
+            # Compute min max
+            nodata = None
+            if asset_type == 'orthophoto':
+                nodata = 0
+            md = ds_src.metadata(pmin=2.0, pmax=98.0, hist_options={"bins": 255}, nodata=nodata)
+            rescale = [md['statistics']['1']['min'], md['statistics']['1']['max']]
 
         ci = src.colorinterp
 
@@ -117,7 +125,13 @@ def export_raster(input, output, **opts):
                 arr = arr.astype(np.uint8)
 
             return arr
-        
+
+        def update_rgb_colorinterp(dst):
+            if with_alpha:
+                dst.colorinterp = [ColorInterp.red, ColorInterp.green, ColorInterp.blue, ColorInterp.alpha]
+            else:
+                dst.colorinterp = [ColorInterp.red, ColorInterp.green, ColorInterp.blue]
+
         profile.update(driver=driver, count=band_count)
         if rgb:
             profile.update(dtype=rasterio.uint8)
@@ -202,6 +216,8 @@ def export_raster(input, output, **opts):
 
                     if with_alpha:
                         write_band(mask, dst, band_num)
+                    
+                    update_rgb_colorinterp(dst)
                 else:
                     # Raw
                     write_band(process(arr)[0], dst, 1)
@@ -230,9 +246,11 @@ def export_raster(input, output, **opts):
                     for b in rgb_data:
                         write_band(process(b, skip_rescale=True), dst, band_num)
                         band_num += 1
-
+                    
                     if with_alpha:
                         write_band(mask, dst, band_num)
+
+                    update_rgb_colorinterp(dst)
                 else:
                     # Raw
                     write_band(process(arr)[0], dst, 1)
@@ -251,7 +269,13 @@ def export_raster(input, output, **opts):
                     else:
                         write_band(process(arr), dst, band_num)
                         band_num += 1
-
+                
+                new_ci = [src.colorinterp[idx - 1] for idx in indexes]
+                if not with_alpha:
+                    new_ci = [ci for ci in new_ci if ci != ColorInterp.alpha]
+                    
+                dst.colorinterp = new_ci
+                
         if kmz:
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
                                         "-co", "Name={}".format(name),

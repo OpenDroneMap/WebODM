@@ -150,7 +150,7 @@ class Metadata(TaskNestedView):
             raise exceptions.NotFound()
         try:
             with COGReader(raster_path) as src:
-                band_count = src.metadata()['count']
+                band_count = src.dataset.meta['count']
                 if boundaries_feature is not None:
                     boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                     boundaries_bbox = featureBounds(boundaries_feature)
@@ -551,7 +551,6 @@ class Export(TaskNestedView):
                                                     rescale=rescale, 
                                                     color_map=color_map,
                                                     hillshade=hillshade,
-                                                    dem=asset_type in ['dsm', 'dtm'],
-                                                    name=task.name,
-                                                    asset_type=asset_type).task_id
+                                                    asset_type=asset_type,
+                                                    name=task.name).task_id
             return Response({'celery_task_id': celery_task_id, 'filename': filename})
