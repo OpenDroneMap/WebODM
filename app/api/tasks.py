@@ -19,7 +19,7 @@ from app import models, pending_actions
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
-from .common import get_and_check_project
+from .common import get_and_check_project, get_asset_download_filename
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 
@@ -370,10 +370,12 @@ class TaskDownloads(TaskNestedView):
         if not is_zipstream and not os.path.isfile(asset_fs):
             raise exceptions.NotFound(_("Asset does not exist"))
         
+        download_filename = request.GET.get('filename', get_asset_download_filename(task, asset))
+
         if not is_zipstream:
-            return download_file_response(request, asset_fs, 'attachment', download_filename=request.GET.get('filename'))
+            return download_file_response(request, asset_fs, 'attachment', download_filename=download_filename)
         else:
-            return download_file_stream(request, asset_fs, 'attachment', download_filename=request.GET.get('filename', asset))
+            return download_file_stream(request, asset_fs, 'attachment', download_filename=download_filename)
 
 """
 Raw access to the task's asset folder resources

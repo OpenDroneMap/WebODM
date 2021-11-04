@@ -6,7 +6,7 @@ from rasterio.crs import CRS
 from rasterio.features import bounds as featureBounds
 import urllib
 import os
-import re
+from .common import get_asset_download_filename
 from django.http import HttpResponse
 from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.utils import has_alpha_band, \
@@ -544,7 +544,7 @@ class Export(TaskNestedView):
         # Strip unsafe chars, append suffix
         extension = extension_for_export_format(export_format)
         filename = "{}{}.{}".format(
-                        re.sub(r'[^0-9a-zA-Z-_]+', '', task.name.replace(" ", "-").replace("/", "-")) + "-" + asset_type,
+                        get_asset_download_filename(task, asset_type),
                         "-{}".format(formula) if expr is not None else "",
                         extension
                     )

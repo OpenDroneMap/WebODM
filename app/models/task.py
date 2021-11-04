@@ -33,7 +33,7 @@ from django.contrib.gis.db.models.fields import GeometryField
 
 from app.cogeo import assure_cogeo
 from app.testwatch import testWatch
-from app.api.common import path_traversal_check
+from app.security import path_traversal_check
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
