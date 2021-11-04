@@ -20,14 +20,14 @@ from rio_tiler.io import COGReader
 from rio_tiler.errors import InvalidColorMapName
 import numpy as np
 from .custom_colormaps_helper import custom_colormaps
-from app.raster_utils import export_raster, extension_for_export_format, ZOOM_EXTRA_LEVELS
+from app.raster_utils import extension_for_export_format, ZOOM_EXTRA_LEVELS
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
-from worker.tasks import export_raster
+from worker.tasks import export_raster, export_pointcloud
 from django.utils.translation import gettext as _
 
 
@@ -75,6 +75,9 @@ def get_extent(task, tile_type):
 
 def get_raster_path(task, tile_type):
     return task.get_asset_download_path(tile_type + ".tif")
+
+def get_pointcloud_path(task):
+    return task.get_asset_download_path("georeferenced_model.laz")
 
 
 class TileJson(TaskNestedView):
@@ -491,7 +494,9 @@ class Export(TaskNestedView):
 
         expr = None
 
-        if not export_format in ['gtiff', 'gtiff-rgb', 'jpg', 'png', 'kmz']:
+        if asset_type in ['orthophoto', 'dsm', 'dtm'] and not export_format in ['gtiff', 'gtiff-rgb', 'jpg', 'png', 'kmz']:
+            raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
+        if asset_type == 'georeferenced_model' and not export_format in ['laz', 'las', 'ply', 'csv']:
             raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
         
         if epsg is not None:
@@ -527,8 +532,11 @@ class Export(TaskNestedView):
                     raise Exception("Hillshade must be > 0")
             except:
                 raise exceptions.ValidationError(_("Invalid hillshade value: %(value)s") % {'value': hillshade})
-
-        url = get_raster_path(task, asset_type)
+        
+        if asset_type == 'georeferenced_model':
+            url = get_pointcloud_path(task)
+        else:
+            url = get_raster_path(task, asset_type)
 
         if not os.path.isfile(url):
             raise exceptions.NotFound()
@@ -541,16 +549,25 @@ class Export(TaskNestedView):
                         extension
                     )
 
-        # Shortcut the process if no processing is required
-        if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None:
-            return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
-        else:
-            celery_task_id = export_raster.delay(url, epsg=epsg, 
-                                                    expression=expr, 
-                                                    format=export_format, 
-                                                    rescale=rescale, 
-                                                    color_map=color_map,
-                                                    hillshade=hillshade,
-                                                    asset_type=asset_type,
-                                                    name=task.name).task_id
-            return Response({'celery_task_id': celery_task_id, 'filename': filename})
+        if asset_type in ['orthophoto', 'dsm', 'dtm']:
+            # Shortcut the process if no processing is required
+            if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None:
+                return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
+            else:
+                celery_task_id = export_raster.delay(url, epsg=epsg, 
+                                                        expression=expr, 
+                                                        format=export_format, 
+                                                        rescale=rescale, 
+                                                        color_map=color_map,
+                                                        hillshade=hillshade,
+                                                        asset_type=asset_type,
+                                                        name=task.name).task_id
+                return Response({'celery_task_id': celery_task_id, 'filename': filename})
+        elif asset_type == 'georeferenced_model':
+            # Shortcut the process if no processing is required
+            if export_format == 'laz' and (epsg == task.epsg or epsg is None):
+                return Response({'url': '/api/projects/{}/tasks/{}/download/{}.laz'.format(task.project.id, task.id, asset_type), 'filename': filename})
+            else:
+                celery_task_id = export_pointcloud.delay(url, epsg=epsg, 
+                                                            format=export_format).task_id
+                return Response({'celery_task_id': celery_task_id, 'filename': filename})

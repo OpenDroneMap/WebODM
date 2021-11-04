@@ -33,25 +33,41 @@ export default class ExportAssetPanel extends React.Component {
 
     this.efInfo = {
         'gtiff-rgb': {
-            label: _("GeoTIFF (RGB)"),
+            label: "GeoTIFF (RGB)",
             icon: "fas fa-palette"
         },
         'gtiff': {
-            label: _("GeoTIFF (Raw)"),
+            label: "GeoTIFF (Raw)",
             icon: "far fa-image"
         },
         'jpg': {
-            label: _("JPEG (RGB)"),
+            label: "JPEG (RGB)",
             icon: "fas fa-palette"
         },
         'png': {
-            label: _("PNG (RGB)"),
+            label: "PNG (RGB)",
             icon: "fas fa-palette"
         },
         'kmz': {
-            label: _("KMZ (RGB)"),
+            label: "KMZ (RGB)",
             icon: "fa fa-globe"
-        }
+        },
+        'laz': {
+            label: "LAZ",
+            icon: "fa fa-cube"
+        },
+        'las': {
+            label: "LAS",
+            icon: "fa fa-cube"
+        },
+        'ply': {
+            label: "PLY",
+            icon: "fa fa-cube"
+        },
+        'csv': {
+            label: "CSV",
+            icon: "fa fa-file-text"
+        }        
     };
 
     this.state = {
@@ -92,6 +108,7 @@ export default class ExportAssetPanel extends React.Component {
       
       params.format = format;
       params.epsg = this.getEpsg();
+      console.log(params);
       return params;
   }
 

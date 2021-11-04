@@ -14,6 +14,7 @@ class ExportAssetDialog extends React.Component {
         asset: PropTypes.string.isRequired,
         task: PropTypes.object.isRequired,
         exportFormats: PropTypes.arrayOf(PropTypes.string),
+        exportParams: PropTypes.object,
         assetLabel: PropTypes.string
     };
 
@@ -43,7 +44,8 @@ class ExportAssetDialog extends React.Component {
                                     task={this.props.task}
                                     ref={(domNode) => { this.exportAssetPanel = domNode; }}
                                     selectorOnly
-                                    exportFormats={this.props.exportFormats} />
+                                    exportFormats={this.props.exportFormats}
+                                    exportParams={this.props.exportParams} />
                 </FormDialog>
             </div>
         );

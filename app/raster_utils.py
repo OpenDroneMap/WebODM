@@ -1,4 +1,3 @@
-# Export a raster index after applying a band expression
 import rasterio
 import re
 import logging
@@ -23,11 +22,8 @@ def extension_for_export_format(export_format):
     extensions = {
         'gtiff': 'tif',
         'gtiff-rgb': 'tif',
-        'jpg': 'jpg',
-        'png': 'png',
-        'kmz': 'kmz'
     }
-    return extensions.get(export_format, 'tif')
+    return extensions.get(export_format, export_format)
 
 def export_raster(input, output, **opts):
     epsg = opts.get('epsg')

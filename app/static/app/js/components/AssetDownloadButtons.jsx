@@ -43,6 +43,7 @@ class AssetDownloadButtons extends React.Component {
             <ExportAssetDialog task={this.props.task}
                                asset={this.state.exportDialogProps.asset}
                                exportFormats={this.state.exportDialogProps.exportFormats}  
+                               exportParams={this.state.exportDialogProps.exportParams}
                                onHide={this.onHide}
                                assetLabel={this.state.exportDialogProps.assetLabel}
             /> 
@@ -67,6 +68,7 @@ class AssetDownloadButtons extends React.Component {
                             this.setState({exportDialogProps: {
                                 asset: asset.exportId(),
                                 exportFormats: asset.exportFormats,
+                                exportParams: asset.exportParams,
                                 assetLabel: asset.label
                             }});
                         }
