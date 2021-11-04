@@ -340,6 +340,16 @@ def download_file_response(request, filePath, content_disposition, download_file
     return response
 
 
+def download_file_stream(request, stream, content_disposition, download_filename=None):
+    response = HttpResponse(FileWrapper(stream),
+                            content_type=(mimetypes.guess_type(download_filename)[0] or "application/zip"))
+
+    response['Content-Type'] = mimetypes.guess_type(download_filename)[0] or "application/zip"
+    response['Content-Disposition'] = "{}; filename={}".format(content_disposition, download_filename)
+
+    return response
+
+
 """
 Task downloads are simply aliases to download the task's assets
 (but require a shorter path and look nicer the API user)
@@ -353,14 +363,17 @@ class TaskDownloads(TaskNestedView):
 
         # Check and download
         try:
-            asset_path = task.get_asset_download_path(asset)
+            asset_fs, is_zipstream = task.get_asset_file_or_zipstream(asset)
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
-            
-        if not os.path.exists(asset_path):
+
+        if not is_zipstream and not os.path.isfile(asset_fs):
             raise exceptions.NotFound(_("Asset does not exist"))
-            
-        return download_file_response(request, asset_path, 'attachment', download_filename=request.GET.get('filename'))
+        
+        if not is_zipstream:
+            return download_file_response(request, asset_fs, 'attachment', download_filename=request.GET.get('filename'))
+        else:
+            return download_file_stream(request, asset_fs, 'attachment', download_filename=request.GET.get('filename', asset))
 
 """
 Raw access to the task's asset folder resources

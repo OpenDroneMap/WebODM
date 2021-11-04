@@ -29,6 +29,19 @@ def update_epsg_fields(apps, schema_editor):
         t.epsg = epsg
         t.save()
 
+def remove_all_zip(apps, schema_editor):
+    Task = apps.get_model('app', 'Task')
+
+    for t in Task.objects.all():
+        asset = 'all.zip'
+        asset_path = os.path.join(settings.MEDIA_ROOT, "project", str(t.project.id), "task", str(t.id), "assets", asset)
+        if os.path.isfile(asset_path):
+            try:
+                os.remove(asset_path)
+                print("Cleaned up {}".format(asset_path))
+            except Exception as e:
+                print(e)
+                
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -43,4 +56,6 @@ class Migration(migrations.Migration):
         ),
 
         migrations.RunPython(update_epsg_fields),
+        migrations.RunPython(remove_all_zip),
+        
     ]

@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import uuid as uuid_module
+from app.vendor import zipfly
 
 import json
 from shlex import quote
@@ -168,7 +169,10 @@ def resize_image(image_path, resize_to, done=None):
 
 class Task(models.Model):
     ASSETS_MAP = {
-            'all.zip': 'all.zip',
+            'all.zip': {
+                'deferred_path': 'all.zip',
+                'deferred_compress_dir': '.'
+            },
             'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
             'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
             'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
@@ -436,14 +440,36 @@ class Task(models.Model):
             logger.warning("Cannot duplicate task: {}".format(str(e)))
         
         return False
-        
+    
+    def get_asset_file_or_zipstream(self, asset):
+        """
+        Get a stream to an asset
+        :param asset: one of ASSETS_MAP keys
+        :return: (path|stream, is_zipstream:bool)
+        """
+        if asset in self.ASSETS_MAP:
+            value = self.ASSETS_MAP[asset]
+            if isinstance(value, str):
+                return self.assets_path(value), False
+
+            elif isinstance(value, dict):
+                if 'deferred_path' in value and 'deferred_compress_dir' in value:
+                    zip_dir = self.assets_path(value['deferred_compress_dir'])
+                    paths = [{'n': os.path.relpath(os.path.join(dp, f), zip_dir), 'fs': os.path.join(dp, f)} for dp, dn, filenames in os.walk(zip_dir) for f in filenames]
+                    return zipfly.ZipStream(paths), True
+                else:
+                    raise FileNotFoundError("{} is not a valid asset (invalid dict values)".format(asset))
+            else:
+                raise FileNotFoundError("{} is not a valid asset (invalid map)".format(asset))
+        else:
+            raise FileNotFoundError("{} is not a valid asset".format(asset))
+
     def get_asset_download_path(self, asset):
         """
         Get the path to an asset download
         :param asset: one of ASSETS_MAP keys
         :return: path
         """
-
         if asset in self.ASSETS_MAP:
             value = self.ASSETS_MAP[asset]
             if isinstance(value, str):
@@ -451,10 +477,9 @@ class Task(models.Model):
 
             elif isinstance(value, dict):
                 if 'deferred_path' in value and 'deferred_compress_dir' in value:
-                    return self.generate_deferred_asset(value['deferred_path'], value['deferred_compress_dir'])
+                    return value['deferred_path']
                 else:
                     raise FileNotFoundError("{} is not a valid asset (invalid dict values)".format(asset))
-
             else:
                 raise FileNotFoundError("{} is not a valid asset (invalid map)".format(asset))
         else:
@@ -812,6 +837,9 @@ class Task(models.Model):
 
         logger.info("Extracted all.zip for {}".format(self))
 
+        # Remove zip
+        os.remove(zip_path)
+
         # Populate *_extent fields
         extent_fields = [
             (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
@@ -906,10 +934,11 @@ class Task(models.Model):
             'public': self.public
         }
 
-    def generate_deferred_asset(self, archive, directory):
+    def generate_deferred_asset(self, archive, directory, stream=False):
         """
         :param archive: path of the destination .zip file (relative to /assets/ directory)
         :param directory: path of the source directory to compress (relative to /assets/ directory)
+        :param stream: return a stream instead of a path to the file
         :return: full path of the generated archive
         """
         archive_path = self.assets_path(archive)
