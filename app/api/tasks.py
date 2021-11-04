@@ -347,6 +347,9 @@ def download_file_stream(request, stream, content_disposition, download_filename
     response['Content-Type'] = mimetypes.guess_type(download_filename)[0] or "application/zip"
     response['Content-Disposition'] = "{}; filename={}".format(content_disposition, download_filename)
 
+    # For testing
+    response['_stream'] = 'yes'
+    
     return response
 
 

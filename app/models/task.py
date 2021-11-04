@@ -456,6 +456,8 @@ class Task(models.Model):
                 if 'deferred_path' in value and 'deferred_compress_dir' in value:
                     zip_dir = self.assets_path(value['deferred_compress_dir'])
                     paths = [{'n': os.path.relpath(os.path.join(dp, f), zip_dir), 'fs': os.path.join(dp, f)} for dp, dn, filenames in os.walk(zip_dir) for f in filenames]
+                    if len(paths) == 0:
+                        raise FileNotFoundError("No files available for download")
                     return zipfly.ZipStream(paths), True
                 else:
                     raise FileNotFoundError("{} is not a valid asset (invalid dict values)".format(asset))

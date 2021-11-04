@@ -504,6 +504,9 @@ class Export(TaskNestedView):
                 epsg = int(epsg)
             except ValueError:
                 raise exceptions.ValidationError(_("Invalid EPSG code: %(value)s") % {'value': epsg})
+        
+        if (formula and not bands) or (not formula and bands):
+            raise exceptions.ValidationError(_("Both formula and bands parameters are required"))
 
         if formula and bands:
             try:

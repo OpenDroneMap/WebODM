@@ -274,7 +274,7 @@ class TestApiTask(BootTransactionTestCase):
             # Cannot download assets (they don't exist yet)
             for asset in list(task.ASSETS_MAP.keys()):
                 res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
-                self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
+                self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
             # Cannot access raw assets (they don't exist yet)
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
@@ -362,7 +362,6 @@ class TestApiTask(BootTransactionTestCase):
             # Can download assets
             for asset in list(task.ASSETS_MAP.keys()):
                 res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
-                print("DOWLOAD: " + asset)
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
 
             # We can stream downloads
@@ -375,13 +374,8 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(valid_cogeo(task.assets_path(task.ASSETS_MAP["dsm.tif"])))
             self.assertTrue(valid_cogeo(task.assets_path(task.ASSETS_MAP["dtm.tif"])))
 
-            # A textured mesh archive file should exist
-            self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
-
-            # Tiles archives should have been created
-            self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["dsm_tiles.zip"]["deferred_path"])))
-            self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["dtm_tiles.zip"]["deferred_path"])))
-            self.assertTrue(os.path.exists(task.assets_path(task.ASSETS_MAP["orthophoto_tiles.zip"]["deferred_path"])))
+            # A textured mesh archive file should not exist (it's generated on the fly)
+            self.assertFalse(os.path.exists(task.assets_path(task.ASSETS_MAP["textured_model.zip"]["deferred_path"])))
 
             # Can download raw assets
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
