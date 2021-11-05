@@ -8,10 +8,6 @@ import os
 from webodm import settings
 
 def find_and_assure_cogeo(apps, schema_editor):
-    print("=====================================================================")
-    print("Migrating TIFFs to Cloud Optimized GeoTIFFs, this might take a while!")
-    print("=====================================================================")
-
     for asset_filename in ["odm_orthophoto.tif", "dsm.tif", "dtm.tif"]:
         for asset in glob.glob(os.path.join(settings.MEDIA_ROOT, "project", "**", asset_filename), recursive=True):
             try:

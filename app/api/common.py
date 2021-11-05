@@ -1,6 +1,7 @@
-from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import exceptions
 import os
+import re
 
 from app import models
 
@@ -32,16 +33,6 @@ def get_and_check_project(request, project_pk, perms=('view_project',)):
     return project
 
 
-def path_traversal_check(unsafe_path, known_safe_path):
-    known_safe_path = os.path.abspath(known_safe_path)
-    unsafe_path = os.path.abspath(unsafe_path)
-
-    if (os.path.commonprefix([known_safe_path, unsafe_path]) != known_safe_path):
-        raise SuspiciousFileOperation("{} is not safe".format(unsafe_path))
-
-    # Passes the check
-    return unsafe_path
-
 def hex2rgb(hex_color, with_alpha=False):
     """
     Adapted from https://stackoverflow.com/questions/29643352/converting-hex-to-rgb-value-in-python/29643643
@@ -62,3 +53,9 @@ def hex2rgb(hex_color, with_alpha=False):
             return tuple((255, 255, 255, 255))
         else:
             return tuple((255, 255, 255))
+
+def get_asset_download_filename(task, asset):
+    name = task.name
+    if name is None: name = ""
+        
+    return re.sub(r'[^0-9a-zA-Z-_]+', '', name.replace(" ", "-").replace("/", "-")) + ("-" if name else "") + asset

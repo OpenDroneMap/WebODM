@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import traceback
+import json
 
 import time
 from threading import Event, Thread
@@ -18,7 +19,8 @@ from nodeodm.models import ProcessingNode
 from webodm import settings
 import worker
 from .celery import app
-from app.raster_utils import export_raster_index as export_raster_index_sync
+from app.raster_utils import export_raster as export_raster_sync, extension_for_export_format
+from app.pointcloud_utils import export_pointcloud as export_pointcloud_sync
 import redis
 
 logger = get_task_logger("app.logger")
@@ -154,11 +156,27 @@ def execute_grass_script(script, serialized_context = {}, out_key='output'):
 
 
 @app.task(bind=True)
-def export_raster_index(self, input, expression):
+def export_raster(self, input, **opts):
     try:
-        logger.info("Exporting raster index {} with expression: {}".format(input, expression))
-        tmpfile = tempfile.mktemp('_raster_index.tif', dir=settings.MEDIA_TMP)
-        export_raster_index_sync(input, expression, tmpfile)
+        logger.info("Exporting raster {} with options: {}".format(input, json.dumps(opts)))
+        tmpfile = tempfile.mktemp('_raster.{}'.format(extension_for_export_format(opts.get('format', 'gtiff'))), dir=settings.MEDIA_TMP)
+        export_raster_sync(input, tmpfile, **opts)
+        result = {'file': tmpfile}
+
+        if settings.TESTING:
+            TestSafeAsyncResult.set(self.request.id, result)
+
+        return result
+    except Exception as e:
+        logger.error(str(e))
+        return {'error': str(e)}
+
+@app.task(bind=True)
+def export_pointcloud(self, input, **opts):
+    try:
+        logger.info("Exporting point cloud {} with options: {}".format(input, json.dumps(opts)))
+        tmpfile = tempfile.mktemp('_pointcloud.{}'.format(opts.get('format', 'laz')), dir=settings.MEDIA_TMP)
+        export_pointcloud_sync(input, tmpfile, **opts)
         result = {'file': tmpfile}
 
         if settings.TESTING:

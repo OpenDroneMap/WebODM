@@ -6,6 +6,7 @@ import { Checkbox, ExpandButton } from './Toggle';
 import Utils from '../classes/Utils';
 import Workers from '../classes/Workers';
 import ErrorMessage from './ErrorMessage';
+import ExportAssetPanel from './ExportAssetPanel';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
 
@@ -38,16 +39,16 @@ export default class LayersControlLayer extends React.Component {
     // (not ideal, but works)
     const mUrl = this.meta.metaUrl;
     const mUrlToDownload = [
-        {url: "orthophoto/metadata", download: "orthophoto.tif"},
-        {url: "dsm/metadata", download: "dsm.tif"},
-        {url: "dtm/metadata", download: "dtm.tif"}
+        {url: "orthophoto/metadata", download: "orthophoto"},
+        {url: "dsm/metadata", download: "dsm"},
+        {url: "dtm/metadata", download: "dtm"}
     ];
 
     if (mUrl){
         for (let d of mUrlToDownload){
             const idx = mUrl.lastIndexOf(d.url);
             if (idx !== -1){
-                this.downloadFileUrl = mUrl.substr(0, idx) + "download/" + d.download;
+                this.asset = d.download;
                 break;
             }
         }
@@ -330,16 +331,12 @@ export default class LayersControlLayer extends React.Component {
                 </div>
             </div> : ""}
 
-            <div className="row form-group form-inline">
-                <label className="col-sm-3 control-label">{_("Export:")} </label>
-                <div className="col-sm-9">
-                    <button onClick={this.handleExport} disabled={exportLoading} type="button" className="btn btn-sm btn-default">
-                        {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="far fa-image fa-fw" />} GeoTIFF
-                    </button>
-                </div>
-            </div>
+            <ExportAssetPanel task={meta.task} 
+                            asset={this.asset} 
+                            exportParams={this.getLayerParams} 
+                            dropUp />
         </div> : ""}
     </div>);
-                
-  }
+
+   }
 }

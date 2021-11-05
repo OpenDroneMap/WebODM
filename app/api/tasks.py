@@ -19,7 +19,7 @@ from app import models, pending_actions
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
-from .common import get_and_check_project
+from .common import get_and_check_project, get_asset_download_filename
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 
@@ -313,8 +313,10 @@ class TaskNestedView(APIView):
         return task
 
 
-def download_file_response(request, filePath, content_disposition):
+def download_file_response(request, filePath, content_disposition, download_filename=None):
     filename = os.path.basename(filePath)
+    if download_filename is None: 
+        download_filename = filename
     filesize = os.stat(filePath).st_size
     file = open(filePath, "rb")
 
@@ -328,13 +330,26 @@ def download_file_response(request, filePath, content_disposition):
                                 content_type=(mimetypes.guess_type(filename)[0] or "application/zip"))
 
     response['Content-Type'] = mimetypes.guess_type(filename)[0] or "application/zip"
-    response['Content-Disposition'] = "{}; filename={}".format(content_disposition, filename)
+    response['Content-Disposition'] = "{}; filename={}".format(content_disposition, download_filename)
     response['Content-Length'] = filesize
 
     # For testing
     if stream:
         response['_stream'] = 'yes'
 
+    return response
+
+
+def download_file_stream(request, stream, content_disposition, download_filename=None):
+    response = HttpResponse(FileWrapper(stream),
+                            content_type=(mimetypes.guess_type(download_filename)[0] or "application/zip"))
+
+    response['Content-Type'] = mimetypes.guess_type(download_filename)[0] or "application/zip"
+    response['Content-Disposition'] = "{}; filename={}".format(content_disposition, download_filename)
+
+    # For testing
+    response['_stream'] = 'yes'
+    
     return response
 
 
@@ -351,14 +366,19 @@ class TaskDownloads(TaskNestedView):
 
         # Check and download
         try:
-            asset_path = task.get_asset_download_path(asset)
+            asset_fs, is_zipstream = task.get_asset_file_or_zipstream(asset)
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
 
-        if not os.path.exists(asset_path):
+        if not is_zipstream and not os.path.isfile(asset_fs):
             raise exceptions.NotFound(_("Asset does not exist"))
+        
+        download_filename = request.GET.get('filename', get_asset_download_filename(task, asset))
 
-        return download_file_response(request, asset_path, 'attachment')
+        if not is_zipstream:
+            return download_file_response(request, asset_fs, 'attachment', download_filename=download_filename)
+        else:
+            return download_file_stream(request, asset_fs, 'attachment', download_filename=download_filename)
 
 """
 Raw access to the task's asset folder resources

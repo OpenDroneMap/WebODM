@@ -19,6 +19,7 @@ class FormDialog extends React.Component {
         getFormData: PropTypes.func.isRequired,
         reset: PropTypes.func,
         saveAction: PropTypes.func.isRequired,
+        handleSaveFunction: PropTypes.func,
         onShow: PropTypes.func,
         onHide: PropTypes.func,
         deleteAction: PropTypes.func,
@@ -104,25 +105,35 @@ class FormDialog extends React.Component {
     handleSave(e){
         e.preventDefault();
 
-        this.setState({saving: true});
+        this.setState({saving: true, error: ""});
 
-        let formData = {};
-        if (this.props.getFormData) formData = this.props.getFormData();
-
-        this.serverRequest = this.props.saveAction(formData);
-        if (this.serverRequest){
-            this.serverRequest.fail(e => {
-                this.setState({error: e.message || (e.responseJSON || {}).detail || (e.responseJSON || {}).error || e.responseText || _("Could not apply changes")});
-            }).always(() => {
-                this.setState({saving: false});
-                this.serverRequest = null;
-            }).done(() => {
-                this.hide();
+        if (this.props.handleSaveFunction){
+            this.props.handleSaveFunction(err => {
+                if (!err) this.hide();
+                else{
+                    this.setState({saving: false, error: err.message});
+                }
             });
         }else{
-            this.setState({saving: false});
-            this.hide();
+            let formData = {};
+            if (this.props.getFormData) formData = this.props.getFormData();
+    
+            this.serverRequest = this.props.saveAction(formData);
+            if (this.serverRequest){
+                this.serverRequest.fail(e => {
+                    this.setState({error: e.message || (e.responseJSON || {}).detail || (e.responseJSON || {}).error || e.responseText || _("Could not apply changes")});
+                }).always(() => {
+                    this.setState({saving: false});
+                    this.serverRequest = null;
+                }).done(() => {
+                    this.hide();
+                });
+            }else{
+                this.setState({saving: false});
+                this.hide();
+            }
         }
+
     }
 
     handleDelete(){

@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import uuid as uuid_module
+from app.vendor import zipfly
 
 import json
 from shlex import quote
@@ -12,6 +13,7 @@ import piexif
 import re
 
 import zipfile
+import rasterio
 from shutil import copyfile
 import requests
 from PIL import Image
@@ -30,8 +32,9 @@ from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
 
 from app.cogeo import assure_cogeo
+from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
-from app.api.common import path_traversal_check
+from app.security import path_traversal_check
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -167,7 +170,10 @@ def resize_image(image_path, resize_to, done=None):
 
 class Task(models.Model):
     ASSETS_MAP = {
-            'all.zip': 'all.zip',
+            'all.zip': {
+                'deferred_path': 'all.zip',
+                'deferred_compress_dir': '.'
+            },
             'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
             'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
             'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
@@ -259,6 +265,7 @@ class Task(models.Model):
     images_count = models.IntegerField(null=False, blank=True, default=0, help_text=_("Number of images associated with this task"), verbose_name=_("Images Count"))
     partial = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing."), verbose_name=_("Partial"))
     potree_scene = fields.JSONField(default=dict, blank=True, help_text=_("Serialized potree scene information used to save/load measurements and camera view angle"), verbose_name=_("Potree Scene"))
+    epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("EPSG code of the dataset (if georeferenced)"), verbose_name="EPSG")
 
     class Meta:
         verbose_name = _("Task")
@@ -434,14 +441,38 @@ class Task(models.Model):
             logger.warning("Cannot duplicate task: {}".format(str(e)))
         
         return False
-        
+    
+    def get_asset_file_or_zipstream(self, asset):
+        """
+        Get a stream to an asset
+        :param asset: one of ASSETS_MAP keys
+        :return: (path|stream, is_zipstream:bool)
+        """
+        if asset in self.ASSETS_MAP:
+            value = self.ASSETS_MAP[asset]
+            if isinstance(value, str):
+                return self.assets_path(value), False
+
+            elif isinstance(value, dict):
+                if 'deferred_path' in value and 'deferred_compress_dir' in value:
+                    zip_dir = self.assets_path(value['deferred_compress_dir'])
+                    paths = [{'n': os.path.relpath(os.path.join(dp, f), zip_dir), 'fs': os.path.join(dp, f)} for dp, dn, filenames in os.walk(zip_dir) for f in filenames]
+                    if len(paths) == 0:
+                        raise FileNotFoundError("No files available for download")
+                    return zipfly.ZipStream(paths), True
+                else:
+                    raise FileNotFoundError("{} is not a valid asset (invalid dict values)".format(asset))
+            else:
+                raise FileNotFoundError("{} is not a valid asset (invalid map)".format(asset))
+        else:
+            raise FileNotFoundError("{} is not a valid asset".format(asset))
+
     def get_asset_download_path(self, asset):
         """
         Get the path to an asset download
         :param asset: one of ASSETS_MAP keys
         :return: path
         """
-
         if asset in self.ASSETS_MAP:
             value = self.ASSETS_MAP[asset]
             if isinstance(value, str):
@@ -449,10 +480,9 @@ class Task(models.Model):
 
             elif isinstance(value, dict):
                 if 'deferred_path' in value and 'deferred_compress_dir' in value:
-                    return self.generate_deferred_asset(value['deferred_path'], value['deferred_compress_dir'])
+                    return value['deferred_path']
                 else:
                     raise FileNotFoundError("{} is not a valid asset (invalid dict values)".format(asset))
-
             else:
                 raise FileNotFoundError("{} is not a valid asset (invalid map)".format(asset))
         else:
@@ -810,6 +840,9 @@ class Task(models.Model):
 
         logger.info("Extracted all.zip for {}".format(self))
 
+        # Remove zip
+        os.remove(zip_path)
+
         # Populate *_extent fields
         extent_fields = [
             (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
@@ -846,6 +879,7 @@ class Task(models.Model):
                 logger.info("Populated extent field with {} for {}".format(raster_path, self))
 
         self.update_available_assets_field()
+        self.update_epsg_field()
         self.potree_scene = {}
         self.running_progress = 1.0
         self.console_output += gettext("Done!") + "\n"
@@ -886,7 +920,8 @@ class Task(models.Model):
                     'project': self.project.id,
                     'public': self.public,
                     'camera_shots': camera_shots,
-                    'ground_control_points': ground_control_points
+                    'ground_control_points': ground_control_points,
+                    'epsg': self.epsg
                 }
             }
         }
@@ -899,13 +934,15 @@ class Task(models.Model):
             'id': str(self.id),
             'project': self.project.id,
             'available_assets': self.available_assets,
-            'public': self.public
+            'public': self.public,
+            'epsg': self.epsg
         }
 
-    def generate_deferred_asset(self, archive, directory):
+    def generate_deferred_asset(self, archive, directory, stream=False):
         """
         :param archive: path of the destination .zip file (relative to /assets/ directory)
         :param directory: path of the source directory to compress (relative to /assets/ directory)
+        :param stream: return a stream instead of a path to the file
         :return: full path of the generated archive
         """
         archive_path = self.assets_path(archive)
@@ -926,6 +963,35 @@ class Task(models.Model):
         """
         all_assets = list(self.ASSETS_MAP.keys())
         self.available_assets = [asset for asset in all_assets if self.is_asset_available_slow(asset)]
+        if commit: self.save()
+
+    
+    def update_epsg_field(self, commit=False):
+        """
+        Updates the epsg field with the correct value
+        :param commit: when True also saves the model, otherwise the user should manually call save()
+        """
+        epsg = None
+        for asset in ['orthophoto.tif', 'dsm.tif', 'dtm.tif']:
+            asset_path = self.assets_path(self.ASSETS_MAP[asset])
+            if os.path.isfile(asset_path):
+                try:
+                    with rasterio.open(asset_path) as f:
+                        if f.crs is not None:
+                            epsg = f.crs.to_epsg()
+                            break # We assume all assets are in the same CRS
+                except Exception as e:
+                    logger.warning(e)
+
+        # If point cloud is not georeferenced, dataset is not georeferenced
+        # (2D assets might be using pseudo-georeferencing)
+        point_cloud = self.assets_path(self.ASSETS_MAP['georeferenced_model.laz'])
+        if epsg is not None and os.path.isfile(point_cloud):
+            if not is_pointcloud_georeferenced(point_cloud):
+                logger.info("{} is not georeferenced".format(self))
+                epsg = None
+
+        self.epsg = epsg
         if commit: self.save()
 
 

@@ -11,6 +11,9 @@ if (!Object.values) {
     values.shim();
 }
 
+// Do not apply to WebODM, can cause confusion
+const OPTS_BLACKLIST = ['orthophoto-png', 'orthophoto-kmz', 'pc-las', 'pc-ply', 'pc-csv', 'pc-ept', 'cog'];
+
 class EditPresetDialog extends React.Component {
     static defaultProps = {
     };
@@ -129,7 +132,7 @@ class EditPresetDialog extends React.Component {
                   : ""}
                   <div className="row">
                     <div className="col-sm-12">
-                    {options.filter(option => this.state.showSearch && this.state.search !== "" ? 
+                    {options.filter(option => OPTS_BLACKLIST.indexOf(option.name.toLowerCase()) === -1).filter(option => this.state.showSearch && this.state.search !== "" ? 
                                                 option.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 :
                                                 true)
                             .map(option =>
