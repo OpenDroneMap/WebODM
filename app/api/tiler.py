@@ -480,7 +480,7 @@ class Export(TaskNestedView):
         formula = request.data.get('formula')
         bands = request.data.get('bands')
         rescale = request.data.get('rescale')
-        export_format = request.data.get('format', 'gtiff')
+        export_format = request.data.get('format', 'laz' if asset_type == 'georeferenced_model' else 'gtiff')
         epsg = request.data.get('epsg')
         color_map = request.data.get('color_map')
         hillshade = request.data.get('hillshade')
@@ -499,6 +499,19 @@ class Export(TaskNestedView):
         if asset_type == 'georeferenced_model' and not export_format in ['laz', 'las', 'ply', 'csv']:
             raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
         
+        # Default color map, hillshade
+        if asset_type in ['dsm', 'dtm'] and export_format != 'gtiff':
+            if color_map is None:
+                color_map = 'viridis'
+            if hillshade is None:
+                hillshade = 6
+        
+        if color_map is not None:
+            try:
+                colormap.get(color_map)
+            except InvalidColorMapName:
+                raise exceptions.ValidationError(_("Not a valid color_map value"))
+
         if epsg is not None:
             try:
                 epsg = int(epsg)
