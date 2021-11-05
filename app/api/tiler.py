@@ -518,6 +518,9 @@ class Export(TaskNestedView):
             except ValueError:
                 raise exceptions.ValidationError(_("Invalid EPSG code: %(value)s") % {'value': epsg})
         
+        if epsg is not None and task.epsg is None:
+                raise exceptions.ValidationError(_("Cannot use epsg on non-georeferenced dataset"))
+
         if (formula and not bands) or (not formula and bands):
             raise exceptions.ValidationError(_("Both formula and bands parameters are required"))
 

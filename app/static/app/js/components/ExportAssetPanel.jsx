@@ -73,7 +73,7 @@ export default class ExportAssetPanel extends React.Component {
     this.state = {
         error: "",
         format: props.exportFormats[0],
-        epsg: this.props.task.epsg || "4326",
+        epsg: this.props.task.epsg || null,
         customEpsg: Storage.getItem("last_export_custom_epsg") || "4326",
         exporting: false
     }
@@ -107,8 +107,10 @@ export default class ExportAssetPanel extends React.Component {
       }
       
       params.format = format;
-      params.epsg = this.getEpsg();
-      console.log(params);
+
+      const epsg = this.getEpsg();
+      if (epsg) params.epsg = this.getEpsg();
+
       return params;
   }
 

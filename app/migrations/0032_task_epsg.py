@@ -3,6 +3,7 @@
 from django.db import migrations, models
 import rasterio
 import os
+from app.pointcloud_utils import is_pointcloud_georeferenced
 from webodm import settings
 
 def update_epsg_fields(apps, schema_editor):
@@ -23,7 +24,16 @@ def update_epsg_fields(apps, schema_editor):
                             break # We assume all assets are in the same CRS
                 except Exception as e:
                     print(e)
-                
+        
+        # If point cloud is not georeferenced, dataset is not georeferenced
+        # (2D assets might be using pseudo-georeferencing)
+        point_cloud = os.path.join(settings.MEDIA_ROOT, "project", str(t.project.id), "task", str(t.id), "assets", "odm_georeferencing", "odm_georeferenced_model.laz")
+        
+        if epsg is not None and os.path.isfile(point_cloud):
+            if not is_pointcloud_georeferenced(point_cloud):
+                print("{} is not georeferenced".format(t))
+                epsg = None
+
         print("Updating {} (with epsg: {})".format(t, epsg))
 
         t.epsg = epsg
@@ -41,7 +51,8 @@ def remove_all_zip(apps, schema_editor):
                 print("Cleaned up {}".format(asset_path))
             except Exception as e:
                 print(e)
-                
+
+
 class Migration(migrations.Migration):
 
     dependencies = [

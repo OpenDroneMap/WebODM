@@ -32,6 +32,7 @@ from app import pending_actions
 from django.contrib.gis.db.models.fields import GeometryField
 
 from app.cogeo import assure_cogeo
+from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
 from nodeodm import status_codes
@@ -933,7 +934,8 @@ class Task(models.Model):
             'id': str(self.id),
             'project': self.project.id,
             'available_assets': self.available_assets,
-            'public': self.public
+            'public': self.public,
+            'epsg': self.epsg
         }
 
     def generate_deferred_asset(self, archive, directory, stream=False):
@@ -980,8 +982,16 @@ class Task(models.Model):
                             break # We assume all assets are in the same CRS
                 except Exception as e:
                     logger.warning(e)
-        self.epsg = epsg
 
+        # If point cloud is not georeferenced, dataset is not georeferenced
+        # (2D assets might be using pseudo-georeferencing)
+        point_cloud = self.assets_path(self.ASSETS_MAP['georeferenced_model.laz'])
+        if epsg is not None and os.path.isfile(point_cloud):
+            if not is_pointcloud_georeferenced(point_cloud):
+                logger.info("{} is not georeferenced".format(self))
+                epsg = None
+
+        self.epsg = epsg
         if commit: self.save()
 
 

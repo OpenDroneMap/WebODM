@@ -144,6 +144,7 @@ class ModelView extends React.Component {
       showTexturedModel: false,
       initializingModel: false,
       selectedCamera: null,
+      modalOpen: false
     };
 
     this.pointCloud = null;
@@ -639,12 +640,14 @@ class ModelView extends React.Component {
                 <div id="potree_sidebar_container"> </div>
           </div>
 
-          <div className="model-action-buttons">
+          <div className={"model-action-buttons " + (this.state.modalOpen ? "modal-open" : "")}>
             <AssetDownloadButtons 
                             task={this.props.task} 
                             direction="up" 
                             showLabel={false}
-                            buttonClass="btn-secondary" />
+                            buttonClass="btn-secondary"
+                            onModalOpen={() => this.setState({modalOpen: true})}
+                            onModalClose={() => this.setState({modalOpen: false})} />
             {(this.props.shareButtons && !this.props.public) ? 
             <ShareButton 
                 ref={(ref) => { this.shareButton = ref; }}

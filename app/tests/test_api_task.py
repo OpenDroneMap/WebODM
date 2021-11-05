@@ -250,6 +250,9 @@ class TestApiTask(BootTransactionTestCase):
             # No processing node is set
             self.assertTrue(task.processing_node is None)
 
+            # EPSG should be null
+            self.assertTrue(task.epsg is None)
+
             # tiles.json, bounds, metadata should not be accessible at this point
             tile_types = ['orthophoto', 'dsm', 'dtm']
             endpoints = ['tiles.json', 'bounds', 'metadata']
@@ -318,6 +321,7 @@ class TestApiTask(BootTransactionTestCase):
             # Processing should have started and a UUID is assigned
             # Calling process pending tasks should finish the process
             # and invoke the plugins completed signal
+            time.sleep(0.5)
             task.refresh_from_db()
             self.assertTrue(task.status in [status_codes.RUNNING, status_codes.COMPLETED])  # Sometimes this finishes before we get here
             self.assertTrue(len(task.uuid) > 0)
@@ -894,6 +898,9 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(task.dtm_extent is not None)
             self.assertTrue(os.path.exists(task.assets_path("dsm_tiles")))
             self.assertTrue(os.path.exists(task.assets_path("dtm_tiles")))
+
+            # EPSG should be populated
+            self.assertEqual(task.epsg, 32615)
 
             # Can access only tiles of available assets
             res = client.get("/api/projects/{}/tasks/{}/dsm/tiles.json".format(project.id, task.id))

@@ -19,7 +19,9 @@ class AssetDownloadButtons extends React.Component {
         task: PropTypes.object.isRequired,
         direction: PropTypes.string,
         buttonClass: PropTypes.string,
-        showLabel: PropTypes.bool
+        showLabel: PropTypes.bool,
+        onModalOpen: PropTypes.func,
+        onModalClose: PropTypes.func
     };
 
     constructor(props){
@@ -32,6 +34,7 @@ class AssetDownloadButtons extends React.Component {
 
     onHide = () => {
         this.setState({exportDialogProps: null});
+        if (this.props.onModalClose) this.props.onModalClose();
     }
 
     render(){
@@ -71,6 +74,7 @@ class AssetDownloadButtons extends React.Component {
                                 exportParams: asset.exportParams,
                                 assetLabel: asset.label
                             }});
+                            if (this.props.onModalOpen) this.props.onModalOpen();
                         }
                     }
                     return (<li key={i}>
