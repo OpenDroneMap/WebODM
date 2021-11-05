@@ -870,7 +870,7 @@ class TestApiTask(BootTransactionTestCase):
 
         # Restart node-odm as to not generate orthophotos
         testWatch.clear()
-        with start_processing_node("--test_skip_orthophotos"):
+        with start_processing_node(["--test_skip_orthophotos"]):
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
                 'images': [image1, image2],
                 'name': 'test_task_no_orthophoto',
