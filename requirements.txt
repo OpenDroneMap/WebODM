@@ -1,5 +1,4 @@
 amqp==2.5.2
-anyjson==0.3.3
 appdirs==1.4.0
 APScheduler==3.2.0
 billiard==3.6.3.0
@@ -57,8 +56,8 @@ rio-tiler==2.1.2
 rio-color==1.0.4
 rio-cogeo==2.3.1
 rasterio==1.2.9 ; sys_platform == 'linux' or sys_platform == 'darwin'
-https://download.lfd.uci.edu/pythonlibs/y2rycu7g/rasterio-1.2.9-cp37-cp37m-win_amd64.whl ; sys_platform == "win32"
-https://download.lfd.uci.edu/pythonlibs/y2rycu7g/GDAL-3.2.3-cp37-cp37m-win_amd64.whl ; sys_platform == "win32"
+https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/rasterio-1.2.10-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
+https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/GDAL-3.3.3-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
 Shapely==1.7.0 ; sys_platform == "win32"
 eventlet==0.25.1 ; sys_platform == "win32"
 pyopenssl==19.1.0 ; sys_platform == "win32"
