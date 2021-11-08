@@ -50,7 +50,7 @@ export default class ExportAssetPanel extends React.Component {
         },
         'kmz': {
             label: "KMZ (RGB)",
-            icon: "fa fa-globe"
+            icon: "fas fa-globe"
         },
         'laz': {
             label: "LAZ",
