@@ -59,6 +59,6 @@ rasterio==1.2.9 ; sys_platform == 'linux' or sys_platform == 'darwin'
 https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/rasterio-1.2.10-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
 https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/GDAL-3.3.3-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
 Shapely==1.7.0 ; sys_platform == "win32"
-eventlet==0.25.1 ; sys_platform == "win32"
+eventlet==0.32.0 ; sys_platform == "win32"
 pyopenssl==19.1.0 ; sys_platform == "win32"
 numpy==1.21.1
