@@ -57,5 +57,7 @@ def hex2rgb(hex_color, with_alpha=False):
 def get_asset_download_filename(task, asset):
     name = task.name
     if name is None: name = ""
-        
-    return re.sub(r'[^0-9a-zA-Z-_]+', '', name.replace(" ", "-").replace("/", "-")) + ("-" if name else "") + asset
+
+    filename = re.sub(r'[^0-9a-zA-Z-_]+', '', name.replace(" ", "-").replace("/", "-")) + ("-" if name else "") + asset
+    filename = re.sub(r'-[-]+', '-', filename)
+    return filename
