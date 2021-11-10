@@ -30,6 +30,7 @@ class ClipboardInput extends React.Component{
         <input 
           {...this.props}
           ref={(domNode) => { this.dom = domNode; }}
+          title={this.props.value || ""}
           onBlur={() => { this.setState({showCopied: false}); }}
          />
         <div style={{position: 'relative', 'width': '100%'}}>

@@ -20,6 +20,7 @@ fi
 
 default_nodes=1
 dev_mode=false
+gpu=false
 
 # define realpath replacement function
 if [[ $platform = "MacOS / OSX" ]]; then
@@ -82,10 +83,18 @@ case $key in
     export WO_DEBUG=YES
     shift # past argument
     ;;
+    --dev-watch-plugins)
+    export WO_DEV_WATCH_PLUGINS=YES
+    shift # past argument
+    ;;
     --dev)
     export WO_DEBUG=YES
     export WO_DEV=YES
     dev_mode=true
+    shift # past argument
+    ;;    
+	--gpu)
+    gpu=true
     shift # past argument
     ;;
 	--broker)
@@ -148,10 +157,59 @@ usage(){
   echo "	--ssl-insecure-port-redirect	<port>	Insecure port number to redirect from when SSL is enabled (default: $DEFAULT_SSL_INSECURE_PORT_REDIRECT)"
   echo "	--debug	Enable debug for development environments (default: disabled)"
   echo "	--dev	Enable development mode. In development mode you can make modifications to WebODM source files and changes will be reflected live. (default: disabled)"
+  echo "	--dev-watch-plugins	Automatically build plugins while in dev mode. (default: disabled)"
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
+  echo "	--gpu	Use GPU NodeODM nodes (Linux only) (default: disabled)"
   exit
 }
+
+detect_gpus(){
+	export GPU_AMD=false
+	export GPU_INTEL=false
+	export GPU_NVIDIA=false
+
+	if [ "${platform}" = "Linux" ]; then
+		set +e
+		lspci | grep 'VGA.*NVIDIA'
+		if [ "${?}" -eq 0 ]; then
+			export GPU_NVIDIA=true
+			set -e
+			return
+		fi
+
+		lspci | grep "VGA.*Intel"
+		if [ "${?}" -eq 0 ]; then
+			export GPU_INTEL=true
+			set -e
+			return
+		fi
+
+		# Total guess.  Need to look into AMD.
+		lspci | grep "VGA.*AMD"
+		if [ "${?}" -eq 0 ]; then
+			export GPU_INTEL=true
+			set -e
+		fi
+	else
+		echo "Warning: GPU support is not available for $platform"
+	fi
+}
+
+prepare_intel_render_group(){
+	if [ "${platform}" = "Linux" ]; then
+		if [ "${GPU_INTEL}" = true ]; then
+			export RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
+		else
+			export RENDER_GROUP_ID=0
+		fi
+	fi
+}
+
+if [[ $gpu = true ]]; then
+	detect_gpus
+	prepare_intel_render_group
+fi
 
 # $1 = command | $2 = help_text | $3 = install_command (optional)
 check_command(){
@@ -181,7 +239,6 @@ check_command(){
 
 environment_check(){
 	check_command "docker" "https://www.docker.com/"
-	check_command "git" "https://git-scm.com/downloads"
 	check_command "docker-compose" "Run \033[1mpip install docker-compose\033[0m" "pip install docker-compose"
 }
 
@@ -216,7 +273,13 @@ start(){
 	command="docker-compose -f docker-compose.yml"
 
     if [[ $default_nodes > 0 ]]; then
-        command+=" -f docker-compose.nodeodm.yml"
+		if [ "${GPU_NVIDIA}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+		elif [ "${GPU_INTEL}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+		else
+			command+=" -f docker-compose.nodeodm.yml"
+		fi
     fi
 
     if [[ $load_micmac_node = true ]]; then
@@ -265,7 +328,7 @@ start(){
 		echo "Will enable SSL ($method)"
 	fi
 
-	command="$command start || $command up"
+	command="$command up"
 
 	if [[ $detached = true ]]; then
 		command+=" -d"
@@ -279,7 +342,19 @@ start(){
 }
 
 down(){
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml -f docker-compose.nodemicmac.yml down --remove-orphans"
+	command="docker-compose -f docker-compose.yml"
+
+	if [ "${GPU_NVIDIA}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+	elif [ "${GPU_INTEL}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+	else
+		command+=" -f docker-compose.nodeodm.yml"
+	fi
+
+	command+=" -f docker-compose.nodemicmac.yml down --remove-orphans"
+
+	run "${command}"
 }
 
 rebuild(){
@@ -336,7 +411,19 @@ if [[ $1 = "start" ]]; then
 elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
-	run "docker-compose -f docker-compose.yml -f docker-compose.nodeodm.yml -f docker-compose.nodemicmac.yml stop"
+
+	command="docker-compose -f docker-compose.yml"
+
+	if [ "${GPU_NVIDIA}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+	elif [ "${GPU_INTEL}" = true ]; then
+		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+	else
+		command+=" -f docker-compose.nodeodm.yml"
+	fi
+
+	command+=" -f docker-compose.nodemicmac.yml stop"
+	run "${command}"
 elif [[ $1 = "restart" ]]; then
 	environment_check
 	echo "Restarting WebODM..."
@@ -353,12 +440,28 @@ elif [[ $1 = "rebuild" ]]; then
 elif [[ $1 = "update" ]]; then
 	down
 	echo "Updating WebODM..."
-	run "git pull origin master"
+
+	hash git 2>/dev/null || git_not_found=true 
+	if [[ $git_not_found ]]; then
+		echo "Skipping source update (git not found)"
+	else
+		if [[ -d .git ]]; then
+			run "git pull origin master"
+		else
+			echo "Skipping source update (.git directory not found)"
+		fi
+	fi
 
 	command="docker-compose -f docker-compose.yml"
 
 	if [[ $default_nodes > 0 ]]; then
-		command+=" -f docker-compose.nodeodm.yml"
+		if [ "${GPU_NVIDIA}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+		elif [ "${GPU_INTEL}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+		else
+			command+=" -f docker-compose.nodeodm.yml"
+		fi
 	fi
 
 	if [[ $load_micmac_node = true ]]; then

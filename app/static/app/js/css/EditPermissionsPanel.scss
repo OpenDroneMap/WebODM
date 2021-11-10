@@ -1,0 +1,77 @@
+.edit-permissions-panel{
+    .perms-loading{
+        margin-top: 14px;
+    }
+    .permission{
+        position: relative;
+        margin-bottom: 4px;
+        display: flex;
+    }
+    .user-indicator{
+        position: absolute;
+        left: 12px;
+        top: 16px;
+    }
+    .remove{
+        position: relative;
+        top: 12px;
+
+        a{
+            position: absolute;
+            left: -36px;
+            top: -12px;
+            padding: 12px;
+            &:hover{
+                cursor: pointer;
+            }
+        }
+    }
+
+    .username{
+        padding-left: 30px;
+    }
+
+    .username-container{
+        flex-grow: 0.66;
+        position: relative;
+
+        .autocomplete{
+            left: 0;
+            top: 44px;
+            z-index: 2;
+            border-width: 1px;
+            border-style: solid;
+            width: 100%;
+            position: absolute;
+            border-radius: 2px;
+            max-height: 240px;
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            .ac-entry{
+                padding: 10px 15px 10px 15px;
+                border-bottom-style: solid;
+                border-bottom-width: 1px;
+
+                &:hover{
+                    cursor: pointer;
+                }
+            }
+
+            .ac-entry:last-child{
+                border: none;
+            }
+
+            .ac-email{
+                opacity: 0.8;
+            }
+        }
+    }
+    .role-container{
+        flex-grow: 0.33;
+    }
+
+    .add-new{
+        margin-top: 4px;
+    }
+}

@@ -12,7 +12,7 @@ let statusCodes = {
         icon: "far fa-hourglass fa-fw"
     },
     [RUNNING]: {
-        descr: _("Running"),
+        descr: _("Processing"),
         icon: "fa fa-cog fa-spin fa-fw"
     },
     [FAILED]: {

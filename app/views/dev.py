@@ -59,19 +59,14 @@ def dev_tools(request, action):
                     raise Exception(_("Cannot find locale/ folder in .zip archive"))
                 
                 webodm_locale_dir = os.path.join(settings.BASE_DIR, "locale")
-                if os.path.isdir(webodm_locale_dir):
-                    logger.info("Removing %s" % webodm_locale_dir)
-                    shutil.rmtree(webodm_locale_dir)
 
                 for locale_path in locale_paths:
                     logger.info("Found locale at %s" % locale_path)
                     logger.info("Moving %s to %s..." % (locale_path, webodm_locale_dir))
                     copymerge(locale_path, webodm_locale_dir)
 
-                logger.info("Running translate.sh extract && translate.sh build safe")
-                translate_script = os.path.join(settings.BASE_DIR, 'translate.sh')
-
-                subprocess.call(['bash', '-c', '%s extract && %s build safe' % (translate_script, translate_script)], cwd=settings.BASE_DIR)
+                logger.info("Running python manage.py translate extract && python manage.py translate build --safe")
+                subprocess.call(['bash', '-c', 'python manage.py translate extract && %s python manage.py translate build --safe'], cwd=settings.BASE_DIR)
                 
                 return JsonResponse({'message': _("Translation files reloaded!"), 'reload': True})
             except Exception as e:

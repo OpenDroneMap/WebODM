@@ -1,0 +1,21 @@
+.export-asset-panel{
+    .btn-export{
+        i{
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+    }
+    .dropdown-toggle{
+        padding: 5px !important;
+    }
+    .dropdown-menu{
+        a{
+            padding-right: 2px;
+            width: 100% !important;
+            text-align: left !important;
+            display: block;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+    }
+}

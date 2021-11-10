@@ -11,6 +11,9 @@ if (!Object.values) {
     values.shim();
 }
 
+// Do not apply to WebODM, can cause confusion
+const OPTS_BLACKLIST = ['orthophoto-png', 'orthophoto-kmz', 'pc-las', 'pc-ply', 'pc-csv', 'pc-ept', 'cog'];
+
 class EditPresetDialog extends React.Component {
     static defaultProps = {
     };
@@ -109,13 +112,13 @@ class EditPresetDialog extends React.Component {
                     deleteWarning={false}
                     deleteAction={(this.props.preset.id !== -1 && !this.props.preset.system) ? this.props.deleteAction : undefined}>
                   {!this.isCustomPreset() ? 
-                    [<div className="row preset-name">
+                    [<div className="row preset-name" key="preset">
                         <label className="col-sm-2 control-label">{_("Name")}</label>
                         <div className="col-sm-10" style={{marginRight: "40px"}}>
                           <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
                         </div>
                     </div>,
-                    <hr/>]
+                    <hr key="hr"/>]
                   : ""}
 
                   <button type="submit" className="btn btn-default search-toggle btn-sm"  title={_("Search")} onClick={this.toggleSearchControl}><i className="fa fa-filter"></i></button>
@@ -129,7 +132,7 @@ class EditPresetDialog extends React.Component {
                   : ""}
                   <div className="row">
                     <div className="col-sm-12">
-                    {options.filter(option => this.state.showSearch && this.state.search !== "" ? 
+                    {options.filter(option => OPTS_BLACKLIST.indexOf(option.name.toLowerCase()) === -1).filter(option => this.state.showSearch && this.state.search !== "" ? 
                                                 option.name.toLowerCase().indexOf(this.state.search.toLowerCase()) !== -1 :
                                                 true)
                             .map(option =>

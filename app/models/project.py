@@ -9,7 +9,8 @@ from django.utils import timezone
 from guardian.models import GroupObjectPermissionBase
 from guardian.models import UserObjectPermissionBase
 from guardian.shortcuts import get_perms_for_model, assign_perm
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
+from django.db import transaction
 
 from app import pending_actions
 
@@ -51,6 +52,33 @@ class Project(models.Model):
                     status=status_codes.COMPLETED
                 ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
                 .only('id', 'project_id')]
+    
+    def duplicate(self):
+        try:
+            with transaction.atomic():
+                project = Project.objects.get(pk=self.pk)
+                project.pk = None
+                project.name = gettext('Copy of %(task)s') % {'task': self.name}
+                project.created_at = timezone.now()
+                project.save()
+                project.refresh_from_db()
+
+                for task in self.task_set.all():
+                    new_task = task.duplicate(set_new_name=False)
+                    if not new_task:
+                        raise Exception("Failed to duplicate {}".format(new_task))
+                    
+                    # Move/Assign to new duplicate
+                    new_task.project = project
+                    new_task.save()
+                    
+            return project
+        except Exception as e:
+            logger.warning("Cannot duplicate project: {}".format(str(e)))
+        
+        return False
+
+
 
     class Meta:
         verbose_name = _("Project")

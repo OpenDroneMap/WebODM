@@ -20,7 +20,9 @@ class ProjectListItem extends React.Component {
   static propTypes = {
       history: PropTypes.object.isRequired,
       data: PropTypes.object.isRequired, // project json
-      onDelete: PropTypes.func
+      onDelete: PropTypes.func,
+      onTaskMoved: PropTypes.func,
+      onProjectDuplicated: PropTypes.func
   }
 
   constructor(props){
@@ -47,6 +49,7 @@ class ProjectListItem extends React.Component {
     this.handleEditProject = this.handleEditProject.bind(this);
     this.updateProject = this.updateProject.bind(this);
     this.taskDeleted = this.taskDeleted.bind(this);
+    this.taskMoved = this.taskMoved.bind(this);
     this.hasPermission = this.hasPermission.bind(this);
   }
 
@@ -304,6 +307,11 @@ class ProjectListItem extends React.Component {
     this.refresh();
   }
 
+  taskMoved(task){
+    this.refresh();
+    if (this.props.onTaskMoved) this.props.onTaskMoved(task);
+  }
+
   handleDelete(){
     return $.ajax({
           url: `/api/projects/${this.state.data.id}/`,
@@ -370,14 +378,15 @@ class ProjectListItem extends React.Component {
 
   updateProject(project){
     return $.ajax({
-        url: `/api/projects/${this.state.data.id}/`,
+        url: `/api/projects/${this.state.data.id}/edit/`,
         contentType: 'application/json',
         data: JSON.stringify({
           name: project.name,
           description: project.descr,
+          permissions: project.permissions
         }),
         dataType: 'json',
-        type: 'PATCH'
+        type: 'POST'
       }).done(() => {
         this.refresh();
       });
@@ -461,24 +470,31 @@ class ProjectListItem extends React.Component {
   render() {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
+    const canEdit = this.hasPermission("change");
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
          href="javascript:void(0);"
          ref={this.setRef("dropzone")}
          >
-
-        <EditProjectDialog 
-          ref={(domNode) => { this.editProjectDialog = domNode; }}
-          title={_("Edit Project")}
-          saveLabel={_("Save Changes")}
-          savingLabel={_("Saving changes...")}
-          saveIcon="far fa-edit"
-          projectName={data.name}
-          projectDescr={data.description}
-          saveAction={this.updateProject}
-          deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
-        />
+        
+        {canEdit ? 
+            <EditProjectDialog 
+            ref={(domNode) => { this.editProjectDialog = domNode; }}
+            title={_("Edit Project")}
+            saveLabel={_("Save Changes")}
+            savingLabel={_("Saving changes...")}
+            saveIcon="far fa-edit"
+            showDuplicate={true}
+            onDuplicated={this.props.onProjectDuplicated}
+            projectName={data.name}
+            projectDescr={data.description}
+            projectId={data.id}
+            saveAction={this.updateProject}
+            showPermissions={this.hasPermission("change")}
+            deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
+            />
+        : ""}
 
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
@@ -530,9 +546,11 @@ class ProjectListItem extends React.Component {
               </span>
               : ""}
 
-            <i className='far fa-edit'>
-            </i> <a href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
-            </a>
+            {canEdit ? 
+                [<i key="edit-icon" className='far fa-edit'>
+                </i>,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
+                </a>]
+            : ""}
           </div>
         </div>
         <i className="drag-drop-icon fa fa-inbox"></i>
@@ -570,6 +588,8 @@ class ProjectListItem extends React.Component {
                 ref={this.setRef("taskList")} 
                 source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
                 onDelete={this.taskDeleted}
+                onTaskMoved={this.taskMoved}
+                hasPermission={this.hasPermission}
                 history={this.props.history}
             /> : ""}
 

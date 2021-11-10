@@ -19,6 +19,10 @@ algos = {
         'expr': '((N + G) - (2 * B)) / ((N + G) + (2 * B))',
         'help': _('Enhanced Normalized Difference Vegetation Index is like NDVI, but uses Blue and Green bands instead of only Red to isolate plant health.')
     },
+    'vNDVI':{
+        'expr': '0.5268*((R ** -0.1294) * (G ** 0.3389) * (B ** -0.3118))',
+        'help': _('Visible NDVI is an un-normalized index for RGB sensors using constants derived from citrus, grape, and sugarcane crop data.')
+    },
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
         'help': _('Visual Atmospheric Resistance Index shows the areas of vegetation.'),
@@ -26,7 +30,11 @@ algos = {
     },
     'EXG': {
         'expr': '(2 * G) - (R + B)',
-        'help': _('Excess Green Index emphasizes the greenness of leafy crops such as potatoes.',)
+        'help': _('Excess Green Index (derived from only the RGB bands) emphasizes the greenness of leafy crops such as potatoes.')
+    },
+    'TGI': {
+        'expr': '(G - 0.39) * (R - 0.61) * B',
+        'help': _('Triangular Greenness Index (derived from only the RGB bands) performs similarly to EXG but with improvements over certain environments.')
     },
     'BAI': {
         'expr': '1.0 / (((0.1 - R) ** 2) + ((0.06 - N) ** 2))',
@@ -100,6 +108,7 @@ camera_filters = [
     'NRB',
 
     'RGBN',
+    'GRReN',
 
     'BGRNRe',
     'BGRReN',

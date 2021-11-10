@@ -1,0 +1,13 @@
+{
+	"name": "Short Links",
+	"webodmMinVersion": "1.9.3",
+	"description": "Create short links when sharing task URLs",
+	"version": "1.0.0",
+	"author": "Piero Toffanin",
+	"email": "pt@uav4geo.com",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["short", "links"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

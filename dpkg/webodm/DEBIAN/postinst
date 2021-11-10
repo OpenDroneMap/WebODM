@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+set -euxo
+
+export WEBODM_VERSION=1.9.7
+export WEBODM_USER=odm
+export WEBODM_USER_HOME="/home/${WEBODM_USER}"
+export WEBODM_DIR=/opt/WebODM
+export WEBODM_VENV_DIR="${WEBODM_DIR}/python3-venv"
+
+function abortRemove() {
+    echo "Unable to remove webodm."
+}
+
+function configure() {
+    detectGPUs
+    createGroup
+    createUser
+    createVenv
+    setFilePermissions
+    upgradePythonPip
+    installPythonDockerCompose
+    enableService
+    startService
+}
+
+function createGroup() {
+    if [ "${GPU_INTEL}" = true ]; then
+        if ! grep -q "^render:" /etc/group; then
+            groupadd render
+        fi
+    fi
+}
+
+function createUser() {
+    if ! grep -q "^${WEBODM_USER}:" /etc/passwd; then
+        if [ "${GPU_INTEL}" = true ]; then
+            useradd -m -d "${WEBODM_USER_HOME}" -s /bin/bash -G docker,video,render "${WEBODM_USER}"
+        else
+            useradd -m -d "${WEBODM_USER_HOME}" -s /bin/bash -G docker "${WEBODM_USER}"
+        fi
+
+        chown "${WEBODM_USER}":"${WEBODM_USER}" "${WEBODM_USER_HOME}"
+    fi
+
+    PROFILE_PATH="/home/odm/.profile"
+    if [ ! -f "${PROFILE_PATH}" ]; then
+        touch "${PROFILE_PATH}"
+        chmod odm:odm "${PROFILE_PATH}"
+    fi
+
+    if ! grep -q "PATH.*home\/odm\/\.local\/bin" "${PROFILE_PATH}"; then
+        echo "export PATH=\"/home/odm/.local/bin:${PATH}\"" >> "${PROFILE_PATH}"
+    fi
+}
+
+function createVenv() {
+    if [ ! -d "${WEBODM_VENV_DIR}" ]; then
+        mkdir "${WEBODM_VENV_DIR}"
+        python3 -m venv "${WEBODM_VENV_DIR}"
+    fi
+}
+
+function detectGPUs() {
+    source "${WEBODM_DIR}/detect_gpus.sh"
+}
+
+function enableService() {
+    systemctl enable "${WEBODM_DIR}/service/webodm-docker.service"
+}
+
+function installPythonDockerCompose() {
+    su "${WEBODM_USER}" -c "python3 -m pip install --upgrade docker-compose"
+}
+
+function setFilePermissions() {
+    chown -R "${WEBODM_USER}:${WEBODM_USER}" "${WEBODM_DIR}"
+}
+
+function startService() {
+    systemctl daemon-reload
+    systemctl restart webodm-docker.service
+}
+
+function upgradePythonPip() {
+    su "${WEBODM_USER}" -c "python3 -m pip install --upgrade pip"
+}
+
+case $1 in
+    abort-remove)
+        abortRemove
+        ;;
+    configure)
+        configure
+        ;;
+    default)
+        exit 1
+        ;;
+esac
+

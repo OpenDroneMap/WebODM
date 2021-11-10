@@ -9,7 +9,9 @@ class TaskList extends React.Component {
   static propTypes = {
       history: PropTypes.object.isRequired,
       source: PropTypes.string.isRequired, // URL where to load task list
-      onDelete: PropTypes.func
+      onDelete: PropTypes.func,
+      onTaskMoved: PropTypes.func,
+      hasPermission: PropTypes.func.isRequired
   }
 
   constructor(props){
@@ -69,6 +71,11 @@ class TaskList extends React.Component {
     if (this.props.onDelete) this.props.onDelete(id);
   }
 
+  moveTask = (task) => {
+    this.refresh();
+    if (this.props.onTaskMoved) this.props.onTaskMoved(task);
+  }
+
   render() {
     let message = "";
     if (this.state.loading){
@@ -76,7 +83,7 @@ class TaskList extends React.Component {
     }else if (this.state.error){
       message = (<span>{interpolate(_("Error: %(error)s"), {error: this.state.error})} <a href="javascript:void(0);" onClick={this.retry}>{_("Try again")}</a></span>);
     }else if (this.state.tasks.length === 0){
-      message = (<span>{_("This project has no tasks. Create one by uploading some images!")}</span>);
+      message = (<span></span>);
     }
 
     return (
@@ -88,7 +95,10 @@ class TaskList extends React.Component {
             data={task} 
             key={task.id} 
             refreshInterval={3000} 
-            onDelete={this.deleteTask} 
+            onDelete={this.deleteTask}
+            onMove={this.moveTask}
+            onDuplicate={this.refresh}
+            hasPermission={this.props.hasPermission}
             history={this.props.history} />
         ))}
       </div>

@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         model  = User
         fields = '__all__' 
 
-class UserViewSet(viewsets.ModelViewSet):
+class AdminUserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
 
@@ -34,7 +34,7 @@ class GroupSerializer(serializers.ModelSerializer):
         model  = Group
         fields = '__all__'
 
-class GroupViewSet(viewsets.ModelViewSet):
+class AdminGroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [IsAdminUser]
 

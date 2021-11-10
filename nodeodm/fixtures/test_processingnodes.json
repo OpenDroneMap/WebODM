@@ -29,7 +29,7 @@
       "available_options": {},
       "hostname": "localhost",
       "last_refreshed": null,
-      "port": 11224,
+      "port": 11223,
       "queue_count": 0,
       "token": "test_token"
     },

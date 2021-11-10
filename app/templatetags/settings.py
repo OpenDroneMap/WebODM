@@ -12,6 +12,10 @@ def is_single_user_mode():
     return settings.SINGLE_USER_MODE
 
 @register.simple_tag
+def is_desktop_mode():
+    return settings.DESKTOP_MODE
+
+@register.simple_tag
 def is_dev_mode():
     return settings.DEV
 

@@ -1,0 +1,16 @@
+Package: WebODM
+Version: 1.9.7-1
+Section: base
+Priority: optional
+Architecture: all
+Depends: docker.io | docker-ce,
+  ocl-icd-libopencl1,
+  clinfo,
+  python3,
+  python3-pip,
+  python3-venv,
+  screen
+Maintainer: Branton Davis <branton@airmap.com>
+Description: WebODM
+ When you need some sunshine, just run this
+ small program!

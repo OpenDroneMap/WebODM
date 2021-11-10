@@ -68,6 +68,10 @@
         bottom: 12px;
         right: 6px;
 
+        &.modal-open{
+            z-index: 999999;
+        }
+
         .switchModeButton{
             position: initial;
         }
@@ -82,7 +86,6 @@
             margin-right: 8px;
         }
     }
-    
 
     /* Potree specific */
     #potree_map{

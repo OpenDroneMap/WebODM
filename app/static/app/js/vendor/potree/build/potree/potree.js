@@ -56837,7 +56837,7 @@
 				this.projection = info.srs.authority + ':' + info.srs.horizontal;
 			}
 
-			if (info.srs.wkt) {
+			if (info.srs && info.srs.wkt) {
 				if (!this.projection) this.projection = info.srs.wkt;
 				else this.fallbackProjection = info.srs.wkt;
 			}
@@ -68504,13 +68504,13 @@ void main() {
 				if (cancel.removeLastMarker) {
 					measure.removeMarker(measure.points.length - 1);
 				}
-				domElement.removeEventListener('mouseup', insertionCallback, true);
+				domElement.removeEventListener('mouseup', insertionCallback, false);
 				this.viewer.removeEventListener('cancel_insertions', cancel.callback);
 			};
 
 			if (measure.maxMarkers > 1) {
 				this.viewer.addEventListener('cancel_insertions', cancel.callback);
-				domElement.addEventListener('mouseup', insertionCallback, true);
+				domElement.addEventListener('mouseup', insertionCallback, false);
 			}
 
 			measure.addMarker(new Vector3(0, 0, 0));
@@ -68895,12 +68895,12 @@ void main() {
 
 			cancel.callback = e => {
 				profile.removeMarker(profile.points.length - 1);
-				domElement.removeEventListener('mouseup', insertionCallback, true);
+				domElement.removeEventListener('mouseup', insertionCallback, false);
 				this.viewer.removeEventListener('cancel_insertions', cancel.callback);
 			};
 
 			this.viewer.addEventListener('cancel_insertions', cancel.callback);
-			domElement.addEventListener('mouseup', insertionCallback, true);
+			domElement.addEventListener('mouseup', insertionCallback, false);
 
 			profile.addMarker(new Vector3(0, 0, 0));
 			this.viewer.inputHandler.startDragging(
@@ -79291,6 +79291,7 @@ ENDSEC
 				'[title]tt.remove_all_measurement',
 				() => {
 					this.viewer.scene.removeAllMeasurements();
+					this.viewer.scene.annotations.removeAllChildren();
 				}
 			));
 

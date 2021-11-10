@@ -1,0 +1,59 @@
+.gcp-popup{
+    div{
+        margin-top: 8px;
+    }
+
+    div.title{
+        margin-top: 0;
+        font-weight: bold;
+        max-width: 300px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .image-container{
+        position: relative;
+        .spinner{
+            position: absolute;
+            left: 4px;
+            min-height: 32px;
+        }
+    }
+
+    .zoom-buttons{
+        float: right; 
+    }
+
+    div.image{
+        overflow: hidden;
+        a{
+            cursor: zoom-in;
+        }
+        &.loading{
+            opacity: 0.2;
+        }
+        &.fullscreen{
+            &.loading{
+                opacity: 1;
+            }
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            i{
+                font-size: 200%;
+                position: absolute;
+                left: 50%;
+                top: 45%;
+            }
+            a{
+                cursor: zoom-out;
+            }
+            img{
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+    }   
+}

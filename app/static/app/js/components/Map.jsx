@@ -13,6 +13,7 @@ import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 import ImagePopup from './ImagePopup';
+import GCPPopup from './GCPPopup';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
@@ -32,14 +33,16 @@ class Map extends React.Component {
   static defaultProps = {
     showBackground: false,
     mapType: "orthophoto",
-    public: false
+    public: false,
+    shareButtons: true
   };
 
   static propTypes = {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
-    public: PropTypes.bool
+    public: PropTypes.bool,
+    shareButtons: PropTypes.bool
   };
 
   constructor(props) {
@@ -123,7 +126,7 @@ class Map extends React.Component {
         let metaUrl = url + "metadata";
 
         if (type == "plant") metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
-        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=6&color_map=jet";
+        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=6&color_map=viridis";
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
@@ -154,7 +157,7 @@ class Map extends React.Component {
                   bounds,
                   minZoom: 0,
                   maxZoom: maxzoom + 99,
-                  maxNativeZoom: maxzoom,
+                  maxNativeZoom: maxzoom - 1,
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
                   detectRetina: true
@@ -219,11 +222,6 @@ class Map extends React.Component {
 
             // Add camera shots layer if available
             if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
-                const cameraMarker = L.AwesomeMarkers.icon({
-                    icon: 'camera',
-                    markerColor: 'blue',
-                    prefix: 'fa'
-                });
 
                 const shotsLayer = new L.GeoJSON.AJAX(meta.task.camera_shots, {
                     style: function (feature) {
@@ -234,8 +232,12 @@ class Map extends React.Component {
                       }
                     },
                     pointToLayer: function (feature, latlng) {
-                      return L.marker(latlng, {
-                        icon: cameraMarker
+                      return new L.CircleMarker(latlng, {
+                        color: '#3498db',
+                        fillColor: '#3498db',
+                        fillOpacity: 0.9,
+                        radius: 10,
+                        weight: 1
                       });
                     },
                     onEachFeature: function (feature, layer) {
@@ -263,6 +265,55 @@ class Map extends React.Component {
                 }));
 
                 this.addedCameraShots = true;
+            }
+
+            // Add ground control points layer if available
+            if (meta.task && meta.task.ground_control_points && !this.addedGroundControlPoints){
+                const gcpMarker = L.AwesomeMarkers.icon({
+                    icon: 'dot-circle',
+                    markerColor: 'blue',
+                    prefix: 'fa'
+                });
+
+                const gcpLayer = new L.GeoJSON.AJAX(meta.task.ground_control_points, {
+                    style: function (feature) {
+                      return {
+                        opacity: 1,
+                        fillOpacity: 0.7,
+                        color: "#000000"
+                      }
+                    },
+                    pointToLayer: function (feature, latlng) {
+                      return new L.marker(latlng, {
+                        icon: gcpMarker
+                      });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties && feature.properties.observations) {
+                            // TODO!
+                            let root = null;
+                            const lazyrender = () => {
+                                if (!root) root = document.createElement("div");
+                                ReactDOM.render(<GCPPopup task={meta.task} feature={feature}/>, root);
+                                return root;
+                            }
+
+                            layer.bindPopup(L.popup(
+                                {
+                                    lazyrender,
+                                    maxHeight: 450,
+                                    minWidth: 320
+                                }));
+                        }
+                    }
+                });
+                gcpLayer[Symbol.for("meta")] = {name: name + " " + _("(GCPs)"), icon: "far fa-dot-circle fa-fw"};
+
+                this.setState(update(this.state, {
+                    overlays: {$push: [gcpLayer]}
+                }));
+
+                this.addedGroundControlPoints = true;
             }
 
             done();
@@ -536,7 +587,7 @@ _('Example:'),
 
         <div className="actionButtons">
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
-          {(!this.props.public && this.state.singleTask !== null) ? 
+          {(this.props.shareButtons && !this.props.public && this.state.singleTask !== null) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
               task={this.state.singleTask} 

@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import importlib
 import subprocess
@@ -20,11 +21,23 @@ from app.security import path_traversal_check
 
 logger = logging.getLogger('app.logger')
 
+# Add additional python path to discover plugins
+if not settings.MEDIA_ROOT in sys.path:
+    sys.path.append(settings.MEDIA_ROOT)
+
 def init_plugins():
     # Make sure app/media/plugins exists
     if not os.path.exists(get_plugins_persistent_path()):
         os.mkdir(get_plugins_persistent_path())
 
+    # Make sure app/media/plugins is importable as a module
+    if not os.path.isfile(os.path.join(get_plugins_persistent_path(), "__init__.py")):
+        try:
+            with open(os.path.join(get_plugins_persistent_path(), "__init__.py"), 'w') as f:
+                f.write("\n")
+        except Exception as e:
+            logger.warning("Cannot create __init__.py: %s" % str(e))
+    
     build_plugins()
     sync_plugin_db()
     register_plugins()
@@ -110,7 +123,7 @@ def build_plugins():
 
         # Check for webpack.config.js (if we need to build it)
         if plugin.path_exists("public/webpack.config.js"):
-            if settings.DEV and webpack_watch_process_count() <= 2:
+            if settings.DEV and webpack_watch_process_count() <= 2 and settings.DEV_WATCH_PLUGINS:
                 logger.info("Running webpack with watcher for {}".format(plugin.get_name()))
                 subprocess.Popen(['webpack-cli', '--watch'], cwd=plugin.get_path("public"))
             elif not plugin.path_exists("public/build"):
@@ -194,11 +207,11 @@ def get_plugins():
                     if settings.TESTING:
                         module = importlib.import_module("app.media_test.plugins.{}".format(dir))
                     else:
-                        module = importlib.import_module("app.media.plugins.{}".format(dir))
+                        module = importlib.import_module("plugins.{}".format(dir))
 
                     plugin = (getattr(module, "Plugin"))()
                 except (ImportError, AttributeError):
-                    module = importlib.import_module("plugins.{}".format(dir))
+                    module = importlib.import_module("coreplugins.{}".format(dir))
                     plugin = (getattr(module, "Plugin"))()
 
                 # Check version
@@ -284,7 +297,7 @@ def get_plugins_paths():
     current_path = os.path.dirname(os.path.realpath(__file__))
     return [
         os.path.abspath(get_plugins_persistent_path()),
-        os.path.abspath(os.path.join(current_path, "..", "..", "plugins")),
+        os.path.abspath(os.path.join(current_path, "..", "..", "coreplugins")),
     ]
 
 def get_plugins_persistent_path(*paths):
@@ -312,9 +325,12 @@ def enable_plugin(plugin_name):
     p = get_plugin_by_name(plugin_name, only_active=False)
     p.register()
     Plugin.objects.get(pk=plugin_name).enable()
+    return p
 
 def disable_plugin(plugin_name):
+    p = get_plugin_by_name(plugin_name, only_active=False)
     Plugin.objects.get(pk=plugin_name).disable()
+    return p
 
 def delete_plugin(plugin_name):
     Plugin.objects.get(pk=plugin_name).delete()
