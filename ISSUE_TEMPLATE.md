@@ -10,6 +10,9 @@ If so, do not open an issue. We already know about it and steps to solve it are 
 
 Every issue needs to follow the format specified below. Do not remove the questions, simply answer each question by typing below it. If you don't know how to answer a question, write so. Questions that don't follow these guidelines will be automatically closed by our friendly IssueBot (who's not very smart and needs to see a particular format to keep an issue open).
 ****************************************
+### How did you install WebODM (docker, installer, etc.)?
+
+[Type answer here]
 
 ### What's your browser and operating system? (Copy/paste the output of https://www.whatismybrowser.com/)
 
@@ -19,10 +22,6 @@ Every issue needs to follow the format specified below. Do not remove the questi
 
 [Type answer here]
 
-### What should be the expected behavior?
-
-[Type answer here]
-
-### How can we reproduce this? (What steps did you do to trigger the problem? What parameters are you using for processing? Please include multiple screenshots of the problem! If possible please include a copy of your dataset uploaded on Google Drive or Dropbox. Be detailed)
+### How can we reproduce this? (What steps trigger the problem? What parameters are you using for processing? Include screenshots. If you are having issues processing a dataset, you must include a copy of your dataset uploaded on Dropbox, Google Drive or https://dronedb.app)
 
 [Type answer here]
