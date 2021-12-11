@@ -179,7 +179,7 @@ docker run --rm --volume webodm_dbdata:/temp --volume `pwd`/backup:/backup ubunt
 docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubuntu bash -c "rm -fr /temp/* && tar xvf /backup/appmedia.tar"
 ./webodm.sh start
 ```
-
+In case when recovery .tar is missed, or corrupted you can conduct [Hard Recovery](/contrib/Hard_Recovery_Guide.md)
 ### Reset Password
 
 If you forgot the password you picked the first time you logged into WebODM, to reset it just type:
