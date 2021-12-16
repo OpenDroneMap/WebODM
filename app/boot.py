@@ -143,7 +143,6 @@ def add_default_presets():
                                                               {'name': 'fast-orthophoto', 'value': True}]})
         Preset.objects.update_or_create(name='High Resolution', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
-                                                              {'name': 'ignore-gsd', 'value': True},
                                                               {'name': 'dsm', 'value': True},
                                                               {'name': 'pc-quality', 'value': 'high'},
                                                               {'name': 'dem-resolution', 'value': "2.0"},
