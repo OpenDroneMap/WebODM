@@ -1,0 +1,31 @@
+{% extends "app/plugins/templates/base.html" %}
+{% load bootstrap_extras %}
+{% block content %}
+<h3>Welcome to Cloud Import!</h3>
+<h5><strong>Instructions</strong></h5>
+On this screen, you will be able to configure everything that is necessary for your different platforms.<BR/>
+You might need to set up a server URL, an authentication token or something else. If so, this is the place!
+<BR/>
+<BR/>
+<h3>Platforms</h3>
+<form action="" method="post" class="oam-form">
+	{% csrf_token %}
+  {% regroup form by field.group as field_groups %}
+  {% for field_group in field_groups %}
+    <h4><strong>{{field_group.grouper}}</strong></h4>
+    {% for field in field_group.list %}
+		<div class="form-group {% if field.errors %}has-error{% endif %}">
+				<label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+				{{ field|with_class:'form-control' }}
+				{% if field.errors %}
+						<span class='text-danger'>{{ field.errors|join:'<br />' }}</span>
+				{% elif field.help_text %}
+						<span class="help-block ">{{ field.help_text }}</span>
+				{% endif %}
+		</div>
+    {% endfor %}
+  {% endfor %}
+	
+	<button type="submit" class="btn btn-primary"><i class="fa fa-save fa-fw"></i> Save Configuration</button>
+</form>
+{% endblock %}
