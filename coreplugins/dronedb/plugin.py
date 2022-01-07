@@ -1,4 +1,5 @@
 from app.plugins import PluginBase, Menu, MountPoint, logger
+from coreplugins.dronedb.app_views import LoadButtonsView
 
 from .api_views import ImportDatasetTaskView, CheckUrlTaskView
 #from .app_views import HomeView, LoadButtonsView
@@ -37,8 +38,8 @@ class Plugin(PluginBase):
         return [
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/import", ImportDatasetTaskView.as_view()),
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/checkforurl", CheckUrlTaskView.as_view()),
-            MountPoint("platforms/(?P<platform_name>[^/.]+)/verify", PlatformsVerifyTaskView.as_view()),
-            MountPoint("platforms", PlatformsTaskView.as_view()),
+            #MountPoint("platforms/(?P<platform_name>[^/.]+)/verify", PlatformsVerifyTaskView.as_view()),
+            #MountPoint("platforms", PlatformsTaskView.as_view()),
         ] 
 
     def HomeView(self):

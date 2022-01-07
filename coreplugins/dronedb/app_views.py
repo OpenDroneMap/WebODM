@@ -10,16 +10,16 @@ from app.plugins import logger
 
 #from .platform_helper import get_all_extended_platforms
 
-# def LoadButtonsView(plugin):
-#     def view(request):
+def LoadButtonsView(plugin):
+    def view(request):
 
-#         return render(
-#             request,
-#             plugin.template_path("load_buttons.js"),
-#             {
-#                 "api_url": "/api" + plugin.public_url("").rstrip("/"),
-#             },
-#             content_type="text/javascript",
-#         )
+        return render(
+            request,
+            plugin.template_path("load_buttons.js"),
+            {
+                "api_url": "/api" + plugin.public_url("").rstrip("/"),
+            },
+            content_type="text/javascript",
+        )
 
-#     return view
+    return view

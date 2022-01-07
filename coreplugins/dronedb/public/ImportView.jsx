@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 
 import ResizeModes from 'webodm/classes/ResizeModes';
 
-import PlatformSelectButton from "./components/PlatformSelectButton";
 import PlatformDialog from "./components/PlatformDialog";
 import LibraryDialog from "./components/LibraryDialog";
 import ErrorDialog from "./components/ErrorDialog";
 import ConfigureNewTaskDialog from "./components/ConfigureNewTaskDialog";
+
+import "./ImportView.scss";
 
 export default class TaskView extends Component {
 	static propTypes = {
@@ -18,24 +19,27 @@ export default class TaskView extends Component {
 	
 	state = {
 		error: "",
-		currentPlatform: null,
-		selectedFolder: null,
-		platforms: [],
+		ddbUrl: "",
+		selectedFolder: "",
 	};
 	
 	componentDidMount() {
-		$.getJSON(`${this.props.apiURL}/platforms/`)
+
+		// We should check if username and password were set in the DroneDB config
+
+		/*$.getJSON(`${this.props.apiURL}/platforms/`)
 				.done(data => {
 					this.setState({platforms: data.platforms});
 				})
 				.fail(() => {
 					this.onErrorInDialog("Failed to find available platforms")
 				})
+				*/
 	}
 
-	onSelectPlatform = platform => this.setState({ currentPlatform: platform });
+	//onSelectPlatform = platform => this.setState({ currentPlatform: platform });
 	onSelectFolder = folder => this.setState({ selectedFolder: folder });
-	onHideDialog = () => this.setState({ currentPlatform: null, selectedFolder: null, taskId: null });
+	onHideDialog = () => this.setState({ ddbUrl: null, taskId: null });
 
 	onSaveTask = taskInfo => {
 		// Create task
@@ -47,8 +51,8 @@ export default class TaskView extends Component {
 				partial: true
 		};
 
-		if (taskInfo.resizeMode === ResizeModes.YES){
-				formData.resize_to = taskInfo.resizeSize;
+		if (taskInfo.resizeMode === ResizeModes.YES) {
+			formData.resize_to = taskInfo.resizeSize;
 		}
 
 		$.ajax({
@@ -61,7 +65,7 @@ export default class TaskView extends Component {
 				$.ajax({
 						url: `${this.props.apiURL}/projects/${this.props.projectId}/tasks/${task.id}/import`,
 						contentType: 'application/json',
-						data: JSON.stringify({platform: this.state.currentPlatform.name, selectedFolderUrl: this.state.selectedFolder.url}),
+						data: JSON.stringify({ddb_url: this.state.ddbUrl}),
 						dataType: 'json',
 						type: 'POST'
 					}).done(() => {
@@ -82,33 +86,32 @@ export default class TaskView extends Component {
 
 	render() {
 		const {
-			currentPlatform,
 			error,
-			selectedFolder,
-			platforms,
+			ddbUrl,
 		} = this.state;
 		return (
 			<Fragment>
-			{error ?
-				<ErrorDialog errorMessage={error} />
-			: ""}
-				<PlatformSelectButton
-					platforms={platforms}
-					onSelect={this.onSelectPlatform}
-				/>
+				{error ? <ErrorDialog errorMessage={error} /> : ""}				
+				<Button
+					id={"dronedbButton"}
+					bsStyle={"default"}
+					bsSize={"small"}
+					className={"platform-btn"}
+					onClick={this.handleClick}>
+						<i className={"fas fa-cloud"} />
+						DroneDB
+				</Button>
 				{selectedFolder === null ?
 					<Fragment>
 						<PlatformDialog
 							show={selectedFolder === null}
-							platform={currentPlatform}
 							apiURL={this.props.apiURL}
 							onHide={this.onHideDialog}
 							onSubmit={this.onSelectFolder}
 						/>
 						<LibraryDialog
 						  show={selectedFolder === null}
-						  platform={currentPlatform}
-							apiURL={this.props.apiURL}
+						  apiURL={this.props.apiURL}
 						  onHide={this.onHideDialog}
 						  onSubmit={this.onSelectFolder}
 						/>
@@ -116,8 +119,7 @@ export default class TaskView extends Component {
 				: 
 					<ConfigureNewTaskDialog
 					  show={selectedFolder !== null}
-						folder={selectedFolder}
-					  platform={currentPlatform}
+					  folder={selectedFolder}
 					  onHide={this.onHideDialog}
 					  onSaveTask={this.onSaveTask}
 					/>

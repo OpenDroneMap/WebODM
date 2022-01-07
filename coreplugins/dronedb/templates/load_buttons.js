@@ -1,5 +1,5 @@
 PluginsAPI.Dashboard.addNewTaskButton(
-	["cloudimport/build/ImportView.js"],
+	["dronedb/build/ImportView.js"],
 	function(args, ImportView) {
         return React.createElement(ImportView, {
                 onNewTaskAdded: args.onNewTaskAdded,
@@ -10,7 +10,7 @@ PluginsAPI.Dashboard.addNewTaskButton(
 );
 
 PluginsAPI.Dashboard.addTaskActionButton(
-    ["cloudimport/build/TaskView.js", "cloudimport/build/TaskView.css"],
+    ["dronedb/build/TaskView.js", "dronedb/build/TaskView.css"],
 	function(args, TaskView) {
 		var reactElement;
 		$.ajax({
