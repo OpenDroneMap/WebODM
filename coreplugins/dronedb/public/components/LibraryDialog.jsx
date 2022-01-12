@@ -28,7 +28,7 @@ export default class LibraryDialog extends Component {
 	
 	componentDidUpdate(){
     if (this.props.platform !== null && this.props.platform.type == "library" && this.state.loadingFolders){
-	    $.get(`${this.props.apiURL}/cloudlibrary/${this.props.platform.name}/listfolders`)
+	    $.get(`${this.props.apiURL}/dronedb/${this.props.platform.name}/listfolders`)
 	    .done(result => {
 	      result.folders.forEach(album => {
 	        album.label = `${album.name} (${album.images_count} images)`;

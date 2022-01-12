@@ -2,6 +2,8 @@ import importlib
 import requests
 import os
 from os import path
+
+from requests.structures import CaseInsensitiveDict
 from coreplugins.dronedb.ddb import DroneDB
 from app import models, pending_actions
 from app.plugins.views import TaskView
@@ -53,7 +55,7 @@ class ImportDatasetTaskView(TaskView):
         get_current_plugin().get_global_data_store().set_string(combined_id, ddb_url)
 
         # Start importing the files in the background
-        serialized = {token: ddb.token, files: [file.serialize() for file in files]}
+        serialized = {'token': ddb.token, 'files': [file.serialize() for file in files]}
         run_function_async(import_files, task.id, serialized)
 
         return Response({}, status=status.HTTP_200_OK)
@@ -101,14 +103,21 @@ class CheckUrlTaskView(TaskView):
 # #         return Response({'platforms': [platform.serialize(user = request.user) for platform in platforms]}, status=status.HTTP_200_OK)
 
 
-def import_files(task_id, files):
+def import_files(task_id, carrier):
     import requests
     from app import models
     from app.plugins import logger
 
+    files = carrier.files
+    
+    headers = CaseInsensitiveDict()
+
+    if carrier.token != None:
+        headers['Authorization'] = 'Token ' + carrier['token']
+
     def download_file(task, file):
         path = task.task_path(file['name'])
-        download_stream = requests.get(file['url'], stream=True, timeout=60)
+        download_stream = requests.get(file['url'], stream=True, timeout=60, headers=headers)
 
         with open(path, 'wb') as fd:
             for chunk in download_stream.iter_content(4096):
