@@ -2,17 +2,19 @@ import PropTypes from 'prop-types';
 import { Component } from "react";
 import { Modal, Button } from "react-bootstrap";
 import Select from 'react-select';
-import "./LibraryDialog.scss";
+import "./SelectUrlDialog.scss";
 
-export default class LibraryDialog extends Component {
+export default class SelectUrlDialog extends Component {
 	static defaultProps = {
 		platform: null,
+		show: false
 	};
 	static propTypes = {
 		onHide: PropTypes.func.isRequired,
 		onSubmit: PropTypes.func.isRequired,
 		platform: PropTypes.object,
 		apiURL: PropTypes.string.isRequired,
+		show: PropTypes.bool.isRequired
   }
 
   constructor(props){
@@ -25,7 +27,7 @@ export default class LibraryDialog extends Component {
 				error: "",
     };
   }
-	
+	/*
 	componentDidUpdate(){
     if (this.props.platform !== null && this.props.platform.type == "library" && this.state.loadingFolders){
 	    $.get(`${this.props.apiURL}/dronedb/${this.props.platform.name}/listfolders`)
@@ -44,7 +46,7 @@ export default class LibraryDialog extends Component {
 			});
     }
   }
-	
+	*/
 	handleSelectFolder = (e) => this.setState({selectedFolder: e});
 	handleSubmit = e => this.props.onSubmit(this.state.selectedFolder);
 	
@@ -52,12 +54,13 @@ export default class LibraryDialog extends Component {
 		const {
 			onHide,
 			platform,
+			show
 		} = this.props;
 
 		const title = "Import from " + (platform !== null ? platform.name : "Platform");
-		const isVisible = platform !== null && platform.type === "library";
+		//const isVisible = true;
 		return (
-			<Modal className={"folder-select"} onHide={onHide} show={isVisible}>
+			<Modal className={"folder-select"} onHide={onHide} show={show}>
 				<Modal.Header closeButton>
 					<Modal.Title>
 						{title}

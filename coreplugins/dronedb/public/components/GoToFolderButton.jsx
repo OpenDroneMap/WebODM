@@ -16,8 +16,7 @@ export default class GoToFolderButton extends Component {
 			<Button
 				bsStyle={"primary"}
 				bsSize={"small"}
-				onClick={this.handleClick}
-			>
+				onClick={this.handleClick}>
 				<i className={"fa fa-folder icon"} />
 				Go To Import Folder
 			</Button>

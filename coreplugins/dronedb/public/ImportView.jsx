@@ -2,44 +2,49 @@ import React, { Component, Fragment } from "react";
 import PropTypes from 'prop-types';
 
 import ResizeModes from 'webodm/classes/ResizeModes';
-
+import { Modal, Button } from "react-bootstrap";
 import PlatformDialog from "./components/PlatformDialog";
-import LibraryDialog from "./components/LibraryDialog";
+import SelectUrlDialog from "./components/SelectUrlDialog";
 import ErrorDialog from "./components/ErrorDialog";
 import ConfigureNewTaskDialog from "./components/ConfigureNewTaskDialog";
 
 import "./ImportView.scss";
 
 export default class TaskView extends Component {
-	static propTypes = {
+
+	/*
+ 	static propTypes = {
 		projectId: PropTypes.number.isRequired,
 		apiURL: PropTypes.string.isRequired,
 		onNewTaskAdded: PropTypes.func.isRequired,
-  }
+  	}*/
 	
 	state = {
 		error: "",
 		ddbUrl: "",
 		selectedFolder: "",
+		isDialogOpen: false
 	};
 	
 	componentDidMount() {
 
-		// We should check if username and password were set in the DroneDB config
-
-		/*$.getJSON(`${this.props.apiURL}/platforms/`)
+		/* $.getJSON(`${this.props.apiURL}/platforms/`)
 				.done(data => {
 					this.setState({platforms: data.platforms});
 				})
 				.fail(() => {
 					this.onErrorInDialog("Failed to find available platforms")
-				})
-				*/
+				}) */
+				
 	}
 
 	//onSelectPlatform = platform => this.setState({ currentPlatform: platform });
+
+	onHideDialog = () => this.setState({ ddbUrl: null, taskId: null, isDialogOpen: false });
+	onSelectFolder = url => this.setState({ ddbUrl: url });
+	/*
 	onSelectFolder = folder => this.setState({ selectedFolder: folder });
-	onHideDialog = () => this.setState({ ddbUrl: null, taskId: null });
+	
 
 	onSaveTask = taskInfo => {
 		// Create task
@@ -82,12 +87,17 @@ export default class TaskView extends Component {
 	onErrorInDialog = msg => {
 		this.setState({ error: msg });
 		this.onHideDialog();
-	};
+	};*/
+
+	handleClick = () => {
+		this.setState({ isDialogOpen: true });
+	}
 
 	render() {
 		const {
 			error,
 			ddbUrl,
+			isDialogOpen
 		} = this.state;
 		return (
 			<Fragment>
@@ -101,30 +111,13 @@ export default class TaskView extends Component {
 						<i className={"fas fa-cloud"} />
 						DroneDB
 				</Button>
-				{selectedFolder === null ?
-					<Fragment>
-						<PlatformDialog
-							show={selectedFolder === null}
-							apiURL={this.props.apiURL}
-							onHide={this.onHideDialog}
-							onSubmit={this.onSelectFolder}
-						/>
-						<LibraryDialog
-						  show={selectedFolder === null}
-						  apiURL={this.props.apiURL}
+				<SelectUrlDialog
+						  show={isDialogOpen}						  
 						  onHide={this.onHideDialog}
 						  onSubmit={this.onSelectFolder}
 						/>
-					</Fragment>
-				: 
-					<ConfigureNewTaskDialog
-					  show={selectedFolder !== null}
-					  folder={selectedFolder}
-					  onHide={this.onHideDialog}
-					  onSaveTask={this.onSaveTask}
-					/>
-				}
-			</Fragment>
+			</Fragment>		
+					
 		);
 	}
 }

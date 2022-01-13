@@ -2,8 +2,7 @@ from app.plugins import PluginBase, Menu, MountPoint, logger
 from coreplugins.dronedb.app_views import LoadButtonsView
 
 from .api_views import FoldersTaskView, ImportDatasetTaskView, CheckCredentialsTaskView, OrganizationsTaskView, DatasetsTaskView, VerifyUrlTaskView
-#from .app_views import HomeView, LoadButtonsView
-#from .platform_helper import get_all_extended_platforms
+
 from django.contrib import messages
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
