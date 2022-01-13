@@ -8,7 +8,7 @@ from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
 from app.plugins import get_current_plugin
-from coreplugins.dronedb.ddb import DroneDB
+from coreplugins.dronedb.ddb import DroneDB, verify_url
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -71,9 +71,117 @@ class CheckCredentialsTaskView(TaskView):
         if hub_url == None or username == None or password == None:
             return Response({'error': 'All fields must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        ddb = DroneDB(hub_url, username, password)
+        try:
 
-        return Response({'success': ddb.login()}, status=status.HTTP_200_OK)        
+            ddb = DroneDB(hub_url, username, password)
+
+            return Response({'success': ddb.login()}, status=status.HTTP_200_OK)      
+
+        except(Exception) as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class OrganizationsTaskView(TaskView):
+    def get(self, request):
+
+        datastore = get_current_plugin().get_user_data_store(request.user)
+        
+        registry_url = datastore.get_string('registry_url')
+        username = datastore.get_string('username')
+        password = datastore.get_string('password')
+
+        if registry_url == None or username == None or password == None:
+            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+
+            ddb = DroneDB(registry_url, username, password)
+
+            orgs = ddb.get_organizations()
+
+            return Response(orgs, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DatasetsTaskView(TaskView):
+    def get(self, request, org=None):
+
+        if org == None:
+            return Response({'error': 'Organization must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        datastore = get_current_plugin().get_user_data_store(request.user)
+        
+        registry_url = datastore.get_string('registry_url')
+        username = datastore.get_string('username')
+        password = datastore.get_string('password')
+
+        if registry_url == None or username == None or password == None:
+            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+
+            ddb = DroneDB(registry_url, username, password)
+
+            dss = ddb.get_datasets(org)
+
+            return Response(dss, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class FoldersTaskView(TaskView):
+    def get(self, request, org=None, ds=None):
+
+        if org == None or ds == None:
+            return Response({'error': 'Organization and dataset must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        datastore = get_current_plugin().get_user_data_store(request.user)
+        
+        registry_url = datastore.get_string('registry_url')
+        username = datastore.get_string('username')
+        password = datastore.get_string('password')
+
+        if registry_url == None or username == None or password == None:
+            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+
+            ddb = DroneDB(registry_url, username, password)
+
+            folders = ddb.get_folders(org, ds)
+
+            return Response(folders, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class VerifyUrlTaskView(TaskView):
+    def post(self, request):
+
+        # Read form data
+        url = request.data.get('url', None)
+
+        if url == None:
+            return Response({'error': 'Url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        datastore = get_current_plugin().get_user_data_store(request.user)
+        
+        registry_url = datastore.get_string('registry_url')
+        username = datastore.get_string('username')
+        password = datastore.get_string('password')
+
+        if registry_url == None or username == None or password == None:
+            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+
+            res = verify_url(url, username, password)            
+
+            return Response({'count': res, 'success': True} if res else {'success': False}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # combined_id = "{}_{}".format(project_pk, pk)
         # folder_url = get_current_plugin().get_global_data_store().get_string(combined_id, default = None)

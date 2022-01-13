@@ -177,6 +177,7 @@ def parse_url(url):
     # 'test' folder of dataset:     ddb://localhost:5001/admin/4uyyyaxcbvahd7qb/test
     # using http instead of https:  ddb+unsafe://localhost:5001/admin/4uyyyaxcbvahd7qb
     # using hub url:                https://localhost:5001/r/admin/4uyyyaxcbvahd7qb
+    # using hub url without /r/     http://localhost:5000/admin/4uyyyaxcbvahd7qb/test
 
     p = urlparse(url)
     segments = p.path.split('/')
@@ -191,14 +192,12 @@ def parse_url(url):
 
     # used to skip the /r/: if ddb url we have no /r/ instead if http we have it
     if p.scheme == 'ddb':
-        scheme = 'https'
-        offset = 0
+        scheme = 'https'       
     elif p.scheme == 'ddb+unsafe':
-        scheme = 'http'
-        offset = 0
-    else:
-        offset = 1    
+        scheme = 'http' 
         
+    offset = 1 if segments[1] == 'r' else 0
+              
     if (len(segments) < offset + 3):
         raise ValueError("Invalid URL.")
 
