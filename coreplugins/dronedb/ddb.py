@@ -6,15 +6,6 @@ from urllib.parse import urlparse
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 
-class Logger:    
-    def info(self, text):
-        print(text)
-        
-    def error(self, text):
-        print(text)
-        
-logger = Logger()
-
 class DroneDB:
   
     def __init__(self, registry_url, username, password):
