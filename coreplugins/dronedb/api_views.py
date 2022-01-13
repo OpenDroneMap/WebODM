@@ -4,11 +4,11 @@ import os
 from os import path
 
 from requests.structures import CaseInsensitiveDict
-from coreplugins.dronedb.ddb import DroneDB
 from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
 from app.plugins import get_current_plugin
+from coreplugins.dronedb.ddb import DroneDB
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -18,8 +18,7 @@ from rest_framework import status
 
 class ImportDatasetTaskView(TaskView):
     def post(self, request, project_pk=None, pk=None):
-        task = self.get_and_check_task(request, pk)
-                
+                        
         # Read form data
         ddb_url = request.data.get('ddb_url', None)
         #platform_name = request.data.get('platform', None)
@@ -60,20 +59,39 @@ class ImportDatasetTaskView(TaskView):
 
         return Response({}, status=status.HTTP_200_OK)
 
-class CheckUrlTaskView(TaskView):
-    def get(self, request, project_pk=None, pk=None):
+class CheckCredentialsTaskView(TaskView):
+    def post(self, request):
 
-        # Assert that task exists
-        self.get_and_check_task(request, pk)
+        # Read form data
+        hub_url = request.data.get('hubUrl', None)
+        username = request.data.get('userName', None)
+        password = request.data.get('password', None)
 
-        # Check if there is an imported url associated with the project and task
-        combined_id = "{}_{}".format(project_pk, pk)
-        folder_url = get_current_plugin().get_global_data_store().get_string(combined_id, default = None)
+        # Make sure both values are set
+        if hub_url == None or username == None or password == None:
+            return Response({'error': 'All fields must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if folder_url == None:
-            return Response({}, status=status.HTTP_200_OK)
-        else:
-            return Response({'folder_url': folder_url}, status=status.HTTP_200_OK)
+        ddb = DroneDB(hub_url, username, password)
+
+        return Response({'success': ddb.login()}, status=status.HTTP_200_OK)        
+
+        # combined_id = "{}_{}".format(project_pk, pk)
+        # folder_url = get_current_plugin().get_global_data_store().get_string(combined_id, default = None)
+
+# class CheckUrlTaskView(TaskView):
+#     def get(self, request, project_pk=None, pk=None):
+
+#         # Assert that task exists
+#         self.get_and_check_task(request, pk)
+
+#         # Check if there is an imported url associated with the project and task
+#         combined_id = "{}_{}".format(project_pk, pk)
+#         folder_url = get_current_plugin().get_global_data_store().get_string(combined_id, default = None)
+
+#         if folder_url == None:
+#             return Response({}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({'folder_url': folder_url}, status=status.HTTP_200_OK)
 
 # class PlatformsVerifyTaskView(TaskView):
 #     def get(self, request, platform_name):
