@@ -33,8 +33,14 @@ export default class SelectUrlDialog extends Component {
 			selectedOrganization: null,
 			selectedDataset: null,
 			selectedFolder: null,
+			info: null,
+
+			// verifyStatus: null (not started), 'loading', 'success', 'error'
+			verifyStatus: null
 		};
 	}
+
+
 
 	// Format bytes to readable string
 	formatBytes(bytes, decimals=2) {
@@ -46,10 +52,8 @@ export default class SelectUrlDialog extends Component {
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 	}
 	
-
-	componentDidMount() {
-
-		$.get(`${this.props.apiURL}/organizations/`)
+	handleOnShow = () => {
+		$.get(`${this.props.apiURL}/organizations`)
 			.done(result => {
 				
 				var orgs = result.map(org => {
@@ -57,8 +61,12 @@ export default class SelectUrlDialog extends Component {
 				});
 
 				if (orgs.length > 0) {
-					this.setState({organizations: orgs, selectedOrganization: orgs[0], loadingOrganizations: false});
-					this.handleSelectOrganization(orgs[0]);
+					this.setState({organizations: orgs, loadingOrganizations: false});
+
+					// Search for user organization
+					var userOrg = orgs.find(org => org.value === this.state.info.username);
+
+					this.handleSelectOrganization(userOrg != null ? userOrg : orgs[0]);
 				} else 
 					this.setState({organizations: orgs, loadingOrganizations: false});
 			})
@@ -69,14 +77,46 @@ export default class SelectUrlDialog extends Component {
 				this.setState({loadingOrganizations: false});
 			});
 
+		$.get(`${this.props.apiURL}/info`)
+			.done(result => {
+				this.setState({info: result});
+			})
+			.fail((error) => {
+				this.setState({info: null});
+			});
 	}
+
+	handleVerify = () => {
+		//console.log("Verify");
+		this.setState({verifyStatus: 'loading'});
+
+		$.post(`${this.props.apiURL}/verifyurl`, { url: this.state.ddbUrl }).done(result => {
+			this.setState({verifyStatus: result != null && result.success ? 'success' : 'error'});
+		})
+		.fail((error) => {
+			this.setState({verifyStatus: 'error'});
+		});
+
+	}
+
 	
 	handleSelectOrganization = (e) => {
 
-		this.setState({loadingDatasets: true, selectedOrganization: e, selectedDataset: null, selectedFolder: null});
+		if (this.state.selectedOrganization !== null && e.value === this.state.selectedOrganization.value) return;
+
+		this.setState({
+			loadingDatasets: true, 
+			selectedOrganization: e, 
+			selectedDataset: null, 
+			selectedFolder: null,
+			verifyStatus: null,
+			datasets: [],
+			folders: []
+		});
+
 		console.log("Load datasets of", e);
 
-		$.get(`${this.props.apiURL}/organizations/${e.value}/datasets/`)
+		$.get(`${this.props.apiURL}/organizations/${e.value}/datasets`)
 			.done(result => {				
 				
 				var dss = result.map(ds => {
@@ -86,7 +126,7 @@ export default class SelectUrlDialog extends Component {
 				});
 
 				if (dss.length > 0) {
-					this.setState({datasets: dss, selectedDataset: dss[0], loadingDatasets: false});
+					this.setState({datasets: dss, loadingDatasets: false});
 					this.handleSelectDataset(dss[0]);
 				} else 
 					this.setState({datasets: dss, loadingDatasets: false});
@@ -102,21 +142,30 @@ export default class SelectUrlDialog extends Component {
 
 	handleSelectDataset = (e) => {
 
-		this.setState({selectedDataset: e, selectedFolder: null, loadingFolders: true});
+		if (this.state.selectedDataset !== null && e.value === this.state.selectedDataset.value) return;
+
+		this.setState({
+			selectedDataset: e, 
+			selectedFolder: null, 
+			loadingFolders: true,
+			verifyStatus: null,
+			folders: []
+		});
+
 		console.log("Load folders of", e);
 
-		$.get(`${this.props.apiURL}/organizations/${this.state.selectedOrganization.value}/datasets/${e.value}/folders/`)
+		$.get(`${this.props.apiURL}/organizations/${this.state.selectedOrganization.value}/datasets/${e.value}/folders`)
 			.done(result => {
 				
 				var folders = result.map(folder => {
-					return { label: folder, value: folder };
+					return { label: folder, value: '/' + folder };
 				});
 
 				folders.unshift({label: '/', value: '/'});
 				folders.sort();
 
 				if (folders.length > 0) {
-					this.setState({folders: folders, selectedFolder: folders[0], loadingFolders: false});
+					this.setState({folders: folders, loadingFolders: false});
 					this.handleSelectFolder(folders[0]);
 				} else 
 					this.setState({folders: folders, loadingFolders: false});
@@ -131,12 +180,28 @@ export default class SelectUrlDialog extends Component {
 	};
 
 	handleSelectFolder = e => {
-		console.log(e);
-		this.setState({selectedFolder: e});
+		
+		if (this.state.selectedFolder !== null && e.value === this.state.selectedFolder.value) return;
+
+		this.setState({selectedFolder: e, verifyStatus: null});
+		
+		if (this.state.info == null || this.state.info.hubUrl == null) {
+			console.log("Cannot generate hub url");
+			return;
+		}
+
+		var url = `${this.state.info.hubUrl}/${this.state.selectedOrganization.value}/${this.state.selectedDataset.value}${e.value}`
+			.replace('http://', 'ddb+unsafe://')
+			.replace('https://', 'ddb://');
+
+		console.log("Generated url:", url);
+
+		this.setState({ddbUrl: url});
+
 	}
 
 	handleChange = (e) => {
-		console.log("Change", e);
+		this.setState({ddbUrl: e.target.value, verifyStatus: null});
 	};
 
 	handleSubmit = e => {
@@ -153,7 +218,7 @@ export default class SelectUrlDialog extends Component {
 
 		//const isVisible = true;
 		return (
-			<Modal className={"folder-select"} onHide={onHide} show={show}>
+			<Modal className={"folder-select"} onHide={onHide} show={show} onShow={this.handleOnShow}>
 				<Modal.Header closeButton>
 					<Modal.Title>
 						Import from DroneDB
@@ -161,61 +226,90 @@ export default class SelectUrlDialog extends Component {
 				</Modal.Header>
 				<Modal.Body bsClass="my-modal">					
 					<p>Import the images from your DroneDB account</p>
-					<Select
-						className="basic-single"
-						classNamePrefix="select"
-						isLoading={this.state.loadingOrganizations}
-						isClearable={false}
-						isSearchable={true}
-						value={this.state.selectedOrganization}
-						onChange={this.handleSelectOrganization}
-						options={this.state.organizations}
-						placeholder={this.state.loadingOrganizations ? "Fetching organizations..." : "Please select an organization"}
-						name="organizations"
-					/>		
-					<Select
-						className="basic-single"
-						classNamePrefix="select"
-						isLoading={this.state.loadingDatasets}
-						isClearable={false}
-						isSearchable={true}
-						value={this.state.selectedDataset}
-						isDisabled={this.state.selectedOrganization === null}
-						onChange={this.handleSelectDataset}
-						options={this.state.datasets}
-						placeholder={this.state.loadingDatasets ? "Fetching datasets..." : (this.state.datasets.length > 0 ? "Please select a dataset" : "No datasets found")}
-						name="datasets"
-					/>
-					<Select
-						className="basic-single"
-						classNamePrefix="select"
-						isLoading={this.state.loadingFolders}
-						isClearable={false}
-						isSearchable={true}
-						value={this.state.selectedFolder}
-						isDisabled={this.state.selectedDataset === null || this.state.selectedOrganization === null}
-						onChange={this.handleSelectFolder}
-						options={this.state.folders}
-						placeholder={this.state.loadingFolders ? "Fetching folders..." : "Please select a folder"}
-						name="folders"
-					/>	
-					<p>DroneDB url</p>
-					<FormControl
-						type="url"
-						placeholder={"Enter DroneDB url"}
-						onChange={this.handleChange}
-					/>
+					<div class="select-row">
+						<div class="icon-cell">
+							<i class="fas fa-sitemap"></i>
+						</div>
+						<div class="select-cell">
+							<Select
+								className="basic-single"
+								classNamePrefix="select"
+								isLoading={this.state.loadingOrganizations}
+								isClearable={false}
+								isSearchable={true}
+								value={this.state.selectedOrganization}
+								onChange={this.handleSelectOrganization}
+								options={this.state.organizations}
+								placeholder={this.state.loadingOrganizations ? "Fetching organizations..." : "Please select an organization"}
+								name="organizations"
+							/>
+						</div>
+					</div>
+					<div class="select-row">
+						<div class="icon-cell">
+							<i class="fas fa-database"></i>
+						</div>
+						<div class="select-cell">				
+							<Select
+								className="basic-single"
+								classNamePrefix="select"
+								isLoading={this.state.loadingDatasets}
+								isClearable={false}
+								isSearchable={true}
+								value={this.state.selectedDataset}
+								isDisabled={this.state.selectedOrganization === null}
+								onChange={this.handleSelectDataset}
+								options={this.state.datasets}
+								placeholder={this.state.loadingDatasets ? "Fetching datasets..." : (this.state.datasets.length > 0 ? "Please select a dataset" : "No datasets found")}
+								name="datasets"
+							/>
+						</div>
+					</div>
+					<div class="select-row">
+						<div class="icon-cell">
+							<i class="fas fa-folder"></i>
+						</div>
+						<div class="select-cell">
+							<Select
+								className="basic-single"
+								classNamePrefix="select"
+								isLoading={this.state.loadingFolders}
+								isClearable={false}
+								isSearchable={true}
+								value={this.state.selectedFolder}
+								isDisabled={this.state.selectedDataset === null || this.state.selectedOrganization === null}
+								onChange={this.handleSelectFolder}
+								options={this.state.folders}
+								placeholder={this.state.loadingFolders ? "Fetching folders..." : "Please select a folder"}
+								name="folders"
+							/>	
+						</div>
+					</div>
+					<p style={{'margin-top': '20px'}}>DroneDB url</p>
+					<div class="select-row">
+						<div class="icon-cell">
+							<i class="fas fa-globe"></i>
+						</div>
+						<div class="select-cell">
+							<FormControl
+								type="url"
+								placeholder={"Enter DroneDB url"}
+								value={this.state.ddbUrl || ''}
+								onChange={this.handleChange}/>
+						</div>
+						<div class="icon-cell">
+							{ this.state.verifyStatus==='loading' && <i class="fas fa-spinner fa-spin"></i> }
+							{ this.state.verifyStatus==='success' && <i class="fas fa-check"></i> }
+							{ this.state.verifyStatus==='error' && <i class="fas fa-times"></i> }
+						</div>
+					</div>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button onClick={onHide}>Close</Button>
-					<Button
-						bsStyle="primary"
-						
-						onClick={this.handleSubmit}
-					>
-						<i className={"fa fa-upload"} />
-						Import
-					</Button>
+					<Button bsStyle="success" disabled={this.state.ddbUrl == null || this.state.ddbUrl.length == 0} onClick={this.handleVerify}>
+						<i className={"fas fa-link"} />Verify</Button>
+					<Button bsStyle="primary" disabled={this.state.verifyStatus !== 'success'} onClick={this.handleSubmit}>
+						<i className={"fa fa-upload"} />Import</Button>
 				</Modal.Footer>
 			</Modal>
 		);
