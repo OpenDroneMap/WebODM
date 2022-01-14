@@ -10,8 +10,8 @@ On this screen, you can provide the registry url and credentials to access Drone
 	<h4>Settings</h4>
 	{% csrf_token %}
 	{% include "app/plugins/templates/form.html" %}
-	<button id="btnVerify" type="button" class="btn btn-success" disabled><i class="fas fa-user-check"></i>&nbsp;&nbsp;Verify Configuration</i></button>
-	<button type="submit" class="btn btn-primary"><i class="fa fa-save fa-fw"></i>&nbsp;&nbsp;Save Configuration</i></button>
+	<button id="btnVerify" type="button" class="btn btn-success" disabled><i class="fas fa-user-check"></i>&nbsp;&nbsp;Verify Configuration</button>
+	<button type="submit" class="btn btn-primary"><i class="fa fa-save fa-fw"></i>&nbsp;&nbsp;Save Configuration</button>
 </form>
 <div id="alert-result" style="display: none; margin-top: 20px" class="alert" role="alert"></div>
 
