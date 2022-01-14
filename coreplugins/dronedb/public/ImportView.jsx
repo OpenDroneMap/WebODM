@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import ResizeModes from 'webodm/classes/ResizeModes';
 import { Modal, Button } from "react-bootstrap";
-import PlatformDialog from "./components/PlatformDialog";
 import SelectUrlDialog from "./components/SelectUrlDialog";
 import ErrorDialog from "./components/ErrorDialog";
 import ConfigureNewTaskDialog from "./components/ConfigureNewTaskDialog";
@@ -12,12 +11,12 @@ import "./ImportView.scss";
 
 export default class TaskView extends Component {
 
-	/*
+	
  	static propTypes = {
 		projectId: PropTypes.number.isRequired,
 		apiURL: PropTypes.string.isRequired,
 		onNewTaskAdded: PropTypes.func.isRequired,
-  	}*/
+  	}
 	
 	state = {
 		error: "",
@@ -27,6 +26,8 @@ export default class TaskView extends Component {
 	};
 	
 	componentDidMount() {
+
+		console.log(this.props.apiURL);
 
 		/* $.getJSON(`${this.props.apiURL}/platforms/`)
 				.done(data => {
@@ -115,6 +116,7 @@ export default class TaskView extends Component {
 						  show={isDialogOpen}						  
 						  onHide={this.onHideDialog}
 						  onSubmit={this.onSelectFolder}
+						  apiURL={this.props.apiURL}
 						/>
 			</Fragment>		
 					

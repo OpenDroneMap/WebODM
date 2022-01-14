@@ -9,6 +9,7 @@ PluginsAPI.Dashboard.addNewTaskButton(
 	}
 );
 
+/*
 PluginsAPI.Dashboard.addTaskActionButton(
     ["dronedb/build/TaskView.js", "dronedb/build/TaskView.css"],
 	function(args, TaskView) {
@@ -27,4 +28,4 @@ PluginsAPI.Dashboard.addTaskActionButton(
 		});
 		return reactElement;
 	}
-);
+);*/
