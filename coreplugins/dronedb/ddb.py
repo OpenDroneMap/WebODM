@@ -1,3 +1,4 @@
+from functools import reduce
 import requests
 from os import path
 from app.plugins import logger
@@ -109,11 +110,10 @@ class DroneDB:
         try:
             
             response = self.wrapped_call('GET', self.__get_datasets_url.format(orgSlug))
-            
+
             return [
                 {'slug': o['slug'], 
-                # Maybe add a null check
-                'name': o['properties']['meta']['name']['data'], 
+                'name': o['properties'].get('meta', {}).get('name', {}).get('data', o['name']), 
                 'public': o['properties'].get('public'), 
                 'size': o['size'], 
                 'entries': o['properties'].get('entries')
