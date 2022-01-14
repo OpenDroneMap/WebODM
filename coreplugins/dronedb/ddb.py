@@ -112,7 +112,8 @@ class DroneDB:
             
             return [
                 {'slug': o['slug'], 
-                'name': o['name'], 
+                # Maybe add a null check
+                'name': o['properties']['meta']['name']['data'], 
                 'public': o['properties'].get('public'), 
                 'size': o['size'], 
                 'entries': o['properties'].get('entries')
