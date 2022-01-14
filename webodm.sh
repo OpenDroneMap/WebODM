@@ -171,7 +171,7 @@ detect_gpus(){
 
 	if [ "${platform}" = "Linux" ]; then
 		set +e
-		lspci | grep 'VGA.*NVIDIA'
+		lspci | grep 'NVIDIA'
 		if [ "${?}" -eq 0 ]; then
 			export GPU_NVIDIA=true
 			set -e
