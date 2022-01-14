@@ -20,41 +20,32 @@ export default class TaskView extends Component {
 	
 	state = {
 		error: "",
-		ddbUrl: "",
-		selectedFolder: "",
+		ddbRes: null,
 		isDialogOpen: false
 	};
 	
 	componentDidMount() {
-
-		console.log(this.props.apiURL);
-
-		/* $.getJSON(`${this.props.apiURL}/platforms/`)
-				.done(data => {
-					this.setState({platforms: data.platforms});
-				})
-				.fail(() => {
-					this.onErrorInDialog("Failed to find available platforms")
-				}) */
+		
 				
 	}
 
 	//onSelectPlatform = platform => this.setState({ currentPlatform: platform });
 
-	onHideDialog = () => this.setState({ ddbUrl: null, taskId: null, isDialogOpen: false });
-	onSelectFolder = url => this.setState({ ddbUrl: url });
-	/*
-	onSelectFolder = folder => this.setState({ selectedFolder: folder });
+	onHideDialog = () => this.setState({ ddbRes: null, taskId: null, isDialogOpen: false });
+	onSelectDdbRes = res => {
+		console.log("Result", res);
+		this.setState({ ddbRes: res, isDialogOpen: false });
+	}
 	
-
+	
 	onSaveTask = taskInfo => {
 		// Create task
 		const formData = {
-				name: taskInfo.name,
-				options: taskInfo.options,
-				processing_node:  taskInfo.selectedNode.id,
-				auto_processing_node: taskInfo.selectedNode.key == "auto",
-				partial: true
+			name: taskInfo.name,
+			options: taskInfo.options,
+			processing_node:  taskInfo.selectedNode.id,
+			auto_processing_node: taskInfo.selectedNode.key == "auto",
+			partial: true
 		};
 
 		if (taskInfo.resizeMode === ResizeModes.YES) {
@@ -71,7 +62,7 @@ export default class TaskView extends Component {
 				$.ajax({
 						url: `${this.props.apiURL}/projects/${this.props.projectId}/tasks/${task.id}/import`,
 						contentType: 'application/json',
-						data: JSON.stringify({ddb_url: this.state.ddbUrl}),
+						data: JSON.stringify({ddb_url: this.state.ddbRes.url}),
 						dataType: 'json',
 						type: 'POST'
 					}).done(() => {
@@ -88,7 +79,7 @@ export default class TaskView extends Component {
 	onErrorInDialog = msg => {
 		this.setState({ error: msg });
 		this.onHideDialog();
-	};*/
+	};
 
 	handleClick = () => {
 		this.setState({ isDialogOpen: true });
@@ -97,7 +88,7 @@ export default class TaskView extends Component {
 	render() {
 		const {
 			error,
-			ddbUrl,
+			ddbRes,
 			isDialogOpen
 		} = this.state;
 		return (
@@ -115,9 +106,17 @@ export default class TaskView extends Component {
 				<SelectUrlDialog
 						  show={isDialogOpen}						  
 						  onHide={this.onHideDialog}
-						  onSubmit={this.onSelectFolder}
+						  onSubmit={this.onSelectDdbRes}
 						  apiURL={this.props.apiURL}
-						/>
+						/>		
+				{ddbRes ? 							
+					<ConfigureNewTaskDialog
+						show={ddbRes !== null}
+						ddbRes={ddbRes}					
+						onHide={this.onHideDialog}
+						onSaveTask={this.onSaveTask}
+					/> : ""}
+				
 			</Fragment>		
 					
 		);

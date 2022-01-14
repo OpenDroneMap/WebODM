@@ -34,7 +34,7 @@ export default class SelectUrlDialog extends Component {
 			selectedDataset: null,
 			selectedFolder: null,
 			info: null,
-
+			images_count: 0,
 			// verifyStatus: null (not started), 'loading', 'success', 'error'
 			verifyStatus: null
 		};
@@ -91,7 +91,7 @@ export default class SelectUrlDialog extends Component {
 		this.setState({verifyStatus: 'loading'});
 
 		$.post(`${this.props.apiURL}/verifyurl`, { url: this.state.ddbUrl }).done(result => {
-			this.setState({verifyStatus: result != null && result.success ? 'success' : 'error'});
+			this.setState({verifyStatus: result != null && result.success ? 'success' : 'error', images_count: result != null ? result.count : 0});
 		})
 		.fail((error) => {
 			this.setState({verifyStatus: 'error'});
@@ -206,7 +206,7 @@ export default class SelectUrlDialog extends Component {
 
 	handleSubmit = e => {
 		console.log("Submit");
-		//this.props.onSubmit(this.state.selectedFolder);
+		this.props.onSubmit({name: "ddb", url: this.state.ddbUrl, images_count: this.state.images_count});
 	};
 
 	render() {

@@ -224,23 +224,23 @@ def parse_url(url):
     #         return None
         
   
-    # def import_from_folder(self, folder_url):
-    #     # Verify the url
-    #     if self.verify_folder_url(folder_url) == None:
-    #         raise Exception('Invalid URL')
+# def import_from_folder(folder_url):
+#     # Verify the url
+#     if self.verify_folder_url(folder_url) == None:
+#         raise Exception('Invalid URL')
 
-    #     # Parse the url and get all necessary information
-    #     information = self.parse_url(folder_url)
-    #     # Define the API url we will call to get all the files in the folder
-    #     folder_api_url = self.build_list_files_in_folder_api_url(information)
-    #     # Call the API
-    #     payload = self.call_api(folder_api_url)
-    #     # Parse the payload into File instances
-    #     files = self.parse_payload_into_files(payload)
-    #     # Let the specific platform do some processing with the files (if necessary)
-    #     files = self.platform_file_processing(files)
-    #     # Return all the valid files
-    #     return [file for file in files if file.is_valid()]
+#     # Parse the url and get all necessary information
+#     information = self.parse_url(folder_url)
+#     # Define the API url we will call to get all the files in the folder
+#     folder_api_url = self.build_list_files_in_folder_api_url(information)
+#     # Call the API
+#     payload = self.call_api(folder_api_url)
+#     # Parse the payload into File instances
+#     files = self.parse_payload_into_files(payload)
+#     # Let the specific platform do some processing with the files (if necessary)
+#     files = self.platform_file_processing(files)
+#     # Return all the valid files
+#     return [file for file in files if file.is_valid()]
 
 
 class Folder:

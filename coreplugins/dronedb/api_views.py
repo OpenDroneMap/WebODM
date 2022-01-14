@@ -3,12 +3,12 @@ import requests
 import os
 from os import path
 
-from requests.structures import CaseInsensitiveDict
+#from requests.structures import CaseInsensitiveDict
 from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
 from app.plugins import get_current_plugin
-from coreplugins.dronedb.ddb import DroneDB, verify_url
+from coreplugins.dronedb.ddb import DroneDB, parse_url, verify_url
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -16,33 +16,43 @@ from rest_framework import status
 
 #from .platform_helper import get_all_platforms, get_platform_by_name
 
+VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
+
+def is_valid(file):
+    _, file_extension = path.splitext(file)
+    return file_extension.lower() in VALID_IMAGE_EXTENSIONS or file == 'gcp_list.txt'
+
 class ImportDatasetTaskView(TaskView):
     def post(self, request, project_pk=None, pk=None):
                         
+        task = self.get_and_check_task(request, pk)
+
         # Read form data
         ddb_url = request.data.get('ddb_url', None)
         #platform_name = request.data.get('platform', None)
         
         ds = get_current_plugin().get_user_data_store(request.user)
                 
-        registry_url = ds.get_string('registry_url', default="")
-        username = ds.get_string('username', default="")
-        password = ds.get_string('password', default="")
+        registry_url = ds.get_string('registry_url')
+        username = ds.get_string('username')
+        password = ds.get_string('password')
         
-        # Make sure both values are set
         if ddb_url == None:
             return Response({'error': 'DroneDB url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Fetch the platform by name    
         ddb = DroneDB(registry_url, username, password)
+
+        info = parse_url(ddb_url)
+
+        # Get the files from the folder
+        files = ddb.get_files_list(info['orgSlug'], info['dsSlug'], info['folder'])
+
+        files = [file for file in files if is_valid(file['path'])]
                         
         # Verify that the folder url is valid    
-        if ddb.verify_folder_url(ddb_url) == None:
-            return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Get the files from the folder
-        files = ddb.import_from_folder(ddb_url)
-        
+        if len(files) == 0:
+            return Response({'error': 'Empty dataset or folder.'}, status=status.HTTP_400_BAD_REQUEST)
+              
         # Update the task with the new information
         task.console_output += "Importing {} images...\n".format(len(files))
         task.images_count = len(files)
@@ -51,10 +61,13 @@ class ImportDatasetTaskView(TaskView):
         
         # Associate the folder url with the project and task
         combined_id = "{}_{}".format(project_pk, pk)
-        get_current_plugin().get_global_data_store().set_string(combined_id, ddb_url)
+        
+        datastore = get_current_plugin().get_global_data_store()
 
+        datastore.set_string(combined_id, {'ddbUrl': ddb_url, 'token': ddb.token})
+        
         # Start importing the files in the background
-        serialized = {'token': ddb.token, 'files': [file.serialize() for file in files]}
+        serialized = {'token': ddb.token, 'files': files}
         run_function_async(import_files, task.id, serialized)
 
         return Response({}, status=status.HTTP_200_OK)
@@ -199,9 +212,10 @@ def import_files(task_id, carrier):
     from app import models
     from app.plugins import logger
 
-    files = carrier.files
+    files = carrier['files']
     
-    headers = CaseInsensitiveDict()
+    #headers = CaseInsensitiveDict()
+    headers = {}
 
     if carrier.token != None:
         headers['Authorization'] = 'Token ' + carrier['token']
