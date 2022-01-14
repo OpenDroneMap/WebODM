@@ -1,7 +1,7 @@
 from app.plugins import PluginBase, Menu, MountPoint, logger
 from coreplugins.dronedb.app_views import LoadButtonsView
 
-from .api_views import FoldersTaskView, ImportDatasetTaskView, CheckCredentialsTaskView, OrganizationsTaskView, DatasetsTaskView, VerifyUrlTaskView
+from .api_views import FoldersTaskView, ImportDatasetTaskView, CheckCredentialsTaskView, OrganizationsTaskView, DatasetsTaskView, VerifyUrlTaskView, InfoTaskView
 
 from django.contrib import messages
 from django.shortcuts import render
@@ -41,6 +41,7 @@ class Plugin(PluginBase):
             MountPoint("organizations/(?P<org>[^/.]+)/datasets", DatasetsTaskView.as_view()),
             MountPoint("organizations", OrganizationsTaskView.as_view()),
             MountPoint("verifyurl", VerifyUrlTaskView.as_view()),
+            MountPoint("info", InfoTaskView.as_view()),
             #MountPoint("platforms/(?P<platform_name>[^/.]+)/verify", PlatformsVerifyTaskView.as_view()),
             #MountPoint("platforms", PlatformsTaskView.as_view()),
         ] 

@@ -181,7 +181,18 @@ class VerifyUrlTaskView(TaskView):
             return Response({'count': res, 'success': True} if res else {'success': False}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)        
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)    
+
+class InfoTaskView(TaskView):
+    def get(self, request):
+            
+        datastore = get_current_plugin().get_user_data_store(request.user)
+        
+        registry_url = datastore.get_string('registry_url') or None
+        username = datastore.get_string('username') or None
+     
+        return Response({ 'hubUrl': registry_url, 'username': username }, status=status.HTTP_200_OK)
+           
 
 def import_files(task_id, carrier):
     import requests
