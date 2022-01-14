@@ -34,6 +34,7 @@ On this screen, you can provide the registry url and credentials to access Drone
 		});
 
 		$("#btnVerify").click(function() {
+			
 			if (running) return;
 			running = true;
 			if (timeout != null) clearTimeout(timeout);
@@ -43,6 +44,8 @@ On this screen, you can provide the registry url and credentials to access Drone
 			alert.attr('class', 'alert alert-info');
 			alert.text("Testing configuration...");
 			alert.show();
+
+			$("#btnVerify").prop('disabled', true);
 
 			$.ajax({
 				url: "/api/plugins/dronedb/checkcredentials",
@@ -63,15 +66,16 @@ On this screen, you can provide the registry url and credentials to access Drone
 						alert.text("Configuration verification failed!");
 					}
 
-					var timeoutID = setTimeout(function() { alert.hide(); }, 5000);
+					timeout = setTimeout(function() { alert.hide(); }, 5000);
 
 				},
 				error: function(data) {
 					alert.attr('class', 'alert alert-danger');
-					alert.text("Configuration failed!");
+					alert.text("Configuration failed: cannot reach server!");
 				},
 				complete: function() {
 					running = false;
+					$("#btnVerify").prop('disabled', false);
 				}
 			});
 	
