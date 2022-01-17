@@ -147,7 +147,10 @@ class DroneDB:
             # Get the folders
             response = self.wrapped_call('GET', self.__get_files_list_url.format(orgSlug, dsSlug), params=params)
 
-            return [{'path': o['path'], 
+            return [
+                {'path': o['path'], 
+                # extract name from path
+                'name': o['path'].split('/')[-1],
                 'type': o['type'], 
                 'size': o['size'],
                 'url': self.__download_file_url.format(orgSlug, dsSlug, o['path'])

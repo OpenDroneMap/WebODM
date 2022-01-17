@@ -217,7 +217,7 @@ def import_files(task_id, carrier):
     #headers = CaseInsensitiveDict()
     headers = {}
 
-    if carrier.token != None:
+    if carrier['token'] != None:
         headers['Authorization'] = 'Token ' + carrier['token']
 
     def download_file(task, file):
