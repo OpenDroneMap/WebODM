@@ -34,7 +34,12 @@ export default class SelectUrlDialog extends Component {
 			selectedDataset: null,
 			selectedFolder: null,
 			info: null,
-			images_count: 0,
+		
+			verDs: null,
+			verCount: 0,
+			verSize: 0,
+			verFolder: null,
+
 			// verifyStatus: null (not started), 'loading', 'success', 'error'
 			verifyStatus: null
 		};
@@ -91,7 +96,20 @@ export default class SelectUrlDialog extends Component {
 		this.setState({verifyStatus: 'loading'});
 
 		$.post(`${this.props.apiURL}/verifyurl`, { url: this.state.ddbUrl }).done(result => {
-			this.setState({verifyStatus: result != null && result.success ? 'success' : 'error', images_count: result != null ? result.count : 0});
+			
+			if (result != null) {
+				this.setState({
+					verifyStatus: result.count > 0 ? 'success' : 'error',
+					verCount: result.count,
+					verDs: result.ds,
+					verSize: result.size,
+					verFolder: result.folder
+				});
+			} else {
+				this.setState({verifyStatus: 'error'});
+			}
+
+			
 		})
 		.fail((error) => {
 			this.setState({verifyStatus: 'error'});
@@ -122,7 +140,7 @@ export default class SelectUrlDialog extends Component {
 				var dss = result.map(ds => {
 					return { label: ds.name !== ds.slug ? 
 						`${ds.name} (${ds.slug}) - ${ds.entries} files (${this.formatBytes(ds.size)})`: 
-						`${ds.name} - ${ds.entries} files (${this.formatBytes(ds.size)})`, value: ds.slug };
+						`${ds.name} - ${ds.entries} files (${this.formatBytes(ds.size)})`, name: ds.name, value: ds.slug };
 				});
 
 				if (dss.length > 0) {
@@ -194,8 +212,6 @@ export default class SelectUrlDialog extends Component {
 			.replace('http://', 'ddb+unsafe://')
 			.replace('https://', 'ddb://');
 
-		console.log("Generated url:", url);
-
 		this.setState({ddbUrl: url});
 
 	}
@@ -205,8 +221,13 @@ export default class SelectUrlDialog extends Component {
 	};
 
 	handleSubmit = e => {
-		console.log("Submit");
-		this.props.onSubmit({name: "ddb", url: this.state.ddbUrl, images_count: this.state.images_count});
+	
+		this.props.onSubmit(
+			{
+				name: this.state.verDs != null ? this.state.verDs : "DroneDB",
+				url: this.state.ddbUrl,
+				images_count: this.state.verCount
+			});
 	};
 
 	render() {
@@ -226,11 +247,11 @@ export default class SelectUrlDialog extends Component {
 				</Modal.Header>
 				<Modal.Body bsClass="my-modal">					
 					<p>Import the images from your DroneDB account</p>
-					<div class="select-row">
-						<div class="icon-cell">
-							<i class="fas fa-sitemap"></i>
+					<div className={"select-row"}>
+						<div className={"icon-cell"}>
+							<i className={"fas fa-sitemap"}></i>
 						</div>
-						<div class="select-cell">
+						<div className={"select-cell"}>
 							<Select
 								className="basic-single"
 								classNamePrefix="select"
@@ -245,11 +266,11 @@ export default class SelectUrlDialog extends Component {
 							/>
 						</div>
 					</div>
-					<div class="select-row">
-						<div class="icon-cell">
-							<i class="fas fa-database"></i>
+					<div className={"select-row"}>
+						<div className={"icon-cell"}>
+							<i className={"fas fa-database"}></i>
 						</div>
-						<div class="select-cell">				
+						<div className={"select-cell"}>				
 							<Select
 								className="basic-single"
 								classNamePrefix="select"
@@ -265,11 +286,11 @@ export default class SelectUrlDialog extends Component {
 							/>
 						</div>
 					</div>
-					<div class="select-row">
-						<div class="icon-cell">
-							<i class="fas fa-folder"></i>
+					<div className={"select-row"}>
+						<div className={"icon-cell"}>
+							<i className={"fas fa-folder"}></i>
 						</div>
-						<div class="select-cell">
+						<div className={"select-cell"}>
 							<Select
 								className="basic-single"
 								classNamePrefix="select"
@@ -285,24 +306,31 @@ export default class SelectUrlDialog extends Component {
 							/>	
 						</div>
 					</div>
-					<p style={{'margin-top': '20px'}}>DroneDB url</p>
-					<div class="select-row">
-						<div class="icon-cell">
-							<i class="fas fa-globe"></i>
+					<p style={{'marginTop': '20px'}}>DroneDB url</p>
+					<div className={"select-row"}>
+						<div className={"icon-cell"}>
+							<i className={"fas fa-globe"}></i>
 						</div>
-						<div class="select-cell">
+						<div className={"select-cell"}>
 							<FormControl
 								type="url"
 								placeholder={"Enter DroneDB url"}
 								value={this.state.ddbUrl || ''}
-								onChange={this.handleChange}/>
+								onChange={this.handleChange} />
 						</div>
-						<div class="icon-cell">
-							{ this.state.verifyStatus==='loading' && <i class="fas fa-spinner fa-spin"></i> }
-							{ this.state.verifyStatus==='success' && <i class="fas fa-check"></i> }
-							{ this.state.verifyStatus==='error' && <i class="fas fa-times"></i> }
+						<div className={"icon-cell"}>
+							{ this.state.verifyStatus==='loading' && <i className={"fas fa-spinner fa-spin"}></i> }
+							{ this.state.verifyStatus==='success' && <i className={"fas fa-check"}></i> }
+							{ this.state.verifyStatus==='error' && <i className={"fas fa-times"}></i> }
 						</div>
 					</div>
+					
+					{this.state.verifyStatus != null && this.state.verifyStatus == "success" ?
+								<div className={"alert alert-success"}>									
+									<span>Found <strong>{this.state.verCount}</strong> files ({this.formatBytes(this.state.verSize)})</span>
+								</div>									
+						: ""}	
+						
 				</Modal.Body>
 				<Modal.Footer>
 					<Button onClick={onHide}>Close</Button>

@@ -29,8 +29,6 @@ export default class TaskView extends Component {
 				
 	}
 
-	//onSelectPlatform = platform => this.setState({ currentPlatform: platform });
-
 	onHideDialog = () => this.setState({ ddbRes: null, taskId: null, isDialogOpen: false });
 	onSelectDdbRes = res => {
 		console.log("Result", res);

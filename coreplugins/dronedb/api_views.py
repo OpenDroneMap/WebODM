@@ -176,9 +176,10 @@ class VerifyUrlTaskView(TaskView):
 
         try:
 
-            res = verify_url(url, username, password)            
+            org, ds, folder, count, size = verify_url(url, username, password)            
 
-            return Response({'count': res, 'success': True} if res else {'success': False}, status=status.HTTP_200_OK)
+            return Response({'count': count, 'success': True, 'ds' : ds, 'org': org, 'folder': folder or None, 'size': size} 
+                    if org else {'success': False}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)    

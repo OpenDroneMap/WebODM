@@ -166,13 +166,13 @@ class DroneDB:
 def verify_url(url, username=None, password=None):
     try:
 
-        info = parse_url(url)
+        registryUrl, orgSlug, dsSlug, folder = parse_url(url).values()
 
-        ddb = DroneDB(info['registryUrl'], username, password)
-        files = ddb.get_files_list(info['orgSlug'], info['dsSlug'], info['folder'])
+        ddb = DroneDB(registryUrl, username, password)
+        files = ddb.get_files_list(orgSlug, dsSlug, folder)
 
-        # return files count
-        return len(files)
+        # return some info
+        return orgSlug, dsSlug, folder, len(files), sum(i['size'] for i in files)
 
     except Exception as e:
         logger.error(e)
