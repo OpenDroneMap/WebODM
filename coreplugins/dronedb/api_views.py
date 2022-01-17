@@ -22,6 +22,33 @@ def is_valid(file):
     _, file_extension = path.splitext(file)
     return file_extension.lower() in VALID_IMAGE_EXTENSIONS or file == 'gcp_list.txt'
 
+def get_settings(request):
+    ds = get_current_plugin().get_user_data_store(request.user)
+            
+    registry_url = ds.get_string('registry_url') or None
+    username = ds.get_string('username') or None
+    password = ds.get_string('password') or None
+    token = ds.get_string('token') or None
+
+    return {
+        'registry_url': registry_url,
+        'username': username,
+        'password': password,
+        'token': token,
+    }
+
+def update_token(request, token):
+    ds = get_current_plugin().get_user_data_store(request.user)
+    ds.set_string('token', token)
+
+def get_ddb(request):
+    registry_url, username, password, token = get_settings(request).values()
+
+    if registry_url == None or username == None or password == None:
+        raise ValueError('Credentials must be set.')
+
+    return DroneDB(registry_url, username, password, token, lambda token: update_token(request, token))
+
 class ImportDatasetTaskView(TaskView):
     def post(self, request, project_pk=None, pk=None):
                         
@@ -29,19 +56,11 @@ class ImportDatasetTaskView(TaskView):
 
         # Read form data
         ddb_url = request.data.get('ddb_url', None)
-        #platform_name = request.data.get('platform', None)
-        
-        ds = get_current_plugin().get_user_data_store(request.user)
-                
-        registry_url = ds.get_string('registry_url')
-        username = ds.get_string('username')
-        password = ds.get_string('password')
-        
+                      
         if ddb_url == None:
             return Response({'error': 'DroneDB url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        ddb = DroneDB(registry_url, username, password)
-
+        ddb = get_ddb(request)
         info = parse_url(ddb_url)
 
         # Get the files from the folder
@@ -63,7 +82,6 @@ class ImportDatasetTaskView(TaskView):
         combined_id = "{}_{}".format(project_pk, pk)
         
         datastore = get_current_plugin().get_global_data_store()
-
         datastore.set_string(combined_id, {'ddbUrl': ddb_url, 'token': ddb.token})
         
         # Start importing the files in the background
@@ -96,18 +114,9 @@ class CheckCredentialsTaskView(TaskView):
 class OrganizationsTaskView(TaskView):
     def get(self, request):
 
-        datastore = get_current_plugin().get_user_data_store(request.user)
-        
-        registry_url = datastore.get_string('registry_url')
-        username = datastore.get_string('username')
-        password = datastore.get_string('password')
-
-        if registry_url == None or username == None or password == None:
-            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
 
-            ddb = DroneDB(registry_url, username, password)
+            ddb = get_ddb(request)
 
             orgs = ddb.get_organizations()
 
@@ -123,18 +132,9 @@ class DatasetsTaskView(TaskView):
         if org == None:
             return Response({'error': 'Organization must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        datastore = get_current_plugin().get_user_data_store(request.user)
-        
-        registry_url = datastore.get_string('registry_url')
-        username = datastore.get_string('username')
-        password = datastore.get_string('password')
-
-        if registry_url == None or username == None or password == None:
-            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
 
-            ddb = DroneDB(registry_url, username, password)
+            ddb = get_ddb(request)
 
             dss = ddb.get_datasets(org)
 
@@ -149,18 +149,9 @@ class FoldersTaskView(TaskView):
         if org == None or ds == None:
             return Response({'error': 'Organization and dataset must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        datastore = get_current_plugin().get_user_data_store(request.user)
-        
-        registry_url = datastore.get_string('registry_url')
-        username = datastore.get_string('username')
-        password = datastore.get_string('password')
-
-        if registry_url == None or username == None or password == None:
-            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
 
-            ddb = DroneDB(registry_url, username, password)
+            ddb = get_ddb(request)
 
             folders = ddb.get_folders(org, ds)
 
@@ -178,11 +169,7 @@ class VerifyUrlTaskView(TaskView):
         if url == None:
             return Response({'error': 'Url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        datastore = get_current_plugin().get_user_data_store(request.user)
-        
-        registry_url = datastore.get_string('registry_url')
-        username = datastore.get_string('username')
-        password = datastore.get_string('password')
+        registry_url, username, password, token = get_settings(request).values()
 
         if registry_url == None or username == None or password == None:
             return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -199,10 +186,7 @@ class VerifyUrlTaskView(TaskView):
 class InfoTaskView(TaskView):
     def get(self, request):
             
-        datastore = get_current_plugin().get_user_data_store(request.user)
-        
-        registry_url = datastore.get_string('registry_url') or None
-        username = datastore.get_string('username') or None
+        registry_url, username, password, token = get_settings(request).values()
      
         return Response({ 'hubUrl': registry_url, 'username': username }, status=status.HTTP_200_OK)
            

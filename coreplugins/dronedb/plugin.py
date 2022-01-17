@@ -42,8 +42,6 @@ class Plugin(PluginBase):
             MountPoint("organizations", OrganizationsTaskView.as_view()),
             MountPoint("verifyurl", VerifyUrlTaskView.as_view()),
             MountPoint("info", InfoTaskView.as_view()),
-            #MountPoint("platforms/(?P<platform_name>[^/.]+)/verify", PlatformsVerifyTaskView.as_view()),
-            #MountPoint("platforms", PlatformsTaskView.as_view()),
         ] 
 
     def HomeView(self):
@@ -58,6 +56,7 @@ class Plugin(PluginBase):
                     ds.set_string('registry_url', form.cleaned_data['registry_url'])
                     ds.set_string('username', form.cleaned_data['username'])
                     ds.set_string('password', form.cleaned_data['password'])
+                    ds.set_string('token', None)
                     messages.success(request, 'Settings updated.')
 
             form = SettingsForm(initial={'username': ds.get_string('username', default=""), 

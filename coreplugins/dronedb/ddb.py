@@ -8,15 +8,16 @@ VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 
 class DroneDB:
   
-    def __init__(self, registry_url, username, password):
+    def __init__(self, registry_url, username, password, token=None, update_token=None):
 
         if not self.validate_url(registry_url):
             raise ValueError("Invalid registry URL.")
 
         self.username = username
         self.password = password
-        self.token = None
+        self.token = token
         self.public = False if username else True
+        self.update_token = update_token
         
         self.__registry_url = registry_url[:-1] if registry_url.endswith('/') else registry_url
         self.__authenticate_url = self.__registry_url + "/users/authenticate"
@@ -54,6 +55,9 @@ class DroneDB:
             self.token = response.json()['token']
 
             logger.info("Logged in to DroneDB as user " + self.username + ".")    
+
+            if (self.update_token is not None):
+                self.update_token(self.token)
 
             return True
         
@@ -245,28 +249,4 @@ def parse_url(url):
 #     # Return all the valid files
 #     return [file for file in files if file.is_valid()]
 
-
-class Folder:
-    def __init__(self, name, url, images_count = -1, **kwargs):
-        self.name = name
-        self.url = url
-        self.images_count = images_count
-        self.other = kwargs
-    
-    def serialize(self):
-        return {'name': self.name, 'url': self.url, 'images_count': self.images_count}
-
-class File:
-    def __init__(self, name, url, **kwargs):
-        self.name = name
-        self.url = url
-        self.other = kwargs
-    
-    def is_valid(self):
-        """Only keep files that are images, or that are named 'gcp_list.txt'"""
-        _, file_extension = path.splitext(self.name)
-        return file_extension.lower() in VALID_IMAGE_EXTENSIONS or self.name == 'gcp_list.txt'
-    
-    def serialize(self):
-        return {'name': self.name, 'url': self.url}    
     
