@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { Modal, Button, FormGroup, ControlLabel, FormControl, HelpBlock } from "react-bootstrap";
 import Select from 'react-select';
 import "./SelectUrlDialog.scss";
@@ -76,7 +76,7 @@ export default class SelectUrlDialog extends Component {
 					this.setState({organizations: orgs, loadingOrganizations: false});
 			})
 			.fail((error) => {
-				this.setState({error: "Cannot load organizations. Check your internet connection."});
+				this.setState({error: "Cannot load organizations. Check your internet connection.", organizations: []});
 			})
 			.always(() => {
 				this.setState({loadingOrganizations: false});
@@ -84,6 +84,7 @@ export default class SelectUrlDialog extends Component {
 
 		$.get(`${this.props.apiURL}/info`)
 			.done(result => {
+				console.log(result);
 				this.setState({info: result});
 			})
 			.fail((error) => {
@@ -245,68 +246,76 @@ export default class SelectUrlDialog extends Component {
 						Import from DroneDB
 					</Modal.Title>
 				</Modal.Header>
-				<Modal.Body bsClass="my-modal">					
-					<p>Import the images from your DroneDB account</p>
-					<div className={"select-row"}>
-						<div className={"icon-cell"}>
-							<i className={"fas fa-sitemap"}></i>
+				<Modal.Body bsClass="my-modal">		
+					{this.state.organizations!= null && this.state.organizations.length > 0 ? 		
+					<div style={{'marginBottom': '20px'}}>
+						<p>Import the images from your DroneDB account</p>
+						<div className={"select-row"}>
+							<div className={"icon-cell"}>
+								<i className={"fas fa-sitemap"}></i>
+							</div>
+							<div className={"select-cell"}>
+								<Select
+									className="basic-single"
+									classNamePrefix="select"
+									isLoading={this.state.loadingOrganizations}
+									isClearable={false}
+									isSearchable={true}
+									value={this.state.selectedOrganization}
+									onChange={this.handleSelectOrganization}
+									options={this.state.organizations}
+									placeholder={this.state.loadingOrganizations ? "Fetching organizations..." : "Please select an organization"}
+									name="organizations"
+								/>
+							</div>
 						</div>
-						<div className={"select-cell"}>
-							<Select
-								className="basic-single"
-								classNamePrefix="select"
-								isLoading={this.state.loadingOrganizations}
-								isClearable={false}
-								isSearchable={true}
-								value={this.state.selectedOrganization}
-								onChange={this.handleSelectOrganization}
-								options={this.state.organizations}
-								placeholder={this.state.loadingOrganizations ? "Fetching organizations..." : "Please select an organization"}
-								name="organizations"
-							/>
+						<div className={"select-row"}>
+							<div className={"icon-cell"}>
+								<i className={"fas fa-database"}></i>
+							</div>
+							<div className={"select-cell"}>				
+								<Select
+									className="basic-single"
+									classNamePrefix="select"
+									isLoading={this.state.loadingDatasets}
+									isClearable={false}
+									isSearchable={true}
+									value={this.state.selectedDataset}
+									isDisabled={this.state.selectedOrganization === null}
+									onChange={this.handleSelectDataset}
+									options={this.state.datasets}
+									placeholder={this.state.loadingDatasets ? "Fetching datasets..." : (this.state.datasets.length > 0 ? "Please select a dataset" : "No datasets found")}
+									name="datasets"
+								/>
+							</div>
 						</div>
-					</div>
-					<div className={"select-row"}>
-						<div className={"icon-cell"}>
-							<i className={"fas fa-database"}></i>
+						<div className={"select-row"}>
+							<div className={"icon-cell"}>
+								<i className={"fas fa-folder"}></i>
+							</div>
+							<div className={"select-cell"}>
+								<Select
+									className="basic-single"
+									classNamePrefix="select"
+									isLoading={this.state.loadingFolders}
+									isClearable={false}
+									isSearchable={true}
+									value={this.state.selectedFolder}
+									isDisabled={this.state.selectedDataset === null || this.state.selectedOrganization === null}
+									onChange={this.handleSelectFolder}
+									options={this.state.folders}
+									placeholder={this.state.loadingFolders ? "Fetching folders..." : "Please select a folder"}
+									name="folders"
+								/>	
+							</div>
 						</div>
-						<div className={"select-cell"}>				
-							<Select
-								className="basic-single"
-								classNamePrefix="select"
-								isLoading={this.state.loadingDatasets}
-								isClearable={false}
-								isSearchable={true}
-								value={this.state.selectedDataset}
-								isDisabled={this.state.selectedOrganization === null}
-								onChange={this.handleSelectDataset}
-								options={this.state.datasets}
-								placeholder={this.state.loadingDatasets ? "Fetching datasets..." : (this.state.datasets.length > 0 ? "Please select a dataset" : "No datasets found")}
-								name="datasets"
-							/>
-						</div>
-					</div>
-					<div className={"select-row"}>
-						<div className={"icon-cell"}>
-							<i className={"fas fa-folder"}></i>
-						</div>
-						<div className={"select-cell"}>
-							<Select
-								className="basic-single"
-								classNamePrefix="select"
-								isLoading={this.state.loadingFolders}
-								isClearable={false}
-								isSearchable={true}
-								value={this.state.selectedFolder}
-								isDisabled={this.state.selectedDataset === null || this.state.selectedOrganization === null}
-								onChange={this.handleSelectFolder}
-								options={this.state.folders}
-								placeholder={this.state.loadingFolders ? "Fetching folders..." : "Please select a folder"}
-								name="folders"
-							/>	
-						</div>
-					</div>
-					<p style={{'marginTop': '20px'}}>DroneDB url</p>
+					</div> : 
+						<div className={"alert alert-info"}>									
+							<span><a href="/plugins/dronedb"><strong>Fill in your Hub credentials</strong></a> to browse your organizations, datasets and folders!</span>
+						</div>		
+					}
+
+					<p>DroneDB import url</p>
 					<div className={"select-row"}>
 						<div className={"icon-cell"}>
 							<i className={"fas fa-globe"}></i>
