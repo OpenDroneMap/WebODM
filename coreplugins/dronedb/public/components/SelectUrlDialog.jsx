@@ -21,6 +21,11 @@ export default class SelectUrlDialog extends Component {
 	constructor(props){
 		super(props);
 
+		this.resetState();
+	}
+
+	resetState() {
+		
 		this.state = {
 			error: "",
 			organizations: [],
@@ -45,8 +50,6 @@ export default class SelectUrlDialog extends Component {
 		};
 	}
 
-
-
 	// Format bytes to readable string
 	formatBytes(bytes, decimals=2) {
 		if(bytes == 0) return '0 bytes';
@@ -58,6 +61,9 @@ export default class SelectUrlDialog extends Component {
 	}
 	
 	handleOnShow = () => {
+
+		this.resetState();
+		
 		$.get(`${this.props.apiURL}/organizations`)
 			.done(result => {
 				

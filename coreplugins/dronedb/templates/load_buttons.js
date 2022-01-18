@@ -9,7 +9,7 @@ PluginsAPI.Dashboard.addNewTaskButton(
 	}
 );
 
-/*
+
 PluginsAPI.Dashboard.addTaskActionButton(
     ["dronedb/build/TaskView.js", "dronedb/build/TaskView.css"],
 	function(args, TaskView) {
@@ -19,13 +19,13 @@ PluginsAPI.Dashboard.addTaskActionButton(
 			dataType: 'json',
 			async: false,
 			success: function(data) {
-				if (data.folder_url) {
+				if (data.ddbUrl) {
 					reactElement = React.createElement(TaskView, {
-						folderUrl: data.folder_url,
+						ddbUrl: data.ddbUrl,
 					});
 				}
 			}
 		});
 		return reactElement;
 	}
-);*/
+);

@@ -6,18 +6,18 @@ import $ from "jquery"; // Fixes a AMD module definition error due to webpack
 
 export default class TaskView extends Component {
 	static propTypes = {
-		folderUrl: PropTypes.string.isRequired,
+		ddbUrl: PropTypes.string.isRequired,
 	}
 	
 	render() {
 		const {
-			folderUrl,
+			ddbUrl,
 		} = this.props;
 		return (
 			<Fragment>
-				{folderUrl ?
+				{ddbUrl ?
 					<GoToFolderButton
-						folderUrl={folderUrl}
+					ddbUrl={ddbUrl}
 					/>
 				: ""}
 			</Fragment>

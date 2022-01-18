@@ -1,4 +1,5 @@
 import importlib
+import json
 import requests
 import os
 from os import path
@@ -13,8 +14,6 @@ from coreplugins.dronedb.ddb import DEFAULT_HUB_URL, DroneDB, parse_url, verify_
 from worker.celery import app
 from rest_framework.response import Response
 from rest_framework import status
-
-#from .platform_helper import get_all_platforms, get_platform_by_name
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 
@@ -44,6 +43,9 @@ def get_ddb(request):
         raise ValueError('Credentials must be set.')
 
     return DroneDB(registry_url, username, password, token, lambda token: update_token(request, token))
+
+def to_web_protocol(registry_url):
+    return registry_url.replace('ddb+unsafe://', 'http://').replace('ddb://', 'https://').rstrip('/')
 
 class ImportDatasetTaskView(TaskView):
     def post(self, request, project_pk=None, pk=None):
@@ -79,7 +81,7 @@ class ImportDatasetTaskView(TaskView):
         combined_id = "{}_{}".format(project_pk, pk)
         
         datastore = get_current_plugin().get_global_data_store()
-        datastore.set_string(combined_id, {'ddbUrl': ddb_url, 'token': ddb.token})
+        datastore.set_json(combined_id, {"ddbUrl": ddb_url, "token": ddb.token, "ddbWebUrl": "{}/r/{}/{}/{}".format(to_web_protocol(registry_url), orgSlug, dsSlug, folder.rstrip('/'))})
         
         # Start importing the files in the background
         serialized = {'token': ddb.token, 'files': files}
@@ -233,3 +235,22 @@ def import_files(task_id, carrier):
     task.processing_time = 0
     task.partial = False
     task.save()
+
+class CheckUrlTaskView(TaskView):
+    def get(self, request, project_pk=None, pk=None):
+
+        from app.plugins import logger
+
+        # Assert that task exists
+        self.get_and_check_task(request, pk)
+
+        # Check if there is an imported url associated with the project and task
+        combined_id = "{}_{}".format(project_pk, pk)
+        data = get_current_plugin().get_global_data_store().get_json(combined_id, default = None)
+
+        logger.info(data)
+
+        if data == None or 'ddbWebUrl' not in data:
+            return Response({'ddbWebUrl': None}, status=status.HTTP_200_OK)
+        else:
+            return Response({'ddbUrl': data['ddbWebUrl']}, status=status.HTTP_200_OK)

@@ -6,10 +6,10 @@ import "./GoToFolderButton.scss";
 
 export default class GoToFolderButton extends Component {
 	static defaultProps = {
-		folderUrl: null,
+		ddbUrl: null,
 	};
 
-	handleClick = () => window.open(this.props.folderUrl, '_blank');;
+	handleClick = () => window.open(this.props.ddbUrl, '_blank');;
 
 	render() {
 		return (
@@ -17,8 +17,8 @@ export default class GoToFolderButton extends Component {
 				bsStyle={"primary"}
 				bsSize={"small"}
 				onClick={this.handleClick}>
-				<i className={"fa fa-folder icon"} />
-				Go To Import Folder
+				<i className={"fas fa-database icon"} />
+				Go To Dataset
 			</Button>
 		);
 	}
