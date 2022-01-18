@@ -30,19 +30,15 @@ def get_settings(request):
     password = ds.get_string('password') or None
     token = ds.get_string('token') or None
 
-    return {
-        'registry_url': registry_url,
-        'username': username,
-        'password': password,
-        'token': token,
-    }
+    return registry_url, username, password, token
+    
 
 def update_token(request, token):
     ds = get_current_plugin().get_user_data_store(request.user)
     ds.set_string('token', token)
 
 def get_ddb(request):
-    registry_url, username, password, token = get_settings(request).values()
+    registry_url, username, password, token = get_settings(request)
 
     if registry_url == None or username == None or password == None:
         raise ValueError('Credentials must be set.')
@@ -62,7 +58,7 @@ class ImportDatasetTaskView(TaskView):
         
         registry_url, orgSlug, dsSlug, folder = parse_url(ddb_url).values()
 
-        _, username, password, token = get_settings(request).values()
+        _, username, password, token = get_settings(request)
         ddb = DroneDB(registry_url, username, password, token, lambda token: update_token(request, token))
 
         # Get the files from the folder
@@ -170,7 +166,7 @@ class VerifyUrlTaskView(TaskView):
         if url == None:
             return Response({'error': 'Url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        _, username, password, token = get_settings(request).values()
+        _, username, password, _ = get_settings(request)
 
         try:
 
@@ -188,7 +184,7 @@ class VerifyUrlTaskView(TaskView):
 class InfoTaskView(TaskView):
     def get(self, request):
             
-        registry_url, username, _, _ = get_settings(request).values()
+        registry_url, username, _, _ = get_settings(request)
      
         return Response({ 'hubUrl': registry_url, 'username': username }, status=status.HTTP_200_OK)
            
