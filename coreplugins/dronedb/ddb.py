@@ -5,7 +5,7 @@ from app.plugins import logger
 from urllib.parse import urlparse
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
-DEFAULT_HUB_URL = 'https://hub.droneDB.app'
+DEFAULT_HUB_URL = 'https://hub.dronedb.app'
 
 class DroneDB:
   

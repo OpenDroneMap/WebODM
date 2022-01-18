@@ -58,7 +58,7 @@ class Plugin(PluginBase):
 
             form = SettingsForm(initial={'username': ds.get_string('username', default=""), 
                                          'password': ds.get_string('password', default=""), 
-                                         'registry_url': ds.get_string('registry_url', default=DEFAULT_HUB_URL)})
+                                         'registry_url': ds.get_string('registry_url', default="") or DEFAULT_HUB_URL})
 
             return render(request, self.template_path("app.html"), {
                 'title': 'DroneDB',
