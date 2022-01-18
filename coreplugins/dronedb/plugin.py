@@ -1,5 +1,6 @@
 from app.plugins import PluginBase, Menu, MountPoint, logger
 from coreplugins.dronedb.app_views import LoadButtonsView
+from coreplugins.dronedb.ddb import DEFAULT_HUB_URL
 
 from .api_views import FoldersTaskView, ImportDatasetTaskView, CheckCredentialsTaskView, OrganizationsTaskView, DatasetsTaskView, VerifyUrlTaskView, InfoTaskView
 
@@ -30,10 +31,6 @@ class Plugin(PluginBase):
         return ["ImportView.jsx", "TaskView.jsx"]
 
     def api_mount_points(self):
-        #api_views = [api_view for platform in get_all_extended_platforms() for api_view in platform.get_api_views()]
-        # mount_points = [MountPoint(path, view) for (path, view) in api_views]
-        # Add mount points for each extended platform that might require us to do so
-
         return [
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/import", ImportDatasetTaskView.as_view()),
             MountPoint("checkcredentials", CheckCredentialsTaskView.as_view()),
@@ -61,7 +58,7 @@ class Plugin(PluginBase):
 
             form = SettingsForm(initial={'username': ds.get_string('username', default=""), 
                                          'password': ds.get_string('password', default=""), 
-                                         'registry_url': ds.get_string('registry_url', default="https://hub.dronedb.app")})
+                                         'registry_url': ds.get_string('registry_url', default=DEFAULT_HUB_URL)})
 
             return render(request, self.template_path("app.html"), {
                 'title': 'DroneDB',

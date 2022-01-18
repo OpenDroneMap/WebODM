@@ -5,6 +5,7 @@ from app.plugins import logger
 from urllib.parse import urlparse
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
+DEFAULT_HUB_URL = 'https://hub.droneDB.app'
 
 class DroneDB:
   
@@ -148,6 +149,8 @@ class DroneDB:
             # Type 1 is folder
             params = {'path': '' if folder is None else folder}
 
+            logger.info(self.__get_files_list_url.format(orgSlug, dsSlug))
+
             # Get the folders
             response = self.wrapped_call('GET', self.__get_files_list_url.format(orgSlug, dsSlug), params=params)
 
@@ -172,18 +175,32 @@ def verify_url(url, username=None, password=None):
         files = ddb.get_files_list(orgSlug, dsSlug, folder)
 
         # return some info
-        return orgSlug, dsSlug, folder, len(files), sum(i['size'] for i in files)
+        return {
+            'success': True,
+            'orgSlug': orgSlug, 
+            'dsSlug': dsSlug, 
+            'folder': folder, 
+            'count': len(files), 
+            'size': sum(i['size'] for i in files)
+        }
 
     except Exception as e:
         logger.error(e)
-        return False
+        return {
+            'success': False,
+            'orgSlug': None, 
+            'dsSlug': None, 
+            'folder': None, 
+            'count': None, 
+            'size': None
+        }
 
 def parse_url(url):
 
     # Check if the url is valid
     # Root folder of dataset:       ddb://localhost:5001/admin/4uyyyaxcbvahd7qb
     # 'test' folder of dataset:     ddb://localhost:5001/admin/4uyyyaxcbvahd7qb/test
-    # using http instead of https:  ddb+unsafe://localhost:5001/admin/4uyyyaxcbvahd7qb
+    # using http instead of https:  ddb+unsafe://localhost:5000/admin/4uyyyaxcbvahd7qb
     # using hub url:                https://localhost:5001/r/admin/4uyyyaxcbvahd7qb
     # using hub url without /r/     http://localhost:5000/admin/4uyyyaxcbvahd7qb/test
 
@@ -215,38 +232,5 @@ def parse_url(url):
         'dsSlug': segments[2 + offset],
         'folder': '/'.join(segments[3 + offset:])
     }
-
-    # def verify_folder_url(self, folder_url):
-    #     try:
-    #         # Parse the url and get all necessary information
-    #         information = self.parse_url(folder_url)
-    #         # Define the API url we will call to assert that the folder exists and is valid
-    #         folder_api_url = self.build_folder_api_url(information)
-    #         # Call the API
-    #         payload = self.call_api(folder_api_url)
-    #         # Parse payload into a Folder instance
-    #         return self.parse_payload_into_folder(folder_url, payload)
-    #     except Exception as e:
-    #         logger.error(str(e))
-    #         return None
-        
-  
-# def import_from_folder(folder_url):
-#     # Verify the url
-#     if self.verify_folder_url(folder_url) == None:
-#         raise Exception('Invalid URL')
-
-#     # Parse the url and get all necessary information
-#     information = self.parse_url(folder_url)
-#     # Define the API url we will call to get all the files in the folder
-#     folder_api_url = self.build_list_files_in_folder_api_url(information)
-#     # Call the API
-#     payload = self.call_api(folder_api_url)
-#     # Parse the payload into File instances
-#     files = self.parse_payload_into_files(payload)
-#     # Let the specific platform do some processing with the files (if necessary)
-#     files = self.platform_file_processing(files)
-#     # Return all the valid files
-#     return [file for file in files if file.is_valid()]
 
     

@@ -8,7 +8,7 @@ from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
 from app.plugins import get_current_plugin
-from coreplugins.dronedb.ddb import DroneDB, parse_url, verify_url
+from coreplugins.dronedb.ddb import DEFAULT_HUB_URL, DroneDB, parse_url, verify_url
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -25,7 +25,7 @@ def is_valid(file):
 def get_settings(request):
     ds = get_current_plugin().get_user_data_store(request.user)
             
-    registry_url = ds.get_string('registry_url') or None
+    registry_url = ds.get_string('registry_url') or DEFAULT_HUB_URL
     username = ds.get_string('username') or None
     password = ds.get_string('password') or None
     token = ds.get_string('token') or None
@@ -60,13 +60,14 @@ class ImportDatasetTaskView(TaskView):
         if ddb_url == None:
             return Response({'error': 'DroneDB url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        ddb = get_ddb(request)
-        info = parse_url(ddb_url)
+        registry_url, orgSlug, dsSlug, folder = parse_url(ddb_url).values()
+
+        _, username, password, token = get_settings(request).values()
+        ddb = DroneDB(registry_url, username, password, token, lambda token: update_token(request, token))
 
         # Get the files from the folder
-        files = ddb.get_files_list(info['orgSlug'], info['dsSlug'], info['folder'])
-
-        files = [file for file in files if is_valid(file['path'])]
+        rawfiles = ddb.get_files_list(orgSlug, dsSlug, folder)
+        files = [file for file in rawfiles if is_valid(file['path'])]
                         
         # Verify that the folder url is valid    
         if len(files) == 0:
@@ -169,16 +170,16 @@ class VerifyUrlTaskView(TaskView):
         if url == None:
             return Response({'error': 'Url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        registry_url, username, password, token = get_settings(request).values()
-
-        if registry_url == None or username == None or password == None:
-            return Response({'error': 'Credentials must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+        _, username, password, token = get_settings(request).values()
 
         try:
 
-            org, ds, folder, count, size = verify_url(url, username, password)            
+            result, org, ds, folder, count, size = verify_url(url, username, password).values() 
 
-            return Response({'count': count, 'success': True, 'ds' : ds, 'org': org, 'folder': folder or None, 'size': size} 
+            if (not result):
+                return Response({'error': 'Invalid url.'}, status=status.HTTP_400_BAD_REQUEST)         
+
+            return Response({'count': count, 'success': result, 'ds' : ds, 'org': org, 'folder': folder or None, 'size': size} 
                     if org else {'success': False}, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -187,7 +188,7 @@ class VerifyUrlTaskView(TaskView):
 class InfoTaskView(TaskView):
     def get(self, request):
             
-        registry_url, username, password, token = get_settings(request).values()
+        registry_url, username, _, _ = get_settings(request).values()
      
         return Response({ 'hubUrl': registry_url, 'username': username }, status=status.HTTP_200_OK)
            
