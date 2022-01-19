@@ -2,7 +2,18 @@ from app.plugins import PluginBase, Menu, MountPoint, logger
 from coreplugins.dronedb.app_views import LoadButtonsView
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL
 
-from .api_views import CheckUrlTaskView, FoldersTaskView, ImportDatasetTaskView, CheckCredentialsTaskView, OrganizationsTaskView, DatasetsTaskView, VerifyUrlTaskView, InfoTaskView
+from .api_views import (
+    CheckUrlTaskView, 
+    FoldersTaskView, 
+    ImportDatasetTaskView, 
+    CheckCredentialsTaskView, 
+    OrganizationsTaskView, 
+    DatasetsTaskView, 
+    StatusTaskView, 
+    VerifyUrlTaskView, 
+    InfoTaskView,
+    ShareTaskView
+)
 
 from django.contrib import messages
 from django.shortcuts import render
@@ -34,6 +45,8 @@ class Plugin(PluginBase):
         return [
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/import", ImportDatasetTaskView.as_view()),
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/checkforurl", CheckUrlTaskView.as_view()),
+            MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/status", StatusTaskView.as_view()),
+            MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/share", ShareTaskView.as_view()),
             MountPoint("checkcredentials", CheckCredentialsTaskView.as_view()),
             MountPoint("organizations/(?P<org>[^/.]+)/datasets/(?P<ds>[^/.]+)/folders", FoldersTaskView.as_view()),
             MountPoint("organizations/(?P<org>[^/.]+)/datasets", DatasetsTaskView.as_view()),

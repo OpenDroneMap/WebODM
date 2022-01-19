@@ -9,7 +9,12 @@ from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
 from app.plugins import get_current_plugin
+from app.models import ImageUpload
+from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals
+
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL, DroneDB, parse_url, verify_url
+
+from django.dispatch import receiver
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -81,7 +86,11 @@ class ImportDatasetTaskView(TaskView):
         combined_id = "{}_{}".format(project_pk, pk)
         
         datastore = get_current_plugin().get_global_data_store()
-        datastore.set_json(combined_id, {"ddbUrl": ddb_url, "token": ddb.token, "ddbWebUrl": "{}/r/{}/{}/{}".format(to_web_protocol(registry_url), orgSlug, dsSlug, folder.rstrip('/'))})
+        datastore.set_json(combined_id, {
+            "ddbUrl": ddb_url, 
+            "token": ddb.token, 
+            "ddbWebUrl": "{}/r/{}/{}/{}".format(to_web_protocol(registry_url), orgSlug, dsSlug, folder.rstrip('/'))
+        })
         
         # Start importing the files in the background
         serialized = {'token': ddb.token, 'files': files}
@@ -252,3 +261,65 @@ class CheckUrlTaskView(TaskView):
             return Response({'ddbWebUrl': None}, status=status.HTTP_200_OK)
         else:
             return Response({'ddbUrl': data['ddbWebUrl']}, status=status.HTTP_200_OK)
+
+
+@receiver(plugin_signals.task_removed, dispatch_uid="ddb_on_task_removed")
+@receiver(plugin_signals.task_completed, dispatch_uid="ddb_on_task_completed")
+def ddb_cleanup(sender, task_id, **kwargs):
+
+    from app.plugins import logger
+
+    # When a task is removed, simply remove clutter
+    # When a task is re-processed, make sure we can re-share it if we shared a task previously
+
+    logger.info("Cleaning up DroneDB datastore for task {}".format(str(task_id)))
+    #ds.del_key(get_key_for(task_id, "status"))
+
+class StatusTaskView(TaskView):
+    def get(self, request, project_pk, pk):
+
+        task = self.get_and_check_task(request, pk)
+
+        # Associate the folder url with the project and task
+        combined_id = "{}_{}_ddb".format(project_pk, pk)
+        
+        datastore = get_current_plugin().get_global_data_store()
+
+        task_info = datastore.get_json(combined_id, {
+            'status': 0, # Idle
+            'shareUrl': None,
+            'uploadedFiles': 0,
+            'totalFiles': 0,
+            'uploadedSize': 0,
+            'totalSize': 0,
+            'error': None
+        })
+
+        #task_info['title'] = task.name
+        #task_info['provider'] = get_site_settings().organization_name
+
+        return Response(task_info, status=status.HTTP_200_OK)
+
+class ShareTaskView(TaskView): 
+    def post(self, request, project_pk, pk):
+
+        task = self.get_and_check_task(request, pk)
+
+        # Associate the folder url with the project and task
+        combined_id = "{}_{}_ddb".format(project_pk, pk)
+        
+        datastore = get_current_plugin().get_global_data_store()
+
+        data = {
+            'status': 1, # Running
+            'shareUrl': None,
+            'uploadedFiles': 3,
+            'totalFiles': 10,
+            'uploadedSize': 1244,
+            'totalSize': 234525,
+            'error': None
+        }
+
+        datastore.set_json(combined_id, data)
+
+        return Response(data, status=status.HTTP_200_OK)        

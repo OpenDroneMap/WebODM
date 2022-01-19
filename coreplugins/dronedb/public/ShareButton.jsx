@@ -4,6 +4,11 @@ import Storage from 'webodm/classes/Storage';
 import ErrorMessage from 'webodm/components/ErrorMessage';
 import $ from 'jquery';
 
+const STATE_IDLE = 0;
+const STATE_RUNNING = 1;
+const STATE_ERROR = 2;
+const STATE_DONE = 3;
+
 const ICON_CLASS_MAPPER = [
     // Idle
     'fas fa-cloud fa-fw', 
@@ -28,13 +33,11 @@ const BUTTON_TEXT_MAPPER = [
 
 export default class ShareButton extends React.Component{
     static defaultProps = {
-        task: null,
-        token: ""
+        task: null
     };
 
     static propTypes = {
         task: PropTypes.object.isRequired,
-        token: PropTypes.string.isRequired // OAM Token
     };
 
     constructor(props){
@@ -42,11 +45,13 @@ export default class ShareButton extends React.Component{
 
         this.state = {            
             taskInfo: null,
-            error: ''
+            error: '',
+            intervalId: null
         };
+
     }
 
-    /*
+    
     componentDidMount(){
         this.updateTaskInfo(false);
     }
@@ -55,81 +60,76 @@ export default class ShareButton extends React.Component{
         const { task } = this.props;
         return $.ajax({
                 type: 'GET',
-                url: `/api/plugins/dronedb/task/${task.id}/status`,
+                url: `/api/plugins/dronedb/projects/${task.project}/tasks/${task.id}/status`,
                 contentType: 'application/json'
-            }).done(taskInfo => {
-                // Allow a user to specify a better name for the sensor
-                // and remember it.
-                let sensor = Storage.getItem("oam_sensor_pref_" + taskInfo.sensor);
-                if (sensor) taskInfo.sensor = sensor;
+            }).done(taskInfo => {                
 
-                // Allow a user to change the default provider name
-                let provider = Storage.getItem("oam_provider_pref");
-                if (provider) taskInfo.provider = provider;
+                console.log(taskInfo);
 
-                this.setState({taskInfo, loading: false});
+                this.setState({taskInfo});
                 if (taskInfo.error && showErrors) this.setState({error: taskInfo.error});
             }).fail(error => {
-                this.setState({error: error.statusText, loading: false});
+                this.setState({error: error.statusText});
             });
     }
-
+    
     componentWillUnmount(){
-        if (this.monitorTimeout) clearTimeout(this.monitorTimeout);
-    }
-
-    handleClick = () => {
-        const { taskInfo } = this.state;
-        if (!taskInfo.shared){
-            this.shareDialog.show();
-        }else if (taskInfo.oam_upload_id){
-            window.open(`https://map.openaerialmap.org/#/upload/status/${encodeURIComponent(taskInfo.oam_upload_id)}`, '_blank');
-        }
+        if (this.intervalId) clearInterval(this.intervalId);
     }
 
     shareToDdb = (formData) => {
         const { task } = this.props;
 
-        const oamParams = {
-          token: this.props.token,
-          sensor: formData.sensor,
-          acquisition_start: formData.startDate,
-          acquisition_end: formData.endDate,
-          title: formData.title,
-          provider: formData.provider,
-          tags: formData.tags
-        };
-
         return $.ajax({
-            url: `/api/plugins/dronedb/task/${task.id}/share`,
+            url: `/api/plugins/dronedb/projects/${task.project}/tasks/${task.id}/share`,
             contentType: 'application/json',
-            data: JSON.stringify({
-                oamParams: oamParams
-            }),
+            //data: JSON.stringify({
+            //    oamParams: oamParams
+            //}),
             dataType: 'json',
             type: 'POST'
           }).done(taskInfo => {
             // Allow a user to associate the sensor name coming from the EXIF tags
             // to one that perhaps is more human readable.
-            Storage.setItem("oam_sensor_pref_" + taskInfo.sensor, formData.sensor);
-            Storage.setItem("oam_provider_pref", formData.provider);
 
             this.setState({taskInfo});
-            this.monitorProgress();
+            
+            if (this.state.intervalId) clearInterval(this.state.intervalId);
+
+            this.state.intervalId = setInterval(() => {
+                this.updateTaskInfo(true);
+
+                if (this.state.taskInfo.status == STATE_DONE || this.state.taskInfo.status == STATE_ERROR) {
+                    clearInterval(this.state.intervalId);
+                }
+
+            }, 3000);
+            
+            //this.monitorProgress();
           });
     }
 
+    /*
     monitorProgress = () => {
         if (this.state.taskInfo.sharing){
             // Monitor progress
             this.monitorTimeout = setTimeout(() => {
                 this.updateTaskInfo(true).always(this.monitorProgress);
-            }, 5000);
+            }, 3000);
         }
     }*/
 
     handleClick = e => {
         console.log("Clicked");
+
+        if (this.state.taskInfo.status == STATE_IDLE){
+            this.shareToDdb();
+        }
+
+        if (this.state.taskInfo.status == STATE_DONE){
+            window.open(this.state.taskInfo.shareUrl, '_blank');
+        }
+
     }
 
 
@@ -154,8 +154,8 @@ export default class ShareButton extends React.Component{
 
         return (
             <div className="share-button">
-                <button className="btn btn-primary btn-sm" onClick={this.handleClick} disabled={taskInfo == null || taskInfo.error}>
-                    <i className={getButtonIcon()}></i>
+                <button className="btn btn-primary btn-sm" onClick={this.handleClick} disabled={this.state.taskInfo == null || this.state.taskInfo.error || this.state.taskInfo.status == 1 }>
+                    <i className={getButtonIcon()}></i>&nbsp;
                     {getButtonLabel()}
                 </button>
             </div>
