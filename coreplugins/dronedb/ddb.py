@@ -28,6 +28,11 @@ class DroneDB:
         self.__get_folders_url = self.__registry_url + "/orgs/{0}/ds/{1}/search"
         self.__get_files_list_url = self.__registry_url + "/orgs/{0}/ds/{1}/list"
         self.__download_file_url = self.__registry_url + "/orgs/{0}/ds/{1}/download?path={2}&inline=1"
+
+        self.__share_init_url = self.__registry_url + "/share/init"
+        self.__share_upload_url = self.__registry_url + "/share/upload/{0}"
+        self.__share_commit_url = self.__registry_url + "/share/commit/{0}"
+
  
     # Validate url
     def validate_url(self, url):
@@ -165,6 +170,18 @@ class DroneDB:
             
         except Exception as e:
             raise Exception("Failed to get files list.") from e
+
+    def share_init(self, tag=None):
+        try:
+            
+            params = {'tag': tag} if tag is not None else None
+                    
+            response = self.wrapped_call('POST', self.__share_init_url, params=params)
+             
+            return response.json()['token']
+            
+        except Exception as e:
+            raise Exception("Failed to initialize share.") from e
 
 def verify_url(url, username=None, password=None):
     try:

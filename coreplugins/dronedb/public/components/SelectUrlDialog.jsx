@@ -350,7 +350,7 @@ export default class SelectUrlDialog extends Component {
 				<Modal.Footer>
 					<Button onClick={onHide}>Close</Button>
 					<Button bsStyle="success" disabled={this.state.ddbUrl == null || this.state.ddbUrl.length == 0} onClick={this.handleVerify}>
-						<i className={"fas fa-link"} />Verify</Button>
+						<i className={"fas fa-check"} />Verify</Button>
 					<Button bsStyle="primary" disabled={this.state.verifyStatus !== 'success'} onClick={this.handleSubmit}>
 						<i className={"fa fa-upload"} />Import</Button>
 				</Modal.Footer>

@@ -7,7 +7,7 @@ from os import path
 #from requests.structures import CaseInsensitiveDict
 from app import models, pending_actions
 from app.plugins.views import TaskView
-from app.plugins.worker import run_function_async
+from app.plugins.worker import run_function_async, task
 from app.plugins import get_current_plugin
 from app.models import ImageUpload
 from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals
@@ -28,7 +28,7 @@ def is_valid(file):
 
 def get_settings(request):
     ds = get_current_plugin().get_user_data_store(request.user)
-            
+    
     registry_url = ds.get_string('registry_url') or DEFAULT_HUB_URL
     username = ds.get_string('username') or None
     password = ds.get_string('password') or None
@@ -248,8 +248,6 @@ def import_files(task_id, carrier):
 class CheckUrlTaskView(TaskView):
     def get(self, request, project_pk=None, pk=None):
 
-        from app.plugins import logger
-
         # Assert that task exists
         self.get_and_check_task(request, pk)
 
@@ -300,12 +298,24 @@ class StatusTaskView(TaskView):
 
         return Response(task_info, status=status.HTTP_200_OK)
 
+DRONEDB_ASSETS = [
+    'orthophoto.tif', 
+    'orthophoto.png',
+    'georeferenced_model.laz',
+    'dtm.tif',
+    'dsm.tif',
+    'cameras.json',
+    'shots.geojson'
+    'report.pdf',
+    'ground_control_points.geojson'
+]
 class ShareTaskView(TaskView): 
     def post(self, request, project_pk, pk):
 
+        from app.plugins import logger
+
         task = self.get_and_check_task(request, pk)
 
-        # Associate the folder url with the project and task
         combined_id = "{}_{}_ddb".format(project_pk, pk)
         
         datastore = get_current_plugin().get_global_data_store()
@@ -313,13 +323,97 @@ class ShareTaskView(TaskView):
         data = {
             'status': 1, # Running
             'shareUrl': None,
-            'uploadedFiles': 3,
-            'totalFiles': 10,
-            'uploadedSize': 1244,
-            'totalSize': 234525,
+            'uploadedFiles': 0,
+            'totalFiles': 0,
+            'uploadedSize': 0,
+            'totalSize': 0,
             'error': None
         }
 
         datastore.set_json(combined_id, data)
 
+        settings = get_settings(request)
+
+        available_assets = [task.get_asset_file_or_zipstream(f) for f in list(set(task.available_assets) & set(DRONEDB_ASSETS))]
+
+        logger.info(available_assets)
+
+        files = [{'path': f, 'size': os.path.getsize(f)} for f in available_assets]
+
+        logger.info(files)
+
+        share_to_ddb.delay(project_pk, pk, settings, files)
+
         return Response(data, status=status.HTTP_200_OK)        
+
+
+
+@task
+def share_to_ddb(project_pk, pk, settings, files):
+    
+    # Upload to temporary central location since
+    # OAM requires a public URL and not all WebODM
+    # instances are public
+
+    # res = requests.post('https://www.webodm.org/oam/upload',
+    #                     files=[
+    #                         ('file', ('orthophoto.tif', open(orthophoto_path, 'rb'), 'image/tiff')),
+    #                     ]).json()
+
+    # task_info = get_task_info(task_id)
+
+    # if 'url' in res:
+    #     orthophoto_public_url = res['url']
+    #     logger.info("Orthophoto uploaded to intermediary public URL " + orthophoto_public_url)
+
+    #     # That's OK... we :heart: dronedeploy
+    #     res = requests.post('https://api.openaerialmap.org/dronedeploy?{}'.format(urlencode(oam_params)),
+    #                         json={
+    #                             'download_path': orthophoto_public_url
+    #                         }).json()
+
+    #     if 'results' in res and 'upload' in res['results']:
+    #         task_info['oam_upload_id'] = res['results']['upload']
+    #         task_info['shared'] = True
+    #     else:
+    #         task_info['error'] = 'Could not upload orthophoto to OAM. The server replied: {}'.format(json.dumps(res))
+
+    #         # Attempt to cleanup intermediate results
+    #         requests.get('https://www.webodm.org/oam/cleanup/{}'.format(os.path.basename(orthophoto_public_url)))
+    # else:
+    #     err_message = res['error'] if 'error' in res else json.dumps(res)
+    #     task_info['error'] = 'Could not upload orthophoto to intermediate location: {}.'.format(err_message)
+
+    # task_info['sharing'] = False
+    # set_task_info(task_id, task_info)
+    
+    combined_id = "{}_{}_ddb".format(project_pk, pk)        
+    datastore = get_current_plugin().get_global_data_store()
+
+    registry_url, username, password, token = settings
+    
+    ddb = DroneDB(registry_url, username, password, token)
+
+    # Init share (to check)
+    share_token = ddb.share_init()
+
+    status = datastore.get_json(combined_id)
+
+    status['totalFiles'] = len(files)
+    status['totalSize'] = sum(i['size'] for i in files)
+
+    datastore.set_json(combined_id, status)
+
+    for file in files:
+        ddb.share_upload(share_token, file)
+        status['uploadedFiles'] += 1
+        status['uploadedSize'] += file['size']
+        datastore.set_json(combined_id, status)
+
+    shareUrl = ddb.share_commit(share_token)
+    
+    status['status'] = 1
+    status['shareUrl'] = shareUrl
+
+    datastore.set_json(combined_id, status)
+
