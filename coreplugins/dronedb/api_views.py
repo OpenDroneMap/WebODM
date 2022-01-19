@@ -248,8 +248,6 @@ class CheckUrlTaskView(TaskView):
         combined_id = "{}_{}".format(project_pk, pk)
         data = get_current_plugin().get_global_data_store().get_json(combined_id, default = None)
 
-        logger.info(data)
-
         if data == None or 'ddbWebUrl' not in data:
             return Response({'ddbWebUrl': None}, status=status.HTTP_200_OK)
         else:
