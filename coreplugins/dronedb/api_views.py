@@ -4,7 +4,6 @@ import requests
 import os
 from os import path
 
-#from requests.structures import CaseInsensitiveDict
 from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async, task
@@ -51,52 +50,6 @@ def get_ddb(request):
 
 def to_web_protocol(registry_url):
     return registry_url.replace('ddb+unsafe://', 'http://').replace('ddb://', 'https://').rstrip('/')
-
-class ImportDatasetTaskView(TaskView):
-    def post(self, request, project_pk=None, pk=None):
-                        
-        task = self.get_and_check_task(request, pk)
-
-        # Read form data
-        ddb_url = request.data.get('ddb_url', None)
-                      
-        if ddb_url == None:
-            return Response({'error': 'DroneDB url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        registry_url, orgSlug, dsSlug, folder = parse_url(ddb_url).values()
-
-        _, username, password, token = get_settings(request)
-        ddb = DroneDB(registry_url, username, password, token, lambda token: update_token(request, token))
-
-        # Get the files from the folder
-        rawfiles = ddb.get_files_list(orgSlug, dsSlug, folder)
-        files = [file for file in rawfiles if is_valid(file['path'])]
-                        
-        # Verify that the folder url is valid    
-        if len(files) == 0:
-            return Response({'error': 'Empty dataset or folder.'}, status=status.HTTP_400_BAD_REQUEST)
-              
-        # Update the task with the new information
-        task.console_output += "Importing {} images...\n".format(len(files))
-        task.images_count = len(files)
-        task.pending_action = pending_actions.IMPORT
-        task.save()
-        
-        # Associate the folder url with the project and task
-        combined_id = "{}_{}".format(project_pk, pk)
-        
-        datastore = get_current_plugin().get_global_data_store()
-        datastore.set_json(combined_id, {
-            "ddbUrl": ddb_url, 
-            "token": ddb.token, 
-            "ddbWebUrl": "{}/r/{}/{}/{}".format(to_web_protocol(registry_url), orgSlug, dsSlug, folder.rstrip('/'))
-        })
-        
-        # Start importing the files in the background
-        serialized = {'token': ddb.token, 'files': files}
-        run_function_async(import_files, task.id, serialized)
-
-        return Response({}, status=status.HTTP_200_OK)
 
 class CheckCredentialsTaskView(TaskView):
     def post(self, request):
@@ -200,6 +153,54 @@ class InfoTaskView(TaskView):
         return Response({ 'hubUrl': registry_url, 'username': username }, status=status.HTTP_200_OK)
            
 
+class ImportDatasetTaskView(TaskView):
+    def post(self, request, project_pk=None, pk=None):
+                        
+        task = self.get_and_check_task(request, pk)
+
+        # Read form data
+        ddb_url = request.data.get('ddb_url', None)
+                      
+        if ddb_url == None:
+            return Response({'error': 'DroneDB url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        registry_url, orgSlug, dsSlug, folder = parse_url(ddb_url).values()
+
+        _, username, password, token = get_settings(request)
+        ddb = DroneDB(registry_url, username, password, token, lambda token: update_token(request, token))
+
+        # Get the files from the folder
+        rawfiles = ddb.get_files_list(orgSlug, dsSlug, folder)
+        files = [file for file in rawfiles if is_valid(file['path'])]
+                        
+        # Verify that the folder url is valid    
+        if len(files) == 0:
+            return Response({'error': 'Empty dataset or folder.'}, status=status.HTTP_400_BAD_REQUEST)
+              
+        # Update the task with the new information
+        task.console_output += "Importing {} images...\n".format(len(files))
+        task.images_count = len(files)
+        task.pending_action = pending_actions.IMPORT
+        task.save()
+        
+        # Associate the folder url with the project and task
+        combined_id = "{}_{}".format(project_pk, pk)
+        
+        datastore = get_current_plugin().get_global_data_store()
+        datastore.set_json(combined_id, {
+            "ddbUrl": ddb_url, 
+            "token": ddb.token, 
+            "ddbWebUrl": "{}/r/{}/{}/{}".format(to_web_protocol(registry_url), orgSlug, dsSlug, folder.rstrip('/'))
+        })
+        
+        #ddb.refresh_token()
+
+        # Start importing the files in the background
+        serialized = {'token': ddb.token, 'files': files}
+        run_function_async(import_files, task.id, serialized)
+
+        return Response({}, status=status.HTTP_200_OK)
+
 def import_files(task_id, carrier):
     import requests
     from app import models
@@ -211,10 +212,11 @@ def import_files(task_id, carrier):
     headers = {}
 
     if carrier['token'] != None:
-        headers['Authorization'] = 'Token ' + carrier['token']
+        headers['Authorization'] = 'Bearer ' + carrier['token']
 
     def download_file(task, file):
         path = task.task_path(file['name'])
+        logger.info("Downloading file: " + file['url'])
         download_stream = requests.get(file['url'], stream=True, timeout=60, headers=headers)
 
         with open(path, 'wb') as fd:
@@ -338,7 +340,7 @@ class ShareTaskView(TaskView):
 
         logger.info(available_assets)
 
-        files = [{'path': f, 'size': os.path.getsize(f)} for f in available_assets]
+        files = [{'path': f[0], 'name': f[0].split('/')[-1], 'size': os.path.getsize(f[0])} for f in available_assets]
 
         logger.info(files)
 
@@ -351,38 +353,7 @@ class ShareTaskView(TaskView):
 @task
 def share_to_ddb(project_pk, pk, settings, files):
     
-    # Upload to temporary central location since
-    # OAM requires a public URL and not all WebODM
-    # instances are public
-
-    # res = requests.post('https://www.webodm.org/oam/upload',
-    #                     files=[
-    #                         ('file', ('orthophoto.tif', open(orthophoto_path, 'rb'), 'image/tiff')),
-    #                     ]).json()
-
-    # task_info = get_task_info(task_id)
-
-    # if 'url' in res:
-    #     orthophoto_public_url = res['url']
-    #     logger.info("Orthophoto uploaded to intermediary public URL " + orthophoto_public_url)
-
-    #     # That's OK... we :heart: dronedeploy
-    #     res = requests.post('https://api.openaerialmap.org/dronedeploy?{}'.format(urlencode(oam_params)),
-    #                         json={
-    #                             'download_path': orthophoto_public_url
-    #                         }).json()
-
-    #     if 'results' in res and 'upload' in res['results']:
-    #         task_info['oam_upload_id'] = res['results']['upload']
-    #         task_info['shared'] = True
-    #     else:
-    #         task_info['error'] = 'Could not upload orthophoto to OAM. The server replied: {}'.format(json.dumps(res))
-
-    #         # Attempt to cleanup intermediate results
-    #         requests.get('https://www.webodm.org/oam/cleanup/{}'.format(os.path.basename(orthophoto_public_url)))
-    # else:
-    #     err_message = res['error'] if 'error' in res else json.dumps(res)
-    #     task_info['error'] = 'Could not upload orthophoto to intermediate location: {}.'.format(err_message)
+    from app.plugins import logger
 
     # task_info['sharing'] = False
     # set_task_info(task_id, task_info)
@@ -405,15 +376,24 @@ def share_to_ddb(project_pk, pk, settings, files):
     datastore.set_json(combined_id, status)
 
     for file in files:
-        ddb.share_upload(share_token, file)
+
+        # check that file exists
+        if not os.path.exists(file['path']):
+            logger.info("File {} does not exist".format(file['path']))
+            continue
+        
+        up = ddb.share_upload(share_token, file['path'], file['name'])
+        logger.info("Uploaded " + file['name'])
         status['uploadedFiles'] += 1
         status['uploadedSize'] += file['size']
         datastore.set_json(combined_id, status)
 
-    shareUrl = ddb.share_commit(share_token)
+    res = ddb.share_commit(share_token)
     
     status['status'] = 1
-    status['shareUrl'] = shareUrl
+    status['shareUrl'] = registry_url + res['url']
+
+    logger.info("Shared on url " + status['shareUrl'])
 
     datastore.set_json(combined_id, status)
 
