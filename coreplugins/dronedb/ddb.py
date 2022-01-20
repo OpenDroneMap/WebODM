@@ -28,7 +28,7 @@ class DroneDB:
         self.__get_folders_url = self.__registry_url + "/orgs/{0}/ds/{1}/search"
         self.__get_files_list_url = self.__registry_url + "/orgs/{0}/ds/{1}/list"
         self.__download_file_url = self.__registry_url + "/orgs/{0}/ds/{1}/download?path={2}&inline=1"
-
+        
         self.__share_init_url = self.__registry_url + "/share/init"
         self.__share_upload_url = self.__registry_url + "/share/upload/{0}"
         self.__share_commit_url = self.__registry_url + "/share/commit/{0}"
@@ -71,7 +71,7 @@ class DroneDB:
             logger.error(e)
             return False             
     
-    def wrapped_call(self, type, url, data=None, params=None, attempts=3):
+    def wrapped_call(self, type, url, data=None, params=None, files=None, attempts=3):
         
         headers = {}
         
@@ -84,24 +84,25 @@ class DroneDB:
             
             if self.token is not None:
                 headers = {'Authorization': 'Bearer ' + self.token }
-                
-            response = requests.request(type, url, data=data, params=params, headers=headers)
+                           
+            response = requests.request(type, url, data=data, params=params, headers=headers, files=files)
                         
             if response.status_code == 200:
                 return response
             
             if response.status_code == 401:            
                 if (self.public):
-                    raise Exception("Failed to call '" + url + "'.")
+                    raise DroneDBException("Failed to call '" + url + "': unauthorized.")
                 
                 if not self.login():
-                    raise Exception("Failed to re-authenticate to DroneDB, cannot call '" + url + "'.")
+                    raise DroneDBException("Failed to re-authenticate to DroneDB, cannot call '" + url + "'.")
                 else:
                     cnt -= 1
                     if cnt == 0:
-                        raise Exception("Failed all attempts to re-authenticate to DroneDB, cannot call '" + url + "'.")
-            else:
-                raise Exception("Failed to call '" + url + "'.")        
+                        raise DroneDBException("Failed all attempts to re-authenticate to DroneDB, cannot call '" + url + "'.")
+            else:   
+                res = response.json()            
+                raise DroneDBException("Failed to call '" + url + "'.", res)       
         
 
     def get_organizations(self):
@@ -174,14 +175,38 @@ class DroneDB:
     def share_init(self, tag=None):
         try:
             
-            params = {'tag': tag} if tag is not None else None
+            data = {'tag': tag} if tag is not None else None
                     
-            response = self.wrapped_call('POST', self.__share_init_url, params=params)
+            response = self.wrapped_call('POST', self.__share_init_url, data=data)
              
             return response.json()['token']
             
         except Exception as e:
             raise Exception("Failed to initialize share.") from e
+        
+    def share_upload(self, token, file, name):
+        try:
+            
+            # Get file name
+            files = { 'file': open(file, 'rb') }
+            data = {'path': name}
+                
+            response = self.wrapped_call('POST', self.__share_upload_url.format(token), files=files, data=data)
+            
+            return response.json()
+            
+        except Exception as e:
+            raise Exception("Failed to upload file.") from e
+        
+    def share_commit(self, token):
+        try:            
+                  
+            response = self.wrapped_call('POST', self.__share_commit_url.format(token))
+             
+            return response.json()
+            
+        except Exception as e:
+            raise Exception("Failed to commit share.") from e
 
 def verify_url(url, username=None, password=None):
     try:
@@ -250,4 +275,8 @@ def parse_url(url):
         'folder': '/'.join(segments[3 + offset:])
     }
 
-    
+class DroneDBException(Exception):
+    def __init__(self, message, res=None):
+        super().__init__(message)
+        self.response = res
+
