@@ -273,7 +273,17 @@ def ddb_cleanup(sender, task_id, **kwargs):
     # When a task is re-processed, make sure we can re-share it if we shared a task previously
 
     logger.info("Cleaning up DroneDB datastore for task {}".format(str(task_id)))
-    #ds.del_key(get_key_for(task_id, "status"))
+
+    task = models.Task.objects.get(id=task_id)
+    project_pk = task.project.id
+
+    datastore = get_current_plugin().get_global_data_store()
+    combined_id = "{}_{}_ddb".format(project_pk, task_id)
+
+    logger.info("Info task {0}, project {1} ({2})".format(str(task_id), str(project_pk), combined_id))
+
+    datastore.del_key(combined_id)
+    # task.project
 
 class StatusTaskView(TaskView):
     def get(self, request, project_pk, pk):
@@ -390,7 +400,7 @@ def share_to_ddb(project_pk, pk, settings, files):
 
     res = ddb.share_commit(share_token)
     
-    status['status'] = 1
+    status['status'] = 3 # Done
     status['shareUrl'] = registry_url + res['url']
 
     logger.info("Shared on url " + status['shareUrl'])

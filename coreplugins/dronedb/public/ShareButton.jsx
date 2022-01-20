@@ -63,9 +63,6 @@ export default class ShareButton extends React.Component{
                 url: `/api/plugins/dronedb/projects/${task.project}/tasks/${task.id}/status`,
                 contentType: 'application/json'
             }).done(taskInfo => {                
-
-                console.log(taskInfo);
-
                 this.setState({taskInfo});
                 if (taskInfo.error && showErrors) this.setState({error: taskInfo.error});
             }).fail(error => {
@@ -99,28 +96,17 @@ export default class ShareButton extends React.Component{
             this.state.intervalId = setInterval(() => {
                 this.updateTaskInfo(true);
 
-                if (this.state.taskInfo.status == STATE_DONE || this.state.taskInfo.status == STATE_ERROR) {
+                if (this.state.error != null || this.state.taskInfo.status == STATE_DONE || this.state.taskInfo.status == STATE_ERROR) {
                     clearInterval(this.state.intervalId);
                 }
 
-            }, 3000);
-            
-            //this.monitorProgress();
+            }, 3000);            
+
           });
     }
 
-    /*
-    monitorProgress = () => {
-        if (this.state.taskInfo.sharing){
-            // Monitor progress
-            this.monitorTimeout = setTimeout(() => {
-                this.updateTaskInfo(true).always(this.monitorProgress);
-            }, 3000);
-        }
-    }*/
 
     handleClick = e => {
-        console.log("Clicked");
 
         if (this.state.taskInfo.status == STATE_IDLE){
             this.shareToDdb();
