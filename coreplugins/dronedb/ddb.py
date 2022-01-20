@@ -69,7 +69,25 @@ class DroneDB:
         
         except(Exception) as e:
             logger.error(e)
-            return False             
+            return False       
+
+    def refresh_token(self):
+        
+        if (self.public):
+            logger.info("Cannot refresh token.")
+            return False
+        
+        try:
+        
+            response = self.wrapped_call('POST', self.__refresh_url)
+
+            self.token = response.json()['token']
+
+            if (self.update_token is not None):
+                self.update_token(self.token)
+        
+        except Exception as e:
+            raise Exception("Failed to refresh token.") from e       
     
     def wrapped_call(self, type, url, data=None, params=None, files=None, attempts=3):
         
@@ -184,11 +202,11 @@ class DroneDB:
         except Exception as e:
             raise Exception("Failed to initialize share.") from e
         
-    def share_upload(self, token, file, name):
+    def share_upload(self, token, path, name):
         try:
             
             # Get file name
-            files = { 'file': open(file, 'rb') }
+            files = { 'file': open(path, 'rb') }
             data = {'path': name}
                 
             response = self.wrapped_call('POST', self.__share_upload_url.format(token), files=files, data=data)
