@@ -8,8 +8,6 @@ from django.contrib.auth.decorators import login_required
 
 from app.plugins import logger
 
-#from .platform_helper import get_all_extended_platforms
-
 def LoadButtonsView(plugin):
     def view(request):
 

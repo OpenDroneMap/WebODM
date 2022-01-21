@@ -10,7 +10,6 @@ import ConfigureNewTaskDialog from "./components/ConfigureNewTaskDialog";
 import "./ImportView.scss";
 
 export default class TaskView extends Component {
-
 	
  	static propTypes = {
 		projectId: PropTypes.number.isRequired,
@@ -24,11 +23,6 @@ export default class TaskView extends Component {
 		isDialogOpen: false
 	};
 	
-	componentDidMount() {
-		
-				
-	}
-
 	onHideDialog = () => this.setState({ ddbRes: null, taskId: null, isDialogOpen: false });
 	onSelectDdbRes = res => {
 		console.log("Result", res);

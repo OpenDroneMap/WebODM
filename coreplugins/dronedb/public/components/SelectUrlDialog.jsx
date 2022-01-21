@@ -239,7 +239,6 @@ export default class SelectUrlDialog extends Component {
 			show
 		} = this.props;
 
-		//const isVisible = true;
 		return (
 			<Modal className={"folder-select"} onHide={onHide} show={show} onShow={this.handleOnShow}>
 				<Modal.Header closeButton>

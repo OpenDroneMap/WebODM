@@ -15,11 +15,7 @@ export default class TaskView extends Component {
 		} = this.props;
 		return (
 			<Fragment>
-				{ddbUrl ?
-					<GoToFolderButton
-					ddbUrl={ddbUrl}
-					/>
-				: ""}
+				{ddbUrl ? <GoToFolderButton ddbUrl={ddbUrl} /> : ""}
 			</Fragment>
 		);
 	}
