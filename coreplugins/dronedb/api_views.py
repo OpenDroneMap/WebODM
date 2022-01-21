@@ -262,6 +262,8 @@ class CheckUrlTaskView(TaskView):
         else:
             return Response({'ddbUrl': data['ddbWebUrl']}, status=status.HTTP_200_OK)
 
+def get_status_key(task_id):
+    return '{}_ddb'.format(task_id)
 
 @receiver(plugin_signals.task_removed, dispatch_uid="ddb_on_task_removed")
 @receiver(plugin_signals.task_completed, dispatch_uid="ddb_on_task_completed")
@@ -274,28 +276,25 @@ def ddb_cleanup(sender, task_id, **kwargs):
 
     logger.info("Cleaning up DroneDB datastore for task {}".format(str(task_id)))
 
-    task = models.Task.objects.get(id=task_id)
-    project_pk = task.project.id
-
     datastore = get_current_plugin().get_global_data_store()
-    combined_id = "{}_{}_ddb".format(project_pk, task_id)
+    status_key = get_status_key(task_id)
 
-    logger.info("Info task {0}, project {1} ({2})".format(str(task_id), str(project_pk), combined_id))
+    logger.info("Info task {0} ({1})".format(str(task_id), status_key))
 
-    datastore.del_key(combined_id)
-    # task.project
+    datastore.del_key(status_key)
+    
 
 class StatusTaskView(TaskView):
-    def get(self, request, project_pk, pk):
+    def get(self, request, pk):
 
         task = self.get_and_check_task(request, pk)
 
         # Associate the folder url with the project and task
-        combined_id = "{}_{}_ddb".format(project_pk, pk)
+        status_key = get_status_key(pk)
         
         datastore = get_current_plugin().get_global_data_store()
 
-        task_info = datastore.get_json(combined_id, {
+        task_info = datastore.get_json(status_key, {
             'status': 0, # Idle
             'shareUrl': None,
             'uploadedFiles': 0,
@@ -322,13 +321,13 @@ DRONEDB_ASSETS = [
     'ground_control_points.geojson'
 ]
 class ShareTaskView(TaskView): 
-    def post(self, request, project_pk, pk):
+    def post(self, request, pk):
 
         from app.plugins import logger
 
         task = self.get_and_check_task(request, pk)
 
-        combined_id = "{}_{}_ddb".format(project_pk, pk)
+        status_key = get_status_key(pk)
         
         datastore = get_current_plugin().get_global_data_store()
 
@@ -342,33 +341,29 @@ class ShareTaskView(TaskView):
             'error': None
         }
 
-        datastore.set_json(combined_id, data)
+        datastore.set_json(status_key, data)
 
         settings = get_settings(request)
 
         available_assets = [task.get_asset_file_or_zipstream(f) for f in list(set(task.available_assets) & set(DRONEDB_ASSETS))]
 
-        logger.info(available_assets)
-
         files = [{'path': f[0], 'name': f[0].split('/')[-1], 'size': os.path.getsize(f[0])} for f in available_assets]
 
-        logger.info(files)
-
-        share_to_ddb.delay(project_pk, pk, settings, files)
+        share_to_ddb.delay(pk, settings, files)
 
         return Response(data, status=status.HTTP_200_OK)        
 
 
 
 @task
-def share_to_ddb(project_pk, pk, settings, files):
+def share_to_ddb(pk, settings, files):
     
     from app.plugins import logger
 
     # task_info['sharing'] = False
     # set_task_info(task_id, task_info)
     
-    combined_id = "{}_{}_ddb".format(project_pk, pk)        
+    status_key = get_status_key(pk)        
     datastore = get_current_plugin().get_global_data_store()
 
     registry_url, username, password, token = settings
@@ -378,12 +373,12 @@ def share_to_ddb(project_pk, pk, settings, files):
     # Init share (to check)
     share_token = ddb.share_init()
 
-    status = datastore.get_json(combined_id)
+    status = datastore.get_json(status_key)
 
     status['totalFiles'] = len(files)
     status['totalSize'] = sum(i['size'] for i in files)
 
-    datastore.set_json(combined_id, status)
+    datastore.set_json(status_key, status)
 
     for file in files:
 
@@ -393,10 +388,13 @@ def share_to_ddb(project_pk, pk, settings, files):
             continue
         
         up = ddb.share_upload(share_token, file['path'], file['name'])
+
         logger.info("Uploaded " + file['name'])
+
         status['uploadedFiles'] += 1
         status['uploadedSize'] += file['size']
-        datastore.set_json(combined_id, status)
+
+        datastore.set_json(status_key, status)
 
     res = ddb.share_commit(share_token)
     
@@ -405,5 +403,5 @@ def share_to_ddb(project_pk, pk, settings, files):
 
     logger.info("Shared on url " + status['shareUrl'])
 
-    datastore.set_json(combined_id, status)
+    datastore.set_json(status_key, status)
 

@@ -25,8 +25,8 @@ const BUTTON_TEXT_MAPPER = [
     'Share to DroneDB',
     // Running
     'Sharing...',
-    // Error
-    'Error',
+    // Error retry
+    'Error, retry',
     // Done
     'View on DroneDB'
 ];
@@ -60,7 +60,7 @@ export default class ShareButton extends React.Component{
         const { task } = this.props;
         return $.ajax({
                 type: 'GET',
-                url: `/api/plugins/dronedb/projects/${task.project}/tasks/${task.id}/status`,
+                url: `/api/plugins/dronedb/tasks/${task.id}/status`,
                 contentType: 'application/json'
             }).done(taskInfo => {                
                 this.setState({taskInfo});
@@ -78,7 +78,7 @@ export default class ShareButton extends React.Component{
         const { task } = this.props;
 
         return $.ajax({
-            url: `/api/plugins/dronedb/projects/${task.project}/tasks/${task.id}/share`,
+            url: `/api/plugins/dronedb/tasks/${task.id}/share`,
             contentType: 'application/json',
             //data: JSON.stringify({
             //    oamParams: oamParams
@@ -140,7 +140,7 @@ export default class ShareButton extends React.Component{
 
         return (
             <div className="share-button">
-                <button className="btn btn-primary btn-sm" onClick={this.handleClick} disabled={this.state.taskInfo == null || this.state.taskInfo.error || this.state.taskInfo.status == 1 }>
+                <button className="btn btn-primary btn-sm" onClick={this.handleClick} disabled={this.state.taskInfo == null || this.state.taskInfo.status == STATE_RUNNING }>
                     <i className={getButtonIcon()}></i>&nbsp;
                     {getButtonLabel()}
                 </button>

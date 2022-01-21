@@ -45,8 +45,8 @@ class Plugin(PluginBase):
         return [
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/import", ImportDatasetTaskView.as_view()),
             MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/checkforurl", CheckUrlTaskView.as_view()),
-            MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/status", StatusTaskView.as_view()),
-            MountPoint("projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/share", ShareTaskView.as_view()),
+            MountPoint("tasks/(?P<pk>[^/.]+)/status", StatusTaskView.as_view()),
+            MountPoint("tasks/(?P<pk>[^/.]+)/share", ShareTaskView.as_view()),
             MountPoint("checkcredentials", CheckCredentialsTaskView.as_view()),
             MountPoint("organizations/(?P<org>[^/.]+)/datasets/(?P<ds>[^/.]+)/folders", FoldersTaskView.as_view()),
             MountPoint("organizations/(?P<org>[^/.]+)/datasets", DatasetsTaskView.as_view()),

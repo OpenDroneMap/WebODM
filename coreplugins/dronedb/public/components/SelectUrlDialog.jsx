@@ -89,8 +89,7 @@ export default class SelectUrlDialog extends Component {
 			});
 
 		$.get(`${this.props.apiURL}/info`)
-			.done(result => {
-				console.log(result);
+			.done(result => {				
 				this.setState({info: result});
 			})
 			.fail((error) => {
@@ -99,7 +98,7 @@ export default class SelectUrlDialog extends Component {
 	}
 
 	handleVerify = () => {
-		//console.log("Verify");
+
 		this.setState({verifyStatus: 'loading'});
 
 		$.post(`${this.props.apiURL}/verifyurl`, { url: this.state.ddbUrl }).done(result => {
@@ -139,8 +138,6 @@ export default class SelectUrlDialog extends Component {
 			folders: []
 		});
 
-		console.log("Load datasets of", e);
-
 		$.get(`${this.props.apiURL}/organizations/${e.value}/datasets`)
 			.done(result => {				
 				
@@ -177,8 +174,6 @@ export default class SelectUrlDialog extends Component {
 			folders: []
 		});
 
-		console.log("Load folders of", e);
-
 		$.get(`${this.props.apiURL}/organizations/${this.state.selectedOrganization.value}/datasets/${e.value}/folders`)
 			.done(result => {
 				
@@ -211,7 +206,7 @@ export default class SelectUrlDialog extends Component {
 		this.setState({selectedFolder: e, verifyStatus: null});
 		
 		if (this.state.info == null || this.state.info.hubUrl == null) {
-			console.log("Cannot generate hub url");
+			console.warn("Cannot generate ddb url, no hub url");
 			return;
 		}
 
