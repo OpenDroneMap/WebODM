@@ -1,5 +1,6 @@
 import importlib
 import json
+import time
 import requests
 import os
 from os import path
@@ -304,9 +305,6 @@ class StatusTaskView(TaskView):
             'error': None
         })
 
-        #task_info['title'] = task.name
-        #task_info['provider'] = get_site_settings().organization_name
-
         return Response(task_info, status=status.HTTP_200_OK)
 
 DRONEDB_ASSETS = [
@@ -354,15 +352,11 @@ class ShareTaskView(TaskView):
         return Response(data, status=status.HTTP_200_OK)        
 
 
-
 @task
 def share_to_ddb(pk, settings, files):
     
     from app.plugins import logger
-
-    # task_info['sharing'] = False
-    # set_task_info(task_id, task_info)
-    
+  
     status_key = get_status_key(pk)        
     datastore = get_current_plugin().get_global_data_store()
 
@@ -386,15 +380,38 @@ def share_to_ddb(pk, settings, files):
         if not os.path.exists(file['path']):
             logger.info("File {} does not exist".format(file['path']))
             continue
-        
-        up = ddb.share_upload(share_token, file['path'], file['name'])
 
-        logger.info("Uploaded " + file['name'])
+        attempt = 0
 
-        status['uploadedFiles'] += 1
-        status['uploadedSize'] += file['size']
+        while attempt < 3:
+            try:
+                
+                attempt += 1
+                
+                up = ddb.share_upload(share_token, file['path'], file['name'])
 
-        datastore.set_json(status_key, status)
+                logger.info("Uploaded " + file['name'] + " to Dronedb (hash: " + up['hash'] + ")")
+
+                status['uploadedFiles'] += 1
+                status['uploadedSize'] += file['size']
+
+                datastore.set_json(status_key, status)
+            
+                break
+
+            except Exception as e:
+
+                if (attempt == 3):
+                    logger.error("Error uploading file {}: {}".format(file['name'], str(e)))
+                    status['error'] = "Error uploading file {}: {}".format(file['name'], str(e))
+                    status['status'] = 2 # Error
+                    datastore.set_json(status_key, status)
+                    return
+                else:
+                    logger.info("Error uploading file {}: {}. Retrying...".format(file['name'], str(e)))
+                    time.sleep(5)
+                    continue
+
 
     res = ddb.share_commit(share_token)
     

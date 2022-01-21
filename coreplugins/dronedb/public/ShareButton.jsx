@@ -24,7 +24,7 @@ const BUTTON_TEXT_MAPPER = [
     // Idle
     'Share to DroneDB',
     // Running
-    'Sharing...',
+    'Sharing',
     // Error retry
     'Error, retry',
     // Done
@@ -46,11 +46,10 @@ export default class ShareButton extends React.Component{
         this.state = {            
             taskInfo: null,
             error: '',
-            intervalId: null
+            monitorTimeout: null
         };
 
     }
-
     
     componentDidMount(){
         this.updateTaskInfo(false);
@@ -62,16 +61,18 @@ export default class ShareButton extends React.Component{
                 type: 'GET',
                 url: `/api/plugins/dronedb/tasks/${task.id}/status`,
                 contentType: 'application/json'
-            }).done(taskInfo => {                
+            }).done(taskInfo => {            
+                console.log(taskInfo);  
+                debugger;  
                 this.setState({taskInfo});
                 if (taskInfo.error && showErrors) this.setState({error: taskInfo.error});
             }).fail(error => {
                 this.setState({error: error.statusText});
             });
     }
-    
+
     componentWillUnmount(){
-        if (this.intervalId) clearInterval(this.intervalId);
+        if (this.monitorTimeout) clearTimeout(this.monitorTimeout);
     }
 
     shareToDdb = (formData) => {
@@ -80,35 +81,28 @@ export default class ShareButton extends React.Component{
         return $.ajax({
             url: `/api/plugins/dronedb/tasks/${task.id}/share`,
             contentType: 'application/json',
-            //data: JSON.stringify({
-            //    oamParams: oamParams
-            //}),
             dataType: 'json',
             type: 'POST'
           }).done(taskInfo => {
-            // Allow a user to associate the sensor name coming from the EXIF tags
-            // to one that perhaps is more human readable.
 
             this.setState({taskInfo});
-            
-            if (this.state.intervalId) clearInterval(this.state.intervalId);
-
-            this.state.intervalId = setInterval(() => {
-                this.updateTaskInfo(true);
-
-                if (this.state.error != null || this.state.taskInfo.status == STATE_DONE || this.state.taskInfo.status == STATE_ERROR) {
-                    clearInterval(this.state.intervalId);
-                }
-
-            }, 3000);            
+            this.monitorProgress();
 
           });
     }
 
+    monitorProgress = () => {
+        if (this.state.taskInfo.status == STATE_RUNNING){
+            // Monitor progress
+            this.monitorTimeout = setTimeout(() => {
+                this.updateTaskInfo(true).always(this.monitorProgress);
+            }, 3000);
+        }
+    }
 
     handleClick = e => {
 
-        if (this.state.taskInfo.status == STATE_IDLE){
+        if (this.state.taskInfo.status == STATE_IDLE || this.state.taskInfo.status == STATE_ERROR) {
             this.shareToDdb();
         }
 
@@ -135,7 +129,14 @@ export default class ShareButton extends React.Component{
             if (taskInfo == null) return "Share on DroneDB";
             if (taskInfo.error) return "DroneDB plugin error";
 
-            return BUTTON_TEXT_MAPPER[taskInfo.status];
+            var text = BUTTON_TEXT_MAPPER[taskInfo.status];
+
+            if (taskInfo.status == STATE_RUNNING && taskInfo.uploadedSize > 0 && taskInfo.totalSize > 0) {
+                var progress = (taskInfo.uploadedSize / taskInfo.totalSize) * 100;
+                text += ` (${progress.toFixed(2)}%)`;
+            }
+
+            return text;
         };
 
         return (
@@ -144,27 +145,8 @@ export default class ShareButton extends React.Component{
                     <i className={getButtonIcon()}></i>&nbsp;
                     {getButtonLabel()}
                 </button>
+                {this.state.error && <div style={{ marginTop: '10px' }}><ErrorMessage bind={[this, 'error']} /></div> }
             </div>
         );
-
-        /*
-        const result = [
-                <ErrorMessage bind={[this, "error"]} />,
-                <button
-                onClick={this.handleClick}
-                disabled={loading || taskInfo.sharing || error}
-                className="btn btn-sm btn-primary">
-                    {[<i className={getButtonIcon()}></i>, getButtonLabel()]}
-                </button>];
-
-        if (taskInfo.sensor !== undefined){
-            result.unshift(<ShareDialog
-                  ref={(domNode) => { this.shareDialog = domNode; }}
-                  task={this.props.task}
-                  taskInfo={taskInfo}
-                  saveAction={this.shareToOAM}
-                />);
-        }*/
-
     }
 }
