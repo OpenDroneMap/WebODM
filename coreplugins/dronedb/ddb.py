@@ -178,6 +178,9 @@ class DroneDB:
             # Get the folders
             response = self.wrapped_call('GET', self.__get_files_list_url.format(orgSlug, dsSlug), params=params)
 
+            # Exclude folders
+            files = filter(lambda itm: itm['type'] != 1, response.json())
+
             return [
                 {'path': o['path'], 
                 # extract name from path
@@ -185,7 +188,7 @@ class DroneDB:
                 'type': o['type'], 
                 'size': o['size'],
                 'url': self.__download_file_url.format(orgSlug, dsSlug, o['path'])
-                } for o in response.json()]
+                } for o in files]
             
         except Exception as e:
             raise Exception("Failed to get files list.") from e

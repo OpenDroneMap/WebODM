@@ -143,8 +143,8 @@ export default class SelectUrlDialog extends Component {
 				
 				var dss = result.map(ds => {
 					return { label: ds.name !== ds.slug ? 
-						`${ds.name} (${ds.slug}) - ${ds.entries} files (${this.formatBytes(ds.size)})`: 
-						`${ds.name} - ${ds.entries} files (${this.formatBytes(ds.size)})`, name: ds.name, value: ds.slug };
+						`${ds.name} (${ds.slug}) - ${ds.entries} entries (${this.formatBytes(ds.size)})`: 
+						`${ds.name} - ${ds.entries} entries (${this.formatBytes(ds.size)})`, name: ds.name, value: ds.slug };
 				});
 
 				if (dss.length > 0) {
