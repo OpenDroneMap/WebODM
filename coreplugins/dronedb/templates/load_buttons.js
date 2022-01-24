@@ -9,27 +9,6 @@ PluginsAPI.Dashboard.addNewTaskButton(
 	}
 );
 
-
-PluginsAPI.Dashboard.addTaskActionButton(
-    ["dronedb/build/TaskView.js", "dronedb/build/TaskView.css"],
-	function(args, TaskView) {
-		var reactElement;
-		$.ajax({
-			url: "{{ api_url }}/projects/" + args.task.project + "/tasks/" + args.task.id + "/checkforurl",
-			dataType: 'json',
-			async: false,
-			success: function(data) {
-				if (data.ddbUrl) {
-					reactElement = React.createElement(TaskView, {
-						ddbUrl: data.ddbUrl,
-					});
-				}
-			}
-		});
-		return reactElement;
-	}
-);
-
 PluginsAPI.Dashboard.addTaskActionButton(['dronedb/build/ShareButton.js'],function(args, ShareButton){
 	var task = args.task;
 

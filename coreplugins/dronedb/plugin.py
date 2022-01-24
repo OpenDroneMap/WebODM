@@ -36,10 +36,10 @@ class Plugin(PluginBase):
         return ["load_buttons.js"]
 
     def include_css_files(self):
-        return ["build/ImportView.css", "build/TaskView.css"]
+        return ["build/ImportView.css"]
 
     def build_jsx_components(self):
-        return ["ImportView.jsx", "TaskView.jsx", "ShareButton.jsx"]
+        return ["ImportView.jsx", "ShareButton.jsx"]
 
     def api_mount_points(self):
         return [
