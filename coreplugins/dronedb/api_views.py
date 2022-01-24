@@ -1,9 +1,11 @@
+from genericpath import isfile
 import importlib
 import json
+from posixpath import join
 import time
 import requests
 import os
-from os import path
+from os import listdir, path
 
 from app import models, pending_actions
 from app.plugins.views import TaskView
@@ -313,11 +315,11 @@ DRONEDB_ASSETS = [
     'georeferenced_model.laz',
     'dtm.tif',
     'dsm.tif',
-    'cameras.json',
-    'shots.geojson'
+    'shots.geojson',
     'report.pdf',
     'ground_control_points.geojson'
 ]
+
 class ShareTaskView(TaskView): 
     def post(self, request, pk):
 
@@ -343,9 +345,15 @@ class ShareTaskView(TaskView):
 
         settings = get_settings(request)
 
-        available_assets = [task.get_asset_file_or_zipstream(f) for f in list(set(task.available_assets) & set(DRONEDB_ASSETS))]
+        available_assets = [task.get_asset_file_or_zipstream(f)[0] for f in list(set(task.available_assets) & set(DRONEDB_ASSETS))]
 
-        files = [{'path': f[0], 'name': f[0].split('/')[-1], 'size': os.path.getsize(f[0])} for f in available_assets]
+        if 'textured_model.zip' in task.available_assets:            
+            texture_files = [join(task.assets_path('odm_texturing'), f) for f in listdir(task.assets_path('odm_texturing')) if isfile(join(task.assets_path('odm_texturing'), f))]
+            available_assets.extend(texture_files)
+
+        assets_path = task.assets_path()
+
+        files = [{'path': f, 'name': f[len(assets_path)+1:], 'size': os.path.getsize(f)} for f in available_assets]
 
         share_to_ddb.delay(pk, settings, files)
 
