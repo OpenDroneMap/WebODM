@@ -177,6 +177,13 @@ detect_gpus(){
 			set -e
 			return
 		fi
+		
+		lspci | grep "VGA.*NVIDIA"
+		if [ "${?}" -eq 0 ]; then
+			export GPU_NVIDIA=true
+			set -e
+			return
+		fi
 
 		lspci | grep "VGA.*Intel"
 		if [ "${?}" -eq 0 ]; then
