@@ -30,13 +30,13 @@ class Plugin(PluginBase):
         super().__init__(*args, **kwargs)
 
     def main_menu(self):
-        return [Menu("DroneDB", self.public_url(""), "fas fa-cloud fa-fw")]
+        return [Menu("DroneDB", self.public_url(""), "ddb-icon fa-fw")]
 
     def include_js_files(self):
         return ["load_buttons.js"]
 
     def include_css_files(self):
-        return ["build/ImportView.css"]
+        return ["build/ImportView.css", "style.css"]
 
     def build_jsx_components(self):
         return ["ImportView.jsx", "ShareButton.jsx"]

@@ -11,7 +11,7 @@ const STATE_DONE = 3;
 
 const ICON_CLASS_MAPPER = [
     // Idle
-    'fas fa-cloud fa-fw', 
+    'ddb-icon fa-fw', 
     // Running
     'fa fa-circle-notch fa-spin fa-fw', 
     // Error
