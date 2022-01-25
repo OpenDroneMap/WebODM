@@ -249,7 +249,7 @@ export default class SelectUrlDialog extends Component {
 				<Modal.Body bsClass="my-modal">		
 					{this.state.organizations!= null && this.state.organizations.length > 0 ? 		
 					<div style={{'marginBottom': '20px'}}>
-						<p>Import the images from your DroneDB account</p>
+						<p>Import images from your DroneDB account</p>
 						<div className={"select-row"}>
 							<div className={"icon-cell"}>
 								<i className={"fas fa-sitemap"}></i>

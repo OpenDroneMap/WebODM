@@ -21,9 +21,9 @@ from django.contrib.auth.decorators import login_required
 from django import forms
 
 class SettingsForm(forms.Form):
-    registry_url = forms.CharField(label='Registry Url', required=False, max_length=1024, widget=forms.TextInput(attrs={'placeholder': 'Registry Url'}))
     username = forms.CharField(label='Username', required=False, max_length=1024, widget=forms.TextInput(attrs={'placeholder': 'Username'}))
     password = forms.CharField(label='Password', required=False, max_length=1024, widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
+    registry_url = forms.CharField(label='Registry URL', required=False, max_length=1024, widget=forms.TextInput(attrs={'placeholder': 'Registry Url'}))
 
 class Plugin(PluginBase):
     def __init__(self, *args, **kwargs):

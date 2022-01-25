@@ -1,13 +1,11 @@
 {% extends "app/plugins/templates/base.html" %}
 {% load bootstrap_extras %}
 {% block content %}
-<h3>Welcome to DroneDB!</h3>
-<h5><strong>Instructions</strong></h5>
-On this screen, you can provide the registry url and credentials to access DroneDB
+<h3>DroneDB Plugin</h3>
+Provide your credentials to access <a href="https://dronedb.app" target="_blank">DroneDB</a>:
 <br/>
 <br/>
 <form action="" method="post" class="oam-form oam-token-form">
-	<h4>Settings</h4>
 	{% csrf_token %}
 	{% include "app/plugins/templates/form.html" %}
 	<button id="btnVerify" type="button" class="btn btn-success" disabled><i class="fas fa-user-check"></i>&nbsp;&nbsp;Verify Configuration</button>

@@ -126,7 +126,7 @@ export default class ShareButton extends React.Component{
 
         const getButtonLabel = () => {
 
-            if (taskInfo == null) return "Share on DroneDB";
+            if (taskInfo == null) return "Share to DroneDB";
             if (taskInfo.error) return "DroneDB plugin error";
 
             var text = BUTTON_TEXT_MAPPER[taskInfo.status];

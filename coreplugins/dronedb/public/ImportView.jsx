@@ -87,13 +87,12 @@ export default class TaskView extends Component {
 			<Fragment>
 				{error ? <ErrorDialog errorMessage={error} /> : ""}				
 				<Button
-					id={"dronedbButton"}
 					bsStyle={"default"}
 					bsSize={"small"}
 					className={"platform-btn"}
 					onClick={this.handleClick}>
-						<i className={"fas fa-cloud"} />
-						DroneDB
+						<i className={"ddb-icon fa-fw"} />
+						DroneDB Import
 				</Button>
 				<SelectUrlDialog
 						  show={isDialogOpen}						  
