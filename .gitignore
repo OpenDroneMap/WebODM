@@ -74,6 +74,7 @@ target/
 .python-version
 
 # celery beat schedule file
+celerybeat-schedule.db
 celerybeat-schedule
 celerybeat.pid
 
