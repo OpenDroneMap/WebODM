@@ -26,7 +26,7 @@ VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 
 def is_valid(file):
     _, file_extension = path.splitext(file)
-    return file_extension.lower() in VALID_IMAGE_EXTENSIONS or file == 'gcp_list.txt'
+    return file_extension.lower() in VALID_IMAGE_EXTENSIONS or file == 'gcp_list.txt' or file == 'geo.txt'
 
 def get_settings(request):
     ds = get_current_plugin().get_user_data_store(request.user)
