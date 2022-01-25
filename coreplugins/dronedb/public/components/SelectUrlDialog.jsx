@@ -309,10 +309,12 @@ export default class SelectUrlDialog extends Component {
 								/>	
 							</div>
 						</div>
-					</div> : 
-						<div className={"alert alert-info"}>									
-							<span><a href="/plugins/dronedb"><strong>Fill in your Hub credentials</strong></a> to browse your organizations, datasets and folders!</span>
-						</div>		
+					</div> : <div className="text-center">
+						{this.state.loadingOrganizations ? <i className="fa fa-spinner fa-spin"></i> : 
+							<div className={"alert alert-info"}>									
+								<span><a href="/plugins/dronedb"><strong>Setup your DroneDB credentials</strong></a> to browse your organizations, datasets and folders!</span>
+							</div>}
+						</div>
 					}
 
 					<p>DroneDB URL</p>
@@ -323,7 +325,7 @@ export default class SelectUrlDialog extends Component {
 						<div className={"select-cell"}>
 							<FormControl
 								type="url"
-								placeholder={"Enter DroneDB url"}
+								placeholder={"https://hub.dronedb.app/r/username/dataset"}
 								value={this.state.ddbUrl || ''}
 								onChange={this.handleChange} />
 						</div>
