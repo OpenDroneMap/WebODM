@@ -1,7 +1,7 @@
 {
 	"name": "DroneDB",
 	"webodmMinVersion": "1.1.2",
-	"description": "Integrate WebODM with DroneDB: import images and export results",
+	"description": "Integrate WebODM with DroneDB: import images and share results",
 	"version": "0.0.1",
 	"author": "Luca Di Leo",
 	"email": "ldileo@digipa.it",

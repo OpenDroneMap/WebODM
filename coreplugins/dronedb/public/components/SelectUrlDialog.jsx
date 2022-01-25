@@ -310,7 +310,7 @@ export default class SelectUrlDialog extends Component {
 							</div>
 						</div>
 					</div> : <div className="text-center">
-						{this.state.loadingOrganizations ? <i className="fa fa-spinner fa-spin"></i> : 
+						{this.state.loadingOrganizations ? <i className="fa fa-circle-notch fa-spin fa-fw"></i> : 
 							<div className={"alert alert-info"}>									
 								<span><a href="/plugins/dronedb"><strong>Setup your DroneDB credentials</strong></a> to browse your organizations, datasets and folders!</span>
 							</div>}
