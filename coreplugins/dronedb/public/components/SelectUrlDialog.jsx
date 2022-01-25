@@ -315,7 +315,7 @@ export default class SelectUrlDialog extends Component {
 						</div>		
 					}
 
-					<p>DroneDB import url</p>
+					<p>DroneDB URL</p>
 					<div className={"select-row"}>
 						<div className={"icon-cell"}>
 							<i className={"fas fa-globe"}></i>
