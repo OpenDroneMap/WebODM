@@ -43,8 +43,10 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     
     echo Setup npm dependencies...
     npm install
+
     cd nodeodm/external/NodeODM
     npm install
+
     cd /webodm
 
     echo Setup pip requirements...
@@ -52,6 +54,13 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
 
     echo Build translations...
     python manage.py translate build --safe
+
+    echo Setup gulp watch...
+    cd app/static/admin
+    npm rebuild node-sass
+    gulp watch &
+
+    cd /webodm
 
     echo Setup webpack watch...
     webpack --watch &

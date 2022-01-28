@@ -68,6 +68,13 @@
     "url-loader": "^0.5.7",
     "webpack": "^4.16.2",
     "webpack-bundle-tracker": "0.0.93",
-    "webpack-livereload-plugin": "^2.1.1"
+    "webpack-livereload-plugin": "^2.1.1",
+    "autoprefixer": "^9.8.4",
+    "cssnano": "^4.1.10",
+    "gulp": "^4.0.2",
+    "gulp-postcss": "^8.0.0",
+    "gulp-sass": "^4.1.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "node-sass": "^5.0.0"
   }
 }
