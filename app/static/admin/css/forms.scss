@@ -120,6 +120,12 @@
         margin-top: 0;
         margin-left: 160px;
         padding-left: 10px;
+
+        @media (max-width: 768px) { 
+            margin-left: 0;
+            padding-left: 0;
+        }
+
     }
 
     form .aligned label + p.help {

@@ -539,16 +539,16 @@ class ProjectListItem extends React.Component {
           <div className="row project-links">
             {numTasks > 0 ? 
               <span>
-                <i className='fa fa-tasks'>
-                </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+                <i className='fa fa-tasks'></i>
+                 <a href="javascript:void(0);" onClick={this.toggleTaskList}>
                   {interpolate(_("%(count)s Tasks"), { count: numTasks})} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
                 </a>
               </span>
               : ""}
 
             {canEdit ? 
-                [<i key="edit-icon" className='far fa-edit'>
-                </i>,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
+                [<i key="edit-icon" className='far fa-edit'></i>
+                ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
                 </a>]
             : ""}
           </div>

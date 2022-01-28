@@ -31,10 +31,6 @@
         }
     }
     
-    .fa-cog{
-        width: auto;
-    }
-
     .status-label{
         padding: 4px;
         padding-left: 8px;
@@ -53,6 +49,7 @@
         padding-top: 4px;
         padding-bottom: 16px;
         padding-left: 16px;
+        padding-right: 16px;
 
         .task-warning{
             margin-top: 16px;
@@ -84,7 +81,7 @@
             }
 
             .edit-button{
-                margin-right: 15px;
+                margin-right: 0px;
             }
 
             .asset-download-buttons{
@@ -102,7 +99,7 @@
     }
 
     .console-switch{
-        margin-right: 10px;
+        margin-right: 0px;
         margin-bottom: 8px;
         position: relative;
         z-index: 99;
