@@ -119,11 +119,13 @@
         clear: left;
         margin-top: 0;
         margin-left: 160px;
-        padding-left: 10px;
+        padding-left: 0px;
 
         @media (max-width: 768px) { 
-            margin-left: 0;
-            padding-left: 0;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            padding-left: 16px;
+            padding-right: 16px;
         }
 
     }
@@ -142,7 +144,7 @@
     form .aligned textarea + p.help,
     form .aligned select + p.help {
         margin-left: 160px;
-        padding-left: 10px;
+        padding-left: 0px;
     }
 
     form .aligned ul li {
@@ -238,7 +240,10 @@
     /* SUBMIT ROW */
 
     .submit-row {
-        padding: 12px 14px;
+        padding-left: 14px;
+        padding-right: 14px;
+        padding-bottom: 10px;
+        //padding: 12px 14px;
         margin: 0 0 20px;
         background: #f8f8f8;
         border: 1px solid #eee;
@@ -254,11 +259,11 @@
     .submit-row input {
         height: 35px;
         line-height: 15px;
-        margin: 0 0 0 5px;
+        margin: 10px 0 0 5px;
     }
 
     .submit-row input.default {
-        margin: 0 0 0 8px;
+        margin: 10px 0 0 8px;
         text-transform: uppercase;
     }
 
