@@ -192,7 +192,13 @@ detect_gpus(){
 
 		# Total guess.  Need to look into AMD.
 		if lspci | grep "VGA.*AMD"; then
-			export GPU_INTEL=true
+			export GPU_AMD=true
+			set -e
+			return
+		fi
+
+		if ! $GPU_NVIDIA && ! $GPU_INTEL && ! $GPU_AMD; then
+			echo "Warning: GPU use was requested, but no GPU has been found"
 			set -e
 		fi
 	else
