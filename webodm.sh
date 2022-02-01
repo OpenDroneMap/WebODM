@@ -18,7 +18,6 @@ if [[ $platform = "Windows" ]]; then
 	export COMPOSE_CONVERT_WINDOWS_PATHS=1
 fi
 
-default_nodes=1
 dev_mode=false
 gpu=false
 
@@ -37,6 +36,7 @@ DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
 DEFAULT_SSL="$WO_SSL"
 DEFAULT_SSL_INSECURE_PORT_REDIRECT="$WO_SSL_INSECURE_PORT_REDIRECT"
 DEFAULT_BROKER="$WO_BROKER"
+DEFAULT_NODES="$WO_DEFAULT_NODES"
 
 # Parse args for overrides
 POSITIONAL=()
@@ -103,7 +103,6 @@ case $key in
     shift # past value
     ;;
     --no-default-node)
-    default_nodes=0
     echo "ATTENTION: --no-default-node is deprecated. Use --default-nodes instead."
     export WO_DEFAULT_NODES=0
     shift # past argument
@@ -117,7 +116,6 @@ case $key in
     shift # past argument
     ;;
     --default-nodes)
-    default_nodes="$2"
     export WO_DEFAULT_NODES="$2"
     shift # past argument
     shift # past value
@@ -149,7 +147,7 @@ usage(){
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
-  echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: 1)"
+  echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: $DEFAULT_NODES)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
@@ -279,7 +277,7 @@ start(){
 
 	command="docker-compose -f docker-compose.yml"
 
-    if [[ $default_nodes > 0 ]]; then
+    if [[ $WO_DEFAULT_NODES > 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
 		elif [ "${GPU_INTEL}" = true ]; then
@@ -341,8 +339,8 @@ start(){
 		command+=" -d"
 	fi
 
-	if [[ $default_nodes > 0 ]]; then
-		command+=" --scale node-odm=$default_nodes"
+	if [[ $WO_DEFAULT_NODES > 0 ]]; then
+		command+=" --scale node-odm=$WO_DEFAULT_NODES"
 	fi
 
 	run "$command"
@@ -461,7 +459,7 @@ elif [[ $1 = "update" ]]; then
 
 	command="docker-compose -f docker-compose.yml"
 
-	if [[ $default_nodes > 0 ]]; then
+	if [[ $WO_DEFAULT_NODES > 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
 		elif [ "${GPU_INTEL}" = true ]; then
