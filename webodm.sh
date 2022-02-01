@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eo pipefail
-__dirname=$(cd $(dirname "$0"); pwd -P)
+__dirname=$(cd "$(dirname "$0")"; pwd -P)
 cd "${__dirname}"
 
 platform="Linux" # Assumed
@@ -49,14 +49,15 @@ case $key in
     export WO_PORT="$2"
     shift # past argument
     shift # past value
-    ;;    
+    ;;
     --hostname)
     export WO_HOST="$2"
     shift # past argument
     shift # past value
     ;;
 	--media-dir)
-    export WO_MEDIA_DIR=$(realpath "$2")
+    WO_MEDIA_DIR=$(realpath "$2")
+    export WO_MEDIA_DIR
     shift # past argument
     shift # past value
     ;;
@@ -65,12 +66,14 @@ case $key in
     shift # past argument
     ;;
 	--ssl-key)
-    export WO_SSL_KEY=$(realpath "$2")
+    WO_SSL_KEY=$(realpath "$2")
+    export WO_SSL_KEY
     shift # past argument
     shift # past value
     ;;
 	--ssl-cert)
-    export WO_SSL_CERT=$(realpath "$2")
+	WO_SSL_CERT=$(realpath "$2")
+	export WO_SSL_CERT
     shift # past argument
     shift # past value
     ;;
@@ -92,7 +95,7 @@ case $key in
     export WO_DEV=YES
     dev_mode=true
     shift # past argument
-    ;;    
+    ;;
 	--gpu)
     gpu=true
     shift # past argument
@@ -132,7 +135,7 @@ usage(){
   echo "Usage: $0 <command>"
   echo
   echo "This program helps to manage the setup/teardown of the docker containers for running WebODM. We recommend that you read the full documentation of docker at https://docs.docker.com if you want to customize your setup."
-  echo 
+  echo
   echo "Command list:"
   echo "	start [options]		Start WebODM"
   echo "	stop			Stop WebODM"
@@ -141,7 +144,7 @@ usage(){
   echo "	rebuild			Rebuild all docker containers and perform cleanups"
   echo "	checkenv		Do an environment check and install missing components"
   echo "	test			Run the unit test suite (developers only)"
-  echo "	resetadminpassword <new password>	Reset the administrator's password to a new one. WebODM must be running when executing this command."
+  echo "	resetadminpassword \"<new password>\"	Reset the administrator's password to a new one. WebODM must be running when executing this command and the password must be enclosed in double quotes."
   echo ""
   echo "Options:"
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
@@ -169,30 +172,26 @@ detect_gpus(){
 
 	if [ "${platform}" = "Linux" ]; then
 		set +e
-		lspci | grep 'NVIDIA'
-		if [ "${?}" -eq 0 ]; then
-			export GPU_NVIDIA=true
-			set -e
-			return
-		fi
-		
-		lspci | grep "VGA.*NVIDIA"
-		if [ "${?}" -eq 0 ]; then
+		if lspci | grep 'NVIDIA'; then
 			export GPU_NVIDIA=true
 			set -e
 			return
 		fi
 
-		lspci | grep "VGA.*Intel"
-		if [ "${?}" -eq 0 ]; then
+		if lspci | grep "VGA.*NVIDIA"; then
+			export GPU_NVIDIA=true
+			set -e
+			return
+		fi
+
+		if lspci | grep "VGA.*Intel"; then
 			export GPU_INTEL=true
 			set -e
 			return
 		fi
 
 		# Total guess.  Need to look into AMD.
-		lspci | grep "VGA.*AMD"
-		if [ "${?}" -eq 0 ]; then
+		if lspci | grep "VGA.*AMD"; then
 			export GPU_INTEL=true
 			set -e
 		fi
@@ -204,10 +203,11 @@ detect_gpus(){
 prepare_intel_render_group(){
 	if [ "${platform}" = "Linux" ]; then
 		if [ "${GPU_INTEL}" = true ]; then
-			export RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
+			RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
 		else
-			export RENDER_GROUP_ID=0
+			RENDER_GROUP_ID=0
 		fi
+		export RENDER_GROUP_ID
 	fi
 }
 
@@ -221,16 +221,16 @@ check_command(){
 	check_msg_prefix="Checking for $1... "
 	check_msg_result="\033[92m\033[1m OK\033[0m\033[39m"
 
-	hash $1 2>/dev/null || not_found=true 
+	hash "$1" 2>/dev/null || not_found=true
 	if [[ $not_found ]]; then
-		
+
 		# Can we attempt to install it?
-		if [[ ! -z "$3" ]]; then
+		if [[ -n "$3" ]]; then
 			echo -e "$check_msg_prefix \033[93mnot found, we'll attempt to install\033[39m"
 			run "$3 || sudo $3"
 
 			# Recurse, but don't pass the install command
-			check_command "$1" "$2"	
+			check_command "$1" "$2"
 		else
 			check_msg_result="\033[91m can't find $1! Check that the program is installed and that you have added the proper path to the program to your PATH environment variable before launching WebODM. If you change your PATH environment variable, remember to close and reopen your terminal. $2\033[39m"
 		fi
@@ -248,8 +248,8 @@ environment_check(){
 }
 
 run(){
-	echo $1
-	eval $1
+	echo "$1"
+	eval "$1"
 }
 
 start(){
@@ -277,7 +277,7 @@ start(){
 
 	command="docker-compose -f docker-compose.yml"
 
-    if [[ $WO_DEFAULT_NODES > 0 ]]; then
+    if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
 		elif [ "${GPU_INTEL}" = true ]; then
@@ -294,21 +294,21 @@ start(){
     if [[ $dev_mode = true ]]; then
         command+=" -f docker-compose.dev.yml"
     fi
-	
+
 	if [ "$WO_SSL" = "YES" ]; then
-		if [ ! -z "$WO_SSL_KEY" ] && [ ! -e "$WO_SSL_KEY" ]; then
+		if [ -n "$WO_SSL_KEY" ] && [ ! -e "$WO_SSL_KEY" ]; then
 			echo -e "\033[91mSSL key file does not exist: $WO_SSL_KEY\033[39m"
 			exit 1
 		fi
-		if [ ! -z "$WO_SSL_CERT" ] && [ ! -e "$WO_SSL_CERT" ]; then
+		if [ -n "$WO_SSL_CERT" ] && [ ! -e "$WO_SSL_CERT" ]; then
 			echo -e "\033[91mSSL certificate file does not exist: $WO_SSL_CERT\033[39m"
 			exit 1
 		fi
-		
+
 		command+=" -f docker-compose.ssl.yml"
-		
+
 		method="Lets Encrypt"
-		if [ ! -z "$WO_SSL_KEY" ] && [ ! -z "$WO_SSL_CERT" ]; then
+		if [ -n "$WO_SSL_KEY" ] && [ -n "$WO_SSL_CERT" ]; then
 			method="Manual"
 			command+=" -f docker-compose.ssl-manual.yml"
 		fi
@@ -323,7 +323,7 @@ start(){
 			fi
 			export WO_PORT=443
 		fi
-		
+
 		# Make sure we have a hostname
 		if [ "$WO_HOST" = "localhost" ]; then
 			echo -e "\033[91mSSL is enabled, but hostname cannot be set to $WO_HOST. Set the --hostname argument to the domain of your WebODM server (for example: www.mywebodm.org).\033[39m"
@@ -339,7 +339,7 @@ start(){
 		command+=" -d"
 	fi
 
-	if [[ $WO_DEFAULT_NODES > 0 ]]; then
+	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		command+=" --scale node-odm=$WO_DEFAULT_NODES"
 	fi
 
@@ -392,15 +392,14 @@ run_tests(){
 resetpassword(){
 	newpass=$1
 
-	if [[ ! -z "$newpass" ]]; then
+	if [[ -n "$newpass" ]]; then
 		container_hash=$(docker ps -q --filter "name=webapp")
 		if [[ -z "$container_hash" ]]; then
 			echo -e "\033[91mCannot find webapp docker container. Is WebODM running?\033[39m"
 			exit 1
 		fi
 
-		docker exec $container_hash bash -c "echo \"from django.contrib.auth.models import User;from django.contrib.auth.hashers import make_password;u=User.objects.filter(is_superuser=True)[0];u.password=make_password('$newpass');u.save();print('The following user was changed: {}'.format(u.username));\" | python manage.py shell"
-		if [[ "$?" -eq 0 ]]; then
+		if docker exec "$container_hash" bash -c "echo \"from django.contrib.auth.models import User;from django.contrib.auth.hashers import make_password;u=User.objects.filter(is_superuser=True)[0];u.password=make_password('$newpass');u.save();print('The following user was changed: {}'.format(u.username));\" | python manage.py shell"; then
 			echo -e "\033[1mPassword changed!\033[0m"
 		else
 			echo -e "\033[91mCould not change administrator password. If you need help, please visit https://github.com/OpenDroneMap/WebODM/issues/ \033[39m"
@@ -446,7 +445,7 @@ elif [[ $1 = "update" ]]; then
 	down
 	echo "Updating WebODM..."
 
-	hash git 2>/dev/null || git_not_found=true 
+	hash git 2>/dev/null || git_not_found=true
 	if [[ $git_not_found ]]; then
 		echo "Skipping source update (git not found)"
 	else
@@ -459,7 +458,7 @@ elif [[ $1 = "update" ]]; then
 
 	command="docker-compose -f docker-compose.yml"
 
-	if [[ $WO_DEFAULT_NODES > 0 ]]; then
+	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
 		elif [ "${GPU_INTEL}" = true ]; then
@@ -481,7 +480,7 @@ elif [[ $1 = "checkenv" ]]; then
 elif [[ $1 = "test" ]]; then
 	run_tests
 elif [[ $1 = "resetadminpassword" ]]; then
-	resetpassword $2
+	resetpassword "$2"
 else
 	usage
 fi
