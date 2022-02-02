@@ -2,7 +2,7 @@ FROM ubuntu:21.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ARG TEST_BUILD
-ARG MAKEFLAGS=-j$(nproc)
+ENV MAKEFLAGS=-j$(nproc)
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH $PYTHONPATH:/webodm
 ENV PROJ_LIB=/usr/share/proj
