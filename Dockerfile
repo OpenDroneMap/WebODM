@@ -29,7 +29,7 @@ RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget cu
     python manage.py rebuildplugins && \
     python manage.py translate build --safe && \
     # Install necessary tools for compilation for (opencv, scipy , numpy ...)
-    apt-get -qq install -y --no-install-recommends libblas-dev automake gcc g++ subversion python3-dev liblapack-dev gfortran libopenblas-dev libatlas-base-dev libblas3 liblapack3 && \
+    apt-get -qq install -y --no-install-recommends make libblas-dev automake gcc g++ subversion python3-dev liblapack-dev gfortran libopenblas-dev libatlas-base-dev libblas3 liblapack3 && \
     # Cleanup
     apt-get autoremove -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
