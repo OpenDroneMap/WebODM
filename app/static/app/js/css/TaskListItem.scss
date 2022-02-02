@@ -21,7 +21,7 @@
     .details{
         font-size: 90%;
         padding-right: 0;
-        margin-top: 4px;
+        margin-top: 7px;
 
         i{
             margin-left: 16px;
@@ -39,6 +39,10 @@
         border-style: solid;
         border-width: 1px;
         border-radius: 2px;
+
+        @media screen and (max-width: 768px){
+            margin-top: 5px;
+        }
     }
 
     .clickable:hover{
@@ -50,6 +54,13 @@
         padding-bottom: 16px;
         padding-left: 16px;
         padding-right: 16px;
+
+        .info-table {
+            tr td:first-child {
+                width: 33%;
+                max-width: 150px;
+            }
+        }
 
         .task-warning{
             margin-top: 16px;
@@ -99,6 +110,9 @@
     }
 
     .console-switch{
+
+        text-align: center;
+
         margin-right: 0px;
         margin-bottom: 8px;
         position: relative;

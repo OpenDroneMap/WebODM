@@ -3,6 +3,14 @@
 
     .project-name{
         font-weight: bold;
+        font-size: large;
+
+        @media screen and (max-width: 768px){
+            font-size: x-large;
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        } 
     }
 
     .drag-drop-icon{
@@ -69,5 +77,24 @@
         margin-left: 0;
         margin-right: 0;
         margin-top: 10px;
+    }
+
+    .project-buttons {
+        float: right;
+
+        @media screen and (max-width: 768px){
+
+            .asset-download-buttons {
+                width: 100%;
+            }
+
+            float: none;      
+            
+            width: 100%;
+
+            .btn {
+                width: 100%;
+            }
+        }
     }
 }

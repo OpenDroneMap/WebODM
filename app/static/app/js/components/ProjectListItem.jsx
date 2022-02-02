@@ -498,7 +498,7 @@ class ProjectListItem extends React.Component {
 
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
-          <div className="btn-group pull-right">
+          <div className="btn-group project-buttons">
             {this.hasPermission("add") ? 
               <div className={"asset-download-buttons btn-group " + (this.state.upload.uploading ? "hide" : "")}>
                 <button type="button" 
@@ -530,9 +530,9 @@ class ProjectListItem extends React.Component {
             </button>
           </div>
 
-          <span className="project-name">
+          <div className="project-name">
             {data.name}
-          </span>
+          </div>
           <div className="project-description">
             {data.description}
           </div>
