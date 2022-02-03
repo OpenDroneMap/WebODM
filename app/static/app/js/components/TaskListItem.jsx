@@ -532,32 +532,36 @@ class TaskListItem extends React.Component {
         <div className="expanded-panel">
           <div className="row">
             <div className="col-md-12 no-padding">
-              <table class="table table-hover table-condensed info-table">
+              <table className="table table-hover table-condensed info-table">
                 <tbody>
                   <tr>
-                    <td cla><strong>{_("Created on:")}</strong></td>
+                    <td><strong>{_("Created on:")}</strong></td>
                     <td>{(new Date(task.created_at)).toLocaleString()}</td>
                   </tr>
                   <tr>
                     <td><strong>{_("Processing Node:")}</strong></td>
                     <td>{task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})</td>
                   </tr>
+                  {Array.isArray(task.options) &&
                   <tr>
                     <td><strong>{_("Options:")}</strong></td>
                     <td>{this.optionsToList(task.options)}</td>
-                  </tr>
+                  </tr>}
+                  {stats && stats.gsd && 
                   <tr>
                     <td><strong>{_("Average GSD:")}</strong></td>
                     <td>{parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm</td>
-                  </tr>
+                  </tr>}
+                  {stats && stats.area &&
                   <tr>
                     <td><strong>{_("Area:")}</strong></td>
                     <td>{parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;</td>
-                  </tr>
+                  </tr>}
+                  {stats && stats.pointcloud && stats.pointcloud.points &&
                   <tr>
                     <td><strong>{_("Reconstructed Points:")}</strong></td>
                     <td>{stats.pointcloud.points.toLocaleString()}</td>
-                  </tr>
+                  </tr>}
                 </tbody>
               </table>
               <div className="console-switch">
