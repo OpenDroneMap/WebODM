@@ -11,6 +11,10 @@ algos = {
         'expr': '(N - R) / (N + R)',
         'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
     },
+    'NDRE': {
+        'expr': '(N - Re) / (N + Re)',
+        'help': _('Normalized Difference Red Edge Index shows the amount of green vegetation of permanent or later stage crops.')
+    },
     'NDWI': {
         'expr': '(G - N) / (G + N)',
         'help': _('Normalized Difference Water Index shows the amount of water content in water bodies.')
