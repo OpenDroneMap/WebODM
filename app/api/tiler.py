@@ -209,6 +209,10 @@ class Metadata(TaskNestedView):
             "better_discrete_ndvi": "Custom NDVI Index",
             "rplumbo": "Rplumbo (Better NDVI)",
             "pastel1": "Pastel",
+            "plasma": "Plasma",
+            "inferno": "Inferno",
+            "magma": "Magma",
+            "cividis": "Cividis"
         }
 
         colormaps = []
@@ -217,7 +221,8 @@ class Metadata(TaskNestedView):
             colormaps = ['viridis', 'jet', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r', 'rplumbo', 'discrete_ndvi',
-                         'better_discrete_ndvi']
+                         'better_discrete_ndvi',
+                         'viridis', 'plasma', 'inferno', 'magma', 'cividis', 'jet']
             algorithms = *get_algorithm_list(band_count),
 
         info['color_maps'] = []
