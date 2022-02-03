@@ -11,6 +11,10 @@ algos = {
         'expr': '(N - R) / (N + R)',
         'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
     },
+    'NDWI': {
+        'expr': '(G - N) / (G + N)',
+        'help': _('Normalized Difference Water Index shows the amount of water content in water bodies.')
+    },
     'NDVI (Blue)': {
         'expr': '(N - B) / (N + B)',
         'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
@@ -22,7 +26,7 @@ algos = {
     'vNDVI':{
         'expr': '0.5268*((R ** -0.1294) * (G ** 0.3389) * (B ** -0.3118))',
         'help': _('Visible NDVI is an un-normalized index for RGB sensors using constants derived from citrus, grape, and sugarcane crop data.')
-    },
+    },    
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
         'help': _('Visual Atmospheric Resistance Index shows the areas of vegetation.'),
