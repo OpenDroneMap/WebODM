@@ -9,7 +9,7 @@ from rasteralign import align, align_altitudes
 
 from webodm import settings
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", settings.MEDIA_ROOT, "plugins", "changedetection", "site-packages"))
+sys.path.insert(0, os.path.join(settings.MEDIA_ROOT, "plugins", "changedetection", "site-packages"))
 import cv2
 
 KERNEL_10_10 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
