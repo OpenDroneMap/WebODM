@@ -1,8 +1,7 @@
 .task-list-item{
     .row{
         margin: 0;
-        padding: 4px;
-        padding-left: 8px;
+        padding: 8px;
 
         .no-padding{
             padding: 0;
@@ -16,6 +15,9 @@
     .name{
         padding-left: 0;
         margin-top: 4px;
+        .clickable {
+            margin-right: 5px;
+        }
     }
     
     .details{
@@ -111,7 +113,11 @@
 
     .console-switch{
 
-        text-align: center;
+        text-align: right;
+
+        @media screen and (max-width: 768px){
+            text-align: center;
+        }
 
         margin-right: 0px;
         margin-bottom: 8px;
