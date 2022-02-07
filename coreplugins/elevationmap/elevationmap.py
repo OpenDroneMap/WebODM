@@ -45,7 +45,7 @@
 #%end
 
 
-import cv2, math, argparse
+import math, argparse
 import numpy as np
 import rasterio as rio
 from rasterio import warp, transform
@@ -56,6 +56,10 @@ import glob
 import shutil
 import sys
 import grass.script as grass
+from webodm import settings
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", settings.MEDIA_ROOT, "plugins", "elevationmap", "site-packages"))
+import cv2
 
 def main():
     ext = ""
