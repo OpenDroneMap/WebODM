@@ -173,18 +173,21 @@ detect_gpus(){
 	if [ "${platform}" = "Linux" ]; then
 		set +e
 		if lspci | grep 'NVIDIA'; then
+			echo "GPU_NVIDIA has been found"
 			export GPU_NVIDIA=true
 			set -e
 			return
 		fi
 
 		if lspci | grep "VGA.*NVIDIA"; then
+			echo "GPU_NVIDIA has been found"
 			export GPU_NVIDIA=true
 			set -e
 			return
 		fi
 
 		if lspci | grep "VGA.*Intel"; then
+			echo "GPU_INTEL has been found"
 			export GPU_INTEL=true
 			set -e
 			return
@@ -192,6 +195,7 @@ detect_gpus(){
 
 		# Total guess.  Need to look into AMD.
 		if lspci | grep "VGA.*AMD"; then
+			echo "GPU_AMD has been found"
 			export GPU_AMD=true
 			set -e
 			return
