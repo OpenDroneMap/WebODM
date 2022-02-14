@@ -95,6 +95,14 @@ algos = {
         'help': _('Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'),
         'range': (-1, 1)
     },
+    'Thermal_C': {
+        'expr': 'Ir',
+        'help': _('Thermal temperature in Celsius degrees.')
+    },
+    'Thermal_cK': {
+        'expr': 'Ir / 100 - 273.15',
+        'help': _('Thermal temperature in Centikelvin degrees')
+    },
 
     # more?
 
@@ -122,6 +130,9 @@ camera_filters = [
     'BGRReN',
     'RGBNRe',
     'RGBReN',
+
+    'BGRNReIr',
+    'BGRReNIr',
 
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
