@@ -1,7 +1,7 @@
 .task-list-item{
     .row{
         margin: 0;
-        padding: 8px;
+        padding: 4px;
 
         .no-padding{
             padding: 0;
@@ -62,6 +62,10 @@
                 width: 33%;
                 max-width: 150px;
             }
+            td{
+                padding: 0;
+            }
+            margin-bottom: 12px;
         }
 
         .task-warning{
@@ -111,26 +115,6 @@
         display: inline;
     }
 
-    .console-switch{
-
-        text-align: right;
-
-        @media screen and (max-width: 768px){
-            text-align: center;
-        }
-
-        margin-right: 0px;
-        margin-bottom: 8px;
-        position: relative;
-        z-index: 99;
-        .console-output-label{
-            margin-right: 8px;
-        }
-        .console-output-label, ul{
-            display: inline-block;
-        }
-    }
-    
     .mb{
         margin-bottom: 12px;
     }

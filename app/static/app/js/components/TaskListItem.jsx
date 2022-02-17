@@ -532,7 +532,7 @@ class TaskListItem extends React.Component {
         <div className="expanded-panel">
           <div className="row">
             <div className="col-md-12 no-padding">
-              <table className="table table-hover table-condensed info-table">
+              <table className="table table-condensed info-table">
                 <tbody>
                   <tr>
                     <td><strong>{_("Created on:")}</strong></td>
@@ -562,18 +562,15 @@ class TaskListItem extends React.Component {
                     <td><strong>{_("Reconstructed Points:")}</strong></td>
                     <td>{stats.pointcloud.points.toLocaleString()}</td>
                   </tr>}
-                </tbody>
-              </table>
-              <div className="console-switch">
-                  <div className="console-output-label">{_("Task Output:")} </div><ul className="list-inline">
-                    <li>
-                      <div className="btn-group btn-toggle"> 
+                  <tr>
+                      <td><strong>{_("Task Output:")}</strong></td>
+                      <td><div className="btn-group btn-toggle"> 
                         <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
                         <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>{_("Off")}</button>
-                      </div>
-                    </li>
-                  </ul>
-              </div>
+                      </div></td>
+                  </tr>
+                </tbody>
+              </table>
               
               {this.state.view === 'console' ?
                 <Console
