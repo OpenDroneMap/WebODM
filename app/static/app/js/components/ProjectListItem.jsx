@@ -498,7 +498,7 @@ class ProjectListItem extends React.Component {
 
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
-          <div className="btn-group pull-right">
+          <div className="btn-group project-buttons">
             {this.hasPermission("add") ? 
               <div className={"asset-download-buttons btn-group " + (this.state.upload.uploading ? "hide" : "")}>
                 <button type="button" 
@@ -530,25 +530,25 @@ class ProjectListItem extends React.Component {
             </button>
           </div>
 
-          <span className="project-name">
+          <div className="project-name">
             {data.name}
-          </span>
+          </div>
           <div className="project-description">
             {data.description}
           </div>
           <div className="row project-links">
             {numTasks > 0 ? 
               <span>
-                <i className='fa fa-tasks'>
-                </i> <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+                <i className='fa fa-tasks'></i>
+                 <a href="javascript:void(0);" onClick={this.toggleTaskList}>
                   {interpolate(_("%(count)s Tasks"), { count: numTasks})} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
                 </a>
               </span>
               : ""}
 
             {canEdit ? 
-                [<i key="edit-icon" className='far fa-edit'>
-                </i>,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
+                [<i key="edit-icon" className='far fa-edit'></i>
+                ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
                 </a>]
             : ""}
           </div>

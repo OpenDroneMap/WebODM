@@ -43,8 +43,10 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
     
     echo Setup npm dependencies...
     npm install
+
     cd nodeodm/external/NodeODM
     npm install
+
     cd /webodm
 
     echo Setup pip requirements...
