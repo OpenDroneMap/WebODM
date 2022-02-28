@@ -109,6 +109,7 @@ export default class ShareButton extends React.Component{
 
     render(){
         const { loading, taskInfo, error } = this.state;
+        if (taskInfo.noImages) return (<div/>);
 
         const getButtonIcon = () => {
             if (loading || taskInfo.sharing) return "fa fa-circle-notch fa-spin fa-fw";
