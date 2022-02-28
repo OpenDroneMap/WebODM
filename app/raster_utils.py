@@ -43,6 +43,7 @@ def export_raster(input, output, **opts):
 
         # Output format
         driver = "GTiff"
+        compress = None
         max_bands = 9999
         with_alpha = True
         rgb = False
@@ -62,7 +63,7 @@ def export_raster(input, output, **opts):
 
         if export_format == "jpg":
             driver = "JPEG"
-            profile.update(quality=70)
+            profile.update(quality=90)
             band_count = 3
             with_alpha = False
             rgb = True
@@ -71,10 +72,17 @@ def export_raster(input, output, **opts):
             band_count = 4
             rgb = True
         elif export_format == "gtiff-rgb":
+            compress = "JPEG"
+            profile.update(jpeg_quality=90)
             band_count = 4
             rgb = True
         else:
+            compress = "DEFLATE"
             band_count = src.count
+        
+        if compress is not None:
+            profile.update(compress=compress)
+            profile.update(predictor=2 if compress == "DEFLATE" else 1)
 
         if rgb and rescale is None:
             # Compute min max
