@@ -407,7 +407,7 @@ class TaskListItem extends React.Component {
     const imported = task.import_url !== "";
 
     let status = statusCodes.description(task.status);
-    if (status === "") status = _("Uploading images to processing node");
+    if (status === "") status = _("Sending images to processing node");
 
     if (!task.processing_node && !imported) status = _("Waiting for a node...");
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);

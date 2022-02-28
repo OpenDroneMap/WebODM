@@ -1,7 +1,6 @@
 // Auto-generated with extract_plugin_manifest_strings.py, do not edit!
 
 from django.utils.translation import gettext as _
-_("Upload and tile ODM assets with Cesium ion.")
 _("Detect changes between two different tasks in the same project.")
 _("Import images from external sources directly")
 _("Compute, preview and export contours from DEMs")
@@ -16,3 +15,4 @@ _("A plugin to create GCP files from images")
 _("A plugin to create GCP files from images")
 _("Create short links when sharing task URLs")
 _("Create editable short links when sharing task URLs")
+_("Integrate WebODM with DroneDB: import images and share results")
