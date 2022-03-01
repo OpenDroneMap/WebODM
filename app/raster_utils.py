@@ -180,7 +180,7 @@ def export_raster(input, output, **opts):
                 profile.update(dtype=rasterio.float32, count=1, nodata=-9999)
 
             bands_names = ["b{}".format(b) for b in tuple(sorted(set(re.findall(r"b(?P<bands>[0-9]{1,2})", expression))))]
-            rgb = expression.split(",")
+            rgb_expr = expression.split(",")
             indexes = tuple([int(b.replace("b", "")) for b in bands_names])
 
             alpha_index = None
@@ -193,7 +193,7 @@ def export_raster(input, output, **opts):
 
             data = src.read(indexes=indexes, out_dtype=np.float32)
             arr = dict(zip(bands_names, data))
-            arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb])
+            arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
 
             # Set nodata values
             index_band = arr[0]
