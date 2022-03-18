@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     'guardian',
     'rest_framework',
     'rest_framework_nested',
+    'drf_yasg',
     'webpack_loader',
     'corsheaders',
     'colorfield',
