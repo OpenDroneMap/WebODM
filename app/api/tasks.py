@@ -10,7 +10,7 @@ from django.db import transaction
 from django.http import FileResponse
 from django.http import HttpResponse
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -117,19 +117,19 @@ class TaskViewSet(viewsets.ViewSet):
 
         return Response({'success': True})
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def cancel(self, *args, **kwargs):
         return self.set_pending_action(pending_actions.CANCEL, *args, **kwargs)
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def restart(self, *args, **kwargs):
         return self.set_pending_action(pending_actions.RESTART, *args, **kwargs)
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def remove(self, *args, **kwargs):
         return self.set_pending_action(pending_actions.REMOVE, *args, perms=('delete_project', ), **kwargs)
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def output(self, request, pk=None, project_pk=None):
         """
         Retrieve the console output for this task.
@@ -165,7 +165,7 @@ class TaskViewSet(viewsets.ViewSet):
         serializer = TaskSerializer(task)
         return Response(serializer.data)
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def commit(self, request, pk=None, project_pk=None):
         """
         Commit a task after all images have been uploaded
@@ -188,7 +188,7 @@ class TaskViewSet(viewsets.ViewSet):
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def upload(self, request, pk=None, project_pk=None):
         """
         Add images to a task
@@ -216,7 +216,7 @@ class TaskViewSet(viewsets.ViewSet):
         
         return Response({'success': True}, status=status.HTTP_200_OK)
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def duplicate(self, request, pk=None, project_pk=None):
         """
         Duplicate a task
