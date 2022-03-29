@@ -23,7 +23,7 @@ export default class ConfigureNewTaskDialog extends Component {
 		} = this.props;
 
 		return (
-			<Modal className={"new-task"} onHide={onHide} show={true}>
+			<Modal className={"new-task"} onHide={onHide} show={true} dialogClassName="modal-newtask">
 				<Modal.Header closeButton>
 					<Modal.Title>
 						Import from DroneDB

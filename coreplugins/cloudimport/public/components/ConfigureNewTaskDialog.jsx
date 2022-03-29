@@ -26,7 +26,7 @@ export default class ConfigureNewTaskDialog extends Component {
 
 		const title = "Import from " + (platform !== null ? platform.name : "Platform");
 		return (
-			<Modal className={"new-task"} onHide={onHide} show={true}>
+			<Modal className={"new-task"} onHide={onHide} show={true} dialogClassName="modal-newtask">
 				<Modal.Header closeButton>
 					<Modal.Title>
 						{title}
