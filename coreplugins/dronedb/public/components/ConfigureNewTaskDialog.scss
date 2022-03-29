@@ -5,3 +5,9 @@
 .new-task.modal button i {
 	margin-right: 1em;
 }
+
+/* Fix edit dialog when opened from plugin modal dialog */
+.modal-newtask {
+  min-height: 100%;
+}
+
