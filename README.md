@@ -504,3 +504,7 @@ To setup the firewall on Google Cloud, open the instance, on the middle of the i
 ## License
 
 WebODM is licensed under the terms of the [GNU Affero General Public License v3.0](https://github.com/OpenDroneMap/WebODM/blob/master/LICENSE.md).
+
+## Trademark
+
+See [Trademark Guidelines](https://github.com/OpenDroneMap/documents/blob/master/TRADEMARK.md)
