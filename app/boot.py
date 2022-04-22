@@ -137,6 +137,10 @@ def add_default_presets():
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'dsm', 'value': True},
                                                               {'name': 'dtm', 'value': True}]})
+        Preset.objects.update_or_create(name='Field', system=True,
+                                        defaults={'options': [{'name': 'sfm-algorithm', 'value': 'planar'},
+                                                              {'name': 'fast-orthophoto', 'value': True},
+                                                              {'name': 'matcher-neighbors', 'value': 4}]})
         Preset.objects.update_or_create(name='Fast Orthophoto', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'fast-orthophoto', 'value': True}]})
