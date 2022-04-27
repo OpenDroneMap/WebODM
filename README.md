@@ -95,7 +95,7 @@ WebODM can be linked to one or more processing nodes that speak the [NodeODM API
 
 Adding more processing nodes will allow you to run multiple jobs in parallel.
 
-You can also setup a [ClusterODM](https://github.com/OpenDroneMap/ClusterODM) node to run a single task across multiple machines with [distributed split-merge](https://docs.opendronemap.org/large.html#distributed-split-merge) and process dozen of thousands of images more quickly, with less memory.
+You can also setup a [ClusterODM](https://github.com/OpenDroneMap/ClusterODM) node to run a single task across multiple machines with [distributed split-merge](https://docs.opendronemap.org/large/?highlight=distributed#getting-started-with-distributed-split-merge) and process dozen of thousands of images more quickly, with less memory.
 
 If you don't need the default "node-odm-1" node, simply pass `--default-nodes 0` flag when starting WebODM:
 
