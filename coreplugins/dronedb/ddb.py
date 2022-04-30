@@ -142,7 +142,7 @@ class DroneDB:
 
             return [
                 {'slug': o['slug'], 
-                'name': o['properties'].get('meta', {}).get('name', {}).get('data', o['name']), 
+                'name': o['properties'].get('meta', {}).get('name', {}).get('data', o['slug']), 
                 'public': o['properties'].get('public'), 
                 'size': o['size'], 
                 'entries': o['properties'].get('entries')
