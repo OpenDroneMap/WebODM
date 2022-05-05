@@ -58,6 +58,8 @@ import sys
 import grass.script as grass
 from webodm import settings
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from webodm import settings
 sys.path.insert(0, os.path.join(settings.MEDIA_ROOT, "plugins", "elevationmap", "site-packages"))
 import cv2
 
