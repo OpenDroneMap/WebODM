@@ -350,7 +350,6 @@ class ModelView extends React.Component {
               type: "GET",
               url: `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/3d/scene`
           }).done(sceneData => {
-            const emptySceneData = !!Object.keys(sceneData).length;
             let localSceneData = Potree.saveProject(viewer);
 
             // Check if we do not have a view set
@@ -371,15 +370,11 @@ class ModelView extends React.Component {
             }
 
             // Load
-            if (!emptySceneData){
-                const potreeLoadProject = () => {
-                    Potree.loadProject(viewer, sceneData);
-                    viewer.removeEventListener("update", potreeLoadProject);
-                };
-                viewer.addEventListener("update", potreeLoadProject);
-            }else{
-                viewer.fitToScreen();
-            }
+            const potreeLoadProject = () => {
+                Potree.loadProject(viewer, sceneData);
+                viewer.removeEventListener("update", potreeLoadProject);
+            };
+            viewer.addEventListener("update", potreeLoadProject);
 
             // Every 3 seconds, check if the scene has changed
             // if it has, save the changes server-side
@@ -418,6 +413,12 @@ class ModelView extends React.Component {
             const checkScene = () => {
                 const sceneData = JSON.stringify(this.getSceneData());
                 if (sceneData !== prevSceneData) postSceneData(sceneData);
+                
+                // Potree is a bit strange, sometimes fitToScreen does
+                // not work, so we check whether the camera position is still
+                // at zero and recall fitToScreen
+                const pos = viewer.scene.view.position;
+                if (pos.x === 0 && pos.y === 0 && pos.z === 0) viewer.fitToScreen();
             };
 
             saveSceneInterval = setInterval(checkScene, 3000);
