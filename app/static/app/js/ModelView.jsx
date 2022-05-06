@@ -350,6 +350,7 @@ class ModelView extends React.Component {
               type: "GET",
               url: `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/3d/scene`
           }).done(sceneData => {
+            const emptySceneData = !!Object.keys(sceneData).length;
             let localSceneData = Potree.saveProject(viewer);
 
             // Check if we do not have a view set
@@ -370,11 +371,15 @@ class ModelView extends React.Component {
             }
 
             // Load
-            const potreeLoadProject = () => {
-                Potree.loadProject(viewer, sceneData);
-                viewer.removeEventListener("update", potreeLoadProject);
-            };
-            viewer.addEventListener("update", potreeLoadProject);
+            if (!emptySceneData){
+                const potreeLoadProject = () => {
+                    Potree.loadProject(viewer, sceneData);
+                    viewer.removeEventListener("update", potreeLoadProject);
+                };
+                viewer.addEventListener("update", potreeLoadProject);
+            }else{
+                viewer.fitToScreen();
+            }
 
             // Every 3 seconds, check if the scene has changed
             // if it has, save the changes server-side
