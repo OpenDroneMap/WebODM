@@ -96,11 +96,11 @@ algos = {
         'range': (-1, 1)
     },
     'Thermal_C': {
-        'expr': 'Ir',
+        'expr': 'Lwir',
         'help': _('Thermal temperature in Celsius degrees.')
     },
     'Thermal_cK': {
-        'expr': 'Ir / 100 - 273.15',
+        'expr': 'Lwir / 100 - 273.15',
         'help': _('Thermal temperature in Centikelvin degrees.')
     },
     'Gray': {
@@ -136,8 +136,8 @@ camera_filters = [
     'RGBNRe',
     'RGBReN',
 
-    'BGRNReIr',
-    'BGRReNIr',
+    'BGRNReLwir',
+    'BGRReNLwir',
 
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
