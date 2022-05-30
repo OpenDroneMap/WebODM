@@ -186,6 +186,14 @@ class Task(models.Model):
                 'deferred_path': 'textured_model.zip',
                 'deferred_compress_dir': 'odm_texturing'
             },
+            '3d_tiles_model.zip': {
+                'deferred_path': '3d_tiles_model.zip',
+                'deferred_compress_dir': os.path.join('3d_tiles', 'model')
+            },
+            '3d_tiles_pointcloud.zip': {
+                'deferred_path': '3d_tiles_pointcloud.zip',
+                'deferred_compress_dir': os.path.join('3d_tiles', 'pointcloud')
+            },
             'dtm.tif': os.path.join('odm_dem', 'dtm.tif'),
             'dsm.tif': os.path.join('odm_dem', 'dsm.tif'),
             'dtm_tiles.zip': {
