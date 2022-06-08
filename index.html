@@ -289,7 +289,7 @@ as soon as a <a href="#processing-node">Processing Node</a> is available. It is 
 
 <h3 id="token-expiration">Token Expiration</h3>
 
-<p>The token expires after a predefined amount of time. The expiration time is dependent on WebODM&rsquo;s settings. You will need to request another token when a token expires.</p>
+<p>The token expires after six hours by default. The expiration time is defined in the settings module of Django in WebODM. If building WebODM from sources or running it natively, the expiration time can be changed in the <code class="prettyprint">JWT_AUTH[&#39;JWT_EXPIRATION_DELTA&#39;]</code> variable. Otherwise, e.g. using the docker images, you will have to request another token when a token expires.</p>
 
 <p>You know that a token has expired if any API call returns a <code class="prettyprint">403</code> status code with the JSON body <code class="prettyprint">{&#39;detail&#39;: &#39;Signature has expired.&#39;}</code>.</p>
 
