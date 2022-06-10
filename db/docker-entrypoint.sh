@@ -222,6 +222,7 @@ docker_setup_env() {
 }
 
 # append POSTGRES_HOST_AUTH_METHOD to pg_hba.conf for "host" connections
+# set POSTGRES_ALLOW_HOST to limit trusted hosts, can be ip or domain, default is "all"
 pg_setup_hba_conf() {
 	{
 		echo
@@ -229,7 +230,7 @@ pg_setup_hba_conf() {
 			echo '# warning trust is enabled for all connections'
 			echo '# see https://www.postgresql.org/docs/12/auth-trust.html'
 		fi
-		echo "host all all all $POSTGRES_HOST_AUTH_METHOD"
+		echo "host all all $POSTGRES_ALLOW_HOST $POSTGRES_HOST_AUTH_METHOD"
 	} >> "$PGDATA/pg_hba.conf"
 }
 
