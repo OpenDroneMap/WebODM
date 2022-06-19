@@ -4,7 +4,7 @@
 
 A user-friendly, commercial grade software for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It supports multiple engines for processing, currently [ODM](https://github.com/OpenDroneMap/ODM) and [MicMac](https://github.com/dronemapper-io/NodeMICMAC/).
 
-![image](https://user-images.githubusercontent.com/1951843/73680798-efc02680-468a-11ea-9ae5-55e51427c6f1.png)
+![image](https://user-images.githubusercontent.com/1951843/174504753-6869e56e-7b65-4775-bb23-6c1dc256575c.png)
 
 * [Getting Started](#getting-started)
     * [Manage Processing Nodes](#manage-processing-nodes)
@@ -30,15 +30,13 @@ A user-friendly, commercial grade software for drone image processing. Generate 
  * [Run it on the cloud (Google Compute, Amazon AWS)](#run-it-on-the-cloud-google-compute-amazon-aws)
  * [License](#license)
  
-![image](https://user-images.githubusercontent.com/1951843/73680589-8213fa80-468a-11ea-9225-442fdcc8b7c8.png)
+![image](https://user-images.githubusercontent.com/1951843/174504771-b0bcfd29-3960-41f7-8d44-103b63050bd5.png)
 
-![image](https://user-images.githubusercontent.com/1951843/73680632-97892480-468a-11ea-83a3-74139bf270cc.png)
+![image](https://user-images.githubusercontent.com/1951843/174504773-f8d8febb-7a45-4d9c-89b6-7d2404c5b8fd.png)
 
 ## Getting Started
 
 Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
-
-Windows users looking for a UI-only native installation can also download the "Desktop App" available from [webodm.net](https://webodm.net).
 
 To install WebODM manually, these steps should get you up and running:
 
@@ -86,8 +84,6 @@ To update WebODM to the latest version use:
 ```bash
 ./webodm.sh update
 ```
-
-We recommend that you read the [Docker Documentation](https://docs.docker.com/) to familiarize with the application lifecycle, setup and teardown, or for more advanced uses. Look at the contents of the webodm.sh script to understand what commands are used to launch WebODM.
 
 ### Manage Processing Nodes
 
@@ -143,12 +139,8 @@ Note that existing task results will not be available after the change. Refer to
 
 Symptoms | Possible Solutions
 --------- | ------------------
-While starting WebODM you get: `from six.moves import _thread as thread ImportError: cannot import name _thread` | Try running: `sudo pip install --ignore-installed six`
+Run out of memory |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
 While starting WebODM you get: `'WaitNamedPipe','The system cannot find the file specified.'` | 1. Make sure you have enabled VT-x virtualization in the BIOS.<br/>2. Try to downgrade your version of Python to 2.7
-While Accessing the WebODM interface you get: `OperationalError at / could not translate host name “db” to address: Name or service not known` or `ProgrammingError at / relation “auth_user” does not exist` | Try restarting your computer, then type: `./webodm.sh restart`
-Task output or console shows one of the following:<ul><li>`MemoryError`</li><li>`Killed`</li></ul> |  Make sure that your Docker environment has enough RAM allocated: [MacOS Instructions](http://stackoverflow.com/a/39720010), [Windows Instructions](https://docs.docker.com/docker-for-windows/#advanced)
-After an update, you get: `django.contrib.auth.models.DoesNotExist: Permission matching query does not exist.` | Try to remove your WebODM folder and start from a fresh git clone
-Task fails with `Process exited with code null`, no task console output - OR - console output shows `Illegal Instruction` - OR - console output shows `Child returned 132` | If the computer running NodeODM is using an old or 32bit CPU, you need to compile [OpenDroneMap](https://github.com/OpenDroneMap/OpenDroneMap) from sources and setup NodeODM natively. You cannot use docker. Docker images work with CPUs with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2 and POPCNT instruction set support or higher.
 On Windows, docker-compose fails with `Failed to execute the script docker-compose` | Make sure you have enabled VT-x virtualization in the BIOS
 Cannot access WebODM using Microsoft Edge on Windows 10 | Try to tweak your internet properties according to [these instructions](http://www.hanselman.com/blog/FixedMicrosoftEdgeCantSeeOrOpenVirtualBoxhostedLocalWebSites.aspx)
 Getting a `No space left on device` error, but hard drive has enough space left | Docker on Windows by default will allocate only 20GB of space to the default docker-machine. You need to increase that amount. See [this link](http://support.divio.com/local-development/docker/managing-disk-space-in-your-docker-vm) and [this link](https://www.howtogeek.com/124622/how-to-enlarge-a-virtual-machines-disk-in-virtualbox-or-vmware/)
@@ -180,6 +172,7 @@ docker run --rm --volume webodm_appmedia:/temp --volume `pwd`/backup:/backup ubu
 ./webodm.sh start
 ```
 In case when recovery .tar is missed, or corrupted you can conduct [Hard Recovery](/contrib/Hard_Recovery_Guide.md)
+
 ### Reset Password
 
 If you forgot the password you picked the first time you logged into WebODM, to reset it just type:
