@@ -11,6 +11,14 @@ algos = {
         'expr': '(N - R) / (N + R)',
         'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
     },
+    'NDRE': {
+        'expr': '(N - Re) / (N + Re)',
+        'help': _('Normalized Difference Red Edge Index shows the amount of green vegetation of permanent or later stage crops.')
+    },
+    'NDWI': {
+        'expr': '(G - N) / (G + N)',
+        'help': _('Normalized Difference Water Index shows the amount of water content in water bodies.')
+    },
     'NDVI (Blue)': {
         'expr': '(N - B) / (N + B)',
         'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
@@ -22,7 +30,7 @@ algos = {
     'vNDVI':{
         'expr': '0.5268*((R ** -0.1294) * (G ** 0.3389) * (B ** -0.3118))',
         'help': _('Visible NDVI is an un-normalized index for RGB sensors using constants derived from citrus, grape, and sugarcane crop data.')
-    },
+    },    
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
         'help': _('Visual Atmospheric Resistance Index shows the areas of vegetation.'),
@@ -87,6 +95,14 @@ algos = {
         'help': _('Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'),
         'range': (-1, 1)
     },
+    'Thermal C': {
+        'expr': 'Lwir',
+        'help': _('Thermal temperature in Celsius degrees.')
+    },
+    'Thermal K': {
+        'expr': 'Lwir / 100 - 273.15',
+        'help': _('Thermal temperature in Centikelvin degrees.')
+    },
 
     # more?
 
@@ -114,6 +130,9 @@ camera_filters = [
     'BGRReN',
     'RGBNRe',
     'RGBReN',
+
+    'BGRNReLwir',
+    'BGRReNLwir',
 
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
@@ -145,7 +164,23 @@ def lookup_formula(algo, band_order = 'RGB'):
 
 @lru_cache(maxsize=2)
 def get_algorithm_list(max_bands=3):
-    return [{'id': k, 'filters': get_camera_filters_for(algos[k], max_bands), **algos[k]} for k in algos if not k.startswith("_")]
+    res = []
+    for k in algos:
+        if k.startswith("_"):
+            continue
+        
+        cam_filters = get_camera_filters_for(algos[k], max_bands)
+        
+        if len(cam_filters) == 0:
+            continue
+
+        res.append({
+            'id': k,
+            'filters': cam_filters,
+            **algos[k]
+        })
+
+    return res
 
 def get_camera_filters_for(algo, max_bands=3):
     result = []
