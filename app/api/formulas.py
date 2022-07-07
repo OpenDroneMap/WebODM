@@ -103,10 +103,6 @@ algos = {
         'expr': 'Lwir / 100 - 273.15',
         'help': _('Thermal temperature in Centikelvin degrees.')
     },
-    'Gray': {
-        'expr': 'Gray * 1',
-        'help': _('Single band grayscale imagery.')
-    },
 
     # more?
 
@@ -121,7 +117,6 @@ algos = {
 }
 
 camera_filters = [
-    'Gray',
     'RGB',
     'RGN',
     'NGB',
