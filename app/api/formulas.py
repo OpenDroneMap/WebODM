@@ -95,11 +95,11 @@ algos = {
         'help': _('Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'),
         'range': (-1, 1)
     },
-    'Thermal_C': {
+    'Thermal C': {
         'expr': 'Lwir',
         'help': _('Thermal temperature in Celsius degrees.')
     },
-    'Thermal_cK': {
+    'Thermal K': {
         'expr': 'Lwir / 100 - 273.15',
         'help': _('Thermal temperature in Centikelvin degrees.')
     },
