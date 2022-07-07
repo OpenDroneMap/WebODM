@@ -136,9 +136,7 @@ export default class LayersControlLayer extends React.Component {
     const algo = this.getAlgorithm(e.target.value);
     if (algo && algo['filters'].indexOf(bands) === -1) bands = algo['filters'][0]; // Pick first
 
-    if (bands !== undefined){
-        this.setState({formula: e.target.value, bands});
-    }
+    this.setState({formula: e.target.value, bands});
   }
 
   getAlgorithm = id => {
