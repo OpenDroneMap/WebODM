@@ -667,8 +667,7 @@ class TestApiTask(BootTransactionTestCase):
 
             for k in algos:
                 a = algos[k]
-                filters = get_camera_filters_for(a, 6)
-                self.assertTrue(len(filters) > 0, "%s has filters" % k)
+                filters = get_camera_filters_for(a)
 
                 for f in filters:
                     params.append(("orthophoto", "formula={}&bands={}&color_map=rdylgn".format(k, f), status.HTTP_200_OK))
