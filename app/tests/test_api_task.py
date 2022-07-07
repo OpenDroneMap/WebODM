@@ -667,7 +667,7 @@ class TestApiTask(BootTransactionTestCase):
 
             for k in algos:
                 a = algos[k]
-                filters = get_camera_filters_for(a)
+                filters = get_camera_filters_for(a, 6)
                 self.assertTrue(len(filters) > 0, "%s has filters" % k)
 
                 for f in filters:
