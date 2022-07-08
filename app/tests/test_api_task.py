@@ -681,7 +681,7 @@ class TestApiTask(BootTransactionTestCase):
             for ext in ["png", "jpg", "webp"]:
                 res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.{}".format(project.id, task.id, tile_path['orthophoto'], ext))
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
-                self.assertEqual(res.get('content-type') == 'image/%s' % ext)
+                self.assertEqual(res.get('content-type'), "image/" + ext)
             
             # Size is 256 by default
             res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png".format(project.id, task.id, tile_path['orthophoto']))
