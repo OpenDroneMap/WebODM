@@ -43,6 +43,7 @@ def export_raster(input, output, **opts):
 
         # Output format
         driver = "GTiff"
+        compress = None
         max_bands = 9999
         with_alpha = True
         rgb = False
@@ -62,7 +63,7 @@ def export_raster(input, output, **opts):
 
         if export_format == "jpg":
             driver = "JPEG"
-            profile.update(quality=70)
+            profile.update(quality=90)
             band_count = 3
             with_alpha = False
             rgb = True
@@ -71,10 +72,17 @@ def export_raster(input, output, **opts):
             band_count = 4
             rgb = True
         elif export_format == "gtiff-rgb":
+            compress = "JPEG"
+            profile.update(jpeg_quality=90)
             band_count = 4
             rgb = True
         else:
+            compress = "DEFLATE"
             band_count = src.count
+        
+        if compress is not None:
+            profile.update(compress=compress)
+            profile.update(predictor=2 if compress == "DEFLATE" else 1)
 
         if rgb and rescale is None:
             # Compute min max
@@ -172,7 +180,7 @@ def export_raster(input, output, **opts):
                 profile.update(dtype=rasterio.float32, count=1, nodata=-9999)
 
             bands_names = ["b{}".format(b) for b in tuple(sorted(set(re.findall(r"b(?P<bands>[0-9]{1,2})", expression))))]
-            rgb = expression.split(",")
+            rgb_expr = expression.split(",")
             indexes = tuple([int(b.replace("b", "")) for b in bands_names])
 
             alpha_index = None
@@ -185,7 +193,7 @@ def export_raster(input, output, **opts):
 
             data = src.read(indexes=indexes, out_dtype=np.float32)
             arr = dict(zip(bands_names, data))
-            arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb])
+            arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
 
             # Set nodata values
             index_band = arr[0]

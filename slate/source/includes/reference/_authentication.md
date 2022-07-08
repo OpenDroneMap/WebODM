@@ -51,6 +51,6 @@ Since applications sometimes do not allow headers to be modified, you can also a
 
 ### Token Expiration
 
-The token expires after a predefined amount of time. The expiration time is dependent on WebODM's settings. You will need to request another token when a token expires.
+The token expires after six hours by default. The expiration time is defined in the settings module of Django in WebODM. If building WebODM from sources or running it natively, the expiration time can be changed in the `JWT_AUTH['JWT_EXPIRATION_DELTA']` variable. Otherwise, e.g. using the docker images, you will have to request another token when a token expires.
 
 You know that a token has expired if any API call returns a `403` status code with the JSON body `{'detail': 'Signature has expired.'}`.

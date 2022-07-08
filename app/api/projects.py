@@ -1,6 +1,6 @@
 from guardian.shortcuts import get_perms, get_users_with_perms, assign_perm, remove_perm
 from rest_framework import serializers, viewsets
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
@@ -53,7 +53,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return None
         return super().paginate_queryset(queryset)
     
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def duplicate(self, request, pk=None):
         """
         Duplicate a task
@@ -66,7 +66,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         else:
             return Response({'error': _("Cannot duplicate project")}, status=status.HTTP_200_OK)
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def permissions(self, request, pk=None):
         project = get_and_check_project(request, pk, ('change_project', ))
 
@@ -81,7 +81,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         result.sort(key=lambda r: r['owner'], reverse=True)
         return Response(result, status=status.HTTP_200_OK)
     
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def edit(self, request, pk=None):
         project = get_and_check_project(request, pk, ('change_project', ))
 

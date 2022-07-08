@@ -59,38 +59,41 @@ class Info(TaskView):
 
         # Populate fields from first image in task
         img = ImageUpload.objects.filter(task=task).exclude(image__iendswith='.txt').first()
-        img_path = os.path.join(settings.MEDIA_ROOT, img.path())
-        im = Image.open(img_path)
+        if img is not None:
+            img_path = os.path.join(settings.MEDIA_ROOT, img.path())
+            im = Image.open(img_path)
 
-        # TODO: for better data we could look over all images
-        # and find actual end and start time
-        # Here we're picking an image at random and assuming a one hour flight
-        if not 'sensor' in task_info:
-            task_info['endDate'] = datetime.utcnow().timestamp() * 1000
-            task_info['sensor'] = ''
-            task_info['title'] = task.name
-            task_info['provider'] = get_site_settings().organization_name
+            # TODO: for better data we could look over all images
+            # and find actual end and start time
+            # Here we're picking an image at random and assuming a one hour flight
+            if not 'sensor' in task_info:
+                task_info['endDate'] = datetime.utcnow().timestamp() * 1000
+                task_info['sensor'] = ''
+                task_info['title'] = task.name
+                task_info['provider'] = get_site_settings().organization_name
 
-            if 'exif' in im.info:
-                exif_dict = piexif.load(im.info['exif'])
-                if 'Exif' in exif_dict:
-                    if piexif.ExifIFD.DateTimeOriginal in exif_dict['Exif']:
-                        try:
-                            parsed_date = datetime.strptime(exif_dict['Exif'][piexif.ExifIFD.DateTimeOriginal].decode('ascii'),
-                                                          '%Y:%m:%d %H:%M:%S')
-                            task_info['endDate'] = parsed_date.timestamp() * 1000
-                        except ValueError:
-                            # Ignore date field if we can't parse it
-                            pass
-                if '0th' in exif_dict:
-                    if piexif.ImageIFD.Make in exif_dict['0th']:
-                        task_info['sensor'] = exif_dict['0th'][piexif.ImageIFD.Make].decode('ascii').strip(' \t\r\n\0')
+                if 'exif' in im.info:
+                    exif_dict = piexif.load(im.info['exif'])
+                    if 'Exif' in exif_dict:
+                        if piexif.ExifIFD.DateTimeOriginal in exif_dict['Exif']:
+                            try:
+                                parsed_date = datetime.strptime(exif_dict['Exif'][piexif.ExifIFD.DateTimeOriginal].decode('ascii'),
+                                                            '%Y:%m:%d %H:%M:%S')
+                                task_info['endDate'] = parsed_date.timestamp() * 1000
+                            except ValueError:
+                                # Ignore date field if we can't parse it
+                                pass
+                    if '0th' in exif_dict:
+                        if piexif.ImageIFD.Make in exif_dict['0th']:
+                            task_info['sensor'] = exif_dict['0th'][piexif.ImageIFD.Make].decode('ascii').strip(' \t\r\n\0')
 
-                    if piexif.ImageIFD.Model in exif_dict['0th']:
-                        task_info['sensor'] = (task_info['sensor'] + " " + exif_dict['0th'][piexif.ImageIFD.Model].decode('ascii')).strip(' \t\r\n\0')
+                        if piexif.ImageIFD.Model in exif_dict['0th']:
+                            task_info['sensor'] = (task_info['sensor'] + " " + exif_dict['0th'][piexif.ImageIFD.Model].decode('ascii')).strip(' \t\r\n\0')
 
-            task_info['startDate'] = task_info['endDate'] - 60 * 60 * 1000
-            set_task_info(task.id, task_info)
+                task_info['startDate'] = task_info['endDate'] - 60 * 60 * 1000
+                set_task_info(task.id, task_info)
+        else:
+            task_info['noImages'] = True
 
         return Response(task_info, status=status.HTTP_200_OK)
 

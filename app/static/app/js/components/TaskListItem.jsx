@@ -407,7 +407,7 @@ class TaskListItem extends React.Component {
     const imported = task.import_url !== "";
 
     let status = statusCodes.description(task.status);
-    if (status === "") status = _("Uploading images to processing node");
+    if (status === "") status = _("Sending images to processing node");
 
     if (!task.processing_node && !imported) status = _("Waiting for a node...");
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
@@ -438,12 +438,12 @@ class TaskListItem extends React.Component {
       };
 
       if (task.status === statusCodes.COMPLETED){
-        if (task.available_assets.indexOf("orthophoto.tif") !== -1){
+        if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1){
           addActionButton(" " + _("View Map"), "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         }else{
-          showOrthophotoMissingWarning = true;
+          showOrthophotoMissingWarning = task.available_assets.indexOf("orthophoto.tif") === -1;
         }
 
         addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
@@ -532,43 +532,45 @@ class TaskListItem extends React.Component {
         <div className="expanded-panel">
           <div className="row">
             <div className="col-md-12 no-padding">
-              <div className="console-switch text-right pull-right">
-                  <div className="console-output-label">{_("Task Output:")} </div><ul className="list-inline">
-                    <li>
-                      <div className="btn-group btn-toggle"> 
+              <table className="table table-condensed info-table">
+                <tbody>
+                  <tr>
+                    <td><strong>{_("Created on:")}</strong></td>
+                    <td>{(new Date(task.created_at)).toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>{_("Processing Node:")}</strong></td>
+                    <td>{task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})</td>
+                  </tr>
+                  {Array.isArray(task.options) &&
+                  <tr>
+                    <td><strong>{_("Options:")}</strong></td>
+                    <td>{this.optionsToList(task.options)}</td>
+                  </tr>}
+                  {stats && stats.gsd && 
+                  <tr>
+                    <td><strong>{_("Average GSD:")}</strong></td>
+                    <td>{parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm</td>
+                  </tr>}
+                  {stats && stats.area &&
+                  <tr>
+                    <td><strong>{_("Area:")}</strong></td>
+                    <td>{parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;</td>
+                  </tr>}
+                  {stats && stats.pointcloud && stats.pointcloud.points &&
+                  <tr>
+                    <td><strong>{_("Reconstructed Points:")}</strong></td>
+                    <td>{stats.pointcloud.points.toLocaleString()}</td>
+                  </tr>}
+                  <tr>
+                      <td><strong>{_("Task Output:")}</strong></td>
+                      <td><div className="btn-group btn-toggle"> 
                         <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
                         <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>{_("Off")}</button>
-                      </div>
-                    </li>
-                  </ul>
-              </div>
-
-              <div className="mb">
-                <div className="labels">
-                  <strong>{_("Created on:")} </strong> {(new Date(task.created_at)).toLocaleString()}<br/>
-                </div>
-                <div className="labels">
-                    <strong>{_("Processing Node:")} </strong> {task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})<br/>
-                </div>
-                {Array.isArray(task.options) ?
-                   <div className="labels">
-                    <strong>{_("Options:")} </strong> {this.optionsToList(task.options)}<br/>
-                  </div>
-                : ""}
-
-                {stats && stats.gsd ? 
-                <div className="labels">
-                    <strong>{_("Average GSD:")} </strong> {parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm<br/>
-                </div> : ""}
-                {stats && stats.area ? 
-                <div className="labels">
-                    <strong>{_("Area:")} </strong> {parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;<br/>
-                </div> : ""}
-                {stats && stats.pointcloud && stats.pointcloud.points ? 
-                <div className="labels">
-                    <strong>{_("Reconstructed Points:")} </strong> {stats.pointcloud.points.toLocaleString()}<br/>
-                </div> : ""}
-              </div> 
+                      </div></td>
+                  </tr>
+                </tbody>
+              </table>
               
               {this.state.view === 'console' ?
                 <Console
@@ -716,21 +718,33 @@ class TaskListItem extends React.Component {
             />
         : ""}
         <div className="row">
-          <div className="col-sm-5 name">
+          <div className="col-sm-5 col-xs-12 name">
             <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
           </div>
-          <div className="col-sm-1 details">
+          <div className="col-sm-1 col-xs-5 details">
             <i className="far fa-image"></i> {task.images_count}
           </div>
-          <div className="col-sm-2 details">
+          <div className="col-sm-2 col-xs-5 details">
             <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
-          <div className="col-sm-3">
+          <div className="col-xs-2 text-right visible-xs-block">
+            {taskActions.length > 0 ? 
+                <div className="btn-group">
+                <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i className={"fa " + taskActionsIcon}></i>
+                </button>
+                <ul className="dropdown-menu dropdown-menu-right">
+                    {taskActions}
+                </ul>
+                </div>
+            : ""}
+          </div>
+          <div className="col-sm-3 col-xs-12">
             {showEditLink ?
               <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
               : statusLabel}
           </div>
-          <div className="col-sm-1 text-right">
+          <div className="col-sm-1 text-right hidden-xs">
             {taskActions.length > 0 ? 
                 <div className="btn-group">
                 <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

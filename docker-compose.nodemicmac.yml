@@ -10,7 +10,7 @@ services:
     environment:
       - WO_CREATE_MICMAC_PNODE=YES
   node-micmac-1:
-    image: dronemapper/node-micmac
+    image: opendronemap/nodemicmac
     container_name: node-micmac-1
     ports:
       - "3000"

@@ -118,6 +118,12 @@
 		<div class="pv-menu-list">
 
 			<div id="scene_export"></div>
+				<li style="margin: 10px 0px">
+					<label for="optLengthUnit" class="pv-select-label"><span data-i18n="appearance.length_unit">Length unit</span></label>
+						<a href="#" id="mm" onclick="viewer.setLengthUnitAndDisplayUnit('m','m');">Meter</a>
+						<a href="#" id="mft" onclick="viewer.setLengthUnitAndDisplayUnit('m','ft');">Feet</a>
+						<a href="#" id="min" onclick="viewer.setLengthUnitAndDisplayUnit('m','in');">Inch</a> 
+				</li>
 
 			<div class="divider"><span>Objects</span></div>
 

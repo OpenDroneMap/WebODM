@@ -1,10 +1,16 @@
 import rasterio as rio
 from rasterio import warp, transform
 import numpy as np
-import cv2
 import json
+import sys
+import os
 from geojson import Feature, FeatureCollection, dumps, Polygon
 from rasteralign import align, align_altitudes
+
+from webodm import settings
+
+sys.path.insert(0, os.path.join(settings.MEDIA_ROOT, "plugins", "changedetection", "site-packages"))
+import cv2
 
 KERNEL_10_10 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
 KERNEL_20_20 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
@@ -111,6 +117,7 @@ def calculate_heatmap(diff, mask, dem, epsg, min_height):
     pixels = np.argwhere(~mask)
     xs = pixels[:, 0]
     ys = pixels[:, 1]
+
 
     # Map pixels to coordinates
     coords_xs, coords_ys = map_pixels_to_coordinates(dem, epsg, xs, ys)

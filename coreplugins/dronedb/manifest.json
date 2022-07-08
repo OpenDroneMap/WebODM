@@ -1,0 +1,13 @@
+{
+	"name": "DroneDB",
+	"webodmMinVersion": "1.1.2",
+	"description": "Integrate WebODM with DroneDB: import images and share results",
+	"version": "0.0.1",
+	"author": "Luca Di Leo",
+	"email": "ldileo@digipa.it",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["ddb", "DroneDB", "cloud"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": true,
+	"deprecated": false
+}

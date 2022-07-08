@@ -3,20 +3,21 @@ appdirs==1.4.0
 APScheduler==3.2.0
 billiard==3.6.3.0
 celery==4.4.0
-coreapi==2.0.9
-Django==2.1.15
+coreapi>=2.3.3
+Django==2.2.27
 django-appconf==1.0.2
 django-codemirror2==0.2
 django-colorfield==0.1.15
 django-compressor==2.2
 django-cors-headers==3.0.2
-django-filter==2.0.0
+django-filter==2.4.0
 django-guardian==1.4.9
 django-imagekit==4.0.1
 django-libsass==0.7
 django-webpack-loader==0.6.0
-djangorestframework==3.9.1
+djangorestframework==3.13.1
 djangorestframework-jwt==1.9.0
+djangorestframework-guardian==0.3.0
 drf-nested-routers==0.11.1
 funcsigs==1.0.2
 futures==3.1.1
@@ -33,7 +34,6 @@ piexif==1.0.13
 pilkit==2.0
 Pillow==8.3.2
 pip-autoremove==0.9.0
-psycopg2==2.8.6
 psycopg2-binary==2.8.6
 PyJWT==1.5.3
 pyodm==1.5.9
@@ -62,3 +62,5 @@ Shapely==1.7.0 ; sys_platform == "win32"
 eventlet==0.32.0 ; sys_platform == "win32"
 pyopenssl==19.1.0 ; sys_platform == "win32"
 numpy==1.21.1
+drf-yasg==1.20.0
+

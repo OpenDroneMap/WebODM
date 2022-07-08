@@ -1,5 +1,4 @@
 import json
-import numpy
 import rio_tiler.utils
 from rasterio.enums import ColorInterp
 from rasterio.crs import CRS
@@ -43,13 +42,13 @@ def get_zoom_safe(src_dst):
 
 
 def get_tile_url(task, tile_type, query_params):
-    url = '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}.png'.format(task.project.id, task.id, tile_type)
+    url = '/api/projects/{}/tasks/{}/{}/tiles/{{z}}/{{x}}/{{y}}'.format(task.project.id, task.id, tile_type)
     params = {}
 
     for k in ['formula', 'bands', 'rescale', 'color_map', 'hillshade']:
         if query_params.get(k):
             params[k] = query_params.get(k)
-
+    
     if len(params) > 0:
         url = url + '?' + urllib.parse.urlencode(params)
 
@@ -172,7 +171,7 @@ class Metadata(TaskNestedView):
                         data, mask = src.preview(expression=expr, vrt_options={'cutline': boundaries_cutline})
                     else:
                         data, mask = src.preview(expression=expr)
-                    data = numpy.ma.array(data)
+                    data = np.ma.array(data)
                     data.mask = mask == 0
                     stats = {
                         str(b + 1): raster_stats(data[b], percentiles=(pmin, pmax), bins=255, range=hrange)
@@ -199,6 +198,7 @@ class Metadata(TaskNestedView):
         cmap_labels = {
             "viridis": "Viridis",
             "jet": "Jet",
+            "jet_r": "Jet (Reverse)",
             "terrain": "Terrain",
             "gist_earth": "Earth",
             "rdylgn": "RdYlGn",
@@ -209,6 +209,10 @@ class Metadata(TaskNestedView):
             "better_discrete_ndvi": "Custom NDVI Index",
             "rplumbo": "Rplumbo (Better NDVI)",
             "pastel1": "Pastel",
+            "plasma": "Plasma",
+            "inferno": "Inferno",
+            "magma": "Magma",
+            "cividis": "Cividis"
         }
 
         colormaps = []
@@ -217,7 +221,8 @@ class Metadata(TaskNestedView):
             colormaps = ['viridis', 'jet', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r', 'rplumbo', 'discrete_ndvi',
-                         'better_discrete_ndvi']
+                         'better_discrete_ndvi',
+                         'viridis', 'plasma', 'inferno', 'magma', 'cividis', 'jet', 'jet_r']
             algorithms = *get_algorithm_list(band_count),
 
         info['color_maps'] = []
@@ -245,52 +250,18 @@ class Metadata(TaskNestedView):
         return Response(info)
 
 
-def get_elevation_tiles(elevation, url, x, y, z, tilesize, nodata, resampling, padding):
-    tile = np.full((tilesize * 3, tilesize * 3), nodata, dtype=elevation.dtype)
-    with COGReader(url) as src:
-        try:
-            left, _discard_ = src.tile(x - 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                               resampling_method=resampling, padding=padding)
-            tile[tilesize:tilesize * 2, 0:tilesize] = left
-        except TileOutsideBounds:
-            pass
-
-        try:
-            right, _discard_ = src.tile(x + 1, y, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                                resampling_method=resampling, padding=padding)
-            tile[tilesize:tilesize * 2, tilesize * 2:tilesize * 3] = right
-        except TileOutsideBounds:
-            pass
-        try:
-            bottom, _discard_ = src.tile(x, y + 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                                 resampling_method=resampling, padding=padding)
-            tile[tilesize * 2:tilesize * 3, tilesize:tilesize * 2] = bottom
-        except TileOutsideBounds:
-            pass
-        try:
-            top, _discard_ = src.tile(x, y - 1, z, indexes=1, tilesize=tilesize, nodata=nodata,
-                              resampling_method=resampling, padding=padding)
-            tile[0:tilesize, tilesize:tilesize * 2] = top
-        except TileOutsideBounds:
-            pass
-    tile[tilesize:tilesize * 2, tilesize:tilesize * 2] = elevation
-    return tile
-
-
 class Tiles(TaskNestedView):
-    def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y="", scale=1):
+    def get(self, request, pk=None, project_pk=None, tile_type="", z="", x="", y="", scale=1, ext=None):
         """
         Get a tile image
         """
         task = self.get_and_check_task(request, pk)
-
+        
         z = int(z)
         x = int(x)
         y = int(y)
 
         scale = int(scale)
-        ext = "png"
-        driver = "jpeg" if ext == "jpg" else ext
 
         indexes = None
         nodata = None
@@ -301,6 +272,8 @@ class Tiles(TaskNestedView):
         rescale = self.request.query_params.get('rescale')
         color_map = self.request.query_params.get('color_map')
         hillshade = self.request.query_params.get('hillshade')
+        tilesize = self.request.query_params.get('size')
+
         boundaries_feature = self.request.query_params.get('boundaries')
         if boundaries_feature == '':
             boundaries_feature = None
@@ -315,6 +288,17 @@ class Tiles(TaskNestedView):
         if rescale == '': rescale = None
         if color_map == '': color_map = None
         if hillshade == '' or hillshade == '0': hillshade = None
+        if tilesize == '' or tilesize is None: tilesize = 256
+
+        try:
+            tilesize = int(tilesize)
+            if tilesize != 256 and tilesize != 512:
+                raise ValueError("Invalid size")
+
+            if tilesize == 512:
+                z -= 1
+        except ValueError:
+            raise exceptions.ValidationError(_("Invalid tile size parameter"))
 
         try:
             expr, _discard_ = lookup_formula(formula, bands)
@@ -337,7 +321,7 @@ class Tiles(TaskNestedView):
 
         if nodata is not None:
             nodata = np.nan if nodata == "nan" else float(nodata)
-        tilesize = scale * 256
+        tilesize = scale * tilesize
         url = get_raster_path(task, tile_type)
         if not os.path.isfile(url):
             raise exceptions.NotFound()
@@ -346,7 +330,6 @@ class Tiles(TaskNestedView):
             if not src.tile_exists(z, x, y):
                 raise exceptions.NotFound(_("Outside of bounds"))
 
-        with COGReader(url) as src:
             minzoom, maxzoom = get_zoom_safe(src)
             has_alpha = has_alpha_band(src.dataset)
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
@@ -380,93 +363,125 @@ class Tiles(TaskNestedView):
             if nodata is None and tile_type == 'orthophoto':
                 nodata = 0
 
-        resampling = "nearest"
-        padding = 0
-        if tile_type in ["dsm", "dtm"]:
-            resampling = "bilinear"
-            padding = 16
+            resampling = "nearest"
+            padding = 0
+            tile_buffer = None
 
-        try:
-            with COGReader(url) as src:
+            if tile_type in ["dsm", "dtm"]:
+                resampling = "bilinear"
+                padding = 16
+
+            # Hillshading is not a local tile operation and
+            # requires neighbor tiles to be rendered seamlessly
+            if hillshade is not None:
+                tile_buffer = tilesize
+
+            try:
                 if expr is not None:
                     if boundaries_cutline is not None:
                         tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
                                         padding=padding,
+                                        tile_buffer=tile_buffer,
                                         resampling_method=resampling, vrt_options={'cutline': boundaries_cutline})
                     else:
                         tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
                                         padding=padding,
+                                        tile_buffer=tile_buffer,
                                         resampling_method=resampling)
                 else:
                     if boundaries_cutline is not None:
                         tile = src.tile(x, y, z, tilesize=tilesize, nodata=nodata,
                                         padding=padding,
+                                        tile_buffer=tile_buffer,
                                         resampling_method=resampling, vrt_options={'cutline': boundaries_cutline})
                     else:
                         tile = src.tile(x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata,
-                                        padding=padding, resampling_method=resampling)
-
-        except TileOutsideBounds:
-            raise exceptions.NotFound(_("Outside of bounds"))
-
-        if color_map:
+                                        padding=padding, 
+                                        tile_buffer=tile_buffer,
+                                        resampling_method=resampling)
+            except TileOutsideBounds:
+                raise exceptions.NotFound(_("Outside of bounds"))
+            
+            if color_map:
+                try:
+                    colormap.get(color_map)
+                except InvalidColorMapName:
+                    raise exceptions.ValidationError(_("Not a valid color_map value"))
+            
+            intensity = None
             try:
-                colormap.get(color_map)
-            except InvalidColorMapName:
-                raise exceptions.ValidationError(_("Not a valid color_map value"))
-        
-        intensity = None
-        try:
-            rescale_arr = list(map(float, rescale.split(",")))
-        except ValueError:
-            raise exceptions.ValidationError(_("Invalid rescale value"))
-
-        options = img_profiles.get(driver, {})
-        if hillshade is not None:
-            try:
-                hillshade = float(hillshade)
-                if hillshade <= 0:
-                    hillshade = 1.0
+                rescale_arr = list(map(float, rescale.split(",")))
             except ValueError:
-                raise exceptions.ValidationError(_("Invalid hillshade value"))
-            if tile.data.shape[0] != 1:
-                raise exceptions.ValidationError(
-                    _("Cannot compute hillshade of non-elevation raster (multiple bands found)"))
-            delta_scale = (maxzoom + ZOOM_EXTRA_LEVELS + 1 - z) * 4
-            dx = src.dataset.meta["transform"][0] * delta_scale
-            dy = -src.dataset.meta["transform"][4] * delta_scale
-            ls = LightSource(azdeg=315, altdeg=45)
-            # Hillshading is not a local tile operation and
-            # requires neighbor tiles to be rendered seamlessly
-            elevation = get_elevation_tiles(tile.data[0], url, x, y, z, tilesize, nodata, resampling, padding)
-            intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
-            intensity = intensity[tilesize:tilesize * 2, tilesize:tilesize * 2]
+                raise exceptions.ValidationError(_("Invalid rescale value"))
 
-        if intensity is not None:
-            rgb = tile.post_process(in_range=(rescale_arr,))
-            if colormap:
-                rgb, _discard_ = apply_cmap(rgb.data, colormap.get(color_map))
-            if rgb.data.shape[0] != 3:
-                raise exceptions.ValidationError(
-                    _("Cannot process tile: intensity image provided, but no RGB data was computed."))
-            intensity = intensity * 255.0
-            rgb = hsv_blend(rgb, intensity)
-            if rgb is not None:
+            # Auto?
+            if ext is None:
+                # Check for transparency
+                if np.equal(tile.mask, 255).all():
+                    ext = "jpg"
+                else:
+                    if 'image/webp' in request.headers.get('Accept', ''):
+                        ext = "webp"
+                    else:
+                        ext = "png"
+
+            driver = "jpeg" if ext == "jpg" else ext
+
+            options = img_profiles.get(driver, {})
+            if hillshade is not None:
+                try:
+                    hillshade = float(hillshade)
+                    if hillshade <= 0:
+                        hillshade = 1.0
+                except ValueError:
+                    raise exceptions.ValidationError(_("Invalid hillshade value"))
+                if tile.data.shape[0] != 1:
+                    raise exceptions.ValidationError(
+                        _("Cannot compute hillshade of non-elevation raster (multiple bands found)"))
+                delta_scale = (maxzoom + ZOOM_EXTRA_LEVELS + 1 - z) * 4
+                dx = src.dataset.meta["transform"][0] * delta_scale
+                dy = -src.dataset.meta["transform"][4] * delta_scale
+                ls = LightSource(azdeg=315, altdeg=45)
+                
+                # Remove elevation data from edge buffer tiles
+                # (to keep intensity uniform across tiles)
+                elevation = tile.data[0]
+                elevation[0:tilesize, 0:tilesize] = nodata
+                elevation[tilesize*2:tilesize*3, 0:tilesize] = nodata
+                elevation[0:tilesize, tilesize*2:tilesize*3] = nodata
+                elevation[tilesize*2:tilesize*3, tilesize*2:tilesize*3] = nodata
+
+                intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
+                intensity = intensity[tilesize:tilesize * 2, tilesize:tilesize * 2]
+
+            if intensity is not None:
+                rgb = tile.post_process(in_range=(rescale_arr,))
+                rgb_data = rgb.data[:,tilesize:tilesize * 2, tilesize:tilesize * 2]
+                if colormap:
+                    rgb, _discard_ = apply_cmap(rgb_data, colormap.get(color_map))
+                if rgb.data.shape[0] != 3:
+                    raise exceptions.ValidationError(
+                        _("Cannot process tile: intensity image provided, but no RGB data was computed."))
+                intensity = intensity * 255.0
+                rgb = hsv_blend(rgb, intensity)
+                if rgb is not None:
+                    mask = tile.mask[tilesize:tilesize * 2, tilesize:tilesize * 2]
+                    return HttpResponse(
+                        render(rgb, mask, img_format=driver, **options),
+                        content_type="image/{}".format(ext)
+                    )
+
+            if color_map is not None:
                 return HttpResponse(
-                    render(rgb, tile.mask, img_format=driver, **options),
+                    tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, colormap=colormap.get(color_map),
+                                                                    **options),
                     content_type="image/{}".format(ext)
                 )
 
-        if color_map is not None:
             return HttpResponse(
-                tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, colormap=colormap.get(color_map),
-                                                                  **options),
+                tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, **options),
                 content_type="image/{}".format(ext)
             )
-        return HttpResponse(
-            tile.post_process(in_range=(rescale_arr,)).render(img_format=driver, **options),
-            content_type="image/{}".format(ext)
-        )
 
 
 class Export(TaskNestedView):

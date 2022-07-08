@@ -1,0 +1,85 @@
+{% extends "app/plugins/templates/base.html" %}
+{% load bootstrap_extras %}
+{% block content %}
+<h3>DroneDB</h3>
+Provide your credentials to access <a href="https://dronedb.app" target="_blank">DroneDB</a>:
+<br/>
+<br/>
+<form action="" method="post" class="oam-form oam-token-form">
+	{% csrf_token %}
+	{% include "app/plugins/templates/form.html" %}
+	<button id="btnVerify" type="button" class="btn btn-success" disabled><i class="fas fa-user-check"></i>&nbsp;&nbsp;Verify Configuration</button>
+	<button type="submit" class="btn btn-primary" disabled><i class="fa fa-save fa-fw"></i>&nbsp;&nbsp;Save Configuration</button>
+</form>
+<div id="alert-result" style="display: none; margin-top: 20px" class="alert" role="alert"></div>
+
+<script>
+
+	$(document).ready(function() {
+
+		var running = false;
+		var timeout = null;
+
+		$("input[name=registry_url],input[name=username],input[name=password]").on('keyup', function() {
+
+			var alert = $("#alert-result").hide();
+			if (timeout != null) clearTimeout(timeout);
+
+			$("#btnVerify,button[type=submit]").prop('disabled', 
+				$("input[name=registry_url]").val().length == 0 || 
+				$("input[name=username]").val().length == 0 || 
+				$("input[name=password]").val().length == 0);
+		});
+
+		$("#btnVerify").click(function() {
+			
+			if (running) return;
+			running = true;
+			if (timeout != null) clearTimeout(timeout);
+
+			var alert = $("#alert-result");
+
+			alert.attr('class', 'alert alert-info');
+			alert.text("Testing configuration...");
+			alert.show();
+
+			$("#btnVerify").prop('disabled', true);
+
+			$.ajax({
+				url: "/api/plugins/dronedb/checkcredentials",
+				type: "POST",
+				data: {
+					"csrfmiddlewaretoken": $("input[name=csrfmiddlewaretoken]").val(),
+					"hubUrl": $("input[name=registry_url]").val(),
+					"userName": $("input[name=username]").val(),
+					"password": $("input[name=password]").val()
+				},
+				success: function(data) {
+
+					if (data.success) {
+						alert.attr('class', 'alert alert-success');
+						alert.text("Configuration verified successfully!");
+					} else {
+						alert.attr('class', 'alert alert-danger');
+						alert.text("Configuration verification failed!");
+					}
+
+					timeout = setTimeout(function() { alert.hide(); }, 5000);
+
+				},
+				error: function(data) {
+					alert.attr('class', 'alert alert-danger');
+					alert.text("Configuration failed: cannot reach server!");
+				},
+				complete: function() {
+					running = false;
+					$("#btnVerify").prop('disabled', false);
+				}
+			});
+	
+		});
+	});
+
+</script>
+
+{% endblock %}

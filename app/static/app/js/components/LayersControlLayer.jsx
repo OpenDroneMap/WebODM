@@ -192,7 +192,8 @@ export default class LayersControlLayer extends React.Component {
         formula,
         bands,
         hillshade,
-        rescale: this.rescale
+        rescale: this.rescale,
+        size: 512
     };
   }
   

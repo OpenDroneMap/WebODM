@@ -413,6 +413,12 @@ class ModelView extends React.Component {
             const checkScene = () => {
                 const sceneData = JSON.stringify(this.getSceneData());
                 if (sceneData !== prevSceneData) postSceneData(sceneData);
+                
+                // Potree is a bit strange, sometimes fitToScreen does
+                // not work, so we check whether the camera position is still
+                // at zero and recall fitToScreen
+                const pos = viewer.scene.view.position;
+                if (pos.x === 0 && pos.y === 0 && pos.z === 0) viewer.fitToScreen();
             };
 
             saveSceneInterval = setInterval(checkScene, 3000);

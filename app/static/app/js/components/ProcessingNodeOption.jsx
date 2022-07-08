@@ -148,7 +148,7 @@ class ProcessingNodeOption extends React.Component {
         loadFileControl = ([
             <button key="btn" type="file" className="btn glyphicon glyphicon-import btn-primary" data-toggle="tooltip" data-placement="left" title={_("Click to import a .JSON file")} onClick={() => this.loadFile()}></button>,
             <input key="file-ctrl" className="file-control" type="file" 
-                accept="text/*,application/json"
+                accept="text/plain,application/json,application/geo+json"
                 onChange={this.handleFileSelect}
                 ref={(domNode) => { this.fileControl = domNode}} />
         ]);

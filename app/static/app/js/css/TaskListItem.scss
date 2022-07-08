@@ -2,7 +2,6 @@
     .row{
         margin: 0;
         padding: 4px;
-        padding-left: 8px;
 
         .no-padding{
             padding: 0;
@@ -16,12 +15,15 @@
     .name{
         padding-left: 0;
         margin-top: 4px;
+        .clickable {
+            margin-right: 5px;
+        }
     }
     
     .details{
         font-size: 90%;
         padding-right: 0;
-        margin-top: 4px;
+        margin-top: 7px;
 
         i{
             margin-left: 16px;
@@ -31,10 +33,6 @@
         }
     }
     
-    .fa-cog{
-        width: auto;
-    }
-
     .status-label{
         padding: 4px;
         padding-left: 8px;
@@ -43,6 +41,10 @@
         border-style: solid;
         border-width: 1px;
         border-radius: 2px;
+
+        @media screen and (max-width: 768px){
+            margin-top: 5px;
+        }
     }
 
     .clickable:hover{
@@ -53,6 +55,18 @@
         padding-top: 4px;
         padding-bottom: 16px;
         padding-left: 16px;
+        padding-right: 16px;
+
+        .info-table {
+            tr td:first-child {
+                width: 33%;
+                max-width: 150px;
+            }
+            td{
+                padding: 0;
+            }
+            margin-bottom: 12px;
+        }
 
         .task-warning{
             margin-top: 16px;
@@ -75,6 +89,7 @@
         .action-buttons{
             button{
                 margin-right: 4px;
+                margin-top: 4px;
             }
 
             .btn-group{
@@ -84,7 +99,7 @@
             }
 
             .edit-button{
-                margin-right: 15px;
+                margin-right: 0px;
             }
 
             .asset-download-buttons{
@@ -101,19 +116,6 @@
         display: inline;
     }
 
-    .console-switch{
-        margin-right: 10px;
-        margin-bottom: 8px;
-        position: relative;
-        z-index: 99;
-        .console-output-label{
-            margin-right: 8px;
-        }
-        .console-output-label, ul{
-            display: inline-block;
-        }
-    }
-    
     .mb{
         margin-bottom: 12px;
     }

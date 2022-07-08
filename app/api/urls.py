@@ -18,14 +18,14 @@ from webodm import settings
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet)
 router.register(r'processingnodes', ProcessingNodeViewSet)
-router.register(r'presets', PresetViewSet, base_name='presets')
+router.register(r'presets', PresetViewSet, basename='presets')
 
 tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')
-tasks_router.register(r'tasks', TaskViewSet, base_name='projects-tasks')
+tasks_router.register(r'tasks', TaskViewSet, basename='projects-tasks')
 
 admin_router = routers.DefaultRouter()
-admin_router.register(r'admin/users', AdminUserViewSet, base_name='admin-users')
-admin_router.register(r'admin/groups', AdminGroupViewSet, base_name='admin-groups')
+admin_router.register(r'admin/users', AdminUserViewSet, basename='admin-users')
+admin_router.register(r'admin/groups', AdminGroupViewSet, basename='admin-groups')
 
 urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
@@ -37,8 +37,8 @@ urlpatterns = [
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles\.json$', TileJson.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/bounds$', Bounds.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/metadata$', Metadata.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.png$', Tiles.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)@(?P<scale>[\d]+)x\.png$', Tiles.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)@(?P<scale>[\d]+)x\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<asset_type>orthophoto|dsm|dtm|georeferenced_model)/export$', Export.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/download/(?P<asset>.+)$', TaskDownloads.as_view()),

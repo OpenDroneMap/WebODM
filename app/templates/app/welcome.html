@@ -225,7 +225,7 @@
         </div>
     {% else %}
         <h3>{% trans 'Welcome!' %} ☺</h3>
-        <div style="margin-bottom: 28px;">Before we get started, we need to create an administrator account for you:</div>
+        <div style="margin-bottom: 28px;">{% trans "Before we get started, we need to create an administrator account for you:" %}</div>
     {% endif %}
 
     <form action="" method="post" class="form-horizontal" role="form">{% csrf_token %}

@@ -186,6 +186,14 @@ class Task(models.Model):
                 'deferred_path': 'textured_model.zip',
                 'deferred_compress_dir': 'odm_texturing'
             },
+            '3d_tiles_model.zip': {
+                'deferred_path': '3d_tiles_model.zip',
+                'deferred_compress_dir': os.path.join('3d_tiles', 'model')
+            },
+            '3d_tiles_pointcloud.zip': {
+                'deferred_path': '3d_tiles_pointcloud.zip',
+                'deferred_compress_dir': os.path.join('3d_tiles', 'pointcloud')
+            },
             'dtm.tif': os.path.join('odm_dem', 'dtm.tif'),
             'dsm.tif': os.path.join('odm_dem', 'dsm.tif'),
             'dtm_tiles.zip': {
@@ -1074,6 +1082,9 @@ class Task(models.Model):
         :return: path to changed GCP file or None if no GCP file was found/changed
         """
         gcp_path = self.find_all_files_matching(r'.*\.txt$')
+
+        # Skip geo.txt, image_groups.txt files
+        gcp_path = list(filter(lambda p: os.path.basename(p).lower() not in ['geo.txt', 'image_groups.txt'], gcp_path))
         if len(gcp_path) == 0: return None
 
         # Assume we only have a single GCP file per task

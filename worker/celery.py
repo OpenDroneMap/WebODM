@@ -32,7 +32,7 @@ app.conf.beat_schedule = {
         'task': 'worker.tasks.cleanup_tmp_directory',
         'schedule': 3600,
         'options': {
-            'expires': 1799,
+            'expires': 30,
             'retry': False
         }
     },

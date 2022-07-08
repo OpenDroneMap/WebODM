@@ -496,7 +496,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(metadata['scheme'], 'xyz')
 
             # Tiles URL has no extra params
-            self.assertTrue(metadata['tiles'][0].endswith('.png'))
+            self.assertTrue(metadata['tiles'][0].endswith('{z}/{x}/{y}'))
 
             # Histogram stats are available (3 bands for orthophoto)
             self.assertTrue(len(metadata['statistics']) == 3)
@@ -531,7 +531,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Colormap is for algorithms
             self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'rdylgn']), 1)
-            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet']), 0)
+            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'pastel1']), 0)
 
             # Formula parameters are copied to tile URL
             self.assertTrue(metadata['tiles'][0].endswith('?formula=NDVI&bands=RGN'))
@@ -553,6 +553,9 @@ class TestApiTask(BootTransactionTestCase):
                 'orthophoto': '17/32042/46185',
                 'dsm': '18/64083/92370',
                 'dtm': '18/64083/92370'
+            }
+            tile_path_512 = {
+                'orthophoto': '18/32042/46185'
             }
 
             # Metadata for DSM/DTM
@@ -647,7 +650,8 @@ class TestApiTask(BootTransactionTestCase):
                 ("dtm", "hillshade=0", status.HTTP_200_OK),
 
                 ("orthophoto", "hillshade=3", status.HTTP_400_BAD_REQUEST),
-
+                
+                ("orthophoto", "", status.HTTP_200_OK),
                 ("orthophoto", "formula=NDVI&bands=RGN", status.HTTP_200_OK),
                 ("orthophoto", "formula=VARI&bands=RGN", status.HTTP_400_BAD_REQUEST),
                 ("orthophoto", "formula=VARI&bands=RGB", status.HTTP_200_OK),
@@ -668,15 +672,37 @@ class TestApiTask(BootTransactionTestCase):
             for k in algos:
                 a = algos[k]
                 filters = get_camera_filters_for(a)
-                self.assertTrue(len(filters) > 0, "%s has filters" % k)
 
                 for f in filters:
                     params.append(("orthophoto", "formula={}&bands={}&color_map=rdylgn".format(k, f), status.HTTP_200_OK))
 
             for tile_type, url, sc in params:
-                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/{}.png?{}".format(project.id, task.id, tile_type, tile_path[tile_type], url))
+                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/{}?{}".format(project.id, task.id, tile_type, tile_path[tile_type], url))
                 self.assertEqual(res.status_code, sc)
-
+            
+            # Can request PNG/JPG/WEBP tiles explicitely
+            for ext in ["png", "jpg", "webp"]:
+                res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.{}".format(project.id, task.id, tile_path['orthophoto'], ext))
+                self.assertEqual(res.status_code, status.HTTP_200_OK)
+                self.assertEqual(res.get('content-type'), "image/" + ext)
+            
+            # Size is 256 by default
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png".format(project.id, task.id, tile_path['orthophoto']))
+            with Image.open(io.BytesIO(res.content)) as i:
+                self.assertEqual(i.width, 256)
+                self.assertEqual(i.height, 256)
+            
+            # Can request 512 tiles
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png?size=512".format(project.id, task.id, tile_path_512['orthophoto']))
+            with Image.open(io.BytesIO(res.content)) as i:
+                self.assertEqual(i.width, 512)
+                self.assertEqual(i.height, 512)
+            
+            # Cannot request invalid tiles sizes
+            for s in ["1024", "abc", "-1"]:
+                res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png?size={}".format(project.id, task.id, tile_path['orthophoto'], s))
+                self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+            
             # Another user does not have access to the resources
             other_client = APIClient()
             other_client.login(username="testuser2", password="test1234")

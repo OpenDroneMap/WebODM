@@ -1,0 +1,29 @@
+.modal-backdrop {
+	z-index: 100000 !important;
+}
+
+.folder-select.modal button i {
+	margin-right: 1em;
+}
+
+.my-modal {
+  max-height: calc(100vh - 220px);
+  position: relative;
+  padding: 20px;
+} 
+
+.select-row {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+  .icon-cell {
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .select-cell {
+    flex-grow: 1;
+  }
+}
+
