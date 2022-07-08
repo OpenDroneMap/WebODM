@@ -496,7 +496,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(metadata['scheme'], 'xyz')
 
             # Tiles URL has no extra params
-            self.assertTrue(metadata['tiles'][0].endswith('.png'))
+            self.assertTrue(metadata['tiles'][0].endswith('{z}/{x}/{y}'))
 
             # Histogram stats are available (3 bands for orthophoto)
             self.assertTrue(len(metadata['statistics']) == 3)
