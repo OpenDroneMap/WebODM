@@ -438,12 +438,12 @@ class TaskListItem extends React.Component {
       };
 
       if (task.status === statusCodes.COMPLETED){
-        if (task.available_assets.indexOf("orthophoto.tif") !== -1){
+        if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1){
           addActionButton(" " + _("View Map"), "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         }else{
-          showOrthophotoMissingWarning = true;
+          showOrthophotoMissingWarning = task.available_assets.indexOf("orthophoto.tif") === -1;
         }
 
         addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
