@@ -419,7 +419,10 @@ class Tiles(TaskNestedView):
                 if np.equal(tile.mask, 255).all():
                     ext = "jpg"
                 else:
-                    ext = "png"
+                    if 'image/webp' in request.headers.get('Accept', ''):
+                        ext = "webp"
+                    else:
+                        ext = "png"
 
             driver = "jpeg" if ext == "jpg" else ext
 
