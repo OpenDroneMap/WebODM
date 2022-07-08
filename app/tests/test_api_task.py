@@ -554,6 +554,9 @@ class TestApiTask(BootTransactionTestCase):
                 'dsm': '18/64083/92370',
                 'dtm': '18/64083/92370'
             }
+            tile_path_512 = {
+                'orthophoto': '18/32042/46185'
+            }
 
             # Metadata for DSM/DTM
             for tile_type in ['dsm', 'dtm']:
@@ -690,7 +693,7 @@ class TestApiTask(BootTransactionTestCase):
                 self.assertEqual(i.height, 256)
             
             # Can request 512 tiles
-            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png?size=512".format(project.id, task.id, tile_path['orthophoto']))
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png?size=512".format(project.id, task.id, tile_path_512['orthophoto']))
             with Image.open(io.BytesIO(res.content)) as i:
                 self.assertEqual(i.width, 512)
                 self.assertEqual(i.height, 512)
