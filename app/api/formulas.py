@@ -95,6 +95,14 @@ algos = {
         'help': _('Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'),
         'range': (-1, 1)
     },
+    'Thermal C': {
+        'expr': 'Lwir',
+        'help': _('Thermal temperature in Celsius degrees.')
+    },
+    'Thermal K': {
+        'expr': 'Lwir / 100 - 273.15',
+        'help': _('Thermal temperature in Centikelvin degrees.')
+    },
 
     # more?
 
@@ -122,6 +130,9 @@ camera_filters = [
     'BGRReN',
     'RGBNRe',
     'RGBReN',
+
+    'BGRNReLwir',
+    'BGRReNLwir',
 
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
@@ -153,7 +164,23 @@ def lookup_formula(algo, band_order = 'RGB'):
 
 @lru_cache(maxsize=2)
 def get_algorithm_list(max_bands=3):
-    return [{'id': k, 'filters': get_camera_filters_for(algos[k], max_bands), **algos[k]} for k in algos if not k.startswith("_")]
+    res = []
+    for k in algos:
+        if k.startswith("_"):
+            continue
+        
+        cam_filters = get_camera_filters_for(algos[k], max_bands)
+        
+        if len(cam_filters) == 0:
+            continue
+
+        res.append({
+            'id': k,
+            'filters': cam_filters,
+            **algos[k]
+        })
+
+    return res
 
 def get_camera_filters_for(algo, max_bands=3):
     result = []

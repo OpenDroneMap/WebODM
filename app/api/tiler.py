@@ -198,6 +198,7 @@ class Metadata(TaskNestedView):
         cmap_labels = {
             "viridis": "Viridis",
             "jet": "Jet",
+            "jet_r": "Jet (Reverse)",
             "terrain": "Terrain",
             "gist_earth": "Earth",
             "rdylgn": "RdYlGn",
@@ -221,7 +222,7 @@ class Metadata(TaskNestedView):
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r', 'rplumbo', 'discrete_ndvi',
                          'better_discrete_ndvi',
-                         'viridis', 'plasma', 'inferno', 'magma', 'cividis', 'jet']
+                         'viridis', 'plasma', 'inferno', 'magma', 'cividis', 'jet', 'jet_r']
             algorithms = *get_algorithm_list(band_count),
 
         info['color_maps'] = []

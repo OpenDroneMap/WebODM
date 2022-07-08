@@ -531,7 +531,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Colormap is for algorithms
             self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'rdylgn']), 1)
-            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'jet']), 0)
+            self.assertEqual(len([x for x in metadata['color_maps'] if x['key'] == 'pastel1']), 0)
 
             # Formula parameters are copied to tile URL
             self.assertTrue(metadata['tiles'][0].endswith('?formula=NDVI&bands=RGN'))
@@ -668,7 +668,6 @@ class TestApiTask(BootTransactionTestCase):
             for k in algos:
                 a = algos[k]
                 filters = get_camera_filters_for(a)
-                self.assertTrue(len(filters) > 0, "%s has filters" % k)
 
                 for f in filters:
                     params.append(("orthophoto", "formula={}&bands={}&color_map=rdylgn".format(k, f), status.HTTP_200_OK))
