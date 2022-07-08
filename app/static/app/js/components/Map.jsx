@@ -138,6 +138,7 @@ class Map extends React.Component {
 
             // Build URL
             let tileUrl = mres.tiles[0];
+            const TILESIZE = 512;
             
             // Set rescale
             if (statistics){
@@ -150,7 +151,10 @@ class Map extends React.Component {
                     params["rescale"] = encodeURIComponent("-1,1");
                 }
                 
+                params["size"] = TILESIZE;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
+            }else{
+                tileUrl = Utils.buildUrlWithQuery(tileUrl, { size: TILESIZE });
             }
 
             const layer = Leaflet.tileLayer(tileUrl, {
@@ -158,6 +162,7 @@ class Map extends React.Component {
                   minZoom: 0,
                   maxZoom: maxzoom + 99,
                   maxNativeZoom: maxzoom - 1,
+                  tileSize: TILESIZE,
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
                   detectRetina: true
