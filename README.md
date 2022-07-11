@@ -216,11 +216,11 @@ To run a standalone installation of WebODM (the user interface), including the p
 * 100 GB free disk space
 * 16 GB RAM
 
-Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is still a work in progress, so currently a good video card does not improve performance.
+Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is also supported. To make use of your CUDA-compatible graphics card, make sure to pass `--gpu` when starting WebODM.
 
-WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms and there's a [native installer for Ubuntu 16.04](https://www.opendronemap.org/webodm/server-installer/) also available.
+WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
 
-[NodeODM](https://github.com/OpenDroneMap/NodeODM) and [ODM](https://github.com/OpenDroneMap/ODM) cannot run natively on Mac and Windows and this is the reason we mostly recommend people to use docker.
+[NodeODM](https://github.com/OpenDroneMap/NodeODM) and [ODM](https://github.com/OpenDroneMap/ODM) cannot run natively on Mac and this is the reason we mostly recommend people to use docker.
 
 WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
 
@@ -230,7 +230,7 @@ Small customizations such as changing the application colors, name, logo, or add
 
 More advanced customizations can be achieved by writing [plugins](https://github.com/OpenDroneMap/WebODM/tree/master/plugins). This is the preferred way to add new functionality to WebODM since it requires less effort than maintaining a separate fork. The plugin system features server-side [signals](https://github.com/OpenDroneMap/WebODM/blob/master/app/plugins/signals.py) that can be used to be notified of various events, a ES6/React build system, a dynamic [client-side API](https://github.com/OpenDroneMap/WebODM/tree/master/app/static/app/js/classes/plugins) for adding elements to the UI, a built-in data store, an async task runner, a GRASS engine, hooks to add menu items and functions to rapidly inject CSS, Javascript and Django views.
 
-The plugin system is still in beta. The best source of documentation currently is to look at existing [code](https://github.com/OpenDroneMap/WebODM/tree/master/plugins). If a particular hook / entrypoint for your plugin does not yet exist, [request it](https://github.com/OpenDroneMap/WebODM/issues). We are adding hooks and entrypoints as we go.
+For plugins, the best source of documentation currently is to look at existing [code](https://github.com/OpenDroneMap/WebODM/tree/master/plugins). If a particular hook / entrypoint for your plugin does not yet exist, [request it](https://github.com/OpenDroneMap/WebODM/issues). We are adding hooks and entrypoints as we go.
 
 To create a plugin simply copy the `plugins/test` plugin into a new directory (for example, `plugins/myplugin`), then modify `manifest.json`, `plugin.py` and issue a `./webodm.sh restart`.
 
