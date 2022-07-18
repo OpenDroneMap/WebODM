@@ -12,7 +12,7 @@ if (!Object.values) {
 }
 
 // Do not apply to WebODM, can cause confusion
-const OPTS_BLACKLIST = ['build-overviews', 'ignore-gsd', 'orthophoto-no-tiled', 'orthophoto-compression', 'orthophoto-png', 'orthophoto-kmz', 'pc-copc', 'pc-las', 'pc-ply', 'pc-csv', 'pc-ept', 'cog'];
+const OPTS_BLACKLIST = ['build-overviews', 'orthophoto-no-tiled', 'orthophoto-compression', 'orthophoto-png', 'orthophoto-kmz', 'pc-copc', 'pc-las', 'pc-ply', 'pc-csv', 'pc-ept', 'cog'];
 
 class EditPresetDialog extends React.Component {
     static defaultProps = {
