@@ -1,4 +1,4 @@
-FROM ubuntu:21.04
+FROM ubuntu:20.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ARG TEST_BUILD
