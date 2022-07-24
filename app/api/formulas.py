@@ -11,6 +11,10 @@ algos = {
         'expr': '(N - R) / (N + R)',
         'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
     },
+    'NDYI': {
+        'expr': '(G - B) / (G + B)',
+        'help': _('Normalized difference yellowness index (NDYI), best model variability in relative yield potential in Canola.')
+    },
     'NDRE': {
         'expr': '(N - Re) / (N + Re)',
         'help': _('Normalized Difference Red Edge Index shows the amount of green vegetation of permanent or later stage crops.')
