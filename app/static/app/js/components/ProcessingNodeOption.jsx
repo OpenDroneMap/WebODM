@@ -4,6 +4,10 @@ import PropTypes from 'prop-types';
 import $ from 'jquery';
 import { _ } from '../classes/gettext';
 
+const warnings = {
+    'ignore-gsd': _("You might run out of memory if you use this option.")
+};
+
 class ProcessingNodeOption extends React.Component {
   static defaultProps = {};
 
@@ -104,6 +108,8 @@ class ProcessingNodeOption extends React.Component {
 
   render() {
     let inputControl = "";
+    let warningMsg = "";
+
     if (this.props.type !== 'bool'){
       if (this.isEnumType()){
         // Enum
@@ -154,6 +160,12 @@ class ProcessingNodeOption extends React.Component {
         ]);
     }
 
+    if (warnings[this.props.name] !== undefined && this.state.value !== ""){
+        warningMsg = (<div class="alert alert-warning">
+                <i class="fa fa-exclamation-triangle"></i> {warnings[this.props.name]}
+            </div>);
+    }
+
     return (
       <div className="processing-node-option form-inline form-group form-horizontal" ref={this.setTooltips}>
         <label>{this.props.name} {(!this.isEnumType() && this.props.domain ? `(${this.props.domain})` : "")} <i data-toggle="tooltip" data-placement="bottom" title={this.props.help} onClick={e => e.preventDefault()} className="fa fa-info-circle info-button"></i></label><br/>
@@ -163,6 +175,8 @@ class ProcessingNodeOption extends React.Component {
         {this.state.value !== "" ? 
         <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title={_("Reset to default")} onClick={this.resetToDefault}></button> :
         ""}
+
+        {warningMsg}
       </div>
     );
   }
