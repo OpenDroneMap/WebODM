@@ -135,15 +135,15 @@ def resize_image(image_path, resize_to, done=None):
         resized_width = int(width * ratio)
         resized_height = int(height * ratio)
 
-        im = im.resize((resized_width, resized_height), Image.BILINEAR)
+        im = im.resize((resized_width, resized_height), Image.LANCZOS)
         params = {}
         if is_jpeg:
             params['quality'] = 100
 
         if 'exif' in im.info:
             exif_dict = piexif.load(im.info['exif'])
-            exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
-            exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
+            #exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
+            #exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
             im.save(resized_image_path, exif=piexif.dump(exif_dict), **params)
         else:
             im.save(resized_image_path, **params)
