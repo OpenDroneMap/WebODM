@@ -373,6 +373,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// Diffuse texture map
 
 					setMapForType( "map", value );
+					setMapForType( "bumpMap", "-bm 0.025 " + value);
 
 					break;
 
@@ -458,7 +459,15 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		}
 
-		this.materials[ materialName ] = new THREE.MeshBasicMaterial( params );
+		const loader = new THREE.CubeTextureLoader();
+		loader.setPath( "/static/app/js/vendor/potree/envmaps/" );
+
+		textureCube = loader.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+		textureCube.encoding = THREE.sRGBEncoding;
+
+		params.envMap = textureCube;
+
+		this.materials[ materialName ] = new THREE.MeshStandardMaterial( params );
 		return this.materials[ materialName ];
 
 	},
