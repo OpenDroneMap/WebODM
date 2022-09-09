@@ -262,7 +262,7 @@ class TaskListItem extends React.Component {
           <li>${_("Not enough overlap between images")}</li>
           <li>${_("Images might be too blurry (common with phone cameras)")}</li>
           <li>${_("The min-num-features task option is set too low, try increasing it by 25%")}</li>
-        </ul>`, link: `<a href='https://support.dronedeploy.com/v1.0/docs/making-successful-maps' target='_blank'>${_("here")}</a>`})});
+        </ul>`, link: `<a href='https://help.dronedeploy.com/hc/en-us/articles/1500004964282-Making-Successful-Maps' target='_blank'>${_("here")}</a>`})});
       }else if (line.indexOf("Illegal instruction") !== -1 ||
                 line.indexOf("Child returned 132") !== -1){
         this.setState({friendlyTaskError: interpolate(_("It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See %(link)s for more information."), { link: `<a href='https://github.com/OpenDroneMap/WebODM#common-troubleshooting'>${_("this page")}</a>` } )});
