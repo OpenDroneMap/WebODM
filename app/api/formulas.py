@@ -100,11 +100,11 @@ algos = {
         'range': (-1, 1)
     },
     'Thermal C': {
-        'expr': 'Lwir',
+        'expr': 'L',
         'help': _('Thermal temperature in Celsius degrees.')
     },
     'Thermal K': {
-        'expr': 'Lwir / 100 - 273.15',
+        'expr': 'L * 100 + 27315',
         'help': _('Thermal temperature in Centikelvin degrees.')
     },
 
@@ -135,8 +135,8 @@ camera_filters = [
     'RGBNRe',
     'RGBReN',
 
-    'BGRNReLwir',
-    'BGRReNLwir',
+    'BGRNReL',
+    'BGRReNL',
 
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
@@ -152,7 +152,7 @@ def lookup_formula(algo, band_order = 'RGB'):
     if algo not in algos:
         raise ValueError("Cannot find algorithm " + algo)
 
-    input_bands = tuple(band_order)
+    input_bands = tuple(b for b in re.split(r"([A-Z][a-z]*)", band_order) if b != "")
 
     def repl(matches):
         b = matches.group(1)
