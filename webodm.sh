@@ -185,6 +185,14 @@ detect_gpus(){
 			set -e
 			return
 		fi
+		NVIDIA_DEVICE=$(nvidia-smi -L | grep "GPU 0:" | awk -F ': ' '{print $2}' | awk -F '(' '{print $1}')
+    #IF the NVIDIA_DEVICE has the word NVIDIA in it, then enable NVIDIA
+    if [[ $NVIDIA_DEVICE == *"NVIDIA"* ]]; then
+    	echo "GPU_NVIDIA has been found"
+    	export GPU_NVIDIA=true
+    	set -e
+    	return
+    fi
 
 		if lspci | grep "VGA.*Intel"; then
 			echo "GPU_INTEL has been found"
