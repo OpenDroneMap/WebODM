@@ -153,7 +153,7 @@ def lookup_formula(algo, band_order = 'RGB'):
         raise ValueError("Cannot find algorithm " + algo)
 
     input_bands = tuple(b for b in re.split(r"([A-Z][a-z]*)", band_order) if b != "")
-
+    
     def repl(matches):
         b = matches.group(1)
         try:
