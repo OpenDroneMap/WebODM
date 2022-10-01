@@ -55,7 +55,9 @@ export default class Histogram extends React.Component {
 
     const st = {
         min: minX.toFixed(3),
-        max: maxX.toFixed(3)
+        max: maxX.toFixed(3),
+        minInput: minX.toFixed(3),
+        maxInput: maxX.toFixed(3)
     };
 
     if (!this.state){
@@ -235,6 +237,9 @@ export default class Histogram extends React.Component {
   }
     
   componentDidUpdate(prevProps, prevState){
+      if (prevState.min !== this.state.min) this.state.minInput = this.state.min;
+      if (prevState.max !== this.state.max) this.state.maxInput = this.state.max;
+
       if (prevState.min !== this.state.min || 
           prevState.max !== this.state.max ||
           prevProps.colorMap !== this.props.colorMap ||
@@ -271,6 +276,7 @@ export default class Histogram extends React.Component {
   }
         
   handleChangeMax = (e) => {
+    this.setState({maxInput: e.target.value});
     const val = parseFloat(e.target.value);
 
     if (val >= this.state.min && val <= this.rangeX[1]){
@@ -279,6 +285,7 @@ export default class Histogram extends React.Component {
   }
 
   handleChangeMin = (e) => {
+    this.setState({minInput: e.target.value});
     const val = parseFloat(e.target.value);
 
     if (val <= this.state.max && val >= this.rangeX[0]){
@@ -290,8 +297,8 @@ export default class Histogram extends React.Component {
     return (<div className={"histogram " + (this.props.loading ? "disabled" : "")}>
         <div ref={(domNode) => { this.hgContainer = domNode; }}>
         </div>
-        <label>{_("Min:")}</label> <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.min} />
-        <label>{_("Max:")}</label> <input onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.max} />
+        <label>{_("Min:")}</label> <input onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.minInput} />
+        <label>{_("Max:")}</label> <input onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.maxInput} />
     </div>);
   }
 }

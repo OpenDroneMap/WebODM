@@ -9,23 +9,28 @@ from django.utils.translation import gettext_lazy as _
 algos = {
     'NDVI': {
         'expr': '(N - R) / (N + R)',
-        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
+        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.'),
+        'range': (-1, 1)
     },
     'NDYI': {
         'expr': '(G - B) / (G + B)',
-        'help': _('Normalized difference yellowness index (NDYI), best model variability in relative yield potential in Canola.')
+        'help': _('Normalized difference yellowness index (NDYI), best model variability in relative yield potential in Canola.'),
+        'range': (-1, 1)
     },
     'NDRE': {
         'expr': '(N - Re) / (N + Re)',
-        'help': _('Normalized Difference Red Edge Index shows the amount of green vegetation of permanent or later stage crops.')
+        'help': _('Normalized Difference Red Edge Index shows the amount of green vegetation of permanent or later stage crops.'),
+        'range': (-1, 1)
     },
     'NDWI': {
         'expr': '(G - N) / (G + N)',
-        'help': _('Normalized Difference Water Index shows the amount of water content in water bodies.')
+        'help': _('Normalized Difference Water Index shows the amount of water content in water bodies.'),
+        'range': (-1, 1)
     },
     'NDVI (Blue)': {
         'expr': '(N - B) / (N + B)',
-        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
+        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.'),
+        'range': (-1, 1)
     },
     'ENDVI':{
         'expr': '((N + G) - (2 * B)) / ((N + G) + (2 * B))',
@@ -59,7 +64,8 @@ algos = {
     },
     'GNDVI':{
         'expr': '(N - G) / (N + G)',
-        'help': _('Green Normalized Difference Vegetation Index is similar to NDVI, but measures the green spectrum instead of red.')
+        'help': _('Green Normalized Difference Vegetation Index is similar to NDVI, but measures the green spectrum instead of red.'),
+        'range': (-1, 1)
     },
     'GRVI':{
         'expr': 'N / G',
@@ -153,7 +159,7 @@ def lookup_formula(algo, band_order = 'RGB'):
         raise ValueError("Cannot find algorithm " + algo)
 
     input_bands = tuple(b for b in re.split(r"([A-Z][a-z]*)", band_order) if b != "")
-
+    
     def repl(matches):
         b = matches.group(1)
         try:
