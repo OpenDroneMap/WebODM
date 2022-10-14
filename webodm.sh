@@ -422,7 +422,7 @@ upgrade_db(){
 
 	echo ""
 	echo "Push dumpfile to the new database"
-	run "docker-compose exec db_14 psql < dumpfile"
+	run "docker-compose exec -f docker-compose.db_15.yml db_14 psql < dumpfile"
 }
 
 resetpassword(){
