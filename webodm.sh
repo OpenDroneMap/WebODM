@@ -407,6 +407,24 @@ run_tests(){
     fi
 }
 
+upgrade_db(){
+	# 1. Dump the current database
+	# 2. Startup the new database container
+	# 3. Push in the dump to the new database container
+	# 4. Stop all containers
+	# 5. Startup system with the new database
+	echo "Dumping the current database"
+	run "docker-compose exec db pg_dumpall -U postgres > dumpfile"
+
+	echo ""
+	echo "Startup the new database container"
+	run "docker-compose -f docker-compose.db_14.yml -d"
+
+	echo ""
+	echo "Push dumpfile to the new database"
+	run "docker-compose exec db_14 psql < dumpfile"
+}
+
 resetpassword(){
 	newpass=$1
 
@@ -497,6 +515,8 @@ elif [[ $1 = "checkenv" ]]; then
 	environment_check
 elif [[ $1 = "test" ]]; then
 	run_tests
+elif [[ $1 = "upgrade_db" ]]; then
+	upgrade_db
 elif [[ $1 = "resetadminpassword" ]]; then
 	resetpassword "$2"
 else

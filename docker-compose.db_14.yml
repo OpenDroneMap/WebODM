@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  db_14:
+    container_name: webodm_db
+    image: postgis/postgis:14-3.3-alpine
+    ports:
+      - "5432"
+    restart: unless-stopped
+    oom_score_adj: -100
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=webodm_password
+      - POSTGRES_DB=webodm_dev
