@@ -53,6 +53,7 @@ class EditTaskForm extends React.Component {
 
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleSelectNode = this.handleSelectNode.bind(this);
+    this.firstEnabledNode = this.firstEnabledNode.bind(this);
     this.loadProcessingNodes = this.loadProcessingNodes.bind(this);
     this.retryLoad = this.retryLoad.bind(this);
     this.selectNodeByKey = this.selectNodeByKey.bind(this);
@@ -82,6 +83,13 @@ class EditTaskForm extends React.Component {
 
   notifyFormLoaded(){
     if (this.props.onFormLoaded && this.formReady()) this.props.onFormLoaded();
+  }
+
+  firstEnabledNode(){
+      for (let i = 0; i < this.state.processingNodes.length; i++){
+          if (this.state.processingNodes[i].enabled) return this.state.processingNodes[i];
+      }
+      return null;
   }
 
   loadProcessingNodes(){
@@ -117,36 +125,18 @@ class EditTaskForm extends React.Component {
             };
           });
 
-          let autoNode = null;
+          // Find a node with lowest queue count
+          let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
+          let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
 
-          // If the user has selected auto, and a processing node has been assigned
-          // we need attempt to find the "auto" node to be the one that has been assigned
-          if (this.props.task && this.props.task.processing_node && this.props.task.auto_processing_node){
-            autoNode = nodes.find(node => node.id === this.props.task.processing_node);
+          if (minQueueCountNodes.length === 0){
+            noProcessingNodesError(nodes);
+            return;
           }
 
-          if (!autoNode){
-            // Find a node with lowest queue count
-            let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
-            let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
-
-            if (minQueueCountNodes.length === 0){
-              noProcessingNodesError(nodes);
-              return;
-            }
-
-            // Choose at random
-            autoNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
-          }
-
-          nodes.unshift({
-            id: autoNode.id,
-            key: "auto",
-            label: "Auto",
-            options: autoNode.options,
-            enabled: true
-          });
-
+          // Choose at random
+          let lowestQueueNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
+          
           this.setState({
             processingNodes: nodes,
             loadedProcessingNodes: true
@@ -155,14 +145,14 @@ class EditTaskForm extends React.Component {
           // Have we specified a node?
           if (this.props.task && this.props.task.processing_node){
             if (this.props.task.auto_processing_node){
-              this.selectNodeByKey("auto");
+              this.selectNodeByKey(lowestQueueNode.key);
             }else{
               this.selectNodeByKey(this.props.task.processing_node);
             }
           }else if (this.props.selectedNode){
             this.selectNodeByKey(this.props.selectedNode);
           }else{
-            this.selectNodeByKey("auto");
+            this.selectNodeByKey(lowestQueueNode.key);
           }
 
           this.notifyFormLoaded();
@@ -328,8 +318,11 @@ class EditTaskForm extends React.Component {
     let node = this.state.processingNodes.find(node => node.key == key);
     if (node) this.setState({selectedNode: node});
     else{
-        console.warn(`Node ${key} does not exist, selecting auto`);
-        this.selectNodeByKey("auto");
+        console.log(`Node ${key} does not exist, selecting first enabled`);
+        const n = this.firstEnabledNode();
+        if (n){
+            this.selectNodeByKey(n.key);
+        }
     }
   }
 
