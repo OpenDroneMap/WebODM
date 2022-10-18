@@ -62,8 +62,6 @@ export default class ShareButton extends React.Component{
                 url: `/api/plugins/dronedb/tasks/${task.id}/status`,
                 contentType: 'application/json'
             }).done(taskInfo => {            
-                console.log(taskInfo);  
-                debugger;  
                 this.setState({taskInfo});
                 if (taskInfo.error && showErrors) this.setState({error: taskInfo.error});
             }).fail(error => {
