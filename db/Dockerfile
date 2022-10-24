@@ -54,6 +54,15 @@ RUN apt-get update; \
 	make -j$(nproc); \
 	make install; \
 	postgres --version; \
+  sed -ri "s/#autovacuum_max_workers = 3/autovacuum_max_workers = 6/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_naptime = 1min/autovacuum_naptime = 15s/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_vacuum_threshold = 50/autovacuum_vacuum_threshold = 25/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_vacuum_scale_factor = 0.2/autovacuum_vacuum_scale_factor = 0.1/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_analyze_threshold = 50/autovacuum_analyze_threshold = 10/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_analyze_scale_factor = 0.1/autovacuum_analyze_scale_factor = 0.05/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_analyze_threshold = 50/autovacuum_analyze_threshold = 10/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_vacuum_cost_delay = 20ms/autovacuum_vacuum_cost_delay = 10ms/" /usr/local/pgsql/share/postgresql.conf.sample; \
+  sed -ri "s/#autovacuum_vacuum_cost_limit = -1/autovacuum_vacuum_cost_limit = 1000/" /usr/local/pgsql/share/postgresql.conf.sample; \
 	sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /usr/local/pgsql/share/postgresql.conf.sample; \
 	grep -F "listen_addresses = '*'" /usr/local/pgsql/share/postgresql.conf.sample; \
     mkdir -p /var/run/postgresql && chown -R postgres:postgres /var/run/postgresql && chmod 2777 /var/run/postgresql; \
