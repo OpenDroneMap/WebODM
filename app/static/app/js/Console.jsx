@@ -132,7 +132,7 @@ class Console extends React.Component {
     let lines = this.state.lines;
     if (this.props.maximumLines && lines.length > this.props.maximumLines){
         lines = lines.slice(-this.props.maximumLines);
-        lines.unshift('... ' + interpolate(_("output truncated at %(count)s lines"), { lines: this.props.maximumLines }) + ' ...');
+        lines.unshift('... ' + interpolate(_("output truncated at %(count)s lines"), { count: this.props.maximumLines }) + ' ...');
     }
 
     const items = [
