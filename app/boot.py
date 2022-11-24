@@ -14,7 +14,7 @@ from app.models import Preset
 from app.models import Theme
 from app.plugins import init_plugins
 from nodeodm.models import ProcessingNode
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferencesapp/boot.py#L20
 from webodm.settings import MEDIA_ROOT
 from . import signals
 import logging
@@ -101,14 +101,13 @@ def add_default_presets():
     try:
         Preset.objects.update_or_create(name='Multispectral', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
-                                                              {'name': 'radiometric-calibration', 'value': 'camera'},
-                                                              ]})
+                                                              {'name': 'radiometric-calibration', 'value': 'camera'}]})
         Preset.objects.update_or_create(name='Volume Analysis', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'dsm', 'value': True},
                                                               {'name': 'dem-resolution', 'value': '2'},
                                                               {'name': 'pc-quality', 'value': 'high'},
-                                                              {'name': 'use-3dmesh', 'value': True},]})
+                                                              {'name': 'use-3dmesh', 'value': True}]})
         Preset.objects.update_or_create(name='3D Model', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'mesh-octree-depth', 'value': "12"},
@@ -119,7 +118,14 @@ def add_default_presets():
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'mesh-size', 'value': '300000'},
                                                               {'name': 'pc-geometric', 'value': True},
+                                                              {'name': 'feature-quality', 'value': 'high'},
                                                               {'name': 'pc-quality', 'value': 'high'}]})
+        Preset.objects.update_or_create(name='Buildings Ultra Quality', system=True,
+                                        defaults={'options': [{'name': 'auto-boundary', 'value': True},
+                                                              {'name': 'mesh-size', 'value': '300000'},
+                                                              {'name': 'pc-geometric', 'value': True},
+                                                              {'name': 'feature-quality', 'value': 'ultra'},
+                                                              {'name': 'pc-quality', 'value': 'ultra'}]})
         Preset.objects.update_or_create(name='Point of Interest', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'mesh-size', 'value': '300000'},
@@ -145,8 +151,14 @@ def add_default_presets():
                                                               {'name': 'dsm', 'value': True},
                                                               {'name': 'pc-quality', 'value': 'high'},
                                                               {'name': 'dem-resolution', 'value': "2.0"},
-                                                              {'name': 'orthophoto-resolution', 'value': "2.0"},
-                                                              ]})
+                                                              {'name': 'orthophoto-resolution', 'value': "2.0"}]})
+        Preset.objects.update_or_create(name='Ultra Quality', system=True,
+                                        defaults={'options': [{'name': 'auto-boundary', 'value': True},
+                                                              {'name': 'dsm', 'value': True},
+                                                              {'name': 'pc-quality', 'value': 'ultra'},
+                                                              {'name': 'feature-quality', 'value': 'ultra'},
+                                                              {'name': 'dem-resolution', 'value': "2.0"},
+                                                              {'name': 'orthophoto-resolution', 'value': "1.0"}]}) 
         Preset.objects.update_or_create(name='Default', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'dsm', 'value': True}]})

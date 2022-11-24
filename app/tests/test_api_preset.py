@@ -58,7 +58,7 @@ class TestApiPreset(BootTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # Only ours and global presets are available
-        self.assertTrue(len(res.data) == 14)
+        self.assertEqual(len(res.data), 16)
         self.assertTrue('My Local Preset' in [preset['name'] for preset in res.data])
         self.assertTrue('High Resolution' in [preset['name'] for preset in res.data])
         self.assertTrue('Global Preset #1' in [preset['name'] for preset in res.data])
