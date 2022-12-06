@@ -47,13 +47,14 @@ def main():
     Module("v.what.rast", map="polygon_points", raster="dsm", column="height")
 
     # Decimate DSM and generate interpolation of new terrain
-    Module("v.surf.rst", input="polygon_points", zcolumn="height", elevation="dsm_below_pile", overwrite=True)
+    Module("v.surf.rst", input="polygon_points", zcolumn="height", elevation="dsm_below_pile", smooth=0, overwrite=True)
 
     # Compute difference between dsm and new dsm
     Module("r.mapcalc", expression='pile_height_above_dsm=dsm-dsm_below_pile', overwrite=True)
 
-    # Set region to polygon area to calculate volume
+    # Update region and mask to polygon area to calculate volume
     Module("g.region", vector="polygon_area")
+    Module("r.mask", vector="polygon_area", overwrite=True)
 
     # Volume output from difference
     Module("r.volume", input="pile_height_above_dsm", f=True)
