@@ -36,7 +36,7 @@ Pillow==8.3.2
 pip-autoremove==0.9.0
 psycopg2-binary==2.8.6
 PyJWT==1.5.3
-pyodm==1.5.9
+pyodm==1.5.10
 pyparsing==2.4.7
 pytz==2020.1
 rcssmin==1.0.6
