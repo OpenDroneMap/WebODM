@@ -10,6 +10,7 @@ from shlex import quote
 
 import errno
 import piexif
+import pyexiv2
 import re
 
 import zipfile
@@ -121,6 +122,13 @@ def resize_image(image_path, resize_to, done=None):
             return {'path': image_path, 'resize_ratio': 1}
 
         im = Image.open(image_path)
+
+        # Use pyexiv2 to copy XMP metadata over to resized image.
+        # PIL doesn't support writing XMP to jpeg
+        im_pyexiv = pyexiv2.Image(image_path)
+        im_pyexiv_xmp = im_pyexiv.read_xmp()
+        im_pyexiv.close()
+
         path, ext = os.path.splitext(image_path)
         resized_image_path = os.path.join(path + '.resized' + ext)
 
@@ -141,10 +149,16 @@ def resize_image(image_path, resize_to, done=None):
             params['quality'] = 100
 
         if 'exif' in im.info:
-            exif_dict = piexif.load(im.info['exif'])
+            #exif_dict = piexif.load(im.info['exif'])
             #exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
             #exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
-            im.save(resized_image_path, exif=piexif.dump(exif_dict), **params)
+            exif_data = im.info['exif']
+            im.save(resized_image_path, exif=exif_data, **params)
+
+            if im_pyexiv_xmp:
+                resized_im_pyexiv = pyexiv2.Image(resized_image_path)
+                resized_im_pyexiv.modify_xmp(im_pyexiv_xmp)
+                resized_im_pyexiv.close()
         else:
             im.save(resized_image_path, **params)
 
