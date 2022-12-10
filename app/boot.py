@@ -34,7 +34,11 @@ def boot():
     logger.info("Booting WebODM {}".format(settings.VERSION))
 
     if settings.DEBUG:
-       logger.warning("Debug mode is ON (for development this is OK)")
+        logger.warning("Debug mode is ON (for development this is OK)")
+
+    # Silence django's "Warning: Session data corrupted" messages
+    session_logger = logging.getLogger("django.security.SuspiciousSession")
+    session_logger.disabled = True
 
     # Make sure our app/media/tmp folder exists
     if not os.path.exists(settings.MEDIA_TMP):
