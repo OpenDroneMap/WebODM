@@ -1083,8 +1083,8 @@ class Task(models.Model):
         """
         gcp_path = self.find_all_files_matching(r'.*\.txt$')
 
-        # Skip geo.txt, image_groups.txt files
-        gcp_path = list(filter(lambda p: os.path.basename(p).lower() not in ['geo.txt', 'image_groups.txt'], gcp_path))
+        # Skip geo.txt, image_groups.txt, align.(las|laz|tif) files
+        gcp_path = list(filter(lambda p: os.path.basename(p).lower() not in ['geo.txt', 'image_groups.txt', 'align.las', 'align.laz', 'align.tif'], gcp_path))
         if len(gcp_path) == 0: return None
 
         # Assume we only have a single GCP file per task
