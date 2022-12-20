@@ -160,7 +160,6 @@ def add_default_presets():
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'dsm', 'value': True},
                                                               {'name': 'pc-quality', 'value': 'ultra'},
-                                                              {'name': 'feature-quality', 'value': 'ultra'},
                                                               {'name': 'dem-resolution', 'value': "2.0"},
                                                               {'name': 'orthophoto-resolution', 'value': "1.0"}]}) 
         Preset.objects.update_or_create(name='Default', system=True,
