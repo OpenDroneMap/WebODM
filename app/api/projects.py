@@ -136,3 +136,18 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+        project = get_and_check_project(request, pk, ('delete_project', ))
+
+        # Owner? Delete the project
+        if project.owner == request.user:
+            return super().destroy(self, request, pk=pk)
+        else:
+            # Do not remove the project, simply remove all user's permissions to the project
+            # to avoid shared projects from being accidentally deleted
+            for p in ["add", "change", "delete", "view"]:
+                perm = p + "_project"
+                remove_perm(perm, request.user, project)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
