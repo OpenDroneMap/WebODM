@@ -140,7 +140,7 @@ class EditProjectDialog extends React.Component {
               <div className="form-group">
                 <label className="col-sm-2 control-label">{_("Name")}</label>
                 <div className="col-sm-10">
-                  <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
+                  <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} onKeyPress={e => this.dialog.handleEnter(e)} />
                 </div>
               </div>
               <div className="form-group">

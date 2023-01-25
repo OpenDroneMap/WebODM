@@ -102,6 +102,12 @@ class FormDialog extends React.Component {
         }
     }
 
+    handleEnter = e => {
+        if (e.key === 'Enter' || e.keyCode === 13){
+          this.handleSave(e);
+        }
+    }
+
     handleSave(e){
         e.preventDefault();
 
