@@ -54,6 +54,7 @@ const api = {
       new AssetDownload(_("Point Cloud (3D Tiles)"),"3d_tiles_pointcloud.zip","fa fa-cube"),
       new AssetDownload(_("Textured Model"),"textured_model.zip","fab fa-connectdevelop"),
       new AssetDownload(_("Textured Model (3D Tiles)"),"3d_tiles_model.zip","fab fa-connectdevelop"),
+      new AssetDownload(_("Textured Model (glTF)"),"textured_model.glb","fab fa-connectdevelop"),
       new AssetDownload(_("Camera Parameters"),"cameras.json","fa fa-camera"),
       new AssetDownload(_("Camera Shots"),"shots.geojson","fa fa-camera"),
       new AssetDownload(_("Ground Control Points"),"ground_control_points.geojson","far fa-dot-circle"),
