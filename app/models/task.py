@@ -184,8 +184,10 @@ class Task(models.Model):
             'georeferenced_model.csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv'),
             'textured_model.zip': {
                 'deferred_path': 'textured_model.zip',
-                'deferred_compress_dir': 'odm_texturing'
+                'deferred_compress_dir': 'odm_texturing',
+                'deferred_exclude_files': ('odm_textured_model_geo.glb', )
             },
+            'textured_model.glb': os.path.join('odm_texturing', 'odm_textured_model_geo.glb'),
             '3d_tiles_model.zip': {
                 'deferred_path': '3d_tiles_model.zip',
                 'deferred_compress_dir': os.path.join('3d_tiles', 'model')
@@ -465,6 +467,8 @@ class Task(models.Model):
                 if 'deferred_path' in value and 'deferred_compress_dir' in value:
                     zip_dir = self.assets_path(value['deferred_compress_dir'])
                     paths = [{'n': os.path.relpath(os.path.join(dp, f), zip_dir), 'fs': os.path.join(dp, f)} for dp, dn, filenames in os.walk(zip_dir) for f in filenames]
+                    if 'deferred_exclude_files' in value and isinstance(value['deferred_exclude_files'], tuple):
+                        paths = [p for p in paths if os.path.basename(p['fs']) not in value['deferred_exclude_files']]
                     if len(paths) == 0:
                         raise FileNotFoundError("No files available for download")
                     return zipfly.ZipStream(paths), True

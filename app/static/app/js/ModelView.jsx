@@ -13,7 +13,8 @@ import { _, interpolate } from './classes/gettext';
 
 require('./vendor/OBJLoader');
 require('./vendor/MTLLoader');
-require('./vendor/ColladaLoader');
+require('./vendor/GLTFLoader');
+require('./vendor/DRACOLoader');
 
 class SetCameraView extends React.Component{
     static propTypes = {
@@ -150,14 +151,10 @@ class ModelView extends React.Component {
     this.pointCloud = null;
     this.modelReference = null;
 
-    this.toggleTexturedModel = this.toggleTexturedModel.bind(this);
-    this.toggleCameras = this.toggleCameras.bind(this);
-    
-
     this.cameraMeshes = [];
   }
 
-  assetsPath(){
+  assetsPath = () => {
     return `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/assets`
   }
 
@@ -224,23 +221,28 @@ class ModelView extends React.Component {
     });
   }
 
-  texturedModelDirectoryPath(){
+  texturedModelDirectoryPath = () => {
     return this.assetsPath() + '/odm_texturing/';
   }
 
-  hasGeoreferencedAssets(){
+  hasGeoreferencedAssets = () => {
     return this.props.task.available_assets.indexOf('orthophoto.tif') !== -1;
   }
 
-  hasTexturedModel(){
+  hasTexturedModel = () => {
     return this.props.task.available_assets.indexOf('textured_model.zip') !== -1;
   }
 
-  hasCameras(){
+  getTexturedModelType = () => {
+    if (this.props.task.available_assets.indexOf('textured_model.glb') !== -1) return 'gltf';
+    else return 'obj';
+  }
+
+  hasCameras = () => {
     return this.props.task.available_assets.indexOf('shots.geojson') !== -1;
   }
 
-  objFilePath(cb){
+  objFilePath = (cb) => {
     // Mostly for backward compatibility
     // as newer versions of ODM do not have 
     // a odm_textured_model.obj
@@ -257,7 +259,11 @@ class ModelView extends React.Component {
     });
   }
 
-  mtlFilename(cb){
+  glbFilePath = () => {
+    return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.glb';
+  }
+
+  mtlFilename = (cb) => {
     // Mostly for backward compatibility
     // as newer versions of ODM do not have 
     // a odm_textured_model.mtl
@@ -457,13 +463,13 @@ class ModelView extends React.Component {
 
     if ( intersects.length > 0){
         const intersection = intersects[0];
-        return intersection.object;
+        return intersection.object.parent.parent;
     }
   }
 
   setCameraOpacity(camera, opacity){
-    camera.material.forEach(m => {
-        m.opacity = opacity;
+    camera.traverse(obj => {
+        if (obj.material) obj.material.opacity = opacity;
     });
   }
 
@@ -520,30 +526,34 @@ class ModelView extends React.Component {
     }
 
     if (this.hasCameras()){
-        const colladaLoader = new THREE.ColladaLoader();
         const fileloader = new THREE.FileLoader();
         
-        colladaLoader.load('/static/app/models/camera.dae', ( collada ) => {
-            const dae = collada.scene;
+        this.loadGltf('/static/app/models/camera.glb', (err, gltf) => {
+            if (err){
+                console.error(err);
+                return;
+            }
+
+            const cameraObj = gltf.scene;
 
             fileloader.load(`/api/projects/${task.project}/tasks/${task.id}/download/shots.geojson`,  ( data ) => {
                 const geojson = JSON.parse(data);
-                const cameraObj = dae.children[0];
-                cameraObj.material.forEach(m => {
-                    m.transparent = true; 
-                    m.opacity = 0.7;
+                cameraObj.traverse(obj => {
+                    if (obj.material){
+                        obj.material.transparent = true; 
+                        obj.material.opacity = 0.7;
+                    }
                 });
                 
-                // const cameraObj = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
-
-                // TODO: instancing doesn't seem to work :/
-                // const cameraMeshes = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
-                // const dummy = new THREE.Object3D();
-
                 let i = 0;
                 geojson.features.forEach(feat => {
-                    const material = cameraObj.material.map(m => m.clone());
-                    const cameraMesh = new THREE.Mesh(cameraObj.geometry, material);
+                    const cameraMesh = cameraObj.clone();
+                    cameraMesh.traverse((node) => {
+                        if (node.isMesh) {
+                            node.material = node.material.clone();
+                        }
+                    });
+
                     cameraMesh.matrixAutoUpdate = false;
                     let scale = 1.0;
                     // if (!this.pointCloud.projection) scale = 0.1;
@@ -553,7 +563,7 @@ class ModelView extends React.Component {
                     viewer.scene.scene.add(cameraMesh);
 
                     cameraMesh._feat = feat;
-                    this.cameraMeshes.push(cameraMesh);
+                    this.cameraMeshes.push(cameraMesh.children[0].children[1]);
 
                     i++;
                 });
@@ -573,7 +583,7 @@ class ModelView extends React.Component {
     // }
   }
 
-  toggleCameras(e){
+  toggleCameras = (e) => {
     if (this.cameraMeshes.length === 0){
         this.loadCameras();
         if (this.cameraMeshes.length === 0) return;
@@ -583,7 +593,25 @@ class ModelView extends React.Component {
     this.cameraMeshes.forEach(cam => cam.visible = !isVisible);
   }
 
-  toggleTexturedModel(e){
+  loadGltf = (url, cb) => {
+    if (!this.gltfLoader) this.gltfLoader = new THREE.GLTFLoader();
+    if (!this.dracoLoader) {
+        this.dracoLoader = new THREE.DRACOLoader();
+        this.dracoLoader.setDecoderPath( '/static/app/js/vendor/draco/' );
+        this.gltfLoader.setDRACOLoader( this.dracoLoader );
+    }
+
+    // Load a glTF resource
+    this.gltfLoader.load(url,
+        gltf => { cb(null, gltf) },
+        xhr => {
+            // called while loading is progressing
+        },
+        error => { cb(error); }
+    );
+  }
+
+  toggleTexturedModel = (e) => {
     const value = e.target.checked;
 
     if (value){
@@ -592,34 +620,56 @@ class ModelView extends React.Component {
 
         this.setState({initializingModel: true});
 
-        const mtlLoader = new THREE.MTLLoader();
-        mtlLoader.setPath(this.texturedModelDirectoryPath());
+        const addObject = (object, offset) => {
+            object.translateX(offset.x);
+            object.translateY(offset.y);
 
-        this.mtlFilename(mtlPath => {
-            mtlLoader.load(mtlPath, (materials) => {
-                materials.preload();
+            viewer.scene.scene.add(object);
+
+            this.modelReference = object;
+            this.setPointCloudsVisible(false);
+
+            this.setState({
+                initializingModel: false,
+            });
+        }
+
+        if (this.getTexturedModelType() === 'gltf'){
+            this.loadGltf(this.glbFilePath(), (err, gltf) => {
+                if (err){
+                    this.setState({initializingModel: false, error: err});
+                    return;
+                }
+
+                const offset = {
+                    x: gltf.scene.CESIUM_RTC.center[0],
+                    y: gltf.scene.CESIUM_RTC.center[1]
+                }
+
+                addObject(gltf.scene, offset);
+            });
+        }else{
+            // Legacy OBJ
+
+            const mtlLoader = new THREE.MTLLoader();
+            mtlLoader.setPath(this.texturedModelDirectoryPath());
     
-                const objLoader = new THREE.OBJLoader();
-                objLoader.setMaterials(materials);
-                this.objFilePath(filePath => {
-                    objLoader.load(filePath, (object) => {
-                        this.loadGeoreferencingOffset((offset) => {
-                            object.translateX(offset.x);
-                            object.translateY(offset.y);
-            
-                            viewer.scene.scene.add(object);
-            
-                            this.modelReference = object;
-                            this.setPointCloudsVisible(false);
-            
-                            this.setState({
-                                initializingModel: false,
+            this.mtlFilename(mtlPath => {
+                mtlLoader.load(mtlPath, (materials) => {
+                    materials.preload();
+        
+                    const objLoader = new THREE.OBJLoader();
+                    objLoader.setMaterials(materials);
+                    this.objFilePath(filePath => {
+                        objLoader.load(filePath, (object) => {
+                            this.loadGeoreferencingOffset((offset) => {
+                                addObject(object, offset);
                             });
                         });
                     });
                 });
             });
-        });
+        }
       }else{
         // Already initialized
         this.modelReference.visible = true;
