@@ -146,7 +146,7 @@ class TestClientApi(TestCase):
 
             # Verify that options have been updated after restarting the task
             task_info = api.get_task(uuid).info()
-            self.assertTrue(len(task_info.options) == 3) # pc-ept, cog, gltf have been added
+            self.assertEqual(len(task_info.options), 4) # pc-ept, cog, gltf have been added
             self.assertTrue(task_info.options[0]['name'] == 'mesh-size')
             self.assertTrue(task_info.options[0]['value'] == 12345)
 
