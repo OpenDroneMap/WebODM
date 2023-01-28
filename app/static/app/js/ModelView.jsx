@@ -13,7 +13,6 @@ import { _, interpolate } from './classes/gettext';
 
 require('./vendor/OBJLoader');
 require('./vendor/MTLLoader');
-require('./vendor/ColladaLoader');
 require('./vendor/GLTFLoader');
 require('./vendor/DRACOLoader');
 
@@ -464,13 +463,13 @@ class ModelView extends React.Component {
 
     if ( intersects.length > 0){
         const intersection = intersects[0];
-        return intersection.object;
+        return intersection.object.parent.parent;
     }
   }
 
   setCameraOpacity(camera, opacity){
-    camera.material.forEach(m => {
-        m.opacity = opacity;
+    camera.traverse(obj => {
+        if (obj.material) obj.material.opacity = opacity;
     });
   }
 
@@ -527,30 +526,34 @@ class ModelView extends React.Component {
     }
 
     if (this.hasCameras()){
-        const colladaLoader = new THREE.ColladaLoader();
         const fileloader = new THREE.FileLoader();
         
-        colladaLoader.load('/static/app/models/camera.dae', ( collada ) => {
-            const dae = collada.scene;
+        this.loadGltf('/static/app/models/camera.glb', (err, gltf) => {
+            if (err){
+                console.error(err);
+                return;
+            }
+
+            const cameraObj = gltf.scene;
 
             fileloader.load(`/api/projects/${task.project}/tasks/${task.id}/download/shots.geojson`,  ( data ) => {
                 const geojson = JSON.parse(data);
-                const cameraObj = dae.children[0];
-                cameraObj.material.forEach(m => {
-                    m.transparent = true; 
-                    m.opacity = 0.7;
+                cameraObj.traverse(obj => {
+                    if (obj.material){
+                        obj.material.transparent = true; 
+                        obj.material.opacity = 0.7;
+                    }
                 });
                 
-                // const cameraObj = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
-
-                // TODO: instancing doesn't seem to work :/
-                // const cameraMeshes = new THREE.InstancedMesh( cameraObj.geometry, cameraObj.material, geojson.features.length );
-                // const dummy = new THREE.Object3D();
-
                 let i = 0;
                 geojson.features.forEach(feat => {
-                    const material = cameraObj.material.map(m => m.clone());
-                    const cameraMesh = new THREE.Mesh(cameraObj.geometry, material);
+                    const cameraMesh = cameraObj.clone();
+                    cameraMesh.traverse((node) => {
+                        if (node.isMesh) {
+                            node.material = node.material.clone();
+                        }
+                    });
+
                     cameraMesh.matrixAutoUpdate = false;
                     let scale = 1.0;
                     // if (!this.pointCloud.projection) scale = 0.1;
@@ -560,7 +563,7 @@ class ModelView extends React.Component {
                     viewer.scene.scene.add(cameraMesh);
 
                     cameraMesh._feat = feat;
-                    this.cameraMeshes.push(cameraMesh);
+                    this.cameraMeshes.push(cameraMesh.children[0].children[1]);
 
                     i++;
                 });
