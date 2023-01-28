@@ -409,7 +409,9 @@ class Task(models.Model):
                     'points': points,
                 },
                 'gsd': j.get('odm_processing_statistics', {}).get('average_gsd'),
-                'area': j.get('processing_statistics', {}).get('area')
+                'area': j.get('processing_statistics', {}).get('area'),
+                'start_date': j.get('processing_statistics', {}).get('start_date'),
+                'end_date': j.get('processing_statistics', {}).get('end_date'),
             }
         else:
             return {}
