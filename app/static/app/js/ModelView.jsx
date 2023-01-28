@@ -663,7 +663,6 @@ class ModelView extends React.Component {
                     this.objFilePath(filePath => {
                         objLoader.load(filePath, (object) => {
                             this.loadGeoreferencingOffset((offset) => {
-                                console.log(object);
                                 addObject(object, offset);
                             });
                         });
