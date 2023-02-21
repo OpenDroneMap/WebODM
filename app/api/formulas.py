@@ -105,6 +105,11 @@ algos = {
         'help': _('Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'),
         'range': (-1, 1)
     },
+    'ARVI': {
+        'expr': '(N - (2 * R) + B) / (N + (2 * R) + B)',
+        'help': _('Atmospherically Resistant Vegetation Index. Useful when working with imagery for regions with high atmospheric aerosol content.'),
+        'range': (-1, 1)
+    },
     'Thermal C': {
         'expr': 'L',
         'help': _('Thermal temperature in Celsius degrees.')
