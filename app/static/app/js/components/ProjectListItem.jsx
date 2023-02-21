@@ -7,6 +7,7 @@ import ImportTaskPanel from './ImportTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import ErrorMessage from './ErrorMessage';
 import EditProjectDialog from './EditProjectDialog';
+import SortItems from './SortItems';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
@@ -471,6 +472,13 @@ class ProjectListItem extends React.Component {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
     const canEdit = this.hasPermission("change");
+    const sortItems = [{
+                        key: "created_at",
+                        label: _("Created on")
+                      },{
+                        key: "name",
+                        label: _("Name")
+                      }];
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
@@ -540,11 +548,26 @@ class ProjectListItem extends React.Component {
             {numTasks > 0 ? 
               <span>
                 <i className='fa fa-tasks'></i>
-                 <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+                <a href="javascript:void(0);" onClick={this.toggleTaskList}>
                   {interpolate(_("%(count)s Tasks"), { count: numTasks})} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
                 </a>
               </span>
               : ""}
+            
+            {this.state.showTaskList && numTasks > 1 ? 
+              <div className="task-filters">
+                <i className='fa fa-filter'></i>
+                <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+                  {_("Filter")}
+                </a>
+                <div className="btn-group">
+                  <i className='fa fa-sort-alpha-down'></i>
+                  <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {_("Sort")} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                  </a>
+                  <SortItems items={sortItems} />
+                </div>
+              </div> : ""}
 
             {canEdit ? 
                 [<i key="edit-icon" className='far fa-edit'></i>

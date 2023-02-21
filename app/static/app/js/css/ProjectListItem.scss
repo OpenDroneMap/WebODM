@@ -12,6 +12,10 @@
         } 
     }
 
+    .project-description{
+        min-height: 12px;
+    }
+
     .drag-drop-icon{
         display: none;
         position: absolute;
@@ -96,5 +100,9 @@
                 width: 100%;
             }
         }
+    }
+
+    .task-filters{
+        float: right;
     }
 }
