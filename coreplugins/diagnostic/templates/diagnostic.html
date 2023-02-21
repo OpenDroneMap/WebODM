@@ -27,10 +27,10 @@
         {% endif %}
     </div>
 </div>
-
+git
 <hr/>
 
-<div style="margin-top: 20px;"><strong>{% trans 'Note!' %}</strong> {% blocktrans with win_link="<a href='https://docs.docker.com/docker-for-windows/#advanced'>Windows</a>" mac_link="<a href='http://stackoverflow.com/a/39720010'>MacOS</a>" %}These values might be relative to the virtualization environment in which the application is running, not necessarily the values of the your machine. See instructions for {{ win_link }} and {{ mac_link }} for changing these values in a Docker setup.{% endblocktrans %}</div>
+<div style="margin-top: 20px;"><strong>{% trans 'Note!' %}</strong> {% blocktrans with win_hyperv_link="<a href='https://docs.docker.com/desktop/settings/windows/#resources'>Windows (Hyper-V)</a>" win_wsl2_link="<a href='https://learn.microsoft.com/en-us/windows/wsl/wsl-config#configuration-setting-for-wslconfig'>Windows (WSL2)</a>" mac_link="<a href='https://docs.docker.com/desktop/settings/mac/#resources'>MacOS</a>" %}These values might be relative to the virtualization environment in which the application is running, not necessarily the values of the your machine. See instructions for {{ win_hyperv_link }}, {{ win_wsl2_link }}, and {{ mac_link }} for changing these values in a Docker setup.{% endblocktrans %}</div>
 
 <script>
 (function(){
