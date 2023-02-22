@@ -41,7 +41,7 @@ class TagsField extends React.Component {
     return e => {
       e.stopPropagation();
       
-      // TODO
+      this.setState(update(this.state, { tags: { $splice: [[idx, 1]] } }));
     }
   }
 

@@ -1,5 +1,7 @@
 .tags-field{
     height: auto;
+    padding-bottom: 2px;
+
     &:hover{
         cursor: text;
     }
@@ -13,8 +15,10 @@
         padding-top: 2px;
         padding-bottom: 2px;
         margin-top: -2px;
-        border-radius: 6px;
         margin-right: 4px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+
 
         a{
             margin-top: 2px;
@@ -29,6 +33,8 @@
         display: inline-block;
         outline: none;
         border: none;
+        margin-bottom: 10px;
+        min-width: 1px;
     }
     
 }
