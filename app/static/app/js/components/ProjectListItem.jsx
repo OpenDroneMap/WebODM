@@ -7,7 +7,7 @@ import ImportTaskPanel from './ImportTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import ErrorMessage from './ErrorMessage';
 import EditProjectDialog from './EditProjectDialog';
-import SortItems from './SortItems';
+import SortPanel from './SortPanel';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
@@ -38,8 +38,18 @@ class ProjectListItem extends React.Component {
       data: props.data,
       refreshing: false,
       importing: false,
-      buttons: []
+      buttons: [],
+      sortKey: "-created_at"
     };
+
+    this.sortItems = [{
+        key: "created_at",
+        label: _("Created on"),
+        selected: "desc"
+      },{
+        key: "name",
+        label: _("Name")
+      }];
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
     this.closeUploadError = this.closeUploadError.bind(this);
@@ -468,17 +478,20 @@ class ProjectListItem extends React.Component {
       });
   }
 
+  sortChanged = key => {
+    if (this.taskList){
+      this.setState({sortKey: key});
+      setTimeout(() => {
+        this.taskList.refresh();
+      }, 0);
+    }
+  }
+
   render() {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
     const canEdit = this.hasPermission("change");
-    const sortItems = [{
-                        key: "created_at",
-                        label: _("Created on")
-                      },{
-                        key: "name",
-                        label: _("Name")
-                      }];
+    
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
@@ -563,9 +576,9 @@ class ProjectListItem extends React.Component {
                 <div className="btn-group">
                   <i className='fa fa-sort-alpha-down'></i>
                   <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {_("Sort")} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                    {_("Sort")}
                   </a>
-                  <SortItems items={sortItems} />
+                  <SortPanel items={this.sortItems} onChange={this.sortChanged} />
                 </div>
               </div> : ""}
 
@@ -609,7 +622,7 @@ class ProjectListItem extends React.Component {
           {this.state.showTaskList ? 
             <TaskList 
                 ref={this.setRef("taskList")} 
-                source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
+                source={`/api/projects/${data.id}/tasks/?ordering=${this.state.sortKey}`}
                 onDelete={this.taskDeleted}
                 onTaskMoved={this.taskMoved}
                 hasPermission={this.hasPermission}

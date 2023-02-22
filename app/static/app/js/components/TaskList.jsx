@@ -42,6 +42,8 @@ class TaskList extends React.Component {
   }
 
   loadTaskList(){
+    this.setState({loading: true});
+
     this.taskListRequest = 
       $.getJSON(this.props.source, json => {
           this.setState({
