@@ -5,6 +5,7 @@ import EditPresetDialog from './EditPresetDialog';
 import ErrorMessage from './ErrorMessage';
 import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
+import TagsField from './TagsField';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
 
@@ -48,7 +49,9 @@ class EditTaskForm extends React.Component {
 
       editingPreset: false,
 
-      loadingTaskName: false
+      loadingTaskName: false,
+
+      showTagsField: true // TODO false
     };
 
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -543,8 +546,19 @@ class EditTaskForm extends React.Component {
         <ErrorMessage className="preset-error" bind={[this, 'presetError']} />
       </div>);
 
+      let tagsField = "";
+      if (this.state.showTagsField){
+        tagsField = (<div className="form-group">
+            <label className="col-sm-2 control-label">{_("Tags")}</label>
+              <div className="col-sm-10">
+                <TagsField />
+              </div>
+          </div>);
+      }
+
       taskOptions = (
         <div>
+          {tagsField}
           <div className="form-group">
             <label className="col-sm-2 control-label">{_("Processing Node")}</label>
               <div className="col-sm-10">
@@ -588,7 +602,7 @@ class EditTaskForm extends React.Component {
       <div className="edit-task-form">
         <div className="form-group">
           <label className="col-sm-2 control-label">{_("Name")}</label>
-          <div className="col-sm-10">
+          <div className="col-sm-10 name-fields">
             {this.state.loadingTaskName ? 
             <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
             : ""}
@@ -598,6 +612,10 @@ class EditTaskForm extends React.Component {
               placeholder={this.state.namePlaceholder} 
               value={this.state.name} 
             />
+            <button type="button" title={_("Add tags")} class="btn btn-sm btn-secondary toggle-tags">
+              <i class="fa fa-tag"></i>
+            </button>
+
           </div>
         </div>
         {taskOptions}
