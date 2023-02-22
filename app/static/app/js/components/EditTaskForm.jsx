@@ -488,6 +488,15 @@ class EditTaskForm extends React.Component {
     }
   }
 
+  toggleTagsField = () => {
+    if (!this.state.showTagsField){
+      setTimeout(() => {
+        if (this.tagsField) this.tagsField.focus();
+      }, 0);
+    }
+    this.setState({showTagsField: !this.state.showTagsField});
+  }
+
   render() {
     if (this.state.error){
       return (<div className="edit-task-panel">
@@ -551,7 +560,7 @@ class EditTaskForm extends React.Component {
         tagsField = (<div className="form-group">
             <label className="col-sm-2 control-label">{_("Tags")}</label>
               <div className="col-sm-10">
-                <TagsField />
+                <TagsField ref={domNode => this.tagsField = domNode}/>
               </div>
           </div>);
       }
@@ -612,7 +621,7 @@ class EditTaskForm extends React.Component {
               placeholder={this.state.namePlaceholder} 
               value={this.state.name} 
             />
-            <button type="button" title={_("Add tags")} class="btn btn-sm btn-secondary toggle-tags">
+            <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} class="btn btn-sm btn-secondary toggle-tags">
               <i class="fa fa-tag"></i>
             </button>
 

@@ -262,3 +262,14 @@ pre.prettyprint,
 		}
 	}
 }
+
+.tag-badge{
+	background-color: theme("button_default");
+	border-color: theme("button_default");
+	color: theme("secondary");
+
+
+	a, a:hover{
+		color: theme("secondary");
+	}
+}
