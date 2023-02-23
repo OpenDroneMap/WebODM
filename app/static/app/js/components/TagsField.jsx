@@ -52,7 +52,7 @@ class TagsField extends React.Component {
   }
 
   handleKeyDown = e => {
-    if (e.key === "Tab" || e.key === "Enter"){
+    if (e.key === "Tab" || e.key === "Enter" || e.key === ","){
       e.preventDefault();
       e.stopPropagation();
       this.addTag();
@@ -139,7 +139,6 @@ class TagsField extends React.Component {
     let minDistX = Infinity, minDistY = Infinity;
     let rowTagY = null;
     const { tags } = this.state;
-    const row = [];
 
     // Find tags in closest row
     this.domTags.forEach((domTag, i) => {

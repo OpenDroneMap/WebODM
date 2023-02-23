@@ -3,8 +3,10 @@ from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from django_filters import rest_framework as filters
 from django.db import transaction
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from app import models
 from .tasks import TaskIDsSerializer
@@ -34,6 +36,18 @@ class ProjectSerializer(serializers.ModelSerializer):
         exclude = ('deleting', )
 
 
+class ProjectFilter(filters.FilterSet):
+    search = filters.CharFilter(method='filter_search')
+
+    def filter_search(self, queryset, name, value):
+        print(name, value)
+        return queryset.filter(Q(name__icontains=value) | Q(task__name__icontains=value)).distinct()
+
+    class Meta:
+        model = models.Project
+        fields = ['search']
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     Project get/add/delete/update
@@ -45,6 +59,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filter_fields = ('id', 'name', 'description', 'created_at')
     serializer_class = ProjectSerializer
     queryset = models.Project.objects.prefetch_related('task_set').filter(deleting=False).order_by('-created_at')
+    filterset_class = ProjectFilter
     ordering_fields = '__all__'
 
     # Disable pagination when not requesting any page
