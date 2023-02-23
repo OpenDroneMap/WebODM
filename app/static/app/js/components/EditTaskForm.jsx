@@ -621,8 +621,8 @@ class EditTaskForm extends React.Component {
               placeholder={this.state.namePlaceholder} 
               value={this.state.name} 
             />
-            <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} class="btn btn-sm btn-secondary toggle-tags">
-              <i class="fa fa-tag"></i>
+            <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="btn btn-sm btn-secondary toggle-tags">
+              <i className="fa fa-tag"></i>
             </button>
 
           </div>

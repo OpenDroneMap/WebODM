@@ -90,8 +90,6 @@ class TaskList extends React.Component {
 
     return (
       <div className="task-list">
-        {message}
-
         {this.state.tasks.map(task => (
           <TaskListItem 
             data={task} 
@@ -103,6 +101,8 @@ class TaskList extends React.Component {
             hasPermission={this.props.hasPermission}
             history={this.props.history} />
         ))}
+
+        {message}
       </div>
     );
   }
