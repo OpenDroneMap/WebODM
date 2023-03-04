@@ -11,6 +11,8 @@ services:
       - WO_DEFAULT_NODES
   node-odm:
     image: opendronemap/nodeodm:gpu
+    volumes:
+      - ${WO_MEDIA_DIR}:/var/www/data:z
     ports:
       - "3000"
     restart: unless-stopped
