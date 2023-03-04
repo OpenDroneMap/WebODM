@@ -13,6 +13,8 @@ services:
     environment:
       - RENDER_GROUP_ID
     image: opendronemap/nodeodm:gpu.intel
+    volumes:
+      - ${WO_MEDIA_DIR}:/var/www/data:z
     devices:
       - "/dev/dri"
     ports:
