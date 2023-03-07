@@ -92,7 +92,7 @@ class TagsField extends React.Component {
     let text = this.inputText.innerText;
     if (text !== ""){
       // Do not allow system tags
-      if (!text.startsWith("_")){
+      if (!text.startsWith(".")){
 
         // Only lower case text allowed
         text = text.toLowerCase();
