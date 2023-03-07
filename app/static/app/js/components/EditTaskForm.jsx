@@ -46,12 +46,13 @@ class EditTaskForm extends React.Component {
       processingNodes: [],
       selectedPreset: null,
       presets: [],
+      tags: Utils.clone(props.task.tags),
 
       editingPreset: false,
 
       loadingTaskName: false,
 
-      showTagsField: true // TODO false
+      showTagsField: !!props.task.tags.length
     };
 
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -357,12 +358,13 @@ class EditTaskForm extends React.Component {
   }
 
   getTaskInfo(){
-    const { name, selectedNode, selectedPreset } = this.state;
+    const { name, selectedNode, selectedPreset, tags } = this.state;
 
     return {
       name: name !== "" ? name : this.namePlaceholder,
       selectedNode: selectedNode,
-      options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options)
+      options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options),
+      tags
     };
   }
 
@@ -559,8 +561,8 @@ class EditTaskForm extends React.Component {
       if (this.state.showTagsField){
         tagsField = (<div className="form-group">
             <label className="col-sm-2 control-label">{_("Tags")}</label>
-              <div className="col-sm-10">
-                <TagsField ref={domNode => this.tagsField = domNode}/>
+              <div className="col-sm-10"> 
+                <TagsField onUpdate={(tags) => this.state.tags = tags } tags={this.state.tags} ref={domNode => this.tagsField = domNode}/>
               </div>
           </div>);
       }
@@ -619,7 +621,7 @@ class EditTaskForm extends React.Component {
               onChange={this.handleNameChange} 
               className="form-control"
               placeholder={this.state.namePlaceholder} 
-              value={this.state.name} 
+              value={this.state.name}
             />
             <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="btn btn-sm btn-secondary toggle-tags">
               <i className="fa fa-tag"></i>

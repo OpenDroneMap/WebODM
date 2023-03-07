@@ -12,6 +12,7 @@ import TaskPluginActionButtons from './TaskPluginActionButtons';
 import MoveTaskDialog from './MoveTaskDialog';
 import PipelineSteps from '../classes/PipelineSteps';
 import Css from '../classes/Css';
+import Tags from '../classes/Tags';
 import Trans from './Trans';
 import { _, interpolate } from '../classes/gettext';
 
@@ -706,6 +707,7 @@ class TaskListItem extends React.Component {
 
     let taskActionsIcon = "fa-ellipsis-h";
     if (actionLoading) taskActionsIcon = "fa-circle-notch fa-spin fa-fw";
+    const userTags = Tags.userTags(task.tags);
 
     return (
       <div className="task-list-item">
@@ -719,7 +721,10 @@ class TaskListItem extends React.Component {
         : ""}
         <div className="row">
           <div className="col-sm-5 col-xs-12 name">
-            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
+            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
+            {userTags.length > 0 ? 
+              userTags.map((t, i) => <div key={i} className="tag-badge small-badge">{t}</div>)
+              : ""}
           </div>
           <div className="col-sm-1 col-xs-5 details">
             <i className="far fa-image"></i> {task.images_count}

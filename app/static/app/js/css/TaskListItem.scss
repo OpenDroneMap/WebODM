@@ -119,4 +119,23 @@
     .mb{
         margin-bottom: 12px;
     }
+
+    .tag-badge.small-badge {
+        display: inline-block;
+        width: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        margin-left: 4px;
+        margin-top: -2px;
+        border-radius: 6px;
+        font-size: 90%;
+        position: relative;
+        top: -1px;
+    }
+
+    .name-link{
+        margin-right: 4px;
+    }
 }

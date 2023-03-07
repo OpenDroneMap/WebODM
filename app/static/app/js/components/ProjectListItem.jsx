@@ -49,6 +49,9 @@ class ProjectListItem extends React.Component {
       },{
         key: "name",
         label: _("Name")
+      },{
+        key: "tags",
+        label: _("Tags")
       }];
 
     this.toggleTaskList = this.toggleTaskList.bind(this);

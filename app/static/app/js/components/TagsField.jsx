@@ -3,25 +3,33 @@ import '../css/TagsField.scss';
 import PropTypes from 'prop-types';
 import update from 'immutability-helper';
 import { _ } from '../classes/gettext';
+import Tags from '../classes/Tags';
 
 class TagsField extends React.Component {
   static defaultProps = {
-    tags: ["abc", "123", "xyz", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbb", "ccccccccccc", "dddddddddddd"]
+    tags: [],
+    onUpdate: () => {}
   };
 
   static propTypes = {
-    tags: PropTypes.arrayOf(PropTypes.string)
+    tags: PropTypes.arrayOf(PropTypes.string),
+    onUpdate: PropTypes.func
   };
 
   constructor(props){
     super(props);
 
     this.state = {
-      tags: props.tags
+      userTags: Tags.userTags(props.tags),
+      systemTags: Tags.systemTags(props.tags)
     }
 
     this.dzList = [];
     this.domTags = [];
+  }
+
+  componentDidUpdate(){
+    this.props.onUpdate(Tags.combine(this.state.userTags, this.state.systemTags));
   }
 
   componentWillUnmount(){
@@ -52,7 +60,7 @@ class TagsField extends React.Component {
   }
 
   handleKeyDown = e => {
-    if (e.key === "Tab" || e.key === "Enter" || e.key === ","){
+    if (e.key === "Tab" || e.key === "Enter" || e.key === "," || e.key === " "){
       e.preventDefault();
       e.stopPropagation();
       this.addTag();
@@ -71,18 +79,21 @@ class TagsField extends React.Component {
     return e => {
       e.stopPropagation();
       
-      this.setState(update(this.state, { tags: { $splice: [[idx, 1]] } }));
+      this.setState(update(this.state, { userTags: { $splice: [[idx, 1]] } }));
     }
   }
 
   addTag = () => {
     const text = this.inputText.innerText;
     if (text !== ""){
-      // Check for dulicates
-      if (this.state.tags.indexOf(text) === -1){
-        this.setState(update(this.state, {
-          tags: {$push: [text]}
-        }));
+      // Do not allow system tags
+      if (!text.startsWith("_")){
+        // Check for dulicates
+        if (this.state.userTags.indexOf(text) === -1){
+          this.setState(update(this.state, {
+            userTags: {$push: [text]}
+          }));
+        }
       }
       this.inputText.innerText = "";
     }
@@ -102,23 +113,23 @@ class TagsField extends React.Component {
     const dragTag = e.dataTransfer.getData("application/tag");
     const [moveTag, side] = this.findClosestTag(e.clientX, e.clientY);
 
-    const { tags } = this.state;
+    const { userTags } = this.state;
     if (moveTag){
-      const dragIdx = tags.indexOf(dragTag);
-      const moveIdx = tags.indexOf(moveTag);
+      const dragIdx = userTags.indexOf(dragTag);
+      const moveIdx = userTags.indexOf(moveTag);
       if (dragIdx !== -1 && moveIdx !== -1){
         if (dragIdx === moveIdx) return;
         else{
           // Put drag tag in front of move tag
           let insertIdx = side === "right" ? moveIdx + 1 : moveIdx;
-          tags.splice(insertIdx, 0, dragTag);
-          for (let i = 0; i < tags.length; i++){
-            if (tags[i] === dragTag && i !== insertIdx){
-              tags.splice(i, 1);
+          userTags.splice(insertIdx, 0, dragTag);
+          for (let i = 0; i < userTags.length; i++){
+            if (userTags[i] === dragTag && i !== insertIdx){
+              userTags.splice(i, 1);
               break;
             }
           }
-          this.setState({tags});
+          this.setState({userTags});
         }
       }
     }
@@ -138,7 +149,7 @@ class TagsField extends React.Component {
     let closestTag = null;
     let minDistX = Infinity, minDistY = Infinity;
     let rowTagY = null;
-    const { tags } = this.state;
+    const { userTags } = this.state;
 
     // Find tags in closest row
     this.domTags.forEach((domTag, i) => {
@@ -164,7 +175,7 @@ class TagsField extends React.Component {
         let dx = clientX - tagX,
             sqDistX = dx*dx;
         if (sqDistX < minDistX){
-          closestTag = tags[i];
+          closestTag = userTags[i];
           minDistX = sqDistX;
         }
       }
@@ -172,7 +183,7 @@ class TagsField extends React.Component {
 
     let side = "right";
     if (closestTag){
-      const b = this.domTags[this.state.tags.indexOf(closestTag)].getBoundingClientRect();
+      const b = this.domTags[this.state.userTags.indexOf(closestTag)].getBoundingClientRect();
       const centerX = b.x + b.width / 2.0;
       if (clientX < centerX) side = "left";
     }
@@ -189,7 +200,7 @@ class TagsField extends React.Component {
                 onDrop={this.handleDrop}
                 onDragOver={this.handleDragOver}
                 onDragEnter={this.handleDragEnter}
-                className="form-control tags-field">{this.state.tags.map((tag, i) => 
+                className="form-control tags-field">{this.state.userTags.map((tag, i) => 
                   <div draggable="true" className="tag-badge" key={i} ref={domNode => this.domTags[i] = domNode} 
                       onClick={this.stop} 
                       onDragStart={this.handleDragStart(tag)} 
