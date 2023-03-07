@@ -10,6 +10,7 @@ from django.db.models import Q
 
 from app import models
 from .tasks import TaskIDsSerializer
+from .tags import TagsField, parse_tags_input
 from .common import get_and_check_project
 from django.utils.translation import gettext as _
 
@@ -23,6 +24,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         )
     created_at = serializers.ReadOnlyField()
     permissions = serializers.SerializerMethodField()
+    tags = TagsField(required=False)
 
     def get_permissions(self, obj):
         if 'request' in self.context:
@@ -67,7 +69,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
             return None
         return super().paginate_queryset(queryset)
-    
+
     @action(detail=True, methods=['post'])
     def duplicate(self, request, pk=None):
         """
@@ -104,6 +106,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 project.name = request.data.get('name', '')
                 project.description = request.data.get('description', '')
+                project.tags = TagsField().to_internal_value(parse_tags_input(request.data.get('tags', [])))
                 project.save()
 
                 form_perms = request.data.get('permissions')
@@ -148,6 +151,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist as e:
             return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
         except AttributeError as e:
+            print(e)
             return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)

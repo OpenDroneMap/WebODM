@@ -13,6 +13,7 @@ import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import ResizeModes from '../classes/ResizeModes';
+import Tags from '../classes/Tags';
 import exifr from '../vendor/exifr';
 import { _, interpolate } from '../classes/gettext';
 import $ from 'jquery';
@@ -397,6 +398,7 @@ class ProjectListItem extends React.Component {
         data: JSON.stringify({
           name: project.name,
           description: project.descr,
+          tags: project.tags,
           permissions: project.permissions
         }),
         dataType: 'json',
@@ -494,7 +496,7 @@ class ProjectListItem extends React.Component {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
     const canEdit = this.hasPermission("change");
-    
+    const userTags = Tags.userTags(data.tags);
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
@@ -514,6 +516,7 @@ class ProjectListItem extends React.Component {
             projectName={data.name}
             projectDescr={data.description}
             projectId={data.id}
+            projectTags={data.tags}
             saveAction={this.updateProject}
             showPermissions={this.hasPermission("change")}
             deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
@@ -556,6 +559,9 @@ class ProjectListItem extends React.Component {
 
           <div className="project-name">
             {data.name}
+            {userTags.length > 0 ? 
+              userTags.map((t, i) => <div key={i} className="tag-badge small-badge">{t}</div>)
+              : ""}
           </div>
           <div className="project-description">
             {data.description}

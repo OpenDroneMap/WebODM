@@ -64,6 +64,8 @@ class TagsField extends React.Component {
       e.preventDefault();
       e.stopPropagation();
       this.addTag();
+    }else if (e.key === "Backspace" && this.inputText.innerText === ""){
+      this.removeTag(this.state.userTags.length - 1);
     }
   }
 
@@ -75,19 +77,26 @@ class TagsField extends React.Component {
     e.stopPropagation();
   }
 
-  removeTag = idx => {
+  handleRemoveTag = idx => {
     return e => {
       e.stopPropagation();
-      
-      this.setState(update(this.state, { userTags: { $splice: [[idx, 1]] } }));
+      this.removeTag(idx);
     }
   }
 
+  removeTag = idx => {
+    this.setState(update(this.state, { userTags: { $splice: [[idx, 1]] } }));
+  }
+
   addTag = () => {
-    const text = this.inputText.innerText;
+    let text = this.inputText.innerText;
     if (text !== ""){
       // Do not allow system tags
       if (!text.startsWith("_")){
+
+        // Only lower case text allowed
+        text = text.toLowerCase();
+
         // Check for dulicates
         if (this.state.userTags.indexOf(text) === -1){
           this.setState(update(this.state, {
@@ -204,7 +213,7 @@ class TagsField extends React.Component {
                   <div draggable="true" className="tag-badge" key={i} ref={domNode => this.domTags[i] = domNode} 
                       onClick={this.stop} 
                       onDragStart={this.handleDragStart(tag)} 
-                      onDragEnd={this.handleDragEnd}>{tag} <a href="javascript:void(0)" onClick={this.removeTag(i)}>×</a>&nbsp;&nbsp;</div>
+                      onDragEnd={this.handleDragEnd}>{tag} <a href="javascript:void(0)" onClick={this.handleRemoveTag(i)}>×</a>&nbsp;&nbsp;</div>
                 )}
                 <div className="inputText" contentEditable="true" ref={(domNode) => this.inputText = domNode}
                      onKeyDown={this.handleKeyDown}

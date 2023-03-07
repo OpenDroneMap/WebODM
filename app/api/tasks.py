@@ -42,7 +42,7 @@ class TaskSerializer(serializers.ModelSerializer):
     processing_node_name = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
     statistics = serializers.SerializerMethodField()
-    tags = TagsField()
+    tags = TagsField(required=False)
 
     def get_processing_node_name(self, obj):
         if obj.processing_node is not None:

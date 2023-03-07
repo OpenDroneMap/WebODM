@@ -28,10 +28,12 @@ class Dashboard extends React.Component {
     return $.ajax({
           url: `/api/projects/`,
           type: 'POST',
-          data: {
+          contentType: 'application/json',
+          data: JSON.stringify({
             name: project.name,
-            description: project.descr
-          }
+            description: project.descr,
+            tags: project.tags
+          })
       }).done(() => {
         this.projectList.refresh();
       });
