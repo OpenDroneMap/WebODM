@@ -113,7 +113,7 @@ class ProjectList extends Paginated {
             return (<div className="project-list">
                 <ErrorMessage bind={[this, 'error']} />
                 <Paginator {...this.state.pagination} {...this.props}>
-                    <ul className={"list-group project-list " + (this.state.refreshing ? "refreshing" : "")}>
+                    <ul key="1" className={"list-group project-list " + (this.state.refreshing ? "refreshing" : "")}>
                         {this.state.projects.map(p => (
                             <ProjectListItem 
                                 ref={(domNode) => { this["projectListItem_" + p.id] = domNode }}

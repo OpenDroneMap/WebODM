@@ -5,4 +5,10 @@
         }
         margin-right: 8px;
     }
+    .btn-group.open > .dropdown-menu{
+        top: 22px;
+        a{
+            border: none;
+        }
+    }
 }
