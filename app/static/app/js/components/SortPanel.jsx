@@ -6,12 +6,14 @@ import { _ } from '../classes/gettext';
 class SortPanel extends React.Component {
   static defaultProps = {
     items: [],
-    onChange: () => {}
+    onChange: () => {},
+    selected: null
   };
 
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.object),
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    selected: PropTypes.string
   };
 
   constructor(props){
@@ -19,6 +21,13 @@ class SortPanel extends React.Component {
 
     this.state = {
       items: props.items
+    }
+
+    if (props.selected){
+      let normSortKey = props.selected.replace("-", "");
+      this.state.items.forEach(s => {
+          if (s.key === normSortKey) s.selected = props.selected[0] === "-" ? "desc" : "asc";
+      });
     }
   }
 

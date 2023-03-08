@@ -45,8 +45,7 @@ class ProjectListItem extends React.Component {
 
     this.sortItems = [{
         key: "created_at",
-        label: _("Created on"),
-        selected: "desc"
+        label: _("Created on")
       },{
         key: "name",
         label: _("Name")
@@ -583,7 +582,7 @@ class ProjectListItem extends React.Component {
                   <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {_("Sort")}
                   </a>
-                  <SortPanel items={this.sortItems} onChange={this.sortChanged} />
+                  <SortPanel selected="-created_at" items={this.sortItems} onChange={this.sortChanged} />
                 </div>
               </div> : ""}
 

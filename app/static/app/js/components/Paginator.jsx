@@ -9,15 +9,16 @@ class Paginator extends React.Component {
     constructor(props){
         super(props);
 
+        const q = Utils.queryParams(props.location);
+
         this.state = {
             showSearch: false,
-            sortKey: "-created_at"
+            sortKey: q.ordering
         }
 
         this.sortItems = [{
             key: "created_at",
-            label: _("Created on"),
-            selected: "desc"
+            label: _("Created on")
           },{
             key: "name",
             label: _("Name")
@@ -54,7 +55,7 @@ class Paginator extends React.Component {
                 <li><a href="javascript:void(0);"><i className="fa fa-filter" title={_("Filter")}></i></a></li>
                 <li className="btn-group">
                     <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
-                    <SortPanel items={this.sortItems} onChange={this.sortChanged} />
+                    <SortPanel selected={this.state.sortKey} items={this.sortItems} onChange={this.sortChanged} />
                 </li>
             </ul>
         );
