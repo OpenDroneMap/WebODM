@@ -188,7 +188,7 @@ footer,
 	border-bottom-color: theme("border");
 }
 .theme-border{
-    border-color: theme("border");
+    border-color: theme("border") !important;
 }
 
 /* Highlight */

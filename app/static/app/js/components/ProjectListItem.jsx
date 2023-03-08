@@ -551,10 +551,6 @@ class ProjectListItem extends React.Component {
               <i className="glyphicon glyphicon-remove-circle"></i>
               Cancel Upload
             </button> 
-
-            <button type="button" className="btn btn-default btn-sm" onClick={this.viewMap}>
-              <i className="fa fa-globe"></i> {_("View Map")}
-            </button>
           </div>
 
           <div className="project-name">
@@ -591,11 +587,19 @@ class ProjectListItem extends React.Component {
                 </div>
               </div> : ""}
 
+              {numTasks > 0 ? 
+                [<i key="edit-icon" className='fa fa-globe'></i>
+                ,<a key="edit-text" href="javascript:void(0);" onClick={this.viewMap}>
+                  {_("View Map")}
+                </a>]
+              : ""}
+              
             {canEdit ? 
                 [<i key="edit-icon" className='far fa-edit'></i>
                 ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
                 </a>]
             : ""}
+
           </div>
         </div>
         <i className="drag-drop-icon fa fa-inbox"></i>
