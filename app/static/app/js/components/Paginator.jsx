@@ -12,8 +12,8 @@ class Paginator extends React.Component {
         const q = Utils.queryParams(props.location);
 
         this.state = {
-            showSearch: false,
-            sortKey: q.ordering
+            searchText: "",
+            sortKey: q.ordering || "-created_at"
         }
 
         this.sortItems = [{
@@ -28,8 +28,57 @@ class Paginator extends React.Component {
           }];
     }
 
-    toggleSearch = () => {
+    stop = e => {
+        e.stopPropagation();
+    }
 
+    componentDidMount(){
+        this.searchPopup.addEventListener("click", this.stop);
+        this.searchButton.addEventListener("click", this.toggleSearch);
+        this.btnSearch.addEventListener("click", this.search);
+        document.body.addEventListener("click", this.closeSearch);
+    }
+
+    componentWillUnmount(){
+        document.body.removeEventListener("click", this.closeSearch);
+        this.btnSearch.removeEventListener("click", this.search);
+        this.searchButton.removeEventListener("click", this.toggleSearch);
+        this.searchPopup.removeEventListener("click", this.stop);
+    }
+
+    closeSearch = () => {
+        this.searchContainer.classList.remove("open");
+    }
+
+    toggleSearch = e => {
+        e.stopPropagation();
+        this.searchContainer.classList.toggle("open");
+
+        setTimeout(() => {
+            this.searchInput.focus();
+        }, 0);
+    }
+
+    handleSearchChange = e => {
+        this.setState({searchText: e.target.value});
+    }
+
+    handleSearchKeyDown = e => {
+        if (e.key === "Enter"){
+            this.search();
+        }
+    }
+    
+    search = () => {
+        this.props.history.push({search: this.getQueryForPage(1)});
+        this.closeSearch();
+    }
+
+    clearSearch = () => {
+        this.setState({searchText: ""});
+        setTimeout(() => {
+            this.search();
+        }, 0);
     }
 
     sortChanged = key => {
@@ -42,16 +91,36 @@ class Paginator extends React.Component {
     getQueryForPage = (num) => {
         return Utils.toSearchQuery({
             page: num,
-            ordering: this.state.sortKey
+            ordering: this.state.sortKey,
+            search: this.state.searchText
         });
     }
 
     render() {
         const { itemsPerPage, totalItems, currentPage } = this.props;
+        const { searchText } = this.state;
+
         let paginator = null;
-        let toolbar = (
-            <ul className="pagination pagination-sm toolbar">
-                <li><a href="javascript:void(0);" onClick={this.toggleSearch} title={_("Search")}><i className="fa fa-search"></i></a></li>
+        let clearSearch = null;
+
+        let toolbar = (<ul className="pagination pagination-sm toolbar">
+                <li className="btn-group" ref={domNode => { this.searchContainer = domNode; }}>
+                    <a href="javascript:void(0);" className="dropdown-toggle" 
+                            aria-haspopup="true" aria-expanded="false"
+                            ref={domNode => { this.searchButton = domNode; }} title={_("Search")}><i className="fa fa-search"></i></a>
+                    <ul className="dropdown-menu dropdown-menu-right search-popup" ref={domNode => { this.searchPopup = domNode; }}>
+                        <li>
+                            <input type="text" 
+                                ref={(domNode) => { this.searchInput = domNode}}
+                                className="form-control search theme-border-secondary-07" 
+                                placeholder={_("Search names or #tags")}
+                                value={searchText}
+                                onKeyDown={this.handleSearchKeyDown}
+                                onChange={this.handleSearchChange} />
+                            <button ref={domNode => {this.btnSearch = domNode;}} className="btn btn-sm btn-default"><i className="fa fa-search"></i></button>
+                        </li>
+                    </ul>
+                </li>
                 <li><a href="javascript:void(0);"><i className="fa fa-filter" title={_("Filter")}></i></a></li>
                 <li className="btn-group">
                     <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
@@ -59,6 +128,10 @@ class Paginator extends React.Component {
                 </li>
             </ul>
         );
+
+        if (this.props.currentSearch){
+            clearSearch = (<span className="clear-search">{_("Search results for:")} <span className="query">{this.props.currentSearch}</span> <a href="javascript:void(0);" onClick={this.clearSearch}>×</a></span>);
+        }
 
         if (itemsPerPage && itemsPerPage && totalItems > itemsPerPage){
             const numPages = Math.ceil(totalItems / itemsPerPage),
@@ -87,7 +160,7 @@ class Paginator extends React.Component {
         }
 
         return [
-            <div key="0" className="text-right paginator">{toolbar}{paginator}</div>,
+            <div key="0" className="text-right paginator">{clearSearch}{toolbar}{paginator}</div>,
             this.props.children,
             <div key="2" className="text-right paginator">{paginator}</div>,
         ];

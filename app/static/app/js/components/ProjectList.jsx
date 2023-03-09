@@ -21,8 +21,7 @@ class ProjectList extends Paginated {
             loading: true,
             refreshing: false,
             error: "",
-            projects: [],
-            showSearch: false
+            projects: []
         }
 
         this.PROJECTS_PER_PAGE = 10;
@@ -96,20 +95,10 @@ class ProjectList extends Paginated {
         this.refresh();
     }
 
-    toggleSearch = (e) => {
-        this.setState({showSearch: !this.state.showSearch});
-    }
-
-    search = () => {
-
-    }
-
-
     render() {
         if (this.state.loading){
             return (<div className="project-list text-center"><i className="fa fa-sync fa-spin fa-2x fa-fw"></i></div>);
         }else{
-            let test = (<button>hi</button>);
             return (<div className="project-list">
                 <ErrorMessage bind={[this, 'error']} />
                 <Paginator {...this.state.pagination} {...this.props}>

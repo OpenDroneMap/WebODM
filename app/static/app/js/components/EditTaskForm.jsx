@@ -46,13 +46,13 @@ class EditTaskForm extends React.Component {
       processingNodes: [],
       selectedPreset: null,
       presets: [],
-      tags: Utils.clone(props.task.tags),
+      tags: props.task !== null ? Utils.clone(props.task.tags) : [],
 
       editingPreset: false,
 
       loadingTaskName: false,
 
-      showTagsField: !!props.task.tags.length
+      showTagsField: props.task !== null ? !!props.task.tags.length : false
     };
 
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -361,7 +361,7 @@ class EditTaskForm extends React.Component {
     const { name, selectedNode, selectedPreset, tags } = this.state;
 
     return {
-      name: name !== "" ? name : this.namePlaceholder,
+      name: name !== "" ? name : this.state.namePlaceholder,
       selectedNode: selectedNode,
       options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options),
       tags

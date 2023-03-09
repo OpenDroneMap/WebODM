@@ -61,6 +61,9 @@ body,
 .pagination li > a{
 	color: theme("primary");
 }
+.theme-border-secondary-07{
+	border-color: scaleby(theme("secondary"), 0.7) !important;
+}
 
 .btn-secondary, .btn-secondary:active, .btn-secondary.active, .open>.dropdown-toggle.btn-secondary{
 	background-color: theme("secondary");

@@ -404,7 +404,7 @@ class TaskListItem extends React.Component {
 
   render() {
     const task = this.state.task;
-    const name = task.name !== null ? task.name : _("(unnamed)");
+    const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
     const imported = task.import_url !== "";
 
     let status = statusCodes.description(task.status);
