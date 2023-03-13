@@ -24,7 +24,8 @@ class TaskListItem extends React.Component {
       onDelete: PropTypes.func,
       onMove: PropTypes.func,
       onDuplicate: PropTypes.func,
-      hasPermission: PropTypes.func
+      hasPermission: PropTypes.func,
+      onEdited: PropTypes.func
   }
 
   constructor(props){
@@ -279,6 +280,7 @@ class TaskListItem extends React.Component {
 
   handleEditTaskSave(task){
     this.setState({task, editing: false});
+    if (this.props.onEdited) this.props.onEdited(task);
     this.setAutoRefresh();
   }
 

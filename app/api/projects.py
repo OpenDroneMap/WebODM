@@ -49,11 +49,11 @@ class ProjectFilter(filters.FilterSet):
         tag_pattern = re.compile("#[^\s]+")
         tags = set(re.findall(tag_pattern, value))
 
-        project_tags = set([t for t in tags if t.startswith("##")])
-        deep_tags = tags - project_tags
+        deep_tags = set([t for t in tags if t.startswith("##")])
+        project_tags = tags - deep_tags
 
-        project_tags = [t.replace("##", "") for t in project_tags]
-        deep_tags = [t.replace("#", "") for t in deep_tags]
+        deep_tags = [t.replace("##", "") for t in deep_tags]
+        project_tags = [t.replace("#", "") for t in project_tags]
 
         names = re.sub("\s+", " ", re.sub(tag_pattern, "", value)).strip()
 

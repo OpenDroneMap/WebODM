@@ -11,7 +11,8 @@ class TaskList extends React.Component {
       source: PropTypes.string.isRequired, // URL where to load task list
       onDelete: PropTypes.func,
       onTaskMoved: PropTypes.func,
-      hasPermission: PropTypes.func.isRequired
+      hasPermission: PropTypes.func.isRequired,
+      onTagsChanged: PropTypes.func
   }
 
   constructor(props){
@@ -49,6 +50,7 @@ class TaskList extends React.Component {
           this.setState({
               tasks: json
           });
+          setTimeout(() => this.notifyTagsChanged(), 0);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
           this.setState({ 
@@ -78,6 +80,38 @@ class TaskList extends React.Component {
     if (this.props.onTaskMoved) this.props.onTaskMoved(task);
   }
 
+  notifyTagsChanged = () => {
+    const { tasks } = this.state;
+    const tags = [];
+    if (tasks){
+      tasks.forEach(t => {
+        if (t.tags){
+          t.tags.forEach(x => {
+            if (tags.indexOf(x) === -1) tags.push(x);
+          });
+        }
+      });
+    }
+    tags.sort();
+
+    if (this.props.onTagsChanged) this.props.onTagsChanged(tags);
+  }
+
+  taskEdited = (task) => {
+    // Update
+    const { tasks } = this.state;
+    for (let i = 0; i < tasks.length; i++){
+      if (tasks[i].id === task.id){
+        tasks[i] = task;
+        break;
+      }
+    }
+    this.setState({tasks});
+
+    // Tags might have changed
+    setTimeout(() => this.notifyTagsChanged(), 0);
+  }
+
   render() {
     let message = "";
     if (this.state.loading){
@@ -98,6 +132,7 @@ class TaskList extends React.Component {
             onDelete={this.deleteTask}
             onMove={this.moveTask}
             onDuplicate={this.refresh}
+            onEdited={this.taskEdited}
             hasPermission={this.props.hasPermission}
             history={this.props.history} />
         ))}

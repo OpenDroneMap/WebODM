@@ -8,6 +8,7 @@ import Paginator from './Paginator';
 import ErrorMessage from './ErrorMessage';
 import { _, interpolate } from '../classes/gettext';
 import PropTypes from 'prop-types';
+import Utils from '../classes/Utils';
 
 class ProjectList extends Paginated {
     static propTypes = {
@@ -33,8 +34,23 @@ class ProjectList extends Paginated {
         this.refresh();
     }
 
+    getParametersHash(source){
+        if (!source) return "";
+        if (source.indexOf("?") === -1) return "";
+
+        let search = source.substr(source.indexOf("?"));
+        let q = Utils.queryParams({search});
+        
+        // All parameters that can change via history.push without
+        // triggering a reload of the project list should go here
+        delete q.project_task_open;
+        delete q.project_task_expanded;
+
+        return JSON.stringify(q);
+    }
+
     componentDidUpdate(prevProps){
-        if (prevProps.source !== this.props.source){
+        if (this.getParametersHash(prevProps.source) !== this.getParametersHash(this.props.source)){
             this.refresh();
         }
     }

@@ -40,7 +40,8 @@ class ProjectListItem extends React.Component {
       refreshing: false,
       importing: false,
       buttons: [],
-      sortKey: "-created_at"
+      sortKey: "-created_at",
+      filterTags: []
     };
 
     this.sortItems = [{
@@ -498,8 +499,12 @@ class ProjectListItem extends React.Component {
     }
   }
 
+  tagsChanged = (filterTags) => {
+    this.setState({filterTags});
+  }
+
   render() {
-    const { refreshing, data } = this.state;
+    const { refreshing, data, filterTags } = this.state;
     const numTasks = data.tasks.length;
     const canEdit = this.hasPermission("change");
     const userTags = Tags.userTags(data.tags);
@@ -580,10 +585,17 @@ class ProjectListItem extends React.Component {
             
             {this.state.showTaskList && numTasks > 1 ? 
               <div className="task-filters">
-                <i className='fa fa-filter'></i>
-                <a href="javascript:void(0);" onClick={this.toggleTaskList}>
-                  {_("Filter")}
-                </a>
+                {filterTags.length > 0 ? 
+                  <div className="btn-group">
+                    <i className='fa fa-filter'></i>
+                    <a href="javascript:void(0);" className="dropdown-toggle" data-toggle-outside data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {_("Filter")}
+                    </a>
+                    <ul className="dropdown-menu dropdown-menu-right">
+                    {filterTags.map(t => <li key={t}>{t}</li>)}
+                    </ul>
+                  </div>
+                : ""}
                 <div className="btn-group">
                   <i className='fa fa-sort-alpha-down'></i>
                   <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -645,6 +657,7 @@ class ProjectListItem extends React.Component {
                 onDelete={this.taskDeleted}
                 onTaskMoved={this.taskMoved}
                 hasPermission={this.hasPermission}
+                onTagsChanged={this.tagsChanged}
                 history={this.props.history}
             /> : ""}
 

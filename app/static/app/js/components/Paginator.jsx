@@ -32,24 +32,12 @@ class Paginator extends React.Component {
           }];
     }
 
-    stop = e => {
-        e.stopPropagation();
-    }
-
     componentDidMount(){
-        this.searchPopup.addEventListener("click", this.stop);
-        this.searchButton.addEventListener("click", this.toggleSearch);
-        this.btnSearch.addEventListener("click", this.search);
-        document.body.addEventListener("click", this.closeSearch);
         document.addEventListener("onProjectListTagClicked", this.addTagAndSearch);
     }
 
     componentWillUnmount(){
         document.removeEventListener("onProjectListTagClicked", this.addTagAndSearch);
-        document.body.removeEventListener("click", this.closeSearch);
-        this.btnSearch.removeEventListener("click", this.search);
-        this.searchButton.removeEventListener("click", this.toggleSearch);
-        this.searchPopup.removeEventListener("click", this.stop);
     }
 
     closeSearch = () => {
@@ -58,11 +46,9 @@ class Paginator extends React.Component {
 
     toggleSearch = e => {
         e.stopPropagation();
-        this.searchContainer.classList.toggle("open");
-
         setTimeout(() => {
             this.searchInput.focus();
-        }, 0);
+        }, 50);
     }
 
     handleSearchChange = e => {
@@ -107,8 +93,8 @@ class Paginator extends React.Component {
         if (tag === undefined) return;
 
         let { searchText } = this.state;
-        if (searchText === "") searchText += "##" + tag;
-        else searchText += " ##" + tag;
+        if (searchText === "") searchText += "#" + tag;
+        else searchText += " #" + tag;
 
         this.setState({searchText});
         setTimeout(() => {
@@ -122,31 +108,32 @@ class Paginator extends React.Component {
 
         let paginator = null;
         let clearSearch = null;
-
-        let toolbar = (<ul className="pagination pagination-sm toolbar">
-                <li className="btn-group" ref={domNode => { this.searchContainer = domNode; }}>
-                    <a href="javascript:void(0);" className="dropdown-toggle" 
-                            aria-haspopup="true" aria-expanded="false"
-                            ref={domNode => { this.searchButton = domNode; }} title={_("Search")}><i className="fa fa-search"></i></a>
-                    <ul className="dropdown-menu dropdown-menu-right search-popup" ref={domNode => { this.searchPopup = domNode; }}>
-                        <li>
-                            <input type="text" 
-                                ref={(domNode) => { this.searchInput = domNode}}
-                                className="form-control search theme-border-secondary-07" 
-                                placeholder={_("Search names or #tags")}
-                                value={searchText}
-                                onKeyDown={this.handleSearchKeyDown}
-                                onChange={this.handleSearchChange} />
-                            <button ref={domNode => {this.btnSearch = domNode;}} className="btn btn-sm btn-default"><i className="fa fa-search"></i></button>
-                        </li>
-                    </ul>
-                </li>
-                <li className="btn-group">
-                    <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
-                    <SortPanel selected={this.state.sortKey} items={this.sortItems} onChange={this.sortChanged} />
-                </li>
-            </ul>
-        );
+        let toolbar = (<ul className={"pagination pagination-sm toolbar " + (totalItems == 0 && !searchText ? "hidden " : " ") + (totalItems / itemsPerPage <= 1 ? "no-margin" : "")}>
+            <li className="btn-group" ref={domNode => { this.searchContainer = domNode; }}>
+                <a href="javascript:void(0);" className="dropdown-toggle"
+                        data-toggle-outside 
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false"
+                        onClick={this.toggleSearch}
+                        title={_("Search")}><i className="fa fa-search"></i></a>
+                <ul className="dropdown-menu dropdown-menu-right search-popup">
+                    <li>
+                        <input type="text" 
+                            ref={(domNode) => { this.searchInput = domNode}}
+                            className="form-control search theme-border-secondary-07" 
+                            placeholder={_("Search names or #tags")}
+                            value={searchText}
+                            onKeyDown={this.handleSearchKeyDown}
+                            onChange={this.handleSearchChange} />
+                        <button onClick={this.search} className="btn btn-sm btn-default"><i className="fa fa-search"></i></button>
+                    </li>
+                </ul>
+            </li>
+            <li className="btn-group">
+                <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
+                <SortPanel selected={this.state.sortKey} items={this.sortItems} onChange={this.sortChanged} />
+            </li>
+        </ul>);
 
         if (this.props.currentSearch){
             let currentSearch = decodeSearch(this.props.currentSearch);

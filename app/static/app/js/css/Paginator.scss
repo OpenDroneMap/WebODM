@@ -8,6 +8,9 @@
             opacity: 0.8;
         }
         margin-right: 8px;
+        &.no-margin{
+            margin-right: 0;
+        }
     }
     .btn-group.open > .dropdown-menu{
         top: 22px;
