@@ -1,3 +1,4 @@
+import re
 from guardian.shortcuts import get_perms, get_users_with_perms, assign_perm, remove_perm
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
@@ -6,6 +7,8 @@ from rest_framework import status
 from django_filters import rest_framework as filters
 from django.db import transaction
 from django.contrib.auth.models import User
+from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Q
 
 from app import models
@@ -41,9 +44,27 @@ class ProjectSerializer(serializers.ModelSerializer):
 class ProjectFilter(filters.FilterSet):
     search = filters.CharFilter(method='filter_search')
 
-    def filter_search(self, queryset, name, value):
-        print(name, value)
-        return queryset.filter(Q(name__icontains=value) | Q(task__name__icontains=value)).distinct()
+    def filter_search(self, qs, name, value):
+        value = value.replace(":", "#")
+        tag_pattern = re.compile("#[^\s]+")
+        tags = re.findall(tag_pattern, value)
+        names = re.sub("\s+", " ", re.sub(tag_pattern, "", value)).strip()
+
+        if len(names) > 0:
+            project_name_vec = SearchVector("name")
+            task_name_vec = SearchVector(StringAgg("task__name", delimiter=' '))
+            name_query = SearchQuery(names, search_type="plain")
+            qs = qs.annotate(n_search=project_name_vec + task_name_vec).filter(n_search=name_query)
+
+        if len(tags) > 0:
+            project_tags_vec = SearchVector("tags")
+            task_tags_vec = SearchVector(StringAgg("task__tags", delimiter=' '))
+            tags_query = SearchQuery(tags[0])
+            for t in tags[1:]:
+                tags_query = tags_query & SearchQuery(t)
+            qs = qs.annotate(t_search=project_tags_vec + task_tags_vec).filter(t_search=tags_query)
+
+        return qs.distinct()
 
     class Meta:
         model = models.Project

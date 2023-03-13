@@ -44,7 +44,6 @@ class Dashboard extends React.Component {
       let q = Utils.queryParams(location);
       if (q.page === undefined) q.page = 1;
       else q.page = parseInt(q.page);
-      if (q.search === undefined) q.search = null;
 
       return <ProjectList
                 source={`/api/projects/${Utils.toSearchQuery(q)}`}

@@ -5,14 +5,18 @@ import SortPanel from './SortPanel';
 import Utils from '../classes/Utils';
 import { _ } from '../classes/gettext';
 
+let decodeSearch = (search) => {
+    return window.decodeURI(search.replace(/:/g, "#"));
+};
+
 class Paginator extends React.Component {
     constructor(props){
         super(props);
 
         const q = Utils.queryParams(props.location);
-
+        
         this.state = {
-            searchText: "",
+            searchText: decodeSearch(q.search || ""),
             sortKey: q.ordering || "-created_at"
         }
 
@@ -92,7 +96,7 @@ class Paginator extends React.Component {
         return Utils.toSearchQuery({
             page: num,
             ordering: this.state.sortKey,
-            search: this.state.searchText
+            search: this.state.searchText.replace(/#/g, ":")
         });
     }
 
@@ -130,7 +134,8 @@ class Paginator extends React.Component {
         );
 
         if (this.props.currentSearch){
-            clearSearch = (<span className="clear-search">{_("Search results for:")} <span className="query">{this.props.currentSearch}</span> <a href="javascript:void(0);" onClick={this.clearSearch}>×</a></span>);
+            let currentSearch = decodeSearch(this.props.currentSearch);
+            clearSearch = (<span className="clear-search">{_("Search results for:")} <span className="query">{currentSearch}</span> <a href="javascript:void(0);" onClick={this.clearSearch}>×</a></span>);
         }
 
         if (itemsPerPage && itemsPerPage && totalItems > itemsPerPage){
