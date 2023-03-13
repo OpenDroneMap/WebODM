@@ -491,6 +491,13 @@ class ProjectListItem extends React.Component {
     }
   }
 
+  handleTagClick = tag => {
+    return e => {
+      const evt = new CustomEvent("onProjectListTagClicked", { detail: tag });
+      document.dispatchEvent(evt);
+    }
+  }
+
   render() {
     const { refreshing, data } = this.state;
     const numTasks = data.tasks.length;
@@ -555,7 +562,7 @@ class ProjectListItem extends React.Component {
           <div className="project-name">
             {data.name}
             {userTags.length > 0 ? 
-              userTags.map((t, i) => <div key={i} className="tag-badge small-badge">{t}</div>)
+              userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
               : ""}
           </div>
           <div className="project-description">

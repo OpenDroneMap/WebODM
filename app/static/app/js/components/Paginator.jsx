@@ -41,9 +41,11 @@ class Paginator extends React.Component {
         this.searchButton.addEventListener("click", this.toggleSearch);
         this.btnSearch.addEventListener("click", this.search);
         document.body.addEventListener("click", this.closeSearch);
+        document.addEventListener("onProjectListTagClicked", this.addTagAndSearch);
     }
 
     componentWillUnmount(){
+        document.removeEventListener("onProjectListTagClicked", this.addTagAndSearch);
         document.body.removeEventListener("click", this.closeSearch);
         this.btnSearch.removeEventListener("click", this.search);
         this.searchButton.removeEventListener("click", this.toggleSearch);
@@ -100,6 +102,20 @@ class Paginator extends React.Component {
         });
     }
 
+    addTagAndSearch = e => {
+        const tag = e.detail;
+        if (tag === undefined) return;
+
+        let { searchText } = this.state;
+        if (searchText === "") searchText += "##" + tag;
+        else searchText += " ##" + tag;
+
+        this.setState({searchText});
+        setTimeout(() => {
+            this.search();
+        }, 0);
+    }
+
     render() {
         const { itemsPerPage, totalItems, currentPage } = this.props;
         const { searchText } = this.state;
@@ -125,7 +141,6 @@ class Paginator extends React.Component {
                         </li>
                     </ul>
                 </li>
-                <li><a href="javascript:void(0);"><i className="fa fa-filter" title={_("Filter")}></i></a></li>
                 <li className="btn-group">
                     <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
                     <SortPanel selected={this.state.sortKey} items={this.sortItems} onChange={this.sortChanged} />
