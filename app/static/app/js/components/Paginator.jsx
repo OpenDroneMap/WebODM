@@ -29,6 +29,9 @@ class Paginator extends React.Component {
           },{
             key: "tags",
             label: _("Tags")
+          },{
+            key: "owner",
+            label: _("Owner")
           }];
     }
 
