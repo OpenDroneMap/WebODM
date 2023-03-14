@@ -1556,6 +1556,22 @@ var Dropzone = function (_Emitter) {
       });
     }
   }, {
+    key: "removeListeners",
+    value: function disable() {
+      this.clickableElements.forEach(function (element) {
+        return element.classList.remove("dz-clickable");
+      });
+      this.removeEventListeners();
+    }
+  }, {
+    key: "restoreListeners",
+    value: function disable() {
+      this.clickableElements.forEach(function (element) {
+        return element.classList.add("dz-clickable");
+      });
+      return this.setupEventListeners();
+    }
+  }, {
     key: "enable",
     value: function enable() {
       this.clickableElements.forEach(function (element) {

@@ -7,11 +7,13 @@ import ImportTaskPanel from './ImportTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
 import ErrorMessage from './ErrorMessage';
 import EditProjectDialog from './EditProjectDialog';
+import SortPanel from './SortPanel';
 import Dropzone from '../vendor/dropzone';
 import csrf from '../django/csrf';
 import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import ResizeModes from '../classes/ResizeModes';
+import Tags from '../classes/Tags';
 import exifr from '../vendor/exifr';
 import { _, interpolate } from '../classes/gettext';
 import $ from 'jquery';
@@ -37,8 +39,23 @@ class ProjectListItem extends React.Component {
       data: props.data,
       refreshing: false,
       importing: false,
-      buttons: []
+      buttons: [],
+      sortKey: "-created_at",
+      filterTags: [],
+      selectedTags: [],
+      filterText: ""
     };
+
+    this.sortItems = [{
+        key: "created_at",
+        label: _("Created on")
+      },{
+        key: "name",
+        label: _("Name")
+      },{
+        key: "tags",
+        label: _("Tags")
+      }];
 
     this.toggleTaskList = this.toggleTaskList.bind(this);
     this.closeUploadError = this.closeUploadError.bind(this);
@@ -73,6 +90,13 @@ class ProjectListItem extends React.Component {
   componentWillUnmount(){
     if (this.deleteProjectRequest) this.deleteProjectRequest.abort();
     if (this.refreshRequest) this.refreshRequest.abort();
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if (prevState.filterText !== this.state.filterText ||
+        prevState.selectedTags.length !== this.state.selectedTags.length){
+      if (this.taskList) this.taskList.applyFilter(this.state.filterText, this.state.selectedTags);
+    }
   }
 
   getDefaultUploadState(){
@@ -383,6 +407,7 @@ class ProjectListItem extends React.Component {
         data: JSON.stringify({
           name: project.name,
           description: project.descr,
+          tags: project.tags,
           permissions: project.permissions
         }),
         dataType: 'json',
@@ -467,10 +492,66 @@ class ProjectListItem extends React.Component {
       });
   }
 
+  sortChanged = key => {
+    if (this.taskList){
+      this.setState({sortKey: key});
+      setTimeout(() => {
+        this.taskList.refresh();
+      }, 0);
+    }
+  }
+
+  handleTagClick = tag => {
+    return e => {
+      const evt = new CustomEvent("onProjectListTagClicked", { detail: tag });
+      document.dispatchEvent(evt);
+    }
+  }
+
+  tagsChanged = (filterTags) => {
+    this.setState({filterTags, selectedTags: []});
+  }
+
+  handleFilterTextChange = e => {
+    this.setState({filterText: e.target.value});
+  }
+
+  toggleTag = t => {
+    return () => {
+      if (this.state.selectedTags.indexOf(t) === -1){
+        this.setState(update(this.state, { selectedTags: {$push: [t]} }));
+      }else{
+        this.setState({selectedTags: this.state.selectedTags.filter(tag => tag !== t)});
+      }
+    }
+  }
+
+  selectTag = t => {
+    if (this.state.selectedTags.indexOf(t) === -1){
+      this.setState(update(this.state, { selectedTags: {$push: [t]} }));
+    }
+  }
+
+  clearFilter = () => {
+    this.setState({
+      filterText: "",
+      selectedTags: []
+    });
+  }
+
+  onOpenFilter = () => {
+    if (this.state.filterTags.length === 0){
+      setTimeout(() => {
+        this.filterTextInput.focus();
+      }, 0);
+    }
+  }
+
   render() {
-    const { refreshing, data } = this.state;
+    const { refreshing, data, filterTags } = this.state;
     const numTasks = data.tasks.length;
     const canEdit = this.hasPermission("change");
+    const userTags = Tags.userTags(data.tags);
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
@@ -490,6 +571,7 @@ class ProjectListItem extends React.Component {
             projectName={data.name}
             projectDescr={data.description}
             projectId={data.id}
+            projectTags={data.tags}
             saveAction={this.updateProject}
             showPermissions={this.hasPermission("change")}
             deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
@@ -524,14 +606,13 @@ class ProjectListItem extends React.Component {
               <i className="glyphicon glyphicon-remove-circle"></i>
               Cancel Upload
             </button> 
-
-            <button type="button" className="btn btn-default btn-sm" onClick={this.viewMap}>
-              <i className="fa fa-globe"></i> {_("View Map")}
-            </button>
           </div>
 
           <div className="project-name">
             {data.name}
+            {userTags.length > 0 ? 
+              userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
+              : ""}
           </div>
           <div className="project-description">
             {data.description}
@@ -540,17 +621,65 @@ class ProjectListItem extends React.Component {
             {numTasks > 0 ? 
               <span>
                 <i className='fa fa-tasks'></i>
-                 <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+                <a href="javascript:void(0);" onClick={this.toggleTaskList}>
                   {interpolate(_("%(count)s Tasks"), { count: numTasks})} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
                 </a>
               </span>
               : ""}
+            
+            {this.state.showTaskList && numTasks > 1 ? 
+              <div className="task-filters">
+                <div className="btn-group">
+                  {this.state.selectedTags.length || this.state.filterText !== "" ? 
+                    <a className="quick-clear-filter" href="javascript:void(0)" onClick={this.clearFilter}>×</a>
+                  : ""}
+                  <i className='fa fa-filter'></i>
+                  <a href="javascript:void(0);" onClick={this.onOpenFilter} className="dropdown-toggle" data-toggle-outside data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {_("Filter")}
+                  </a>
+                  <ul className="dropdown-menu dropdown-menu-right filter-dropdown">
+                  <li className="filter-text-container">
+                    <input type="text" className="form-control filter-text theme-border-secondary-07" 
+                          value={this.state.filterText}
+                          ref={domNode => {this.filterTextInput = domNode}}
+                          placeholder=""
+                          spellCheck="false"
+                          autoComplete="false"
+                          onChange={this.handleFilterTextChange} />
+                  </li>
+                  {filterTags.map(t => <li key={t} className="tag-selection">
+                    <input type="checkbox"
+                        className="filter-checkbox"
+                        id={"filter-tag-" + data.id + "-" + t}
+                        checked={this.state.selectedTags.indexOf(t) !== -1}
+                        onChange={this.toggleTag(t)} /> <label className="filter-checkbox-label" htmlFor={"filter-tag-" + data.id + "-" + t}>{t}</label>
+                  </li>)}
 
+                  <li className="clear-container"><input type="button" onClick={this.clearFilter} className="btn btn-default btn-xs" value={_("Clear")}/></li>
+                  </ul>
+                </div>
+                <div className="btn-group">
+                  <i className='fa fa-sort-alpha-down'></i>
+                  <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {_("Sort")}
+                  </a>
+                  <SortPanel selected="-created_at" items={this.sortItems} onChange={this.sortChanged} />
+                </div>
+              </div> : ""}
+
+              {numTasks > 0 ? 
+                [<i key="edit-icon" className='fa fa-globe'></i>
+                ,<a key="edit-text" href="javascript:void(0);" onClick={this.viewMap}>
+                  {_("View Map")}
+                </a>]
+              : ""}
+              
             {canEdit ? 
                 [<i key="edit-icon" className='far fa-edit'></i>
                 ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
                 </a>]
             : ""}
+
           </div>
         </div>
         <i className="drag-drop-icon fa fa-inbox"></i>
@@ -586,10 +715,12 @@ class ProjectListItem extends React.Component {
           {this.state.showTaskList ? 
             <TaskList 
                 ref={this.setRef("taskList")} 
-                source={`/api/projects/${data.id}/tasks/?ordering=-created_at`}
+                source={`/api/projects/${data.id}/tasks/?ordering=${this.state.sortKey}`}
                 onDelete={this.taskDeleted}
                 onTaskMoved={this.taskMoved}
                 hasPermission={this.hasPermission}
+                onTagsChanged={this.tagsChanged}
+                onTagClicked={this.selectTag}
                 history={this.props.history}
             /> : ""}
 

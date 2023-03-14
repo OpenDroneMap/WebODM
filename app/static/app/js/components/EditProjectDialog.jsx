@@ -1,8 +1,10 @@
 import React from 'react';
+import '../css/EditProjectDialog.scss';
 import FormDialog from './FormDialog';
 import PropTypes from 'prop-types';
 import ErrorMessage from './ErrorMessage';
 import EditPermissionsPanel from './EditPermissionsPanel';
+import TagsField from './TagsField';
 import { _ } from '../classes/gettext';
 
 class EditProjectDialog extends React.Component {
@@ -10,6 +12,7 @@ class EditProjectDialog extends React.Component {
         projectName: "",
         projectDescr: "",
         projectId: -1,
+        projectTags: [],
         title: _("New Project"),
         saveLabel: _("Create Project"),
         savingLabel: _("Creating project..."),
@@ -25,6 +28,7 @@ class EditProjectDialog extends React.Component {
         projectName: PropTypes.string,
         projectDescr: PropTypes.string,
         projectId: PropTypes.number,
+        projectTags: PropTypes.array,
         saveAction: PropTypes.func.isRequired,
         onShow: PropTypes.func,
         deleteAction: PropTypes.func,
@@ -46,7 +50,9 @@ class EditProjectDialog extends React.Component {
           name: props.projectName,
           descr: props.projectDescr !== null ? props.projectDescr : "",
           duplicating: false,
-          error: ""
+          tags: props.projectTags,
+          error: "",
+          showTagsField: !!props.projectTags.length
         };
 
         this.reset = this.reset.bind(this);
@@ -60,6 +66,8 @@ class EditProjectDialog extends React.Component {
         name: this.props.projectName,
         descr: this.props.projectDescr,
         duplicating: false,
+        tags: this.props.projectTags,
+        showTagsField: !!this.props.projectTags.length,
         error: ""
       });
     }
@@ -68,6 +76,7 @@ class EditProjectDialog extends React.Component {
       const res = {
           name: this.state.name,
           descr: this.state.descr,
+          tags: this.state.tags
       };
       
       if (this.editPermissionsPanel){
@@ -128,7 +137,26 @@ class EditProjectDialog extends React.Component {
             });
     }
 
+    toggleTagsField = () => {
+      if (!this.state.showTagsField){
+        setTimeout(() => {
+          if (this.tagsField) this.tagsField.focus();
+        }, 0);
+      }
+      this.setState({showTagsField: !this.state.showTagsField});
+    }
+
     render(){
+        let tagsField = "";
+        if (this.state.showTagsField){
+          tagsField = (<div className="form-group">
+              <label className="col-sm-2 control-label">{_("Tags")}</label>
+                <div className="col-sm-10"> 
+                  <TagsField onUpdate={(tags) => this.state.tags = tags } tags={this.state.tags} ref={domNode => this.tagsField = domNode}/>
+                </div>
+            </div>);
+        }
+
         return (
             <FormDialog {...this.props}
                 getFormData={this.getFormData}
@@ -137,12 +165,16 @@ class EditProjectDialog extends React.Component {
                 leftButtons={this.props.showDuplicate ? [<button key="duplicate" disabled={this.duplicating} onClick={this.handleDuplicate} className="btn btn-default"><i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i> Duplicate</button>] : undefined}
                 ref={(domNode) => { this.dialog = domNode; }}>
               <ErrorMessage bind={[this, "error"]} />
-              <div className="form-group">
+              <div className="form-group edit-project-dialog">
                 <label className="col-sm-2 control-label">{_("Name")}</label>
-                <div className="col-sm-10">
+                <div className="col-sm-10 name-fields">
                   <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} onKeyPress={e => this.dialog.handleEnter(e)} />
+                  <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="btn btn-sm btn-secondary toggle-tags">
+                    <i className="fa fa-tag"></i>
+                  </button>
                 </div>
               </div>
+              {tagsField}
               <div className="form-group">
                 <label className="col-sm-2 control-label">{_("Description (optional)")}</label>
                 <div className="col-sm-10">

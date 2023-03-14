@@ -15,7 +15,7 @@ RUN printf "deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted\n
 
 # Install Node.js
 RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget curl && \
-    wget --no-check-certificate https://deb.nodesource.com/setup_12.x -O /tmp/node.sh && bash /tmp/node.sh && \
+    wget --no-check-certificate https://deb.nodesource.com/setup_14.x -O /tmp/node.sh && bash /tmp/node.sh && \
     apt-get -qq update && apt-get -qq install -y nodejs && \
     # Install Python3, GDAL, PDAL, nginx, letsencrypt, psql
     apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin pdal libgdal-dev python3-gdal nginx certbot grass-core gettext-base cron postgresql-client-13 gettext tzdata && \

@@ -20,6 +20,7 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
 from .common import get_and_check_project, get_asset_download_filename
+from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 
@@ -41,6 +42,7 @@ class TaskSerializer(serializers.ModelSerializer):
     processing_node_name = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
     statistics = serializers.SerializerMethodField()
+    tags = TagsField(required=False)
 
     def get_processing_node_name(self, obj):
         if obj.processing_node is not None:

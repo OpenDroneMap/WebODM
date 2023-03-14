@@ -61,6 +61,9 @@ body,
 .pagination li > a{
 	color: theme("primary");
 }
+.theme-border-secondary-07{
+	border-color: scaleby(theme("secondary"), 0.7) !important;
+}
 
 .btn-secondary, .btn-secondary:active, .btn-secondary.active, .open>.dropdown-toggle.btn-secondary{
 	background-color: theme("secondary");
@@ -188,7 +191,7 @@ footer,
 	border-bottom-color: theme("border");
 }
 .theme-border{
-    border-color: theme("border");
+    border-color: theme("border") !important;
 }
 
 /* Highlight */
@@ -260,5 +263,16 @@ pre.prettyprint,
 		&:hover{
 			color: complementary(theme("secondary")) !important;
 		}
+	}
+}
+
+.tag-badge{
+	background-color: theme("button_default");
+	border-color: theme("button_default");
+	color: theme("secondary");
+
+
+	a, a:hover{
+		color: theme("secondary");
 	}
 }

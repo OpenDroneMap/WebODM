@@ -11,7 +11,9 @@ class TaskList extends React.Component {
       source: PropTypes.string.isRequired, // URL where to load task list
       onDelete: PropTypes.func,
       onTaskMoved: PropTypes.func,
-      hasPermission: PropTypes.func.isRequired
+      hasPermission: PropTypes.func.isRequired,
+      onTagsChanged: PropTypes.func,
+      onTagClicked: PropTypes.func
   }
 
   constructor(props){
@@ -20,7 +22,9 @@ class TaskList extends React.Component {
     this.state = {
       tasks: [],
       error: "",
-      loading: true
+      loading: true,
+      filterText: "",
+      filterTags: []
     };
 
     this.refresh = this.refresh.bind(this);
@@ -41,12 +45,19 @@ class TaskList extends React.Component {
     this.refresh();
   }
 
+  applyFilter(text, tags){
+    this.setState({filterText: text, filterTags: tags});
+  }
+
   loadTaskList(){
+    this.setState({loading: true});
+
     this.taskListRequest = 
       $.getJSON(this.props.source, json => {
           this.setState({
               tasks: json
           });
+          setTimeout(() => this.notifyTagsChanged(), 0);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
           this.setState({ 
@@ -76,6 +87,49 @@ class TaskList extends React.Component {
     if (this.props.onTaskMoved) this.props.onTaskMoved(task);
   }
 
+  notifyTagsChanged = () => {
+    const { tasks } = this.state;
+    const tags = [];
+    if (tasks){
+      tasks.forEach(t => {
+        if (t.tags){
+          t.tags.forEach(x => {
+            if (tags.indexOf(x) === -1) tags.push(x);
+          });
+        }
+      });
+    }
+    tags.sort();
+
+    if (this.props.onTagsChanged) this.props.onTagsChanged(tags);
+  }
+
+  taskEdited = (task) => {
+    // Update
+    const { tasks } = this.state;
+    for (let i = 0; i < tasks.length; i++){
+      if (tasks[i].id === task.id){
+        tasks[i] = task;
+        break;
+      }
+    }
+    this.setState({tasks});
+
+    // Tags might have changed
+    setTimeout(() => this.notifyTagsChanged(), 0);
+  }
+
+  arrayContainsAll = (a, b) => {
+    let miss = false;
+    for (let i = 0; i < b.length; i++){
+      if (a.indexOf(b[i]) === -1){
+        miss = true;
+        break;
+      }
+    }
+    return !miss;
+  }
+
   render() {
     let message = "";
     if (this.state.loading){
@@ -88,9 +142,10 @@ class TaskList extends React.Component {
 
     return (
       <div className="task-list">
-        {message}
-
-        {this.state.tasks.map(task => (
+        {this.state.tasks.filter(t => {
+          return t.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) !== -1 &&
+                  this.arrayContainsAll(t.tags, this.state.filterTags);
+        }).map(task => (
           <TaskListItem 
             data={task} 
             key={task.id} 
@@ -98,9 +153,13 @@ class TaskList extends React.Component {
             onDelete={this.deleteTask}
             onMove={this.moveTask}
             onDuplicate={this.refresh}
+            onEdited={this.taskEdited}
+            onTagClicked={this.props.onTagClicked}
             hasPermission={this.props.hasPermission}
             history={this.props.history} />
         ))}
+
+        {message}
       </div>
     );
   }

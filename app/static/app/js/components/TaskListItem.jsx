@@ -12,6 +12,7 @@ import TaskPluginActionButtons from './TaskPluginActionButtons';
 import MoveTaskDialog from './MoveTaskDialog';
 import PipelineSteps from '../classes/PipelineSteps';
 import Css from '../classes/Css';
+import Tags from '../classes/Tags';
 import Trans from './Trans';
 import { _, interpolate } from '../classes/gettext';
 
@@ -23,7 +24,9 @@ class TaskListItem extends React.Component {
       onDelete: PropTypes.func,
       onMove: PropTypes.func,
       onDuplicate: PropTypes.func,
-      hasPermission: PropTypes.func
+      hasPermission: PropTypes.func,
+      onEdited: PropTypes.func,
+      onTagClicked: PropTypes.func
   }
 
   constructor(props){
@@ -278,6 +281,7 @@ class TaskListItem extends React.Component {
 
   handleEditTaskSave(task){
     this.setState({task, editing: false});
+    if (this.props.onEdited) this.props.onEdited(task);
     this.setAutoRefresh();
   }
 
@@ -399,6 +403,12 @@ class TaskListItem extends React.Component {
             type: 'PATCH'
           }).done(this.props.onMove);
     }else return false;
+  }
+
+  handleTagClick = t => {
+    return () => {
+      if (this.props.onTagClicked) this.props.onTagClicked(t);
+    }
   }
 
   render() {
@@ -706,6 +716,7 @@ class TaskListItem extends React.Component {
 
     let taskActionsIcon = "fa-ellipsis-h";
     if (actionLoading) taskActionsIcon = "fa-circle-notch fa-spin fa-fw";
+    const userTags = Tags.userTags(task.tags);
 
     return (
       <div className="task-list-item">
@@ -719,7 +730,10 @@ class TaskListItem extends React.Component {
         : ""}
         <div className="row">
           <div className="col-sm-5 col-xs-12 name">
-            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded}>{name}</a>
+            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
+            {userTags.length > 0 ? 
+              userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
+              : ""}
           </div>
           <div className="col-sm-1 col-xs-5 details">
             <i className="far fa-image"></i> {task.images_count}

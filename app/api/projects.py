@@ -1,13 +1,19 @@
+import re
 from guardian.shortcuts import get_perms, get_users_with_perms, assign_perm, remove_perm
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from django_filters import rest_framework as filters
 from django.db import transaction
 from django.contrib.auth.models import User
+from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.contrib.postgres.aggregates import StringAgg
+from django.db.models import Q
 
 from app import models
 from .tasks import TaskIDsSerializer
+from .tags import TagsField, parse_tags_input
 from .common import get_and_check_project
 from django.utils.translation import gettext as _
 
@@ -21,6 +27,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         )
     created_at = serializers.ReadOnlyField()
     permissions = serializers.SerializerMethodField()
+    tags = TagsField(required=False)
 
     def get_permissions(self, obj):
         if 'request' in self.context:
@@ -34,6 +41,49 @@ class ProjectSerializer(serializers.ModelSerializer):
         exclude = ('deleting', )
 
 
+class ProjectFilter(filters.FilterSet):
+    search = filters.CharFilter(method='filter_search')
+
+    def filter_search(self, qs, name, value):
+        value = value.replace(":", "#")
+        tag_pattern = re.compile("#[^\s]+")
+        tags = set(re.findall(tag_pattern, value))
+
+        task_tags = set([t for t in tags if t.startswith("##")])
+        project_tags = tags - task_tags
+
+        task_tags = [t.replace("##", "") for t in task_tags]
+        project_tags = [t.replace("#", "") for t in project_tags]
+
+        names = re.sub("\s+", " ", re.sub(tag_pattern, "", value)).strip()
+
+        if len(names) > 0:
+            project_name_vec = SearchVector("name")
+            task_name_vec = SearchVector(StringAgg("task__name", delimiter=' '))
+            name_query = SearchQuery(names, search_type="plain")
+            qs = qs.annotate(n_search=project_name_vec + task_name_vec).filter(n_search=name_query)
+
+        if len(task_tags) > 0:
+            task_tags_vec = SearchVector("task__tags")
+            tags_query = SearchQuery(task_tags[0])
+            for t in task_tags[1:]:
+                tags_query = tags_query & SearchQuery(t)
+            qs = qs.annotate(tt_search=task_tags_vec).filter(tt_search=tags_query)
+
+        if len(project_tags) > 0:
+            project_tags_vec = SearchVector("tags")
+            tags_query = SearchQuery(project_tags[0])
+            for t in project_tags[1:]:
+                tags_query = tags_query & SearchQuery(t)
+            qs = qs.annotate(pt_search=project_tags_vec).filter(pt_search=tags_query)
+
+        return qs.distinct()
+
+    class Meta:
+        model = models.Project
+        fields = ['search', 'id', 'name', 'description', 'created_at']
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     Project get/add/delete/update
@@ -45,6 +95,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filter_fields = ('id', 'name', 'description', 'created_at')
     serializer_class = ProjectSerializer
     queryset = models.Project.objects.prefetch_related('task_set').filter(deleting=False).order_by('-created_at')
+    filterset_class = ProjectFilter
     ordering_fields = '__all__'
 
     # Disable pagination when not requesting any page
@@ -52,7 +103,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
             return None
         return super().paginate_queryset(queryset)
-    
+
     @action(detail=True, methods=['post'])
     def duplicate(self, request, pk=None):
         """
@@ -89,6 +140,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 project.name = request.data.get('name', '')
                 project.description = request.data.get('description', '')
+                project.tags = TagsField().to_internal_value(parse_tags_input(request.data.get('tags', [])))
                 project.save()
 
                 form_perms = request.data.get('permissions')
