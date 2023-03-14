@@ -185,7 +185,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         except User.DoesNotExist as e:
             return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
         except AttributeError as e:
-            print(e)
             return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)

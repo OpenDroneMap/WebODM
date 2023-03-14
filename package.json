@@ -69,8 +69,5 @@
     "webpack": "^4.16.2",
     "webpack-bundle-tracker": "0.0.93",
     "webpack-livereload-plugin": "^2.1.1"
-  },
-  "resolutions": {
-    "sass": "1.22.7"
   }
 }
