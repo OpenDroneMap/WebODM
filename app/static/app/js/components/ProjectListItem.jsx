@@ -41,7 +41,9 @@ class ProjectListItem extends React.Component {
       importing: false,
       buttons: [],
       sortKey: "-created_at",
-      filterTags: []
+      filterTags: [],
+      selectedTags: [],
+      filterText: ""
     };
 
     this.sortItems = [{
@@ -88,6 +90,13 @@ class ProjectListItem extends React.Component {
   componentWillUnmount(){
     if (this.deleteProjectRequest) this.deleteProjectRequest.abort();
     if (this.refreshRequest) this.refreshRequest.abort();
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if (prevState.filterText !== this.state.filterText ||
+        prevState.selectedTags.length !== this.state.selectedTags.length){
+      if (this.taskList) this.taskList.applyFilter(this.state.filterText, this.state.selectedTags);
+    }
   }
 
   getDefaultUploadState(){
@@ -500,7 +509,42 @@ class ProjectListItem extends React.Component {
   }
 
   tagsChanged = (filterTags) => {
-    this.setState({filterTags});
+    this.setState({filterTags, selectedTags: []});
+  }
+
+  handleFilterTextChange = e => {
+    this.setState({filterText: e.target.value});
+  }
+
+  toggleTag = t => {
+    return () => {
+      if (this.state.selectedTags.indexOf(t) === -1){
+        this.setState(update(this.state, { selectedTags: {$push: [t]} }));
+      }else{
+        this.setState({selectedTags: this.state.selectedTags.filter(tag => tag !== t)});
+      }
+    }
+  }
+
+  selectTag = t => {
+    if (this.state.selectedTags.indexOf(t) === -1){
+      this.setState(update(this.state, { selectedTags: {$push: [t]} }));
+    }
+  }
+
+  clearFilter = () => {
+    this.setState({
+      filterText: "",
+      selectedTags: []
+    });
+  }
+
+  onOpenFilter = () => {
+    if (this.state.filterTags.length === 0){
+      setTimeout(() => {
+        this.filterTextInput.focus();
+      }, 0);
+    }
   }
 
   render() {
@@ -585,17 +629,35 @@ class ProjectListItem extends React.Component {
             
             {this.state.showTaskList && numTasks > 1 ? 
               <div className="task-filters">
-                {filterTags.length > 0 ? 
-                  <div className="btn-group">
-                    <i className='fa fa-filter'></i>
-                    <a href="javascript:void(0);" className="dropdown-toggle" data-toggle-outside data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      {_("Filter")}
-                    </a>
-                    <ul className="dropdown-menu dropdown-menu-right">
-                    {filterTags.map(t => <li key={t}>{t}</li>)}
-                    </ul>
-                  </div>
-                : ""}
+                <div className="btn-group">
+                  {this.state.selectedTags.length || this.state.filterText !== "" ? 
+                    <a className="quick-clear-filter" href="javascript:void(0)" onClick={this.clearFilter}>×</a>
+                  : ""}
+                  <i className='fa fa-filter'></i>
+                  <a href="javascript:void(0);" onClick={this.onOpenFilter} className="dropdown-toggle" data-toggle-outside data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {_("Filter")}
+                  </a>
+                  <ul className="dropdown-menu dropdown-menu-right filter-dropdown">
+                  <li className="filter-text-container">
+                    <input type="text" className="form-control filter-text theme-border-secondary-07" 
+                          value={this.state.filterText}
+                          ref={domNode => {this.filterTextInput = domNode}}
+                          placeholder=""
+                          spellCheck="false"
+                          autoComplete="false"
+                          onChange={this.handleFilterTextChange} />
+                  </li>
+                  {filterTags.map(t => <li key={t} className="tag-selection">
+                    <input type="checkbox"
+                        className="filter-checkbox"
+                        id={"filter-tag-" + data.id + "-" + t}
+                        checked={this.state.selectedTags.indexOf(t) !== -1}
+                        onChange={this.toggleTag(t)} /> <label className="filter-checkbox-label" htmlFor={"filter-tag-" + data.id + "-" + t}>{t}</label>
+                  </li>)}
+
+                  <li className="clear-container"><input type="button" onClick={this.clearFilter} className="btn btn-default btn-xs" value={_("Clear")}/></li>
+                  </ul>
+                </div>
                 <div className="btn-group">
                   <i className='fa fa-sort-alpha-down'></i>
                   <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -658,6 +720,7 @@ class ProjectListItem extends React.Component {
                 onTaskMoved={this.taskMoved}
                 hasPermission={this.hasPermission}
                 onTagsChanged={this.tagsChanged}
+                onTagClicked={this.selectTag}
                 history={this.props.history}
             /> : ""}
 

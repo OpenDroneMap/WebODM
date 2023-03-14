@@ -12,7 +12,8 @@ class TaskList extends React.Component {
       onDelete: PropTypes.func,
       onTaskMoved: PropTypes.func,
       hasPermission: PropTypes.func.isRequired,
-      onTagsChanged: PropTypes.func
+      onTagsChanged: PropTypes.func,
+      onTagClicked: PropTypes.func
   }
 
   constructor(props){
@@ -21,7 +22,9 @@ class TaskList extends React.Component {
     this.state = {
       tasks: [],
       error: "",
-      loading: true
+      loading: true,
+      filterText: "",
+      filterTags: []
     };
 
     this.refresh = this.refresh.bind(this);
@@ -40,6 +43,10 @@ class TaskList extends React.Component {
   retry(){
     this.setState({error: "", loading: true});
     this.refresh();
+  }
+
+  applyFilter(text, tags){
+    this.setState({filterText: text, filterTags: tags});
   }
 
   loadTaskList(){
@@ -112,6 +119,17 @@ class TaskList extends React.Component {
     setTimeout(() => this.notifyTagsChanged(), 0);
   }
 
+  arrayContainsAll = (a, b) => {
+    let miss = false;
+    for (let i = 0; i < b.length; i++){
+      if (a.indexOf(b[i]) === -1){
+        miss = true;
+        break;
+      }
+    }
+    return !miss;
+  }
+
   render() {
     let message = "";
     if (this.state.loading){
@@ -124,7 +142,10 @@ class TaskList extends React.Component {
 
     return (
       <div className="task-list">
-        {this.state.tasks.map(task => (
+        {this.state.tasks.filter(t => {
+          return t.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) !== -1 &&
+                  this.arrayContainsAll(t.tags, this.state.filterTags);
+        }).map(task => (
           <TaskListItem 
             data={task} 
             key={task.id} 
@@ -133,6 +154,7 @@ class TaskList extends React.Component {
             onMove={this.moveTask}
             onDuplicate={this.refresh}
             onEdited={this.taskEdited}
+            onTagClicked={this.props.onTagClicked}
             hasPermission={this.props.hasPermission}
             history={this.props.history} />
         ))}

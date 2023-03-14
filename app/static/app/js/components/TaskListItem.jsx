@@ -25,7 +25,8 @@ class TaskListItem extends React.Component {
       onMove: PropTypes.func,
       onDuplicate: PropTypes.func,
       hasPermission: PropTypes.func,
-      onEdited: PropTypes.func
+      onEdited: PropTypes.func,
+      onTagClicked: PropTypes.func
   }
 
   constructor(props){
@@ -404,6 +405,12 @@ class TaskListItem extends React.Component {
     }else return false;
   }
 
+  handleTagClick = t => {
+    return () => {
+      if (this.props.onTagClicked) this.props.onTagClicked(t);
+    }
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -725,7 +732,7 @@ class TaskListItem extends React.Component {
           <div className="col-sm-5 col-xs-12 name">
             <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
             {userTags.length > 0 ? 
-              userTags.map((t, i) => <div key={i} className="tag-badge small-badge">{t}</div>)
+              userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
               : ""}
           </div>
           <div className="col-sm-1 col-xs-5 details">

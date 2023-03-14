@@ -122,6 +122,8 @@ class Paginator extends React.Component {
                             ref={(domNode) => { this.searchInput = domNode}}
                             className="form-control search theme-border-secondary-07" 
                             placeholder={_("Search names or #tags")}
+                            spellCheck="false"
+                            autoComplete="false"
                             value={searchText}
                             onKeyDown={this.handleSearchKeyDown}
                             onChange={this.handleSearchChange} />

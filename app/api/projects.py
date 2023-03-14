@@ -49,10 +49,10 @@ class ProjectFilter(filters.FilterSet):
         tag_pattern = re.compile("#[^\s]+")
         tags = set(re.findall(tag_pattern, value))
 
-        deep_tags = set([t for t in tags if t.startswith("##")])
-        project_tags = tags - deep_tags
+        task_tags = set([t for t in tags if t.startswith("##")])
+        project_tags = tags - task_tags
 
-        deep_tags = [t.replace("##", "") for t in deep_tags]
+        task_tags = [t.replace("##", "") for t in task_tags]
         project_tags = [t.replace("#", "") for t in project_tags]
 
         names = re.sub("\s+", " ", re.sub(tag_pattern, "", value)).strip()
@@ -63,13 +63,12 @@ class ProjectFilter(filters.FilterSet):
             name_query = SearchQuery(names, search_type="plain")
             qs = qs.annotate(n_search=project_name_vec + task_name_vec).filter(n_search=name_query)
 
-        if len(deep_tags) > 0:
-            project_tags_vec = SearchVector("tags")
-            task_tags_vec = SearchVector(StringAgg("task__tags", delimiter=' '))
-            tags_query = SearchQuery(deep_tags[0])
-            for t in deep_tags[1:]:
+        if len(task_tags) > 0:
+            task_tags_vec = SearchVector("task__tags")
+            tags_query = SearchQuery(task_tags[0])
+            for t in task_tags[1:]:
                 tags_query = tags_query & SearchQuery(t)
-            qs = qs.annotate(dt_search=project_tags_vec + task_tags_vec).filter(dt_search=tags_query)
+            qs = qs.annotate(tt_search=task_tags_vec).filter(tt_search=tags_query)
 
         if len(project_tags) > 0:
             project_tags_vec = SearchVector("tags")
