@@ -81,7 +81,7 @@ class ProjectFilter(filters.FilterSet):
 
     class Meta:
         model = models.Project
-        fields = ['search']
+        fields = ['search', 'id', 'name', 'description', 'created_at']
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
