@@ -118,7 +118,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """
         project = get_and_check_project(request, pk, ('change_project', ))
 
-        new_project = project.duplicate()
+        new_project = project.duplicate(new_owner=request.user)
         if new_project:
             return Response({'success': True, 'project': ProjectSerializer(new_project).data}, status=status.HTTP_200_OK)
         else:

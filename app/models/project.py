@@ -54,13 +54,15 @@ class Project(models.Model):
                 ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
                 .only('id', 'project_id')]
     
-    def duplicate(self):
+    def duplicate(self, new_owner=None):
         try:
             with transaction.atomic():
                 project = Project.objects.get(pk=self.pk)
                 project.pk = None
                 project.name = gettext('Copy of %(task)s') % {'task': self.name}
                 project.created_at = timezone.now()
+                if new_owner is not None:
+                    project.owner = new_owner
                 project.save()
                 project.refresh_from_db()
 
