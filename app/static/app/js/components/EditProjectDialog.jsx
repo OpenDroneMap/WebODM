@@ -17,7 +17,7 @@ class EditProjectDialog extends React.Component {
         saveLabel: _("Create Project"),
         savingLabel: _("Creating project..."),
         saveIcon: "glyphicon glyphicon-plus",
-        deleteWarning: _("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?"),
+        deleteWarning: "",
         show: false,
         showDuplicate: false,
         showPermissions: false,

@@ -25,6 +25,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     owner = serializers.HiddenField(
             default=serializers.CurrentUserDefault()
         )
+    owned = serializers.SerializerMethodField()
     created_at = serializers.ReadOnlyField()
     permissions = serializers.SerializerMethodField()
     tags = TagsField(required=False)
@@ -35,6 +36,12 @@ class ProjectSerializer(serializers.ModelSerializer):
         else:
             # Cannot list permissions, no user is associated with request (happens when serializing ui test mocks)
             return []
+    
+    def get_owned(self, obj):
+        if 'request' in self.context:
+            user = self.context['request'].user
+            return user.is_superuser or obj.owner.id == user.id
+        return False
 
     class Meta:
         model = models.Project
@@ -111,7 +118,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """
         project = get_and_check_project(request, pk, ('change_project', ))
 
-        new_project = project.duplicate()
+        new_project = project.duplicate(new_owner=request.user)
         if new_project:
             return Response({'success': True, 'project': ProjectSerializer(new_project).data}, status=status.HTTP_200_OK)
         else:
@@ -193,7 +200,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = get_and_check_project(request, pk, ('delete_project', ))
 
         # Owner? Delete the project
-        if project.owner == request.user:
+        if project.owner == request.user or request.user.is_superuser:
             return super().destroy(self, request, pk=pk)
         else:
             # Do not remove the project, simply remove all user's permissions to the project
