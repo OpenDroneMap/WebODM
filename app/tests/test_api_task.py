@@ -22,7 +22,7 @@ from app import pending_actions
 from app.api.formulas import algos, get_camera_filters_for
 from app.api.tiler import ZOOM_EXTRA_LEVELS
 from app.cogeo import valid_cogeo
-from app.models import Project, Task, ImageUpload
+from app.models import Project, Task
 from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
 from app.plugins.signals import task_completed, task_removed, task_removing
 from app.tests.classes import BootTransactionTestCase
@@ -239,7 +239,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(task.running_progress, 0.0)
 
             # Two images should have been uploaded
-            self.assertTrue(ImageUpload.objects.filter(task=task).count() == 2)
+            self.assertEqual(len(task.scan_images()), 2)
 
             # Can_rerun_from should be an empty list
             self.assertTrue(len(res.data['can_rerun_from']) == 0)
@@ -797,7 +797,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Has been removed along with assets
             self.assertFalse(Task.objects.filter(pk=task.id).exists())
-            self.assertFalse(ImageUpload.objects.filter(task=task).exists())
+            self.assertEqual(len(task.scan_images()), 0)
 
             task_assets_path = os.path.join(settings.MEDIA_ROOT, task_directory_path(task.id, task.project.id))
             self.assertFalse(os.path.exists(task_assets_path))
@@ -881,18 +881,13 @@ class TestApiTask(BootTransactionTestCase):
 
             # Reassigning the task to another project should move its assets
             self.assertTrue(os.path.exists(full_task_directory_path(task.id, project.id)))
-            self.assertTrue(len(task.imageupload_set.all()) == 2)
-            for image in task.imageupload_set.all():
-                self.assertTrue('project/{}/'.format(project.id) in image.image.path)
+            self.assertTrue(len(task.scan_images()) == 2)
 
             task.project = other_project
             task.save()
             task.refresh_from_db()
             self.assertFalse(os.path.exists(full_task_directory_path(task.id, project.id)))
             self.assertTrue(os.path.exists(full_task_directory_path(task.id, other_project.id)))
-
-            for image in task.imageupload_set.all():
-                self.assertTrue('project/{}/'.format(other_project.id) in image.image.path)
 
         # Restart node-odm as to not generate orthophotos
         testWatch.clear()
@@ -953,7 +948,7 @@ class TestApiTask(BootTransactionTestCase):
         new_task = Task.objects.get(pk=new_task_id)
 
         # New task has same number of image uploads
-        self.assertEqual(task.imageupload_set.count(), new_task.imageupload_set.count())
+        self.assertEqual(len(task.scan_images()), len(new_task.scan_images()))
         
         # Directories have been created
         self.assertTrue(os.path.exists(new_task.task_path()))
