@@ -8,7 +8,6 @@ import uuid, os, pickle, tempfile
 from webodm import settings
 
 tasks = []
-imageuploads = []
 task_ids = {} # map old task IDs --> new task IDs
 
 def task_path(project_id, task_id):
@@ -44,10 +43,10 @@ def create_uuids(apps, schema_editor):
 
 
 def restore(apps, schema_editor):
-    global tasks, imageuploads, task_ids
+    global tasks, task_ids
     
     tmp_path = os.path.join(tempfile.gettempdir(), "public_task_uuids_migration.pickle")
-    tasks, imageuploads, task_ids = pickle.load(open(tmp_path, 'rb'))
+    tasks, task_ids = pickle.load(open(tmp_path, 'rb'))
 
 
 class Migration(migrations.Migration):
