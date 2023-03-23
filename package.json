@@ -1,6 +1,6 @@
 {
   "name": "WebODM",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "User-friendly, extendable application and API for processing aerial imagery.",
   "main": "index.js",
   "scripts": {
@@ -51,6 +51,7 @@
     "proj4": "^2.4.3",
     "qrcode.react": "^0.7.2",
     "raw-loader": "^0.5.1",
+    "rbush": "^3.0.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-router": "^4.1.1",
