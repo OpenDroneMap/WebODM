@@ -1135,4 +1135,4 @@ class Task(models.Model):
                         fd.write(chunk)
                 else:
                     with open(file.temporary_file_path(), 'rb') as f:
-                        copyfileobj(f, fd)
+                        shutil.copyfileobj(f, fd)
