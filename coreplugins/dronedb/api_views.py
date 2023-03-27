@@ -208,10 +208,10 @@ def import_files(task_id, carrier):
     import requests
     from app import models
     from app.plugins import logger
+    from app.security import path_traversal_check
 
     files = carrier['files']
     
-    #headers = CaseInsensitiveDict()
     headers = {}
 
     if carrier['token'] != None:
