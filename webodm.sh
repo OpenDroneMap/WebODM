@@ -501,6 +501,7 @@ elif [[ $1 = "rebuild" ]]; then
 	echo  "Rebuilding WebODM..."
 	rebuild
 elif [[ $1 = "update" ]]; then
+	environment_check
 	down
 	echo "Updating WebODM..."
 
