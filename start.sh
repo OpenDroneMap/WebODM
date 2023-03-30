@@ -113,7 +113,7 @@ congrats(){
 
     echo -e "\033[93m"
     echo Open a web browser and navigate to $proto://$WO_HOST:$WO_PORT
-    echo -e "\033[39m"
+    echo -e "\033[39m") &
 }
 
 if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ] || [ "$1" = "--no-gunicorn" ]; then
