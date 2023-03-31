@@ -44,6 +44,11 @@ algos = {
         'expr': '(G - R) / (G + R - B)',
         'help': _('Visual Atmospheric Resistance Index shows the areas of vegetation.'),
         'range': (-1, 1)
+    },    
+    'MPRI': {
+        'expr': '(G - R) / (G + R)',
+        'help': _('Modified Photochemical Reflectance Index'),
+        'range': (-1, 1)
     },
     'EXG': {
         'expr': '(2 * G) - (R + B)',
