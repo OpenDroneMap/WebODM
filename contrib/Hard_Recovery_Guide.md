@@ -25,7 +25,7 @@ python manage.py shell
 ```python
 # START COPY FIRST PART
 from django.contrib.auth.models import User
-from app.models import Project, Task, ImageUpload
+from app.models import Project, Task
 import os
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
@@ -89,17 +89,7 @@ def create_project(project_id, user):
     project.owner = user
     project.id = int(project_id)
     return project
-def reindex_shots(projectID, taskID):
-    project_and_task_path = f'project/{projectID}/task/{taskID}'
-    try:
-        with open(f"/webodm/app/media/{project_and_task_path}/assets/images.json", 'r') as file:
-            camera_shots = json.load(file)
-            for image_shot in camera_shots:
-                ImageUpload.objects.update_or_create(task=Task.objects.get(pk=taskID),
-                                                 image=f"{project_and_task_path}/{image_shot['filename']}")
-                print(f"Succesfully indexed file {image_shot['filename']}")
-    except Exception as e:
-        print(e)
+
 
 # END COPY FIRST PART
 ```
@@ -110,7 +100,7 @@ user = User.objects.get(username="YOUR NEW CREATED ADMIN USERNAME HERE")
 # END COPY COPY SECOND PART
 ```
 
-## Step 3. This is the main part of script which make the main magic of the project. It will read media dir and create tasks and projects from the sources, also it will reindex photo sources, if avaliable
+## Step 3. This is the main part of script which make the main magic of the project. It will read media dir and create tasks and projects from the sources
 ```python
 # START COPY THIRD PART
 for project_id in os.listdir("/webodm/app/media/project"):
@@ -124,7 +114,6 @@ for project_id in os.listdir("/webodm/app/media/project"):
             task = Task(project=project)
             task.id = task_id
             process_task(task)
-            reindex_shots(project_id, task_id)
 # END COPY THIRD PART
 ```
 ## Step 4. You must update project ID sequence for new created tasks

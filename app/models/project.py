@@ -25,7 +25,8 @@ class Project(models.Model):
     description = models.TextField(default="", blank=True, help_text=_("More in-depth description of the project"), verbose_name=_("Description"))
     created_at = models.DateTimeField(default=timezone.now, help_text=_("Creation date"), verbose_name=_("Created at"))
     deleting = models.BooleanField(db_index=True, default=False, help_text=_("Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted."), verbose_name=_("Deleting"))
-
+    tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Project tags"), verbose_name=_("Tags"))
+    
     def delete(self, *args):
         # No tasks?
         if self.task_set.count() == 0:
@@ -53,13 +54,15 @@ class Project(models.Model):
                 ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
                 .only('id', 'project_id')]
     
-    def duplicate(self):
+    def duplicate(self, new_owner=None):
         try:
             with transaction.atomic():
                 project = Project.objects.get(pk=self.pk)
                 project.pk = None
                 project.name = gettext('Copy of %(task)s') % {'task': self.name}
                 project.created_at = timezone.now()
+                if new_owner is not None:
+                    project.owner = new_owner
                 project.save()
                 project.refresh_from_db()
 

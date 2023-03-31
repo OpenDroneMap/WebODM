@@ -10,7 +10,7 @@ def update_images_count(apps, schema_editor):
 
     for t in Task.objects.all():
         print("Updating {}".format(t))
-        t.images_count = t.imageupload_set.count()
+        t.images_count = len(t.scan_images())
         t.save()
 
 

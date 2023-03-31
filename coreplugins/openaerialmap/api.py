@@ -9,7 +9,6 @@ from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
 
-from app.models import ImageUpload
 from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals
 from app.plugins.views import TaskView
 from app.plugins.worker import task
@@ -58,9 +57,10 @@ class Info(TaskView):
         task_info = get_task_info(task.id)
 
         # Populate fields from first image in task
-        img = ImageUpload.objects.filter(task=task).exclude(image__iendswith='.txt').first()
-        if img is not None:
-            img_path = os.path.join(settings.MEDIA_ROOT, img.path())
+        imgs = [f for f in task.scan_images() if not f.lower().endswith(".txt")]
+        if len(imgs) > 0:
+            img = imgs[0]
+            img_path = task.get_image_path(img)
             im = Image.open(img_path)
 
             # TODO: for better data we could look over all images

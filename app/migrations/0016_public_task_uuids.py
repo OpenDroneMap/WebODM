@@ -9,7 +9,7 @@ from webodm import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0015_public_task_uuids'),
+        ('app', '0014_public_task_uuids'),
     ]
 
     operations = [

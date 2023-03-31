@@ -4,7 +4,6 @@ import math
 
 from .tasks import TaskNestedView
 from rest_framework import exceptions
-from app.models import ImageUpload
 from app.models.task import assets_directory_path
 from PIL import Image, ImageDraw, ImageOps
 from django.http import HttpResponse
@@ -33,12 +32,7 @@ class Thumbnail(TaskNestedView):
         Generate a thumbnail on the fly for a particular task's image
         """
         task = self.get_and_check_task(request, pk)
-        image = ImageUpload.objects.filter(task=task, image=assets_directory_path(task.id, task.project.id, image_filename)).first()
-
-        if image is None:
-            raise exceptions.NotFound()
-
-        image_path = image.path()
+        image_path = task.get_image_path(image_filename)
         if not os.path.isfile(image_path):
             raise exceptions.NotFound()
 
@@ -146,12 +140,7 @@ class ImageDownload(TaskNestedView):
         Download a task's image
         """
         task = self.get_and_check_task(request, pk)
-        image = ImageUpload.objects.filter(task=task, image=assets_directory_path(task.id, task.project.id, image_filename)).first()
-
-        if image is None:
-            raise exceptions.NotFound()
-
-        image_path = image.path()
+        image_path = task.get_image_path(image_filename)
         if not os.path.isfile(image_path):
             raise exceptions.NotFound()
 
