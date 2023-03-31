@@ -68,6 +68,9 @@ class TestApiProjects(BootTestCase):
         # Other user can see project
         res = other_client.get("/api/projects/{}/".format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        
+        # Other user does not own the project
+        self.assertFalse(res.data['owned'])
 
         # Other user still cannot edit project
         res = other_client.post("/api/projects/{}/edit/".format(project.id), {
@@ -102,6 +105,9 @@ class TestApiProjects(BootTestCase):
         # Current user (owner) still has permissions
         res = client.get("/api/projects/{}/".format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Current user owns the project
+        self.assertTrue(res.data['owned'])
 
         perms = get_perms(user, project)
         self.assertEqual(len(perms), 4)

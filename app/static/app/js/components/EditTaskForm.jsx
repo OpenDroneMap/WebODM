@@ -5,6 +5,7 @@ import EditPresetDialog from './EditPresetDialog';
 import ErrorMessage from './ErrorMessage';
 import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
+import TagsField from './TagsField';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
 
@@ -45,10 +46,13 @@ class EditTaskForm extends React.Component {
       processingNodes: [],
       selectedPreset: null,
       presets: [],
+      tags: props.task !== null ? Utils.clone(props.task.tags) : [],
 
       editingPreset: false,
 
-      loadingTaskName: false
+      loadingTaskName: false,
+
+      showTagsField: props.task !== null ? !!props.task.tags.length : false
     };
 
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -354,12 +358,13 @@ class EditTaskForm extends React.Component {
   }
 
   getTaskInfo(){
-    const { name, selectedNode, selectedPreset } = this.state;
+    const { name, selectedNode, selectedPreset, tags } = this.state;
 
     return {
-      name: name !== "" ? name : this.namePlaceholder,
+      name: name !== "" ? name : this.state.namePlaceholder,
       selectedNode: selectedNode,
-      options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options)
+      options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options),
+      tags
     };
   }
 
@@ -485,6 +490,15 @@ class EditTaskForm extends React.Component {
     }
   }
 
+  toggleTagsField = () => {
+    if (!this.state.showTagsField){
+      setTimeout(() => {
+        if (this.tagsField) this.tagsField.focus();
+      }, 0);
+    }
+    this.setState({showTagsField: !this.state.showTagsField});
+  }
+
   render() {
     if (this.state.error){
       return (<div className="edit-task-panel">
@@ -513,10 +527,10 @@ class EditTaskForm extends React.Component {
 
         {!this.state.presetActionPerforming ?
         <div className="btn-group presets-dropdown">
-            <button type="button" className="btn btn-default" title={_("Edit Task Options")} onClick={this.handleEditPreset}>
+            <button type="button" className="btn btn-sm btn-default" title={_("Edit Task Options")} onClick={this.handleEditPreset}>
             <i className="fa fa-sliders-h"></i> {_("Edit")}
             </button>
-            <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
                 <span className="caret"></span>
             </button>
             <ul className="dropdown-menu">
@@ -543,8 +557,19 @@ class EditTaskForm extends React.Component {
         <ErrorMessage className="preset-error" bind={[this, 'presetError']} />
       </div>);
 
+      let tagsField = "";
+      if (this.state.showTagsField){
+        tagsField = (<div className="form-group">
+            <label className="col-sm-2 control-label">{_("Tags")}</label>
+              <div className="col-sm-10"> 
+                <TagsField onUpdate={(tags) => this.state.tags = tags } tags={this.state.tags} ref={domNode => this.tagsField = domNode}/>
+              </div>
+          </div>);
+      }
+
       taskOptions = (
         <div>
+          {tagsField}
           <div className="form-group">
             <label className="col-sm-2 control-label">{_("Processing Node")}</label>
               <div className="col-sm-10">
@@ -588,7 +613,7 @@ class EditTaskForm extends React.Component {
       <div className="edit-task-form">
         <div className="form-group">
           <label className="col-sm-2 control-label">{_("Name")}</label>
-          <div className="col-sm-10">
+          <div className="col-sm-10 name-fields">
             {this.state.loadingTaskName ? 
             <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
             : ""}
@@ -596,8 +621,12 @@ class EditTaskForm extends React.Component {
               onChange={this.handleNameChange} 
               className="form-control"
               placeholder={this.state.namePlaceholder} 
-              value={this.state.name} 
+              value={this.state.name}
             />
+            <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="btn btn-sm btn-secondary toggle-tags">
+              <i className="fa fa-tag"></i>
+            </button>
+
           </div>
         </div>
         {taskOptions}

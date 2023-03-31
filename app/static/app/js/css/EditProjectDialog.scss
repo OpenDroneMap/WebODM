@@ -1,0 +1,15 @@
+.edit-project-dialog{
+    .name-fields{
+        display: flex;
+        .btn.toggle-tags{
+            margin-top: 0;
+            margin-bottom: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        input[type="text"]{
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
+}

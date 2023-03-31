@@ -16,7 +16,7 @@ from app.models import Preset
 from app.models import Plugin
 from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin, delete_plugin, valid_plugin, \
     get_plugins_persistent_path, clear_plugins_cache, init_plugins
-from .models import Project, Task, ImageUpload, Setting, Theme
+from .models import Project, Task, Setting, Theme
 from django import forms
 from codemirror2.widgets import CodeMirrorEditor
 from webodm import settings
@@ -36,12 +36,6 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Task, TaskAdmin)
-
-
-class ImageUploadAdmin(admin.ModelAdmin):
-    readonly_fields = ('image',)
-
-admin.site.register(ImageUpload, ImageUploadAdmin)
 
 admin.site.register(Preset, admin.ModelAdmin)
 
