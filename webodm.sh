@@ -33,6 +33,7 @@ source "${__dirname}/.env"
 DEFAULT_PORT="$WO_PORT"
 DEFAULT_HOST="$WO_HOST"
 DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
+DEFAULT_DB_DIR="$WO_DB_DIR"
 DEFAULT_SSL="$WO_SSL"
 DEFAULT_SSL_INSECURE_PORT_REDIRECT="$WO_SSL_INSECURE_PORT_REDIRECT"
 DEFAULT_BROKER="$WO_BROKER"
@@ -58,6 +59,12 @@ case $key in
 	--media-dir)
     WO_MEDIA_DIR=$(realpath "$2")
     export WO_MEDIA_DIR
+    shift # past argument
+    shift # past value
+    ;;
+	--db-dir)
+    WO_DB_DIR=$(realpath "$2")
+    export WO_DB_DIR
     shift # past argument
     shift # past value
     ;;
@@ -150,6 +157,7 @@ usage(){
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
+  echo "	--db-dir	<path>	Path where the Postgres db data will be stored to (default: $DEFAULT_DB_DIR (docker named volume))"
   echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: $DEFAULT_NODES)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
@@ -324,6 +332,7 @@ start(){
 	echo "Host: $WO_HOST"
 	echo "Port: $WO_PORT"
 	echo "Media directory: $WO_MEDIA_DIR"
+	echo "Postgres DB directory: $WO_DB_DIR"
 	echo "SSL: $WO_SSL"
 	echo "SSL key: $WO_SSL_KEY"
 	echo "SSL certificate: $WO_SSL_CERT"

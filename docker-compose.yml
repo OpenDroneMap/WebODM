@@ -11,7 +11,7 @@ services:
     ports:
       - "5432"
     volumes:
-      - dbdata:/var/lib/postgresql/data:Z
+      - ${WO_DB_DIR}:/var/lib/postgresql/data:Z
     restart: unless-stopped
     oom_score_adj: -100
   webapp:
