@@ -70,8 +70,7 @@ case $key in
     shift # past value
     ;;
   --data-upload-timeout)
-    WO_DATA_UPLOAD_TIMEOUT=$(realpath "$2")
-    export WO_DATA_UPLOAD_TIMEOUT
+    export WO_DATA_UPLOAD_TIMEOUT="$2"
     shift # past argument
     shift # past value
     ;;
