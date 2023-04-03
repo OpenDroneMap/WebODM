@@ -131,7 +131,7 @@ When using Docker, all processing results are stored in a docker volume and are 
 1. Media (called webodm_appmedia): This is where all files related to a project and task are stored.
 2. Postgres DB (called webodm_dbdata): This is what Postgres database uses to store its data.
 
-For more information on how these two volumes are used and in which containers, and in which containers, please refer to the [docker-compose.yml](docker-compose.yml) file. 
+For more information on how these two volumes are used and in which containers, please refer to the [docker-compose.yml](docker-compose.yml) file. 
 
 For various reasons such as ease of backup/restore, if you want to store your files on the host filesystem instead of a docker volume, you need to pass a path via the `--media-dir` and/or the `--db-dir` options:
 
