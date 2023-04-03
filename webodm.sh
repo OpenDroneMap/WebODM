@@ -341,6 +341,7 @@ start(){
 	echo "Port: $WO_PORT"
 	echo "Media directory: $WO_MEDIA_DIR"
 	echo "Postgres DB directory: $WO_DB_DIR"
+	echo "Data upload timeout: $WO_DATA_UPLOAD_TIMEOUT"
 	echo "SSL: $WO_SSL"
 	echo "SSL key: $WO_SSL_KEY"
 	echo "SSL certificate: $WO_SSL_CERT"
