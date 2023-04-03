@@ -4,7 +4,6 @@ import os
 from os import path
 
 from app import models, pending_actions
-from app.security import path_traversal_check
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
 from app.plugins import get_current_plugin
@@ -104,6 +103,7 @@ def import_files(task_id, files):
     import requests
     from app import models
     from app.plugins import logger
+    from app.security import path_traversal_check
 
     def download_file(task, file):
         path = path_traversal_check(task.task_path(file['name']), task.task_path())
