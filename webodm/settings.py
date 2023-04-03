@@ -203,6 +203,9 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 4718592 # 4.5 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10 MB
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
+# When importing a task's assets into WebODM, this sets the http timeout
+DATA_UPLOAD_TIMEOUT = 10    # 10 seconds
+
 FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'app.uploadhandler.TemporaryFileUploadHandler', # Ours doesn't keep file descriptors open by default

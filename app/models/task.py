@@ -510,7 +510,7 @@ class Task(models.Model):
                     #       mitigated by the fact that a valid account is needed to
                     #       import tasks
                     logger.info("Importing task assets from {} for {}".format(self.import_url, self))
-                    download_stream = requests.get(self.import_url, stream=True, timeout=10)
+                    download_stream = requests.get(self.import_url, stream=True, timeout=settings.DATA_UPLOAD_TIMEOUT)
                     content_length = download_stream.headers.get('content-length')
                     total_length = int(content_length) if content_length is not None else None
                     downloaded = 0
