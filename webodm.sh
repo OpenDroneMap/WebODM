@@ -34,6 +34,7 @@ DEFAULT_PORT="$WO_PORT"
 DEFAULT_HOST="$WO_HOST"
 DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
 DEFAULT_DB_DIR="$WO_DB_DIR"
+DEFAULT_DATA_UPLOAD_TIMEOUT="$WO_DATA_UPLOAD_TIMEOUT"
 DEFAULT_SSL="$WO_SSL"
 DEFAULT_SSL_INSECURE_PORT_REDIRECT="$WO_SSL_INSECURE_PORT_REDIRECT"
 DEFAULT_BROKER="$WO_BROKER"
@@ -46,12 +47,12 @@ do
 key="$1"
 
 case $key in
-    --port)
+  --port)
     export WO_PORT="$2"
     shift # past argument
     shift # past value
     ;;
-    --hostname)
+  --hostname)
     export WO_HOST="$2"
     shift # past argument
     shift # past value
@@ -68,7 +69,13 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --ssl)
+  --data-upload-timeout)
+    WO_DATA_UPLOAD_TIMEOUT=$(realpath "$2")
+    export WO_DATA_UPLOAD_TIMEOUT
+    shift # past argument
+    shift # past value
+    ;;
+  --ssl)
     export WO_SSL=YES
     shift # past argument
     ;;
@@ -79,8 +86,8 @@ case $key in
     shift # past value
     ;;
 	--ssl-cert)
-	WO_SSL_CERT=$(realpath "$2")
-	export WO_SSL_CERT
+	  WO_SSL_CERT=$(realpath "$2")
+	  export WO_SSL_CERT
     shift # past argument
     shift # past value
     ;;
@@ -89,15 +96,15 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --debug)
+  --debug)
     export WO_DEBUG=YES
     shift # past argument
     ;;
-    --dev-watch-plugins)
+  --dev-watch-plugins)
     export WO_DEV_WATCH_PLUGINS=YES
     shift # past argument
     ;;
-    --dev)
+  --dev)
     export WO_DEBUG=YES
     export WO_DEV=YES
     dev_mode=true
@@ -112,25 +119,25 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --no-default-node)
+  --no-default-node)
     echo "ATTENTION: --no-default-node is deprecated. Use --default-nodes instead."
     export WO_DEFAULT_NODES=0
     shift # past argument
     ;;
-    --with-micmac)
+  --with-micmac)
     load_micmac_node=true
     shift # past argument
     ;;
-    --detached)
+  --detached)
     detached=true
     shift # past argument
     ;;
-    --default-nodes)
+  --default-nodes)
     export WO_DEFAULT_NODES="$2"
     shift # past argument
     shift # past value
     ;;
-    *)    # unknown option
+  *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
     ;;
@@ -158,6 +165,7 @@ usage(){
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
   echo "	--db-dir	<path>	Path where the Postgres db data will be stored to (default: $DEFAULT_DB_DIR (docker named volume))"
+  echo "	--data-upload-timeout	<seconds>	This is the http timeout value for importing tasks into WebODM (default: $DEFAULT_DATA_UPLOAD_TIMEOUT)"
   echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: $DEFAULT_NODES)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
