@@ -37,7 +37,7 @@ def boot():
         logger.warning("Debug mode is ON (for development this is OK)")
 
     # Silence django's "Warning: Session data corrupted" messages
-    session_logger = logging.getLogger("django.security.SuspiciousSession")
+    session_logger = logging.getLogger("django.SuspiciousOperation.SuspiciousSession")
     session_logger.disabled = True
 
     # Make sure our app/media/tmp folder exists
