@@ -48,6 +48,9 @@ class Project(models.Model):
     def tasks(self):
         return self.task_set.only('id')
 
+    def tasks_count(self):
+        return self.task_set.count()
+
     def get_map_items(self):
         return [task.get_map_items() for task in self.task_set.filter(
                     status=status_codes.COMPLETED
