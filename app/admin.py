@@ -23,7 +23,14 @@ from webodm import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext_lazy as _, gettext
 
-admin.site.register(Project, GuardedModelAdmin)
+
+class ProjectAdmin(GuardedModelAdmin):
+    list_display = ('id', 'name', 'owner', 'created_at', 'tasks_count', 'tags')
+    list_filter = ('owner',)
+    search_fields = ('id', 'name', 'owner__username')
+
+
+admin.site.register(Project, ProjectAdmin)
 
 
 class TaskAdmin(admin.ModelAdmin):
