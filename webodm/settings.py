@@ -334,6 +334,7 @@ JWT_AUTH = {
 COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
+COMPRESS_ENABLED = True
 
 # Sass
 def theme(color):
