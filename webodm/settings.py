@@ -335,6 +335,7 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
 COMPRESS_ENABLED = True
+COMPRESS_MTIME_DELAY = 0
 
 # Sass
 def theme(color):
