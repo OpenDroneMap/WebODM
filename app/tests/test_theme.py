@@ -1,5 +1,6 @@
 import os
 import re
+import time
 
 from django.contrib.staticfiles import finders
 from django.test import Client
@@ -38,6 +39,8 @@ class TestSettings(BootTestCase):
         theme.primary = purple # add color
         theme.html_footer = "<p>hello</p>"
         theme.save()
+
+        time.sleep(0.5)
 
         # Get a page
         res = c.get('/dashboard/', follow=True)
