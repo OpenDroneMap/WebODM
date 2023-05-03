@@ -12,7 +12,7 @@ services:
   node-micmac-1:
     image: opendronemap/nodemicmac
     container_name: node-micmac-1
-    ports:
+    expose:
       - "3000"
     restart: unless-stopped
     oom_score_adj: 500
