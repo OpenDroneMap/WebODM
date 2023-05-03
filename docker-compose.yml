@@ -8,7 +8,7 @@ services:
   db:
     image: opendronemap/webodm_db
     container_name: db
-    ports:
+    expose:
       - "5432"
     volumes:
       - ${WO_DB_DIR}:/var/lib/postgresql/data:Z
