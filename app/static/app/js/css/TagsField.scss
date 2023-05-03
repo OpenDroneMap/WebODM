@@ -1,0 +1,40 @@
+.tags-field{
+    height: auto;
+    padding-bottom: 2px;
+
+    &:hover{
+        cursor: text;
+    }
+    .tag-badge{
+        &:hover{
+            cursor: grab;
+        }
+        display: inline-block;
+        width: auto;
+        padding-left: 6px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        margin-top: -2px;
+        margin-right: 4px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+
+        a{
+            margin-top: 2px;
+            font-weight: bold;
+            padding-bottom: 5px;
+        }
+        a:hover, a:focus, a:active{
+            cursor: pointer;
+            text-decoration: none !important;
+        }
+    }
+    .inputText{
+        display: inline-block;
+        outline: none;
+        border: none;
+        margin-bottom: 10px;
+        min-width: 1px;
+    }
+    
+}

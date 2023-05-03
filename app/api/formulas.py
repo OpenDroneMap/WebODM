@@ -9,19 +9,28 @@ from django.utils.translation import gettext_lazy as _
 algos = {
     'NDVI': {
         'expr': '(N - R) / (N + R)',
-        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
+        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.'),
+        'range': (-1, 1)
+    },
+    'NDYI': {
+        'expr': '(G - B) / (G + B)',
+        'help': _('Normalized difference yellowness index (NDYI), best model variability in relative yield potential in Canola.'),
+        'range': (-1, 1)
     },
     'NDRE': {
         'expr': '(N - Re) / (N + Re)',
-        'help': _('Normalized Difference Red Edge Index shows the amount of green vegetation of permanent or later stage crops.')
+        'help': _('Normalized Difference Red Edge Index shows the amount of green vegetation of permanent or later stage crops.'),
+        'range': (-1, 1)
     },
     'NDWI': {
         'expr': '(G - N) / (G + N)',
-        'help': _('Normalized Difference Water Index shows the amount of water content in water bodies.')
+        'help': _('Normalized Difference Water Index shows the amount of water content in water bodies.'),
+        'range': (-1, 1)
     },
     'NDVI (Blue)': {
         'expr': '(N - B) / (N + B)',
-        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.')
+        'help': _('Normalized Difference Vegetation Index shows the amount of green vegetation.'),
+        'range': (-1, 1)
     },
     'ENDVI':{
         'expr': '((N + G) - (2 * B)) / ((N + G) + (2 * B))',
@@ -34,6 +43,11 @@ algos = {
     'VARI': {
         'expr': '(G - R) / (G + R - B)',
         'help': _('Visual Atmospheric Resistance Index shows the areas of vegetation.'),
+        'range': (-1, 1)
+    },    
+    'MPRI': {
+        'expr': '(G - R) / (G + R)',
+        'help': _('Modified Photochemical Reflectance Index'),
         'range': (-1, 1)
     },
     'EXG': {
@@ -55,7 +69,8 @@ algos = {
     },
     'GNDVI':{
         'expr': '(N - G) / (N + G)',
-        'help': _('Green Normalized Difference Vegetation Index is similar to NDVI, but measures the green spectrum instead of red.')
+        'help': _('Green Normalized Difference Vegetation Index is similar to NDVI, but measures the green spectrum instead of red.'),
+        'range': (-1, 1)
     },
     'GRVI':{
         'expr': 'N / G',
@@ -95,12 +110,17 @@ algos = {
         'help': _('Enhanced Vegetation Index is useful in areas where NDVI might saturate, by using blue wavelengths to correct soil signals.'),
         'range': (-1, 1)
     },
+    'ARVI': {
+        'expr': '(N - (2 * R) + B) / (N + (2 * R) + B)',
+        'help': _('Atmospherically Resistant Vegetation Index. Useful when working with imagery for regions with high atmospheric aerosol content.'),
+        'range': (-1, 1)
+    },
     'Thermal C': {
-        'expr': 'Lwir',
+        'expr': 'L',
         'help': _('Thermal temperature in Celsius degrees.')
     },
     'Thermal K': {
-        'expr': 'Lwir / 100 - 273.15',
+        'expr': 'L * 100 + 27315',
         'help': _('Thermal temperature in Centikelvin degrees.')
     },
 
@@ -131,8 +151,8 @@ camera_filters = [
     'RGBNRe',
     'RGBReN',
 
-    'BGRNReLwir',
-    'BGRReNLwir',
+    'BGRNReL',
+    'BGRReNL',
 
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR
@@ -148,8 +168,8 @@ def lookup_formula(algo, band_order = 'RGB'):
     if algo not in algos:
         raise ValueError("Cannot find algorithm " + algo)
 
-    input_bands = tuple(band_order)
-
+    input_bands = tuple(b for b in re.split(r"([A-Z][a-z]*)", band_order) if b != "")
+    
     def repl(matches):
         b = matches.group(1)
         try:

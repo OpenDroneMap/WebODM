@@ -68,6 +68,9 @@ class TestApiProjects(BootTestCase):
         # Other user can see project
         res = other_client.get("/api/projects/{}/".format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        
+        # Other user does not own the project
+        self.assertFalse(res.data['owned'])
 
         # Other user still cannot edit project
         res = other_client.post("/api/projects/{}/edit/".format(project.id), {
@@ -103,5 +106,29 @@ class TestApiProjects(BootTestCase):
         res = client.get("/api/projects/{}/".format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
+        # Current user owns the project
+        self.assertTrue(res.data['owned'])
+
         perms = get_perms(user, project)
         self.assertEqual(len(perms), 4)
+
+        # Re-add permissions for other user
+        res = client.post("/api/projects/{}/edit/".format(project.id), {
+            'permissions': [{'username': 'testuser2', 'permissions': ['view', 'add', 'change', 'delete']}]
+        }, format="json")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Other user deletes project
+        res = other_client.delete("/api/projects/{}/".format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        project.refresh_from_db()
+
+        # Other user can no longer see the project (permissions have been revoked)
+        res = other_client.get("/api/projects/{}/".format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        perms = get_perms(other_user, project)
+        self.assertEqual(len(perms), 0)
+        
+        # Project is still there
+        res = client.get("/api/projects/{}/".format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)

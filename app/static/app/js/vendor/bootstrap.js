@@ -1,5 +1,5 @@
 /*!
- * Bootstrap v3.3.1 (http://getbootstrap.com)
+ * Bootstrap v3.3.1 (http://getbootstrap.com) modified to allow "data-toggle-outside"
  * Copyright 2011-2014 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
@@ -837,6 +837,15 @@ if (typeof jQuery === 'undefined') {
       var relatedTarget = { relatedTarget: this }
 
       if (!$parent.hasClass('open')) return
+
+      // Modification to allow toggling only with click outside
+      if ($this.attr('data-toggle-outside')){
+        if (e && e.target){
+          var sibiling = $this.get(0).nextSibling;
+          if (sibiling === e.target || sibiling.contains(e.target)) return
+        }
+      }
+      // End modification
 
       $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
 

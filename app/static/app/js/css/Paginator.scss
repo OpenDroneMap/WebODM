@@ -1,0 +1,59 @@
+.paginator{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+
+    .toolbar{
+        i{
+            opacity: 0.8;
+        }
+        margin-right: 8px;
+        &.no-margin{
+            margin-right: 0;
+        }
+    }
+    .btn-group.open > .dropdown-menu{
+        top: 22px;
+        a{
+            border: none;
+        }
+    }
+
+    .search{
+        height: 25px;
+        margin-left: 7px;
+        margin-right: 4px;
+        padding-left: 4px;
+        padding-right: 4px;
+        border-width: 1px;
+        border-radius: 3px;
+        display: inline-block;
+        max-width: 210px;
+    }
+
+    .search-popup{
+        min-width: 256px;
+
+        li{
+            display: flex;
+            button{
+                width: 27px;
+                height: 25px;
+                i{
+                    position: relative;
+                    top: -4px;
+                    left: -3px;
+                }
+            }
+        }
+    }
+
+    .clear-search{
+        margin-top: 1px;
+        font-weight: bold;
+        margin-right: 8px;
+        .query{
+            font-weight: normal;
+        }
+    }
+}

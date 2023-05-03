@@ -5,6 +5,7 @@ import EditPresetDialog from './EditPresetDialog';
 import ErrorMessage from './ErrorMessage';
 import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
+import TagsField from './TagsField';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
 
@@ -45,14 +46,18 @@ class EditTaskForm extends React.Component {
       processingNodes: [],
       selectedPreset: null,
       presets: [],
+      tags: props.task !== null ? Utils.clone(props.task.tags) : [],
 
       editingPreset: false,
 
-      loadingTaskName: false
+      loadingTaskName: false,
+
+      showTagsField: props.task !== null ? !!props.task.tags.length : false
     };
 
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleSelectNode = this.handleSelectNode.bind(this);
+    this.firstEnabledNode = this.firstEnabledNode.bind(this);
     this.loadProcessingNodes = this.loadProcessingNodes.bind(this);
     this.retryLoad = this.retryLoad.bind(this);
     this.selectNodeByKey = this.selectNodeByKey.bind(this);
@@ -82,6 +87,13 @@ class EditTaskForm extends React.Component {
 
   notifyFormLoaded(){
     if (this.props.onFormLoaded && this.formReady()) this.props.onFormLoaded();
+  }
+
+  firstEnabledNode(){
+      for (let i = 0; i < this.state.processingNodes.length; i++){
+          if (this.state.processingNodes[i].enabled) return this.state.processingNodes[i];
+      }
+      return null;
   }
 
   loadProcessingNodes(){
@@ -117,36 +129,18 @@ class EditTaskForm extends React.Component {
             };
           });
 
-          let autoNode = null;
+          // Find a node with lowest queue count
+          let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
+          let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
 
-          // If the user has selected auto, and a processing node has been assigned
-          // we need attempt to find the "auto" node to be the one that has been assigned
-          if (this.props.task && this.props.task.processing_node && this.props.task.auto_processing_node){
-            autoNode = nodes.find(node => node.id === this.props.task.processing_node);
+          if (minQueueCountNodes.length === 0){
+            noProcessingNodesError(nodes);
+            return;
           }
 
-          if (!autoNode){
-            // Find a node with lowest queue count
-            let minQueueCount = Math.min(...nodes.filter(node => node.enabled).map(node => node.queue_count));
-            let minQueueCountNodes = nodes.filter(node => node.enabled && node.queue_count === minQueueCount);
-
-            if (minQueueCountNodes.length === 0){
-              noProcessingNodesError(nodes);
-              return;
-            }
-
-            // Choose at random
-            autoNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
-          }
-
-          nodes.unshift({
-            id: autoNode.id,
-            key: "auto",
-            label: "Auto",
-            options: autoNode.options,
-            enabled: true
-          });
-
+          // Choose at random
+          let lowestQueueNode = minQueueCountNodes[~~(Math.random() * minQueueCountNodes.length)];
+          
           this.setState({
             processingNodes: nodes,
             loadedProcessingNodes: true
@@ -155,14 +149,14 @@ class EditTaskForm extends React.Component {
           // Have we specified a node?
           if (this.props.task && this.props.task.processing_node){
             if (this.props.task.auto_processing_node){
-              this.selectNodeByKey("auto");
+              this.selectNodeByKey(lowestQueueNode.key);
             }else{
               this.selectNodeByKey(this.props.task.processing_node);
             }
           }else if (this.props.selectedNode){
             this.selectNodeByKey(this.props.selectedNode);
           }else{
-            this.selectNodeByKey("auto");
+            this.selectNodeByKey(lowestQueueNode.key);
           }
 
           this.notifyFormLoaded();
@@ -328,8 +322,11 @@ class EditTaskForm extends React.Component {
     let node = this.state.processingNodes.find(node => node.key == key);
     if (node) this.setState({selectedNode: node});
     else{
-        console.warn(`Node ${key} does not exist, selecting auto`);
-        this.selectNodeByKey("auto");
+        console.log(`Node ${key} does not exist, selecting first enabled`);
+        const n = this.firstEnabledNode();
+        if (n){
+            this.selectNodeByKey(n.key);
+        }
     }
   }
 
@@ -361,12 +358,13 @@ class EditTaskForm extends React.Component {
   }
 
   getTaskInfo(){
-    const { name, selectedNode, selectedPreset } = this.state;
+    const { name, selectedNode, selectedPreset, tags } = this.state;
 
     return {
-      name: name !== "" ? name : this.namePlaceholder,
+      name: name !== "" ? name : this.state.namePlaceholder,
       selectedNode: selectedNode,
-      options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options)
+      options: this.getAvailableOptionsOnly(selectedPreset.options, selectedNode.options),
+      tags
     };
   }
 
@@ -492,6 +490,15 @@ class EditTaskForm extends React.Component {
     }
   }
 
+  toggleTagsField = () => {
+    if (!this.state.showTagsField){
+      setTimeout(() => {
+        if (this.tagsField) this.tagsField.focus();
+      }, 0);
+    }
+    this.setState({showTagsField: !this.state.showTagsField});
+  }
+
   render() {
     if (this.state.error){
       return (<div className="edit-task-panel">
@@ -520,10 +527,10 @@ class EditTaskForm extends React.Component {
 
         {!this.state.presetActionPerforming ?
         <div className="btn-group presets-dropdown">
-            <button type="button" className="btn btn-default" title={_("Edit Task Options")} onClick={this.handleEditPreset}>
+            <button type="button" className="btn btn-sm btn-default" title={_("Edit Task Options")} onClick={this.handleEditPreset}>
             <i className="fa fa-sliders-h"></i> {_("Edit")}
             </button>
-            <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
                 <span className="caret"></span>
             </button>
             <ul className="dropdown-menu">
@@ -550,8 +557,19 @@ class EditTaskForm extends React.Component {
         <ErrorMessage className="preset-error" bind={[this, 'presetError']} />
       </div>);
 
+      let tagsField = "";
+      if (this.state.showTagsField){
+        tagsField = (<div className="form-group">
+            <label className="col-sm-2 control-label">{_("Tags")}</label>
+              <div className="col-sm-10"> 
+                <TagsField onUpdate={(tags) => this.state.tags = tags } tags={this.state.tags} ref={domNode => this.tagsField = domNode}/>
+              </div>
+          </div>);
+      }
+
       taskOptions = (
         <div>
+          {tagsField}
           <div className="form-group">
             <label className="col-sm-2 control-label">{_("Processing Node")}</label>
               <div className="col-sm-10">
@@ -595,7 +613,7 @@ class EditTaskForm extends React.Component {
       <div className="edit-task-form">
         <div className="form-group">
           <label className="col-sm-2 control-label">{_("Name")}</label>
-          <div className="col-sm-10">
+          <div className="col-sm-10 name-fields">
             {this.state.loadingTaskName ? 
             <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
             : ""}
@@ -603,8 +621,12 @@ class EditTaskForm extends React.Component {
               onChange={this.handleNameChange} 
               className="form-control"
               placeholder={this.state.namePlaceholder} 
-              value={this.state.name} 
+              value={this.state.name}
             />
+            <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="btn btn-sm btn-secondary toggle-tags">
+              <i className="fa fa-tag"></i>
+            </button>
+
           </div>
         </div>
         {taskOptions}

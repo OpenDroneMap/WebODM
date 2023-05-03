@@ -16,34 +16,44 @@ from app.models import Preset
 from app.models import Plugin
 from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin, delete_plugin, valid_plugin, \
     get_plugins_persistent_path, clear_plugins_cache, init_plugins
-from .models import Project, Task, ImageUpload, Setting, Theme
+from .models import Project, Task, Setting, Theme
 from django import forms
 from codemirror2.widgets import CodeMirrorEditor
 from webodm import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext_lazy as _, gettext
 
-admin.site.register(Project, GuardedModelAdmin)
+
+class ProjectAdmin(GuardedModelAdmin):
+    list_display = ('id', 'name', 'owner', 'created_at', 'tasks_count', 'tags')
+    list_filter = ('owner',)
+    search_fields = ('id', 'name', 'owner__username')
+
+
+admin.site.register(Project, ProjectAdmin)
+
 
 class TaskAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
-admin.site.register(Task, TaskAdmin)
 
-class ImageUploadAdmin(admin.ModelAdmin):
-    readonly_fields = ('image',)
-admin.site.register(ImageUpload, ImageUploadAdmin)
+    list_display = ('id', 'project', 'processing_node', 'created_at', 'status', 'last_error')
+    list_filter = ('status', 'project',)
+    search_fields = ('id', 'project__name')
+
+
+admin.site.register(Task, TaskAdmin)
 
 admin.site.register(Preset, admin.ModelAdmin)
 
 
 class SettingAdmin(admin.ModelAdmin):
 
-
     def has_add_permission(self, request):
         # if there's already an entry, do not allow adding
         count = Setting.objects.all().count()
         return count == 0
+
 
 admin.site.register(Setting, SettingAdmin)
 
@@ -64,11 +74,12 @@ class ThemeModelForm(forms.ModelForm):
     html_after_body = forms.CharField(help_text=_("HTML that will be displayed after the body tag"),
                                       label=_("HTML (after body)"),
                                       required=False,
-                                    widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
-    html_footer = forms.CharField(help_text=_("HTML that will be displayed in the footer. You can also use the special tags such as {ORGANIZATION} and {YEAR}."),
-                                  label=_("HTML (footer)"),
-                                  required=False,
-                                  widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
+                                      widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
+    html_footer = forms.CharField(help_text=_(
+        "HTML that will be displayed in the footer. You can also use the special tags such as {ORGANIZATION} and {YEAR}."),
+        label=_("HTML (footer)"),
+        required=False,
+        widget=CodeMirrorEditor(options={'mode': 'xml', 'lineNumbers': True}))
 
     class Meta:
         model = Theme
@@ -85,11 +96,12 @@ admin.site.register(PluginDatum, admin.ModelAdmin)
 
 class PluginAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "version", "author", "enabled", "plugin_actions")
-    readonly_fields = ("name", )
+    readonly_fields = ("name",)
     change_list_template = "admin/change_list_plugin.html"
 
     def has_add_permission(self, request):
         return False
+
     def has_delete_permission(self, request, obj=None):
         return False
 
@@ -141,9 +153,11 @@ class PluginAdmin(admin.ModelAdmin):
         try:
             p = enable_plugin(plugin_name)
             if p.requires_restart():
-                messages.warning(request, _("Restart required. Please restart WebODM to enable %(plugin)s") % {'plugin': plugin_name})
+                messages.warning(request, _("Restart required. Please restart WebODM to enable %(plugin)s") % {
+                    'plugin': plugin_name})
         except Exception as e:
-            messages.warning(request, _("Cannot enable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name, 'message': str(e)})
+            messages.warning(request, _("Cannot enable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
+                                                                                           'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
@@ -151,9 +165,11 @@ class PluginAdmin(admin.ModelAdmin):
         try:
             p = disable_plugin(plugin_name)
             if p.requires_restart():
-                messages.warning(request, _("Restart required. Please restart WebODM to fully disable %(plugin)s") % {'plugin': plugin_name})
+                messages.warning(request, _("Restart required. Please restart WebODM to fully disable %(plugin)s") % {
+                    'plugin': plugin_name})
         except Exception as e:
-            messages.warning(request, _("Cannot disable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name, 'message': str(e)})
+            messages.warning(request, _("Cannot disable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
+                                                                                            'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
@@ -161,7 +177,8 @@ class PluginAdmin(admin.ModelAdmin):
         try:
             delete_plugin(plugin_name)
         except Exception as e:
-            messages.warning(request, _("Cannot delete plugin %(plugin)s: %(message)s") % {'plugin': plugin_name, 'message': str(e)})
+            messages.warning(request, _("Cannot delete plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
+                                                                                           'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
@@ -193,10 +210,13 @@ class PluginAdmin(admin.ModelAdmin):
                 plugin_name = folders[0]
                 plugin_path = os.path.join(tmp_extract_path, plugin_name)
                 if not valid_plugin(plugin_path):
-                    raise ValueError("This doesn't look like a plugin. Are plugin.py and manifest.json in the proper place?")
+                    raise ValueError(
+                        "This doesn't look like a plugin. Are plugin.py and manifest.json in the proper place?")
 
                 if os.path.exists(get_plugins_persistent_path(plugin_name)):
-                    raise ValueError("A plugin with the name {} already exist. Please remove it before uploading one with the same name.".format(plugin_name))
+                    raise ValueError(
+                        "A plugin with the name {} already exist. Please remove it before uploading one with the same name.".format(
+                            plugin_name))
 
                 # Move
                 shutil.move(plugin_path, get_plugins_persistent_path())
@@ -217,13 +237,13 @@ class PluginAdmin(admin.ModelAdmin):
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
-
     def plugin_actions(self, obj):
         plugin = get_plugin_by_name(obj.name, only_active=False)
         return format_html(
             '<a class="button" href="{}" {}>{}</a>&nbsp;'
             '<a class="button" href="{}" {}>{}</a>'
-            + ('&nbsp;<a class="button" href="{}" onclick="return confirm(\'Are you sure you want to delete {}?\')"><i class="fa fa-trash"></i></a>' if not plugin.is_persistent() else '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+            + (
+                '&nbsp;<a class="button" href="{}" onclick="return confirm(\'Are you sure you want to delete {}?\')"><i class="fa fa-trash"></i></a>' if not plugin.is_persistent() else '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
             ,
             reverse('admin:plugin-disable', args=[obj.pk]) if obj.enabled else '#',
             'disabled' if not obj.enabled else '',

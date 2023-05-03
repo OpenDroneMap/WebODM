@@ -255,7 +255,7 @@ class TestApi(BootTestCase):
 
         # Can't delete a project for which we just have view permissions
         res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
-        self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # Can delete a project for which we have delete permissions
         assign_perm('delete_project', user, other_temp_project)

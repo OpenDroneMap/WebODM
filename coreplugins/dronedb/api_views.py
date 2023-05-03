@@ -8,10 +8,10 @@ import os
 from os import listdir, path
 
 from app import models, pending_actions
+from app.security import path_traversal_check
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async, task
 from app.plugins import get_current_plugin
-from app.models import ImageUpload
 from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals
 
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL, DroneDB, parse_url, verify_url
@@ -208,17 +208,17 @@ def import_files(task_id, carrier):
     import requests
     from app import models
     from app.plugins import logger
+    from app.security import path_traversal_check
 
     files = carrier['files']
     
-    #headers = CaseInsensitiveDict()
     headers = {}
 
     if carrier['token'] != None:
         headers['Authorization'] = 'Bearer ' + carrier['token']
 
     def download_file(task, file):
-        path = task.task_path(file['name'])
+        path = path_traversal_check(task.task_path(file['name']), task.task_path())
         logger.info("Downloading file: " + file['url'])
         download_stream = requests.get(file['url'], stream=True, timeout=60, headers=headers)
 
@@ -226,8 +226,6 @@ def import_files(task_id, carrier):
             for chunk in download_stream.iter_content(4096):
                 fd.write(chunk)
         
-        models.ImageUpload.objects.create(task=task, image=path)
-
     logger.info("Will import {} files".format(len(files)))
     task = models.Task.objects.get(pk=task_id)
     task.create_task_directories()

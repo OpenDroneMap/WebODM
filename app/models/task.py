@@ -21,6 +21,7 @@ from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.gdal import OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError, SuspiciousFileOperation
 from django.db import models
 from django.db import transaction
@@ -135,15 +136,15 @@ def resize_image(image_path, resize_to, done=None):
         resized_width = int(width * ratio)
         resized_height = int(height * ratio)
 
-        im = im.resize((resized_width, resized_height), Image.BILINEAR)
+        im = im.resize((resized_width, resized_height), Image.LANCZOS)
         params = {}
         if is_jpeg:
             params['quality'] = 100
 
         if 'exif' in im.info:
             exif_dict = piexif.load(im.info['exif'])
-            exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
-            exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
+            #exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
+            #exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
             im.save(resized_image_path, exif=piexif.dump(exif_dict), **params)
         else:
             im.save(resized_image_path, **params)
@@ -184,8 +185,10 @@ class Task(models.Model):
             'georeferenced_model.csv': os.path.join('odm_georeferencing', 'odm_georeferenced_model.csv'),
             'textured_model.zip': {
                 'deferred_path': 'textured_model.zip',
-                'deferred_compress_dir': 'odm_texturing'
+                'deferred_compress_dir': 'odm_texturing',
+                'deferred_exclude_files': ('odm_textured_model_geo.glb', )
             },
+            'textured_model.glb': os.path.join('odm_texturing', 'odm_textured_model_geo.glb'),
             '3d_tiles_model.zip': {
                 'deferred_path': '3d_tiles_model.zip',
                 'deferred_compress_dir': os.path.join('3d_tiles', 'model')
@@ -274,7 +277,8 @@ class Task(models.Model):
     partial = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing."), verbose_name=_("Partial"))
     potree_scene = fields.JSONField(default=dict, blank=True, help_text=_("Serialized potree scene information used to save/load measurements and camera view angle"), verbose_name=_("Potree Scene"))
     epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("EPSG code of the dataset (if georeferenced)"), verbose_name="EPSG")
-
+    tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Task tags"), verbose_name=_("Tags"))
+    
     class Meta:
         verbose_name = _("Task")
         verbose_name_plural = _("Tasks")
@@ -307,15 +311,6 @@ class Task(models.Model):
                 shutil.move(old_task_folder, new_task_folder_parent)
 
                 logger.info("Moved task folder from {} to {}".format(old_task_folder, new_task_folder))
-
-                with transaction.atomic():
-                    for img in self.imageupload_set.all():
-                        prev_name = img.image.name
-                        img.image.name = assets_directory_path(self.id, new_project_id,
-                                                               os.path.basename(img.image.name))
-                        logger.info("Changing {} to {}".format(prev_name, img))
-                        img.save()
-
             else:
                 logger.warning("Project changed for task {}, but either {} doesn't exist, or {} already exists. This doesn't look right, so we will not move any files.".format(self,
                                                                                                              old_task_folder,
@@ -407,7 +402,9 @@ class Task(models.Model):
                     'points': points,
                 },
                 'gsd': j.get('odm_processing_statistics', {}).get('average_gsd'),
-                'area': j.get('processing_statistics', {}).get('area')
+                'area': j.get('processing_statistics', {}).get('area'),
+                'start_date': j.get('processing_statistics', {}).get('start_date'),
+                'end_date': j.get('processing_statistics', {}).get('end_date'),
             }
         else:
             return {}
@@ -424,16 +421,6 @@ class Task(models.Model):
                 task.refresh_from_db()
 
                 logger.info("Duplicating {} to {}".format(self, task))
-
-                for img in self.imageupload_set.all():
-                    img.pk = None
-                    img.task = task
-
-                    prev_name = img.image.name
-                    img.image.name = assets_directory_path(task.id, task.project.id,
-                                                            os.path.basename(img.image.name))
-                    
-                    img.save()
 
                 if os.path.isdir(self.task_path()):
                     try:
@@ -465,6 +452,8 @@ class Task(models.Model):
                 if 'deferred_path' in value and 'deferred_compress_dir' in value:
                     zip_dir = self.assets_path(value['deferred_compress_dir'])
                     paths = [{'n': os.path.relpath(os.path.join(dp, f), zip_dir), 'fs': os.path.join(dp, f)} for dp, dn, filenames in os.walk(zip_dir) for f in filenames]
+                    if 'deferred_exclude_files' in value and isinstance(value['deferred_exclude_files'], tuple):
+                        paths = [p for p in paths if os.path.basename(p['fs']) not in value['deferred_exclude_files']]
                     if len(paths) == 0:
                         raise FileNotFoundError("No files available for download")
                     return zipfly.ZipStream(paths), True
@@ -622,7 +611,8 @@ class Task(models.Model):
                 if not self.uuid and self.pending_action is None and self.status is None:
                     logger.info("Processing... {}".format(self))
 
-                    images = [image.path() for image in self.imageupload_set.all()]
+                    images_path = self.task_path()
+                    images = [os.path.join(images_path, i) for i in self.scan_images()]
 
                     # Track upload progress, but limit the number of DB updates
                     # to every 2 seconds (and always record the 100% progress)
@@ -1083,8 +1073,8 @@ class Task(models.Model):
         """
         gcp_path = self.find_all_files_matching(r'.*\.txt$')
 
-        # Skip geo.txt, image_groups.txt files
-        gcp_path = list(filter(lambda p: os.path.basename(p).lower() not in ['geo.txt', 'image_groups.txt'], gcp_path))
+        # Skip geo.txt, image_groups.txt, align.(las|laz|tif) files
+        gcp_path = list(filter(lambda p: os.path.basename(p).lower() not in ['geo.txt', 'image_groups.txt', 'align.las', 'align.laz', 'align.tif'], gcp_path))
         if len(gcp_path) == 0: return None
 
         # Assume we only have a single GCP file per task
@@ -1115,3 +1105,34 @@ class Task(models.Model):
                 pass
             else:
                 raise
+
+    def scan_images(self):
+        tp = self.task_path()
+        try:
+            return [e.name for e in os.scandir(tp) if e.is_file()]
+        except:
+            return []
+
+    def get_image_path(self, filename):
+        p = self.task_path(filename)
+        return path_traversal_check(p, self.task_path())
+    
+    def handle_images_upload(self, files):
+        for file in files:
+            name = file.name
+            if name is None:
+                continue
+
+            tp = self.task_path()
+            if not os.path.exists(tp):
+                os.makedirs(tp, exist_ok=True)
+
+            dst_path = self.get_image_path(name)
+
+            with open(dst_path, 'wb+') as fd:
+                if isinstance(file, InMemoryUploadedFile):
+                    for chunk in file.chunks():
+                        fd.write(chunk)
+                else:
+                    with open(file.temporary_file_path(), 'rb') as f:
+                        shutil.copyfileobj(f, fd)

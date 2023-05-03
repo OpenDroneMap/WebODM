@@ -28,8 +28,22 @@
 
     .name-loading{
         position: absolute;
-        right: 30px;
+        right: 60px;
         top: 15px;
         opacity: 0.5;
+    }
+
+    .name-fields{
+        display: flex;
+        .btn.toggle-tags{
+            margin-top: 2px;
+            margin-bottom: 2px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        input[type="text"]{
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
     }
 }

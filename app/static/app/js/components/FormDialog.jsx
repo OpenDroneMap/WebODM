@@ -102,6 +102,12 @@ class FormDialog extends React.Component {
         }
     }
 
+    handleEnter = e => {
+        if (e.key === 'Enter' || e.keyCode === 13){
+          this.handleSave(e);
+        }
+    }
+
     handleSave(e){
         e.preventDefault();
 
@@ -138,7 +144,7 @@ class FormDialog extends React.Component {
 
     handleDelete(){
         if (this.props.deleteAction){
-            if (this.props.deleteWarning === false || window.confirm(this.props.deleteWarning)){
+            if (!this.props.deleteWarning || window.confirm(this.props.deleteWarning)){
                 this.setState({deleting: true});
                 this.props.deleteAction()
                     .fail(e => {

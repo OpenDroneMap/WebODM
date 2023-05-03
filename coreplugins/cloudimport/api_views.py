@@ -103,17 +103,16 @@ def import_files(task_id, files):
     import requests
     from app import models
     from app.plugins import logger
+    from app.security import path_traversal_check
 
     def download_file(task, file):
-        path = task.task_path(file['name'])
+        path = path_traversal_check(task.task_path(file['name']), task.task_path())
         download_stream = requests.get(file['url'], stream=True, timeout=60)
 
         with open(path, 'wb') as fd:
             for chunk in download_stream.iter_content(4096):
                 fd.write(chunk)
         
-        models.ImageUpload.objects.create(task=task, image=path)
-
     logger.info("Will import {} files".format(len(files)))
     task = models.Task.objects.get(pk=task_id)
     task.create_task_directories()
@@ -134,4 +133,5 @@ def import_files(task_id, files):
     task.pending_action = None
     task.processing_time = 0
     task.partial = False
+    task.images_count = len(task.scan_images())
     task.save()

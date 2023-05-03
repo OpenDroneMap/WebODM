@@ -33,6 +33,7 @@ source "${__dirname}/.env"
 DEFAULT_PORT="$WO_PORT"
 DEFAULT_HOST="$WO_HOST"
 DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
+DEFAULT_DB_DIR="$WO_DB_DIR"
 DEFAULT_SSL="$WO_SSL"
 DEFAULT_SSL_INSECURE_PORT_REDIRECT="$WO_SSL_INSECURE_PORT_REDIRECT"
 DEFAULT_BROKER="$WO_BROKER"
@@ -58,6 +59,12 @@ case $key in
 	--media-dir)
     WO_MEDIA_DIR=$(realpath "$2")
     export WO_MEDIA_DIR
+    shift # past argument
+    shift # past value
+    ;;
+	--db-dir)
+    WO_DB_DIR=$(realpath "$2")
+    export WO_DB_DIR
     shift # past argument
     shift # past value
     ;;
@@ -150,6 +157,7 @@ usage(){
   echo "	--port	<port>	Set the port that WebODM should bind to (default: $DEFAULT_PORT)"
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
+  echo "	--db-dir	<path>	Path where the Postgres db data will be stored to (default: $DEFAULT_DB_DIR (docker named volume))"
   echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: $DEFAULT_NODES)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
@@ -180,6 +188,14 @@ detect_gpus(){
 		fi
 
 		if lspci | grep "VGA.*NVIDIA"; then
+			echo "GPU_NVIDIA has been found"
+			export GPU_NVIDIA=true
+			set -e
+			return
+		fi
+		NVIDIA_DEVICE=$(nvidia-smi -L | grep "GPU 0:" | awk -F ': ' '{print $2}' | awk -F '(' '{print $1}')
+		#IF the NVIDIA_DEVICE has the word NVIDIA in it, then enable NVIDIA
+		if [[ $NVIDIA_DEVICE == *"NVIDIA"* ]]; then
 			echo "GPU_NVIDIA has been found"
 			export GPU_NVIDIA=true
 			set -e
@@ -226,11 +242,49 @@ if [[ $gpu = true ]]; then
 	prepare_intel_render_group
 fi
 
-# $1 = command | $2 = help_text | $3 = install_command (optional)
+docker_compose="docker-compose"
+check_docker_compose(){
+	dc_msg_ok="\033[92m\033[1m OK\033[0m\033[39m"
+
+	# Check if docker-compose exists
+	hash "docker-compose" 2>/dev/null || not_found=true
+	if [[ $not_found ]]; then
+		# Check if compose plugin is installed
+		if ! docker compose > /dev/null 2>&1; then
+
+			if [ "${platform}" = "Linux" ] && [ -z "$1" ] && [ ! -z "$HOME" ]; then
+				echo -e "Checking for docker compose... \033[93mnot found, we'll attempt to install it\033[39m"
+				check_command "curl" "Cannot automatically install docker compose. Please visit https://docs.docker.com/compose/install/" "" "silent"
+				DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+				mkdir -p $DOCKER_CONFIG/cli-plugins
+				curl -SL# https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+				chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+				check_docker_compose "y"
+			else
+				if [ -z "$1" ]; then
+					echo -e "Checking for docker compose... \033[93mnot found, please visit https://docs.docker.com/compose/install/ to install docker compose\033[39m"
+				else
+					echo -e "\033[93mCannot automatically install docker compose. Please visit https://docs.docker.com/compose/install/\033[39m"
+				fi
+				return 1
+			fi
+		else
+			docker_compose="docker compose"
+		fi
+	else
+		docker_compose="docker-compose"
+	fi
+
+	if [ -z "$1" ]; then
+		echo -e "Checking for $docker_compose... $dc_msg_ok"
+	fi
+}
+
+# $1 = command | $2 = help_text | $3 = install_command (optional) | $4 = silent
 check_command(){
 	check_msg_prefix="Checking for $1... "
 	check_msg_result="\033[92m\033[1m OK\033[0m\033[39m"
-
+	unset not_found
 	hash "$1" 2>/dev/null || not_found=true
 	if [[ $not_found ]]; then
 
@@ -246,7 +300,10 @@ check_command(){
 		fi
 	fi
 
-	echo -e "$check_msg_prefix $check_msg_result"
+	if [ -z "$4" ]; then
+		echo -e "$check_msg_prefix $check_msg_result"
+	fi
+
 	if [[ $not_found ]]; then
 		return 1
 	fi
@@ -254,7 +311,7 @@ check_command(){
 
 environment_check(){
 	check_command "docker" "https://www.docker.com/"
-	check_command "docker-compose" "Run \033[1mpip install docker-compose\033[0m" "pip install docker-compose"
+	check_docker_compose
 }
 
 run(){
@@ -275,6 +332,7 @@ start(){
 	echo "Host: $WO_HOST"
 	echo "Port: $WO_PORT"
 	echo "Media directory: $WO_MEDIA_DIR"
+	echo "Postgres DB directory: $WO_DB_DIR"
 	echo "SSL: $WO_SSL"
 	echo "SSL key: $WO_SSL_KEY"
 	echo "SSL certificate: $WO_SSL_CERT"
@@ -285,7 +343,7 @@ start(){
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
 
-	command="docker-compose -f docker-compose.yml"
+	command="$docker_compose -f docker-compose.yml"
 
     if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
@@ -357,7 +415,7 @@ start(){
 }
 
 down(){
-	command="docker-compose -f docker-compose.yml"
+	command="$docker_compose -f docker-compose.yml"
 
 	if [ "${GPU_NVIDIA}" = true ]; then
 		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
@@ -373,10 +431,10 @@ down(){
 }
 
 rebuild(){
-	run "docker-compose down --remove-orphans"
+	run "$docker_compose down --remove-orphans"
 	run "rm -fr node_modules/ || sudo rm -fr node_modules/"
 	run "rm -fr nodeodm/external/NodeODM || sudo rm -fr nodeodm/external/NodeODM"
-	run "docker-compose -f docker-compose.yml -f docker-compose.build.yml build --no-cache"
+	run "$docker_compose -f docker-compose.yml -f docker-compose.build.yml build --no-cache"
 	#run "docker images --no-trunc -aqf \"dangling=true\" | xargs docker rmi"
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
 }
@@ -395,7 +453,7 @@ run_tests(){
         echo -e "\033[1mDone!\033[0m Everything looks in order."
     else
         echo "Running tests in webapp container"
-        run "docker-compose exec webapp /bin/bash -c \"/webodm/webodm.sh test\""
+        run "$docker_compose exec webapp /bin/bash -c \"/webodm/webodm.sh test\""
     fi
 }
 
@@ -426,7 +484,7 @@ elif [[ $1 = "stop" ]]; then
 	environment_check
 	echo "Stopping WebODM..."
 
-	command="docker-compose -f docker-compose.yml"
+	command="$docker_compose -f docker-compose.yml"
 
 	if [ "${GPU_NVIDIA}" = true ]; then
 		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
@@ -452,6 +510,7 @@ elif [[ $1 = "rebuild" ]]; then
 	echo  "Rebuilding WebODM..."
 	rebuild
 elif [[ $1 = "update" ]]; then
+	environment_check
 	down
 	echo "Updating WebODM..."
 
@@ -466,7 +525,7 @@ elif [[ $1 = "update" ]]; then
 		fi
 	fi
 
-	command="docker-compose -f docker-compose.yml"
+	command="$docker_compose -f docker-compose.yml"
 
 	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then

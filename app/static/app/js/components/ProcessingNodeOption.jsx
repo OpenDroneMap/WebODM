@@ -4,6 +4,10 @@ import PropTypes from 'prop-types';
 import $ from 'jquery';
 import { _ } from '../classes/gettext';
 
+const warnings = {
+    'ignore-gsd': _("You might run out of memory if you use this option.")
+};
+
 class ProcessingNodeOption extends React.Component {
   static defaultProps = {};
 
@@ -104,6 +108,8 @@ class ProcessingNodeOption extends React.Component {
 
   render() {
     let inputControl = "";
+    let warningMsg = "";
+
     if (this.props.type !== 'bool'){
       if (this.isEnumType()){
         // Enum
@@ -148,10 +154,16 @@ class ProcessingNodeOption extends React.Component {
         loadFileControl = ([
             <button key="btn" type="file" className="btn glyphicon glyphicon-import btn-primary" data-toggle="tooltip" data-placement="left" title={_("Click to import a .JSON file")} onClick={() => this.loadFile()}></button>,
             <input key="file-ctrl" className="file-control" type="file" 
-                accept="text/plain,application/json,application/geo+json"
+                accept="text/plain,application/json,application/geo+json,.geojson"
                 onChange={this.handleFileSelect}
                 ref={(domNode) => { this.fileControl = domNode}} />
         ]);
+    }
+
+    if (warnings[this.props.name] !== undefined && this.state.value !== ""){
+        warningMsg = (<div class="alert alert-warning">
+                <i class="fa fa-exclamation-triangle"></i> {warnings[this.props.name]}
+            </div>);
     }
 
     return (
@@ -163,6 +175,8 @@ class ProcessingNodeOption extends React.Component {
         {this.state.value !== "" ? 
         <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title={_("Reset to default")} onClick={this.resetToDefault}></button> :
         ""}
+
+        {warningMsg}
       </div>
     );
   }

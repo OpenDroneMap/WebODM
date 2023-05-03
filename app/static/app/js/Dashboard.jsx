@@ -28,10 +28,12 @@ class Dashboard extends React.Component {
     return $.ajax({
           url: `/api/projects/`,
           type: 'POST',
-          data: {
+          contentType: 'application/json',
+          data: JSON.stringify({
             name: project.name,
-            description: project.descr
-          }
+            description: project.descr,
+            tags: project.tags
+          })
       }).done(() => {
         this.projectList.refresh();
       });
@@ -39,13 +41,15 @@ class Dashboard extends React.Component {
     
   render() {
     const projectList = ({ location, history }) => {
-      let q = Utils.queryParams(location),
-          page = parseInt(q.page !== undefined ? q.page : 1);
+      let q = Utils.queryParams(location);
+      if (q.page === undefined) q.page = 1;
+      else q.page = parseInt(q.page);
 
       return <ProjectList
-                source={`/api/projects/?ordering=-created_at&page=${page}`}
+                source={`/api/projects/${Utils.toSearchQuery(q)}`}
                 ref={(domNode) => { this.projectList = domNode; }} 
-                currentPage={page}
+                currentPage={q.page}
+                currentSearch={q.search}
                 history={history}
                 />;
     };

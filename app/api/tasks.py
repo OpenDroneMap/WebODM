@@ -20,6 +20,7 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
 from .common import get_and_check_project, get_asset_download_filename
+from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 
@@ -41,6 +42,7 @@ class TaskSerializer(serializers.ModelSerializer):
     processing_node_name = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
     statistics = serializers.SerializerMethodField()
+    tags = TagsField(required=False)
 
     def get_processing_node_name(self, obj):
         if obj.processing_node is not None:
@@ -177,7 +179,7 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
 
         task.partial = False
-        task.images_count = models.ImageUpload.objects.filter(task=task).count()
+        task.images_count = len(task.scan_images())
 
         if task.images_count < 2:
             raise exceptions.ValidationError(detail=_("You need to upload at least 2 images before commit"))
@@ -204,11 +206,8 @@ class TaskViewSet(viewsets.ViewSet):
         if len(files) == 0:
             raise exceptions.ValidationError(detail=_("No files uploaded"))
 
-        with transaction.atomic():
-            for image in files:
-                models.ImageUpload.objects.create(task=task, image=image)
-
-        task.images_count = models.ImageUpload.objects.filter(task=task).count()
+        task.handle_images_upload(files)
+        task.images_count = len(task.scan_images())
         # Update other parameters such as processing node, task name, etc.
         serializer = TaskSerializer(task, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -254,9 +253,8 @@ class TaskViewSet(viewsets.ViewSet):
                 task = models.Task.objects.create(project=project,
                                                   pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
 
-                for image in files:
-                    models.ImageUpload.objects.create(task=task, image=image)
-                task.images_count = len(files)
+                task.handle_images_upload(files)
+                task.images_count = len(task.scan_images())
 
                 # Update other parameters such as processing node, task name, etc.
                 serializer = TaskSerializer(task, data=request.data, partial=True)
