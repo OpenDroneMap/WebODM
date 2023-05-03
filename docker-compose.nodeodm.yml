@@ -11,7 +11,7 @@ services:
       - WO_DEFAULT_NODES
   node-odm:
     image: opendronemap/nodeodm
-    ports:
+    expose:
       - "3000"
     restart: unless-stopped
     oom_score_adj: 500

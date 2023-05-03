@@ -15,7 +15,7 @@ services:
     image: opendronemap/nodeodm:gpu.intel
     devices:
       - "/dev/dri"
-    ports:
+    expose:
       - "3000"
     restart: unless-stopped
     oom_score_adj: 500
