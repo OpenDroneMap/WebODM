@@ -181,8 +181,8 @@ class TaskViewSet(viewsets.ViewSet):
         task.partial = False
         task.images_count = len(task.scan_images())
 
-        if task.images_count < 2:
-            raise exceptions.ValidationError(detail=_("You need to upload at least 2 images before commit"))
+        if task.images_count < 1:
+            raise exceptions.ValidationError(detail=_("You need to upload at least 1 file before commit"))
 
         task.save()
         worker_tasks.process_task.delay(task.id)

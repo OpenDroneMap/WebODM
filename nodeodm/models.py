@@ -114,7 +114,7 @@ class ProcessingNode(models.Model):
 
         :returns UUID of the newly created task
         """
-        if len(images) < 2: raise exceptions.NodeServerError("Need at least 2 images")
+        if len(images) < 1: raise exceptions.NodeServerError("Need at least 1 file")
 
         api_client = self.api_client()
 

@@ -114,13 +114,6 @@ class TestApiTask(BootTransactionTestCase):
             }, format="multipart")
             self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
 
-            # Cannot create a task with just 1 image
-            res = client.post("/api/projects/{}/tasks/".format(project.id), {
-                'images': image1
-            }, format="multipart")
-            self.assertTrue(res.status_code == status.HTTP_400_BAD_REQUEST)
-            image1.seek(0)
-
             # Normal case with images[], name and processing node parameter
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
                 'images': [image1, image2],
@@ -1117,10 +1110,6 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(res.status_code, status.HTTP_200_OK)
             self.assertEqual(res.data['success'], True)
             image1.seek(0)
-
-            # Cannot commit with a single image
-            res = client.post("/api/projects/{}/tasks/{}/commit/".format(project.id, task.id))
-            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
             # And second image
             res = client.post("/api/projects/{}/tasks/{}/upload/".format(project.id, task.id), {
