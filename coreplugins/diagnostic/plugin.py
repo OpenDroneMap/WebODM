@@ -2,12 +2,12 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 
-from app.plugins import PluginBase, Menu, MountPoint
+from app.plugins import PluginBase, Menu, MountPoint, get_current_plugin
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
 
-import json, shutil, psutil
+import json, shutil
 
 def get_memory_stats():
     """
@@ -35,6 +35,10 @@ def get_memory_stats():
         return {}
 
 def get_diagnostic_stats():
+    plugin = get_current_plugin()
+    with plugin.python_imports():
+        import psutil
+
     # Disk space
     total_disk_space, used_disk_space, free_disk_space = shutil.disk_usage('./')
 
