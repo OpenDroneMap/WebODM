@@ -11,20 +11,34 @@
         <div style="width: 80%; margin-left: 10%;">
             <canvas id="diskChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
         </div>
-        <p><b>{% trans 'Free' context 'Megabytes of storage space' %}:</b> {{ free_disk_space|filesizeformat }} |
+        <p id="storageStatsLabel">
+            <b>{% trans 'Free' context 'Megabytes of storage space' %}:</b> {{ free_disk_space|filesizeformat }} |
             <b>{% trans 'Used' context 'Megabytes of storage space' %}:</b> {{ used_disk_space|filesizeformat }} |
-            <b>{% trans 'Total' context 'Megabytes of storage space' %}:</b> {{ total_disk_space|filesizeformat }}</p>
+            <b>{% trans 'Total' context 'Megabytes of storage space' %}:</b> {{ total_disk_space|filesizeformat }}
+        </p>
     </div>
-    <div class="col-md-4 col-sm-12">
-        {% if total_memory %}
-        <h4>{% trans 'Memory' context 'Computer memory (RAM)' %}</h4>
-        <div style="width: 80%; margin-left: 10%;">
-            <canvas id="memoryChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
+    {% if total_memory %}
+        <div class="col-md-4 col-sm-12">
+            <h4>{% trans 'Memory' context 'Computer memory (RAM)' %}</h4>
+            <div style="width: 80%; margin-left: 10%;">
+                <canvas id="memoryChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
+            </div>
+            <p id="memoryStatsLabel">
+                <b>{% trans 'Free' context 'Megabytes of memory space' %}:</b> {{ free_memory|filesizeformat }} |
+                <b>{% trans 'Used' context 'Megabytes of memory space' %}:</b> {{ used_memory|filesizeformat }} |
+                <b>{% trans 'Total' context 'Megabytes of memory space'%}:</b> {{ total_memory|filesizeformat }}
+            </p>
         </div>
-        <p><b>{% trans 'Free' context 'Megabytes of memory space' %}:</b> {{ free_memory|filesizeformat }} |
-            <b>{% trans 'Used' context 'Megabytes of memory space' %}:</b> {{ used_memory|filesizeformat }} |
-            <b>{% trans 'Total' context 'Megabytes of memory space'%}:</b> {{ total_memory|filesizeformat }}</p>
-        {% endif %}
+    {% endif %}
+    <div class="col-md-4 col-sm-12">
+        <h4>{% trans 'CPU Usage' context 'Computer CPU Usage' %}</h4>
+        <div style="width: 80%; margin-left: 10%;">
+            <canvas id="cpuChart" width="200" height="200" style="margin-bottom: 12px;"></canvas>
+        </div>
+        <p id="cpuStatsLabel">
+            <b>{% trans 'CPU Usage' context 'CPU usage percentage' %}:</b> {{ cpu_percent_used }}% |
+            <b>{% trans 'CPU Frequency' context 'CPU frequenzy in Heartz' %}:</b> {{ cpu_freq_current }} GHz
+        </p>
     </div>
 </div>
 
@@ -33,74 +47,178 @@
 <div style="margin-top: 20px;"><strong>{% trans 'Note!' %}</strong> {% blocktrans with win_hyperv_link="<a href='https://docs.docker.com/desktop/settings/windows/#resources'>Windows (Hyper-V)</a>" win_wsl2_link="<a href='https://learn.microsoft.com/en-us/windows/wsl/wsl-config#configuration-setting-for-wslconfig'>Windows (WSL2)</a>" mac_link="<a href='https://docs.docker.com/desktop/settings/mac/#resources'>MacOS</a>" %}These values might be relative to the virtualization environment in which the application is running, not necessarily the values of the your machine. See instructions for {{ win_hyperv_link }}, {{ win_wsl2_link }}, and {{ mac_link }} for changing these values in a Docker setup.{% endblocktrans %}</div>
 
 <script>
-(function(){
-    var ctx = document.getElementById('diskChart').getContext('2d');
-    var labels = {
-        "{% trans 'Used' context 'Megabytes of storage space' %}": '{{ used_disk_space|filesizeformat }}',
-        "{% trans 'Free' context 'Megabytes of storage space' %}": '{{ free_disk_space|filesizeformat }}'
-    };
-    var chart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ["{% trans 'Used' context 'Megabytes of storage space' %}", "{% trans 'Free' context 'Megabytes of storage space' %}"],
-            datasets: [{
-                label: "{% trans 'Disk Space' %}",
-                backgroundColor:[
-                    "rgb(255, 99, 132)",
-                    "rgb(54, 162, 235)"
-                ],
-                data: [ {{ used_disk_space }}, {{ free_disk_space }} ],
-            }]
-        },
-        options: {
-            legend:{
-                reverse: true
+
+(async function(){
+    function initializeStorageChart(){
+        let ctx = document.getElementById('diskChart').getContext('2d');
+        let chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ["{% trans 'Used' context 'Megabytes of storage space' %}", "{% trans 'Free' context 'Megabytes of storage space' %}"],
+                datasets: [{
+                    label: "{% trans 'Disk Space' %}",
+                    backgroundColor:[
+                        "rgb(255, 99, 132)",
+                        "rgb(54, 162, 235)"
+                    ],
+                    data: [ {{ used_disk_space }}, {{ free_disk_space }} ],
+                }]
             },
-            tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                        return labels[data.labels[tooltipItem.index]];
+            options: {
+                legend:{
+                    reverse: true
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            let = used_disk_space = data.datasets[0].data[0]
+                            let = free_disk_space = data.datasets[0].data[1]
+                            let labels = {
+                                "{% trans 'Used' context 'Megabytes of storage space' %}": `${filesizeformat(used_disk_space)}`,
+                                "{% trans 'Free' context 'Megabytes of storage space' %}": `${filesizeformat(free_disk_space)}`
+                            };
+                            return labels[data.labels[tooltipItem.index]];
+                        }
                     }
                 }
             }
+        });
+        return chart;
+    }
+
+    function initializeMemoryChart(){
+        let ctx = document.getElementById('memoryChart').getContext('2d');
+        let chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ["{% trans 'Used' context 'Megabytes of memory space' %}", "{% trans 'Free' context 'Megabytes of memory space' %}"],
+                datasets: [{
+                    label: "{% trans 'Disk Space' %}",
+                    backgroundColor:[
+                        "rgb(255, 99, 132)",
+                        "rgb(54, 162, 235)"
+                    ],
+                    data: [ {{ used_memory }}, {{ free_memory }} ],
+                }]
+            },
+            options: {
+                legend:{
+                    reverse: true
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            let used_memory = data.datasets[0].data[0]
+                            let free_memory = data.datasets[0].data[1]
+                            let labels = {
+                                "{% trans 'Used' context 'Megabytes of memory space' %}": `${filesizeformat(used_memory)}`,
+                                "{% trans 'Free' context 'Megabytes of memory space' %}": `${filesizeformat(free_memory)}`
+                            };
+                            return labels[data.labels[tooltipItem.index]];
+                        }
+                    }
+                }
+            }
+        });
+        return chart;
+    }
+
+    function initializeCPUChart(){
+        let cpuPercent = "{{cpu_percent_used}}".replace(",", ".")
+        cpuPercent = Number(cpuPercent)
+        let cpuFreePercent = "{{cpu_percent_free}}".replace(",", ".")
+        cpuFreePercent = Number(cpuFreePercent)
+
+        var ctx = document.getElementById('cpuChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ["{% trans 'Used' context 'CPU Usage percent' %}", "{% trans 'Free' context 'CPU Usage percent' %}"],
+                datasets: [{
+                    label: "{% trans 'CPU Usage' %}",
+                    backgroundColor:[
+                        "rgb(255, 99, 132)",
+                        "rgb(54, 162, 235)"
+                    ],
+                    data: [ cpuPercent, cpuFreePercent ],
+                }]
+            },
+            options: {
+                legend:{
+                    reverse: true
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            let cpu_percent_used = data.datasets[0].data[0]
+                            let cpu_percent_free = data.datasets[0].data[1]
+                            
+                             let labels = {
+                                "{% trans 'Used' context 'CPU Usage percent' %}": cpu_percent_used + '%',
+                                "{% trans 'Free' context 'CPU Usage percent' %}": cpu_percent_free + '%'
+                            };
+                            return labels[data.labels[tooltipItem.index]];
+                        }
+                    }
+                }
+            }
+        });
+        return chart;
+    }
+
+    let storageChart = initializeStorageChart();
+    let cpuChart = initializeCPUChart();
+
+    {% if total_memory %}
+        let memoryChart = initializeMemoryChart();
+    {% endif %}
+
+    setInterval(async () => {
+
+        try{
+            let diagnosticStats = await $.ajax({
+                url: '/api/plugins/diagnostic/',
+                contentType: 'application/json',
+                type: 'GET'
+            });
+
+            storageChart.data.datasets[0].data = [diagnosticStats.used_disk_space, diagnosticStats.free_disk_space];
+            storageChart.update();
+            $('#storageStatsLabel').html(`
+                <b>{% trans 'Free' context 'Megabytes of storage space' %}:</b> ${filesizeformat(diagnosticStats.free_disk_space)} |
+                <b>{% trans 'Used' context 'Megabytes of storage space' %}:</b> ${filesizeformat(diagnosticStats.used_disk_space)} |
+                <b>{% trans 'Total' context 'Megabytes of storage space' %}:</b> ${filesizeformat(diagnosticStats.total_disk_space)}
+            `)
+
+            {% if total_memory %}
+                memoryChart.data.datasets[0].data = [diagnosticStats.used_memory, diagnosticStats.free_memory];
+                memoryChart.update()
+                $('#memoryStatsLabel').html(`
+                    <b>{% trans 'Free' context 'Megabytes of memory space' %}:</b> ${filesizeformat(diagnosticStats.free_memory)} |
+                    <b>{% trans 'Used' context 'Megabytes of memory space' %}:</b> ${filesizeformat(diagnosticStats.used_memory)} |
+                    <b>{% trans 'Total' context 'Megabytes of memory space'%}:</b> ${filesizeformat(diagnosticStats.total_memory)}
+                `);
+            {% endif %}
+
+            cpuChart.data.datasets[0].data = [diagnosticStats.cpu_percent_used, diagnosticStats.cpu_percent_free];
+            cpuChart.update();        
+            $('#cpuStatsLabel').html(`
+                <b>{% trans 'CPU Usage' context 'CPU usage percentage' %}:</b> ${diagnosticStats.cpu_percent_used}% |
+                <b>{% trans 'CPU Frequency' context 'CPU frequenzy in Heartz' %}:</b> ${diagnosticStats.cpu_freq_current} GHz
+            `);
         }
-    });
+        catch(error){
+            console.error(error)
+        }
+    }, 5000);
+
+    function filesizeformat(bytes) {
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        if (bytes == 0) return '0 Bytes';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return parseFloat((bytes / Math.pow(1024, i)).toFixed(1)) + ' ' + sizes[i];
+    }
 })();
 
-{% if total_memory %}
-(function(){
-    var ctx = document.getElementById('memoryChart').getContext('2d');
-    var labels = {
-        "{% trans 'Used' context 'Megabytes of memory space' %}": '{{ used_memory|filesizeformat }}',
-        "{% trans 'Free' context 'Megabytes of memory space' %}": '{{ free_memory|filesizeformat }}'
-    };
-    var chart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ["{% trans 'Used' context 'Megabytes of memory space' %}", "{% trans 'Free' context 'Megabytes of memory space' %}"],
-            datasets: [{
-                label: "{% trans 'Disk Space' %}",
-                backgroundColor:[
-                    "rgb(255, 99, 132)",
-                    "rgb(54, 162, 235)"
-                ],
-                data: [ {{ used_memory }}, {{ free_memory }} ],
-            }]
-        },
-        options: {
-            legend:{
-                reverse: true
-            },
-            tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                        return labels[data.labels[tooltipItem.index]];
-                    }
-                }
-            }
-        }
-    });
-})();
-{% endif %}
 </script>
 {% endblock %}
