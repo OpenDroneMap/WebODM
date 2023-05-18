@@ -72,7 +72,7 @@ class Plugin(PluginBase):
     def api_mount_points(self):
 
         @api_view()
-        @permission_classes((permissions.AllowAny,))
+        @permission_classes((permissions.IsAuthenticated,))
         def diagnostic(request):
             diagnostic_stats = get_diagnostic_stats()
             return Response(diagnostic_stats)
