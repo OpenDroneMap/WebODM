@@ -381,6 +381,9 @@ class TestApiTask(BootTransactionTestCase):
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
+             # Orthophoto bands field should be populated
+            self.assertEqual(len(task.orthophoto_bands), 4)
+
             # Can export orthophoto (when formula and bands are specified)
             res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
                 'formula': 'NDVI'
@@ -919,8 +922,8 @@ class TestApiTask(BootTransactionTestCase):
             # EPSG should be populated
             self.assertEqual(task.epsg, 32615)
 
-            # Orthophoto bands should be populated
-            self.assertTrue(len(task.orthophoto_bands) > 0)
+            # Orthophoto bands should not be populated
+            self.assertEqual(len(task.orthophoto_bands), 0)
 
             # Can access only tiles of available assets
             res = client.get("/api/projects/{}/tasks/{}/dsm/tiles.json".format(project.id, task.id))
