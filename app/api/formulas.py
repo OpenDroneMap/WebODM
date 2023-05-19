@@ -115,13 +115,13 @@ algos = {
         'help': _('Atmospherically Resistant Vegetation Index. Useful when working with imagery for regions with high atmospheric aerosol content.'),
         'range': (-1, 1)
     },
-    'Thermal C': {
+    'Celsius': {
         'expr': 'L',
-        'help': _('Thermal temperature in Celsius degrees.')
+        'help': _('Temperature in Celsius degrees.')
     },
-    'Thermal K': {
+    'Kelvin': {
         'expr': 'L * 100 + 27315',
-        'help': _('Thermal temperature in Centikelvin degrees.')
+        'help': _('Temperature in Centikelvin degrees.')
     },
 
     # more?
@@ -153,6 +153,8 @@ camera_filters = [
 
     'BGRNReL',
     'BGRReNL',
+
+    'L', # FLIR camera has a single LWIR band
 
     # more?
     # TODO: certain cameras have only two bands? eg. MAPIR NDVI BLUE+NIR

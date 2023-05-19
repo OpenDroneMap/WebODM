@@ -126,8 +126,17 @@ class Map extends React.Component {
         
         let metaUrl = url + "metadata";
 
-        if (type == "plant") metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
-        if (type == "dsm" || type == "dtm") metaUrl += "?hillshade=6&color_map=viridis";
+        if (type == "plant"){
+          if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
+            // Single band, probably thermal dataset, in any case we can't render NDVI
+            // because it requires 3 bands
+            metaUrl += "?formula=Celsius&bands=L&color_map=magma";
+          }else{
+            metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
+          }
+        }else if (type == "dsm" || type == "dtm"){
+          metaUrl += "?hillshade=6&color_map=viridis";
+        }
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
