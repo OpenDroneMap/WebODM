@@ -2,6 +2,7 @@ import logging
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from app.plugins.signals import task_completed, task_failed, task_removed
+from app.plugins.functions import get_current_plugin
 from . import email as notification
 from . import config
 from app.models import Task, Setting
@@ -10,6 +11,9 @@ logger = logging.getLogger('app.logger')
 
 @receiver(task_completed)
 def handle_task_completed(sender, task_id, **kwargs):
+    if get_current_plugin(only_active=True) is None:
+        return
+
     logger.info("TaskNotification: Task Completed")
 
     config_data = config.load()
@@ -27,6 +31,9 @@ def handle_task_completed(sender, task_id, **kwargs):
 
 @receiver(task_removed)
 def handle_task_removed(sender, task_id, **kwargs):
+    if get_current_plugin(only_active=True) is None:
+        return
+
     logger.info("TaskNotification: Task Removed")
 
     config_data = config.load()
@@ -43,6 +50,9 @@ def handle_task_removed(sender, task_id, **kwargs):
 
 @receiver(task_failed)
 def handle_task_failed(sender, task_id, **kwargs):
+    if get_current_plugin(only_active=True) is None:
+        return
+
     logger.info("TaskNotification: Task Failed")
 
     config_data = config.load()

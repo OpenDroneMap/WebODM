@@ -273,7 +273,7 @@ def get_plugin_by_name(name, only_active=True, refresh_cache_if_none=False):
     else:
         return res
 
-def get_current_plugin():
+def get_current_plugin(only_active=False):
     """
     When called from a python module inside a plugin's directory,
     it returns the plugin that this python module belongs to
@@ -289,7 +289,7 @@ def get_current_plugin():
         parts = relp.split(os.sep)
         if len(parts) > 0:
             plugin_name = parts[0]
-            return get_plugin_by_name(plugin_name, only_active=False)
+            return get_plugin_by_name(plugin_name, only_active=only_active)
 
     return None
 
