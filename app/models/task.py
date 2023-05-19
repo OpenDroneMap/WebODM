@@ -812,6 +812,11 @@ class Task(models.Model):
                         else:
                             # FAILED, CANCELED
                             self.save()
+                            
+                            if self.status == status_codes.FAILED:
+                                from app.plugins import signals as plugin_signals
+                                plugin_signals.task_failed.send_robust(sender=self.__class__, task_id=self.id)
+
                     else:
                         # Still waiting...
                         self.save()
