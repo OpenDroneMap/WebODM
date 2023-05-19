@@ -278,6 +278,7 @@ class Task(models.Model):
     potree_scene = fields.JSONField(default=dict, blank=True, help_text=_("Serialized potree scene information used to save/load measurements and camera view angle"), verbose_name=_("Potree Scene"))
     epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("EPSG code of the dataset (if georeferenced)"), verbose_name="EPSG")
     tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Task tags"), verbose_name=_("Tags"))
+    orthophoto_bands = fields.JSONField(default=list, blank=True, help_text=_("List of orthophoto bands"), verbose_name=_("Orthophoto Bands"))
     
     class Meta:
         verbose_name = _("Task")
@@ -878,6 +879,7 @@ class Task(models.Model):
 
         self.update_available_assets_field()
         self.update_epsg_field()
+        self.update_orthophoto_bands_field()
         self.potree_scene = {}
         self.running_progress = 1.0
         self.console_output += gettext("Done!") + "\n"
@@ -899,8 +901,9 @@ class Task(models.Model):
 
     def get_map_items(self):
         types = []
-        if 'orthophoto.tif' in self.available_assets: types.append('orthophoto')
-        if 'orthophoto.tif' in self.available_assets: types.append('plant')
+        if 'orthophoto.tif' in self.available_assets: 
+            types.append('orthophoto')
+            types.append('plant')
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
 
@@ -919,7 +922,8 @@ class Task(models.Model):
                     'public': self.public,
                     'camera_shots': camera_shots,
                     'ground_control_points': ground_control_points,
-                    'epsg': self.epsg
+                    'epsg': self.epsg,
+                    'orthophoto_bands': self.orthophoto_bands,
                 }
             }
         }
@@ -990,6 +994,22 @@ class Task(models.Model):
                 epsg = None
 
         self.epsg = epsg
+        if commit: self.save()
+
+
+    def update_orthophoto_bands_field(self, commit=False):
+        """
+        Updates the orthophoto bands field with the correct value
+        :param commit: when True also saves the model, otherwise the user should manually call save()
+        """
+        bands = []
+        orthophoto_path = self.assets_path(self.ASSETS_MAP['orthophoto.tif'])
+
+        if os.path.isfile(orthophoto_path):
+            with rasterio.open(orthophoto_path) as f:
+                bands = [c.name for c in f.colorinterp]
+
+        self.orthophoto_bands = bands
         if commit: self.save()
 
 
