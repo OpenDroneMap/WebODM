@@ -1,8 +1,4 @@
-from rest_framework.response import Response
-from rest_framework import status, permissions
-from rest_framework.decorators import api_view, permission_classes
-
-from app.plugins import PluginBase, Menu, MountPoint, get_current_plugin
+from app.plugins import PluginBase, Menu, MountPoint
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
@@ -34,58 +30,30 @@ def get_memory_stats():
     except:
         return {}
 
-def get_diagnostic_stats():
-    plugin = get_current_plugin()
-    with plugin.python_imports():
-        import psutil
-
-    # Disk space
-    total_disk_space, used_disk_space, free_disk_space = shutil.disk_usage('./')
-
-    # CPU Stats
-    cpu_percent_used = psutil.cpu_percent()
-    cpu_percent_free = 100 - cpu_percent_used
-    cpu_freq = psutil.cpu_freq()
-
-    diagnostic_stats = {
-        'total_disk_space': total_disk_space,
-        'used_disk_space': used_disk_space,
-        'free_disk_space': free_disk_space,
-        'cpu_percent_used': round(cpu_percent_used, 2),
-        'cpu_percent_free': round(cpu_percent_free, 2),
-        'cpu_freq_current': round(cpu_freq.current / 1000, 2),
-    }
-
-    # Memory (Linux only)
-    memory_stats = get_memory_stats()
-    if 'free' in memory_stats:
-        diagnostic_stats['free_memory'] = memory_stats['free']
-        diagnostic_stats['used_memory'] = memory_stats['used']
-        diagnostic_stats['total_memory'] = memory_stats['total']
-    
-    return diagnostic_stats
 
 class Plugin(PluginBase):
     def main_menu(self):
         return [Menu(_("Diagnostic"), self.public_url(""), "fa fa-chart-pie fa-fw")]
-    
-    def api_mount_points(self):
-
-        @api_view()
-        @permission_classes((permissions.IsAuthenticated,))
-        def diagnostic(request):
-            diagnostic_stats = get_diagnostic_stats()
-            return Response(diagnostic_stats)
-
-        return [
-            MountPoint('/', diagnostic)
-        ]
 
     def app_mount_points(self):
         @login_required
         def diagnostic(request):
-            template_args = get_diagnostic_stats()
-            template_args['title'] = 'Diagnostic'
+            # Disk space
+            total_disk_space, used_disk_space, free_disk_space = shutil.disk_usage('./')
+
+            template_args = {
+                'title': 'Diagnostic',
+                'total_disk_space': total_disk_space,
+                'used_disk_space': used_disk_space,
+                'free_disk_space': free_disk_space
+            }
+
+            # Memory (Linux only)
+            memory_stats = get_memory_stats()
+            if 'free' in memory_stats:
+                template_args['free_memory'] = memory_stats['free']
+                template_args['used_memory'] = memory_stats['used']
+                template_args['total_memory'] = memory_stats['total']
 
             return render(request, self.template_path("diagnostic.html"), template_args)
 
