@@ -270,6 +270,7 @@ There are many ways to contribute back to the project:
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
  - ⭐️ us on GitHub.
  - Help us [translate](#translations) WebODM in your language.
+ - Help us classify [point cloud datasets](https://github.com/OpenDroneMap/ODMSemantic3D).
  - Spread the word about WebODM and OpenDroneMap on social media.
  - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
  - You can [pledge funds](https://fund.webodm.org) for getting new features built and bug fixed.
