@@ -1,0 +1,16 @@
+{
+  "name": "Projects and tasks charts Plugin",
+  "webodmMinVersion": "0.1.0",
+  "description": "A plugin to show charts of projects and tasks",
+  "version": "0.1.0",
+  "author": "Diego Acuña, Greenbot Labs",
+  "email": "dacuna@greenbot.cl",
+  "repository": "https://github.com/OpenDroneMap/WebODM",
+  "tags": [
+    "plugin",
+    "charts"
+  ],
+  "homepage": "https://github.com/OpenDroneMap/WebODM",
+  "experimental": false,
+  "deprecated": false
+}
