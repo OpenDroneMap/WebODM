@@ -1,0 +1,126 @@
+{% extends "app/plugins/templates/base.html" %}
+{% load i18n %}
+{% block content %}
+
+    <div class="row text-center">
+        <div class="col-md-12 col-sm-12">
+            <h4>{% trans 'Projects' %}</h4>
+            <form action="/plugins/projects-charts/" method="get" class="mt-6">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label for="year">{% trans 'Year' %}</label>
+                    </div>
+                    {% for field in form %}
+                        <div class="col-sm-4">
+
+                        {{ field }}
+                    {% endfor %}
+                    </div>
+
+
+                    <div class="col-sm-4">
+                        {{ form.non_field_errors }}
+                        <input type="submit" value="{% trans 'Next' %}" class="btn btn-primary"/>
+                    </div>
+                </div>
+            </form>
+
+            <div class="col-md-12 col-sm-12">
+                <div style="width: 80%; margin-left: 10%;">
+                    <canvas id="projectsChart" width="200" height="50" style="margin-bottom: 12px;"></canvas>
+                </div>
+            </div>
+
+            <div style="width: 80%; margin-left: 10%;">
+                <canvas id="tasksChart" width="200" height="50" style="margin-bottom: 12px;"></canvas>
+            </div>
+
+        </div>
+    </div>
+    <script>
+
+        (function () {
+            const ctx = document.getElementById('projectsChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                options: {
+                    tooltip: {
+                        enabled: false,
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                        }
+                    }
+                },
+
+                data: {
+                    labels: [
+                        {% for month in months %}
+                            "{{ month }}",
+                        {% endfor %}
+                    ],
+                    datasets: [
+                        {
+                            label: "{% trans 'Projects by month' %}",
+                            data: [{{ projects_by_month|join:", "  }}],
+                            backgroundColor: [
+                                {% for _ in projects_by_month %}
+                                    'rgba(54, 162, 235, 0.4)',
+                                {% endfor %}
+                            ],
+                        },
+                    ]
+                },
+
+            });
+        })();
+
+        (function () {
+            const ctx = document.getElementById('tasksChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                options: {
+                    tooltip: {
+                        enabled: false,
+                    },
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                        }
+                    }
+                },
+
+                data: {
+                    labels: [
+                        {% for month in months %}
+                            "{{ month }}",
+                        {% endfor %}
+                    ],
+                    datasets: [
+                        {
+                            label: "{% trans 'Tasks by month' %}",
+                            data: [{{ tasks_by_month|join:", "  }}],
+                            backgroundColor: [
+                                {% for _ in tasks_by_month %}
+                                    'rgba(54, 162, 235, 0.4)',
+                                {% endfor %}
+                            ],
+                        },
+                    ]
+                },
+
+            });
+        })();
+
+    </script>
+{% endblock %}
