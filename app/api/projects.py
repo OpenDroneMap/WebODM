@@ -197,10 +197,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response({'success': True}, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
-        project = get_and_check_project(request, pk, ('delete_project', ))
+        project = get_and_check_project(request, pk, ('view_project', ))
 
         # Owner? Delete the project
         if project.owner == request.user or request.user.is_superuser:
+            get_and_check_project(request, pk, ('delete_project', ))
+
             return super().destroy(self, request, pk=pk)
         else:
             # Do not remove the project, simply remove all user's permissions to the project
