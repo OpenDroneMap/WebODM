@@ -400,6 +400,20 @@ class ProjectListItem extends React.Component {
     this.editProjectDialog.show();
   }
 
+  handleHideProject = (deleteWarning, deleteAction) => {
+    return () => {
+      if (window.confirm(deleteWarning)){
+        this.setState({error: "", refreshing: true});
+        deleteAction()
+          .fail(e => {
+            this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Could not delete item")});
+          }).always(() => {
+            this.setState({refreshing: false});
+          });
+      }
+    }
+  }
+
   updateProject(project){
     return $.ajax({
         url: `/api/projects/${this.state.data.id}/edit/`,
@@ -681,6 +695,12 @@ class ProjectListItem extends React.Component {
                 [<i key="edit-icon" className='far fa-edit'></i>
                 ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
                 </a>]
+            : ""}
+
+            {!canEdit && !data.owned ? 
+              [<i key="edit-icon" className='far fa-eye-slash'></i>
+              ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleHideProject(deleteWarning, this.handleDelete)}> {_("Delete")}
+              </a>]
             : ""}
 
           </div>

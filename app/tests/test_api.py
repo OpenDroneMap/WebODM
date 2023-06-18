@@ -253,14 +253,17 @@ class TestApi(BootTestCase):
         for perm in ['delete', 'change', 'add']:
             self.assertFalse(perm in res.data['permissions'])
 
-        # Can't delete a project for which we just have view permissions
-        res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
-        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
-
-        # Can delete a project for which we have delete permissions
-        assign_perm('delete_project', user, other_temp_project)
+        # Can delete a project for which we just have view permissions
+        # (we will just remove our read permissions without deleting the project)
         res = client.delete('/api/projects/{}/'.format(other_temp_project.id))
         self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
+        
+        # Project still exists
+        self.assertTrue(Project.objects.filter(id=other_temp_project.id).count() == 1)
+
+        # We just can't access it
+        res = client.get('/api/projects/{}/'.format(other_temp_project.id))
+        self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
         # A user cannot reassign a task to a
         # project for which he/she has no permissions
