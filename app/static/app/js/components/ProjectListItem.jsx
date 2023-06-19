@@ -223,7 +223,7 @@ class ProjectListItem extends React.Component {
                             totalBytes: this.state.upload.totalBytes - file.size
                         });
                         throw new Error(interpolate(_('Cannot upload %(filename)s, File too Large! Default MaxFileSize is %(maxFileSize)s MB!'), { filename: file.name, maxFileSize: this.dz.options.maxFilesize }));
-                        }
+                    }
                     retry();
                 }else{
                     // Check response
