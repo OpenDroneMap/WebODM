@@ -143,6 +143,7 @@ class ProjectListItem extends React.Component {
           autoProcessQueue: false,
           createImageThumbnails: false,
           clickable: this.uploadButton,
+          maxFilesize: 131072, // 128G
           chunkSize: 2147483647,
           timeout: 2147483647,
           
@@ -215,6 +216,14 @@ class ProjectListItem extends React.Component {
 
             try{
                 if (file.status === "error"){
+                    if ((file.size / 1024) > this.dz.options.maxFilesize) {
+                        // Delete from upload queue
+                        this.setUploadState({
+                            totalCount: this.state.upload.totalCount - 1,
+                            totalBytes: this.state.upload.totalBytes - file.size
+                        });
+                        throw new Error(interpolate(_('Cannot upload %(filename)s, File too Large! Default MaxFileSize is %(maxFileSize)s MB!'), { filename: file.name, maxFileSize: this.dz.options.maxFilesize }));
+                    }
                     retry();
                 }else{
                     // Check response
