@@ -55,6 +55,7 @@ webcolors==1.5
 rio-tiler==2.1.2
 rio-color==1.0.4
 rio-cogeo==2.3.1
+pydantic~=1.0
 rasterio==1.2.9 ; sys_platform == 'linux' or sys_platform == 'darwin'
 https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/rasterio-1.2.10-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
 https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/GDAL-3.3.3-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
