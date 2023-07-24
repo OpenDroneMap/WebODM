@@ -14,6 +14,6 @@ services:
     expose:
       - "3000"
     volumes:
-      - ${WO_MEDIA_DIR}:/webodm/app/media:z
+      - ${WO_MEDIA_DIR}:/var/www/data:z
     restart: unless-stopped
     oom_score_adj: 500
