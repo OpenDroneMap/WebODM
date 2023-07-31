@@ -69,9 +69,10 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-	--processing-dir)
-	export WO_PROCESSING_DIR
-	shift # past argument
+    --processing-dir)
+    WO_PROCESSING_DIR=$(realpath "$2")
+    export WO_PROCESSING_DIR
+    shift # past argument
     shift # past value
     ;;
     --ssl)

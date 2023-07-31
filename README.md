@@ -139,6 +139,11 @@ For various reasons such as ease of backup/restore, if you want to store your fi
 ./webodm.sh restart --media-dir /home/user/webodm_data --db-dir /home/user/webodm_db
 ```
 
+If you want to avoid huge usage in system disk,you can store temporary files produced during the re-constructiong in external Hard Drive,and pass the realpath to  the `--processing-dir` option:
+```bash
+./webodm.sh restart --processing-dir /data/webodm_processing_data
+```
+
 Note that existing task results will not be available after the change. Refer to the [Migrate Data Volumes](https://docs.docker.com/engine/tutorials/dockervolumes/#backup-restore-or-migrate-data-volumes) section of the Docker documentation for information on migrating existing task results.
 
 ### Common Troubleshooting
