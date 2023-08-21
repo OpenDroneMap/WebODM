@@ -169,6 +169,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
+    'app.auth.backends.ExternalBackend',
 )
 
 # Internationalization
@@ -379,6 +380,10 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 # Number of minutes a processing node hasn't been seen 
 # before it should be considered offline
 NODE_OFFLINE_MINUTES = 5 
+
+USE_EXTERNAL_AUTH = True # TODO: change
+EXTERNAL_AUTH_ENDPOINT = "http://192.168.2.253:5000/r/auth/login"
+# TODO: make these env vars?
 
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True

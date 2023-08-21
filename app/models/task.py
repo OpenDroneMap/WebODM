@@ -279,6 +279,7 @@ class Task(models.Model):
     epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("EPSG code of the dataset (if georeferenced)"), verbose_name="EPSG")
     tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Task tags"), verbose_name=_("Tags"))
     orthophoto_bands = fields.JSONField(default=list, blank=True, help_text=_("List of orthophoto bands"), verbose_name=_("Orthophoto Bands"))
+    size = models.FloatField(default=0.0, blank=True, help_text=_("Size of the task on disk in megabytes"), verbose_name=_("Size"))
     
     class Meta:
         verbose_name = _("Task")
@@ -1161,3 +1162,16 @@ class Task(models.Model):
                 else:
                     with open(file.temporary_file_path(), 'rb') as f:
                         shutil.copyfileobj(f, fd)
+
+    def update_size(self, commit=False):
+        try:
+            total_bytes = 0
+            for dirpath, _, filenames in os.walk(self.task_path()):
+                for f in filenames:
+                    fp = os.path.join(dirpath, f)
+                    if not os.path.islink(fp):
+                        total_bytes += os.path.getsize(fp)
+            self.size = (total_bytes / 1024 / 1024)
+            if commit: self.save()
+        except Exception as e:
+            logger.warn("Cannot update size for task {}: {}".format(self, str(e)))
