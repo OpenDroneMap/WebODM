@@ -8,6 +8,15 @@ register = template.Library()
 logger = logging.getLogger('app.logger')
 
 @register.simple_tag
+def percentage(num, den, maximum=None):
+    if den == 0:
+        return 0
+    perc = max(0, num / den * 100)
+    if maximum is not None:
+        perc = min(perc, maximum)
+    return perc
+
+@register.simple_tag
 def is_single_user_mode():
     return settings.SINGLE_USER_MODE
 

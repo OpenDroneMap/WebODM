@@ -15,6 +15,17 @@
                     {% blocktrans with user=user.username %}Hello, {{ user }}!{% endblocktrans %}<br/>
                     <span class="email">{{ user.email }}</span>
                 </li>
+                {% if user.profile.has_quota %}
+                <li class="divider"></li>
+                    {% with tot_quota=user.profile.quota %}
+                    {% with used_quota=user.profile.used_quota_cached %}
+                    {% percentage 0 tot_quota as perc_quota %}
+
+                    Tot: {{ tot_quota }} Used: {{ used_quota }}
+                    Perc: {{ perc_quota|floatformat:0 }}
+
+                    {% endwith %}{% endwith %}
+                {% endif %}
                 <li class="divider"></li>
                 <li><a href="/logout/"><i class="fa fa-sign-out-alt fa-fw"></i> {% trans 'Logout' %}</a>
                 </li>
