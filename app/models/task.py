@@ -433,6 +433,7 @@ class Task(models.Model):
                         shutil.copytree(self.task_path(), task.task_path())
                 else:
                     logger.warning("Task {} doesn't have folder, will skip copying".format(self))
+
             return task
         except Exception as e:
             logger.warning("Cannot duplicate task: {}".format(str(e)))
@@ -886,6 +887,7 @@ class Task(models.Model):
         self.update_available_assets_field()
         self.update_epsg_field()
         self.update_orthophoto_bands_field()
+        self.update_size()
         self.potree_scene = {}
         self.running_progress = 1.0
         self.console_output += gettext("Done!") + "\n"
