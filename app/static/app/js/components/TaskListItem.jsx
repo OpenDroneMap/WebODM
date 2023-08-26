@@ -575,7 +575,7 @@ class TaskListItem extends React.Component {
                   </tr>}
                   {task.size > 0 && 
                   <tr>
-                    <td><strong>{_("Size:")}</strong></td>
+                    <td><strong>{_("Disk Usage:")}</strong></td>
                     <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
                   </tr>}
                   <tr>

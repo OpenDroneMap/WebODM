@@ -8,7 +8,7 @@ register = template.Library()
 logger = logging.getLogger('app.logger')
 
 @register.filter
-def storage_size(megabytes):
+def disk_size(megabytes):
     k = 1000
     k2 = k ** 2
     k3 = k ** 3

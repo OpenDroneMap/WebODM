@@ -390,6 +390,9 @@ class TestApiTask(BootTransactionTestCase):
             # Size should be updated
             self.assertTrue(task.size > 0)
 
+            # The owner's used quota should have increased
+            self.assertTrue(task.project.owner.profile.used_quota_cached() > 0)
+
             # Can export orthophoto (when formula and bands are specified)
             res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
                 'formula': 'NDVI'

@@ -26,7 +26,7 @@
                     
                     <li>
                         <div class="info-item quotas">
-                            {% with usage=perc_quota|floatformat:0 used=used_quota|storage_size total=tot_quota|storage_size %}
+                            {% with usage=perc_quota|floatformat:0 used=used_quota|disk_size total=tot_quota|disk_size %}
                             <i class="fa fa-database fa-fw"></i> {% blocktrans %}{{used}} of {{total}} used{% endblocktrans %}
                             <div class="progress">
                                 <div class="progress-bar progress-bar-{% if perc_quota <= 100 %}success{% else %}warning{% endif %} active" style="width: {{ bar_width }}%">
