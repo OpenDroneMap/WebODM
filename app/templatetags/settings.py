@@ -1,11 +1,23 @@
 import datetime
-
+import math
 import logging
 from django import template
 from webodm import settings
 
 register = template.Library()
 logger = logging.getLogger('app.logger')
+
+@register.filter
+def storage_size(megabytes):
+    k = 1000
+    k2 = k ** 2
+    k3 = k ** 3
+    if megabytes <= k2:
+        return str(round(megabytes / k, 2)) + ' GB'
+    elif megabytes <= k3:
+        return str(round(megabytes / k2, 2)) + ' TB'
+    else:
+        return str(round(megabytes / k3, 2)) + ' PB'
 
 @register.simple_tag
 def percentage(num, den, maximum=None):
