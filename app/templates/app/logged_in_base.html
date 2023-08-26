@@ -20,8 +20,7 @@
                 {% if user.profile.has_quota %}
                     <li class="divider"></li>
                     
-                    {% with tot_quota=user.profile.quota %}
-                    {% with used_quota=user.profile.used_quota_cached %}
+                    {% with tot_quota=user.profile.quota used_quota=user.profile.used_quota_cached %}
                     {% percentage used_quota tot_quota as perc_quota %}
                     {% percentage used_quota tot_quota 100 as bar_width %}
                     
@@ -38,7 +37,7 @@
                         </div>
                     </li>
 
-                    {% endwith %}{% endwith %}
+                    {% endwith %}
                 {% endif %}
                 <li class="divider"></li>
                 <li><a href="/logout/"><i class="fa fa-sign-out-alt fa-fw"></i> {% trans 'Logout' %}</a>

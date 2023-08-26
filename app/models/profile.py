@@ -24,8 +24,18 @@ class Profile(models.Model):
             return cached
         
         v = self.used_quota()
-        cache.set(k, v, 300) # 2 minutes
+        cache.set(k, v, 1800) # 30 minutes
         return v
+
+    def has_exceeded_quota_cached(self):
+        if not self.has_quota():
+            return False
+        
+        q = self.used_quota_cached()
+        return q > self.quota
+
+    def clear_used_quota_cache(self):
+        cache.delete(f'used_quota_{self.user.id}')
     
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

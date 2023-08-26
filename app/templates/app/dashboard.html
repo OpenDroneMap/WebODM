@@ -1,5 +1,6 @@
 {% extends "app/logged_in_base.html" %}
 {% load i18n %}
+{% load settings %}
 
 {% block content %}
 	{% load render_bundle from webpack_loader %}
@@ -37,6 +38,15 @@
 					<li>{% blocktrans with link_start='<a href="https://github.com/OpenDroneMap/OpenDroneMap/wiki/Running-OpenDroneMap#running-odm-with-ground-control" target="_blank">' link_end='</a>' %}A {{link_start}}GCP File{{link_end}} is optional, but can increase georeferencing accuracy{% endblocktrans %}</li>
 				</ul>
 			</p>
+		{% endif %}
+
+		{% if user.profile.has_exceeded_quota_cached %}
+			{% with total=user.profile.quota|storage_size used=user.profile.used_quota_cached|storage_size %}
+			{% quota_exceeded_grace_period as hours %}
+			<div class="alert alert-warning alert-dismissible">
+				<i class="fas fa-exclamation-triangle"></i> {% blocktrans %}The current storage quota is being exceeded ({{ used }} of {{ total }} used). The most recent tasks will be automatically deleted within {{ hours }} hours, until usage falls below {{ total }}.{% endblocktrans %}
+			</div>
+			{% endwith %}
 		{% endif %}
 
 		<div id="dashboard-app" data-dashboard></div>

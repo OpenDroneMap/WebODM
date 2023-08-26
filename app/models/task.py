@@ -434,6 +434,7 @@ class Task(models.Model):
                 else:
                     logger.warning("Task {} doesn't have folder, will skip copying".format(self))
 
+                self.project.owner.profile.clear_used_quota_cache()
             return task
         except Exception as e:
             logger.warning("Cannot duplicate task: {}".format(str(e)))
@@ -1037,6 +1038,8 @@ class Task(models.Model):
         except FileNotFoundError as e:
             logger.warning(e)
 
+        self.project.owner.profile.clear_used_quota_cache()
+
         plugin_signals.task_removed.send_robust(sender=self.__class__, task_id=task_id)
 
     def set_failure(self, error_message):
@@ -1175,5 +1178,7 @@ class Task(models.Model):
                         total_bytes += os.path.getsize(fp)
             self.size = (total_bytes / 1024 / 1024)
             if commit: self.save()
+
+            self.project.owner.profile.clear_used_quota_cache()
         except Exception as e:
             logger.warn("Cannot update size for task {}: {}".format(self, str(e)))

@@ -29,6 +29,10 @@ def percentage(num, den, maximum=None):
     return perc
 
 @register.simple_tag
+def quota_exceeded_grace_period():
+    return settings.QUOTA_EXCEEDED_GRACE_PERIOD
+
+@register.simple_tag
 def is_single_user_mode():
     return settings.SINGLE_USER_MODE
 

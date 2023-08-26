@@ -395,6 +395,11 @@ USE_EXTERNAL_AUTH = True # TODO: change
 EXTERNAL_AUTH_ENDPOINT = "http://192.168.2.253:5000/r/auth/login"
 # TODO: make these env vars?
 
+# Number of hours before tasks are automatically deleted
+# from an account that is exceeding a disk quota
+QUOTA_EXCEEDED_GRACE_PERIOD = 8
+
+
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
 
