@@ -4,7 +4,6 @@ version: '2.1'
 volumes:
   dbdata:
   appmedia:
-  apptemp:
 services:
   db:
     image: opendronemap/webodm_db
