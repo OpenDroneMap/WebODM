@@ -1,8 +1,10 @@
 import datetime
 import math
 import logging
+import time
 from django import template
 from webodm import settings
+from django.utils.translation import gettext as _
 
 register = template.Library()
 logger = logging.getLogger('app.logger')
@@ -28,9 +30,22 @@ def percentage(num, den, maximum=None):
         perc = min(perc, maximum)
     return perc
 
-@register.simple_tag
-def quota_exceeded_grace_period():
-    return settings.QUOTA_EXCEEDED_GRACE_PERIOD
+@register.simple_tag(takes_context=True)
+def quota_exceeded_grace_period(context):
+    deadline = context.request.user.profile.get_quota_deadline()
+    now = time.time()
+    if deadline is None:
+        deadline = now + settings.QUOTA_EXCEEDED_GRACE_PERIOD * 60 * 60
+    diff = max(0, deadline - now)
+    if diff >= 60*60*24*2:
+        return _("within %(num)s days") % {"num": math.ceil(diff / (60*60*24))}
+    elif diff >= 60*60:
+        return _("within %(num)s hours") % {"num": math.ceil(diff / (60*60))}
+    elif diff > 0:
+        return _("within %(num)s minutes") % {"num": math.ceil(diff / 60)}
+    else:
+        return _("very soon")
+    
 
 @register.simple_tag
 def is_single_user_mode():

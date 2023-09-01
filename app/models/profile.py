@@ -1,3 +1,4 @@
+import time
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -6,6 +7,8 @@ from django.dispatch import receiver
 from app.models import Task
 from django.db.models import Sum
 from django.core.cache import cache
+from webodm import settings
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -16,6 +19,13 @@ class Profile(models.Model):
 
     def used_quota(self):
         return Task.objects.filter(project__owner=self.user).aggregate(total=Sum('size'))['total']
+
+    def has_exceeded_quota(self):
+        if not self.has_quota():
+            return False
+        
+        q = self.used_quota()
+        return q > self.quota
 
     def used_quota_cached(self):
         k = f'used_quota_{self.user.id}'
@@ -36,6 +46,20 @@ class Profile(models.Model):
 
     def clear_used_quota_cache(self):
         cache.delete(f'used_quota_{self.user.id}')
+
+    def get_quota_deadline(self):
+        return cache.get(f'quota_deadline_{self.user.id}')
+
+    def set_quota_deadline(self, hours):
+        k = f'quota_deadline_{self.user.id}'
+        seconds = (hours * 60 * 60)
+        v = time.time() + seconds
+        cache.set(k, v, int(max(seconds * 10, settings.QUOTA_EXCEEDED_GRACE_PERIOD * 60 * 60)))
+        return v
+    
+    def clear_quota_deadline(self):
+        cache.delete(f'quota_deadline_{self.user.id}')
+
     
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

@@ -1,7 +1,10 @@
 from django.contrib.auth.models import User, Group
-from rest_framework import serializers, viewsets, generics, status
+from app.models import Profile
+from rest_framework import serializers, viewsets, generics, status, exceptions
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password
 from app import models
 
@@ -20,6 +23,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         if email is not None:
             queryset = queryset.filter(email=email)
         return queryset
+
     def create(self, request):
         data = request.data.copy()
         password = data.get('password')
@@ -44,3 +48,36 @@ class AdminGroupViewSet(viewsets.ModelViewSet):
         if name is not None:
             queryset = queryset.filter(name=name)
         return queryset
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = Profile
+        exclude = ('id', ) 
+
+        read_only_fields = ('user', )
+
+class AdminProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = 'user'
+    
+    def get_queryset(self):
+        return Profile.objects.all()
+
+    
+    @action(detail=True, methods=['post'])
+    def update_quota_deadline(self, request, user=None):
+        try:
+            hours = float(request.data.get('hours', ''))
+            if hours < 0:
+                raise ValueError("hours must be >= 0")
+        except ValueError as e:
+            raise exceptions.ValidationError(str(e))
+
+        try:
+            p = Profile.objects.get(user=user)
+        except ObjectDoesNotExist:
+            raise exceptions.NotFound()
+        
+        return Response({'deadline': p.set_quota_deadline(hours)}, status=status.HTTP_200_OK)

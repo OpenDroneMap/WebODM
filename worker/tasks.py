@@ -11,6 +11,7 @@ from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from django.db.models import Q
+from app.models import Profile
 
 from app.models import Project
 from app.models import Task
@@ -203,3 +204,16 @@ def export_pointcloud(self, input, **opts):
     except Exception as e:
         logger.error(str(e))
         return {'error': str(e)}
+
+@app.task
+def check_quotas():
+    profiles = Profile.objects.filter(quota__gt=-1)
+    # for p in profiles:
+    #     deadline_key = "%s_quota_exceeded_deadline" % p.user.id
+
+    #     if p.has_exceeded_quota():
+    #         now = time.time()
+    #         deadline = redis_client.getset(deadline_key, now + (settings.QUOTA_EXCEEDED_GRACE_PERIOD * 60 * 60))
+    #         # if deadline < now: TODO..
+    #     else:
+    #         redis_client.delete(deadline_key)

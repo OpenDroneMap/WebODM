@@ -44,6 +44,14 @@ app.conf.beat_schedule = {
         	'retry': False
         }
     },
+    'check-quotas': {
+        'task': 'worker.tasks.check_quotas',
+        'schedule': 3600,
+        'options': {
+        	'expires': 1799,
+        	'retry': False
+        }
+    },
 }
 
 # Mock class for handling async results during testing
