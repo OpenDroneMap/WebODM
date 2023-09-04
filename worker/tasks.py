@@ -208,12 +208,26 @@ def export_pointcloud(self, input, **opts):
 @app.task
 def check_quotas():
     profiles = Profile.objects.filter(quota__gt=-1)
-    # for p in profiles:
-    #     deadline_key = "%s_quota_exceeded_deadline" % p.user.id
+    for p in profiles:
+        if p.has_exceeded_quota():
+            deadline = p.get_quota_deadline()
+            if deadline is None:
+                deadline = p.set_quota_deadline(settings.QUOTA_EXCEEDED_GRACE_PERIOD)
+            now = time.time()
+            if now > deadline:
+                # deadline passed, delete tasks until quota is met
+                logger.info("Quota deadline expired for %s, deleting tasks" % str(p.user.username))
 
-    #     if p.has_exceeded_quota():
-    #         now = time.time()
-    #         deadline = redis_client.getset(deadline_key, now + (settings.QUOTA_EXCEEDED_GRACE_PERIOD * 60 * 60))
-    #         # if deadline < now: TODO..
-    #     else:
-    #         redis_client.delete(deadline_key)
+                while p.has_exceeded_quota():
+                    try:
+                        last_task = Task.objects.filter(project__owner=p.user).order_by("-created_at").first()
+                        if last_task is None:
+                            break
+                        logger.info("Deleting %s" % last_task)
+                        last_task.delete()
+                    except Exception as e:
+                        logger.warn("Cannot delete %s for %s: %s" % (str(last_task), str(p.user.username), str(e)))
+                        break
+        else:
+            p.clear_quota_deadline()
+

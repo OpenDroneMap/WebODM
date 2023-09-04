@@ -41,7 +41,7 @@ def quota_exceeded_grace_period(context):
         return _("within %(num)s days") % {"num": math.ceil(diff / (60*60*24))}
     elif diff >= 60*60:
         return _("within %(num)s hours") % {"num": math.ceil(diff / (60*60))}
-    elif diff > 0:
+    elif diff > 1:
         return _("within %(num)s minutes") % {"num": math.ceil(diff / 60)}
     else:
         return _("very soon")
