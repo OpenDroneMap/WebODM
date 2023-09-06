@@ -18,7 +18,10 @@ class Profile(models.Model):
         return self.quota != -1
 
     def used_quota(self):
-        return Task.objects.filter(project__owner=self.user).aggregate(total=Sum('size'))['total']
+        q = Task.objects.filter(project__owner=self.user).aggregate(total=Sum('size'))['total']
+        if q is None:
+            q = 0
+        return q
 
     def has_exceeded_quota(self):
         if not self.has_quota():

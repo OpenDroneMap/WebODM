@@ -391,9 +391,7 @@ CACHES = {
 # before it should be considered offline
 NODE_OFFLINE_MINUTES = 5 
 
-USE_EXTERNAL_AUTH = True # TODO: change
-EXTERNAL_AUTH_ENDPOINT = "http://192.168.2.253:5000/r/auth/login"
-# TODO: make these env vars?
+EXTERNAL_AUTH_ENDPOINT = os.environ.get('WO_EXTERNAL_AUTH_ENDPOINT', '')
 
 # Number of hours before tasks are automatically deleted
 # from an account that is exceeding a disk quota

@@ -130,6 +130,12 @@ case $key in
     shift # past argument
     shift # past value
     ;;
+    --external-auth-endpoint)
+    WO_EXTERNAL_AUTH_ENDPOINT="$2"
+    export WO_EXTERNAL_AUTH_ENDPOINT
+    shift # past argument
+    shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -170,6 +176,7 @@ usage(){
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
   echo "	--gpu	Use GPU NodeODM nodes (Linux only) (default: disabled)"
+  echo "	--external-auth-endpoint	External authentication endpoint (default: disabled)"
   exit
 }
 
@@ -339,6 +346,7 @@ start(){
 	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
 	echo "Celery Broker: $WO_BROKER"
 	echo "Default Nodes: $WO_DEFAULT_NODES"
+	echo "External auth endpoint: $WO_EXTERNAL_AUTH_ENDPOINT"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""

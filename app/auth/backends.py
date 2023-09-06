@@ -2,7 +2,7 @@ import requests
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 from nodeodm.models import ProcessingNode
-from webodm.settings import EXTERNAL_AUTH_ENDPOINT, USE_EXTERNAL_AUTH
+from webodm.settings import EXTERNAL_AUTH_ENDPOINT
 from guardian.shortcuts import assign_perm
 import logging
 
@@ -10,7 +10,7 @@ logger = logging.getLogger('app.logger')
 
 class ExternalBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None):
-        if not USE_EXTERNAL_AUTH:
+        if EXTERNAL_AUTH_ENDPOINT == "":
             return None
         
         try:
@@ -20,10 +20,10 @@ class ExternalBackend(ModelBackend):
             }, headers={'Accept': 'application/json'})
             res = r.json()
 
+            # logger.info(res)
+
             if 'message' in res or 'error' in res:
                 return None
-            
-            logger.info(res)
 
             if 'user_id' in res:
                 try:
@@ -32,6 +32,17 @@ class ExternalBackend(ModelBackend):
                     # Update user info
                     if user.username != username:
                         user.username = username
+                        user.save()
+                    
+                    # Update quotas
+                    maxQuota = -1
+                    if 'maxQuota' in res:
+                        maxQuota = res['maxQuota']
+                    if 'node' in res and 'limits' in res['node'] and 'maxQuota' in res['node']['limits']:
+                        maxQuota = res['node']['limits']['maxQuota']
+
+                    if user.profile.quota != maxQuota:
+                        user.profile.quota = maxQuota
                         user.save()
                 except User.DoesNotExist:
                     user = User(pk=res['user_id'], username=username)
@@ -64,7 +75,7 @@ class ExternalBackend(ModelBackend):
             return None
     
     def get_user(self, user_id):
-        if not USE_EXTERNAL_AUTH:
+        if EXTERNAL_AUTH_ENDPOINT == "":
             return None
 
         try:
