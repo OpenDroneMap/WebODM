@@ -9,6 +9,10 @@ from django.utils.translation import gettext as _
 register = template.Library()
 logger = logging.getLogger('app.logger')
 
+@register.simple_tag
+def external_auth_endpoint():
+    return settings.EXTERNAL_AUTH_ENDPOINT
+
 @register.filter
 def disk_size(megabytes):
     k = 1000

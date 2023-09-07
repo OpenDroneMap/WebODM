@@ -10,11 +10,12 @@
     {% endif %}
 
     {% is_single_user_mode as autologin %}
+    {% external_auth_endpoint as ext_auth_ep %}
 
     {% if autologin %}
         <script>location.href='/';</script>
     {% else %}
-    <form action="{% url 'login' %}" method="post" class="form-horizontal" role="form">{% csrf_token %}
+    <form id="loginForm" {% if ext_auth_ep != "" %} style="display: none" {% endif %} action="{% url 'login' %}" method="post" class="form-horizontal" role="form">{% csrf_token %}
         {% for field in form %}
             {% include 'registration/form_field.html' %}
         {% endfor %}
@@ -34,5 +35,39 @@
             </div>
         </div>
     </form>
+
+    {% if ext_auth_ep != '' %}
+    <div class="text-center" id="authLoading">
+        <i class="fa fa-spin fa-circle-notch fa-spin fa-fw fa-2x"></i>
+    </div>
+    <script>
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    function delCookie(name) {
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    $(function(){
+        if (getCookie("autologin") !== undefined){
+            $.ajax({
+                url: "{{ ext_auth_ep }}",
+                type: "POST",
+            }).done(function(res){
+                console.log(res);
+                // delCookie("autologin");
+            }).fail(function(){
+
+                // delCookie("autologin");
+            });
+        }else{
+            $("#authLoading").hide();
+            $("#loginForm").show();
+        }
+    });
+    </script>
+    {% endif %}
+
     {% endif %}
 {% endblock %}
