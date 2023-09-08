@@ -401,6 +401,7 @@ QUOTA_EXCEEDED_GRACE_PERIOD = 8
 
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
+    EXTERNAL_AUTH_ENDPOINT = '/_test-external-auth'
 
 try:
     from .local_settings import *

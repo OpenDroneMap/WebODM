@@ -58,6 +58,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ('user', )
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
+    pagination_class = None
     serializer_class = ProfileSerializer
     permission_classes = [IsAdminUser]
     lookup_field = 'user'
