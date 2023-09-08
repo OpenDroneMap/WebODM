@@ -10,6 +10,10 @@ register = template.Library()
 logger = logging.getLogger('app.logger')
 
 @register.simple_tag
+def reset_password_link():
+    return settings.RESET_PASSWORD_LINK
+
+@register.simple_tag
 def has_external_auth():
     return settings.EXTERNAL_AUTH_ENDPOINT != ""
 
