@@ -10,8 +10,8 @@ register = template.Library()
 logger = logging.getLogger('app.logger')
 
 @register.simple_tag
-def external_auth_endpoint():
-    return settings.EXTERNAL_AUTH_ENDPOINT
+def has_external_auth():
+    return settings.EXTERNAL_AUTH_ENDPOINT != ""
 
 @register.filter
 def disk_size(megabytes):
