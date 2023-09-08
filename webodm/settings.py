@@ -391,7 +391,8 @@ CACHES = {
 # before it should be considered offline
 NODE_OFFLINE_MINUTES = 5 
 
-EXTERNAL_AUTH_ENDPOINT = os.environ.get('WO_EXTERNAL_AUTH_ENDPOINT', '')
+EXTERNAL_AUTH_ENDPOINT = ''
+RESET_PASSWORD_LINK = ''
 
 # Number of hours before tasks are automatically deleted
 # from an account that is exceeding a disk quota
@@ -403,5 +404,10 @@ if TESTING or FLUSHING:
 
 try:
     from .local_settings import *
+except ImportError:
+    pass
+
+try:
+    from .settings_override import *
 except ImportError:
     pass
