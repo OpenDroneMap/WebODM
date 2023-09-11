@@ -19,7 +19,7 @@
                 </li>
                 {% if user.profile.has_quota %}
                     <li class="divider"></li>
-                    
+
                     {% with tot_quota=user.profile.quota used_quota=user.profile.used_quota_cached %}
                     {% percentage used_quota tot_quota as perc_quota %}
                     {% percentage used_quota tot_quota 100 as bar_width %}

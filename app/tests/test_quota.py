@@ -2,6 +2,8 @@ from django.contrib.auth.models import User, Group
 from rest_framework import status
 from rest_framework.test import APIClient
 from app.models import Task, Project
+from nodeodm.models import ProcessingNode
+from worker.tasks import check_quotas
 from .classes import BootTestCase
 
 class TestQuota(BootTestCase):
@@ -43,7 +45,9 @@ class TestQuota(BootTestCase):
         # Create a task with size
         p = Project.objects.create(owner=user, name='Test')
         p.save()
-        t = Task.objects.create(project=p, name='Test', size=2005)
+        t = Task.objects.create(project=p, name='Test', size=1005)
+        t.save()
+        t = Task.objects.create(project=p, name='Test2', size=1010)
         t.save()
 
         # Simulate call to task.update_size which calls clear_used_quota_cache
@@ -55,4 +59,30 @@ class TestQuota(BootTestCase):
         res = c.get('/dashboard/', follow=True)
         body = res.content.decode("utf-8")
 
-        # self.assertTrue("disk quota is being exceeded" in body)
+        self.assertTrue("disk quota is being exceeded" in body)
+        self.assertTrue("in 8 hours" in body)
+
+        # Running the workers check_quota function will not remove tasks
+        check_quotas()
+        self.assertEqual(len(Task.objects.filter(project__owner=user)), 2)
+
+        # Update grace period
+        def check_quota_warning(hours, text):
+            user.profile.set_quota_deadline(hours)
+            res = c.get('/dashboard/', follow=True)
+            body = res.content.decode("utf-8")
+            self.assertTrue(text in body)
+        
+        check_quota_warning(73, "in 3 days")
+        check_quota_warning(71, "in 2 days")
+        check_quota_warning(47.9, "in 47 hours")
+        check_quota_warning(3.1, "in 3 hours")
+        check_quota_warning(1.51, "in 90 minutes")
+        check_quota_warning(0.99, "in 59 minutes")
+        check_quota_warning(0, "very soon")
+
+        # Running the check_quotas function should remove the last task only
+        check_quotas()
+        tasks = Task.objects.filter(project__owner=user)
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual(tasks[0].name, "Test")

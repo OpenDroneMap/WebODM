@@ -246,6 +246,8 @@ class TestApi(BootTestCase):
         
         # Update quota deadlines
 
+        self.assertTrue(user.profile.get_quota_deadline() is None)
+
         # Miss parameters
         res = client.post('/api/admin/profiles/%s/update_quota_deadline/' % user.id)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

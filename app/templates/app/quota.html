@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load settings %}
+
+{% if user.profile.has_exceeded_quota_cached %}
+    {% with total=user.profile.quota|disk_size used=user.profile.used_quota_cached|disk_size %}
+    {% quota_exceeded_grace_period as when %}
+    <div class="alert alert-warning alert-dismissible">
+        <i class="fas fa-info-circle"></i> {% blocktrans %}The disk quota is being exceeded ({{ used }} of {{ total }} used). The most recent tasks will be automatically deleted {{ when }}, until usage falls below {{ total }}.{% endblocktrans %}
+    </div>
+    {% endwith %}
+{% endif %}

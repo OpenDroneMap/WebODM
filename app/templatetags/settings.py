@@ -46,11 +46,11 @@ def quota_exceeded_grace_period(context):
         deadline = now + settings.QUOTA_EXCEEDED_GRACE_PERIOD * 60 * 60
     diff = max(0, deadline - now)
     if diff >= 60*60*24*2:
-        return _("within %(num)s days") % {"num": math.ceil(diff / (60*60*24))}
-    elif diff >= 60*60:
-        return _("within %(num)s hours") % {"num": math.ceil(diff / (60*60))}
+        return _("in %(num)s days") % {"num": math.floor(diff / (60*60*24))}
+    elif diff >= 60*60*2:
+        return _("in %(num)s hours") % {"num": math.floor(diff / (60*60))}
     elif diff > 1:
-        return _("within %(num)s minutes") % {"num": math.ceil(diff / 60)}
+        return _("in %(num)s minutes") % {"num": math.floor(diff / 60)}
     else:
         return _("very soon")
     
