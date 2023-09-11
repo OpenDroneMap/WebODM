@@ -25,6 +25,16 @@ def start_processing_node(args = []):
     node_odm.terminate()
     time.sleep(1)  # Wait for the server to stop
 
+@contextmanager
+def start_simple_auth_server(args = []):
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    s = subprocess.Popen(['python', 'simple_auth_server.py'] + args, shell=False,
+                                cwd=os.path.join(current_dir, "scripts"))
+    time.sleep(2)  # Wait for the server to launch
+    yield s
+    s.terminate()
+    time.sleep(1)  # Wait for the server to stop
+
 # We need to clear previous media_root content
 # This points to the test directory, but just in case
 # we double check that the directory is indeed a test directory

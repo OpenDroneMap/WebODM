@@ -2,7 +2,7 @@ import requests
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 from nodeodm.models import ProcessingNode
-from webodm.settings import EXTERNAL_AUTH_ENDPOINT
+from webodm import settings
 from guardian.shortcuts import assign_perm
 import logging
 
@@ -15,45 +15,48 @@ def get_user_from_external_auth_response(res):
     if 'user_id' in res and 'username' in res:
         try:
             user = User.objects.get(pk=res['user_id'])
-
-            # Update user info
-            if user.username != res['username']:
-                user.username = res['username']
-                user.save()
-            
-            # Update quotas
-            maxQuota = -1
-            if 'maxQuota' in res:
-                maxQuota = res['maxQuota']
-            if 'node' in res and 'limits' in res['node'] and 'maxQuota' in res['node']['limits']:
-                maxQuota = res['node']['limits']['maxQuota']
-
-            if user.profile.quota != maxQuota:
-                user.profile.quota = maxQuota
-                user.save()
         except User.DoesNotExist:
-            user = User(pk=res['user_id'], username=username)
+            user = User(pk=res['user_id'], username=res['username'])
+            user.save()
+
+        # Update user info
+        if user.username != res['username']:
+            user.username = res['username']
+            user.save()
+        
+        maxQuota = -1
+        if 'maxQuota' in res:
+            maxQuota = res['maxQuota']
+        if 'node' in res and 'limits' in res['node'] and 'maxQuota' in res['node']['limits']:
+            maxQuota = res['node']['limits']['maxQuota']
+
+        # Update quotas
+        if user.profile.quota != maxQuota:
+            user.profile.quota = maxQuota
             user.save()
 
         # Setup/update processing node
-        if ('api_key' in res or 'token' in res) and 'node' in res:
+        if 'node' in res and 'hostname' in res['node'] and 'port' in res['node']:
             hostname = res['node']['hostname']
             port = res['node']['port']
-            token = res['api_key'] if 'api_key' in res else res['token']
+            token = res['node'].get('token', '')
 
-            try:
-                node = ProcessingNode.objects.get(token=token)
-                if node.hostname != hostname or node.port != port:
-                    node.hostname = hostname
-                    node.port = port
+            # Only add/update if a token is provided, since we use 
+            # tokens as unique identifiers for hostname/port updates
+            if token != "":
+                try:
+                    node = ProcessingNode.objects.get(token=token)
+                    if node.hostname != hostname or node.port != port:
+                        node.hostname = hostname
+                        node.port = port
+                        node.save()
+                    
+                except ProcessingNode.DoesNotExist:
+                    node = ProcessingNode(hostname=hostname, port=port, token=token)
                     node.save()
                 
-            except ProcessingNode.DoesNotExist:
-                node = ProcessingNode(hostname=hostname, port=port, token=token)
-                node.save()
-            
-            if not user.has_perm('view_processingnode', node):
-                assign_perm('view_processingnode', user, node)
+                if not user.has_perm('view_processingnode', node):
+                    assign_perm('view_processingnode', user, node)
 
         return user
     else:
@@ -61,11 +64,11 @@ def get_user_from_external_auth_response(res):
 
 class ExternalBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None):
-        if EXTERNAL_AUTH_ENDPOINT == "":
+        if settings.EXTERNAL_AUTH_ENDPOINT == "":
             return None
         
         try:
-            r = requests.post(EXTERNAL_AUTH_ENDPOINT, {
+            r = requests.post(settings.EXTERNAL_AUTH_ENDPOINT, {
                 'username': username,
                 'password': password
             }, headers={'Accept': 'application/json'})
@@ -76,7 +79,7 @@ class ExternalBackend(ModelBackend):
             return None
     
     def get_user(self, user_id):
-        if EXTERNAL_AUTH_ENDPOINT == "":
+        if settings.EXTERNAL_AUTH_ENDPOINT == "":
             return None
 
         try:

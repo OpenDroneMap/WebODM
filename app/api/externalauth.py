@@ -37,31 +37,3 @@ class ExternalTokenAuth(APIView):
         except Exception as e:
             return Response({'error': str(e)})
 
-# TODO: move to simple http server
-# class TestExternalAuth(APIView):
-#     permission_classes = (permissions.AllowAny,)
-#     parser_classes = (parsers.JSONParser, parsers.FormParser,)
-
-#     def post(self, request):
-#         print("YO!!!")
-#         if settings.EXTERNAL_AUTH_ENDPOINT == '':
-#             return Response({'message': 'Disabled'})
-
-#         username = request.data.get("username")
-#         password = request.data.get("password")
-
-#         print("HERE", username)
-
-#         if username == "extuser1" and password == "test1234":
-#             return Response({
-#                 'user_id': 100,
-#                 'username': 'extuser1',
-#                 'maxQuota': 500,
-#                 'token': 'test',
-#                 'node': {
-#                     'hostname': 'localhost',
-#                     'port': 4444
-#                 }
-#             })
-#         else:
-#             return Response({'message': "Invalid credentials"})
