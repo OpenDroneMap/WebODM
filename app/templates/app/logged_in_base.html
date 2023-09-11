@@ -12,9 +12,33 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li class="user-profile">
-                    {% blocktrans with user=user.username %}Hello, {{ user }}!{% endblocktrans %}<br/>
-                    <span class="email">{{ user.email }}</span>
+                    <div class="info-item">
+                        {% blocktrans with user=user.username %}Hello, {{ user }}!{% endblocktrans %}<br/>
+                        <span class="email">{{ user.email }}</span>
+                    </div>
                 </li>
+                {% if user.profile.has_quota %}
+                    <li class="divider"></li>
+
+                    {% with tot_quota=user.profile.quota used_quota=user.profile.used_quota_cached %}
+                    {% percentage used_quota tot_quota as perc_quota %}
+                    {% percentage used_quota tot_quota 100 as bar_width %}
+                    
+                    <li>
+                        <div class="info-item quotas">
+                            {% with usage=perc_quota|floatformat:0 used=used_quota|disk_size total=tot_quota|disk_size %}
+                            <i class="fa fa-database fa-fw"></i> {% blocktrans %}{{used}} of {{total}} used{% endblocktrans %}
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-{% if perc_quota <= 100 %}success{% else %}warning{% endif %} active" style="width: {{ bar_width }}%">
+                                    {{usage}}%
+                                </div>
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </li>
+
+                    {% endwith %}
+                {% endif %}
                 <li class="divider"></li>
                 <li><a href="/logout/"><i class="fa fa-sign-out-alt fa-fw"></i> {% trans 'Logout' %}</a>
                 </li>

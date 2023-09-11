@@ -75,7 +75,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
         exclude = ('console_output', 'orthophoto_extent', 'dsm_extent', 'dtm_extent', )
-        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', )
+        read_only_fields = ('processing_time', 'status', 'last_error', 'created_at', 'pending_action', 'available_assets', 'size', )
 
 class TaskViewSet(viewsets.ViewSet):
     """
@@ -184,6 +184,7 @@ class TaskViewSet(viewsets.ViewSet):
         if task.images_count < 1:
             raise exceptions.ValidationError(detail=_("You need to upload at least 1 file before commit"))
 
+        task.update_size()
         task.save()
         worker_tasks.process_task.delay(task.id)
 

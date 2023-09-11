@@ -11,6 +11,7 @@ from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from django.db.models import Q
+from app.models import Profile
 
 from app.models import Project
 from app.models import Task
@@ -203,3 +204,30 @@ def export_pointcloud(self, input, **opts):
     except Exception as e:
         logger.error(str(e))
         return {'error': str(e)}
+
+@app.task
+def check_quotas():
+    profiles = Profile.objects.filter(quota__gt=-1)
+    for p in profiles:
+        if p.has_exceeded_quota():
+            deadline = p.get_quota_deadline()
+            if deadline is None:
+                deadline = p.set_quota_deadline(settings.QUOTA_EXCEEDED_GRACE_PERIOD)
+            now = time.time()
+            if now > deadline:
+                # deadline passed, delete tasks until quota is met
+                logger.info("Quota deadline expired for %s, deleting tasks" % str(p.user.username))
+
+                while p.has_exceeded_quota():
+                    try:
+                        last_task = Task.objects.filter(project__owner=p.user).order_by("-created_at").first()
+                        if last_task is None:
+                            break
+                        logger.info("Deleting %s" % last_task)
+                        last_task.delete()
+                    except Exception as e:
+                        logger.warn("Cannot delete %s for %s: %s" % (str(last_task), str(p.user.username), str(e)))
+                        break
+        else:
+            p.clear_quota_deadline()
+

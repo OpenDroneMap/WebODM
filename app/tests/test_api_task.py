@@ -249,6 +249,9 @@ class TestApiTask(BootTransactionTestCase):
             # Orthophoto bands field should be an empty list
             self.assertEqual(len(task.orthophoto_bands), 0)
 
+            # Size should be zero
+            self.assertEqual(task.size, 0)
+
             # tiles.json, bounds, metadata should not be accessible at this point
             tile_types = ['orthophoto', 'dsm', 'dtm']
             endpoints = ['tiles.json', 'bounds', 'metadata']
@@ -383,6 +386,12 @@ class TestApiTask(BootTransactionTestCase):
 
              # Orthophoto bands field should be populated
             self.assertEqual(len(task.orthophoto_bands), 4)
+
+            # Size should be updated
+            self.assertTrue(task.size > 0)
+
+            # The owner's used quota should have increased
+            self.assertTrue(task.project.owner.profile.used_quota_cached() > 0)
 
             # Can export orthophoto (when formula and bands are specified)
             res = client.post("/api/projects/{}/tasks/{}/orthophoto/export".format(project.id, task.id), {
@@ -946,6 +955,7 @@ class TestApiTask(BootTransactionTestCase):
         self.assertTrue(res.data['success'])
         new_task_id = res.data['task']['id']
         self.assertNotEqual(res.data['task']['id'], task.id)
+        self.assertEqual(res.data['task']['size'], task.size)
         
         new_task = Task.objects.get(pk=new_task_id)
 

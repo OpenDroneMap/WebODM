@@ -6,13 +6,14 @@ from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskDownloads, TaskAssets, TaskAssetsImport
 from .imageuploads import Thumbnail, ImageDownload
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
-from .admin import AdminUserViewSet, AdminGroupViewSet
+from .admin import AdminUserViewSet, AdminGroupViewSet, AdminProfileViewSet
 from rest_framework_nested import routers
 from rest_framework_jwt.views import obtain_jwt_token
 from .tiler import TileJson, Bounds, Metadata, Tiles, Export
 from .potree import Scene, CameraView
 from .workers import CheckTask, GetTaskResult
 from .users import UsersList
+from .externalauth import ExternalTokenAuth
 from webodm import settings
 
 router = routers.DefaultRouter()
@@ -26,6 +27,7 @@ tasks_router.register(r'tasks', TaskViewSet, basename='projects-tasks')
 admin_router = routers.DefaultRouter()
 admin_router.register(r'admin/users', AdminUserViewSet, basename='admin-users')
 admin_router.register(r'admin/groups', AdminGroupViewSet, basename='admin-groups')
+admin_router.register(r'admin/profiles', AdminProfileViewSet, basename='admin-groups')
 
 urlpatterns = [
     url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
@@ -56,9 +58,12 @@ urlpatterns = [
     url(r'^auth/', include('rest_framework.urls')),
     url(r'^token-auth/', obtain_jwt_token),
 
-    url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler)
+    url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler),
 ]
 
 if settings.ENABLE_USERS_API:
     urlpatterns.append(url(r'users', UsersList.as_view()))
+
+if settings.EXTERNAL_AUTH_ENDPOINT != '':
+    urlpatterns.append(url(r'^external-token-auth/', ExternalTokenAuth.as_view()))
 

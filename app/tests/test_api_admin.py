@@ -1,3 +1,4 @@
+import time
 from django.contrib.auth.models import User, Group
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -202,3 +203,59 @@ class TestApi(BootTestCase):
         res = client.delete('/api/admin/groups/{}/'.format(group.id))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_profile(self):
+        client = APIClient()
+        client.login(username="testuser", password="test1234")
+
+        user = User.objects.get(username="testuser")
+
+        # Cannot list profiles (not admin)
+        res = client.get('/api/admin/profiles/')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        res = client.get('/api/admin/profiles/%s/' % user.id)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Cannot update quota deadlines
+        res = client.post('/api/admin/profiles/%s/update_quota_deadline/' % user.id, data={'hours': 1})
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Admin can
+        client.login(username="testsuperuser", password="test1234")
+
+        res = client.get('/api/admin/profiles/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res.data) > 0)
+
+        res = client.get('/api/admin/profiles/%s/' % user.id)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue('quota' in res.data)
+        self.assertTrue('user' in res.data)
+
+        # User is the primary key (not profile id)
+        self.assertEqual(res.data['user'], user.id)
+        
+        # There should be no quota by default
+        self.assertEqual(res.data['quota'], -1)
+
+        # Try updating
+        user.profile.quota = 10
+        user.save()
+        res = client.get('/api/admin/profiles/%s/' % user.id)
+        self.assertEqual(res.data['quota'], 10)
+        
+        # Update quota deadlines
+
+        self.assertTrue(user.profile.get_quota_deadline() is None)
+
+        # Miss parameters
+        res = client.post('/api/admin/profiles/%s/update_quota_deadline/' % user.id)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        res = client.post('/api/admin/profiles/%s/update_quota_deadline/' % user.id, data={'hours': 48})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue('deadline' in res.data and res.data['deadline'] > time.time() + 47*60*60)
+
+        res = client.post('/api/admin/profiles/%s/update_quota_deadline/' % user.id, data={'hours': 0})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(abs(user.profile.get_quota_deadline() - time.time()) < 10)

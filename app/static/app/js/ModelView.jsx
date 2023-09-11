@@ -298,7 +298,7 @@ class ModelView extends React.Component {
     window.viewer = new Potree.Viewer(container);
     viewer.setEDLEnabled(true);
     viewer.setFOV(60);
-    viewer.setPointBudget(1*1000*1000);
+    viewer.setPointBudget(10*1000*1000);
     viewer.setEDLEnabled(true);
     viewer.loadSettingsFromURL();
         
@@ -644,9 +644,10 @@ class ModelView extends React.Component {
                     return;
                 }
 
-                const offset = {
-                    x: gltf.scene.CESIUM_RTC.center[0],
-                    y: gltf.scene.CESIUM_RTC.center[1]
+                const offset = {x: 0, y: 0};
+                if (gltf.scene.CESIUM_RTC && gltf.scene.CESIUM_RTC.center){
+                    offset.x = gltf.scene.CESIUM_RTC.center[0];
+                    offset.y = gltf.scene.CESIUM_RTC.center[1];
                 }
 
                 addObject(gltf.scene, offset);

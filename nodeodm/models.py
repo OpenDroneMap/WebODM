@@ -15,7 +15,9 @@ from pyodm import Node
 from pyodm import exceptions
 from django.db.models import signals
 from datetime import timedelta
+import logging
 
+logger = logging.getLogger('app.logger')
 
 class ProcessingNode(models.Model):
     hostname = models.CharField(verbose_name=_("Hostname"), max_length=255, help_text=_("Hostname or IP address where the node is located (can be an internal hostname as well). If you are using Docker, this is never 127.0.0.1 or localhost. Find the IP address of your host machine by running ifconfig on Linux or by checking your network settings."))
@@ -197,6 +199,8 @@ def auto_update_node_info(sender, instance, created, **kwargs):
             instance.update_node_info()
         except exceptions.OdmError:
             pass
+        except Exception as e:
+            logger.warning("auto_update_node_info: " + str(e))
 
 class ProcessingNodeUserObjectPermission(UserObjectPermissionBase):
     content_object = models.ForeignKey(ProcessingNode, on_delete=models.CASCADE)

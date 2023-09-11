@@ -169,6 +169,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
     'guardian.backends.ObjectPermissionBackend',
+    'app.auth.backends.ExternalBackend',
 )
 
 # Internationalization
@@ -376,14 +377,38 @@ CELERY_INCLUDE=['worker.tasks', 'app.plugins.worker']
 CELERY_WORKER_REDIRECT_STDOUTS = False
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get('WO_BROKER', 'redis://localhost'),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 # Number of minutes a processing node hasn't been seen 
 # before it should be considered offline
 NODE_OFFLINE_MINUTES = 5 
 
+EXTERNAL_AUTH_ENDPOINT = ''
+RESET_PASSWORD_LINK = ''
+
+# Number of hours before tasks are automatically deleted
+# from an account that is exceeding a disk quota
+QUOTA_EXCEEDED_GRACE_PERIOD = 8
+
+
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
+    EXTERNAL_AUTH_ENDPOINT = 'http://0.0.0.0:5555/auth'
 
 try:
     from .local_settings import *
+except ImportError:
+    pass
+
+try:
+    from .settings_override import *
 except ImportError:
     pass

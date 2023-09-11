@@ -1,11 +1,59 @@
 import datetime
-
+import math
 import logging
+import time
 from django import template
 from webodm import settings
+from django.utils.translation import gettext as _
 
 register = template.Library()
 logger = logging.getLogger('app.logger')
+
+@register.simple_tag
+def reset_password_link():
+    return settings.RESET_PASSWORD_LINK
+
+@register.simple_tag
+def has_external_auth():
+    return settings.EXTERNAL_AUTH_ENDPOINT != ""
+
+@register.filter
+def disk_size(megabytes):
+    k = 1000
+    k2 = k ** 2
+    k3 = k ** 3
+    if megabytes <= k2:
+        return str(round(megabytes / k, 2)) + ' GB'
+    elif megabytes <= k3:
+        return str(round(megabytes / k2, 2)) + ' TB'
+    else:
+        return str(round(megabytes / k3, 2)) + ' PB'
+
+@register.simple_tag
+def percentage(num, den, maximum=None):
+    if den == 0:
+        return 0
+    perc = max(0, num / den * 100)
+    if maximum is not None:
+        perc = min(perc, maximum)
+    return perc
+
+@register.simple_tag(takes_context=True)
+def quota_exceeded_grace_period(context):
+    deadline = context.request.user.profile.get_quota_deadline()
+    now = time.time()
+    if deadline is None:
+        deadline = now + settings.QUOTA_EXCEEDED_GRACE_PERIOD * 60 * 60
+    diff = max(0, deadline - now)
+    if diff >= 60*60*24*2:
+        return _("in %(num)s days") % {"num": math.floor(diff / (60*60*24))}
+    elif diff >= 60*60*2:
+        return _("in %(num)s hours") % {"num": math.floor(diff / (60*60))}
+    elif diff > 1:
+        return _("in %(num)s minutes") % {"num": math.floor(diff / 60)}
+    else:
+        return _("very soon")
+    
 
 @register.simple_tag
 def is_single_user_mode():

@@ -14,6 +14,7 @@ import PipelineSteps from '../classes/PipelineSteps';
 import Css from '../classes/Css';
 import Tags from '../classes/Tags';
 import Trans from './Trans';
+import Utils from '../classes/Utils';
 import { _, interpolate } from '../classes/gettext';
 
 class TaskListItem extends React.Component {
@@ -571,6 +572,11 @@ class TaskListItem extends React.Component {
                   <tr>
                     <td><strong>{_("Reconstructed Points:")}</strong></td>
                     <td>{stats.pointcloud.points.toLocaleString()}</td>
+                  </tr>}
+                  {task.size > 0 && 
+                  <tr>
+                    <td><strong>{_("Disk Usage:")}</strong></td>
+                    <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
                   </tr>}
                   <tr>
                       <td><strong>{_("Task Output:")}</strong></td>

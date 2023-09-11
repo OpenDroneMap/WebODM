@@ -130,6 +130,12 @@ case $key in
     shift # past argument
     shift # past value
     ;;
+    --settings)
+    WO_SETTINGS=$(realpath "$2")
+    export WO_SETTINGS
+    shift # past argument
+    shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -170,6 +176,7 @@ usage(){
   echo "	--broker	Set the URL used to connect to the celery broker (default: $DEFAULT_BROKER)"
   echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
   echo "	--gpu	Use GPU NodeODM nodes (Linux only) (default: disabled)"
+  echo "	--settings	Path to a settings.py file to enable modifications of system settings (default: None)"
   exit
 }
 
@@ -339,6 +346,7 @@ start(){
 	echo "SSL insecure port redirect: $WO_SSL_INSECURE_PORT_REDIRECT"
 	echo "Celery Broker: $WO_BROKER"
 	echo "Default Nodes: $WO_DEFAULT_NODES"
+	echo "Settings: $WO_SETTINGS"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
@@ -399,6 +407,14 @@ start(){
 		fi
 
 		echo "Will enable SSL ($method)"
+	fi
+
+	if [ ! -z "$WO_SETTINGS" ]; then
+		if [ ! -e "$WO_SETTINGS" ]; then
+			echo -e "\033[91mSettings file does not exist: $WO_SETTINGS\033[39m"
+			exit 1
+		fi
+		command+=" -f docker-compose.settings.yml"
 	fi
 
 	command="$command up"

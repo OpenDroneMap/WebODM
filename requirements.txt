@@ -14,6 +14,7 @@ django-filter==2.4.0
 django-guardian==1.4.9
 django-imagekit==4.0.1
 django-libsass==0.7
+django-redis==4.12.1
 django-webpack-loader==0.6.0
 djangorestframework==3.13.1
 djangorestframework-jwt==1.9.0

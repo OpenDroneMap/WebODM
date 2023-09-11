@@ -50,10 +50,25 @@ body {
     margin-right: 0;
 }
 
-.navbar-top-links .dropdown-menu li a {
+.navbar-top-links .dropdown-menu li a{
     padding: 3px 20px;
     min-height: 0;
 }
+
+.navbar-top-links .dropdown-menu li div.info-item{
+    padding: 3px 8px;
+    min-height: 0;
+}
+
+.navbar-top-links .dropdown-menu li div.info-item.quotas{
+    min-width: 232px;
+}
+
+.navbar-top-links .dropdown-menu li .progress{
+    margin-bottom: 0;
+    margin-top: 6px;
+}
+
 
 .navbar-top-links .dropdown-menu li a div {
     white-space: normal;
