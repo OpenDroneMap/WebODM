@@ -31,18 +31,23 @@ class Console:
 
     def append(self, text):
         if os.path.isdir(self.parent_dir):
-            # Write
-            if not os.path.isdir(self.base_dir):
-                os.makedirs(self.base_dir, exist_ok=True)
+            try:
+                # Write
+                if not os.path.isdir(self.base_dir):
+                    os.makedirs(self.base_dir, exist_ok=True)
+                
+                with open(self.file, "a") as f:
+                    f.write(text)
+            except IOError:
+                logger.warn("Cannot append to console file: %s" % self.file)
 
-            with open(self.file, "a") as f:
-                f.write(text)
-    
     def reset(self, text = ""):
         if os.path.isdir(self.parent_dir):
-            if not os.path.isdir(self.base_dir):
-                os.makedirs(self.base_dir, exist_ok=True)
-
-            with open(self.file, "w") as f:
-                f.write(text)
-
+            try:
+                if not os.path.isdir(self.base_dir):
+                    os.makedirs(self.base_dir, exist_ok=True)
+                
+                with open(self.file, "w") as f:
+                    f.write(text)
+            except IOError:
+                logger.warn("Cannot reset console file: %s" % self.file)
