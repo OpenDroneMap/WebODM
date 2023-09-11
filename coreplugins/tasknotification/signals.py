@@ -22,7 +22,7 @@ def handle_task_completed(sender, task_id, **kwargs):
         setting = Setting.objects.first()
         notification_app_name = config_data['notification_app_name'] or settings.app_name
 
-        console_output = reverse_output(task.console_output)
+        console_output = reverse_output(task.console.output())
         notification.send(
             f"{notification_app_name} - {task.project.name} Task Completed", 
             f"{task.project.name}\n{task.name} Completed\nProcessing time:{hours_minutes_secs(task.processing_time)}\n\nConsole Output:{console_output}",
@@ -41,7 +41,7 @@ def handle_task_removed(sender, task_id, **kwargs):
         task = Task.objects.get(id=task_id)
         setting = Setting.objects.first()
         notification_app_name = config_data['notification_app_name'] or settings.app_name
-        console_output = reverse_output(task.console_output)
+        console_output = reverse_output(task.console.output())
         notification.send(
             f"{notification_app_name} - {task.project.name} Task removed", 
             f"{task.project.name}\n{task.name} was removed\nProcessing time:{hours_minutes_secs(task.processing_time)}\n\nConsole Output:{console_output}",
@@ -60,7 +60,7 @@ def handle_task_failed(sender, task_id, **kwargs):
         task = Task.objects.get(id=task_id)
         setting = Setting.objects.first()
         notification_app_name = config_data['notification_app_name'] or settings.app_name
-        console_output = reverse_output(task.console_output)
+        console_output = reverse_output(task.console.output())
         notification.send(
             f"{notification_app_name} - {task.project.name} Task Failed", 
             f"{task.project.name}\n{task.name} Failed with error: {task.last_error}\nProcessing time:{hours_minutes_secs(task.processing_time)}\n\nConsole Output:{console_output}",

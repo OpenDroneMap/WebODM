@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm, get_objects_for_user
@@ -140,22 +141,26 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data == "")
 
-        task.console_output = "line1\nline2\nline3"
+        data_path = task.data_path()
+        if not os.path.exists(data_path):
+            os.makedirs(data_path, exist_ok=True)
+
+        task.console.reset("line1\nline2\nline3")
         task.save()
 
         res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(res.data == task.console_output)
+        self.assertEqual(res.data, task.console.output())
 
         # Console output with line num
         res = client.get('/api/projects/{}/tasks/{}/output/?line=2'.format(project.id, task.id))
-        self.assertTrue(res.data == "line3")
+        self.assertEqual(res.data, "line3")
 
         # Console output with line num out of bounds
         res = client.get('/api/projects/{}/tasks/{}/output/?line=3'.format(project.id, task.id))
-        self.assertTrue(res.data == "")
+        self.assertEqual(res.data, "")
         res = client.get('/api/projects/{}/tasks/{}/output/?line=-1'.format(project.id, task.id))
-        self.assertTrue(res.data == task.console_output)
+        self.assertEqual(res.data, task.console.output())
 
         # Cannot list task details for a task belonging to a project we don't have access to
         res = client.get('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id))

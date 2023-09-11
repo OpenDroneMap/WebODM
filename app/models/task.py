@@ -46,6 +46,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 
 from functools import partial
 import subprocess
+from app.classes.console import Console
 
 logger = logging.getLogger('app.logger')
 
@@ -247,7 +248,6 @@ class Task(models.Model):
     last_error = models.TextField(null=True, blank=True, help_text=_("The last processing error received"), verbose_name=_("Last Error"))
     options = fields.JSONField(default=dict, blank=True, help_text=_("Options that are being used to process this task"), validators=[validate_task_options], verbose_name=_("Options"))
     available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text=_("List of available assets to download"), verbose_name=_("Available Assets"))
-    console_output = models.TextField(null=False, default="", blank=True, help_text=_("Console output of the processing node"), verbose_name=_("Console Output"))
 
     orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text=_("Extent of the orthophoto"), verbose_name=_("Orthophoto Extent"))
     dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM", verbose_name=_("DSM Extent"))
@@ -290,6 +290,8 @@ class Task(models.Model):
 
         # To help keep track of changes to the project id
         self.__original_project_id = self.project.id
+        
+        self.console = Console(self.data_path("console_output.txt"))
 
     def __str__(self):
         name = self.name if self.name is not None else gettext("unnamed")
@@ -353,6 +355,12 @@ class Task(models.Model):
         Get a path relative to the place where assets are stored
         """
         return self.task_path("assets", *args)
+
+    def data_path(self, *args):
+        """
+        Path to task data that does not fit in database fields (e.g. console output)
+        """
+        return self.task_path("data", *args)
 
     def task_path(self, *args):
         """
@@ -490,7 +498,7 @@ class Task(models.Model):
             raise FileNotFoundError("{} is not a valid asset".format(asset))
 
     def handle_import(self):
-        self.console_output += gettext("Importing assets...") + "\n"
+        self.console += gettext("Importing assets...") + "\n"
         self.save()
 
         zip_path = self.assets_path("all.zip")
@@ -709,7 +717,7 @@ class Task(models.Model):
                             self.options = list(filter(lambda d: d['name'] != 'rerun-from', self.options))
                             self.upload_progress = 0
 
-                        self.console_output = ""
+                        self.console.reset()
                         self.processing_time = -1
                         self.status = None
                         self.last_error = None
@@ -740,10 +748,10 @@ class Task(models.Model):
                 # Need to update status (first time, queued or running?)
                 if self.uuid and self.status in [None, status_codes.QUEUED, status_codes.RUNNING]:
                     # Update task info from processing node
-                    if not self.console_output:
+                    if not self.console.output():
                         current_lines_count = 0
                     else:
-                        current_lines_count = len(self.console_output.split("\n"))
+                        current_lines_count = len(self.console.output().split("\n"))
 
                     info = self.processing_node.get_task_info(self.uuid, current_lines_count)
 
@@ -751,7 +759,7 @@ class Task(models.Model):
                     self.status = info.status.value
 
                     if len(info.output) > 0:
-                        self.console_output += "\n".join(info.output) + '\n'
+                        self.console += "\n".join(info.output) + '\n'
 
                     # Update running progress
                     self.running_progress = (info.progress / 100.0) * self.TASK_PROGRESS_LAST_VALUE
@@ -891,7 +899,7 @@ class Task(models.Model):
         self.update_size()
         self.potree_scene = {}
         self.running_progress = 1.0
-        self.console_output += gettext("Done!") + "\n"
+        self.console += gettext("Done!") + "\n"
         self.status = status_codes.COMPLETED
         self.save()
 
