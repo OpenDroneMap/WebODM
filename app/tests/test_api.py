@@ -140,12 +140,12 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data == "")
 
-        task.console_output = "line1\nline2\nline3"
+        task.console.reset("line1\nline2\nline3")
         task.save()
 
         res = client.get('/api/projects/{}/tasks/{}/output/'.format(project.id, task.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(res.data == task.console_output)
+        self.assertTrue(res.data == task.console.output())
 
         # Console output with line num
         res = client.get('/api/projects/{}/tasks/{}/output/?line=2'.format(project.id, task.id))
@@ -155,7 +155,7 @@ class TestApi(BootTestCase):
         res = client.get('/api/projects/{}/tasks/{}/output/?line=3'.format(project.id, task.id))
         self.assertTrue(res.data == "")
         res = client.get('/api/projects/{}/tasks/{}/output/?line=-1'.format(project.id, task.id))
-        self.assertTrue(res.data == task.console_output)
+        self.assertTrue(res.data == task.console.output())
 
         # Cannot list task details for a task belonging to a project we don't have access to
         res = client.get('/api/projects/{}/tasks/{}/'.format(other_project.id, other_task.id))

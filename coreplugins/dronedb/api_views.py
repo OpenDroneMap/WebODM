@@ -181,7 +181,7 @@ class ImportDatasetTaskView(TaskView):
             return Response({'error': 'Empty dataset or folder.'}, status=status.HTTP_400_BAD_REQUEST)
               
         # Update the task with the new information
-        task.console_output += "Importing {} images...\n".format(len(files))
+        task.console += "Importing {} images...\n".format(len(files))
         task.images_count = len(files)
         task.pending_action = pending_actions.IMPORT
         task.save()
