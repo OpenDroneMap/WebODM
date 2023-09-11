@@ -28,7 +28,7 @@ class TestLogin(BootTestCase):
         res = c.get('/login/', follow=True)
         body = res.content.decode("utf-8")
 
-        # The reset password link should show instructions
+        # The reset password link is a link
         self.assertTrue('<a href="http://0.0.0.0/reset_test' in body)
 
 
