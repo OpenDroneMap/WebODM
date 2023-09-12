@@ -25,7 +25,8 @@
 		<button class="btn btn-primary" onclick="location.href='{% url "admin:nodeodm_processingnode_add" %}';"><i class="fa fa-plus-circle"></i> {{ add_processing_node }}</button>
 		
 	{% else %}
-		
+		{% include "quota.html" %}
+
 		{% if no_tasks %}
 			<h3>{% trans 'Welcome!' %} ☺</h3>
 			{% trans 'Select Images and GCP' as upload_images %}
@@ -42,8 +43,6 @@
 			</p>
 		{% endif %}
 		
-		{% include "quota.html" %}
-
 		<div id="dashboard-app" data-dashboard></div>
 
 	{% endif %}
