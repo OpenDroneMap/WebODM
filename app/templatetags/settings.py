@@ -32,7 +32,7 @@ def disk_size(megabytes):
 @register.simple_tag
 def percentage(num, den, maximum=None):
     if den == 0:
-        return 0
+        return 100
     perc = max(0, num / den * 100)
     if maximum is not None:
         perc = min(perc, maximum)
