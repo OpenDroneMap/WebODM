@@ -46,3 +46,6 @@ class TestAuth(BootTestCase):
             # Re-test login
             ok = client.login(username='extuser1', password='test1234')
             self.assertTrue(ok)
+
+            # Check that the user has been added to the default group
+            self.assertTrue(user.groups.filter(name='Default').exists())
