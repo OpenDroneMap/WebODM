@@ -217,6 +217,8 @@ def check_quotas():
             if now > deadline:
                 # deadline passed, delete tasks until quota is met
                 logger.info("Quota deadline expired for %s, deleting tasks" % str(p.user.username))
+                task_count = Task.objects.filter(project__owner=p.user).count()
+                c = 0
 
                 while p.has_exceeded_quota():
                     try:
@@ -227,6 +229,9 @@ def check_quotas():
                         last_task.delete()
                     except Exception as e:
                         logger.warn("Cannot delete %s for %s: %s" % (str(last_task), str(p.user.username), str(e)))
+                    
+                    c += 1
+                    if c >= task_count:
                         break
         else:
             p.clear_quota_deadline()
