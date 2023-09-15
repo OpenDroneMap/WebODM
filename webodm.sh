@@ -135,6 +135,12 @@ case $key in
     export WO_SETTINGS
     shift # past argument
     shift # past value
+    ;;    
+	--worker-memory)
+    WO_WORKER_MEMORY="$2"
+    export WO_WORKER_MEMORY
+    shift # past argument
+    shift # past value
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -178,6 +184,8 @@ usage(){
   echo "	--detached	Run WebODM in detached mode. This means WebODM will run in the background, without blocking the terminal (default: disabled)"
   echo "	--gpu	Use GPU NodeODM nodes (Linux only) (default: disabled)"
   echo "	--settings	Path to a settings.py file to enable modifications of system settings (default: None)"
+  echo "	--worker-memory	Maximum amount of memory allocated for the worker process (default: unlimited)"
+  
   exit
 }
 
@@ -348,6 +356,7 @@ start(){
 	echo "Celery Broker: $WO_BROKER"
 	echo "Default Nodes: $WO_DEFAULT_NODES"
 	echo "Settings: $WO_SETTINGS"
+	echo "Worker memory limit: $WO_WORKER_MEMORY"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
@@ -416,6 +425,10 @@ start(){
 			exit 1
 		fi
 		command+=" -f docker-compose.settings.yml"
+	fi
+
+	if [ ! -z "$WO_WORKER_MEMORY" ]; then
+		command+=" -f docker-compose.worker-memory.yml"
 	fi
 
 	command="$command up"

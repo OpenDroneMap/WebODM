@@ -1,0 +1,4 @@
+version: '2.1'
+services:
+  worker:
+    mem_limit: ${WO_WORKER_MEMORY}
