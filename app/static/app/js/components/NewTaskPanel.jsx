@@ -124,11 +124,24 @@ class NewTaskPanel extends React.Component {
   }
 
   render() {
+    let filesCountOk = true;
+    if (this.taskForm && !this.taskForm.checkFilesCount(this.props.filesCount)) filesCountOk = false;
+    
     return (
       <div className="new-task-panel theme-background-highlight">
         <div className="form-horizontal">
           <div className={this.state.inReview ? "disabled" : ""}>
             <p>{interpolate(_("%(count)s files selected. Please check these additional options:"), { count: this.props.filesCount})}</p>
+
+            {!filesCountOk ? 
+            <div className="alert alert-warning">
+              {interpolate(_("Number of files selected exceeds the maximum of %(count)s allowed on this processing node."), { count: this.taskForm.selectedNodeMaxImages() })}
+              <button onClick={this.props.onCancel} type="button" className="btn btn-xs btn-primary redo">
+                <span><i className="glyphicon glyphicon-remove-circle"></i> {_("Cancel")}</span>
+              </button>
+            </div>
+            : ""}
+
             <EditTaskForm
               selectedNode={Storage.getItem("last_processing_node") || "auto"}
               onFormLoaded={this.handleFormTaskLoaded}
@@ -186,7 +199,7 @@ class NewTaskPanel extends React.Component {
                 {this.state.loading ?
                   <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
                   :
-                  <button type="submit" className="btn btn-primary" onClick={this.save} disabled={this.props.filesCount < 1}><i className="glyphicon glyphicon-saved"></i> {!this.state.inReview ? _("Review") : _("Start Processing")}</button>
+                  <button type="submit" className="btn btn-primary" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}><i className="glyphicon glyphicon-saved"></i> {!this.state.inReview ? _("Review") : _("Start Processing")}</button>
                 }
               </div>
             </div>
