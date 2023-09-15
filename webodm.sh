@@ -154,6 +154,7 @@ usage(){
   echo "	stop			Stop WebODM"
   echo "	down			Stop and remove WebODM's docker containers"
   echo "	update			Update WebODM to the latest release"
+  echo "	liveupdate		Update WebODM to the latest release without stopping it"
   echo "	rebuild			Rebuild all docker containers and perform cleanups"
   echo "	checkenv		Do an environment check and install missing components"
   echo "	test			Run the unit test suite (developers only)"
@@ -493,6 +494,40 @@ resetpassword(){
 	fi
 }
 
+update(){
+	echo "Updating WebODM..."
+
+	hash git 2>/dev/null || git_not_found=true
+	if [[ $git_not_found ]]; then
+		echo "Skipping source update (git not found)"
+	else
+		if [[ -d .git ]]; then
+			run "git pull origin master"
+		else
+			echo "Skipping source update (.git directory not found)"
+		fi
+	fi
+
+	command="$docker_compose -f docker-compose.yml"
+
+	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
+		if [ "${GPU_NVIDIA}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+		elif [ "${GPU_INTEL}" = true ]; then
+			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+		else
+			command+=" -f docker-compose.nodeodm.yml"
+		fi
+	fi
+
+	if [[ $load_micmac_node = true ]]; then
+		command+=" -f docker-compose.nodemicmac.yml"
+	fi
+
+	command+=" pull"
+	run "$command"
+}
+
 if [[ $1 = "start" ]]; then
 	environment_check
 	start
@@ -528,38 +563,12 @@ elif [[ $1 = "rebuild" ]]; then
 elif [[ $1 = "update" ]]; then
 	environment_check
 	down
-	echo "Updating WebODM..."
-
-	hash git 2>/dev/null || git_not_found=true
-	if [[ $git_not_found ]]; then
-		echo "Skipping source update (git not found)"
-	else
-		if [[ -d .git ]]; then
-			run "git pull origin master"
-		else
-			echo "Skipping source update (.git directory not found)"
-		fi
-	fi
-
-	command="$docker_compose -f docker-compose.yml"
-
-	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
-		if [ "${GPU_NVIDIA}" = true ]; then
-			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-		elif [ "${GPU_INTEL}" = true ]; then
-			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
-		else
-			command+=" -f docker-compose.nodeodm.yml"
-		fi
-	fi
-
-	if [[ $load_micmac_node = true ]]; then
-		command+=" -f docker-compose.nodemicmac.yml"
-	fi
-
-	command+=" pull"
-	run "$command"
+	update
 	echo -e "\033[1mDone!\033[0m You can now start WebODM by running $0 start"
+elif [[ $1 = "liveupdate" ]]; then
+	environment_check
+	update
+	echo -e "\033[1mDone!\033[0m You can now finish the update by running $0 restart"
 elif [[ $1 = "checkenv" ]]; then
 	environment_check
 elif [[ $1 = "test" ]]; then
