@@ -264,13 +264,14 @@ class PluginAdmin(admin.ModelAdmin):
 
 admin.site.register(Plugin, PluginAdmin)
 
-class ProfileInline(admin.StackedInline):
-    model = Profile
-    can_delete = False
+if not settings.FLUSHING:
+    class ProfileInline(admin.StackedInline):
+        model = Profile
+        can_delete = False
 
-class UserAdmin(BaseUserAdmin):
-    inlines = [ProfileInline]
+    class UserAdmin(BaseUserAdmin):
+        inlines = [ProfileInline]
 
-# Re-register UserAdmin
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+    # Re-register UserAdmin
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
