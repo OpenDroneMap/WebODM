@@ -281,7 +281,7 @@ class ProjectListItem extends React.Component {
                 });
             }
         })
-        .on("reset", (e) => {
+        .on("reset", () => {
           this.resetUploadState();
         })
         .on("dragenter", () => {
@@ -396,10 +396,6 @@ class ProjectListItem extends React.Component {
   handleTaskCanceled = () => {
     this.dz.removeAllFiles(true);
     this.resetUploadState();
-  }
-
-  handleClearFiles = () => {
-    this.dz.removeAllFiles(true);
   }
 
   handleUpload = () => {
