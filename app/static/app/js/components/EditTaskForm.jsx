@@ -85,6 +85,18 @@ class EditTaskForm extends React.Component {
             this.state.selectedPreset;
   }
 
+  checkFilesCount(filesCount){
+    if (!this.state.selectedNode) return false;
+    if (filesCount === 0) return true;
+    if (this.state.selectedNode.max_images === null) return true;
+    return this.state.selectedNode.max_images >= filesCount;
+  }
+
+  selectedNodeMaxImages(){
+    if (!this.state.selectedNode) return null;
+    return this.state.selectedNode.max_images;
+  }
+
   notifyFormLoaded(){
     if (this.props.onFormLoaded && this.formReady()) this.props.onFormLoaded();
   }
@@ -115,8 +127,6 @@ class EditTaskForm extends React.Component {
             return;
           }
 
-          let now = new Date();
-
           let nodes = json.map(node => {
             return {
               id: node.id,
@@ -124,6 +134,7 @@ class EditTaskForm extends React.Component {
               label: `${node.label} (queue: ${node.queue_count})`,
               options: node.available_options,
               queue_count: node.queue_count,
+              max_images: node.max_images,
               enabled: node.online,
               url: `http://${node.hostname}:${node.port}`
             };
