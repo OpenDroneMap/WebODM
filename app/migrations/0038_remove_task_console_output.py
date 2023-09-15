@@ -21,7 +21,7 @@ def dump_console_outputs(apps, schema_editor):
             os.makedirs(dp, exist_ok=True)
             outfile = os.path.join(dp, "console_output.txt")
 
-            with open(outfile, "w") as f:
+            with open(outfile, "w", encoding="utf-8") as f:
                 f.write(t.console_output)
             print("Wrote console output for %s to %s" % (t, outfile))
         else:
