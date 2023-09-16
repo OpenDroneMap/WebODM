@@ -391,7 +391,10 @@ CACHES = {
 # before it should be considered offline
 NODE_OFFLINE_MINUTES = 5 
 
+# URL to external auth endpoint
 EXTERNAL_AUTH_ENDPOINT = ''
+
+# URL to a page where a user can reset the password
 RESET_PASSWORD_LINK = ''
 
 # Number of hours before tasks are automatically deleted
