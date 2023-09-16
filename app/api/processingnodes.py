@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from nodeodm.models import ProcessingNode
-
+from webodm import settings
 
 class ProcessingNodeSerializer(serializers.ModelSerializer):
     online = serializers.SerializerMethodField()
@@ -49,6 +49,18 @@ class ProcessingNodeViewSet(viewsets.ModelViewSet):
     serializer_class = ProcessingNodeSerializer
     queryset = ProcessingNode.objects.all()
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        if settings.UI_MAX_PROCESSING_NODES is not None:
+            queryset = queryset[:settings.UI_MAX_PROCESSING_NODES]
+
+        if settings.NODE_OPTIMISTIC_MODE:
+            for pn in queryset:
+                pn.update_node_info()
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class ProcessingNodeOptionsView(APIView):
     """

@@ -1,5 +1,6 @@
 from django import template
 from guardian.shortcuts import get_objects_for_user
+from webodm import settings
 
 from nodeodm.models import ProcessingNode
 
@@ -8,7 +9,11 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def get_visible_processing_nodes(context):
-    return get_objects_for_user(context['request'].user, "nodeodm.view_processingnode", ProcessingNode, accept_global_perms=False)
+    queryset = get_objects_for_user(context['request'].user, "nodeodm.view_processingnode", ProcessingNode, accept_global_perms=False)
+    if settings.UI_MAX_PROCESSING_NODES is not None:
+        return queryset[:settings.UI_MAX_PROCESSING_NODES]
+    else:
+        return queryset
 
 
 @register.simple_tag(takes_context=True)

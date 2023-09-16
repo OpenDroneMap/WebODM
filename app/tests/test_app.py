@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User, Group
 from django.test import Client
 from rest_framework import status
+from guardian.shortcuts import assign_perm
+from nodeodm.models import ProcessingNode
 
 from app.models import Project, Task
 from app.models import Setting
@@ -24,6 +26,11 @@ class TestApp(BootTestCase):
         # Add user to test Group
         User.objects.get(pk=1).groups.add(my_group)
 
+        # Add view permissions
+        user = User.objects.get(username=self.credentials['username'])
+        pns = ProcessingNode.objects.all()
+        for pn in pns:
+            assign_perm('view_processingnode', user, pn)
 
     def test_user_login(self):
         c = Client()
@@ -88,6 +95,27 @@ class TestApp(BootTestCase):
         message = list(res.context['messages'])[0]
         self.assertEqual(message.tags, 'warning')
         self.assertTrue("offline" in message.message)
+
+        # The menu should have 3 processing nodes
+        res = c.get('/dashboard/', follow=True)
+        self.assertEqual(res.content.decode("utf-8").count('href="/processingnode/'), 3)
+        self.assertTemplateUsed(res, 'app/dashboard.html')
+
+        # The API should return 3 nodes
+        res = c.get('/api/processingnodes/')
+        self.assertEqual(len(res.data), 3)
+
+        # We can change that with a setting
+        settings.UI_MAX_PROCESSING_NODES = 1
+
+        res = c.get('/dashboard/', follow=True)
+        self.assertEqual(res.content.decode("utf-8").count('href="/processingnode/'), 1)
+        self.assertTemplateUsed(res, 'app/dashboard.html')
+
+        res = c.get('/api/processingnodes/')
+        self.assertEqual(len(res.data), 1)
+
+        settings.UI_MAX_PROCESSING_NODES = None
 
         res = c.get('/processingnode/9999/')
         self.assertTrue(res.status_code == 404)

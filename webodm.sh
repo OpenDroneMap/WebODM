@@ -335,13 +335,27 @@ run(){
 	eval "$1"
 }
 
+get_secret(){
+	if [ ! -e ./.secret_key ] && [ -e /dev/random ]; then
+		echo "Generating secret in ./.secret_key"
+		export WO_SECRET_KEY=$(head -c50 < /dev/random | base64)
+		echo $WO_SECRET_KEY > ./.secret_key
+	elif [ -e ./.secret_key ]; then
+		export WO_SECRET_KEY=$(cat ./.secret_key)
+	else
+		export WO_SECRET_KEY=""
+	fi
+}
+
 start(){
-    if [[ $dev_mode = true ]]; then
-	    echo "Starting WebODM in development mode..."
-        down
-    else
-        echo "Starting WebODM..."
-    fi
+	get_secret
+
+	if [[ $dev_mode = true ]]; then
+		echo "Starting WebODM in development mode..."
+		down
+	else
+		echo "Starting WebODM..."
+	fi
 	echo ""
 	echo "Using the following environment:"
 	echo "================================"

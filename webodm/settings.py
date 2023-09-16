@@ -27,18 +27,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 try:
     from .secret_key import SECRET_KEY
 except ImportError:
-    # This will be executed the first time Django runs
-    # It generates a secret_key.py file that contains the SECRET_KEY
-    from django.utils.crypto import get_random_string
+    if os.environ.get("WO_SECRET_KEY", "") != "":
+        SECRET_KEY = os.environ.get("WO_SECRET_KEY")
+    else:
+        # This will be executed the first time Django runs
+        # It generates a secret_key.py file that contains the SECRET_KEY
+        from django.utils.crypto import get_random_string
 
-    current_dir = os.path.abspath(os.path.dirname(__file__))
-    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-    secret = get_random_string(50, chars)
-    with open(os.path.join(current_dir, 'secret_key.py'), 'w') as f:
-        f.write("SECRET_KEY='{}'".format(secret))
-    SECRET_KEY=secret
+        current_dir = os.path.abspath(os.path.dirname(__file__))
+        chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+        secret = get_random_string(50, chars)
+        with open(os.path.join(current_dir, 'secret_key.py'), 'w') as f:
+            f.write("SECRET_KEY='{}'".format(secret))
+        SECRET_KEY=secret
 
-    print("Generated secret key")
+        print("Generated secret key")
 
 with open(os.path.join(BASE_DIR, 'package.json')) as package_file:
     data = json.load(package_file)
@@ -389,15 +392,24 @@ CACHES = {
 
 # Number of minutes a processing node hasn't been seen 
 # before it should be considered offline
-NODE_OFFLINE_MINUTES = 5 
+NODE_OFFLINE_MINUTES = 5
 
+# When turned on, updates nodes information only when necessary
+# and assumes that all nodes are always online, avoiding polling
+NODE_OPTIMISTIC_MODE = False
+
+# URL to external auth endpoint
 EXTERNAL_AUTH_ENDPOINT = ''
+
+# URL to a page where a user can reset the password
 RESET_PASSWORD_LINK = ''
 
 # Number of hours before tasks are automatically deleted
 # from an account that is exceeding a disk quota
 QUOTA_EXCEEDED_GRACE_PERIOD = 8
 
+# Maximum number of processing nodes to show in "Processing Nodes" menus/dropdowns
+UI_MAX_PROCESSING_NODES = None
 
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True

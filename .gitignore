@@ -103,3 +103,4 @@ package-lock.json
 # Debian builds
 dpkg/build
 dpkg/deb
+.secret_key

@@ -52,6 +52,9 @@ class ProcessingNode(models.Model):
                                      .order_by('queue_count').first()
 
     def is_online(self):
+        if settings.NODE_OPTIMISTIC_MODE:
+            return True
+
         return self.last_refreshed is not None and \
                self.last_refreshed >= timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES)
 

@@ -33,6 +33,9 @@ TestSafeAsyncResult = worker.celery.MockAsyncResult if settings.TESTING else app
 
 @app.task
 def update_nodes_info():
+    if settings.NODE_OPTIMISTIC_MODE:
+        return
+    
     processing_nodes = ProcessingNode.objects.all()
     for processing_node in processing_nodes:
         processing_node.update_node_info()
