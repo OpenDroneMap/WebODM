@@ -68,7 +68,7 @@ class ProjectFilter(filters.FilterSet):
             project_name_vec = SearchVector("name")
             task_name_vec = SearchVector(StringAgg("task__name", delimiter=' '))
             name_query = SearchQuery(names, search_type="plain")
-            qs = qs.annotate(n_search=project_name_vec + task_name_vec).filter(n_search=name_query)
+            qs = qs.filter(name__icontains=names)
 
         if len(task_tags) > 0:
             task_tags_vec = SearchVector("task__tags")
