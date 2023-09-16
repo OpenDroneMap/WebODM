@@ -398,6 +398,8 @@ RESET_PASSWORD_LINK = ''
 # from an account that is exceeding a disk quota
 QUOTA_EXCEEDED_GRACE_PERIOD = 8
 
+# Maximum number of processing nodes to show in the "Processing Nodes" menu
+UI_MAX_PROCESSING_NODES = None
 
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
