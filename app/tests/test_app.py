@@ -101,12 +101,21 @@ class TestApp(BootTestCase):
         self.assertEqual(res.content.decode("utf-8").count('href="/processingnode/'), 3)
         self.assertTemplateUsed(res, 'app/dashboard.html')
 
+        # The API should return 3 nodes
+        res = c.get('/api/processingnodes/')
+        self.assertEqual(len(res.data), 3)
+
         # We can change that with a setting
         settings.UI_MAX_PROCESSING_NODES = 1
 
         res = c.get('/dashboard/', follow=True)
         self.assertEqual(res.content.decode("utf-8").count('href="/processingnode/'), 1)
         self.assertTemplateUsed(res, 'app/dashboard.html')
+
+        res = c.get('/api/processingnodes/')
+        self.assertEqual(len(res.data), 1)
+
+        settings.UI_MAX_PROCESSING_NODES = None
 
         res = c.get('/processingnode/9999/')
         self.assertTrue(res.status_code == 404)

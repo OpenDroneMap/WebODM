@@ -389,7 +389,11 @@ CACHES = {
 
 # Number of minutes a processing node hasn't been seen 
 # before it should be considered offline
-NODE_OFFLINE_MINUTES = 5 
+NODE_OFFLINE_MINUTES = 5
+
+# When turned on, updates nodes information only when necessary
+# and assumes that all nodes are always online, avoiding polling
+NODE_OPTIMISTIC_MODE = False
 
 # URL to external auth endpoint
 EXTERNAL_AUTH_ENDPOINT = ''
@@ -401,7 +405,7 @@ RESET_PASSWORD_LINK = ''
 # from an account that is exceeding a disk quota
 QUOTA_EXCEEDED_GRACE_PERIOD = 8
 
-# Maximum number of processing nodes to show in the "Processing Nodes" menu
+# Maximum number of processing nodes to show in "Processing Nodes" menus/dropdowns
 UI_MAX_PROCESSING_NODES = None
 
 if TESTING or FLUSHING:

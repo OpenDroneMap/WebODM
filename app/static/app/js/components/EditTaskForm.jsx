@@ -86,7 +86,7 @@ class EditTaskForm extends React.Component {
   }
 
   checkFilesCount(filesCount){
-    if (!this.state.selectedNode) return false;
+    if (!this.state.selectedNode) return true;
     if (filesCount === 0) return true;
     if (this.state.selectedNode.max_images === null) return true;
     return this.state.selectedNode.max_images >= filesCount;

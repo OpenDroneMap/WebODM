@@ -460,6 +460,18 @@ class TestApi(BootTestCase):
         self.assertTrue(len(res.data) == 1)
         self.assertTrue(res.data[0]['name'] == 'a')
 
+        # Test optimistic mode
+        self.assertFalse(p4.is_online())
+
+        settings.NODE_OPTIMISTIC_MODE = True
+
+        self.assertTrue(p4.is_online())
+        res = client.get('/api/processingnodes/')
+        self.assertEqual(len(res.data), 3)
+        for nodes in res.data:
+            self.assertTrue(nodes['online'])
+
+        settings.NODE_OPTIMISTIC_MODE = False
 
     def test_token_auth(self):
         client = APIClient()
