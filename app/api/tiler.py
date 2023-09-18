@@ -3,6 +3,7 @@ import rio_tiler.utils
 from rasterio.enums import ColorInterp
 from rasterio.crs import CRS
 from rasterio.features import bounds as featureBounds
+from rasterio.errors import NotGeoreferencedWarning
 import urllib
 import os
 from .common import get_asset_download_filename
@@ -16,7 +17,7 @@ from rio_tiler.models import Metadata as RioMetadata
 from rio_tiler.profiles import img_profiles
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.io import COGReader
-from rio_tiler.errors import InvalidColorMapName
+from rio_tiler.errors import InvalidColorMapName, AlphaBandWarning
 import numpy as np
 from .custom_colormaps_helper import custom_colormaps
 from app.raster_utils import extension_for_export_format, ZOOM_EXTRA_LEVELS
@@ -28,7 +29,13 @@ from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster, export_pointcloud
 from django.utils.translation import gettext as _
+import warnings
 
+# Disable: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix be returned.
+warnings.filterwarnings("ignore", category=NotGeoreferencedWarning)
+
+# Disable: Alpha band was removed from the output data array
+warnings.filterwarnings("ignore", category=AlphaBandWarning)
 
 for custom_colormap in custom_colormaps:
     colormap = colormap.register(custom_colormap)

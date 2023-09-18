@@ -53,7 +53,8 @@ class ImportTaskPanel extends React.Component {
           clickable: this.uploadButton,
           chunkSize: 2147483647,
           timeout: 2147483647,
-          
+          chunking: true,
+          chunkSize: 16000000, // 16MB
           headers: {
             [csrf.header]: csrf.token
           }
@@ -69,6 +70,7 @@ class ImportTaskPanel extends React.Component {
           this.setState({uploading: false, progress: 0, totalBytes: 0, totalBytesSent: 0});
         })
         .on("uploadprogress", (file, progress, bytesSent) => {
+            if (progress == 100) return; // Workaround for chunked upload progress bar jumping around
             this.setState({
               progress,
               totalBytes: file.size,
