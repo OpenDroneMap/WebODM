@@ -1,9 +1,11 @@
 import os
+import re
+import shutil
 from wsgiref.util import FileWrapper
 
 import mimetypes
 
-from shutil import copyfileobj
+from shutil import copyfileobj, move
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
@@ -23,7 +25,7 @@ from .common import get_and_check_project, get_asset_download_filename
 from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
-
+from webodm import settings
 
 def flatten_files(request_files):
     # MultiValueDict in, flat array of files out
@@ -420,18 +422,52 @@ class TaskAssetsImport(APIView):
         if import_url and len(files) > 0:
             raise exceptions.ValidationError(detail=_("Cannot create task, either specify a URL or upload 1 file."))
 
+        chunk_index = request.data.get('dzchunkindex')
+        uuid = request.data.get('dzuuid') 
+        total_chunk_count = request.data.get('dztotalchunkcount', None)
+
+        # Chunked upload?
+        tmp_upload_file = None
+        if len(files) > 0 and chunk_index is not None and uuid is not None and total_chunk_count is not None:
+            byte_offset = request.data.get('dzchunkbyteoffset', 0) 
+
+            try:
+                chunk_index = int(chunk_index)
+                byte_offset = int(byte_offset)
+                total_chunk_count = int(total_chunk_count)
+            except ValueError:
+                raise exceptions.ValidationError(detail="chunkIndex is not an int")
+            uuid = re.sub('[^0-9a-zA-Z-]+', "", uuid)
+
+            tmp_upload_file = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, f"{uuid}.upload")
+            if os.path.isfile(tmp_upload_file) and chunk_index == 0:
+                os.unlink(tmp_upload_file)
+            
+            with open(tmp_upload_file, 'ab') as fd:
+                fd.seek(byte_offset)
+                if isinstance(files[0], InMemoryUploadedFile):
+                    for chunk in files[0].chunks():
+                        fd.write(chunk)
+                else:
+                    with open(files[0].temporary_file_path(), 'rb') as file:
+                        fd.write(file.read())
+            
+            if chunk_index + 1 < total_chunk_count:
+                return Response({'uploaded': True}, status=status.HTTP_200_OK)
+
+        # Ready to import
         with transaction.atomic():
             task = models.Task.objects.create(project=project,
-                                              auto_processing_node=False,
-                                              name=task_name,
-                                              import_url=import_url if import_url else "file://all.zip",
-                                              status=status_codes.RUNNING,
-                                              pending_action=pending_actions.IMPORT)
+                                            auto_processing_node=False,
+                                            name=task_name,
+                                            import_url=import_url if import_url else "file://all.zip",
+                                            status=status_codes.RUNNING,
+                                            pending_action=pending_actions.IMPORT)
             task.create_task_directories()
+            destination_file = task.assets_path("all.zip")
 
-            if len(files) > 0:
-                destination_file = task.assets_path("all.zip")
-
+            # Non-chunked file import
+            if tmp_upload_file is None and len(files) > 0:
                 with open(destination_file, 'wb+') as fd:
                     if isinstance(files[0], InMemoryUploadedFile):
                         for chunk in files[0].chunks():
@@ -439,6 +475,9 @@ class TaskAssetsImport(APIView):
                     else:
                         with open(files[0].temporary_file_path(), 'rb') as file:
                             copyfileobj(file, fd)
+            elif tmp_upload_file is not None:
+                # Move
+                shutil.move(tmp_upload_file, destination_file)
 
             worker_tasks.process_task.delay(task.id)
 
