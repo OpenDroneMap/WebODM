@@ -166,3 +166,54 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(corrupted_task.status, status_codes.FAILED)
             self.assertTrue("Invalid" in corrupted_task.last_error)
 
+            # Test chunked upload import
+            assets_file = open(assets_path, 'rb')
+            assets_size = os.path.getsize(assets_path)
+            chunk_1_size = assets_size // 2
+            chunk_1_path = os.path.join(os.path.dirname(assets_path), "1.zip")
+            chunk_2_path = os.path.join(os.path.dirname(assets_path), "2.zip")
+            with open(chunk_1_path, 'wb') as f:
+                assets_file.seek(0)
+                f.write(assets_file.read(chunk_1_size))
+            with open(chunk_2_path, 'wb') as f:
+                f.write(assets_file.read())
+            
+            chunk_1 = open(chunk_1_path, 'rb')
+            chunk_2 = open(chunk_2_path, 'rb')
+            assets_file.close()
+
+            res = client.post("/api/projects/{}/tasks/import".format(project.id), {
+                'file': [chunk_1],
+                'dzuuid': 'abc-test',
+                'dzchunkindex': 0,
+                'dztotalchunkcount': 2,
+                'dzchunkbyteoffset': 0
+            }, format="multipart")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertTrue(res.data['uploaded'])
+            chunk_1.close()
+                
+            res = client.post("/api/projects/{}/tasks/import".format(project.id), {
+                'file': [chunk_2],
+                'dzuuid': 'abc-test',
+                'dzchunkindex': 1,
+                'dztotalchunkcount': 2,
+                'dzchunkbyteoffset': chunk_1_size
+            }, format="multipart")
+            self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+            chunk_2.close()
+
+            file_import_task = Task.objects.get(id=res.data['id'])
+            # Wait for completion
+            c = 0
+            while c < 10:
+                worker.tasks.process_pending_tasks()
+                file_import_task.refresh_from_db()
+                if file_import_task.status == status_codes.COMPLETED:
+                    break
+                c += 1
+                time.sleep(1)
+
+            self.assertEqual(file_import_task.import_url, "file://all.zip")
+            self.assertEqual(file_import_task.images_count, 1)
+
