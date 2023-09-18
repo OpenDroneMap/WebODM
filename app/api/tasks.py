@@ -436,7 +436,7 @@ class TaskAssetsImport(APIView):
                 byte_offset = int(byte_offset)
                 total_chunk_count = int(total_chunk_count)
             except ValueError:
-                raise exceptions.ValidationError(detail="chunkIndex is not an int")
+                raise exceptions.ValidationError(detail="some parameters are not integers")
             uuid = re.sub('[^0-9a-zA-Z-]+', "", uuid)
 
             tmp_upload_file = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, f"{uuid}.upload")
