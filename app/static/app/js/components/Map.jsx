@@ -482,7 +482,11 @@ _('Example:'),
     });
     new AddOverlayCtrl().addTo(this.map);
 
-    this.map.fitWorld();
+    this.map.fitBounds([
+     [13.772919746115805,
+     45.664640939831735],
+     [13.772825784981254,
+     45.664591558975154]]);
     this.map.attributionControl.setPrefix("");
 
     this.setState({showLoading: true});
