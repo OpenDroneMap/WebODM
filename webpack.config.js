@@ -4,10 +4,13 @@ let BundleTracker = require('webpack-bundle-tracker');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 
-module.exports = {
-  mode: 'production',
-  context: __dirname,
+const mode = process.argv.indexOf("production") !== -1 ? "production" : "development";
+console.log(`Webpack mode: ${mode}`);
 
+module.exports = {
+  mode,
+  context: __dirname,
+  
   entry: {
     main: ['./app/static/app/js/main.jsx'],
     Console: ['./app/static/app/js/Console.jsx'],
