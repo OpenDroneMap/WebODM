@@ -67,8 +67,9 @@ class ProjectFilter(filters.FilterSet):
         if len(names) > 0:
             project_name_vec = SearchVector("name")
             task_name_vec = SearchVector(StringAgg("task__name", delimiter=' '))
-            qs = qs.annotate(n_search=project_name_vec + task_name_vec).filter(n_search__icontains=names)
-
+            name_query = SearchQuery(names, search_type="plain")
+            qs = qs.annotate(n_search=project_name_vec + task_name_vec).filter(Q(n_search__icontains=names) | Q(n_search=name_query))
+            
         if len(task_tags) > 0:
             task_tags_vec = SearchVector("task__tags")
             tags_query = SearchQuery(task_tags[0])
@@ -210,4 +211,3 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 perm = p + "_project"
                 remove_perm(perm, request.user, project)
             return Response(status=status.HTTP_204_NO_CONTENT)
-        
