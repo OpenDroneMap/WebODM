@@ -16,7 +16,7 @@ class Console:
             return ""
 
         try:
-            with open(self.file, 'r') as f:
+            with open(self.file, 'r', encoding="utf-8") as f:
                 return f.read()
         except IOError:
             logger.warn("Cannot read console file: %s" % self.file)
@@ -36,7 +36,7 @@ class Console:
                 if not os.path.isdir(self.base_dir):
                     os.makedirs(self.base_dir, exist_ok=True)
                 
-                with open(self.file, "a") as f:
+                with open(self.file, "a", encoding="utf-8") as f:
                     f.write(text)
             except IOError:
                 logger.warn("Cannot append to console file: %s" % self.file)
@@ -47,7 +47,7 @@ class Console:
                 if not os.path.isdir(self.base_dir):
                     os.makedirs(self.base_dir, exist_ok=True)
                 
-                with open(self.file, "w") as f:
+                with open(self.file, "w", encoding="utf-8") as f:
                     f.write(text)
             except IOError:
                 logger.warn("Cannot reset console file: %s" % self.file)
