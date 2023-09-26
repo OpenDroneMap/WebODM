@@ -3,9 +3,67 @@ import os
 from rest_framework import status
 from rest_framework.response import Response
 from app.plugins.views import TaskView, CheckTask, GetTaskResult
-from worker.tasks import execute_grass_script
-from app.plugins.grass_engine import grass, GrassEngineException, cleanup_grass_context
+from app.plugins.worker import run_function_async
 from django.utils.translation import gettext_lazy as _
+
+class ContoursException(Exception):
+    pass
+
+def calc_contours(dem, epsg, interval, output_format, simplify):
+    import os
+    import subprocess
+    import tempfile
+    import shutil
+    from webodm import settings
+
+    ext = ""
+    if output_format == "GeoJSON":
+        ext = "json"
+    elif output_format == "GPKG":
+        ext = "gpkg"
+    elif output_format == "DXF":
+        ext = "dxf"
+    elif output_format == "ESRI Shapefile":
+        ext = "shp"
+    MIN_CONTOUR_LENGTH = 10
+
+    tmpdir = os.path.join(settings.MEDIA_TMP, os.path.basename(tempfile.mkdtemp('_contours', dir=settings.MEDIA_TMP)))
+    gdal_contour_bin = shutil.which("gdal_contour")
+    ogr2ogr_bin = shutil.which("ogr2ogr")
+
+    if gdal_contour_bin is None:
+        return {'error': 'Cannot find gdal_contour'}
+    if ogr2ogr_bin is None:
+        return {'error': 'Cannot find ogr2ogr'}
+    
+    contours_file = f"contours.gpkg"
+    p = subprocess.Popen([gdal_contour_bin, "-q", "-a", "level", "-3d", "-f", "GPKG", "-i", str(interval), dem, contours_file], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+
+    out = out.decode('utf-8').strip()
+    err = err.decode('utf-8').strip()
+    success = p.returncode == 0
+
+    if not success:
+        return {'error', f'Error calling gdal_contour: {str(err)}'}
+    
+    outfile = os.path.join(tmpdir, f"output.{ext}")
+    p = subprocess.Popen([ogr2ogr_bin, outfile, contours_file, "-simplify", str(simplify), "-f", output_format, "-t_srs", f"EPSG:{epsg}", 
+                            "-dialect", "sqlite", "-sql", f"SELECT * FROM contour WHERE ST_Length(GEOM) >= {MIN_CONTOUR_LENGTH}"], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+
+    out = out.decode('utf-8').strip()
+    err = err.decode('utf-8').strip()
+    success = p.returncode == 0
+
+    if not success:
+        return {'error', f'Error calling ogr2ogr: {str(err)}'}
+    
+    if not os.path.isfile(outfile):
+        return {'error': f'Cannot find output file: {outfile}'}
+
+    return {'file': outfile}
+
 
 class TaskContoursGenerate(TaskView):
     def post(self, request, pk=None):
@@ -23,36 +81,24 @@ class TaskContoursGenerate(TaskView):
             elif layer == 'DTM':
                 dem = os.path.abspath(task.get_asset_download_path("dtm.tif"))
             else:
-                raise GrassEngineException('{} is not a valid layer.'.format(layer))
+                raise ContoursException('{} is not a valid layer.'.format(layer))
 
-            context = grass.create_context({'auto_cleanup' : False})
             epsg = int(request.data.get('epsg', '3857'))
             interval = float(request.data.get('interval', 1))
             format = request.data.get('format', 'GPKG')
             supported_formats = ['GPKG', 'ESRI Shapefile', 'DXF', 'GeoJSON']
             if not format in supported_formats:
-                raise GrassEngineException("Invalid format {} (must be one of: {})".format(format, ",".join(supported_formats)))
+                raise ContoursException("Invalid format {} (must be one of: {})".format(format, ",".join(supported_formats)))
             simplify = float(request.data.get('simplify', 0.01))
 
-            context.add_param('dem_file', dem)
-            context.add_param('interval', interval)
-            context.add_param('format', format)
-            context.add_param('simplify', simplify)
-            context.add_param('epsg', epsg)
-            context.set_location(dem)
-
-            celery_task_id = execute_grass_script.delay(os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "calc_contours.py"
-            ), context.serialize(), 'file').task_id
-
+            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify).task_id
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
-        except GrassEngineException as e:
+        except ContoursException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
 
 class TaskContoursCheck(CheckTask):
     def on_error(self, result):
-        cleanup_grass_context(result['context'])
+        pass
 
     def error_check(self, result):
         contours_file = result.get('file')
