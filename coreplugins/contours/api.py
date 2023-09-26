@@ -48,7 +48,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify):
         return {'error', f'Error calling gdal_contour: {str(err)}'}
     
     outfile = os.path.join(tmpdir, f"output.{ext}")
-    p = subprocess.Popen([ogr2ogr_bin, outfile, contours_file, "-simplify", str(simplify), "-f", output_format, "-t_srs", f"EPSG:{epsg}", 
+    p = subprocess.Popen([ogr2ogr_bin, outfile, contours_file, "-simplify", str(simplify), "-f", output_format, "-t_srs", f"EPSG:{epsg}", "-nln", "contours",
                             "-dialect", "sqlite", "-sql", f"SELECT * FROM contour WHERE ST_Length(GEOM) >= {MIN_CONTOUR_LENGTH}"], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
 
