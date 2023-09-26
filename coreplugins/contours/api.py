@@ -14,6 +14,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify):
     import subprocess
     import tempfile
     import shutil
+    import glob
     from webodm import settings
 
     ext = ""
@@ -61,6 +62,17 @@ def calc_contours(dem, epsg, interval, output_format, simplify):
     
     if not os.path.isfile(outfile):
         return {'error': f'Cannot find output file: {outfile}'}
+    
+    if output_format == "ESRI Shapefile":
+        ext="zip"
+        shp_dir = os.path.join(tmpdir, "contours")
+        os.makedirs(shp_dir)
+        contour_files = glob.glob(os.path.join(tmpdir, "output.*"))
+        for cf in contour_files:
+            shutil.move(cf, shp_dir)
+
+        shutil.make_archive(os.path.join(tmpdir, 'output'), 'zip', shp_dir)
+        outfile = os.path.join(tmpdir, f"output.{ext}")
 
     return {'file': outfile}
 
