@@ -175,7 +175,6 @@ def execute_grass_script(script, serialized_context = {}, out_key='output'):
         logger.error(str(e))
         return {'error': str(e), 'context': ctx.serialize()}
 
-
 @app.task(bind=True)
 def export_raster(self, input, **opts):
     try:
@@ -238,4 +237,3 @@ def check_quotas():
                         break
         else:
             p.clear_quota_deadline()
-
