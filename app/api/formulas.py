@@ -144,6 +144,7 @@ camera_filters = [
     'NRB',
 
     'RGBN',
+    'RGNRe',
     'GRReN',
 
     'RGBNRe',
