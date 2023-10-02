@@ -146,11 +146,12 @@ camera_filters = [
     'RGBN',
     'GRReN',
 
+    'RGBNRe',
     'BGRNRe',
     'BGRReN',
-    'RGBNRe',
     'RGBReN',
 
+    'RGBNReL',
     'BGRNReL',
     'BGRReNL',
 
