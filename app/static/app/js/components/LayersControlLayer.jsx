@@ -302,12 +302,12 @@ export default class LayersControlLayer extends React.Component {
                 <div className="col-sm-9 ">
                     {histogramLoading ? 
                     <i className="fa fa-circle-notch fa-spin fa-fw" /> :
-                    [<select className="form-control" value={bands} onChange={this.handleSelectBands} title={auto_bands.filter !== "" && bands == "auto" ? auto_bands.filter : ""}>
+                    [<select key="sel" className="form-control" value={bands} onChange={this.handleSelectBands} title={auto_bands.filter !== "" && bands == "auto" ? auto_bands.filter : ""}>
                         <option key="auto" value="auto">{_("Automatic")}</option>
                         {algo.filters.map(f => <option key={f} value={f}>{f}</option>)}
                     </select>,
                     bands == "auto" && !auto_bands.match ? 
-                    <i style={{marginLeft: '4px'}} title={interpolate(_("Not every band for %(name)s could be automatically identified."), {name: algo.id}) + "\n" + _("Your sensor might not have the proper bands for using this algorithm.")} className="fa fa-exclamation-circle info-button"></i>
+                    <i key="ico" style={{marginLeft: '4px'}} title={interpolate(_("Not every band for %(name)s could be automatically identified."), {name: algo.id}) + "\n" + _("Your sensor might not have the proper bands for using this algorithm.")} className="fa fa-exclamation-circle info-button"></i>
                     : ""]}
                 </div>
             </div> : ""}

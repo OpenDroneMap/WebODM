@@ -96,7 +96,7 @@ class Map extends React.Component {
 
   hasBands = (bands, orthophoto_bands) => {
     if (!orthophoto_bands) return false;
-    console.log(orthophoto_bands)
+
     for (let i = 0; i < bands.length; i++){
       if (orthophoto_bands.find(b => b.description !== null && b.description.toLowerCase() === bands[i].toLowerCase()) === undefined) return false;
     }
