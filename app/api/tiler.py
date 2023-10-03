@@ -23,7 +23,7 @@ from .custom_colormaps_helper import custom_colormaps
 from app.raster_utils import extension_for_export_format, ZOOM_EXTRA_LEVELS
 from .hsvblend import hsv_blend
 from .hillshade import LightSource
-from .formulas import lookup_formula, get_algorithm_list
+from .formulas import lookup_formula, get_algorithm_list, get_auto_bands
 from .tasks import TaskNestedView
 from rest_framework import exceptions
 from rest_framework.response import Response
@@ -141,6 +141,12 @@ class Metadata(TaskNestedView):
         if boundaries_feature == '': boundaries_feature = None
         if boundaries_feature is not None:
             boundaries_feature = json.loads(boundaries_feature)
+        
+        is_auto_bands_match = False
+        is_auto_bands = False
+        if bands == 'auto' and formula:
+            is_auto_bands = True
+            bands, is_auto_bands_match = get_auto_bands(task.orthophoto_bands, formula)
         try:
             expr, hrange = lookup_formula(formula, bands)
             if defined_range is not None:
@@ -224,6 +230,8 @@ class Metadata(TaskNestedView):
 
         colormaps = []
         algorithms = []
+        auto_bands = {'filter': '', 'match': None}
+
         if tile_type in ['dsm', 'dtm']:
             colormaps = ['viridis', 'jet', 'terrain', 'gist_earth', 'pastel1']
         elif formula and bands:
@@ -231,9 +239,14 @@ class Metadata(TaskNestedView):
                          'better_discrete_ndvi',
                          'viridis', 'plasma', 'inferno', 'magma', 'cividis', 'jet', 'jet_r']
             algorithms = *get_algorithm_list(band_count),
+            if is_auto_bands:
+                auto_bands['filter'] = bands
+                auto_bands['match'] = is_auto_bands_match
 
         info['color_maps'] = []
         info['algorithms'] = algorithms
+        info['auto_bands'] = auto_bands
+        
         if colormaps:
             for cmap in colormaps:
                 try:
@@ -254,6 +267,7 @@ class Metadata(TaskNestedView):
         info['maxzoom'] += ZOOM_EXTRA_LEVELS
         info['minzoom'] -= ZOOM_EXTRA_LEVELS
         info['bounds'] = {'value': src.bounds, 'crs': src.dataset.crs}
+
         return Response(info)
 
 
@@ -296,6 +310,8 @@ class Tiles(TaskNestedView):
         if color_map == '': color_map = None
         if hillshade == '' or hillshade == '0': hillshade = None
         if tilesize == '' or tilesize is None: tilesize = 256
+        if bands == 'auto' and formula:
+            bands, _ = get_auto_bands(task.orthophoto_bands, formula)
 
         try:
             tilesize = int(tilesize)

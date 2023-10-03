@@ -134,7 +134,7 @@ export default class LayersControlLayer extends React.Component {
 
     // Check if bands need to be switched
     const algo = this.getAlgorithm(e.target.value);
-    if (algo && algo['filters'].indexOf(bands) === -1) bands = algo['filters'][0]; // Pick first
+    if (algo && algo['filters'].indexOf(bands) === -1 && bands !== "auto") bands = algo['filters'][0]; // Pick first
 
     this.setState({formula: e.target.value, bands});
   }
@@ -262,7 +262,7 @@ export default class LayersControlLayer extends React.Component {
   render(){
     const { colorMap, bands, hillshade, formula, histogramLoading, exportLoading } = this.state;
     const { meta, tmeta } = this;
-    const { color_maps, algorithms } = tmeta;
+    const { color_maps, algorithms, auto_bands } = tmeta;
     const algo = this.getAlgorithm(formula);
 
     let cmapValues = null;
@@ -298,13 +298,17 @@ export default class LayersControlLayer extends React.Component {
 
             {bands !== "" && algo ? 
             <div className="row form-group form-inline">
-                <label className="col-sm-3 control-label">{_("Filter:")}</label>
+                <label className="col-sm-3 control-label">{_("Bands:")}</label>
                 <div className="col-sm-9 ">
                     {histogramLoading ? 
                     <i className="fa fa-circle-notch fa-spin fa-fw" /> :
-                    <select className="form-control" value={bands} onChange={this.handleSelectBands}>
+                    [<select className="form-control" value={bands} onChange={this.handleSelectBands} title={auto_bands.filter !== "" && bands == "auto" ? auto_bands.filter : ""}>
+                        <option key="auto" value="auto">{_("Automatic")}</option>
                         {algo.filters.map(f => <option key={f} value={f}>{f}</option>)}
-                    </select>}
+                    </select>,
+                    bands == "auto" && !auto_bands.match ? 
+                    <i style={{marginLeft: '4px'}} title={interpolate(_("Not every band for %(name)s could be automatically identified."), {name: algo.id}) + "\n" + _("Your sensor might not have the proper bands for using this algorithm.")} className="fa fa-exclamation-circle info-button"></i>
+                    : ""]}
                 </div>
             </div> : ""}
 

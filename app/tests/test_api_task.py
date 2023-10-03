@@ -679,7 +679,7 @@ class TestApiTask(BootTransactionTestCase):
 
             for k in algos:
                 a = algos[k]
-                filters = get_camera_filters_for(a)
+                filters = get_camera_filters_for(a['expr'])
 
                 for f in filters:
                     params.append(("orthophoto", "formula={}&bands={}&color_map=rdylgn".format(k, f), status.HTTP_200_OK))

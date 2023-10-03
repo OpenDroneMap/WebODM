@@ -38,7 +38,7 @@ class TestFormulas(TestCase):
                 bands = list(set(re.findall(pattern, f)))
                 self.assertTrue(len(bands) <= 3)
 
-        self.assertTrue(get_camera_filters_for(algos['VARI']) == ['RGB'])
+        self.assertTrue(get_camera_filters_for(algos['VARI']['expr']) == ['RGB'])
 
         # Request algorithms with more band filters
         al = get_algorithm_list(max_bands=5)
