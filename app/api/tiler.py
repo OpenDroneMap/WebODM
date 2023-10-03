@@ -560,6 +560,9 @@ class Export(TaskNestedView):
             raise exceptions.ValidationError(_("Both formula and bands parameters are required"))
 
         if formula and bands:
+            if bands == 'auto':
+                bands, _ = get_auto_bands(task.orthophoto_bands, formula)
+
             try:
                 expr, _discard_ = lookup_formula(formula, bands)
             except ValueError as e:
