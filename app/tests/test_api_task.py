@@ -537,7 +537,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Auto band is populated
             self.assertEqual(metadata['auto_bands']['filter'], '')
-            self.assertEqual(metadata['auto_bands']['match'], False)
+            self.assertEqual(metadata['auto_bands']['match'], None)
 
             # Algorithms have valid keys
             for k in ['id', 'filters', 'expr', 'help']:
