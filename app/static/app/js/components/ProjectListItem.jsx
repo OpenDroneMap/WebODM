@@ -573,8 +573,6 @@ class ProjectListItem extends React.Component {
   render() {
     const { refreshing, data, filterTags } = this.state;
     const numTasks = data.tasks.length;
-
-    // const numValidTasks = data.tasks.filter(t => )
     const canEdit = this.hasPermission("change");
     const userTags = Tags.userTags(data.tags);
     let deleteWarning = _("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?");

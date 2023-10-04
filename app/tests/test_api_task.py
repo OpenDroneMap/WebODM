@@ -497,6 +497,10 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(metadata['algorithms'], [])
             self.assertEqual(metadata['color_maps'], [])
 
+            # Auto bands
+            self.assertEqual(metadata['auto_bands']['filter'], '')
+            self.assertEqual(metadata['auto_bands']['match'], None)
+
             # Address key is removed
             self.assertFalse('address' in metadata)
 
@@ -531,6 +535,10 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(len(metadata['algorithms']) > 0)
             self.assertTrue(len(metadata['color_maps']) > 0)
 
+            # Auto band is populated
+            self.assertEqual(metadata['auto_bands']['filter'], 'RGN')
+            self.assertEqual(metadata['auto_bands']['match'], False)
+
             # Algorithms have valid keys
             for k in ['id', 'filters', 'expr', 'help']:
                 for a in metadata['algorithms']:
@@ -556,6 +564,10 @@ class TestApiTask(BootTransactionTestCase):
             # Min/max values have been replaced
             self.assertEqual(metadata['statistics']['1']['min'], algos['VARI']['range'][0])
             self.assertEqual(metadata['statistics']['1']['max'], algos['VARI']['range'][1])
+
+            # Formula can be set to auto
+            res = client.get("/api/projects/{}/tasks/{}/orthophoto/metadata?formula=VARI&bands=auto".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
 
             tile_path = {
                 'orthophoto': '17/32042/46185',
@@ -665,7 +677,9 @@ class TestApiTask(BootTransactionTestCase):
                 ("orthophoto", "formula=VARI&bands=RGB", status.HTTP_200_OK),
                 ("orthophoto", "formula=VARI&bands=invalid", status.HTTP_400_BAD_REQUEST),
                 ("orthophoto", "formula=invalid&bands=RGB", status.HTTP_400_BAD_REQUEST),
-
+                ("orthophoto", "formula=NDVI&bands=auto", status.HTTP_200_OK),
+                ("orthophoto", "formula=NDVI&bands=auto", status.HTTP_200_OK),
+                
                 ("orthophoto", "formula=NDVI&bands=RGN&color_map=rdylgn&rescale=-1,1", status.HTTP_200_OK),
                 ("orthophoto", "formula=NDVI&bands=RGN&color_map=rdylgn&rescale=1,-1", status.HTTP_200_OK),
 
