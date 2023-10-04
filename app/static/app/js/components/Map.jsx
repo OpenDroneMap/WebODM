@@ -94,6 +94,16 @@ class Map extends React.Component {
       return "";
   }
 
+  hasBands = (bands, orthophoto_bands) => {
+    if (!orthophoto_bands) return false;
+
+    for (let i = 0; i < bands.length; i++){
+      if (orthophoto_bands.find(b => b.description !== null && b.description.toLowerCase() === bands[i].toLowerCase()) === undefined) return false;
+    }
+    
+    return true;
+  }
+
   loadImageryLayers(forceAddLayers = false){
     // Cancel previous requests
     if (this.tileJsonRequests) {
@@ -131,7 +141,11 @@ class Map extends React.Component {
             // Single band, probably thermal dataset, in any case we can't render NDVI
             // because it requires 3 bands
             metaUrl += "?formula=Celsius&bands=L&color_map=magma";
+          }else if (meta.task && meta.task.orthophoto_bands){
+            let formula = this.hasBands(["red", "green", "nir"], meta.task.orthophoto_bands) ? "NDVI" : "VARI";
+            metaUrl += `?formula=${formula}&bands=auto&color_map=rdylgn`;
           }else{
+            // This should never happen?
             metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
           }
         }else if (type == "dsm" || type == "dtm"){

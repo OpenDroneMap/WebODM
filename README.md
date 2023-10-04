@@ -38,9 +38,11 @@ A user-friendly, commercial grade software for drone image processing. Generate 
 
 Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
 
-To install WebODM manually, these steps should get you up and running:
+There's also a cloud-hosted version of WebODM available from [webodm.net](https://webodm.net).
 
-* Install the following applications (if they are not installed already):
+To install WebODM manually on your machine:
+
+* Install the following applications:
   - [Git](https://git-scm.com/downloads)
   - [Docker](https://www.docker.com/)
   - [Docker-compose](https://docs.docker.com/compose/install/)

@@ -1,6 +1,6 @@
 import re
 from django.test import TestCase
-from app.api.formulas import lookup_formula, get_algorithm_list, get_camera_filters_for, algos
+from app.api.formulas import lookup_formula, get_algorithm_list, get_camera_filters_for, algos, get_auto_bands
 
 class TestFormulas(TestCase):
     def setUp(self):
@@ -38,7 +38,7 @@ class TestFormulas(TestCase):
                 bands = list(set(re.findall(pattern, f)))
                 self.assertTrue(len(bands) <= 3)
 
-        self.assertTrue(get_camera_filters_for(algos['VARI']) == ['RGB'])
+        self.assertTrue(get_camera_filters_for(algos['VARI']['expr']) == ['RGB'])
 
         # Request algorithms with more band filters
         al = get_algorithm_list(max_bands=5)
@@ -49,3 +49,31 @@ class TestFormulas(TestCase):
             for f in i['filters']:
                 bands = list(set(re.findall(pattern, f)))
                 self.assertTrue(len(bands) <= 5)
+    
+    def test_auto_bands(self):
+        obands = [{'name': 'red', 'description': 'red'},
+                 {'name': 'green', 'description': 'green'},
+                 {'name': 'blue', 'description': 'blue'},
+                 {'name': 'gray', 'description': 'nir'},
+                 {'name': 'alpha', 'description': None}]
+        
+        self.assertEqual(get_auto_bands(obands, "NDVI")[0], "RGBN")
+        self.assertTrue(get_auto_bands(obands, "NDVI")[1])
+        
+        self.assertEqual(get_auto_bands(obands, "Celsius")[0], "L")
+        self.assertFalse(get_auto_bands(obands, "Celsius")[1])
+
+        self.assertEqual(get_auto_bands(obands, "VARI")[0], "RGBN")
+        self.assertTrue(get_auto_bands(obands, "VARI")[0])
+        
+        obands = [{'name': 'red', 'description': None},
+                 {'name': 'green', 'description': None},
+                 {'name': 'blue', 'description': None},
+                 {'name': 'gray', 'description': None},
+                 {'name': 'alpha', 'description': None}]
+        
+        self.assertEqual(get_auto_bands(obands, "NDVI")[0], "RGN")
+        self.assertFalse(get_auto_bands(obands, "NDVI")[1])
+        
+        self.assertEqual(get_auto_bands(obands, "VARI")[0], "RGB")
+        self.assertFalse(get_auto_bands(obands, "VARI")[1])

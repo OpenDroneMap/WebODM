@@ -1024,7 +1024,12 @@ class Task(models.Model):
 
         if os.path.isfile(orthophoto_path):
             with rasterio.open(orthophoto_path) as f:
-                bands = [c.name for c in f.colorinterp]
+                names = [c.name for c in f.colorinterp]
+                for i, n in enumerate(names):
+                    bands.append({
+                        'name': n,
+                        'description': f.descriptions[i]
+                    })
 
         self.orthophoto_bands = bands
         if commit: self.save()
