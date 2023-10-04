@@ -311,7 +311,7 @@ class Tiles(TaskNestedView):
         if hillshade == '' or hillshade == '0': hillshade = None
         if tilesize == '' or tilesize is None: tilesize = 256
         if bands == 'auto' and formula:
-            bands, _ = get_auto_bands(task.orthophoto_bands, formula)
+            bands, _discard_ = get_auto_bands(task.orthophoto_bands, formula)
 
         try:
             tilesize = int(tilesize)
@@ -561,7 +561,7 @@ class Export(TaskNestedView):
 
         if formula and bands:
             if bands == 'auto':
-                bands, _ = get_auto_bands(task.orthophoto_bands, formula)
+                bands, _discard_ = get_auto_bands(task.orthophoto_bands, formula)
 
             try:
                 expr, _discard_ = lookup_formula(formula, bands)
