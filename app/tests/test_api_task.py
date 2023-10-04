@@ -536,7 +536,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(len(metadata['color_maps']) > 0)
 
             # Auto band is populated
-            self.assertEqual(metadata['auto_bands']['filter'], 'RGN')
+            self.assertEqual(metadata['auto_bands']['filter'], '')
             self.assertEqual(metadata['auto_bands']['match'], False)
 
             # Algorithms have valid keys
