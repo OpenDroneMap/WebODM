@@ -31,7 +31,7 @@ redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
 # What class to use for async results, since during testing we need to mock it
 TestSafeAsyncResult = worker.celery.MockAsyncResult if settings.TESTING else app.AsyncResult
 
-@app.task
+@app.task(ignore_result=True)
 def update_nodes_info():
     if settings.NODE_OPTIMISTIC_MODE:
         return
@@ -57,7 +57,7 @@ def update_nodes_info():
                     processing_node.hostname = check_hostname
                 processing_node.save()
 
-@app.task
+@app.task(ignore_result=True)
 def cleanup_projects():
     # Delete all projects that are marked for deletion
     # and that have no tasks left
@@ -68,7 +68,7 @@ def cleanup_projects():
         logger.info("Deleted {} projects".format(count_dict['app.Project']))
 
 
-@app.task
+@app.task(ignore_result=True)
 def cleanup_tmp_directory():
     # Delete files and folder in the tmp directory that are
     # older than 24 hours
@@ -99,7 +99,7 @@ def setInterval(interval, func, *args):
     t.start()
     return stopped.set
 
-@app.task
+@app.task(ignore_result=True)
 def process_task(taskId):
     lock_id = 'task_lock_{}'.format(taskId)
     cancel_monitor = None
@@ -159,7 +159,7 @@ def get_pending_tasks():
                                   processing_node__isnull=False, partial=False) |
                                 Q(pending_action__isnull=False, partial=False))
 
-@app.task
+@app.task(ignore_result=True)
 def process_pending_tasks():
     tasks = get_pending_tasks()
     for task in tasks:
@@ -207,7 +207,7 @@ def export_pointcloud(self, input, **opts):
         logger.error(str(e))
         return {'error': str(e)}
 
-@app.task
+@app.task(ignore_result=True)
 def check_quotas():
     profiles = Profile.objects.filter(quota__gt=-1)
     for p in profiles:
