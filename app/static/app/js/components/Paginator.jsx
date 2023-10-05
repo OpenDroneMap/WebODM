@@ -146,8 +146,16 @@ class Paginator extends React.Component {
         }
 
         if (itemsPerPage && itemsPerPage && totalItems > itemsPerPage){
-            const numPages = Math.ceil(totalItems / itemsPerPage),
-                  pages = [...Array(numPages).keys()]; // [0, 1, 2, ...numPages]
+            const numPages = Math.ceil(totalItems / itemsPerPage);
+            const MAX_PAGE_BUTTONS = 7;
+
+            let rangeStart = Math.max(1, currentPage - Math.floor(MAX_PAGE_BUTTONS / 2));
+            let rangeEnd = rangeStart + Math.min(numPages, MAX_PAGE_BUTTONS);
+            if (rangeEnd > numPages){
+                rangeStart -= rangeEnd - numPages - 1;
+                rangeEnd -= rangeEnd - numPages - 1
+            }
+            let pages = [...Array(rangeEnd - rangeStart).keys()].map(i => i + rangeStart - 1);
             
             paginator = (
                 <ul className="pagination pagination-sm">
