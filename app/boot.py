@@ -126,7 +126,7 @@ def add_default_presets():
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'min-num-features', 'value': '18000'},
                                                               {'name': 'use-3dmesh', 'value': True},
-                                                              {'name': 'feature-quality', 'value': 'ultra'}]})
+                                                              {'name': 'feature-quality', 'value': 'medium'}]})
         Preset.objects.update_or_create(name='DSM + DTM', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'dsm', 'value': True},
