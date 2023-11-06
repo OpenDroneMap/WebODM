@@ -60,6 +60,7 @@ class ProjectListItem extends React.Component {
     this.toggleTaskList = this.toggleTaskList.bind(this);
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
     this.handleTaskSaved = this.handleTaskSaved.bind(this);
     this.viewMap = this.viewMap.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
@@ -248,13 +249,19 @@ class ProjectListItem extends React.Component {
                     }
                 }
             }catch(e){
-                this.setUploadState({error: `${e.message}`, uploading: false});
-                this.dz.cancelUpload();
+                if (this.manuallyCanceled){
+                  // Manually canceled, ignore error
+                  this.setUploadState({uploading: false});
+                }else{
+                  this.setUploadState({error: `${e.message}`, uploading: false});
+                }
+
+                if (this.dz.files.length) this.dz.cancelUpload();
             }
         })
         .on("queuecomplete", () => {
             const remainingFilesCount = this.state.upload.totalCount - this.state.upload.uploadedCount;
-            if (remainingFilesCount === 0){
+            if (remainingFilesCount === 0 && this.state.upload.uploadedCount > 0){
                 // All files have uploaded!
                 this.setUploadState({uploading: false});
 
@@ -332,8 +339,24 @@ class ProjectListItem extends React.Component {
     this.setUploadState({error: ""});
   }
 
-  cancelUpload(e){
+  cancelUpload(){
     this.dz.removeAllFiles(true);
+  }
+
+  handleCancel(){
+    this.manuallyCanceled = true;
+    this.cancelUpload();
+    if (this.dz._taskInfo && this.dz._taskInfo.id !== undefined){
+      $.ajax({
+        url: `/api/projects/${this.state.data.id}/tasks/${this.dz._taskInfo.id}/remove/`,
+        contentType: 'application/json',
+        dataType: 'json',
+        type: 'POST'
+      });
+    }
+    setTimeout(() => {
+      this.manuallyCanceled = false;
+    }, 500);
   }
 
   taskDeleted(){
@@ -628,7 +651,7 @@ class ProjectListItem extends React.Component {
             <button disabled={this.state.upload.error !== ""} 
                     type="button"
                     className={"btn btn-danger btn-sm " + (!this.state.upload.uploading ? "hide" : "")} 
-                    onClick={this.cancelUpload}>
+                    onClick={this.handleCancel}>
               <i className="glyphicon glyphicon-remove-circle"></i>
               Cancel Upload
             </button> 

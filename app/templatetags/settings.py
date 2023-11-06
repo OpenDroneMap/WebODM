@@ -10,6 +10,14 @@ register = template.Library()
 logger = logging.getLogger('app.logger')
 
 @register.simple_tag
+def task_options_docs_link():
+    return settings.TASK_OPTIONS_DOCS_LINK
+
+@register.simple_tag
+def gcp_docs_link():
+    return '<a href="%s" target="_blank">' % settings.GCP_DOCS_LINK
+
+@register.simple_tag
 def reset_password_link():
     return settings.RESET_PASSWORD_LINK
 

@@ -106,6 +106,13 @@ class ProcessingNodeOption extends React.Component {
     }
   }
 
+  handleHelp = e => {
+    e.preventDefault();
+    if (window.__taskOptionsDocsLink){
+      window.open(window.__taskOptionsDocsLink + "#" + encodeURIComponent(this.props.name), "task-options")
+    }
+  }
+
   render() {
     let inputControl = "";
     let warningMsg = "";
@@ -168,7 +175,7 @@ class ProcessingNodeOption extends React.Component {
 
     return (
       <div className="processing-node-option form-inline form-group form-horizontal" ref={this.setTooltips}>
-        <label>{this.props.name} {(!this.isEnumType() && this.props.domain ? `(${this.props.domain})` : "")} <i data-toggle="tooltip" data-placement="bottom" title={this.props.help} onClick={e => e.preventDefault()} className="fa fa-info-circle info-button"></i></label><br/>
+        <label>{this.props.name} {(!this.isEnumType() && this.props.domain ? `(${this.props.domain})` : "")} <i data-toggle="tooltip" data-placement="bottom" title={this.props.help} onClick={this.handleHelp} className="fa fa-info-circle info-button help-button"></i></label><br/>
         {inputControl}
         {loadFileControl}
         
