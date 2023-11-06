@@ -413,7 +413,7 @@ UI_MAX_PROCESSING_NODES = None
 
 # Number of hours before partial tasks
 # are removed (or None to disable)
-CLEANUP_PARTIAL_TASKS = None
+CLEANUP_PARTIAL_TASKS = 72
 
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
