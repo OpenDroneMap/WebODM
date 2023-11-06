@@ -3,6 +3,7 @@ import '../css/TaskList.scss';
 import TaskListItem from './TaskListItem';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import HistoryNav from '../classes/HistoryNav';
 import { _, interpolate } from '../classes/gettext';
 
 class TaskList extends React.Component {
@@ -18,6 +19,8 @@ class TaskList extends React.Component {
 
   constructor(props){
     super(props);
+
+    this.historyNav = new HistoryNav(props.history);
 
     this.state = {
       tasks: [],
@@ -54,6 +57,10 @@ class TaskList extends React.Component {
 
     this.taskListRequest = 
       $.getJSON(this.props.source, json => {
+          if (json.length === 1){
+            this.historyNav.addToQSList("project_task_expanded", json[0].id);
+          }
+
           this.setState({
               tasks: json
           });
@@ -67,7 +74,7 @@ class TaskList extends React.Component {
         .always(() => {
           this.setState({
             loading: false
-          })
+          });
         });
   }
 
