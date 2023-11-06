@@ -411,6 +411,10 @@ QUOTA_EXCEEDED_GRACE_PERIOD = 8
 # Maximum number of processing nodes to show in "Processing Nodes" menus/dropdowns
 UI_MAX_PROCESSING_NODES = None
 
+# Number of hours before partial tasks
+# are removed (or None to disable)
+CLEANUP_PARTIAL_TASKS = None
+
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
     EXTERNAL_AUTH_ENDPOINT = 'http://0.0.0.0:5555/auth'

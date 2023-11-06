@@ -23,6 +23,8 @@ import worker
 from .celery import app
 from app.raster_utils import export_raster as export_raster_sync, extension_for_export_format
 from app.pointcloud_utils import export_pointcloud as export_pointcloud_sync
+from django.utils import timezone
+from datetime import timedelta
 import redis
 
 logger = get_task_logger("app.logger")
@@ -67,6 +69,16 @@ def cleanup_projects():
     if total > 0 and 'app.Project' in count_dict:
         logger.info("Deleted {} projects".format(count_dict['app.Project']))
 
+@app.task(ignore_result=True)
+def cleanup_tasks():
+    # Delete tasks that are older than 
+    if settings.CLEANUP_PARTIAL_TASKS is None:
+        return
+    
+    tasks_to_delete = Task.objects.filter(partial=True, created_at__lte=timezone.now() - timedelta(hours=settings.CLEANUP_PARTIAL_TASKS))
+    for t in tasks_to_delete:
+        logger.info("Cleaning up partial task {}".format(t))
+        t.delete()
 
 @app.task(ignore_result=True)
 def cleanup_tmp_directory():
