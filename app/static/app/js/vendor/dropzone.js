@@ -2199,6 +2199,8 @@ var Dropzone = function (_Emitter) {
   }, {
     key: "cancelUpload",
     value: function cancelUpload(file) {
+      if (file === undefined) return;
+
       if (file.status === Dropzone.UPLOADING) {
         var groupedFiles = this._getFilesWithXhr(file.xhr);
         for (var _iterator19 = groupedFiles, _isArray19 = true, _i20 = 0, _iterator19 = _isArray19 ? _iterator19 : _iterator19[Symbol.iterator]();;) {

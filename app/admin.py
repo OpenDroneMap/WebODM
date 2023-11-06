@@ -40,9 +40,9 @@ class TaskAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-    list_display = ('id', 'project', 'processing_node', 'created_at', 'status', 'last_error')
+    list_display = ('id', 'name', 'project', 'processing_node', 'created_at', 'status', 'last_error')
     list_filter = ('status', 'project',)
-    search_fields = ('id', 'project__name')
+    search_fields = ('id', 'name', 'project__name')
 
 
 admin.site.register(Task, TaskAdmin)
