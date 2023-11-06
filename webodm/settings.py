@@ -415,6 +415,15 @@ UI_MAX_PROCESSING_NODES = None
 # are removed (or None to disable)
 CLEANUP_PARTIAL_TASKS = 72
 
+# Link to GCP docs
+GCP_DOCS_LINK = "https://docs.opendronemap.org/gcp/#gcp-file-format"
+
+# Link to general docs
+DOCS_LINK = "https://docs.opendronemap.org"
+
+# Link to task options docs
+TASK_OPTIONS_DOCS_LINK = "https://docs.opendronemap.org/arguments/"
+
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
     EXTERNAL_AUTH_ENDPOINT = 'http://0.0.0.0:5555/auth'

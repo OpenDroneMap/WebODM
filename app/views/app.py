@@ -39,7 +39,7 @@ def dashboard(request):
 
     no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
     no_projects = Project.objects.filter(owner=request.user).count() == 0
-    
+
     # Create first project automatically
     if no_projects and request.user.has_perm('app.add_project'):
         Project.objects.create(owner=request.user, name=_("First Project"))
