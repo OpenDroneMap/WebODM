@@ -18,7 +18,7 @@ jobs:
           variables: |
             - Q: "A question about using a software or seeking guidance on doing something?"
             - B: "Reporting an issue or a software bug?"
-            - P: "Describes an issue with processing a set of images or a particular dataset"
+            - P: "Describes an issue with processing a set of images or a particular dataset?"
             - D: "Contains a link to a dataset or images?"
             - E: "Contains a suggestion for an improvement or a feature request?"
             - SC: "Describes an issue related to compiling or building source code?"
