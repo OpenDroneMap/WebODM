@@ -8,7 +8,7 @@ import { _, interpolate } from './classes/gettext';
 class MapView extends React.Component {
   static defaultProps = {
     mapItems: [],
-    selectedMapType: 'orthophoto',
+    selectedMapType: 'auto',
     title: "",
     public: false,
     shareButtons: true
@@ -16,7 +16,7 @@ class MapView extends React.Component {
 
   static propTypes = {
       mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
-      selectedMapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
+      selectedMapType: PropTypes.oneOf(['auto', 'orthophoto', 'plant', 'dsm', 'dtm']),
       title: PropTypes.string,
       public: PropTypes.bool,
       shareButtons: PropTypes.bool
@@ -25,9 +25,30 @@ class MapView extends React.Component {
   constructor(props){
     super(props);
 
+    let selectedMapType = props.selectedMapType;
+
+    // Automatically select type based on available tiles
+    // and preference order (below)
+    if (props.selectedMapType === "auto"){
+      let preferredTypes = ['orthophoto', 'dsm', 'dtm'];
+
+      for (let i = 0; i < this.props.mapItems.length; i++){
+        let mapItem = this.props.mapItems[i];
+        for (let j = 0; j < preferredTypes.length; j++){
+          if (mapItem.tiles.find(t => t.type === preferredTypes[j])){
+            selectedMapType = preferredTypes[j];
+            break;
+          }
+        }
+        if (selectedMapType !== "auto") break;
+      }
+    }
+
+    if (selectedMapType === "auto") selectedMapType = "orthophoto"; // Hope for the best
+
     this.state = {
-      selectedMapType: props.selectedMapType,
-      tiles: this.getTilesByMapType(props.selectedMapType)
+      selectedMapType,
+      tiles: this.getTilesByMapType(selectedMapType)
     };
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
@@ -101,7 +122,7 @@ class MapView extends React.Component {
         {this.props.title ? 
           <h3><i className="fa fa-globe"></i> {this.props.title}</h3>
         : ""}
-
+      
         <div className="map-container">
             <Map 
                 tiles={this.state.tiles} 
