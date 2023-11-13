@@ -120,6 +120,59 @@ algos = {
         'help': _('Temperature in Centikelvin degrees.')
     },
 
+
+    # new vegetation index
+
+    'SIPI': {
+        'expr': '(N - B) / (N - R)',
+        'help': _('Structure-Insensitive Pigment Index.')
+    },
+    'mNDVI': {
+        'expr': '(N - Re) / (N + Re - 2 * B)',
+        'help': _('Modified Normalized Difference Vegetation Index.')
+    },
+    'RENDVI': {
+        'expr': '(N - Re) / (N + Re)',
+        'help': _('Ratio Enhanced Normalized Difference Vegetation Index.')
+    },
+    'MTVI_1': {
+        'expr': '1.2 * (1.2 * (N - G) - 2.5 * (R - G))',
+        'help': _('Modified Transformed Vegetation Index 1.')
+    },
+    'MTVI_2': {
+        'expr': '1.5 * (1.2 * (N - G) - 2.5(R - G)) / (((2 * N + 1) ** 2 - (6 * N - 5 * (R0 ** 0.5)) - 0.5) ** 0.5)',
+        'help': _('Modified Transformed Vegetation Index 2.')
+    },
+    'GI': {
+        'expr': 'G / R',
+        'help': _('Greenness Index.'),
+    },
+    'TVI': {
+        'expr': '0.5 * (120 * (N - G) - 200 * (R - G))',
+        'help': _('Transparency Vegetation Index.')
+    },
+    'MCARI_1': {
+        'expr': '1.2 * (2.5 * (N - R) - 1.3 * (N - G))',
+        'help': _('Modified Chlorophyll Absorption Reflectance Index 1.')
+    },
+    'CI': {
+        'expr': 'N / G - 1',
+        'help': _('Chlorophyll Index.')
+    },
+    'SR': {
+        'expr': 'N / R',
+        'help': _('Simple Ratio.')
+    },
+    'mSR_2': {
+        'expr': '(N - Re) / (N + Re)',
+        'help': _('Modified Simple Ratio.')
+    },
+    'IPVI': {
+        'expr': 'N / (N + R)',
+        'help': _('Improved Perpendicular Vegetation Index.')
+    },
+
+
     # more?
 
     '_TESTRB': {
