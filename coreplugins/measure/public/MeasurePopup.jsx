@@ -23,7 +23,12 @@ export default class MeasurePopup extends React.Component {
   constructor(props){
     super(props);
 
+    let featureType = "Point";
+    if (props.model.area !== 0) featureType = "Polygon";
+    else if (props.model.length > 0) featureType = "LineString";
+
     this.state = {
+        featureType,
         volume: null, // to be calculated,
         baseMethod: localStorage.getItem("measure_base_method") || "triangulate",
         task: null,
@@ -36,7 +41,7 @@ export default class MeasurePopup extends React.Component {
   }
 
   componentDidMount(){
-    this.calculateVolume();
+    if (this.state.featureType == "Polygon") this.calculateVolume();
     this.props.resultFeature._measurePopup = this;
   }
 
@@ -46,9 +51,10 @@ export default class MeasurePopup extends React.Component {
 
   getProperties(){
     const result = {
-        Length: this.props.model.length,
-        Area: this.props.model.area
+      Length: this.props.model.length,
+      Area: this.props.model.area
     };
+
     if (this.state.volume !== null && this.state.volume !== false){
         result.Volume = this.state.volume;
         result.BaseSurface = this.state.baseMethod;
@@ -160,7 +166,7 @@ export default class MeasurePopup extends React.Component {
   }
 
   render(){
-    const { volume, error } = this.state;
+    const { volume, error, featureType } = this.state;
     const baseMethods = [
       {label: _("Triangulate"), method: 'triangulate'},
       {label: _("Plane"), method: 'plane'},
@@ -169,9 +175,9 @@ export default class MeasurePopup extends React.Component {
       {label: _("Lowest"), method: 'lowest'}];
 
     return (<div className="plugin-measure popup">
-        <p>{_("Area:")} {this.props.model.areaDisplay}</p>
-        <p>{_("Perimeter:")} {this.props.model.lengthDisplay}</p>
-        {volume === null && !error && <p>{_("Volume:")} <i>{_("computing…")}</i> <i className="fa fa-cog fa-spin fa-fw" /></p>}
+        {featureType == "Polygon" && <p>{_("Area:")} {this.props.model.areaDisplay}</p>}
+        {featureType == "Polygon" && <p>{_("Perimeter:")} {this.props.model.lengthDisplay}</p>}
+        {featureType == "Polygon" && volume === null && !error && <p>{_("Volume:")} <i>{_("computing…")}</i> <i className="fa fa-cog fa-spin fa-fw" /></p>}
         {typeof volume === "number" ? 
             [
               <p>{_("Volume:")} {volume.toFixed("2")} {_("Cubic Meters")} ({(volume * 35.3147).toFixed(2)} {_("Cubic Feet")})</p>,
