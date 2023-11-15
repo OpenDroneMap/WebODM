@@ -71454,7 +71454,7 @@ void main() {
 		};
 
 		removeCameraAnimation(animation){
-			let index = this.cameraAnimations.indexOf(volume);
+			let index = this.cameraAnimations.indexOf(animation);
 			if (index > -1) {
 				this.cameraAnimations.splice(index, 1);
 
@@ -79722,10 +79722,18 @@ ENDSEC
 				tree.jstree("delete_node", jsonNode.id);
 			};
 
+			let oCameraAnimationRemoved = (e) => {
+				let otherRoot = $("#jstree_scene").jstree().get_json("other");
+				let jsonNode = otherRoot.children.find(child => child.data.uuid === e.animation.uuid);
+				
+				tree.jstree("delete_node", jsonNode.id);
+			};
+
 			this.viewer.scene.addEventListener("measurement_removed", onMeasurementRemoved);
 			this.viewer.scene.addEventListener("volume_removed", onVolumeRemoved);
 			this.viewer.scene.addEventListener("polygon_clip_volume_removed", onPolygonClipVolumeRemoved);
 			this.viewer.scene.addEventListener("profile_removed", onProfileRemoved);
+			this.viewer.scene.addEventListener("camera_animation_removed", oCameraAnimationRemoved);
 
 			{
 				let annotationIcon = `${Potree.resourcePath}/icons/annotation.svg`;
@@ -80447,6 +80455,17 @@ ENDSEC
 				}
 			));
 
+			elNavigation.append(this.createToolIcon(
+				Potree.resourcePath + '/icons/reset_tools.svg',
+				'[title]tt.remove_last_camera_animation',
+				() => {
+					if (viewer.scene.cameraAnimations.length > 0){
+						let a = viewer.scene.cameraAnimations[viewer.scene.cameraAnimations.length - 1];
+						viewer.scene.removeCameraAnimation(a);
+						a.setVisible(false);
+					}
+				}
+			));
 
 			elNavigation.append("<br>");
 
