@@ -75386,6 +75386,7 @@ ENDSEC
 					<span>Time: </span><span id="lblTime"></span> <div id="sldTime"></div>
 
 					<input name="play" type="button" value="play"/>
+					<input name="record" type="button" value="record movie"/>
 				</span>
 			</div>
 		`);
@@ -75393,6 +75394,52 @@ ENDSEC
 			const elPlay = this.elContent.find("input[name=play]");
 			elPlay.click( () => {
 				animation.play();
+			});
+
+			function record(canvas, time) {
+				var recordedChunks = [];
+				return new Promise(function (res, rej) {
+					var stream = canvas.captureStream(29.97 /*fps*/);
+					let mediaRecorder = new MediaRecorder(stream, {
+						mimeType: "video/webm; codecs=vp9"
+					});
+					
+					//ondataavailable will fire in interval of `time || 4000 ms`
+					mediaRecorder.start(time || 4000);
+			
+					mediaRecorder.ondataavailable = function (event) {
+						recordedChunks.push(event.data);
+						 // after stop `dataavilable` event run one more time
+						if (mediaRecorder.state === 'recording') {
+							mediaRecorder.stop();
+						}
+			
+					}
+			
+					mediaRecorder.onstop = function (event) {
+						var blob = new Blob(recordedChunks, {type: "video/webm" });
+						var url = URL.createObjectURL(blob);
+						res(url);
+					}
+				})
+			}
+
+			const elRecord = this.elContent.find("input[name=record]");
+			elRecord.click( () => {
+				const t = parseFloat(elDuration.val()) * 1000 + 1000;
+				this.viewer.toggleSidebar();
+				animation.setVisible(false);
+				setTimeout(() => {
+					animation.play();
+					record(this.viewer.renderer.domElement, t).then(url => {
+						let link = document.createElement('a');
+						link.setAttribute('href', url);
+						link.setAttribute('download', 'recording.webm');
+						link.click();
+						this.viewer.toggleSidebar();
+						animation.setVisible(true);
+					});
+				}, 1000);
 			});
 
 			const elSlider = this.elContent.find('#sldTime');
