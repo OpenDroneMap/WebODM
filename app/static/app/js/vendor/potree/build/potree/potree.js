@@ -75401,7 +75401,7 @@ ENDSEC
 				return new Promise(function (res, rej) {
 					var stream = canvas.captureStream(29.97 /*fps*/);
 					let mediaRecorder = new MediaRecorder(stream, {
-						mimeType: "video/webm; codecs=vp9"
+						mimeType: "video/webm; codecs=vp8"
 					});
 					
 					//ondataavailable will fire in interval of `time || 4000 ms`
