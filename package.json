@@ -1,6 +1,6 @@
 {
   "name": "WebODM",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "User-friendly, extendable application and API for processing aerial imagery.",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,6 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "exifr": "^6.0.0",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "fbemitter": "^2.1.1",
     "file-loader": "^0.9.0",
     "file-saver": "^2.0.2",
@@ -56,7 +55,7 @@
     "react-dom": "^16.4.0",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
-    "react-test-renderer": "^15.6.1",
+    "react-test-renderer": "^16.14.0",
     "regenerator-runtime": "^0.11.0",
     "sass": "^1.22.7",
     "sass-loader": "^7.1.0",
@@ -68,7 +67,8 @@
     "uglifyjs-webpack-plugin": "^1.2.7",
     "url-loader": "^0.5.7",
     "webpack": "^4.16.2",
-    "webpack-bundle-tracker": "0.0.93",
-    "webpack-livereload-plugin": "^2.1.1"
+    "webpack-bundle-tracker": "0.4.3",
+    "webpack-livereload-plugin": "3.0.2",
+    "mini-css-extract-plugin": "1.6.2"
   }
 }
