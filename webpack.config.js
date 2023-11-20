@@ -23,6 +23,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, './app/static/app/bundles/'),
     filename: "[name]-[hash].js",
+    publicPath: '/static/app/bundles/'
   },
 
   plugins: [
@@ -32,7 +33,7 @@ module.exports = {
       path: path.join(__dirname, './'),
     }),
     new MiniCssExtractPlugin({
-      filename: "[name]-[hash].css",
+      filename: "./css/[name]-[hash].css",
       chunkFilename: "[id].css"
     }),
   ],
@@ -85,7 +86,10 @@ module.exports = {
 
   resolve: {
     modules: ['node_modules', 'bower_components'],
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    fallback: {
+      "buffer": false
+    }
   },
 
   externals: {

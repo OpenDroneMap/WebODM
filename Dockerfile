@@ -19,7 +19,7 @@ RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget cu
     apt-get install -y ca-certificates gnupg && \
     mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    NODE_MAJOR=16 && \
+    NODE_MAJOR=18 && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
     apt-get -qq update && apt-get -qq install -y nodejs && \
     # Install Python3, GDAL, PDAL, nginx, letsencrypt, psql
@@ -30,7 +30,7 @@ RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget cu
     # Setup cron
     ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && chmod 0644 /webodm/nginx/crontab && service cron start && chmod +x /webodm/nginx/letsencrypt-autogen.sh && \
     /webodm/nodeodm/setup.sh && /webodm/nodeodm/cleanup.sh && cd /webodm && \
-    npm install --quiet -g webpack@4.16.5 && npm install --quiet -g webpack-cli@4.2.0 && npm install --quiet && webpack --mode production && \
+    npm install --quiet -g webpack@5.89.0 && npm install --quiet -g webpack-cli@5.1.4 && npm install --quiet && webpack --mode production && \
     echo "UTC" > /etc/timezone && \
     python manage.py collectstatic --noinput && \
     python manage.py rebuildplugins && \
