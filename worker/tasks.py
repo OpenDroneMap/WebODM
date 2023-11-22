@@ -15,7 +15,6 @@ from app.models import Profile
 
 from app.models import Project
 from app.models import Task
-from app.plugins.grass_engine import grass, GrassEngineException
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
@@ -177,15 +176,6 @@ def process_pending_tasks():
     for task in tasks:
         process_task.delay(task.id)
 
-
-@app.task
-def execute_grass_script(script, serialized_context = {}, out_key='output'):
-    try:
-        ctx = grass.create_context(serialized_context)
-        return {out_key: ctx.execute(script), 'context': ctx.serialize()}
-    except GrassEngineException as e:
-        logger.error(str(e))
-        return {'error': str(e), 'context': ctx.serialize()}
 
 @app.task(bind=True)
 def export_raster(self, input, **opts):

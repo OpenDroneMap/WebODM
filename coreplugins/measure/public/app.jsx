@@ -73,18 +73,19 @@ export default class App{
 
         map.on('measurepopupshown', ({popupContainer, model, resultFeature}) => {
             // Only modify area popup, length popup is fine as default
+            const $container = $("<div/>"),
+                  $popup = $(popupContainer);
+            
             if (model.area !== 0){
-                const $container = $("<div/>"),
-                      $popup = $(popupContainer);
-
-                $popup.children("p").empty();
-                $popup.children("h3:first-child").after($container);
-
-                ReactDOM.render(<MeasurePopup 
-                                    model={model} 
-                                    resultFeature={resultFeature} 
-                                    map={map} />, $container.get(0));
+              // Erase measurements for area
+              $popup.children("p").empty();
             }
+            $popup.children("ul.tasks").before($container);
+
+            ReactDOM.render(<MeasurePopup 
+                                model={model}
+                                resultFeature={resultFeature} 
+                                map={map} />, $container.get(0));
         });
     }
 }

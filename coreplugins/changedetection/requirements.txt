@@ -1,3 +1,0 @@
-geojson==2.4.1
-opencv-python-headless==4.4.0.46
-

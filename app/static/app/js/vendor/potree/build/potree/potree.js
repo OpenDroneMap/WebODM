@@ -54099,14 +54099,16 @@
 		getArea () {
 			let area = 0;
 			let j = this.points.length - 1;
-
 			for (let i = 0; i < this.points.length; i++) {
+				let p0 = this.points[0].position;
 				let p1 = this.points[i].position;
 				let p2 = this.points[j].position;
-				area += (p2.x + p1.x) * (p1.y - p2.y);
+				let a = (p2.y - p0.y) * (p1.z - p0.z) - (p2.z - p0.z) * (p1.y - p0.y);
+				let b = (p2.x - p0.x) * (p1.z - p0.z) - (p2.z - p0.z) * (p1.x - p0.x);
+				let c = (p2.x - p0.x) * (p1.y - p0.y) - (p2.y - p0.y) * (p1.x - p0.x);
+				area += Math.sqrt(a * a + b * b + c * c);
 				j = i;
 			}
-
 			return Math.abs(area / 2);
 		};
 
@@ -67901,13 +67903,13 @@ void main() {
 					this.viewer.scene.removePolygonClipVolume(polyClipVol);
 				}
 
-				this.viewer.renderer.domElement.removeEventListener("mouseup", insertionCallback, true);
+				this.viewer.renderer.domElement.removeEventListener("mouseup", insertionCallback, false);
 				this.viewer.removeEventListener("cancel_insertions", cancel.callback);
 				this.viewer.inputHandler.enabled = true;
 			};
 			
 			this.viewer.addEventListener("cancel_insertions", cancel.callback);
-			this.viewer.renderer.domElement.addEventListener("mouseup", insertionCallback , true);
+			this.viewer.renderer.domElement.addEventListener("mouseup", insertionCallback , false);
 			this.viewer.inputHandler.enabled = false;
 			
 			polyClipVol.addMarker();
@@ -71452,7 +71454,7 @@ void main() {
 		};
 
 		removeCameraAnimation(animation){
-			let index = this.cameraAnimations.indexOf(volume);
+			let index = this.cameraAnimations.indexOf(animation);
 			if (index > -1) {
 				this.cameraAnimations.splice(index, 1);
 
@@ -75384,6 +75386,7 @@ ENDSEC
 					<span>Time: </span><span id="lblTime"></span> <div id="sldTime"></div>
 
 					<input name="play" type="button" value="play"/>
+					<input name="record" type="button" value="record movie"/>
 				</span>
 			</div>
 		`);
@@ -75391,6 +75394,52 @@ ENDSEC
 			const elPlay = this.elContent.find("input[name=play]");
 			elPlay.click( () => {
 				animation.play();
+			});
+
+			function record(canvas, time) {
+				var recordedChunks = [];
+				return new Promise(function (res, rej) {
+					var stream = canvas.captureStream(29.97 /*fps*/);
+					let mediaRecorder = new MediaRecorder(stream, {
+						mimeType: "video/webm; codecs=vp8"
+					});
+					
+					//ondataavailable will fire in interval of `time || 4000 ms`
+					mediaRecorder.start(time || 4000);
+			
+					mediaRecorder.ondataavailable = function (event) {
+						recordedChunks.push(event.data);
+						 // after stop `dataavilable` event run one more time
+						if (mediaRecorder.state === 'recording') {
+							mediaRecorder.stop();
+						}
+			
+					}
+			
+					mediaRecorder.onstop = function (event) {
+						var blob = new Blob(recordedChunks, {type: "video/webm" });
+						var url = URL.createObjectURL(blob);
+						res(url);
+					}
+				})
+			}
+
+			const elRecord = this.elContent.find("input[name=record]");
+			elRecord.click( () => {
+				const t = parseFloat(elDuration.val()) * 1000 + 1000;
+				this.viewer.toggleSidebar();
+				animation.setVisible(false);
+				setTimeout(() => {
+					animation.play();
+					record(this.viewer.renderer.domElement, t).then(url => {
+						let link = document.createElement('a');
+						link.setAttribute('href', url);
+						link.setAttribute('download', 'recording.webm');
+						link.click();
+						this.viewer.toggleSidebar();
+						animation.setVisible(true);
+					});
+				}, 1000);
 			});
 
 			const elSlider = this.elContent.find('#sldTime');
@@ -79720,10 +79769,18 @@ ENDSEC
 				tree.jstree("delete_node", jsonNode.id);
 			};
 
+			let oCameraAnimationRemoved = (e) => {
+				let otherRoot = $("#jstree_scene").jstree().get_json("other");
+				let jsonNode = otherRoot.children.find(child => child.data.uuid === e.animation.uuid);
+				
+				tree.jstree("delete_node", jsonNode.id);
+			};
+
 			this.viewer.scene.addEventListener("measurement_removed", onMeasurementRemoved);
 			this.viewer.scene.addEventListener("volume_removed", onVolumeRemoved);
 			this.viewer.scene.addEventListener("polygon_clip_volume_removed", onPolygonClipVolumeRemoved);
 			this.viewer.scene.addEventListener("profile_removed", onProfileRemoved);
+			this.viewer.scene.addEventListener("camera_animation_removed", oCameraAnimationRemoved);
 
 			{
 				let annotationIcon = `${Potree.resourcePath}/icons/annotation.svg`;
@@ -80445,6 +80502,17 @@ ENDSEC
 				}
 			));
 
+			elNavigation.append(this.createToolIcon(
+				Potree.resourcePath + '/icons/reset_tools.svg',
+				'[title]tt.remove_last_camera_animation',
+				() => {
+					if (viewer.scene.cameraAnimations.length > 0){
+						let a = viewer.scene.cameraAnimations[viewer.scene.cameraAnimations.length - 1];
+						viewer.scene.removeCameraAnimation(a);
+						a.setVisible(false);
+					}
+				}
+			));
 
 			elNavigation.append("<br>");
 

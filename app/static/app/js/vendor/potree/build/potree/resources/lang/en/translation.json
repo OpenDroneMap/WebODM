@@ -46,7 +46,8 @@
 		"navigation_cube_control": "Navigation cube",
 		"remove_all_clipping_volumes": "Remove all clipping volumes",
 		"compass": "Compass",
-		"camera_animation": "Camera Animation"
+		"camera_animation": "Camera Animation",
+		"remove_last_camera_animation": "Remove last camera animation"
 	},
 	"appearance": {
 		"nb_max_pts": "Point budget", 

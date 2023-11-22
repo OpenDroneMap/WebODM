@@ -13,4 +13,17 @@
     	display: block;
     	margin-top: 12px;
     }
+
+    .base-control{
+        display: inline-block;
+        margin-top: 16px;
+        select{
+            font-size: 12px;
+            height: auto;
+            margin-left: 4px;
+            padding: 4px;
+            display: inline-block;
+            width: auto;
+        }
+    }
 }
