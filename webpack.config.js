@@ -88,7 +88,7 @@ module.exports = {
     modules: ['node_modules', 'bower_components'],
     extensions: ['.js', '.jsx'],
     fallback: {
-      "buffer": false
+      buffer: require.resolve('buffer'),
     }
   },
 
