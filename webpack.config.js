@@ -36,6 +36,9 @@ module.exports = {
       filename: "./css/[name]-[hash].css",
       chunkFilename: "[id].css"
     }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+  }),
   ],
 
   module: {
