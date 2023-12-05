@@ -191,7 +191,7 @@ usage(){
   echo "	--gpu	Use GPU NodeODM nodes (Linux only) (default: disabled)"
   echo "	--settings	Path to a settings.py file to enable modifications of system settings (default: None)"
   echo "	--worker-memory	Maximum amount of memory allocated for the worker process (default: unlimited)"
-  echo "	--worker-cpus	Maximum number of CPUS allocated for the worker process (default: all)"
+  echo "	--worker-cpus	Maximum number of CPUs allocated for the worker process (default: all)"
   
   exit
 }
