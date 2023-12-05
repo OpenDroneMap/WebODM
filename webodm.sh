@@ -56,13 +56,13 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-	--media-dir)
+    --media-dir)
     WO_MEDIA_DIR=$(realpath "$2")
     export WO_MEDIA_DIR
     shift # past argument
     shift # past value
     ;;
-	--db-dir)
+    --db-dir)
     WO_DB_DIR=$(realpath "$2")
     export WO_DB_DIR
     shift # past argument
@@ -72,19 +72,19 @@ case $key in
     export WO_SSL=YES
     shift # past argument
     ;;
-	--ssl-key)
+    --ssl-key)
     WO_SSL_KEY=$(realpath "$2")
     export WO_SSL_KEY
     shift # past argument
     shift # past value
     ;;
-	--ssl-cert)
-	WO_SSL_CERT=$(realpath "$2")
-	export WO_SSL_CERT
+    --ssl-cert)
+    WO_SSL_CERT=$(realpath "$2")
+    export WO_SSL_CERT
     shift # past argument
     shift # past value
     ;;
-	--ssl-insecure-port-redirect)
+    --ssl-insecure-port-redirect)
     export WO_SSL_INSECURE_PORT_REDIRECT="$2"
     shift # past argument
     shift # past value
@@ -103,11 +103,11 @@ case $key in
     dev_mode=true
     shift # past argument
     ;;
-	--gpu)
+    --gpu)
     gpu=true
     shift # past argument
     ;;
-	--broker)
+    --broker)
     export WO_BROKER="$2"
     shift # past argument
     shift # past value
@@ -136,9 +136,15 @@ case $key in
     shift # past argument
     shift # past value
     ;;    
-	--worker-memory)
+    --worker-memory)
     WO_WORKER_MEMORY="$2"
     export WO_WORKER_MEMORY
+    shift # past argument
+    shift # past value
+    ;;	
+    --worker-cpus)
+    WO_WORKER_CPUS="$2"
+    export WO_WORKER_CPUS
     shift # past argument
     shift # past value
     ;;
@@ -185,6 +191,7 @@ usage(){
   echo "	--gpu	Use GPU NodeODM nodes (Linux only) (default: disabled)"
   echo "	--settings	Path to a settings.py file to enable modifications of system settings (default: None)"
   echo "	--worker-memory	Maximum amount of memory allocated for the worker process (default: unlimited)"
+  echo "	--worker-cpus	Maximum number of CPUS allocated for the worker process (default: all)"
   
   exit
 }
@@ -371,6 +378,7 @@ start(){
 	echo "Default Nodes: $WO_DEFAULT_NODES"
 	echo "Settings: $WO_SETTINGS"
 	echo "Worker memory limit: $WO_WORKER_MEMORY"
+	echo "Worker cpus limit: $WO_WORKER_CPUS"
 	echo "================================"
 	echo "Make sure to issue a $0 down if you decide to change the environment."
 	echo ""
@@ -443,6 +451,10 @@ start(){
 
 	if [ ! -z "$WO_WORKER_MEMORY" ]; then
 		command+=" -f docker-compose.worker-memory.yml"
+	fi
+
+	if [ ! -z "$WO_WORKER_CPUS" ]; then
+		command+=" -f docker-compose.worker-cpu.yml"
 	fi
 
 	command="$command up"
