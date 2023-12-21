@@ -209,7 +209,9 @@ class ProjectListItem extends React.Component {
                     file.deltaBytesSent = 0;
                     file.trackedBytesSent = 0;
                     file.retries++;
-                    this.dz.processQueue();
+                    setTimeout(() => {
+                      this.dz.processQueue();
+                    }, 5000 * file.retries);
                 }else{
                     throw new Error(interpolate(_('Cannot upload %(filename)s, exceeded max retries (%(max_retries)s)'), {filename: file.name, max_retries: MAX_RETRIES}));
                 }
