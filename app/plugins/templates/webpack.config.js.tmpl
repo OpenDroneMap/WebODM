@@ -6,7 +6,7 @@ process.env.NODE_PATH = webodmRoot + "node_modules";
 require("module").Module._initPaths();
 
 let path = require("path");
-let ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'production',
@@ -21,8 +21,9 @@ module.exports = {
   },
 
   plugins: [
-    new ExtractTextPlugin('[name].css', {
-        allChunks: true
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[id].css'
     })
   ],
 
@@ -34,7 +35,7 @@ module.exports = {
         use: [
           {
             loader: 'babel-loader',
-            query: {
+            options: {
               plugins: [
                  '@babel/syntax-class-properties',
                  '@babel/proposal-class-properties'
@@ -49,22 +50,21 @@ module.exports = {
       },
       {
         test: /\.s?css$$/,
-        use: ExtractTextPlugin.extract({
-          use: [
-            { loader: 'css-loader' },
-            {
-                loader: 'sass-loader',
-                options: {
-                    implementation: require("sass")
-                }
-            }
-          ]
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+        ]
       },
-      {
+{
         test: /\.(png|jpg|jpeg|svg)/,
-        loader: "url-loader?limit=100000"
-      }
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 100000,
+          },
+        },
+      },
     ]
   },
 
