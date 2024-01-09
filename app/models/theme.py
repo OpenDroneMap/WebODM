@@ -7,6 +7,8 @@ from django.db import models
 from colorfield.fields import ColorField
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 
 from webodm import settings
 
@@ -54,14 +56,5 @@ def theme_post_save(sender, instance, created, **kwargs):
 
 
 def update_theme_css():
-    """
-    Touch theme.scss to invalidate its cache and force
-    compressor to regenerate it
-    """
-
-    theme_file = os.path.join('app', 'static', 'app', 'css', 'theme.scss')
-    try:
-        Path(theme_file).touch()
-        logger.info("Regenerate cache for {}".format(theme_file))
-    except:
-        logger.warning("Failed to touch {}".format(theme_file))
+    key = make_template_fragment_key("theme_css")
+    cache.delete(key)

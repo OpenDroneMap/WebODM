@@ -114,7 +114,6 @@ INSTALLED_APPS = [
     'colorfield',
     'imagekit',
     'codemirror2',
-    'compressor',
     'app',
     'nodeodm',
 ]
@@ -199,7 +198,6 @@ STATICFILES_DIRS = [
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
 ]
 
 # File Uploads
@@ -334,41 +332,6 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=6),
 }
 
-# Compressor
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
-COMPRESS_ENABLED = True
-COMPRESS_MTIME_DELAY = 0
-
-# Sass
-def theme(color):
-    from app.contexts.settings import theme as f
-    return f(color)
-
-
-def complementary(color):
-    from app.contexts.settings import complementary as f
-    return f(color)
-
-
-def scaleby(color, n):
-    from app.contexts.settings import scaleby as f
-    return f(color, n)
-
-
-def scalebyiv(color, n):
-    from app.contexts.settings import scaleby as f
-    return f(color, n, True)
-
-
-LIBSASS_CUSTOM_FUNCTIONS = {
-    'theme': theme,
-    'complementary': complementary,
-    'scaleby': scaleby,
-    'scalebyiv': scalebyiv
-}
-
 # Celery
 CELERY_BROKER_URL = os.environ.get('WO_BROKER', 'redis://localhost')
 CELERY_RESULT_BACKEND = os.environ.get('WO_BROKER', 'redis://localhost')
@@ -389,6 +352,12 @@ CACHES = {
         }
     }
 }
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
 
 # Number of minutes a processing node hasn't been seen 
 # before it should be considered offline
