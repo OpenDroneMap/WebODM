@@ -20,7 +20,7 @@ ul#side-menu.nav a,
 .alert,
 .form-control,
 .dropdown-menu > li > a,
-.theme-color-primary,
+.theme-color-primary
 {
     color: {{ theme_primary }};
 }
@@ -132,7 +132,7 @@ a, a:hover, a:focus{
 .btn-primary:focus, .btn-primary.active:focus, .open>.dropdown-toggle.btn-primary:focus,
 .btn-primary[disabled]:hover, .btn-primary.active[disabled]:hover, .open>.dropdown-toggle.btn-primary[disabled]:hover,
 .btn-primary[disabled]:focus, .btn-primary.active[disabled]:focus, .open>.dropdown-toggle.btn-primary[disabled]:focus,
-.btn-primary[disabled]:active, .btn-primary.active[disabled]:active, .open>.dropdown-toggle.btn-primary[disabled]:active,
+.btn-primary[disabled]:active, .btn-primary.active[disabled]:active, .open>.dropdown-toggle.btn-primary[disabled]:active{
     background-color: {% scalebyiv theme_button_primary 0.90 %};
     border-color: {% scalebyiv theme_button_primary 0.90 %};
     color: {{ theme_secondary }};
@@ -244,7 +244,7 @@ pre.prettyprint,
 	border-color: {{ theme_highlight }};
 }
 pre.prettyprint:focus,
-.form-control:focus
+.form-control:focus{
 	border-color: {% scalebyiv theme_highlight 0.7 %};
 }
 
