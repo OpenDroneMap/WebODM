@@ -200,7 +200,8 @@ a, a:hover, a:focus{
 	color: {{ theme_header_primary }};
 }
 .navbar-default .navbar-link:hover,
-#navbar-top .navbar-top-links a.dropdown-toggle:hover{
+#navbar-top .navbar-top-links a.dropdown-toggle:hover,
+#navbar-top .navbar-top-links .dropdown.open a.dropdown-toggle{
 	color: {{ theme_secondary }};
 }
 
