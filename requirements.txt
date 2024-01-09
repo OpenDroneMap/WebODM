@@ -8,12 +8,10 @@ Django==2.2.27
 django-appconf==1.0.2
 django-codemirror2==0.2
 django-colorfield==0.1.15
-django-compressor==2.2
 django-cors-headers==3.0.2
 django-filter==2.4.0
 django-guardian==1.4.9
 django-imagekit==4.0.1
-django-libsass==0.7
 django-redis==4.12.1
 django-webpack-loader==0.6.0
 djangorestframework==3.13.1
@@ -25,7 +23,6 @@ futures==3.1.1
 gunicorn==19.7.1
 itypes==1.1.0
 kombu==4.6.7
-libsass==0.19.4
 Markdown==3.3.4
 olefile==0.44
 openapi-codec==1.1.7

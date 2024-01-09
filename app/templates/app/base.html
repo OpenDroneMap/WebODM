@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load i18n static settings compress plugins %}
+    {% load i18n cache static settings plugins %}
     <!-- 
     WebODM - User-friendly, commercial grade software for processing aerial imagery.
     Copyright (C) 2020  WebODM Authors
@@ -51,9 +51,11 @@
 
     <title>{{title|default:"Login"}} - {{ SETTINGS.app_name }}</title>
 
-    {% compress css inline %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'app/css/theme.scss' %}" />
-    {% endcompress %}
+    {% cache 3600 theme_css %}
+    <style type="text/css">
+    {% include "theme.css" %}
+    </style>
+    {% endcache %}
 
     {% is_desktop_mode as desktop_mode %}
     {% if desktop_mode %}
