@@ -228,8 +228,6 @@ Don't expect to process more than a few hundred images with these specifications
 
 WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
 
-[NodeODM](https://github.com/OpenDroneMap/NodeODM) and [ODM](https://github.com/OpenDroneMap/ODM) cannot run natively on Mac and this is the reason we mostly recommend people to use docker.
-
 WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
 
 ## Customizing and Extending
