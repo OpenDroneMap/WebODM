@@ -579,6 +579,10 @@ class TaskListItem extends React.Component {
                     <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
                   </tr>}
                   <tr>
+                    <td><strong>{_("Task ID:")}</strong></td>
+                    <td>{task.id}</td>
+                  </tr>
+                  <tr>
                       <td><strong>{_("Task Output:")}</strong></td>
                       <td><div className="btn-group btn-toggle"> 
                         <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
