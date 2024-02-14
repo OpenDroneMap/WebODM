@@ -26,7 +26,7 @@ class Theme(models.Model):
     button_default = ColorField(default='#95a5a6', help_text=_("Default button color."), verbose_name=_("Button Default"))
     button_danger = ColorField(default='#e74c3c', help_text=_("Delete button color."), verbose_name=_("Button Danger"))
 
-    header_background = ColorField(default='#59D2FE', help_text=_("Background color of the site's header."), verbose_name=_("Header Background"))
+    header_background = ColorField(default='#0DCAF0', help_text=_("Background color of the site's header."), verbose_name=_("Header Background"))
     header_primary = ColorField(default='#2B0504', help_text=_("Text and icons in the site's header."), verbose_name=_("Header Primary"))
 
     border = ColorField(default='#e7e7e7', help_text=_("The color of most borders."), verbose_name=_("Border"))
