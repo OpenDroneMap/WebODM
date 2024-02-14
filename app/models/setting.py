@@ -20,16 +20,16 @@ class Setting(models.Model):
     app_name = models.CharField(max_length=255, blank=False, null=False, help_text=_("The name of your application"), verbose_name=_("App name"))
     app_logo = models.ImageField(upload_to="settings/", blank=False, null=False, help_text=_("A 512x512 logo of your application (.png or .jpeg)"), verbose_name=_("App logo"))
     app_logo_36 = ImageSpecField(source='app_logo',
-                                      processors=[ResizeToFit(36, 36)],
+                                      processors=[ResizeToFit(79, 36)],
                                       format='PNG',
                                       options={'quality': 90})
     app_logo_favicon = ImageSpecField(source='app_logo',
-                                      processors=[ResizeToFit(48, 48)],
+                                      processors=[ResizeToFit(118, 48)],
                                       format='PNG',
                                       options={'quality': 90})
 
-    organization_name = models.CharField(default='WebODM', max_length=255, blank=True, null=True, help_text=_("The name of your organization"), verbose_name=_("Organization name"))
-    organization_website = models.URLField(default='https://github.com/OpenDroneMap/WebODM/', max_length=255, blank=True, null=True, help_text=_("The website URL of your organization"), verbose_name=_("Organization website"))
+    organization_name = models.CharField(default='Global Drones', max_length=255, blank=True, null=True, help_text=_("The name of your organization"), verbose_name=_("Organization name"))
+    organization_website = models.URLField(default='https://www.globaldrones.com.br', max_length=255, blank=True, null=True, help_text=_("The website URL of your organization"), verbose_name=_("Organization website"))
     theme = models.ForeignKey(Theme, blank=False, null=False, on_delete=models.DO_NOTHING, verbose_name=_("Theme"),
                               help_text=_("Active theme"))
 

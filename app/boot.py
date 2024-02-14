@@ -83,7 +83,8 @@ def boot():
         if Setting.objects.all().count() == 0:
             s = Setting.objects.create(
                     app_name=settings.APP_NAME,
-                    theme=default_theme)
+                    theme=default_theme,
+                    organization_website=settings.ORG_WEBSITE)
             s.app_logo.save(os.path.basename(settings.APP_DEFAULT_LOGO), File(open(settings.APP_DEFAULT_LOGO, 'rb')))
 
             logger.info("Created settings")

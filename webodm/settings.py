@@ -62,8 +62,9 @@ INTERNAL_IPS = ['127.0.0.1']
 ALLOWED_HOSTS = ['*']
 
 # Branding
-APP_NAME = "WebODM"
+APP_NAME = "Global Drones"
 APP_DEFAULT_LOGO = os.path.join('app', 'static', 'app', 'img', 'logo512.png')
+ORG_WEBSITE = "https://www.globaldrones.com.br"
 
 # In single user mode, a default admin account is created and automatically
 # used so that no login windows are displayed
