@@ -156,6 +156,23 @@ Cannot start WebODM via `./webodm.sh start`, error messages are different at eac
 While running WebODM with Docker Toolbox (VirtualBox) you cannot access WebODM from another computer in the same network. | As Administrator, run `cmd.exe` and then type `"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm "default" natpf1 "rule-name,tcp,,8000,,8000"`
 On Windows, the storage space shown on the WebODM diagnostic page is not the same as what is actually set in Docker's settings. | From Hyper-V Manager, right-click “DockerDesktopVM”, go to Edit Disk, then choose to expand the disk and match the maximum size to the settings specified in the docker settings. Upon making the changes, restart docker.
 
+#### Images Missing from Lightning Assets
+
+When you use Lightning to process your task, you will need to download all assets to your local instance of WebODM. The all assets zip does *not* contain the images which were used to create the orthomosaic. This means that, although you can visualise the cameras layer in your local WebODM, when you click on a particular camera icon the image will not be shown.
+
+The fix if you are using WebODM with Docker is as follows (instructions are for MacOS host):
+
+1. Ensure that you have a directory which contains all of the images for the task and only the images;
+2. Open Docker Desktop and navigate to Containers. Identify your WebODM instance and navigate to the container that is named `worker`. You will need the Container ID. This is a hash which is listed under the container name. Click to copy the Container ID using the copy icon next to it.
+3. Open Terminal and enter `docker cp <sourcedirectory>/. <dockercontainerID>:/webodm/app/media/project/<projectID>/task/<taskID>`. Paste the Container ID to replace the location titled `<dockercontainerID>`. Enter the full directory path for your images to replace `<sourcedirectory`;
+4. Go back to Docker Desktop and navigate to Volumes in the side bar. Click on the volume called `webodm_appmedia`, click on `project`, identify the correct project and click on it, click on `task` and identify the correct task.
+5. From Docker Desktop substitute the correct `<projectID>` and `<taskID>` into the command in Terminal;
+6. Execute the newly edited command in Terminal. You will see a series of progress messages and your images will be copied to Docker;
+7. Navigate to your project in your local instance of WebODM;
+8. Open the Map and turn on the Cameras layer (top left);
+9. Click on a Camera icon and the relevant image will be shown
+
+
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
 ### Backup and Restore
