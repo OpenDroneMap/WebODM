@@ -1,5 +1,20 @@
 {% extends 'registration/registration_base.html' %}
 
+{% block registration_header %}
+<style>
+    h3 {
+        color: #009f32;
+        font-family: "Montserrat ExtraBold";
+    }
+    p a {
+        color: #464749;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
 {% block registration_content %}
-{% block message %}{% endblock%}
+<div class="center-block text-center">
+    {% block message %}{% endblock%}
+</div>
 {% endblock %}
