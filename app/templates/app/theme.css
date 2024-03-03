@@ -325,7 +325,7 @@ pre.prettyprint:focus,
 }
 
 @font-face {
-	font-family: "Montserrat";
+	font-family: "Montserrat Regular";
 	src: url( {% static 'app/fonts/Montserrat-Regular.ttf' %} );
 	font-weight: 400;
 }
