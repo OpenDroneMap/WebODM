@@ -119,8 +119,11 @@ ul#side-menu.nav{
     }
 }
 
-.top-buffer { 
-    margin-top: 15px; 
+.center { 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .navbar-default.sidebar{
@@ -269,4 +272,12 @@ footer{
 
 .floatfix{
     clear: both;
+}
+
+.rounded-corners {
+    border-radius: 25px;
+}
+
+.login-help {
+    padding-top: 10px;
 }

@@ -1,9 +1,15 @@
 {% load bootstrap_extras %}
 
 <div class="form-group {% if field.errors %}has-error{% endif %}">
-    <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-    <div class="col-sm-10 ">
-        {{ field|with_class:'form-control' }}
+    {% if field.label == "Username" %}
+        <label for="{{ field.id_for_label }}" class="control-label">Usuário</label>
+    {% elif field.label == "Password" %}
+        <label for="{{ field.id_for_label }}" class="control-label">Senha</label>
+    {% else %}
+        <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+    {% endif %}
+    <div class="">
+        {{ field|with_class:'form-control rounded-corners' }}
         {% if field.errors %}
             <span class='text-danger'>{{ field.errors|join:'<br />' }}</span>
         {% endif %}

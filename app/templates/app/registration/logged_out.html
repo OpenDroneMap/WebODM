@@ -1,7 +1,7 @@
-{% extends 'registration/login.html' %}
+{% extends 'registration/registration_message.html' %}
 {% load i18n %}
 
-{% block registration_content %}
+{% block message %}
     <h3>{% trans "You have been logged out." %}</h3>
     <p><a href="{% url 'login' %}">{% trans 'Log In' %}</a></p>
 {% endblock %}

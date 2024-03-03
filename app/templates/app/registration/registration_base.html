@@ -1,19 +1,47 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block navbar %} {% endblock %}
 
 {% block page-wrapper %}
 <style type="text/css">
+
+* {
+    min-width: 0;
+}
+
 footer{
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
 }
+
+.white-canvas {
+    background-color: rgba(255, 255, 255, 0.85);
+    height: 80%;
+}
+
+.content, html {
+    background-image: url({% static 'app/img/background.png' %});
+}
+
+#main-logo {
+    padding: 20px;
+}
+
+.top-buffer {
+    padding-top: 60px;
+}
 </style>
 <section class="main">
     <div class="content">
         {% block registration_header %}{% endblock %}
-        <div class="col-sm-12 col-md-6 col-md-offset-3 top-buffer">
-            {% block registration_content %}{% endblock %}
+        <div class="col-xs-10 col-sm-4 col-md-4 col-lg-3 center white-canvas rounded-corners">
+            <div class="top-buffer">
+                <img src="{% static 'app/img/logo-global.png' %}" id="main-logo" class="center-block">
+                {% block registration_content %}{% endblock %}
+            </div>
         </div>
     </div>
 </section>

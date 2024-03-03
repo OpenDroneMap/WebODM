@@ -85,6 +85,7 @@
     <div id="wrapper">
         {{ SETTINGS.theme.html_before_header|safe }}
 
+        {% block navbar%}
         <nav id="navbar-top" class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -106,6 +107,7 @@
 
             {% block navbar-sidebar %}{% endblock %}
         </nav>
+        {% endblock %}
 
         {% block page-wrapper %}{{ SETTINGS.theme.html_after_header|safe }}{% endblock %}
     </div>

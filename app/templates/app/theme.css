@@ -1,4 +1,4 @@
-{% load settings %}
+{% load settings static %}
 {% theme "primary" as theme_primary %}
 {% theme "secondary" as theme_secondary %}
 {% theme "tertiary" as theme_tertiary %}
@@ -317,3 +317,44 @@ pre.prettyprint:focus,
 .tag-badge a, .tag-badge a:hover{
 	color: {{ theme_secondary }};
 }
+
+@font-face {
+	font-family: "Montserrat Bold";
+	src: url( {% static 'app/fonts/Montserrat-Bold.ttf' %} );
+	font-weight: 700;
+}
+
+@font-face {
+	font-family: "Montserrat";
+	src: url( {% static 'app/fonts/Montserrat-Regular.ttf' %} );
+	font-weight: 400;
+}
+
+@font-face {
+	font-family: "Montserrat ExtraBold";
+	src: url( {% static 'app/fonts/Montserrat-ExtraBold.ttf' %} );
+	font-weight: 800;
+}
+
+body {
+	font-family: 'Montserrat Bold';
+}
+
+
+/* @font-face {
+	font-family: "Montserrat";
+	src: local('Montserrat Bold'), local("Montserrat-Bold");
+	font-weight: 700;
+}
+
+@font-face {
+	font-family: "Montserrat";
+	src: local('Montserrat Regular'), local("Montserrat-Regular");
+	font-weight: 400;
+}
+
+@font-face {
+	font-family: "Montserrat";
+	src: local('Montserrat ExtraBold'), local("Montserrat-ExtraBold");
+	font-weight: 800;
+} */

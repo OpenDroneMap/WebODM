@@ -104,3 +104,5 @@ package-lock.json
 dpkg/build
 dpkg/deb
 .secret_key
+
+.vscode
