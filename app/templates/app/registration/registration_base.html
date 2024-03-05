@@ -19,15 +19,16 @@ footer{
 
 .white-canvas {
     background-color: rgba(255, 255, 255, 0.85);
-    height: 90%;
+    height: 700px;
 }
 
 .content, html {
-    background-image: url({% static 'app/img/background.png' %});
+    background: url({% static 'app/img/background.png' %}) no-repeat center center fixed;
+    background-size:cover;
 }
 
 #main-logo {
-    padding: 20px;
+    padding: 18px;
 }
 
 .top-buffer {
