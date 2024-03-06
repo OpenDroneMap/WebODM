@@ -113,7 +113,7 @@ class Paginator extends React.Component {
         let clearSearch = null;
         let toolbar = (<ul className={"pagination pagination-sm toolbar " + (totalItems == 0 && !searchText ? "hidden " : " ") + (totalItems / itemsPerPage <= 1 ? "no-margin" : "")}>
             <li className="btn-group" ref={domNode => { this.searchContainer = domNode; }}>
-                <a href="javascript:void(0);" className="dropdown-toggle"
+                <a href="javascript:void(0);" className="dropdown-toggle force-rounded btn-search"
                         data-toggle-outside 
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false"
@@ -135,7 +135,7 @@ class Paginator extends React.Component {
                 </ul>
             </li>
             <li className="btn-group">
-                <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
+                <a href="javascript:void(0);" className="dropdown-toggle force-rounded btn-sort" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
                 <SortPanel selected={this.state.sortKey} items={this.sortItems} onChange={this.sortChanged} />
             </li>
         </ul>);

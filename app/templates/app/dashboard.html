@@ -27,7 +27,7 @@
 	{% else %}
 		{% include "quota.html" %}
 
-		{% if no_tasks %}
+		<!-- {% if no_tasks %}
 			<h3>{% trans 'Welcome!' %} ☺</h3>
 			{% trans 'Select Images and GCP' as upload_images %}
 			<p>
@@ -41,7 +41,7 @@
 					<li>{% gcp_docs_link as gcp_link %}{% blocktrans with link_start=gcp_link|safe link_end='</a>' %}A {{link_start}}GCP File{{link_end}} is optional, but can increase georeferencing accuracy{% endblocktrans %}</li>
 				</ul>
 			</p>
-		{% endif %}
+		{% endif %} -->
 		
 		<div id="dashboard-app" data-dashboard></div>
 

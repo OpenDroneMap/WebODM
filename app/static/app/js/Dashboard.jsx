@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import $ from 'jquery';
 import { _ } from './classes/gettext';
+import { useState } from 'react/cjs/react.production.min';
 
 class Dashboard extends React.Component {
   constructor(){
@@ -55,15 +56,22 @@ class Dashboard extends React.Component {
     };
 
 
+
     return (
       <Router basename="/dashboard">
         <div>
           <div className="text-right add-button">
-            <button type="button" 
-                    className="btn btn-primary btn-sm"
+            <button type="button"
+                    className="btn"
+                    id="btn-add"
                     onClick={this.handleAddProject}>
               <i className="glyphicon glyphicon-plus"></i>
-              {_("Add Project")}
+            </button>
+            <button type="button" 
+                    id="btn-text"
+                    className="btn rounded-corners font-12"
+                    onClick={this.handleAddProject}>
+              {_("Adicionar Projeto")}
             </button>
           </div>
 
@@ -100,6 +108,33 @@ $(function(){
         });
         return found ? _("Your changes will be lost. Are you sure you want to leave?") : undefined; 
     };
+
+    const btn_add_default = 'btn';
+    const btn_add_hovering = 'btn hovering';
+
+    const btn_text_default = "btn rounded-corners font-12";
+    const btn_text_hovering = "btn rounded-corners font-12 hovering";
+
+    $("#btn-add").each(function (id, el) {
+        el.addEventListener('mouseover', () => {
+          el.classList = btn_add_hovering;
+          $("#btn-text").get(0).classList = btn_text_hovering;
+        });
+        el.addEventListener('mouseout', () => {
+          el.classList = btn_add_default;
+          $("#btn-text").get(0).classList = btn_text_default;        
+        });
+    });
+    $("#btn-text").each(function (id, el) {
+      el.addEventListener('mouseover', () => {
+        el.classList = btn_text_hovering;
+        $("#btn-add").get(0).classList = btn_add_hovering;
+      });
+      el.addEventListener('mouseout', () => {
+        el.classList = btn_text_default;
+        $("#btn-add").get(0).classList = btn_add_default;        
+      });
+  });
 });
 
 export default Dashboard;

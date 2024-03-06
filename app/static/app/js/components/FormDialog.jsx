@@ -183,12 +183,12 @@ class FormDialog extends React.Component {
                 data-backdrop="static"
             >
               <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <button type="button" className="close" onClick={this.hide}><span>&times;</span></button>
-                    <h4 className="modal-title">{this.props.title}</h4>
+                <div className="modal-content rounded-corners">
+                  <div className="modal-header no-border">
+                    <button type="button" className="close" onClick={this.hide}><span className="x-close">&times;</span></button>
+                    <h4 className="modal-title text-center force-montserrat-bold">{this.props.title}</h4>
                   </div>
-                  <div className="modal-body">
+                  <div id="edit-project-popup" className="modal-body">
                     <ErrorMessage bind={[this, "error"]} />
                     <div className="form-horizontal" onSubmit={this.handleSave}>
                       {this.props.children}
@@ -196,8 +196,8 @@ class FormDialog extends React.Component {
                   </div>
                   <div className="modal-footer">
                     <div className="pull-right">
-                        <button type="button" className="btn btn-default" onClick={this.hide} disabled={this.state.saving}>{_("Cancel")}</button>
-                        <button type="button" className="btn btn-primary save" onClick={this.handleSave} disabled={this.state.saving}>
+                        <button type="button" className="btn btn-cancel btn-default rounded-corners font-12" onClick={this.hide} disabled={this.state.saving}>{_("Cancel")}</button>
+                        <button type="button" className="btn save rounded-corners font-12" onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
                                 <span>
                                     <i className="fa fa-circle-notch fa-spin"></i> {this.props.savingLabel}

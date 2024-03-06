@@ -1,20 +1,61 @@
-#dashboard-app{
-    .row{
-        &.no-margin{
-            margin: 0;
-        }
+#dashboard-app {
+  .row {
+    &.no-margin {
+      margin: 0;
+    }
+  }
+
+  .progress {
+    height: 20px;
+    margin-bottom: 4px;
+    .progress-bar {
+      font-size: 14px;
+      line-height: 18px;
+    }
+  }
+
+  .add-button,
+  .list-group {
+    margin-top: 10px;
+    margin-bottom: 8px;
+  }
+  .add-button {
+    #btn-text {
+      background-color: #529a4c;
+      color: #fff;
+      width: 200px;
     }
 
-    .progress{
-        height: 20px;
-        margin-bottom: 4px;
-        .progress-bar{
-            font-size: 14px;
-            line-height: 18px;
-        }
+    #btn-add {
+      position: relative;
+      left: 20px;
+      border-radius: 50%;
+      background: linear-gradient(
+        75deg,
+        rgba(81, 155, 85, 1) 0%,
+        rgba(76, 159, 138, 1) 100%
+      );
+      border-color: #fff;
+      border-width: 5px;
+      font-size: 30px;
+      width: 70px;
+      height: 70px;
+
+      i {
+        margin: 0;
+        position: relative;
+        left: 1px;
+        top: 2px;
+        color: white;
+      }
     }
 
-    .add-button, .list-group{
-        margin-bottom: 8px;
+    #btn-add.hovering {
+        background: linear-gradient(75deg, rgba(75,139,69,1) 0%, rgba(76,159,138,1) 100%);
     }
+
+    #btn-text.hovering {
+        background-color: #4b8b45;
+    }
+  }
 }

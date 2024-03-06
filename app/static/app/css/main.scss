@@ -2,7 +2,6 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     height: auto;
 }
 #page-wrapper{
-    margin-top: 1px;
     padding-bottom: 8px;
 }
 
@@ -178,13 +177,6 @@ ul#side-menu.nav{
             background-color: #798d8f;
         }
     }  
-
-    &.pagination-sm{
-        a{
-            padding-top: 2px;
-            padding-bottom: 2px;
-        }
-    }
 }
 
 table.table-first-col-bold{
@@ -239,6 +231,10 @@ button i.glyphicon{
 .navbar-brand {
 	position: absolute;
 	top: 0px;
+    left: 15px;
+}
+.navbar-brand img {
+    height: 35px;
 }
 
 .navbar-text {
@@ -256,12 +252,37 @@ footer{
     padding: 8px;
 }
 
-.list-group-item{
+.list-group-item {
     background-color: inherit;
     border-top-width: 0px;
+    border: none;
 
-    &:first-child{
-        border-top-width: 1px;
+    $padding-size: 20px;
+    padding-bottom: $padding-size;
+    padding-top: $padding-size;
+
+    $list-item-bar-size: 98%;
+
+    &::after {
+        content: " ";
+        position: relative;
+        display: block;
+        width: $list-item-bar-size;
+        left: calc((100% - $list-item-bar-size) / 2);
+        top: $padding-size;
+        border-bottom: solid 2px #14a5a2;
+    }
+
+    &:first-child {
+        padding-top: 30px;
+    }
+
+    &:last-child {
+        padding-bottom: 30px;
+
+        &::after {
+            border-bottom: none;
+        }
     }
 }
 
@@ -276,4 +297,41 @@ footer{
 
 .rounded-corners {
     border-radius: 25px;
+}
+
+.no-border {
+    border: none;
+}
+
+* {
+	font-family: 'Montserrat Bold';
+}
+
+.force-montserrat-bold {
+    font-family: 'Montserrat Bold';
+}
+
+.force-montserrat-extra-bold {
+    font-family: 'Montserrat ExtraBold';
+}
+
+.force-montserrat-regular {
+    font-family: 'Montserrat Regular';
+}
+
+.font-14,
+.field-label-default {
+    font-size: 14px;
+}
+
+.font-12 {
+    font-size: 12px;
+}
+
+.plugin-icon {
+    color: #4ca2a1;
+}
+
+.force-rounded {
+    border-radius: 50%!important;
 }

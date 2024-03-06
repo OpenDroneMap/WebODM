@@ -3,3 +3,48 @@
         margin-right: 4px;
     }
 }
+
+.modal-dialog {
+    padding-top: 10%;
+
+    .modal-content {
+        background-color: rgba($color: #fff, $alpha: 0.85);
+    }
+    
+    .close {
+        opacity: 1.0;
+    }
+    
+    .x-close {
+        color: #7c7c7c;
+        opacity: 1.0;
+        font-family: "Montserrat Bold";
+    }
+    
+    .save {
+        background-color: #529a4c;
+        color: #fff;
+        border-color: #4b8b45;
+    }
+    
+    .save:hover {
+        background-color: #4b8b45;
+    }
+    
+    .btn-cancel {
+        background-color: #afafaf;
+        border-color: #a0a0a0;
+
+        &:hover {
+            background-color: #a0a0a0;
+        }
+    }
+    
+    #edit-project-popup {
+        padding-bottom: 5px;
+    }    
+}
+
+.modal-title {
+    color: #4ca2a1;
+}

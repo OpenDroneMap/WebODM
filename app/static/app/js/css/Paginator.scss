@@ -56,4 +56,17 @@
             font-weight: normal;
         }
     }
+    a.btn-sort,
+    a.btn-search {
+        height: 30px !important;
+        width: 30px !important;
+        
+        i {
+            position: relative;
+            font-size: 16px;
+            right: 2px;
+        }
+
+        margin: 3px;
+    }
 }
