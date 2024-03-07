@@ -1,0 +1,138 @@
+* {
+  min-width: 0;
+}
+
+label {
+  font-size: 14px;
+}
+
+p {
+  font-family: "Montserrat Regular";
+  font-size: 13px;
+  color: #333;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.white-canvas {
+  width: 400px;
+  height: 800px;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+#main-logo {
+  width: 150px;
+  height: auto;
+  padding: 20px;
+}
+
+.top-buffer {
+  margin-top: 60px;
+}
+
+.rounded-corners {
+  border-radius: 25px;
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+  gap: 10px;
+}
+
+form input {
+  width: 100%;
+  border: none;
+  padding: 15px;
+}
+
+form p {
+  text-align: center;
+}
+
+form button {
+  width: 100%;
+  background-color: #009f31;
+  border: none;
+  padding: 15px;
+  color: white;
+  font-weight: bold;
+}
+
+form button:hover {
+  background-color: #017424;
+}
+
+.login-button,
+.login-button:hover,
+.login-button:focus {
+  color: #464749;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.5s;
+}
+
+.login-button:hover {
+  transform: scale(0.95);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  width: 100%;
+}
+
+#confirmation-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#confirmation-message h1 {
+  margin: 50px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+  color: #009f31;
+}
+
+#confirmation-message p {
+  margin-bottom: 100px;
+  text-align: center;
+  color: #464749;
+  font-weight: bold;
+}
+
+.invalid {
+  border: 3px solid red;
+}
+
+@media screen and (max-width: 410px) {
+  .white-canvas {
+    width: 90%;
+  }
+  #confirmation-message h1 {
+    font-size: 20px;
+    margin: 50px 0;
+  }
+}
+
+/*# sourceMappingURL=register-new-account.css.map */

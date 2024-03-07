@@ -151,6 +151,9 @@ def welcome(request):
                       'firstuserform': fuf
                   })
 
+def registration(request):
+    return render(request, 'app/registration/new_account.html')
+
 
 def handler404(request, exception):
     return render(request, '404.html', status=404)

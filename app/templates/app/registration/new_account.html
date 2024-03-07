@@ -1,0 +1,72 @@
+{% extends 'registration/registration_base.html' %}
+{% load static %}
+
+{% block registration_header %}
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/register-new-account.css' %}">
+{% endblock %}
+
+{% block registration_content %}
+<div id="new-account">
+  <form id="register-form" action="#" method="POST">
+    <div class="field">
+      <label for="nome">Nome Completo *</label>
+      <input type="text" id="nome" class="rounded-corners" />
+    </div>
+    <div class="field">
+      <label for="email">E-mail *</label>
+      <input type="email" id="email" class="rounded-corners" />
+    </div>
+    <div class="field">
+      <label for="senha">Senha *</label>
+      <input type="password" name="senha" id="senha" class="rounded-corners" />
+    </div>
+    <div class="field">
+      <label for="repetir-senha">Repetir Senha *</label>
+      <input
+        type="password"
+        name="repetir-senha"
+        id="repetir-senha"
+        class="rounded-corners"
+      />
+    </div>
+    <p>
+      Minimo de 8 caracteres, contendo um número, uma letra maiúscula e uma
+      letra minúscula.
+    </p>
+    <button type="submit" class="rounded-corners">Cadastrar</button>
+    <a href="{% url 'login' %}" class="login-button">Já tenho conta</a>
+  </form>
+  <div id="confirmation-message" style="display: none">
+    <h1>Cadastro foi realizado com sucesso!</h1>
+    <p>A equipe liberará o acesso em breve.</p>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    $("#register-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (validateForm()) {
+        $("#register-form").style.display = "none";
+        $("#confirmation-message").style.display = "block";
+      }
+    });
+
+    function validateForm() {
+      var nome = document.getElementById("nome").value;
+      var email = document.getElementById("email").value;
+      var senha = document.getElementById("senha").value;
+      var repetirSenha = document.getElementById("repetir-senha").value;
+
+      if (nome === "" || email === "" || senha === "" || repetirSenha === "") {
+        window.alert("Preencha todos os campos!");
+        return false;
+      } else if (senha != repetirSenha) {
+        window.alert("As senhas devem ser iguais!");
+        return false;
+      }
+      return true;
+    }
+  });
+</script>
+{% endblock %}
