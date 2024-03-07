@@ -633,18 +633,18 @@ class ProjectListItem extends React.Component {
           <ErrorMessage bind={[this, 'error']} />
           <div className="btn-group project-buttons">
             {this.hasPermission("add") ? 
-              <div className={"asset-download-buttons btn-group " + (this.state.upload.uploading ? "hide" : "")}>
+              <div className={"asset-download-buttons " + (this.state.upload.uploading ? "hide" : "")}>
                 <button type="button" 
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-sm rounded-corners upload-file"
                       onClick={this.handleUpload}
                       ref={this.setRef("uploadButton")}>
-                  <i className="glyphicon glyphicon-upload"></i>
-                  {_("Select Images and GCP")}
+                  <i className="content-upload-glyphicon" aria-hidden="true"></i>
+                  {_("Selecionar imagens e Ponto de Controle")}
                 </button>
                 <button type="button" 
-                      className="btn btn-default btn-sm"
+                      className="btn btn-sm rounded-corners import-file"
                       onClick={this.handleImportTask}>
-                  <i className="glyphicon glyphicon-import"></i> {_("Import")}
+                  <i className="content-import-glyphicon"></i> {_("Importar")}
                 </button>
                 {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
               </div>
@@ -673,7 +673,7 @@ class ProjectListItem extends React.Component {
               <span>
                 <i className='fa fa-tasks'></i>
                 <a href="javascript:void(0);" onClick={this.toggleTaskList}>
-                  {interpolate(_("%(count)s Tasks"), { count: numTasks})} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                  {interpolate(_("%(count)s Tarefas"), { count: numTasks})} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
                 </a>
               </span>
               : ""}
@@ -686,7 +686,7 @@ class ProjectListItem extends React.Component {
                   : ""}
                   <i className='fa fa-filter'></i>
                   <a href="javascript:void(0);" onClick={this.onOpenFilter} className="dropdown-toggle" data-toggle-outside data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {_("Filter")}
+                    {_("Filtrar")}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-right filter-dropdown">
                   <li className="filter-text-container">

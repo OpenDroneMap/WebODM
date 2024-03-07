@@ -40,7 +40,8 @@ body {
 
 .navbar-top-links li a {
     padding: 15px;
-    min-height: 50px;
+    padding-top: 20px;
+    min-height: 60px;
 }
 
 .navbar-top-links .dropdown-menu li {
@@ -175,12 +176,13 @@ body {
 }
 
 @media(min-width: 768px) {
+    $top: 60px;
     .white-screen {
         position: absolute;
-        top: 50px;
+        top: $top;
         z-index: -1;
         width: $navbar-size;
-        height: calc(100vh - 50px);
+        height: calc(100vh - $top);
         background-color: #fff;
         box-shadow: 9px 0 5px -5px rgba(0, 0, 0, 0.1);
     }

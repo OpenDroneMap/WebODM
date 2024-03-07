@@ -37,7 +37,8 @@ body {
 
 .navbar-top-links li a {
   padding: 15px;
-  min-height: 50px;
+  padding-top: 20px;
+  min-height: 60px;
 }
 
 .navbar-top-links .dropdown-menu li {
@@ -166,10 +167,10 @@ body {
 @media (min-width: 768px) {
   .white-screen {
     position: absolute;
-    top: 50px;
+    top: 60px;
     z-index: -1;
     width: 452px;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 60px);
     background-color: #fff;
     box-shadow: 9px 0 5px -5px rgba(0, 0, 0, 0.1);
   }

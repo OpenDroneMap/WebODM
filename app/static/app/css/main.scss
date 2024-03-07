@@ -1,3 +1,5 @@
+$navbar-size: 60px;
+
 html, body, section.main, .content, #wrapper, #page-wrapper{
     height: auto;
 }
@@ -37,8 +39,8 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
 }
 
 #navbar-top{
-    height: 50px;
-    min-height: 50px;
+    height: $navbar-size;
+    min-height: $navbar-size;
     background-color: #18bc9c;
     z-index: 99999;
 
@@ -216,12 +218,12 @@ button i.glyphicon{
 }
 
 .navbar-header {
-	height: 50px;
+	height: $navbar-size;
 }
 
 .navbar-right {
 	clear: none !important;
-	height: 50px;
+	height: $navbar-size;
 }
 
 .dropdown {
@@ -234,7 +236,7 @@ button i.glyphicon{
     left: 15px;
 }
 .navbar-brand img {
-    height: 35px;
+    height: 45px;
 }
 
 .navbar-text {
@@ -260,8 +262,10 @@ footer{
     $padding-size: 20px;
     padding-bottom: $padding-size;
     padding-top: $padding-size;
+    padding-left: 30px;
+    padding-right: 20px;
 
-    $list-item-bar-size: 98%;
+    $list-item-bar-size: 100%;
 
     &::after {
         content: " ";
@@ -274,11 +278,11 @@ footer{
     }
 
     &:first-child {
-        padding-top: 30px;
+        padding-top: 40px;
     }
 
     &:last-child {
-        padding-bottom: 30px;
+        padding-bottom: 20px;
 
         &::after {
             border-bottom: none;
@@ -335,3 +339,23 @@ footer{
 .force-rounded {
     border-radius: 50%!important;
 }
+
+// .content-upload-glyphicon {
+//     -webkit-mask-size: cover;
+//     mask-size: cover;
+//     -webkit-mask-image: url("../fonts/upload.svg");
+//     mask-image: url("../fonts/upload.svg");
+//     background-color: white;
+//     width: 1em;
+//     height: 1em;
+// }
+
+// .content-import-glyphicon {
+//     -webkit-mask-size: cover;
+//     mask-size: cover;
+//     -webkit-mask-image: url("../fonts/box-arrow-in-down.svg");
+//     mask-image: url("../fonts/box-arrow-in-down.svg");
+//     background-color: white;
+//     width: 1em;
+//     height: 1em;
+// }

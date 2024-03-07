@@ -1,9 +1,12 @@
 .asset-download-buttons{
     display: inline-block;
+
     button{
-        margin-right: 0 !important;
-        i{
-            left: 2px;
+        color: #fff;
+
+        i {
+            position: relative;
+            margin-right: 5px;
         }
     }
 

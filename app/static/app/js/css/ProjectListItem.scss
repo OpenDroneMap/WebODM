@@ -60,6 +60,8 @@
     .project-links{
         margin-top: 10px;
         margin-bottom: 10px;
+        margin-left: 10px !important;
+
         font-size: 90%;
         i{
             margin-right: 4px;
@@ -167,5 +169,55 @@
 
     .quick-clear-filter{
         margin-right: 6px !important;
+    }
+
+    .upload-file {
+        $font-size: 10px;
+
+        color: #fff;
+        background-color: #52994c;
+        font-size: $font-size;
+        padding: 5px 13px 10px;
+        margin-right: 10px;
+
+        i {
+            font-size: $font-size + 6px;
+            margin-right: 10px;
+            top: 4px;
+        }
+
+        &:hover {
+            background-color: #4b8b45;
+        }
+    }
+
+    .import-file {
+        $font-size: 10px;
+        
+        color: #fff;
+        background-color: #82b076;
+        font-size: $font-size;
+        padding: 5px 15px 10px;
+        margin-right: 10px;
+
+        i {
+            font-size: $font-size + 8px;
+            top: 2px;
+        }
+
+        &:hover {
+            background-color: #6b9262;
+        }
+    }
+
+    .project-links
+    {
+        a {
+            color: #707070 !important;
+        }
+
+        .fa, .far {
+            color: #4ca2a1;
+        }
     }
 }
