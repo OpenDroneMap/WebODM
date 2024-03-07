@@ -110,10 +110,6 @@ body {
 
 .navbar-collapse ul li,
 .sidebar ul li {
-    a {
-        z-index: 1;
-    }
-
     $left-spacing: 5px;
 
     &::after {
@@ -137,6 +133,19 @@ body {
         border-radius: 25px;
         background: #cce0e0;
         z-index: -1;
+    }
+
+    a {
+        z-index: 1;
+    }
+}
+
+@media(min-width: 768px) {
+    .navbar-collapse ul li,
+    .sidebar ul li {
+        a {
+            z-index: auto;
+        }
     }
 }
 

@@ -104,10 +104,6 @@ body {
   padding: 15px;
 }
 
-.navbar-collapse ul li a,
-.sidebar ul li a {
-  z-index: 1;
-}
 .navbar-collapse ul li::after,
 .sidebar ul li::after {
   content: " ";
@@ -131,7 +127,17 @@ body {
   background: #cce0e0;
   z-index: -1;
 }
+.navbar-collapse ul li a,
+.sidebar ul li a {
+  z-index: 1;
+}
 
+@media (min-width: 768px) {
+  .navbar-collapse ul li a,
+  .sidebar ul li a {
+    z-index: auto;
+  }
+}
 .sidebar .arrow {
   float: right;
 }

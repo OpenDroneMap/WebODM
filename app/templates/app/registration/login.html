@@ -11,7 +11,7 @@
     .btn-custom:hover {
         color: #000;
     }
-    button.new-account {
+    .btn.new-account {
         background-color: #5fb367;
     }
     label {
@@ -44,35 +44,37 @@
     {% if autologin %}
         <script>location.href='/';</script>
     {% else %}
-    <form id="loginForm" {% if ext_auth %} style="display: none" {% endif %} action="{% url 'login' %}" method="post" class="" role="form">{% csrf_token %}
-        {% for field in form %}
-            {% include 'registration/form_field.html' %}
-        {% endfor %}
-        <div class="form-group">
-            <div>
-              <button type="submit" class="btn rounded-corners btn-block center-block btn-custom">Entrar</button>
-            </div>
-            <div>
-                {% if reset_pwd_link != '' %}
-                    <p class="text-center login-help"><a href="{{ reset_pwd_link }}">Esqueceu a senha?</a></p>
-                {% else %}
-                    <p class="text-center login-help"><a href="javascript:toggleForgotPasswordHint();">Esqueceu a senha?</a></p>
-                    <script>function toggleForgotPasswordHint(){ $("#forgotPasswordHint").toggle(); }</script>
-                    <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 4px;" class="theme-secondary">
-                        You can reset the administrator password by running the following command:
-                        <span class="theme-background-highlight" style="padding: 4px; margin: 8px 0; display: inline-block;">./webodm.sh resetadminpassword yournewpass</span><br/>
-                        If you used WebODM Manager to launch WebODM, find the "Reset Password" button within the maintenance panel or within one of WebODM Manager menus.
-                    </div>
-                {% endif %}
+    <div>
+        <form id="loginForm" {% if ext_auth %} style="display: none" {% endif %} action="{% url 'login' %}" method="post" class="" role="form">{% csrf_token %}
+            {% for field in form %}
+                {% include 'registration/form_field.html' %}
+            {% endfor %}
+            <div class="form-group">
                 <div>
-                    <button type="submit" class="btn rounded-corners btn-block center-block new-account btn-custom">Criar nova conta</button>
+                  <button type="submit" class="btn rounded-corners btn-block center-block btn-custom">Entrar</button>
                 </div>
                 <div>
-                    <p class="text-center login-help"><a>Suporte</a></p>
+                    {% if reset_pwd_link != '' %}
+                        <p class="text-center login-help"><a href="{{ reset_pwd_link }}">Esqueceu a senha?</a></p>
+                    {% else %}
+                        <p class="text-center login-help"><a href="javascript:toggleForgotPasswordHint();">Esqueceu a senha?</a></p>
+                        <script>function toggleForgotPasswordHint(){ $("#forgotPasswordHint").toggle(); }</script>
+                        <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 4px;" class="theme-secondary">
+                            You can reset the administrator password by running the following command:
+                            <span class="theme-background-highlight" style="padding: 4px; margin: 8px 0; display: inline-block;">./webodm.sh resetadminpassword yournewpass</span><br/>
+                            If you used WebODM Manager to launch WebODM, find the "Reset Password" button within the maintenance panel or within one of WebODM Manager menus.
+                        </div>
+                    {% endif %}
                 </div>
             </div>
+        </form>
+        <div>
+            <a type="submit" href="{% url 'new_account_registration' %}" class="btn rounded-corners btn-block center-block new-account btn-custom" >Criar nova conta</a>
         </div>
-    </form>
+        <div>
+            <p class="text-center login-help"><a>Suporte</a></p>
+        </div>
+    </div>
 
     {% if ext_auth %}
     <div class="text-center" id="authLoading">
