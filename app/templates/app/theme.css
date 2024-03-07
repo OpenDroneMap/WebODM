@@ -42,7 +42,6 @@ ul#side-menu.nav a,
 }
 
 /* Secondary */
-body,
 .navbar-default,
 .console,
 .alert,
@@ -51,6 +50,10 @@ body,
 .theme-secondary
 {
 	background-color: #fff;
+}
+
+body {
+	background-color: #edeeef;
 }
 
 .tooltip > .tooltip-inner{
