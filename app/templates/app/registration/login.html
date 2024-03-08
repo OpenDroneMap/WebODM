@@ -55,9 +55,9 @@
                 </div>
                 <div>
                     {% if reset_pwd_link != '' %}
-                        <p class="text-center login-help"><a href="{{ reset_pwd_link }}">Esqueceu a senha?</a></p>
+                        <p class="text-center login-help redirect-link"><a href="{{ reset_pwd_link }}">Esqueceu a senha?</a></p>
                     {% else %}
-                        <p class="text-center login-help"><a href="javascript:toggleForgotPasswordHint();">Esqueceu a senha?</a></p>
+                        <p class="text-center login-help redirect-link"><a class="redirect-link" href="javascript:toggleForgotPasswordHint();">Esqueceu a senha?</a></p>
                         <script>function toggleForgotPasswordHint(){ $("#forgotPasswordHint").toggle(); }</script>
                         <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 4px;" class="theme-secondary">
                             You can reset the administrator password by running the following command:
@@ -72,7 +72,7 @@
             <a type="submit" href="{% url 'new_account_registration' %}" class="btn rounded-corners btn-block center-block new-account btn-custom" >Criar nova conta</a>
         </div>
         <div>
-            <p class="text-center login-help"><a>Suporte</a></p>
+            <p class="text-center login-help redirect-link"><a>Suporte</a></p>
         </div>
     </div>
 
