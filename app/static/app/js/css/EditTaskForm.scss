@@ -47,3 +47,45 @@
         }
     }
 }
+
+/* ---------------------Button---------------------- */
+
+.form-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.form-group-data {
+    justify-content: start;
+}
+
+.input-field {
+    background-color: #FFFFFF;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    outline: none;
+}
+
+.name-input {
+    width: 100%;
+}
+
+.data-input {
+    width: 95px;
+}
+
+.remove-style {
+    background: none;
+    border: none;
+    outline: none;
+}
+
+.fa-tag {
+    color: #14A5A2;
+    transform: scale(1.2);
+}

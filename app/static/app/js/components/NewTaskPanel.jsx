@@ -131,7 +131,7 @@ class NewTaskPanel extends React.Component {
       <div className="new-task-panel theme-background-highlight">
         <div className="form-horizontal">
           <div className={this.state.inReview ? "disabled" : ""}>
-            <p>{interpolate(_("%(count)s files selected. Please check these additional options:"), { count: this.props.filesCount})}</p>
+            <p className='files-text'>{interpolate(_("%(count)s files selected. Please check these additional options:"), { count: this.props.filesCount})}</p>
 
             {!filesCountOk ? 
             <div className="alert alert-warning">
@@ -153,11 +153,11 @@ class NewTaskPanel extends React.Component {
 
             {this.state.editTaskFormLoaded && this.props.showResize ?
               <div>
-                <div className="form-group">
+                <div className="form-group resize-images-container">
                   <label className="col-sm-2 control-label">{_("Resize Images")}</label>
                   <div className="col-sm-10">
                       <div className="btn-group">
-                      <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                      <button type="button" className="btn btn-default-s dropdown-toggle" data-toggle="dropdown">
                           {ResizeModes.toHuman(this.state.resizeMode)} <span className="caret"></span>
                       </button>
                       <ul className="dropdown-menu">
@@ -174,7 +174,7 @@ class NewTaskPanel extends React.Component {
                       <input 
                           type="number" 
                           step="100"
-                          className="form-control"
+                          className="form-control input-field"
                           onChange={this.handleResizeSizeChange} 
                           value={this.state.resizeSize} 
                       />
@@ -195,11 +195,11 @@ class NewTaskPanel extends React.Component {
           {this.state.editTaskFormLoaded ? 
             <div className="form-group">
               <div className="col-sm-offset-2 col-sm-10 text-right">
-                {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{marginRight: 4}}><i className="glyphicon glyphicon-remove-circle"></i> {_("Cancel")}</button>}
+                {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{marginRight: 4}}>{_("Cancel")}</button>}
                 {this.state.loading ?
                   <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
                   :
-                  <button type="submit" className="btn btn-primary" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}><i className="glyphicon glyphicon-saved"></i> {!this.state.inReview ? _("Review") : _("Start Processing")}</button>
+                  <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{!this.state.inReview ? _("Próximo") : _("Start Processing")}</button>
                 }
               </div>
             </div>

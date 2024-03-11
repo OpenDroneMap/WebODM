@@ -581,8 +581,8 @@ class EditTaskForm extends React.Component {
       taskOptions = (
         <div>
           {tagsField}
-          <div className="form-group">
-            <label className="col-sm-2 control-label">{_("Processing Node")}</label>
+          <div className="form-group col-sm-10 form-group-data">
+            {/* <label className="col-sm-2 control-label">{_("Processing Node")}</label>
               <div className="col-sm-10">
                 <select className="form-control" value={this.state.selectedNode.key} onChange={this.handleSelectNode}>
                 {this.state.processingNodes.map(node => 
@@ -598,7 +598,11 @@ class EditTaskForm extends React.Component {
                <div className="review-options">
                 {this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
                </div>}
-            </div>
+            </div> */}
+
+            <label className="col-sm-2 control-label">{_("Data")}</label>
+            <input type="text" className="col-sm-10 input-field data-input"/>
+
           </div>
 
           {this.state.editingPreset ? 
@@ -622,22 +626,20 @@ class EditTaskForm extends React.Component {
 
     return (
       <div className="edit-task-form">
-        <div className="form-group">
+        <div className="form-group col-sm-10">
           <label className="col-sm-2 control-label">{_("Name")}</label>
-          <div className="col-sm-10 name-fields">
-            {this.state.loadingTaskName ? 
-            <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
-            : ""}
-            <input type="text" 
-              onChange={this.handleNameChange} 
-              className="form-control"
-              placeholder={this.state.namePlaceholder} 
-              value={this.state.name}
-            />
-            <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="btn btn-sm btn-secondary toggle-tags">
-              <i className="fa fa-tag"></i>
-            </button>
-
+            <div className="col-sm-10 name-fields input-field">
+              {this.state.loadingTaskName ? 
+              <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
+              : ""}
+              <input type="text" 
+                onChange={this.handleNameChange} 
+                className="remove-style name-input"
+                placeholder={this.state.namePlaceholder} 
+                value={this.state.name}/>
+              <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="remove-style">
+                <i className="fa fa-tag"></i>
+              </button>
           </div>
         </div>
         {taskOptions}
