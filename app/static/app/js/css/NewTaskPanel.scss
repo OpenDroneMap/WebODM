@@ -60,7 +60,7 @@
     }
     
     .resize-images-container {
-        display: flex;
+        display: block;
         flex-wrap: wrap;
 
         .col-sm-10 {
@@ -134,5 +134,41 @@
         display: flex;
         justify-content: space-between;
         outline: none;
+    }
+
+    @media (max-width: 600px) {
+        .resize-images-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .col-sm-10 {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .files-text {
+            font-size: 15px;
+            text-align: center;
+        }
+    
+        .resize-control {
+            width: 100%;
+        }
+    
+        .btn-confirm {
+            padding: 15px 20px;
+        }
+
+        .btn-danger {
+            padding: 10px 15px;
+        }
+
+        .text-right {
+            justify-content: center;
+        }
     }
 }

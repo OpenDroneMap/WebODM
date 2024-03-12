@@ -48,9 +48,6 @@
     }
 
     .form-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         width: 100%;
     }
     
@@ -85,5 +82,11 @@
     .fa-tag {
         color: #14A5A2;
         transform: scale(1.2);
+        transition: all 0.5s;
+    }
+
+    .fa-tag:hover {
+        color: #0d7e7c;
+        transform: scale(1.3);
     }
 }

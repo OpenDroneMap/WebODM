@@ -153,7 +153,7 @@ class NewTaskPanel extends React.Component {
 
             {this.state.editTaskFormLoaded && this.props.showResize ?
               <div>
-                <div className="form-group resize-images-container" style={{display: "block"}}>
+                <div className="form-group resize-images-container">
                   <label className="col-sm-2 control-label">{_("Resize Images")}</label>
                   <div className="col-sm-10">
                       <div className="btn-group">
