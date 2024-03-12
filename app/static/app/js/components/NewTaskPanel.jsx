@@ -153,7 +153,7 @@ class NewTaskPanel extends React.Component {
 
             {this.state.editTaskFormLoaded && this.props.showResize ?
               <div>
-                <div className="form-group resize-images-container">
+                <div className="form-group resize-images-container" style={{display: "block"}}>
                   <label className="col-sm-2 control-label">{_("Resize Images")}</label>
                   <div className="col-sm-10">
                       <div className="btn-group">
@@ -169,16 +169,6 @@ class NewTaskPanel extends React.Component {
                           </li>
                           )}
                       </ul>
-                      </div>
-                      <div className={"resize-control " + (this.state.resizeMode === ResizeModes.NO ? "hide" : "")}>
-                      <input 
-                          type="number" 
-                          step="100"
-                          className="form-control input-field"
-                          onChange={this.handleResizeSizeChange} 
-                          value={this.state.resizeSize} 
-                      />
-                      <span>{_("px")}</span>
                       </div>
                   </div>
                 </div>

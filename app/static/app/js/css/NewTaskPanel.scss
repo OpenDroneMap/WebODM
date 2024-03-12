@@ -7,6 +7,10 @@
     border-radius: 20px;
     background-color: #E3E3E3;
 
+    .new-task-panel .resize-images-container {
+        display: block;
+    }
+
     .alert{
     	margin-top: 4px;
     	ol, ul{
@@ -50,82 +54,85 @@
         margin-top: 0;
         margin-left: 10px;
     }
-}
+    .text-right {
+        display: flex;
+        justify-content: end;
+    }
+    
+    .resize-images-container {
+        display: flex;
+        flex-wrap: wrap;
 
-.text-right {
-    display: flex;
-    justify-content: end;
-}
-
-.resize-images-container {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-/* ---------------------File Text---------------------- */
-
-.files-text {
-    font-weight: 600;
-    font-family: "Montserrat", sans-serif;
-    color: #838383;
-}
-
-/* ---------------------Cancel Button---------------------- */
-
-.btn-danger {
-    background-color: #AFAFAF;
-    border: none;
-    border-radius: 50px;
-    padding: 15px 20px;
-    transition: all 0.2s;
-}
-
-.btn-danger:hover {
-    background-color: rgb(220, 45, 45);
-}
-
-/* ---------------------Next/Confirm Button---------------------- */
-
-.btn-confirm {
-    color: #fff;
-    background-color: #74B16F;
-    border: none;
-    border-radius: 50px;
-    padding: 15px 35px;
-    transition: all 0.2s;
-}
-
-.btn-confirm:hover {
-    background-color: #529A4C;
-}
-
-/* ---------------------Button Default---------------------- */
-
-.btn-default-s {
-    color: #fff;
-    background-color: #AFAFAF;
-    border-radius: 15px;
-    border: none;
-    transition: all 0.2s;
-}
-
-.btn-default-s:hover, .btn-default-s:active {
-    background-color: #6a6a6a;
-}
-
-/* ---------------------Icons---------------------- */
-
-.caret {
-    width: 10px;
-    height: auto;
-}
-
-.input-field {
-    background-color: #FFFFFF;
-    padding: 10px;
-    border: none;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    outline: none;
+        .col-sm-10 {
+            padding: 0;
+        }
+    }
+    
+    /* ---------------------File Text---------------------- */
+    
+    .files-text {
+        font-weight: 600;
+        font-family: "Montserrat", sans-serif;
+        color: #838383;
+    }
+    
+    /* ---------------------Cancel Button---------------------- */
+    
+    .btn-danger {
+        background-color: #AFAFAF;
+        border: none;
+        border-radius: 50px;
+        padding: 15px 20px;
+        transition: all 0.2s;
+    }
+    
+    .btn-danger:hover {
+        background-color: rgb(220, 45, 45);
+    }
+    
+    /* ---------------------Next/Confirm Button---------------------- */
+    
+    .btn-confirm {
+        color: #fff;
+        background-color: #74B16F;
+        border: none;
+        border-radius: 50px;
+        padding: 15px 35px;
+        transition: all 0.2s;
+    }
+    
+    .btn-confirm:hover {
+        background-color: #529A4C;
+    }
+    
+    /* ---------------------Button Default---------------------- */
+    
+    .btn-default-s {
+        color: #fff;
+        background-color: #AFAFAF;
+        border-radius: 15px;
+        border: none;
+        transition: all 0.2s;
+    }
+    
+    .btn-default-s:hover, .btn-default-s:active {
+        background-color: #6a6a6a;
+    }
+    
+    /* ---------------------Icons---------------------- */
+    
+    .caret {
+        width: 10px;
+        height: auto;
+    }
+    
+    .input-field {
+        background-color: #FFFFFF;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        outline: none;
+    }
 }
