@@ -92,6 +92,9 @@
         @media screen and (max-width: 768px){
 
             .asset-download-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
                 width: 100%;
             }
 
