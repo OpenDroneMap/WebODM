@@ -67,6 +67,16 @@
     
     .name-input {
         width: 100%;
+
+        $place-holder-opacity: 0.4;
+
+        &::placeholder {
+            opacity: $place-holder-opacity;
+        }
+
+        &::-ms-input-placeholder {
+            opacity: $place-holder-opacity;
+        }
     }
     
     .data-input {
