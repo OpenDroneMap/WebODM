@@ -17,3 +17,10 @@
         }
     }
 }
+
+.leaflet-control-measure .leaflet-control-measure-toggle {
+    background-image: url(measure_icon.svg) !important;
+    background-repeat: no-repeat;
+    background-size: 50px 50px !important;
+    background-position-y: -8px;
+}   

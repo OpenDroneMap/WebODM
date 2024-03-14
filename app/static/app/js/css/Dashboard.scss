@@ -25,6 +25,8 @@
       background-color: #529a4c;
       color: #fff;
       width: 200px;
+
+      transition: all 0.3s;
     }
 
     #btn-add {
@@ -41,6 +43,7 @@
       font-size: 30px;
       width: 70px;
       height: 70px;
+      transition: all 0.3s;
 
       i {
         margin: 0;

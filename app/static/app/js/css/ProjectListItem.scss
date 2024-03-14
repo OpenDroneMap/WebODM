@@ -89,6 +89,10 @@
     .project-buttons {
         float: right;
 
+        button {
+            transition: all 0.3s;
+        }
+
         @media screen and (max-width: 768px){
 
             .asset-download-buttons {

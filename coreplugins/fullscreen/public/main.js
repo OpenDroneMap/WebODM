@@ -3,7 +3,7 @@ PluginsAPI.Map.willAddControls([
     	'fullscreen/node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css'
 	], function(args, _){
 	args.map.addControl(new L.Control.Fullscreen({
-        position: 'bottomleft'
+        position: 'bottomleft',
     }));
 
     var fullscreenchange;

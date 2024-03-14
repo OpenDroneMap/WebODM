@@ -1,6 +1,12 @@
 .shareButton{
-	button{
-    	border-width: 1px;
+	button {
+		font-size: 12px !important;
+		padding: 5px 10px;
+		border-width: 1px;
+
+		i {
+			margin-right: 5px;
+		}
 	}
 }
 

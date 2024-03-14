@@ -2,10 +2,9 @@
   z-index: 999;
   
   a.leaflet-control-layers-control-button{
-    background: url(../icons/layers.svg) 0 0 no-repeat;
-    background-size: 26px 26px;
-    border-radius: 2px;
-    background-position: 2px 2px;
+    background: no-repeat center url(../icons/layers.svg);
+    background-size: 50px 50px;
+    background-position-y: -8px;
   }
 
   div.layers-control-panel{ display: none; }

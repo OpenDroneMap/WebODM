@@ -325,11 +325,11 @@ footer{
 
 .font-14,
 .field-label-default {
-    font-size: 14px;
+    font-size: 14px !important;
 }
 
 .font-12 {
-    font-size: 12px;
+    font-size: 12px !important;
 }
 
 .plugin-icon {
@@ -340,22 +340,28 @@ footer{
     border-radius: 50%!important;
 }
 
-// .content-upload-glyphicon {
-//     -webkit-mask-size: cover;
-//     mask-size: cover;
-//     -webkit-mask-image: url("../fonts/upload.svg");
-//     mask-image: url("../fonts/upload.svg");
-//     background-color: white;
-//     width: 1em;
-//     height: 1em;
-// }
+.selected-button {
+    color: white;
+    background-color: #459b41;
+    transition: all 0.3s;
 
-// .content-import-glyphicon {
-//     -webkit-mask-size: cover;
-//     mask-size: cover;
-//     -webkit-mask-image: url("../fonts/box-arrow-in-down.svg");
-//     mask-image: url("../fonts/box-arrow-in-down.svg");
-//     background-color: white;
-//     width: 1em;
-//     height: 1em;
-// }
+    &:hover {
+        background-color: #4b8b45;
+    }
+}
+
+.default-button {
+    color: white;
+    background-color: #74b06f;
+    transition: all 0.3s;
+
+    &:hover {
+        background-color: #6b9262;
+    }
+}
+
+.leaflet-control-fullscreen-button {
+    background: url(../js/icons/map-control.svg) no-repeat center !important;
+    background-size: 50px 50px !important;
+    background-position: -9.4px -7px !important;
+}

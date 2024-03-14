@@ -5,6 +5,11 @@
 }
 
 .modal-dialog {
+
+    button {
+        transition: all 0.3s;
+    }
+
     padding-top: 10%;
 
     .modal-content {

@@ -23,6 +23,7 @@ ul#side-menu.nav a,
 {
     color: #707070;
 }
+
 .theme-border-primary{
     border-color: #707070;
 }
@@ -73,6 +74,7 @@ body {
 	color: #fff;
 	background-color: #78b5b5;
 	border-color: #78b5b5B3;
+	transition: all 0.3s;
 }
 
 .theme-border-secondary-07{
@@ -285,14 +287,14 @@ pre.prettyprint:focus,
 
 /* MapView.jsx specific */
 .leaflet-bar a, .leaflet-control > a{
-	background-color: #fff !important;
-	border-color: #fff !important;
-	color: #707070 !important;
+	background-color: #ececec !important;
+	border-color: #ececec !important;
+	color: #4aa4a1 !important;
+	font-family: "Montserrat Bold";
 }
 
 .leaflet-bar a:hover, .leaflet-control > a:hover{
-	background-color: {% scalebyiv theme_secondary 0.90 %} !important;
-	border-color: {% scalebyiv theme_secondary 0.90 %} !important;
+	filter: brightness(85%);
 }
 
 .leaflet-popup-content-wrapper{

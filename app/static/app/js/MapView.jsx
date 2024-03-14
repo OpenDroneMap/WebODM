@@ -110,18 +110,23 @@ class MapView extends React.Component {
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
     return (<div className="map-view">
-        <div className="map-type-selector btn-group" role="group">
-          {mapTypeButtons.map(mapType =>
-            <button 
-              key={mapType.type}
-              onClick={this.handleMapTypeButton(mapType.type)}
-              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i> {mapType.label}</button>
-          )}
-        </div>
+        <div className="map-header-wrapper">
+          <div className="map-type-selector" role="group">
+            {mapTypeButtons.map(mapType =>
+              <button 
+                key={mapType.type}
+                onClick={this.handleMapTypeButton(mapType.type)}
+                className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
+            )}
+          </div>
 
-        {this.props.title ? 
-          <h3><i className="fa fa-globe"></i> {this.props.title}</h3>
-        : ""}
+          {this.props.title ? 
+            <div className="text-wrapper">
+              <i className="fa fa-globe"></i>
+              <h3 className="force-montserrat-bold">{this.props.title}</h3>
+            </div>
+          : ""}
+        </div>
       
         <div className="map-container">
             <Map 
@@ -141,6 +146,12 @@ $(function(){
         let props = $(this).data();
         delete(props.mapview);
         window.ReactDOM.render(<MapView {...props}/>, $(this).get(0));
+    });
+    $(".map-container").each(function() {
+      $(this).get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
+    });
+    window.addEventListener("resize", () => {
+      $(".map-container").get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
     });
 });
 

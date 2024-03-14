@@ -53,7 +53,7 @@ class SwitchModeButton extends React.Component {
         style={this.props.style}
         onClick={this.handleClick}
         type="button"
-        className={"switchModeButton btn btn-sm btn-secondary " + (!this.props.task ? "hide" : "")}>
+        className={"switchModeButton btn selected-button rounded-corners " + (!this.props.task ? "hide" : "")}>
         <i className={"fa " + (this.icon())}></i> {this.text()}
       </button>
     );
