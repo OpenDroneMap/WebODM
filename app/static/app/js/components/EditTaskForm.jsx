@@ -582,7 +582,7 @@ class EditTaskForm extends React.Component {
         <div>
           {tagsField}
           <div className="form-group col-sm-10 form-group-data">
-            {/* <label className="col-sm-2 control-label">{_("Processing Node")}</label>
+            <label className="col-sm-2 control-label">{_("Processing Node")}</label>
               <div className="col-sm-10">
                 <select className="form-control" value={this.state.selectedNode.key} onChange={this.handleSelectNode}>
                 {this.state.processingNodes.map(node => 
@@ -598,11 +598,12 @@ class EditTaskForm extends React.Component {
                <div className="review-options">
                 {this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
                </div>}
+            </div>
+
+            {/* <div className='form-group pad-this'>
+              <label className="col-sm-2 control-label">{_("Data")}</label>
+              <input type="text" className="col-sm-10 input-field data-input"/>
             </div> */}
-
-            <label className="col-sm-2 control-label">{_("Data")}</label>
-            <input type="text" className="col-sm-10 input-field data-input"/>
-
           </div>
 
           {this.state.editingPreset ? 
