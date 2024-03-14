@@ -581,7 +581,7 @@ class EditTaskForm extends React.Component {
       taskOptions = (
         <div>
           {tagsField}
-          <div className="form-group col-sm-10 form-group-data">
+          {/* <div className="form-group col-sm-10 form-group-data">
             <label className="col-sm-2 control-label">{_("Processing Node")}</label>
               <div className="col-sm-10">
                 <select className="form-control" value={this.state.selectedNode.key} onChange={this.handleSelectNode}>
@@ -590,7 +590,7 @@ class EditTaskForm extends React.Component {
                 )}
                 </select>
               </div>
-          </div>
+          </div> */}
           <div className="form-group form-inline">
             <label className="col-sm-2 control-label">{_("Options")}</label>
             <div className="col-sm-10">
