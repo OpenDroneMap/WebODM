@@ -525,10 +525,11 @@ class EditTaskForm extends React.Component {
     let taskOptions = "";
     if (this.formReady()){
 
-      const optionsSelector = (<div>
+      const optionsSelector = (
+      <div className='select-container'>
         <select 
             title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
-            className="form-control" 
+            className="form-control input-field" 
             value={this.state.selectedPreset.id} 
             onChange={this.handleSelectPreset}>
         {this.state.presets.map(preset => 
@@ -593,17 +594,17 @@ class EditTaskForm extends React.Component {
           </div> */}
           <div className="form-group form-inline">
             <label className="col-sm-2 control-label">{_("Options")}</label>
-            <div className="col-sm-10">
+            <div className="col-sm-10 option-container">
               {!this.props.inReview ? optionsSelector : 
                <div className="review-options">
                 {this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
                </div>}
             </div>
 
-            {/* <div className='form-group pad-this'>
+            <div className='form-group pad-this'>
               <label className="col-sm-2 control-label">{_("Data")}</label>
               <input type="text" className="col-sm-10 input-field data-input"/>
-            </div> */}
+            </div>
           </div>
 
           {this.state.editingPreset ? 
