@@ -55,7 +55,7 @@ export function addTempLayer(file, cb) {
           return {
             opacity: 1,
             fillOpacity: 0.7,
-            color: getColor()
+            color: '#99ff99'
           }
         },
         //for point layers

@@ -133,6 +133,12 @@ class Map extends React.Component {
 
       async.each(tiles, (tile, done) => {
         const { url, meta, type } = tile;
+
+        window.this_map_info = {
+          id: meta.task.id,
+          project: meta.task.project
+        }
+
         
         let metaUrl = url + "metadata";
 
