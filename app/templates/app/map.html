@@ -1,5 +1,5 @@
 {% extends "app/logged_in_base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block content %}
 	{% load render_bundle from webpack_loader %}
@@ -10,5 +10,9 @@
 			data-{{key}}="{{value}}"
 		{% endfor %}
 	></div>
+
+	<script>
+		window.deploy_url = '{% static 'deploy' %}';
+	</script>
 
 {% endblock %}

@@ -85,3 +85,60 @@ export function addTempLayer(file, cb) {
     cb(null, tempLayer, file.name);
   }
 }
+
+export function addTempLayerUsingRequest(api, cb) {
+    console.log(cb);
+    fetch(api).then((value) => {
+      // console.log(api);
+      if (value.status == 404) {
+        err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
+        cb(err);
+        return;
+      }
+
+      value.json().then((geojson) => {
+        addLayer(geojson);
+      }).catch((err) => {
+        console.log(err);
+        err.message = interpolate(_("Not a proper JSON file at: %(url)s!"), { url: api });
+        cb(err);
+      });
+    });
+
+    let addLayer = (_geojson) => {
+      let tempLayer =
+        L.geoJson(_geojson, {
+          style: function (feature) {
+            return {
+              opacity: 1,
+              fillOpacity: 0.7,
+              color: '#99ff99'
+            }
+          },
+          //for point layers
+          pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, {
+              radius: 6,
+              color: getColor(),
+              opacity: 1,
+              fillOpacity: 0.7
+            });
+          },
+          //
+          onEachFeature: function (feature, layer) {
+            if (feature.properties) {
+              if (feature.properties) {
+                layer.bindPopup(Object.keys(feature.properties).map(function (k) {
+                  return "<strong>" + k + ":</strong> " + feature.properties[k];
+                }).join("<br />"), {
+                    maxHeight: 200
+                  });
+              }
+            }
+          }
+        });
+      tempLayer.options.bounds = tempLayer.getBounds();
+      
+      cb(null, tempLayer, api);
+    }
+}

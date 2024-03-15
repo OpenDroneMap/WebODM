@@ -17,7 +17,7 @@ import GCPPopup from './GCPPopup';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
-import {addTempLayer} from '../classes/TempLayer';
+import {addTempLayer, addTempLayerUsingRequest} from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
@@ -35,7 +35,8 @@ class Map extends React.Component {
     showBackground: false,
     mapType: "orthophoto",
     public: false,
-    shareButtons: true
+    shareButtons: true,
+    AIenabled: false
   };
 
   static propTypes = {
@@ -43,7 +44,8 @@ class Map extends React.Component {
     tiles: PropTypes.array.isRequired,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool,
-    shareButtons: PropTypes.bool
+    shareButtons: PropTypes.bool,
+    AIenabled: PropTypes.bool
   };
 
   constructor(props) {
@@ -63,10 +65,22 @@ class Map extends React.Component {
     this.mapBounds = null;
     this.autolayers = null;
     this.addedCameraShots = false;
+    this.getAILayer = null;
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
+    this.loadStaticGeoJSON = this.loadStaticGeoJSON.bind(this);
+  }
+
+  setOpacityForLayer(layer, opacity) {
+    if (opacity == 0)
+    {
+      layer.setStyle({opacity: opacity, fillOpacity: opacity});
+    }
+    else {
+      layer.setStyle({opacity: opacity, fillOpacity: 0.5});
+    }
   }
 
   updateOpacity = (evt) => {
@@ -133,12 +147,6 @@ class Map extends React.Component {
 
       async.each(tiles, (tile, done) => {
         const { url, meta, type } = tile;
-
-        window.this_map_info = {
-          id: meta.task.id,
-          project: meta.task.project
-        }
-
         
         let metaUrl = url + "metadata";
 
@@ -581,6 +589,12 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
+
+    this.loadStaticGeoJSON();
+    
+    if (this.state.error) {
+      alert("AI detections not found!");
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -597,6 +611,18 @@ _('Example:'),
                             prevState.overlays !== this.state.overlays)){
         this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
+
+    if (prevProps.AIenabled != this.props.AIenabled) {
+      if (this.getAILayer != null) {
+        if (this.props.AIenabled)
+        {
+          this.setOpacityForLayer(this.getAILayer(), 1);
+          this.map.fitBounds(this.getAILayer().getBounds());
+        } else {
+          this.setOpacityForLayer(this.getAILayer(), 0);
+        }
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -612,6 +638,28 @@ _('Example:'),
     // Make sure the share popup closes
     if (this.shareButton) this.shareButton.hidePopup();
   }
+
+  loadStaticGeoJSON() {
+    const { tiles } = this.props;
+    const id = tiles[0].meta.task.id.replaceAll('-', '_');
+    // const project_id = tiles[0].meta.task.project;
+
+    const url = `${window.deploy_url}/${id}/detections.geojson`;
+
+    addTempLayerUsingRequest(url, (err, tempLayer, filename) => {
+      if (!err){
+        this.setOpacityForLayer(tempLayer, 0);
+        tempLayer.addTo(this.map);
+        tempLayer[Symbol.for("meta")] = {name: filename};
+        this.setState(update(this.state, {
+           overlays: {$push: [tempLayer]}
+        }));
+        this.getAILayer = () => {return tempLayer;};
+      }else{
+        this.setState({ error: err.message || JSON.stringify(err) });
+      }
+    });
+};
 
   render() {
     return (

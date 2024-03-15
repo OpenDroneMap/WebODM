@@ -91,8 +91,6 @@ class MapView extends React.Component {
     this.setState(update(this.state, {
       AIEnabled: {$set: !this.state.AIEnabled}
     }));
-
-    
   }
 
   render(){
@@ -153,6 +151,7 @@ class MapView extends React.Component {
                 mapType={this.state.selectedMapType} 
                 public={this.props.public}
                 shareButtons={this.props.shareButtons}
+                AIenabled={this.state.AIEnabled}
             />
         </div>
       </div>);
