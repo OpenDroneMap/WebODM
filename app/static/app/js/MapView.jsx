@@ -4,6 +4,7 @@ import Map from './components/Map';
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import { _, interpolate } from './classes/gettext';
+import update from 'immutability-helper';
 
 class MapView extends React.Component {
   static defaultProps = {
@@ -48,11 +49,13 @@ class MapView extends React.Component {
 
     this.state = {
       selectedMapType,
-      tiles: this.getTilesByMapType(selectedMapType)
+      tiles: this.getTilesByMapType(selectedMapType),
+      AIEnabled: false
     };
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
+    this.handleAIBtnClick = this.handleAIBtnClick.bind(this);
   }
 
   getTilesByMapType(type){
@@ -75,11 +78,21 @@ class MapView extends React.Component {
 
   handleMapTypeButton(type){
     return () => {
-      this.setState({
-        selectedMapType: type,
-        tiles: this.getTilesByMapType(type)
-      });
+      this.setState(update(this.state, {
+        $merge: {
+          selectedMapType: type,
+          tiles: this.getTilesByMapType(type)
+        }
+      }));
     };
+  }
+
+  handleAIBtnClick() {
+    this.setState(update(this.state, {
+      AIEnabled: {$set: !this.state.AIEnabled}
+    }));
+
+    
   }
 
   render(){
@@ -118,6 +131,11 @@ class MapView extends React.Component {
                 onClick={this.handleMapTypeButton(mapType.type)}
                 className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
             )}
+            <button 
+              key={100}
+              onClick={this.handleAIBtnClick}
+              className={'btn rounded-corners AI-btn ' + (this.state.AIEnabled ? "selected-button" : "default-button")}
+            ><i className='glyphicon glyphicon-screenshot'></i> AI</button>
           </div>
 
           {this.props.title ? 
