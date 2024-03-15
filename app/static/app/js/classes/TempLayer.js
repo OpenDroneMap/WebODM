@@ -87,9 +87,7 @@ export function addTempLayer(file, cb) {
 }
 
 export function addTempLayerUsingRequest(api, cb) {
-    console.log(cb);
     fetch(api).then((value) => {
-      // console.log(api);
       if (value.status == 404) {
         err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
         cb(err);
@@ -99,7 +97,6 @@ export function addTempLayerUsingRequest(api, cb) {
       value.json().then((geojson) => {
         addLayer(geojson);
       }).catch((err) => {
-        console.log(err);
         err.message = interpolate(_("Not a proper JSON file at: %(url)s!"), { url: api });
         cb(err);
       });
