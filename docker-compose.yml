@@ -42,6 +42,8 @@ services:
     image: opendronemap/nodeodm:gpu
     expose:
       - "3000"
+    ports:
+      - "3000:3000"
     restart: unless-stopped
     oom_score_adj: 500
     deploy:

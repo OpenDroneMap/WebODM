@@ -102,5 +102,8 @@ RUN apt-get remove -y g++ python3-dev libpq-dev && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /webodm/webodm/secret_key.py
 
+# alias python to python3.9
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+RUN alias python=python3.9
 
 VOLUME /webodm/app/media
