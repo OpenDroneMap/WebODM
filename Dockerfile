@@ -39,7 +39,7 @@ RUN apt-get update
 RUN apt-get update && apt-get install -y software-properties-common && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt-get install -y --fix-missing --no-install-recommends python3.9 python3-pip python3-setuptools python3-wheel python3.9-dev python2.7-dev
+    apt-get install -y --fix-missing --no-install-recommends python3.9 python3-pip python3-setuptools python3-wheel python3.9-dev 
 
 
 # Install GDAL and others
@@ -55,13 +55,13 @@ RUN apt update
 RUN apt install -y postgresql-client-13
 RUN apt-get install -y --no-install-recommends nginx certbot gettext-base cron postgresql-client-13 gettext tzdata
 
-# Set Python alternatives
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2
+# # Set Python alternatives
+# RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
+#     update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2
 
 # Install Python packages
-RUN pip install -U pip && \
-    pip install -r requirements.txt "boto3==1.14.14"
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 # Setup cron
 RUN ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && \
