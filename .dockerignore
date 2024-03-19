@@ -1,2 +1,7 @@
 **/.git
 .secret_key
+.git
+**/node_modules/
+db/
+screenshots/
+nodeodm/
