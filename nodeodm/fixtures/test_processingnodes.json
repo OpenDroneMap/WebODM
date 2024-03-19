@@ -1,0 +1,39 @@
+[
+  {
+    "fields": {
+      "api_version": "",
+      "available_options": {},
+      "hostname": "localhost",
+      "last_refreshed": null,
+      "port": 11223,
+      "queue_count": 0
+    },
+    "model": "nodeodm.processingnode",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "api_version": "",
+      "available_options": {},
+      "hostname": "invalid-host",
+      "last_refreshed": null,
+      "port": 11223,
+      "queue_count": 0
+    },
+    "model": "nodeodm.processingnode",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "api_version": "",
+      "available_options": {},
+      "hostname": "localhost",
+      "last_refreshed": null,
+      "port": 11223,
+      "queue_count": 0,
+      "token": "test_token"
+    },
+    "model": "nodeodm.processingnode",
+    "pk": 3
+  }
+]

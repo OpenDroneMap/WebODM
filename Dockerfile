@@ -39,7 +39,7 @@ RUN apt-get update
 RUN apt-get update && apt-get install -y software-properties-common && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt-get install -y --fix-missing --no-install-recommends python3.9 python3-pip python3-setuptools python3-wheel python3.9-dev 
+    apt-get install -y --fix-missing  python3.9 python3-pip python3-setuptools python3-wheel python3.9-dev 
 
 
 # Install GDAL and others
@@ -63,7 +63,7 @@ RUN apt-get install -y --no-install-recommends nginx certbot gettext-base cron p
 # RUN pip install --upgrade pip
 RUN python3.9 -m pip install --upgrade pip
 # RUN pip install -r requirements.txt
-RUN python3.9 -m pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Setup cron
 RUN ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && \
@@ -84,9 +84,9 @@ RUN /webodm/nodeodm/setup.sh && \
 RUN echo "UTC" > /etc/timezone
 
 # Django setup
-RUN python manage.py collectstatic --noinput && \
-    python manage.py rebuildplugins && \
-    python manage.py translate build --safe
+RUN python3.9 manage.py collectstatic --noinput && \
+    python3.9 manage.py rebuildplugins && \
+    python3.9 manage.py translate build --safe
 
 # Cleanup
 RUN apt-get remove -y g++ python3-dev libpq-dev && \
