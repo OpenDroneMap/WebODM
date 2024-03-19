@@ -2,9 +2,12 @@ FROM ubuntu:20.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ARG TEST_BUILD
+
 ARG DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH $PYTHONPATH:/webodm
+
+# This makes the system use python2.x as default, which is not what we want
+# ENV PYTHONPATH $PYTHONPATH:/webodm
 
 # ENV PROJ_LIB=/usr/share/proj
 
