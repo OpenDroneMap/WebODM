@@ -5,7 +5,11 @@ ARG TEST_BUILD
 ARG DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH $PYTHONPATH:/webodm
-ENV PROJ_LIB=/usr/share/proj
+
+# ENV PROJ_LIB=/usr/share/proj
+
+# Why can’t rasterio find proj.db (rasterio from PyPI versions >= 1.2.0)?
+# Starting with version 1.2.0, rasterio wheels on PyPI include PROJ 7.x and GDAL 3.x. The libraries and modules in these wheels are incompatible with older versions of PROJ that may be installed on your system. If PROJ_LIB (PROJ < 9.1) | PROJ_DATA (PROJ 9.1+) is set in your program’s environment and points to an older version of PROJ, you must unset this variable. Rasterio will then use the version of PROJ contained in the wheel.
 
 # Prepare directory
 ADD . /webodm/
