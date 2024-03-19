@@ -62,3 +62,4 @@ pyopenssl==19.1.0 ; sys_platform == "win32"
 numpy==1.26.2
 scipy==1.11.3
 drf-yasg==1.20.0
+boto3==1.14.14
