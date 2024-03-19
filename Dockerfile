@@ -60,8 +60,10 @@ RUN apt-get install -y --no-install-recommends nginx certbot gettext-base cron p
 #     update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2
 
 # Install Python packages
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# RUN pip install --upgrade pip
+RUN python3.9 -m pip install --upgrade pip
+# RUN pip install -r requirements.txt
+RUN python3.9 -m pip install -r requirements.txt
 
 # Setup cron
 RUN ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && \
