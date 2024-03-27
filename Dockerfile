@@ -65,6 +65,13 @@ RUN /webodm/nodeodm/setup.sh && \
     npm install --quiet && \
     webpack --mode production
 
+# Configurações Django
+RUN echo "UTC" > /etc/timezone && \
+    python manage.py collectstatic --noinput && \
+    python manage.py rebuildplugins && \
+    python manage.py translate build --safe
+
+
 # Cleanup to reduce image size
 RUN echo "Cleaning up unnecessary files" && \
     apt-get remove -y g++ python3-dev libpq-dev && \
