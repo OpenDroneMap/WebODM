@@ -71,7 +71,7 @@ RUN echo "Cleaning up unnecessary files" && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm /webodm/webodm/secret_key.py
+    rm -f /webodm/webodm/secret_key.py
 
 # Volume for media files
 VOLUME /webodm/app/media
