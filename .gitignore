@@ -108,4 +108,4 @@ dpkg/deb
 .vscode
 
 #Deploy
-static/deploy/
+app/static/deploy/

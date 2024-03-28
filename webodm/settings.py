@@ -64,7 +64,7 @@ ALLOWED_HOSTS = ['*']
 # Branding
 APP_NAME = "Global Drones"
 APP_DEFAULT_LOGO = os.path.join('app', 'static', 'app', 'img', 'logo-global-white.png')
-ORG_WEBSITE = "https://www.globaldrones.com.br"
+ORG_WEBSITE = "/"
 
 # In single user mode, a default admin account is created and automatically
 # used so that no login windows are displayed

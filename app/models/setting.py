@@ -29,7 +29,7 @@ class Setting(models.Model):
                                       options={'quality': 90})
 
     organization_name = models.CharField(default='Global Drones', max_length=255, blank=True, null=True, help_text=_("The name of your organization"), verbose_name=_("Organization name"))
-    organization_website = models.URLField(default='https://www.globaldrones.com.br', max_length=255, blank=True, null=True, help_text=_("The website URL of your organization"), verbose_name=_("Organization website"))
+    organization_website = models.URLField(default='/', max_length=255, blank=True, null=True, help_text=_("The website URL of your organization"), verbose_name=_("Organization website"))
     theme = models.ForeignKey(Theme, blank=False, null=False, on_delete=models.DO_NOTHING, verbose_name=_("Theme"),
                               help_text=_("Active theme"))
 
