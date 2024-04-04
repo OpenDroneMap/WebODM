@@ -35,3 +35,24 @@ RUN for i in {1..5}; do echo "Installing Python3, GDAL, PDAL, Nginx, LetsEncrypt
     apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin pdal libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata && \
     break || sleep 15; done
 
+# Prepare directory structure
+ADD . /webodm/
+WORKDIR /webodm
+
+# Update alternatives for Python
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2
+
+# Install Python requirements with retry logic
+RUN for i in {1..5}; do echo "Installing Python dependencies ($i attempt)" && \
+    pip install -U pip && \
+    pip install -r requirements.txt "boto3==1.14.14" && break || sleep 15; done
+
+
+# Cleanup to reduce image size
+RUN echo "Cleaning up unnecessary files" && \
+    apt-get remove -y g++ python3-dev libpq-dev && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    rm -f /webodm/webodm/secret_key.py
