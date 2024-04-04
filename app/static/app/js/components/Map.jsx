@@ -648,6 +648,7 @@ _('Example:'),
               ref={(ref) => { this.shareButton = ref; }}
               task={this.state.singleTask} 
               linksTarget="map"
+              queryParams={{t: this.props.mapType}}
             />
           : ""}
           <SwitchModeButton 
