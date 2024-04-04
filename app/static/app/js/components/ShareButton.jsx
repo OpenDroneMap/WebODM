@@ -12,7 +12,8 @@ class ShareButton extends React.Component {
   static propTypes = {
     task: PropTypes.object.isRequired,
     linksTarget: PropTypes.oneOf(['map', '3d']).isRequired,
-    popupPlacement: PropTypes.string
+    popupPlacement: PropTypes.string,
+    queryParams: PropTypes.string
   }
 
   constructor(props){
@@ -45,6 +46,7 @@ class ShareButton extends React.Component {
             taskChanged={this.handleTaskChanged}
             placement={this.props.popupPlacement}
             linksTarget={this.props.linksTarget}
+            queryParams={this.props.queryParams}
           />;
 
     return (
