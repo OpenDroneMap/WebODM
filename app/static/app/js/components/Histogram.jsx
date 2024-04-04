@@ -10,13 +10,17 @@ export default class Histogram extends React.Component {
       colorMap: null,
       onUpdate: null,
       loading: false,
+      min: null,
+      max: null
   };
   static propTypes = {
       statistics: PropTypes.object.isRequired,
       colorMap: PropTypes.array,
       width: PropTypes.number,
       onUpdate: PropTypes.func,
-      loading: PropTypes.bool
+      loading: PropTypes.bool,
+      min: PropTypes.number,
+      max: PropTypes.number
   }
 
   constructor(props){
@@ -53,11 +57,19 @@ export default class Histogram extends React.Component {
     this.rangeX = [minX, maxX];
     this.rangeY = [minY, maxY];
 
+    let min = minX;
+    let max = maxX;
+
+    if (this.props.min !== null && this.props.max !== null){
+        min = this.props.min;
+        max = this.props.max;
+    }
+
     const st = {
-        min: minX.toFixed(3),
-        max: maxX.toFixed(3),
-        minInput: minX.toFixed(3),
-        maxInput: maxX.toFixed(3)
+        min: min,
+        max: max,
+        minInput: min.toFixed(3),
+        maxInput: max.toFixed(3)
     };
 
     if (!this.state){
@@ -183,7 +195,7 @@ export default class Histogram extends React.Component {
             maxLine.setAttribute('x2', newX);
 
             if (prevX !== newX){
-                self.setState({max: (self.rangeX[0] + ((self.rangeX[1] - self.rangeX[0]) / width) * newX).toFixed(3)});
+                self.setState({max: (self.rangeX[0] + ((self.rangeX[1] - self.rangeX[0]) / width) * newX)});
             }
         }
     };
@@ -201,7 +213,7 @@ export default class Histogram extends React.Component {
             minLine.setAttribute('x2', newX);
 
             if (prevX !== newX){
-                self.setState({min: (self.rangeX[0] + ((self.rangeX[1] - self.rangeX[0]) / width) * newX).toFixed(3)});
+                self.setState({min: (self.rangeX[0] + ((self.rangeX[1] - self.rangeX[0]) / width) * newX)});
             }
         }
     };
@@ -237,8 +249,9 @@ export default class Histogram extends React.Component {
   }
     
   componentDidUpdate(prevProps, prevState){
-      if (prevState.min !== this.state.min) this.state.minInput = this.state.min;
-      if (prevState.max !== this.state.max) this.state.maxInput = this.state.max;
+      if (prevState.min !== this.state.min || prevState.max !== this.state.max){
+        this.setState({minInput: this.state.min.toFixed(3), maxInput: this.state.max.toFixed(3)});
+      }
 
       if (prevState.min !== this.state.min || 
           prevState.max !== this.state.max ||
