@@ -169,7 +169,22 @@ class Map extends React.Component {
                 const params = Utils.queryParams({search: tileUrl.slice(tileUrl.indexOf("?"))});
                 if (statistics["1"]){
                     // Add rescale
-                    params["rescale"] = encodeURIComponent(`${statistics["1"]["min"]},${statistics["1"]["max"]}`);              
+                    let min = Infinity;
+                    let max = -Infinity;
+                    if (type === 'plant'){
+                      // percentile
+                      for (let b in statistics){
+                        min = Math.min(statistics[b]["percentiles"][0]);
+                        max = Math.max(statistics[b]["percentiles"][1]);
+                      }
+                    }else{
+                      // min/max
+                      for (let b in statistics){
+                        min = Math.min(statistics[b]["min"]);
+                        max = Math.max(statistics[b]["max"]);
+                      }
+                    }
+                    params["rescale"] = encodeURIComponent(`${min},${max}`);              
                 }else{
                     console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
                     params["rescale"] = encodeURIComponent("-1,1");
