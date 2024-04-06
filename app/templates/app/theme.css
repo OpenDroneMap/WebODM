@@ -1,0 +1,319 @@
+{% load settings %}
+{% theme "primary" as theme_primary %}
+{% theme "secondary" as theme_secondary %}
+{% theme "tertiary" as theme_tertiary %}
+{% theme "button_primary" as theme_button_primary %}
+{% theme "button_default" as theme_button_default %}
+{% theme "button_danger" as theme_button_danger %}
+{% theme "header_background" as theme_header_background %}
+{% theme "header_primary" as theme_header_primary %}
+{% theme "border" as theme_border %}
+{% theme "highlight" as theme_highlight %}
+{% theme "dialog_warning" as theme_dialog_warning %}
+{% theme "success" as theme_success %}
+{% theme "failed" as theme_failed %}
+
+/* Primary */
+body,
+ul#side-menu.nav a,
+.console,
+.alert,
+.form-control,
+.dropdown-menu > li > a,
+.theme-color-primary
+{
+    color: {{ theme_primary }};
+}
+.theme-border-primary{
+    border-color: {{ theme_primary }};
+}
+.tooltip .tooltip-inner{
+	background-color: {{ theme_primary }};
+}
+.tooltip.left .tooltip-arrow{ border-left-color: {{ theme_primary }}; }
+.tooltip.top .tooltip-arrow{ border-top-color: {{ theme_primary }}; }
+.tooltip.bottom .tooltip-arrow{ border-bottom-color: {{ theme_primary }}; }
+.tooltip.right .tooltip-arrow{ border-right-color: {{ theme_primary }}; }
+
+.theme-fill-primary{
+    fill: {{ theme_primary }};
+}
+.theme-stroke-primary{
+    stroke: {{ theme_primary }};
+}
+
+/* Secondary */
+body,
+.navbar-default,
+.console,
+.alert,
+.modal-content,
+.form-control,
+.dropdown-menu,
+.theme-secondary
+{
+	background-color: {{ theme_secondary }};
+}
+
+.tooltip > .tooltip-inner{
+	color: {{ theme_secondary }};
+}
+
+.alert.close:hover{
+    color: {% complementary theme_secondary %};
+}
+.alert.close:focus{
+    color: {% complementary theme_secondary %};
+}
+
+.pagination li > a,
+.pagination .disabled > a,
+.pagination .disabled > a:hover, .pagination .disabled > a:focus{
+	color: {% scaleby theme_primary 0.7 %};
+	background-color: {{ theme_secondary }};
+	border-color: {% scaleby theme_secondary 0.7 %};
+}
+.pagination li > a{
+	color: {{ theme_primary }};
+}
+.theme-border-secondary-07{
+	border-color: {% scaleby theme_secondary 0.7 %} !important;
+}
+
+.btn-secondary, .btn-secondary:active, .open>.dropdown-toggle.btn-secondary{
+	background-color: {{ theme_secondary }};
+	border-color: {{ theme_secondary }};
+	color: {{ theme_primary }};
+}
+
+.btn-secondary:hover, .open>.dropdown-toggle.btn-secondary:hover,
+.btn-secondary:active, .open>.dropdown-toggle.btn-secondary:active,
+.btn-secondary:focus, .open>.dropdown-toggle.btn-secondary:focus{
+    background-color: {% scalebyiv theme_secondary 0.90 %};
+    border-color: {% scalebyiv theme_secondary 0.90 %};
+    color: {{ theme_primary }};
+}
+
+
+/* Tertiary */
+a, a:hover, a:focus{
+	color: {{ theme_tertiary }};
+}
+.progress-bar-success{
+    background-color: {{ theme_tertiary }};
+}
+
+/* Button primary */
+#navbar-top .navbar-top-links a:hover,
+#navbar-top .navbar-top-links a:focus,
+#navbar-top .navbar-top-links .open > a{
+    background-color: {{ theme_button_primary }};
+    color: {{ theme_secondary }};
+}
+
+#navbar-top ul#side-menu a:focus{
+    background-color: inherit;
+    color: inherit;
+}
+
+#navbar-top ul#side-menu a:hover, #navbar-top ul#side-menu a.active:hover{
+	background-color: {{ theme_button_primary }};
+	color: {{ theme_secondary }};
+}
+
+.btn-primary, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary{
+	background-color: {{ theme_button_primary }};
+	border-color: {{ theme_button_primary }};
+	color: {{ theme_secondary }};
+}
+
+.btn-primary:hover, .btn-primary.active:hover, .open>.dropdown-toggle.btn-primary:hover,
+.btn-primary:active, .btn-primary.active:active, .open>.dropdown-toggle.btn-primary:active,
+.btn-primary:focus, .btn-primary.active:focus, .open>.dropdown-toggle.btn-primary:focus,
+.btn-primary[disabled]:hover, .btn-primary.active[disabled]:hover, .open>.dropdown-toggle.btn-primary[disabled]:hover,
+.btn-primary[disabled]:focus, .btn-primary.active[disabled]:focus, .open>.dropdown-toggle.btn-primary[disabled]:focus,
+.btn-primary[disabled]:active, .btn-primary.active[disabled]:active, .open>.dropdown-toggle.btn-primary[disabled]:active{
+    background-color: {% scalebyiv theme_button_primary 0.90 %};
+    border-color: {% scalebyiv theme_button_primary 0.90 %};
+    color: {{ theme_secondary }};
+}
+
+/* Button default */
+.btn-default, .btn-default:active, .open>.dropdown-toggle.btn-default{
+	background-color: {{ theme_button_default }};
+	border-color: {{ theme_button_default }};
+	color: {{ theme_secondary }};
+
+}
+.btn-default:hover, .open>.dropdown-toggle.btn-default:hover,
+.btn-default:active, .open>.dropdown-toggle.btn-default:active,
+.btn-default:focus, .open>.dropdown-toggle.btn-default:focus,
+.btn-default[disabled]:hover, .open>.dropdown-toggle.btn-default[disabled]:hover,
+.btn-default[disabled]:focus, .open>.dropdown-toggle.btn-default[disabled]:focus,
+.btn-default[disabled]:active, .open>.dropdown-toggle.btn-default[disabled]:active{
+	background-color: {% scalebyiv theme_button_default 0.90 %};
+	border-color: {% scalebyiv theme_button_default 0.90 %};
+	color: {{ theme_secondary }};
+}
+
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus,
+.pagination .active > a:hover, .pagination .active > a:focus,
+.pagination li > a:hover, .pagination li > a:focus{
+	background-color: {{ theme_button_default }};
+	color: {{ theme_secondary }};
+}
+
+/* Button danger */
+.btn-danger, .btn-danger:active, .open>.dropdown-toggle.btn-danger{
+	background-color: {{ theme_button_danger }};
+	border-color: {{ theme_button_danger }};
+	color: {{ theme_secondary }};
+}
+.btn-danger:hover, .open>.dropdown-toggle.btn-danger:hover,
+.btn-danger:active, .open>.dropdown-toggle.btn-danger:active,
+.btn-danger:focus, .open>.dropdown-toggle.btn-danger:focus,
+.btn-danger[disabled]:hover, .open>.dropdown-toggle.btn-danger[disabled]:hover,
+.btn-danger[disabled]:active, .open>.dropdown-toggle.btn-danger[disabled]:active,
+.btn-danger[disabled]:focus, .open>.dropdown-toggle.btn-danger[disabled]:focus{
+	background-color: {% scalebyiv theme_button_danger 0.90 %};
+	border-color: {% scalebyiv theme_button_danger 0.90 %};
+	color: {{ theme_secondary }};
+}
+
+.theme-color-button-danger{
+    color: {{ theme_button_danger }};
+}
+
+.theme-color-button-primary{
+    color: {{ theme_button_primary }};
+}
+
+/* Header background */
+#navbar-top{
+	background-color: {{ theme_header_background }};
+}
+
+/* Header primary */
+.navbar-default .navbar-link,
+#navbar-top .navbar-top-links a.dropdown-toggle,
+#navbar-top .navbar-top-links a.nav-link,
+#navbar-top .navbar-text{
+	color: {{ theme_header_primary }};
+}
+
+.navbar-default .navbar-toggle .icon-bar{
+	background-color: {{ theme_header_primary }};
+}
+.navbar-default .navbar-toggle:hover .icon-bar,
+.navbar-default .navbar-toggle:active .icon-bar,
+.navbar-default .navbar-toggle:focus .icon-bar{
+	background-color: {{ theme_secondary }};
+}
+
+.navbar-default .navbar-link:hover,
+#navbar-top .navbar-top-links a.dropdown-toggle:hover,
+#navbar-top .navbar-top-links a.nav-link:hover,
+#navbar-top .navbar-top-links .dropdown.open a.dropdown-toggle{
+	color: {{ theme_secondary }};
+}
+
+/* Border */
+.sidebar ul li,
+.project-list-item,
+#page-wrapper,
+table-bordered>thead>tr>th, .table-bordered>thead>tr>th, table-bordered>tbody>tr>th, .table-bordered>tbody>tr>th, table-bordered>tfoot>tr>th, .table-bordered>tfoot>tr>th, table-bordered>thead>tr>td, .table-bordered>thead>tr>td, table-bordered>tbody>tr>td, .table-bordered>tbody>tr>td, table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>td,
+footer,
+.modal-content,
+.modal-header,
+.modal-footer,
+.dropdown-menu
+{
+	border-color: {{ theme_border }};
+}
+.dropdown-menu .divider{
+	background-color: {{ theme_border }};
+}
+.popover-title{
+	border-bottom-color: {{ theme_border }};
+}
+.theme-border{
+    border-color: {{ theme_border }} !important;
+}
+
+/* Highlight */
+.task-list-item:nth-child(odd),
+.table-striped>tbody>tr:nth-of-type(odd),
+select.form-control option[disabled],
+.theme-background-highlight{
+	background-color: {{ theme_highlight }};
+}
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus{
+	background-color: {{ theme_highlight }};
+	color: {{ theme_primary }};
+}
+pre.prettyprint,
+.form-control{
+	border-color: {{ theme_highlight }};
+}
+pre.prettyprint:focus,
+.form-control:focus{
+	border-color: {% scalebyiv theme_highlight 0.7 %};
+}
+
+/* Dialog warning */
+.alert-warning{
+	border-color: {{ theme_dialog_warning }};
+}
+
+/* Success */
+.task-list-item .status-label.done, .theme-background-success{
+	background-color: {{ theme_success }};
+}
+
+/* Failed */
+.task-list-item .status-label.error, .theme-background-failed{
+	background-color: {{ theme_failed }};
+}
+
+/* ModelView.jsx specific */
+.model-view #potree_sidebar_container .dropdown-menu > li > a{
+	color: {{ theme_primary }};
+}
+
+/* MapView.jsx specific */
+.leaflet-bar a, .leaflet-control > a{
+	background-color: {{ theme_secondary }} !important;
+	border-color: {{ theme_secondary }} !important;
+	color: {{ theme_primary }} !important;
+}
+
+.leaflet-bar a:hover, .leaflet-control > a:hover{
+	background-color: {% scalebyiv theme_secondary 0.90 %} !important;
+	border-color: {% scalebyiv theme_secondary 0.90 %} !important;
+}
+
+.leaflet-popup-content-wrapper{
+	background-color: {{ theme_secondary }} !important;
+	color: {{ theme_primary }} !important;
+}
+.leaflet-popup-content-wrapper a{
+	color: {{ theme_tertiary }} !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button{
+	color: {{ theme_primary }} !important;
+}
+.leaflet-container a.leaflet-popup-close-button:hover{
+	color: {% complementary theme_secondary %} !important;
+}
+
+.tag-badge{
+	background-color: {{ theme_button_default }};
+	border-color: {{ theme_button_default }};
+	color: {{ theme_secondary }};
+}
+
+.tag-badge a, .tag-badge a:hover{
+	color: {{ theme_secondary }};
+}

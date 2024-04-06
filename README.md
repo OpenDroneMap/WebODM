@@ -156,6 +156,23 @@ Cannot start WebODM via `./webodm.sh start`, error messages are different at eac
 While running WebODM with Docker Toolbox (VirtualBox) you cannot access WebODM from another computer in the same network. | As Administrator, run `cmd.exe` and then type `"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm "default" natpf1 "rule-name,tcp,,8000,,8000"`
 On Windows, the storage space shown on the WebODM diagnostic page is not the same as what is actually set in Docker's settings. | From Hyper-V Manager, right-click “DockerDesktopVM”, go to Edit Disk, then choose to expand the disk and match the maximum size to the settings specified in the docker settings. Upon making the changes, restart docker.
 
+#### Images Missing from Lightning Assets
+
+When you use Lightning to process your task, you will need to download all assets to your local instance of WebODM. The all assets zip does *not* contain the images which were used to create the orthomosaic. This means that, although you can visualise the cameras layer in your local WebODM, when you click on a particular camera icon the image will not be shown.
+
+The fix if you are using WebODM with Docker is as follows (instructions are for MacOS host):
+
+1. Ensure that you have a directory which contains all of the images for the task and only the images;
+2. Open Docker Desktop and navigate to Containers. Identify your WebODM instance and navigate to the container that is named `worker`. You will need the Container ID. This is a hash which is listed under the container name. Click to copy the Container ID using the copy icon next to it.
+3. Open Terminal and enter `docker cp <sourcedirectory>/. <dockercontainerID>:/webodm/app/media/project/<projectID>/task/<taskID>`. Paste the Container ID to replace the location titled `<dockercontainerID>`. Enter the full directory path for your images to replace `<sourcedirectory>`;
+4. Go back to Docker Desktop and navigate to Volumes in the side bar. Click on the volume called `webodm_appmedia`, click on `project`, identify the correct project and click on it, click on `task` and identify the correct task.
+5. From Docker Desktop substitute the correct `<projectID>` and `<taskID>` into the command in Terminal;
+6. Execute the newly edited command in Terminal. You will see a series of progress messages and your images will be copied to Docker;
+7. Navigate to your project in your local instance of WebODM;
+8. Open the Map and turn on the Cameras layer (top left);
+9. Click on a Camera icon and the relevant image will be shown
+
+
 Have you had other issues? Please [report them](https://github.com/OpenDroneMap/WebODM/issues/new) so that we can include them in this document.
 
 ### Backup and Restore
@@ -228,13 +245,11 @@ Don't expect to process more than a few hundred images with these specifications
 
 WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
 
-[NodeODM](https://github.com/OpenDroneMap/NodeODM) and [ODM](https://github.com/OpenDroneMap/ODM) cannot run natively on Mac and this is the reason we mostly recommend people to use docker.
-
 WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
 
 ## Customizing and Extending
 
-Small customizations such as changing the application colors, name, logo, or addying custom CSS/HTML/Javascript can be performed directly from the Customize -- Brand/Theme panels within WebODM. No need to fork or change the code.
+Small customizations such as changing the application colors, name, logo, or adding custom CSS/HTML/Javascript can be performed directly from the Customize -- Brand/Theme panels within WebODM. No need to fork or change the code.
 
 More advanced customizations can be achieved by writing [plugins](https://github.com/OpenDroneMap/WebODM/tree/master/coreplugins). This is the preferred way to add new functionality to WebODM since it requires less effort than maintaining a separate fork. The plugin system features server-side [signals](https://github.com/OpenDroneMap/WebODM/blob/master/app/plugins/signals.py) that can be used to be notified of various events, a ES6/React build system, a dynamic [client-side API](https://github.com/OpenDroneMap/WebODM/tree/master/app/static/app/js/classes/plugins) for adding elements to the UI, a built-in data store, an async task runner, a GRASS engine, hooks to add menu items and functions to rapidly inject CSS, Javascript and Django views.
 
@@ -335,35 +350,36 @@ If you wish to run the docker version with auto start/monitoring/stop, etc, as a
 
 This should work on any Linux OS capable of running WebODM, and using a SystemD based service daemon (such as Ubuntu 16.04 server for example).
 
-This has only been tested on Ubuntu 16.04 server.
+This has only been tested on Ubuntu 16.04 server and Red Hat Enterprise Linux 9.
 
 The following pre-requisites are required:
  * Requires odm user
  * Requires docker installed via system (ubuntu: `sudo apt-get install docker.io`)
- * Requires screen to be installed
+ * Requires 'screen' package to be installed
  * Requires odm user member of docker group
- * Required WebODM directory checked out to /webodm
- * Requires that /webodm is recursively owned by odm:odm
- * Requires that a Python 3 environment is used at /webodm/python3-venv
+ * Required WebODM directory checked out/cloned to /opt/WebODM
+ * Requires that /opt/WebODM is recursively owned by odm:odm
+ * Requires that a Python 3 environment is used at /opt/WebODM/python3-venv
 
-If all pre-requisites have been met, and repository is checked out to /opt/WebODM folder, then you can use the following steps to enable and manage the service:
+If all pre-requisites have been met, and repository is checked out/cloned to /opt/WebODM folder, then you can use the following steps to enable and manage the service:
 
 First, to install the service, and enable the services to run at startup from now on:
 ```bash
-sudo systemctl enable /webodm/service/webodm-gunicorn.service
-sudo systemctl enable /webodm/service/webodm-nginx.service
+sudo systemctl enable /opt/WebODM/service/webodm-docker.service
 ```
 
 To manually start/stop the service:
 ```bash
-sudo systemctl stop webodm-gunicorn
-sudo systemctl start webodm-gunicorn
+sudo systemctl stop webodm-docker
+sudo systemctl start webodm-docker
 ```
 
 To manually check service status:
 ```bash
-sudo systemctl status webodm-gunicorn
+sudo systemctl status webodm-docker
 ```
+
+For the adventurous, the repository can be put anyplace you like by editing the ./WebODM/service/webodm-docker.service file before enabling the service the reflect your repository location, and modifying the systemctl enable command to that directiory.
 
 ## Run it natively
 

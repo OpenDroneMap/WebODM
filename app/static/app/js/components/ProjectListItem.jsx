@@ -209,7 +209,9 @@ class ProjectListItem extends React.Component {
                     file.deltaBytesSent = 0;
                     file.trackedBytesSent = 0;
                     file.retries++;
-                    this.dz.processQueue();
+                    setTimeout(() => {
+                      this.dz.processQueue();
+                    }, 5000 * file.retries);
                 }else{
                     throw new Error(interpolate(_('Cannot upload %(filename)s, exceeded max retries (%(max_retries)s)'), {filename: file.name, max_retries: MAX_RETRIES}));
                 }
@@ -223,7 +225,7 @@ class ProjectListItem extends React.Component {
                             totalCount: this.state.upload.totalCount - 1,
                             totalBytes: this.state.upload.totalBytes - file.size
                         });
-                        throw new Error(interpolate(_('Cannot upload %(filename)s, File too Large! Default MaxFileSize is %(maxFileSize)s MB!'), { filename: file.name, maxFileSize: this.dz.options.maxFilesize }));
+                        throw new Error(interpolate(_('Cannot upload %(filename)s, file is too large! Default MaxFileSize is %(maxFileSize)s MB!'), { filename: file.name, maxFileSize: this.dz.options.maxFilesize }));
                     }
                     retry();
                 }else{
