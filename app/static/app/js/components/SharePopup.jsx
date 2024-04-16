@@ -15,7 +15,8 @@ class SharePopup extends React.Component{
     task: PropTypes.object.isRequired,
     linksTarget: PropTypes.oneOf(['map', '3d']).isRequired,
     placement: PropTypes.string,
-    taskChanged: PropTypes.func
+    taskChanged: PropTypes.func,
+    queryParams: PropTypes.object
   };
   static defaultProps = {
     placement: 'top',
@@ -38,7 +39,11 @@ class SharePopup extends React.Component{
   }
 
   getRelShareLink = () => {
-    return `/public/task/${this.props.task.id}/${this.props.linksTarget}/`;
+    let url = `/public/task/${this.props.task.id}/${this.props.linksTarget}/`;
+    if (this.props.queryParams){
+      url += Utils.toSearchQuery(this.props.queryParams);
+    }
+    return url;
   }
 
   componentDidMount(){
@@ -86,8 +91,8 @@ class SharePopup extends React.Component{
   }
 
   render(){
-    const shareLink = Utils.absoluteUrl(this.state.relShareLink);
-    const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/${this.props.linksTarget}/`);
+    const shareLink = Utils.absoluteUrl(this.getRelShareLink());
+    const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/${this.props.linksTarget}/${Utils.toSearchQuery(this.props.queryParams)}`);
     const iframeCode = `<iframe scrolling="no" title="WebODM" width="61.8033%" height="360" frameBorder="0" src="${iframeUrl}"></iframe>`;
 
     return (<div onMouseDown={e => { e.stopPropagation(); }} className={"sharePopup " + this.props.placement}>

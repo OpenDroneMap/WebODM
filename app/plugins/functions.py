@@ -210,9 +210,12 @@ def get_plugins():
                         module = importlib.import_module("plugins.{}".format(dir))
 
                     plugin = (getattr(module, "Plugin"))()
-                except (ImportError, AttributeError):
-                    module = importlib.import_module("coreplugins.{}".format(dir))
-                    plugin = (getattr(module, "Plugin"))()
+                except (ImportError, AttributeError) as plugin_error:
+                    try:
+                        module = importlib.import_module("coreplugins.{}".format(dir))
+                        plugin = (getattr(module, "Plugin"))()
+                    except (ImportError, AttributeError) as coreplugin_error:
+                        raise coreplugin_error from plugin_error
 
                 # Check version
                 manifest = plugin.get_manifest()
@@ -237,7 +240,7 @@ def get_plugins():
 
                 plugins.append(plugin)
             except Exception as e:
-                logger.warning("Failed to instantiate plugin {}: {}".format(dir, e))
+                logger.warning("Failed to instantiate plugin {}: {}: {}".format(dir, e, e.__cause__))
 
     return plugins
 

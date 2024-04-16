@@ -29,7 +29,8 @@ def handle_map(request, template, task_pk=None, hide_title=False):
             'map-items': json.dumps([task.get_map_items()]),
             'title': task.name if not hide_title else '',
             'public': 'true',
-            'share-buttons': 'false' if settings.DESKTOP_MODE else 'true'
+            'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
+            'selected-map-type': request.GET.get('t', 'auto'),
         }.items()
     })
 
