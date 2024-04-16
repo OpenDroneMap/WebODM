@@ -49,19 +49,37 @@
 
     .form-group {
         width: 100%;
-
+        
+        .select-container {
+            display: flex;
+        }
         .option-container {
-            padding: 0  15px 0 7px;
+            padding: 0;
+
         }
 
-        @media (max-width: 600px) {
-            .option-container {
-                padding: 0px 15px;
-            }
-        }
-
+        
         .pad-this {
             padding: 0 30px;
+        }
+        
+        .selectBtn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            background-position: calc(100% - 0.75rem) center !important;
+            -moz-appearance:none !important;
+            -webkit-appearance: none !important; 
+            appearance: none !important;
+        }
+        
+        .ai-label {
+            width: 400px;
+            @media (max-width: 600px) {
+                .ai-label {
+                }
+            }
         }
     }
     
