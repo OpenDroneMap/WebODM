@@ -41,4 +41,4 @@ Execute o comando `docker build -f "./Dockerfile_Base" -t webodm_webapp_base:lat
 
 ## Como passar modificações para produção
 
-Depois de alterar os arquivos HTML e CSS execute o comando `docker build -t opendronemap\webodm_webapp .` estando no diretorio raiz deste projeto. Aguarde o fim da recompilação que pode demorar até 20 minutos e depois rode o comando `docker compose up` para subir o projeto. É necessário ter conexão com a internet para fazer a recompilação.
+Depois de alterar os arquivos HTML e CSS execute o comando `docker build -t webodm_webapp:latest .` estando no diretorio raiz deste projeto. Aguarde o fim da recompilação que pode demorar até 20 minutos e depois rode o comando `docker compose up` para subir o projeto. É necessário ter conexão com a internet para fazer a recompilação.
