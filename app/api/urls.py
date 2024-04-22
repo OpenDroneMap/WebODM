@@ -4,7 +4,7 @@ from app.api.presets import PresetViewSet
 from app.plugins.views import api_view_handler
 from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskDownloads, TaskAssets, TaskAssetsImport
-from .tasks_ai import TaskAiDetectionCattle
+from .tasks_ai import TaskAiDetectionCattle, TaskAiDetectionSoy
 from .imageuploads import Thumbnail, ImageDownload
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
 from .admin import AdminUserViewSet, AdminGroupViewSet, AdminProfileViewSet
@@ -54,6 +54,9 @@ urlpatterns = [
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/cameraview$', CameraView.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/cattle$', TaskAiDetectionCattle.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/soy$', TaskAiDetectionSoy.as_view()),
+    # url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/corn$', TaskAiDetectionCorn.as_view()),
+    # url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/filed$', TaskAiDetectionField.as_view()),
 
 
     url(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
