@@ -20,6 +20,11 @@ Ele também pode ser feito por outra classe que ainda não foi identificada mas 
 
 Essa api é usada no front-end com uma biblioteca chamada de leaflet que é utilizada para desenhar o mapa. Para mais informações: [Leaflet](https://leafletjs.com/reference.html "Leaflet")
 
+### API para pegar os dados de detecção de AI
+
+- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/cattle`: Retorna um JSON com o conteúdo do geojson de detecção de gado, se existir
+- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/soy`: Retorna uma lista com N objetos com o conteúdo do geojson de detecção de soja para cada talhão, se existir
+
 ## Exibição do Mapa
 
 Ele é divido em dois componentes, o primeiro componente a `MapView` é responsável por exibir algumas informações adicionais além do mapa. Onde a magia realmente acontece é no componente chamado `Map`.
