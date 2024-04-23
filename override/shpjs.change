@@ -1,0 +1,11 @@
+workspace ./node_modules/shpjs/lib/
+
+on binaryajax-fetch.js
+from "import fallback from './binaryajax-browser';"
+to "import fallback from './binaryajax-browser.js';"
+from "import combine from './combine';"
+to "import combine from './combine.js';"
+
+on binaryajax-browser.js
+from "import combine from './combine';"
+to "import combine from './combine.js';"
