@@ -1,132 +1,96 @@
 import os
-import re
-import shutil
-from wsgiref.util import FileWrapper
-import json
-
-
-import mimetypes
-
-from shutil import copyfileobj, move
-from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db import transaction
-from django.http import FileResponse
+from django.conf import settings
 from django.http import HttpResponse
-from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
-from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework import exceptions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from webodm import settings
-
 from .tasks import TaskNestedView
 
-
-
-class TaskAiDetectionCattle(TaskNestedView):
-    """
-        Retrive the cattle detection geojson file for a task
-    """
-
-    def get(self, request, pk=None, project_pk=None):
-        task = pk
-        
-
-        # Get the path to the cattle detection file (it is on /webodm/app/media/project/project_pk/task/pk/assets/ai_detections/cattle/cattle_detection.geojson)
-
-        
-
-        cattle_detection_path = os.path.join(settings.MEDIA_ROOT, 'project', str(project_pk),'task', str(task), 'assets', 'ai_detections', 'cattle', 'cattle_detection.geojson')
-        # print(f'THE CATTLE DETECTION PATH IS {cattle_detection_path}')
-
-        # Check if the folder exists
-        if not os.path.exists(cattle_detection_path):
-            raise exceptions.NotFound(detail="Cattle detection folder not found")
-        
-        # Open the file
-
-        # check if file exists
-        if not os.path.exists(cattle_detection_path):
-            raise exceptions.NotFound(detail="Cattle detection file not found")
-
-        with open(cattle_detection_path, 'rb') as f:
-            # the response is a json with the content of the file
-            # it should not download the file. it should be read and returned as a json
-            response = HttpResponse(f.read(), content_type='application/json')
-            response['Content-Disposition'] = 'inline; filename=cattle_detection.geojson'
-            return response
-
-
+# Serializer for the Detection data
 class DetectionSerializer(serializers.Serializer):
     field_number = serializers.CharField()
     content = serializers.CharField()
 
-class TaskAiDetectionWeed(TaskNestedView):
-    """Retrieves a list of geojson files for soy detection"""
+# Base class for AI detection-related views
+class TaskAiDetectionBase(TaskNestedView):
+    """
+    Base view for AI detection tasks.
+    Provides common methods used across specific AI detection task views.
+    """
 
+    def get_file_path(self, project_pk, task_pk, detection_type, file_name=''):
+        """
+        Constructs and returns a file path for the specified AI detection type and file name.
+        """
+        base_path = os.path.join(settings.MEDIA_ROOT, 'project', str(project_pk), 'task', str(task_pk), 'assets', 'ai_detections', detection_type)
+        return os.path.join(base_path, file_name)
 
-    def get(self, request, pk=None, project_pk=None,detection_type=""):
-
-        if detection_type == "":
-            raise exceptions.NotFound(detail="Detection type not found")
-
-        task = pk
-        # Get the path to the soy detection files (they are on /webodm/app/media/project/project_pk/task/pk/assets/ai_detections/soy/soy_detection_<filed_number>.geojson)
-
-        detections_path = os.path.join(settings.MEDIA_ROOT, 'project', str(project_pk),'task', str(task), 'assets', 'ai_detections', detection_type)
-
-        # Check if the directory exists
-        if not os.path.exists(detections_path):
-            raise exceptions.NotFound(detail=f"{detection_type} detection folder not found")
-    
-        # Get all the files in the directory
-        files = os.listdir(detections_path)
-        detections_files = []
-        for file in files:
-            if file.startswith(f'{detection_type}_detection_') and file.endswith('.geojson'):
-                detections_files.append(file)
+    def read_geojson_file(self, file_path):
+        """
+        Reads and returns the content of a geojson file.
+        Raises NotFound exception if the file does not exist.
+        """
+        if not os.path.exists(file_path):
+            raise exceptions.NotFound(detail=f"File not found: {file_path}")
         
+        with open(file_path, 'rb') as file:
+            return file.read()
 
-        # Check if there are any files
-        if not detections_files:
-            raise exceptions.NotFound(detail=f"{detection_type} detection files not found")
-        
-        # Open the files
-        detections_files_content  = []
-        
-        for file in detections_files:
-            with open(os.path.join(detections_path, file), 'rb') as f:
-                detections_files_content.append({
-                    'field_number': file.split('_')[2].split('.')[0],
-                    'content': f.read()
-                })
+# AI Detection for Cattle
+class TaskAiDetectionCattle(TaskAiDetectionBase):
+    """
+    Retrieves the cattle detection geojson file for a given task.
+    """
 
-        return Response(DetectionSerializer(detections_files_content, many=True).data)
-    
-
-class TaskAiDetectionField(TaskNestedView):
-    """Retrieves a geojson file for field polygon detection"""
     def get(self, request, pk=None, project_pk=None):
-        task = pk
-        # Get the path to the field detection file (it is on /webodm/app/media/project/project_pk/task/pk/assets/ai_detections/fields/field_detection.geojson)
+        file_path = self.get_file_path(project_pk, pk, 'cattle', 'cattle_detection.geojson')
+        file_content = self.read_geojson_file(file_path)
+        response = HttpResponse(file_content, content_type='application/json')
+        response['Content-Disposition'] = 'inline; filename=cattle_detection.geojson'
+        return response
 
-        field_detection_path = os.path.join(settings.MEDIA_ROOT, 'project', str(project_pk),'task', str(task), 'assets', 'ai_detections', 'fields', 'field_detection.geojson')
+# AI Detection for Weeds
+class TaskAiDetectionWeed(TaskAiDetectionBase):
+    """
+    Retrieves a list of geojson files for a specified type of weed detection.
+    """
 
-        # Check if the folder exists
-        if not os.path.exists(field_detection_path):
-            raise exceptions.NotFound(detail="Field detection folder not found")
-        
-        # Open the file
+    def get(self, request, pk=None, project_pk=None, detection_type=""):
+        if not detection_type:
+            raise exceptions.NotFound(detail="Detection type not specified")
 
-        # check if file exists
-        if not os.path.exists(field_detection_path):
-            raise exceptions.NotFound(detail="Field detection file not found")
+        base_path = self.get_file_path(project_pk, pk, detection_type)
+        if not os.path.exists(base_path):
+            raise exceptions.NotFound(detail=f"{detection_type} detection folder not found")
 
-        with open(field_detection_path, 'rb') as f:
-            # the response is a json with the content of the file
-            # it should not download the file. it should be read and returned as a json
-            response = HttpResponse(f.read(), content_type='application/json')
-            response['Content-Disposition'] = 'inline; filename=field_detection.geojson'
-            return response
+        files = [f for f in os.listdir(base_path) if f.startswith(f'{detection_type}_detection_') and f.endswith('.geojson')]
+        if not files:
+            raise exceptions.NotFound(detail=f"No detection files found for type: {detection_type}")
+
+        detections = [self._build_detection_data(file, base_path) for file in files]
+        return Response(DetectionSerializer(detections, many=True).data)
+
+    def _build_detection_data(self, file_name, base_path):
+        """
+        Builds and returns detection data dictionary for the given file.
+        """
+        file_path = os.path.join(base_path, file_name)
+        file_content = self.read_geojson_file(file_path)
+        return {
+            'field_number': file_name.split('_')[2].split('.')[0],
+            'content': file_content
+        }
+
+# AI Detection for Field Polygon
+class TaskAiDetectionField(TaskAiDetectionBase):
+    """
+    Retrieves a geojson file for field polygon detection.
+    """
+
+    def get(self, request, pk=None, project_pk=None):
+        file_path = self.get_file_path(project_pk, pk, 'fields', 'field_detection.geojson')
+        file_content = self.read_geojson_file(file_path)
+        response = HttpResponse(file_content, content_type='application/json')
+        response['Content-Disposition'] = 'inline; filename=field_detection.geojson'
+        return response

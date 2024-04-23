@@ -20,11 +20,35 @@ Ele também pode ser feito por outra classe que ainda não foi identificada mas 
 
 Essa api é usada no front-end com uma biblioteca chamada de leaflet que é utilizada para desenhar o mapa. Para mais informações: [Leaflet](https://leafletjs.com/reference.html "Leaflet")
 
-### API para pegar os dados de detecção de AI
+### Documentação da API para Recuperação dos Dados de Detecção de AI
 
-- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/cattle`: Retorna um JSON com o conteúdo do geojson de detecção de gado, se existir
-- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/<detection_type (soy/corn)>`: Retorna uma lista com N objetos com o conteúdo do geojson de detecção de <detection_type> para cada talhão, se existir
-- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/field`: Retorna um JSON com o conteúdo do geojson dos poligonos dos talhões, se existir
+Esta API provê endpoints para acessar arquivos GeoJSON que contêm dados de detecções AI realizadas em tarefas específicas dentro de projetos. Cada endpoint suporta o método HTTP GET e retorna informações específicas conforme descrito abaixo:
+
+#### Detecção de Gado
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/cattle`
+- **Método:** GET
+- **Descrição:** Retorna um JSON contendo o conteúdo do arquivo GeoJSON de detecção de gado, se disponível. Este arquivo inclui as áreas identificadas com presença de gado na área especificada da tarefa.
+
+#### Detecção de Culturas (Soja ou Milho)
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/<detection_type>`
+  - Substitua `<detection_type>` por `soy` para detecções de soja ou `corn` para detecções de milho.
+- **Método:** GET
+- **Descrição:** Retorna uma lista de objetos, cada um contendo o conteúdo de um arquivo GeoJSON para a detecção do tipo de cultura especificado (`soy` ou `corn`). Cada objeto representa um talhão diferente na área da tarefa especificados e possuem os atributos `filed_number`, que referencia o ID do talhão, e `content` que contém os dados do arquivo GeoJSON.
+
+#### Detecção de Polígonos de Campos
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/field`
+- **Método:** GET
+- **Descrição:** Retorna um JSON com o conteúdo do arquivo GeoJSON que mapeia os polígonos dos talhões dentro da área da tarefa especificada.
+
+### Notas Adicionais:
+
+- **Autenticação:** **AINDA DEVE SER IMPLEMENTADO A VERIFICAÇÃO DE AUTENTICAÇÃO**
+- **Erros:** Em caso de falhas, como arquivos não encontrados ou permissões insuficientes, a API retornará um erro com uma mensagem explicativa.
+
+Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente para acessar os endpoints. Em ambiente de desenvolvimento é `http://localhost:8000`
 
 ## Exibição do Mapa
 
