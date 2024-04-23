@@ -59,44 +59,48 @@ class TaskAiDetectionCattle(TaskNestedView):
             return response
 
 
-class SoyDetectionSerializer(serializers.Serializer):
+class DetectionSerializer(serializers.Serializer):
     field_number = serializers.CharField()
     content = serializers.CharField()
 
-class TaskAiDetectionSoy(TaskNestedView):
+class TaskAiDetections(TaskNestedView):
     """Retrieves a list of geojson files for soy detection"""
 
 
-    def get(self, request, pk=None, project_pk=None):
+    def get(self, request, pk=None, project_pk=None,detection_type=""):
+
+        if detection_type == "":
+            raise exceptions.NotFound(detail="Detection type not found")
+
         task = pk
         # Get the path to the soy detection files (they are on /webodm/app/media/project/project_pk/task/pk/assets/ai_detections/soy/soy_detection_<filed_number>.geojson)
 
-        soy_detection_path = os.path.join(settings.MEDIA_ROOT, 'project', str(project_pk),'task', str(task), 'assets', 'ai_detections', 'soy')
+        detections_path = os.path.join(settings.MEDIA_ROOT, 'project', str(project_pk),'task', str(task), 'assets', 'ai_detections', detection_type)
 
         # Check if the directory exists
-        if not os.path.exists(soy_detection_path):
-            raise exceptions.NotFound(detail="Soy detection folder not found")
+        if not os.path.exists(detections_path):
+            raise exceptions.NotFound(detail=f"{detection_type} detection folder not found")
     
         # Get all the files in the directory
-        files = os.listdir(soy_detection_path)
-        soy_files = []
+        files = os.listdir(detections_path)
+        detections_files = []
         for file in files:
-            if file.startswith('soy_detection_') and file.endswith('.geojson'):
-                soy_files.append(file)
+            if file.startswith(f'{detection_type}_detection_') and file.endswith('.geojson'):
+                detections_files.append(file)
         
 
         # Check if there are any files
-        if not soy_files:
-            raise exceptions.NotFound(detail="Soy detection files not found")
+        if not detections_files:
+            raise exceptions.NotFound(detail=f"{detection_type} detection files not found")
         
         # Open the files
-        soy_files_content  = []
+        detections_files_content  = []
         
-        for file in soy_files:
-            with open(os.path.join(soy_detection_path, file), 'rb') as f:
-                soy_files_content.append({
+        for file in detections_files:
+            with open(os.path.join(detections_path, file), 'rb') as f:
+                detections_files_content.append({
                     'field_number': file.split('_')[2].split('.')[0],
                     'content': f.read()
                 })
 
-        return Response(SoyDetectionSerializer(soy_files_content, many=True).data)
+        return Response(DetectionSerializer(detections_files_content, many=True).data)
