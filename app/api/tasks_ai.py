@@ -63,7 +63,7 @@ class DetectionSerializer(serializers.Serializer):
     field_number = serializers.CharField()
     content = serializers.CharField()
 
-class TaskAiDetections(TaskNestedView):
+class TaskAiDetectionWeed(TaskNestedView):
     """Retrieves a list of geojson files for soy detection"""
 
 
@@ -104,3 +104,29 @@ class TaskAiDetections(TaskNestedView):
                 })
 
         return Response(DetectionSerializer(detections_files_content, many=True).data)
+    
+
+class TaskAiDetectionField(TaskNestedView):
+    """Retrieves a geojson file for field polygon detection"""
+    def get(self, request, pk=None, project_pk=None):
+        task = pk
+        # Get the path to the field detection file (it is on /webodm/app/media/project/project_pk/task/pk/assets/ai_detections/fields/field_detection.geojson)
+
+        field_detection_path = os.path.join(settings.MEDIA_ROOT, 'project', str(project_pk),'task', str(task), 'assets', 'ai_detections', 'fields', 'field_detection.geojson')
+
+        # Check if the folder exists
+        if not os.path.exists(field_detection_path):
+            raise exceptions.NotFound(detail="Field detection folder not found")
+        
+        # Open the file
+
+        # check if file exists
+        if not os.path.exists(field_detection_path):
+            raise exceptions.NotFound(detail="Field detection file not found")
+
+        with open(field_detection_path, 'rb') as f:
+            # the response is a json with the content of the file
+            # it should not download the file. it should be read and returned as a json
+            response = HttpResponse(f.read(), content_type='application/json')
+            response['Content-Disposition'] = 'inline; filename=field_detection.geojson'
+            return response
