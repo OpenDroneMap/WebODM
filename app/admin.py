@@ -3,7 +3,7 @@ import tempfile
 import zipfile
 import shutil
 
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -129,22 +129,22 @@ class PluginAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            url(
+            re_path(
                 r'^(?P<plugin_name>.+)/enable/$',
                 self.admin_site.admin_view(self.plugin_enable),
                 name='plugin-enable',
             ),
-            url(
+            re_path(
                 r'^(?P<plugin_name>.+)/disable/$',
                 self.admin_site.admin_view(self.plugin_disable),
                 name='plugin-disable',
             ),
-            url(
+            re_path(
                 r'^(?P<plugin_name>.+)/delete/$',
                 self.admin_site.admin_view(self.plugin_delete),
                 name='plugin-delete',
             ),
-            url(
+            re_path(
                 r'^actions/upload/$',
                 self.admin_site.admin_view(self.plugin_upload),
                 name='plugin-upload',

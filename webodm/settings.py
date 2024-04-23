@@ -407,3 +407,13 @@ try:
     from .settings_override import *
 except ImportError:
     pass
+
+
+"""
+    WARNING!
+    Following code is stop-gap measure so that some of the new functionality from the django doesn't break some geriatric dependencies!
+"""
+
+# import django
+# from django.utils.encoding import smart_str
+# django.utils.encoding.smart_text = smart_str
