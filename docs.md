@@ -23,7 +23,8 @@ Essa api é usada no front-end com uma biblioteca chamada de leaflet que é util
 ### API para pegar os dados de detecção de AI
 
 - `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/cattle`: Retorna um JSON com o conteúdo do geojson de detecção de gado, se existir
-- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/soy`: Retorna uma lista com N objetos com o conteúdo do geojson de detecção de soja para cada talhão, se existir
+- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/<detection_type (soy/corn)>`: Retorna uma lista com N objetos com o conteúdo do geojson de detecção de <detection_type> para cada talhão, se existir
+- `http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/ai/detections/field`: Retorna um JSON com o conteúdo do geojson dos poligonos dos talhões, se existir
 
 ## Exibição do Mapa
 

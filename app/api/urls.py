@@ -55,7 +55,7 @@ urlpatterns = [
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/cattle$', TaskAiDetectionCattle.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn)$', TaskAiDetectionWeed.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/fields$', TaskAiDetectionField.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/field$', TaskAiDetectionField.as_view()),
 
 
     url(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
