@@ -155,6 +155,10 @@
         
         .select-container {
             display: flex;
+
+            .options-select {
+                width: 100px;
+            }
         }
         .option-container {
             padding: 0;
@@ -237,6 +241,7 @@
 
     .select-container {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         margin-bottom: 15px;
 
