@@ -566,7 +566,7 @@ class EditTaskForm extends React.Component {
         <div className='select-container' style={{ display: "flex", justifyContent: "start", alignItems: "center", }}>
           <select
             title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
-            className="form-control input-field"
+            className="form-control input-field options-select"
             value={this.state.selectedPreset.id}
             onChange={this.handleSelectPreset}>
             {this.state.presets.map(preset =>
@@ -645,7 +645,7 @@ class EditTaskForm extends React.Component {
               </button>
             </div>
           </div>
-          {/* <div>
+          <div className='form-group col-sm-10'>
               <label className="col-sm-2 control-label">{_("Options")}</label>
               <div className="col-sm-10 option-container">
                 {!this.props.inReview ? optionsSelector :
@@ -653,7 +653,7 @@ class EditTaskForm extends React.Component {
                     {this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
                   </div>}
               </div>
-            </div> */}
+            </div>
 
           <div className='form-group col-sm-10'>
             <label className="col-sm-2 control-label">{_("Data")}</label>
