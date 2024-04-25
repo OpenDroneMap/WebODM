@@ -110,7 +110,7 @@ def build_plugins():
                     # Create entry configuration
                     entry = {}
                     for e in plugin.build_jsx_components():
-                        entry[os.path.splitext(os.path.basename(e))[0]] = [os.path.join('.', e)]
+                        entry[os.path.splitext(os.path.basename(e))[0]] = ['./' + e]
                     wpc_content = tmpl.substitute({
                         'entry_json': json.dumps(entry)
                     })
