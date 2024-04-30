@@ -397,7 +397,8 @@ class Map extends React.Component {
 
     PluginsAPI.Map.triggerWillAddControls({
         map: this.map,
-        tiles
+        tiles,
+        mapView: this
     });
 
     let scaleControl = Leaflet.control.scale({
@@ -524,6 +525,8 @@ _('Example:'),
         this.map.fitBounds(this.mapBounds);
 
         this.map.on('click', e => {
+          if (PluginsAPI.Map.handleClick(e)) return;
+          
           // Find first tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
