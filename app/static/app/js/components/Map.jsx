@@ -4,8 +4,6 @@ import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
-import '../vendor/leaflet/L.Control.MousePosition.css';
-import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
 // import '../vendor/leaflet/L.TileLayer.NoGap';
@@ -385,7 +383,7 @@ class Map extends React.Component {
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
-      positionControl: true,
+      positionControl: false,
       zoomControl: false,
       minZoom: 0,
       maxZoom: 24
@@ -400,10 +398,6 @@ class Map extends React.Component {
         tiles,
         mapView: this
     });
-
-    let scaleControl = Leaflet.control.scale({
-      maxWidth: 250,
-    }).addTo(this.map);
 
     //add zoom control with your options
     let zoomControl = Leaflet.control.zoom({
@@ -580,7 +574,6 @@ _('Example:'),
       tiles: tiles,
       controls:{
         autolayers: this.autolayers,
-        scale: scaleControl,
         zoom: zoomControl
       }
     });
@@ -630,7 +623,7 @@ _('Example:'),
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 
