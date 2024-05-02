@@ -26,6 +26,14 @@ window.React = React;
 // Expose set locale function globally
 window.setLocale = setLocale;
 
+// Expose to allow every part of the app to access this information
+window.getPreferredUnitSystem = () => {
+    return localStorage.getItem("preferred_unit_system") || "metric";
+};
+window.setPreferredUnitSystem = (system) => {
+    localStorage.setItem("preferred_unit_system", system);
+};
+
 $(function(){
     PluginsAPI.App.triggerReady();
 });
