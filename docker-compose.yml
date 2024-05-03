@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     oom_score_adj: -100
   webapp:
-    image: opendronemap/webodm_webapp
+    image: webodm_webapp
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
     volumes:
@@ -42,6 +42,8 @@ services:
     image: opendronemap/nodeodm:gpu
     expose:
       - "3000"
+    ports:
+      - "3000:3000"
     restart: unless-stopped
     oom_score_adj: 500
     deploy:
@@ -58,7 +60,7 @@ services:
     restart: unless-stopped
     oom_score_adj: -500
   worker:
-    image: opendronemap/webodm_webapp
+    image: webodm_webapp
     container_name: worker
     entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/wait-for-it.sh -t 0 webapp:8000 -- /webodm/worker.sh start"
     volumes:
