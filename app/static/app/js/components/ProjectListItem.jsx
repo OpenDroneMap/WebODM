@@ -219,7 +219,7 @@ class ProjectListItem extends React.Component {
 
             try{
                 if (file.status === "error"){
-                    if ((file.size / 1024) > this.dz.options.maxFilesize) {
+                    if ((file.size / 1024 / 1024) > this.dz.options.maxFilesize) {
                         // Delete from upload queue
                         this.setUploadState({
                             totalCount: this.state.upload.totalCount - 1,
