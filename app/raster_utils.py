@@ -51,14 +51,13 @@ def export_raster(input, output, **opts):
         output_raster = output
         jpg_background = 255 # white
 
-        # KMZ is special, we just export it as PNG with EPSG:4326
+        # KMZ is special, we just export it as GeoTIFF
         # and then call GDAL to tile/package it
         kmz = export_format == "kmz"
         if kmz:
-            export_format = "png"
-            epsg = 4326
+            export_format = "gtiff-rgb"
             path_base, _ = os.path.splitext(output)
-            output_raster = path_base + ".png"
+            output_raster = path_base + ".kmz.tif"
 
         if export_format == "jpg":
             driver = "JPEG"
@@ -282,4 +281,4 @@ def export_raster(input, output, **opts):
         if kmz:
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
                                         "-co", "Name={}".format(name),
-                                        "-co", "FORMAT=PNG", output_raster, output])
+                                        "-co", "FORMAT=AUTO", output_raster, output])
