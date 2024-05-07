@@ -193,7 +193,7 @@ class ProjectListItem extends React.Component {
         .on("complete", (file) => {
             // Retry
             const retry = () => {
-                const MAX_RETRIES = 10;
+                const MAX_RETRIES = 20;
 
                 if (file.retries < MAX_RETRIES){
                     // Update progress
@@ -284,7 +284,6 @@ class ProjectListItem extends React.Component {
             }else if (this.dz.getQueuedFiles() === 0){
                 // Done but didn't upload all?
                 this.setUploadState({
-                    totalCount: this.state.upload.totalCount - remainingFilesCount,
                     uploading: false,
                     error: interpolate(_('%(count)s files cannot be uploaded. As a reminder, only images (.jpg, .tif, .png) and GCP files (.txt) can be uploaded. Try again.'), { count: remainingFilesCount })
                 });
