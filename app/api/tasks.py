@@ -204,13 +204,6 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
 
         files = flatten_files(request.FILES)
-        
-        import time
-        import random
-        for f in files:
-            if f.name == 'DJI_0018.JPG':
-                return Response("Timeout", status=status.HTTP_504_GATEWAY_TIMEOUT)
-
         if len(files) == 0:
             raise exceptions.ValidationError(detail=_("No files uploaded"))
 
