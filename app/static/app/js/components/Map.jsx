@@ -27,6 +27,7 @@ import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _ } from '../classes/gettext';
+import UnitSelector from './UnitSelector';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -403,6 +404,21 @@ class Map extends React.Component {
     let zoomControl = Leaflet.control.zoom({
          position:'bottomleft'
     }).addTo(this.map);
+
+    const UnitsCtrl = Leaflet.Control.extend({
+      options: {
+          position: 'bottomleft'
+      },
+  
+      onAdd: function () {
+          this.container = Leaflet.DomUtil.create('div', 'leaflet-control-units-selection leaflet-control');
+          Leaflet.DomEvent.disableClickPropagation(this.container);
+          ReactDOM.render(<UnitSelector />, this.container);
+          return this.container;
+      }
+    });
+    new UnitsCtrl().addTo(this.map);
+
 
     if (showBackground) {
       this.basemaps = {};

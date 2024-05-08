@@ -1,4 +1,4 @@
-import { _ } from '../classes/gettext';
+import { _ } from './gettext';
 
 const units = {
     acres: {
@@ -47,13 +47,19 @@ const units = {
       factor: 10.7639,
       label: _('Square Feet'),
       abbr: 'ft²',
-      round: 2,
+      round: 2
     },
     sqmeters: {
       factor: 1,
       label: _('Square Meters'),
       abbr: 'm²',
-      round: 2,
+      round: 2
+    },
+    sqmeters: {
+        factor: 0.000001,
+        label: _('Square Kilometers'),
+        abbr: 'km²',
+        round: 5
     },
     sqmiles: {
       factor: 0.000000386102,
@@ -61,36 +67,68 @@ const units = {
       abbr: 'mi²',
       round: 5
     }
-  };
+};
+
+class ValueUnit{
+    constructor(val, unit){
+        this.val = val;
+        this.unit = unit;
+    }
+
+    toString(){
+        const mul = Math.pow(10, this.unit.round);
+        const rounded = (Math.round(this.val * mul) / mul).toString();
+
+        let withCommas = "";
+        let parts = rounded.split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        withCommas = parts.join(".");
+
+        return `${withCommas} ${this.unit.abbr}`;
+    }
+}
 
 class UnitSystem{
     lengthUnit(meters){ throw new Error("Not implemented"); }
     areaUnit(sqmeters){ throw new Error("Not implemented"); }
+    getName(){ throw new Error("Not implemented"); }
     
-    area(meters){
-
+    area(sqmeters){
+        const unit = this.areaUnit(sqmeters);
+        const val = unit.factor * sqmeters;
+        return new ValueUnit(val, unit);
     }
 
-    length(sqmeters){
-        const unit = this.lengthUnit(sqmeters);
-        const v = unit.factor * sqmeters;
-        return {v, s: `{v.toLocaleString()}` };
+    length(meters){
+        const unit = this.lengthUnit(meters);
+        const val = unit.factor * meters;
+        return new ValueUnit(val, unit);
     }
 };
 
-class Metric extends UnitSystem{
+class MetricSystem extends UnitSystem{
+    getName(){
+        return _("Metric");
+    }
+
     lengthUnit(meters){
-        if (meters < 100) return units.centimeters;
+        if (meters < 1) return units.centimeters;
         else if (meters >= 1000) return units.kilometers;
         else return units.meters;
     }
 
     areaUnit(sqmeters){
-        return units.sqmeters; // TODO
+        if (sqmeters >= 10000 && sqmeters < 1000000) return units.hectares;
+        else if (sqmeters >= 1000000) return units.sqkilometers;
+        return units.sqmeters;
     }
 }
 
-class Imperial extends UnitSystem{
+class ImperialSystem extends UnitSystem{
+    getName(){
+        return _("Imperial");
+    }
+    
     lengthUnit(meters){
         const feet = units.feet.factor * meters;
         if (feet >= 5280) return units.miles;
@@ -98,7 +136,7 @@ class Imperial extends UnitSystem{
     }
 
     areaUnit(sqmeters){
-        const sqfeet = units.sqfeet.factor * meters;
+        const sqfeet = units.sqfeet.factor * sqmeters;
         if (sqfeet >= 43560 && sqfeet < 27878400) return units.acres;
         else if (sqfeet >= 27878400) return units.sqmiles;
         else return units.sqfeet;
@@ -106,18 +144,21 @@ class Imperial extends UnitSystem{
 }
 
 const systems = {
-    metric: new Metric(),
-
-
-    // TODO
+    metric: new MetricSystem(),
+    imperial: new ImperialSystem()
 }
 
-let a = 100;
-let S = systems.metric;
+// Expose to allow every part of the app to access this information
+function getPreferredUnitSystem(){
+    return localStorage.getItem("preferred_unit_system") || "metric";
+}
+function setPreferredUnitSystem(system){
+    localStorage.setItem("preferred_unit_system", system);
+}
 
-
-export default {
-    // to be used on individual strings
-    
+export {
+    systems,
+    getPreferredUnitSystem,
+    setPreferredUnitSystem
 };
 
