@@ -400,11 +400,6 @@ class Map extends React.Component {
         mapView: this
     });
 
-    //add zoom control with your options
-    let zoomControl = Leaflet.control.zoom({
-         position:'bottomleft'
-    }).addTo(this.map);
-
     const UnitsCtrl = Leaflet.Control.extend({
       options: {
           position: 'bottomleft'
@@ -419,6 +414,10 @@ class Map extends React.Component {
     });
     new UnitsCtrl().addTo(this.map);
 
+    //add zoom control with your options
+    let zoomControl = Leaflet.control.zoom({
+         position:'bottomleft'
+    }).addTo(this.map);
 
     if (showBackground) {
       this.basemaps = {};

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { systems, getPreferredUnitSystem, setPreferredUnitSystem } from '../classes/Units';
+import '../css/UnitSelector.scss';
 
 class UnitSelector extends React.Component {
   static propTypes = {
@@ -12,8 +13,6 @@ class UnitSelector extends React.Component {
     this.state = {
         system: getPreferredUnitSystem()
     }
-
-    // console.log(systems.metric.length(1.01).toString());
   }
   
   handleChange = e => {
@@ -23,7 +22,7 @@ class UnitSelector extends React.Component {
 
   render() {
     return (
-      <select value={this.state.system} onChange={this.handleChange}>
+      <select className="unit-selector" value={this.state.system} onChange={this.handleChange}>
             {Object.keys(systems).map(k => 
                 <option value={k} key={k}>{systems[k].getName()}</option>)}
         </select>
