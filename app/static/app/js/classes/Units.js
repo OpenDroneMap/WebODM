@@ -80,6 +80,21 @@ const units = {
         factor: Math.pow((3937 / 1200) / 5280, 2),
         abbr: 'mi² (US)',
         round: 5
+    },
+    cbmeters:{
+        factor: 1,
+        abbr: 'm³',
+        round: 4
+    },
+    cbyards:{
+        factor: Math.pow(1/(0.3048*3), 3),
+        abbr: 'yd³',
+        round: 4
+    },
+    cbyards_us:{
+        factor: Math.pow(3937/3600, 3),
+        abbr: 'yd³ (US)',
+        round: 4
     }
 };
 
@@ -105,6 +120,8 @@ class ValueUnit{
 class UnitSystem{
     lengthUnit(meters){ throw new Error("Not implemented"); }
     areaUnit(sqmeters){ throw new Error("Not implemented"); }
+    volumeUnit(cbmeters){ throw new Error("Not implemented"); }
+    
     getName(){ throw new Error("Not implemented"); }
     
     area(sqmeters){
@@ -116,6 +133,12 @@ class UnitSystem{
     length(meters){
         const unit = this.lengthUnit(meters);
         const val = unit.factor * meters;
+        return new ValueUnit(val, unit);
+    }
+
+    volume(cbmeters){
+        const unit = this.volumeUnit(cbmeters);
+        const val = unit.factor * cbmeters;
         return new ValueUnit(val, unit);
     }
 };
@@ -135,6 +158,10 @@ class MetricSystem extends UnitSystem{
         if (sqmeters >= 10000 && sqmeters < 1000000) return units.hectares;
         else if (sqmeters >= 1000000) return units.sqkilometers;
         return units.sqmeters;
+    }
+
+    volumeUnit(cbmeters){
+        return units.cbmeters;
     }
 }
 
@@ -162,6 +189,10 @@ class ImperialSystem extends UnitSystem{
     acres(){
         return units.acres;
     }
+
+    cbyards(){
+        return units.cbyards;
+    }
     
     lengthUnit(meters){
         const feet = this.feet().factor * meters;
@@ -174,6 +205,10 @@ class ImperialSystem extends UnitSystem{
         if (sqfeet >= 43560 && sqfeet < 27878400) return this.acres();
         else if (sqfeet >= 27878400) return this.sqmiles();
         else return this.sqfeet();
+    }
+
+    volumeUnit(cbmeters){
+        return this.cbyards();
     }
 }
 
@@ -200,6 +235,10 @@ class ImperialUSSystem extends ImperialSystem{
 
     acres(){
         return units.acres_us;
+    }
+
+    cbyards(){
+        return units.cbyards_us;
     }
 }
 

@@ -38,6 +38,16 @@ describe('Metric system', () => {
     areas.forEach(a => {
         expect(metric.area(a[0]).toString()).toBe(a[1]);
     });
+
+    const volumes = [
+      [1, "1 m³"],
+      [9000, "9,000 m³"],
+      [9000.25559, "9,000.2556 m³"],
+    ];
+
+    volumes.forEach(v => {
+      expect(metric.volume(v[0]).toString()).toBe(v[1]);
+    });
   })
 });
 
@@ -73,6 +83,16 @@ describe('Imperial systems', () => {
     areas.forEach(a => {
       expect(imperial.area(a[0]).toString()).toBe(a[1]);
       expect(imperialUS.area(a[0]).toString()).toBe(a[2]);
+    });
+
+    const volumes = [
+      [1, "1.308 yd³", "1.3079 yd³ (US)"],
+      [1000, "1,307.9506 yd³", "1,307.9428 yd³ (US)"]
+    ];
+
+    volumes.forEach(v => {
+      expect(imperial.volume(v[0]).toString()).toBe(v[1]);
+      expect(imperialUS.volume(v[0]).toString()).toBe(v[2]);
     });
   })
 });
