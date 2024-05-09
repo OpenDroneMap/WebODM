@@ -1163,6 +1163,7 @@ class Task(models.Model):
         return path_traversal_check(p, self.task_path())
     
     def handle_images_upload(self, files):
+        uploaded = {}
         for file in files:
             name = file.name
             if name is None:
@@ -1181,6 +1182,9 @@ class Task(models.Model):
                 else:
                     with open(file.temporary_file_path(), 'rb') as f:
                         shutil.copyfileobj(f, fd)
+            
+            uploaded[name] = os.path.getsize(dst_path)
+        return uploaded
 
     def update_size(self, commit=False):
         try:

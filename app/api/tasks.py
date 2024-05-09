@@ -208,14 +208,14 @@ class TaskViewSet(viewsets.ViewSet):
         if len(files) == 0:
             raise exceptions.ValidationError(detail=_("No files uploaded"))
 
-        task.handle_images_upload(files)
+        uploaded = task.handle_images_upload(files)
         task.images_count = len(task.scan_images())
         # Update other parameters such as processing node, task name, etc.
         serializer = TaskSerializer(task, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
-        return Response({'success': True}, status=status.HTTP_200_OK)
+        return Response({'success': True, 'uploaded': uploaded}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def duplicate(self, request, pk=None, project_pk=None):

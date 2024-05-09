@@ -193,7 +193,7 @@ class ProjectListItem extends React.Component {
         .on("complete", (file) => {
             // Retry
             const retry = () => {
-                const MAX_RETRIES = 10;
+                const MAX_RETRIES = 20;
 
                 if (file.retries < MAX_RETRIES){
                     // Update progress
@@ -219,7 +219,7 @@ class ProjectListItem extends React.Component {
 
             try{
                 if (file.status === "error"){
-                    if ((file.size / 1024) > this.dz.options.maxFilesize) {
+                    if ((file.size / 1024 / 1024) > this.dz.options.maxFilesize) {
                         // Delete from upload queue
                         this.setUploadState({
                             totalCount: this.state.upload.totalCount - 1,
@@ -231,7 +231,7 @@ class ProjectListItem extends React.Component {
                 }else{
                     // Check response
                     let response = JSON.parse(file.xhr.response);
-                    if (response.success){
+                    if (response.success && response.uploaded && response.uploaded[file.name] === file.size){
                         // Update progress by removing the tracked progress and 
                         // use the file size as the true number of bytes
                         let totalBytesSent = this.state.upload.totalBytesSent + file.size;
@@ -284,7 +284,6 @@ class ProjectListItem extends React.Component {
             }else if (this.dz.getQueuedFiles() === 0){
                 // Done but didn't upload all?
                 this.setUploadState({
-                    totalCount: this.state.upload.totalCount - remainingFilesCount,
                     uploading: false,
                     error: interpolate(_('%(count)s files cannot be uploaded. As a reminder, only images (.jpg, .tif, .png) and GCP files (.txt) can be uploaded. Try again.'), { count: remainingFilesCount })
                 });
