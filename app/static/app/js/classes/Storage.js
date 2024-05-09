@@ -18,6 +18,14 @@ class Storage{
 			console.warn("Failed to call setItem " + key, e);
 		}
 	}
+
+	static removeItem(key){
+		try{
+			localStorage.removeItem(key);
+		}catch(e){
+			console.warn("Failed to call removeItem " + key, e);
+		}
+	}
 }
 
 export default Storage;

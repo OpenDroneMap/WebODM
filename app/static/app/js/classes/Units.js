@@ -1,112 +1,156 @@
 import { _ } from './gettext';
 
+const types = {
+    LENGTH: 1,
+    AREA: 2,
+    VOLUME: 3
+};
+
 const units = {
     acres: {
         factor: (1 / (0.3048 * 0.3048)) / 43560,
         abbr: 'ac',
-        round: 5
+        round: 5,
+        label: _("Acres"),
+        type: types.AREA
     },
     acres_us: {
       factor: Math.pow(3937 / 1200, 2) / 43560,
       abbr: 'ac (US)',
-      round: 5
+      round: 5,
+      label: _("Acres"),
+      type: types.AREA
     },
     feet: {
       factor: 1 / 0.3048,
       abbr: 'ft',
-      round: 4
+      round: 4,
+      label: _("Feet"),
+      type: types.LENGTH
     },
     feet_us:{
       factor: 3937 / 1200,
       abbr: 'ft (US)',
-      round: 4
+      round: 4,
+      label: _("Feet"),
+      type: types.LENGTH
     },
     hectares: {
       factor: 0.0001,
       abbr: 'ha',
-      round: 4
+      round: 4,
+      label: _("Hectares"),
+      type: types.AREA
     },
     meters: {
       factor: 1,
       abbr: 'm',
-      round: 3
+      round: 3,
+      label: _("Meters"),
+      type: types.LENGTH
     },
     kilometers: {
         factor: 0.001,
         abbr: 'km',
-        round: 5
+        round: 5,
+        label: _("Kilometers"),
+        type: types.LENGTH
     },
     centimeters: {
       factor: 100,
       abbr: 'cm',
-      round: 1
+      round: 1,
+      label: _("Centimeters"),
+      type: types.LENGTH
     },
     miles: {
         factor: (1 / 0.3048) / 5280,
         abbr: 'mi',
-        round: 5
-      },
+        round: 5,
+        label: _("Miles"),
+        type: types.LENGTH
+    },
     miles_us: {
         factor: (3937 / 1200) / 5280,
         abbr: 'mi (US)',
-        round: 5
+        round: 5,
+        label: _("Miles"),
+        type: types.LENGTH
     },
     sqfeet: {
       factor: 1 / (0.3048 * 0.3048),
       abbr: 'ft²',
-      round: 2
+      round: 2,
+      label: _("Squared Feet"),
+      type: types.AREA
     },
     sqfeet_us: {
         factor: Math.pow(3937 / 1200, 2),
         abbr: 'ft² (US)',
-        round: 2
+        round: 2,
+        label: _("Squared Feet"),
+        type: types.AREA
     },
     sqmeters: {
       factor: 1,
       abbr: 'm²',
-      round: 2
+      round: 2,
+      label: _("Squared Meters"),
+      type: types.AREA
     },
     sqkilometers: {
         factor: 0.000001,
         abbr: 'km²',
-        round: 5
+        round: 5,
+        label: _("Squared Kilometers"),
+        type: types.AREA
     },
     sqmiles: {
       factor: Math.pow((1 / 0.3048) / 5280, 2),
       abbr: 'mi²',
-      round: 5
+      round: 5,
+      label: _("Squared Miles"),
+      type: types.AREA
     },
     sqmiles_us: {
         factor: Math.pow((3937 / 1200) / 5280, 2),
         abbr: 'mi² (US)',
-        round: 5
+        round: 5,
+        label: _("Squared Miles"),
+        type: types.AREA
     },
     cbmeters:{
         factor: 1,
         abbr: 'm³',
-        round: 4
+        round: 4,
+        label: _("Cubic Meters"),
+        type: types.VOLUME
     },
     cbyards:{
         factor: Math.pow(1/(0.3048*3), 3),
         abbr: 'yd³',
-        round: 4
+        round: 4,
+        label: _("Cubic Yards"),
+        type: types.VOLUME
     },
     cbyards_us:{
         factor: Math.pow(3937/3600, 3),
         abbr: 'yd³ (US)',
-        round: 4
+        round: 4,
+        label: _("Cubic Yards"),
+        type: types.VOLUME
     }
 };
 
 class ValueUnit{
-    constructor(val, unit){
-        this.val = val;
+    constructor(value, unit){
+        this.value = value;
         this.unit = unit;
     }
 
     toString(){
         const mul = Math.pow(10, this.unit.round);
-        const rounded = (Math.round(this.val * mul) / mul).toString();
+        const rounded = (Math.round(this.value * mul) / mul).toString();
 
         let withCommas = "";
         let parts = rounded.split(".");
@@ -114,6 +158,12 @@ class ValueUnit{
         withCommas = parts.join(".");
 
         return `${withCommas} ${this.unit.abbr}`;
+    }
+}
+
+class NanUnit{
+    toString(){
+        return "NaN";
     }
 }
 
@@ -125,23 +175,54 @@ class UnitSystem{
     getName(){ throw new Error("Not implemented"); }
     
     area(sqmeters){
+        sqmeters = parseFloat(sqmeters);
+        if (isNaN(sqmeters)) return NanUnit();
+
         const unit = this.areaUnit(sqmeters);
         const val = unit.factor * sqmeters;
         return new ValueUnit(val, unit);
     }
 
     length(meters){
+        meters = parseFloat(meters);
+        if (isNaN(meters)) return NanUnit();
+
         const unit = this.lengthUnit(meters);
         const val = unit.factor * meters;
         return new ValueUnit(val, unit);
     }
 
     volume(cbmeters){
+        cbmeters = parseFloat(cbmeters);
+        if (isNaN(cbmeters)) return NanUnit();
+
         const unit = this.volumeUnit(cbmeters);
         const val = unit.factor * cbmeters;
         return new ValueUnit(val, unit);
     }
 };
+
+function toMetric(valueUnit, unit){
+    let value = NaN;
+    if (typeof valueUnit === "object" && unit === undefined){
+        value = valueUnit.value;
+        unit = valueUnit.unit;
+    }else{
+        value = parseFloat(valueUnit);
+    }
+    if (isNaN(value)) return NanUnit();
+
+    const val = value / unit.factor;
+    if (unit.type === types.LENGTH){
+        return new ValueUnit(val, units.meters);
+    }else if (unit.type === types.AREA){
+        return new ValueUnit(val, unit.sqmeters);
+    }else if (unit.type === types.VOLUME){
+        return new ValueUnit(val, unit.cbmeters);
+    }else{
+        throw new Error(`Unrecognized unit type: ${unit.type}`);
+    }
+}
 
 class MetricSystem extends UnitSystem{
     getName(){
@@ -249,16 +330,32 @@ const systems = {
 }
 
 // Expose to allow every part of the app to access this information
-function getPreferredUnitSystem(){
-    return localStorage.getItem("preferred_unit_system") || "metric";
+function getUnitSystem(){
+    return localStorage.getItem("_unit_system") || "metric";
 }
-function setPreferredUnitSystem(system){
-    localStorage.setItem("preferred_unit_system", system);
+function setUnitSystem(system){
+    let prevSystem = getUnitSystem();
+    localStorage.setItem("_unit_system", system);
+    if (prevSystem !== system){
+        document.dispatchEvent(new CustomEvent("onUnitSystemChanged", { detail: system }));
+    }
+}
+
+function onUnitSystemChanged(callback){
+    document.addEventListener("onUnitSystemChanged", callback);
+}
+
+function offUnitSystemChanged(callback){
+    document.removeEventListener("onUnitSystemChanged", callback);
 }
 
 export {
     systems,
-    getPreferredUnitSystem,
-    setPreferredUnitSystem
+    types,
+    toMetric,
+    getUnitSystem,
+    setUnitSystem,
+    onUnitSystemChanged,
+    offUnitSystemChanged
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { systems, getPreferredUnitSystem, setPreferredUnitSystem } from '../classes/Units';
+import { systems, getUnitSystem, setUnitSystem } from '../classes/Units';
 import '../css/UnitSelector.scss';
 
 class UnitSelector extends React.Component {
@@ -11,13 +11,13 @@ class UnitSelector extends React.Component {
     super(props);
 
     this.state = {
-        system: getPreferredUnitSystem()
+        system: getUnitSystem()
     }
   }
   
   handleChange = e => {
     this.setState({system: e.target.value});
-    setPreferredUnitSystem(e.target.value);
+    setUnitSystem(e.target.value);
   };
 
   render() {

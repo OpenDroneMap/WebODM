@@ -1,4 +1,4 @@
-import { systems } from '../../classes/Units';
+import { systems, toMetric } from '../../classes/Units';
 
 describe('Metric system', () => {
   it('it should display units properly', () => {
@@ -94,5 +94,25 @@ describe('Imperial systems', () => {
       expect(imperial.volume(v[0]).toString()).toBe(v[1]);
       expect(imperialUS.volume(v[0]).toString()).toBe(v[2]);
     });
-  })
+  });
+});
+
+describe('Metric conversion', () => {
+  it('it should convert units properly', () => {
+    const { metric, imperial } = systems;
+
+    const km = metric.length(2000);
+    const mi = imperial.length(3220);
+
+    expect(km.unit.abbr).toBe("km");
+    expect(km.value).toBe(2);
+    expect(mi.unit.abbr).toBe("mi");
+    expect(Math.round(mi.value)).toBe(2)
+
+    expect(toMetric(km).toString()).toBe("2,000 m");
+    expect(toMetric(mi).toString()).toBe("3,220 m");
+
+    expect(toMetric(km).value).toBe(2000);
+    expect(toMetric(mi).value).toBe(3220);
+  });
 });
