@@ -2,13 +2,23 @@ import { _ } from './gettext';
 
 const units = {
     acres: {
-      factor: 1 / 4046.85642,
-      abbr: 'ac',
+        factor: (1 / (0.3048 * 0.3048)) / 43560,
+        abbr: 'ac',
+        round: 5
+    },
+    acres_us: {
+      factor: Math.pow(3937 / 1200, 2) / 43560,
+      abbr: 'ac (US)',
       round: 5
     },
     feet: {
-      factor: 3.28084,
+      factor: 1 / 0.3048,
       abbr: 'ft',
+      round: 4
+    },
+    feet_us:{
+      factor: 3937 / 1200,
+      abbr: 'ft (US)',
       round: 4
     },
     hectares: {
@@ -32,14 +42,24 @@ const units = {
       round: 1
     },
     miles: {
-      factor: 3.28084 / 5280,
-      abbr: 'mi',
-      round: 5
+        factor: (1 / 0.3048) / 5280,
+        abbr: 'mi',
+        round: 5
+      },
+    miles_us: {
+        factor: (3937 / 1200) / 5280,
+        abbr: 'mi (US)',
+        round: 5
     },
     sqfeet: {
-      factor: 1 / 0.09290304,
+      factor: 1 / (0.3048 * 0.3048),
       abbr: 'ft²',
       round: 2
+    },
+    sqfeet_us: {
+        factor: Math.pow(3937 / 1200, 2),
+        abbr: 'ft² (US)',
+        round: 2
     },
     sqmeters: {
       factor: 1,
@@ -52,9 +72,14 @@ const units = {
         round: 5
     },
     sqmiles: {
-      factor: 0.000000386102,
+      factor: Math.pow((1 / 0.3048) / 5280, 2),
       abbr: 'mi²',
       round: 5
+    },
+    sqmiles_us: {
+        factor: Math.pow((3937 / 1200) / 5280, 2),
+        abbr: 'mi² (US)',
+        round: 5
     }
 };
 
@@ -117,24 +142,71 @@ class ImperialSystem extends UnitSystem{
     getName(){
         return _("Imperial");
     }
+
+    feet(){
+        return units.feet;
+    }
+
+    sqfeet(){
+        return units.sqfeet;
+    }
+
+    miles(){
+        return units.miles;
+    }
+
+    sqmiles(){
+        return units.sqmiles;
+    }
+
+    acres(){
+        return units.acres;
+    }
     
     lengthUnit(meters){
-        const feet = units.feet.factor * meters;
-        if (feet >= 5280) return units.miles;
-        else return units.feet;
+        const feet = this.feet().factor * meters;
+        if (feet >= 5280) return this.miles();
+        else return this.feet();
     }
 
     areaUnit(sqmeters){
-        const sqfeet = units.sqfeet.factor * sqmeters;
-        if (sqfeet >= 43560 && sqfeet < 27878400) return units.acres;
-        else if (sqfeet >= 27878400) return units.sqmiles;
-        else return units.sqfeet;
+        const sqfeet = this.sqfeet().factor * sqmeters;
+        if (sqfeet >= 43560 && sqfeet < 27878400) return this.acres();
+        else if (sqfeet >= 27878400) return this.sqmiles();
+        else return this.sqfeet();
+    }
+}
+
+class ImperialUSSystem extends ImperialSystem{
+    getName(){
+        return _("Imperial (US)");
+    }
+
+    feet(){
+        return units.feet_us;
+    }
+
+    sqfeet(){
+        return units.sqfeet_us;
+    }
+
+    miles(){
+        return units.miles_us;
+    }
+
+    sqmiles(){
+        return units.sqmiles_us;
+    }
+
+    acres(){
+        return units.acres_us;
     }
 }
 
 const systems = {
     metric: new MetricSystem(),
-    imperial: new ImperialSystem()
+    imperial: new ImperialSystem(),
+    imperialUS: new ImperialUSSystem()
 }
 
 // Expose to allow every part of the app to access this information

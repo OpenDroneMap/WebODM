@@ -41,34 +41,38 @@ describe('Metric system', () => {
   })
 });
 
-describe('Imperial system', () => {
+describe('Imperial systems', () => {
   it('it should display units properly', () => {
 
-    const { imperial } = systems;
+    const { imperial, imperialUS } = systems;
 
     const lengths = [
-        [1, "3.2808 ft"],
-        [0.01, "0.0328 ft"],
-        [0.0154, "0.0505 ft"],
-        [1609, "5,278.8716 ft"],
-        [1609.344, "1 mi"],
-        [3218.69, "2 mi"]
+        [1, "3.2808 ft", "3.2808 ft (US)"],
+        [0.01, "0.0328 ft", "0.0328 ft (US)"],
+        [0.0154, "0.0505 ft", "0.0505 ft (US)"],
+        [1609, "5,278.8714 ft", "5,278.8608 ft (US)"],
+        [1609.344, "1 mi", "5,279.9894 ft (US)"],
+        [1609.3472187, "1 mi", "1 mi (US)"],
+        [3218.69, "2 mi", "2 mi (US)"]
     ];
     
     lengths.forEach(l => {
-        expect(imperial.length(l[0]).toString()).toBe(l[1]);
+      expect(imperial.length(l[0]).toString()).toBe(l[1]);
+      expect(imperialUS.length(l[0]).toString()).toBe(l[2]);
     });
 
     const areas = [
-        [1, "10.76 ft²"],
-        [9999, "2.47081 ac"],
-        [4046.86, "1 ac"],
-        [2587398.1, "639.35999 ac"],
-        [2.59e+6, "1 mi²"]
+        [1, "10.76 ft²", "10.76 ft² (US)"],
+        [9999, "2.47081 ac", "2.4708 ac (US)"],
+        [4046.86, "1 ac", "43,559.86 ft² (US)"],
+        [4046.87261, "1 ac", "1 ac (US)"],
+        [2587398.1, "639.35999 ac", "639.35744 ac (US)"],
+        [2.59e+6, "1 mi²", "1 mi² (US)"]
     ];
 
     areas.forEach(a => {
-        expect(imperial.area(a[0]).toString()).toBe(a[1]);
+      expect(imperial.area(a[0]).toString()).toBe(a[1]);
+      expect(imperialUS.area(a[0]).toString()).toBe(a[2]);
     });
   })
 });
