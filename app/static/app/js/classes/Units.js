@@ -2,68 +2,57 @@ import { _ } from './gettext';
 
 const units = {
     acres: {
-      factor: 0.00024711,
-      label: _('Acres'),
+      factor: 1 / 4046.85642,
       abbr: 'ac',
       round: 5
     },
     feet: {
-      factor: 3.2808,
-      label: _('Feet'),
+      factor: 3.28084,
       abbr: 'ft',
       round: 4
     },
     hectares: {
       factor: 0.0001,
-      label: _('Hectares'),
       abbr: 'ha',
       round: 4
     },
     meters: {
       factor: 1,
-      label: _('Meters'),
       abbr: 'm',
       round: 3
     },
     kilometers: {
         factor: 0.001,
-        label: _('Kilometers'),
         abbr: 'km',
         round: 5
     },
     centimeters: {
       factor: 100,
-      label: _('Centimeters'),
       abbr: 'cm',
       round: 1
     },
     miles: {
-      factor: 3.2808 / 5280,
-      label: _('Miles'),
+      factor: 3.28084 / 5280,
       abbr: 'mi',
       round: 5
     },
     sqfeet: {
-      factor: 10.7639,
-      label: _('Square Feet'),
+      factor: 1 / 0.09290304,
       abbr: 'ft²',
       round: 2
     },
     sqmeters: {
       factor: 1,
-      label: _('Square Meters'),
       abbr: 'm²',
       round: 2
     },
-    sqmeters: {
+    sqkilometers: {
         factor: 0.000001,
-        label: _('Square Kilometers'),
         abbr: 'km²',
         round: 5
     },
     sqmiles: {
       factor: 0.000000386102,
-      label: _('Square Miles'),
       abbr: 'mi²',
       round: 5
     }
