@@ -140,7 +140,7 @@ export default class ContoursPanel extends React.Component {
     this.setState({customEpsg: e.target.value});
   }
 
-  getFormValues = () => {
+  getFormValues = (preview) => {
     const { interval, customInterval, epsg, customEpsg, 
       simplify, customSimplify, layer, unitSystem } = this.state;
     const su = systems[unitSystem];
@@ -151,13 +151,13 @@ export default class ContoursPanel extends React.Component {
     meterInterval = toMetric(meterInterval, su.lengthUnit(1)).value;
     meterSimplify = toMetric(meterSimplify, su.lengthUnit(1)).value;
     
-    const zExportFactor = su.lengthUnit(1).factor;
+    const zfactor = preview ? 1 : su.lengthUnit(1).factor;
 
     return {
       interval: meterInterval,
       epsg: epsg !== "custom" ? epsg : customEpsg,
       simplify: meterSimplify,
-      zExportFactor,
+      zfactor,
       layer
     };
   }
@@ -254,7 +254,7 @@ export default class ContoursPanel extends React.Component {
 
   handleExport = (format) => {
     return () => {
-      const data = this.getFormValues();
+      const data = this.getFormValues(false);
       data.format = format;
       this.generateContours(data, 'exportLoading', false);
     };
@@ -263,7 +263,7 @@ export default class ContoursPanel extends React.Component {
   handleShowPreview = () => {
     this.setState({previewLoading: true});
 
-    const data = this.getFormValues();
+    const data = this.getFormValues(true);
     data.epsg = 4326;
     data.format = "GeoJSON";
     this.generateContours(data, 'previewLoading', true);
