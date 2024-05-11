@@ -399,7 +399,7 @@ class Tiles(TaskNestedView):
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
             if hillshade is not None:
-                tile_buffer = tilesize
+                tile_buffer = 16
 
             try:
                 if expr is not None:
@@ -471,17 +471,17 @@ class Tiles(TaskNestedView):
                 # Remove elevation data from edge buffer tiles
                 # (to keep intensity uniform across tiles)
                 elevation = tile.data[0]
-                elevation[0:tilesize, 0:tilesize] = nodata
-                elevation[tilesize*2:tilesize*3, 0:tilesize] = nodata
-                elevation[0:tilesize, tilesize*2:tilesize*3] = nodata
-                elevation[tilesize*2:tilesize*3, tilesize*2:tilesize*3] = nodata
+                elevation[0:tile_buffer, 0:tile_buffer] = nodata
+                elevation[tile_buffer+tilesize:tile_buffer*2+tilesize, 0:tile_buffer] = nodata
+                elevation[0:tile_buffer, tile_buffer+tilesize:tile_buffer*2+tilesize] = nodata
+                elevation[tile_buffer+tilesize:tile_buffer*2+tilesize, tile_buffer+tilesize:tile_buffer*2+tilesize] = nodata
 
                 intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
-                intensity = intensity[tilesize:tilesize * 2, tilesize:tilesize * 2]
+                intensity = intensity[tile_buffer:tile_buffer+tilesize, tile_buffer:tile_buffer+tilesize]
 
             if intensity is not None:
                 rgb = tile.post_process(in_range=(rescale_arr,))
-                rgb_data = rgb.data[:,tilesize:tilesize * 2, tilesize:tilesize * 2]
+                rgb_data = rgb.data[:,tile_buffer:tilesize + tile_buffer, tile_buffer:tilesize + tile_buffer]
                 if colormap:
                     rgb, _discard_ = apply_cmap(rgb_data, colormap.get(color_map))
                 if rgb.data.shape[0] != 3:
@@ -490,7 +490,7 @@ class Tiles(TaskNestedView):
                 intensity = intensity * 255.0
                 rgb = hsv_blend(rgb, intensity)
                 if rgb is not None:
-                    mask = tile.mask[tilesize:tilesize * 2, tilesize:tilesize * 2]
+                    mask = tile.mask[tile_buffer:tilesize + tile_buffer, tile_buffer:tilesize + tile_buffer]
                     return HttpResponse(
                         render(rgb, mask, img_format=driver, **options),
                         content_type="image/{}".format(ext)
