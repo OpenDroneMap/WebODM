@@ -450,16 +450,16 @@ class Task(models.Model):
         
         return False
     
-    def get_asset_file_or_zipstream(self, asset):
+    def get_asset_file_or_stream(self, asset):
         """
         Get a stream to an asset
         :param asset: one of ASSETS_MAP keys
-        :return: (path|stream, is_zipstream:bool)
+        :return: (path|stream)
         """
         if asset in self.ASSETS_MAP:
             value = self.ASSETS_MAP[asset]
             if isinstance(value, str):
-                return self.assets_path(value), False
+                return self.assets_path(value)
 
             elif isinstance(value, dict):
                 if 'deferred_path' in value and 'deferred_compress_dir' in value:
@@ -469,7 +469,7 @@ class Task(models.Model):
                         paths = [p for p in paths if os.path.basename(p['fs']) not in value['deferred_exclude_files']]
                     if len(paths) == 0:
                         raise FileNotFoundError("No files available for download")
-                    return zipfly.ZipStream(paths), True
+                    return zipfly.ZipStream(paths)
                 else:
                     raise FileNotFoundError("{} is not a valid asset (invalid dict values)".format(asset))
             else:
