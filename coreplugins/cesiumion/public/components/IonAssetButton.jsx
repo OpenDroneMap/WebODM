@@ -72,7 +72,7 @@ export default class IonAssetButton extends PureComponent {
 			)
 			.map(asset => (
 				<li key={asset}>
-					<a onClick={this.handleClick(asset)}>
+					<a style={{cursor:'pointer'}} onClick={this.handleClick(asset)}>
 						<AssetComponent asset={asset} showIcon={true} />
 					</a>
 				</li>
