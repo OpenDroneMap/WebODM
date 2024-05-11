@@ -28,6 +28,7 @@ import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
+import { unitSystem } from '../classes/Units';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -134,6 +135,9 @@ class Map extends React.Component {
         const { url, meta, type } = tile;
         
         let metaUrl = url + "metadata";
+        let histUnit = (value, precision) => {
+          return value.toFixed(precision);
+        };
 
         if (type == "plant"){
           if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
@@ -149,6 +153,9 @@ class Map extends React.Component {
           }
         }else if (type == "dsm" || type == "dtm"){
           metaUrl += "?hillshade=6&color_map=viridis";
+          histUnit = (value, precision) => {
+            return unitSystem().length(value, { fixedUnit: true }).toString({precision});
+          };
         }
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
@@ -209,6 +216,7 @@ class Map extends React.Component {
             // Associate metadata with this layer
             meta.name = name + ` (${this.typeToHuman(type)})`;
             meta.metaUrl = metaUrl;
+            meta.histUnit = histUnit;
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 

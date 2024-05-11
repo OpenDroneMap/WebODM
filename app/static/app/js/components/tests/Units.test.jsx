@@ -48,6 +48,8 @@ describe('Metric system', () => {
     volumes.forEach(v => {
       expect(metric.volume(v[0]).toString()).toBe(v[1]);
     });
+
+    expect(metric.area(11005.09, { fixedUnit: true }).toString({precision: 1})).toBe("11,005.1 m²");
   })
 });
 
@@ -94,6 +96,8 @@ describe('Imperial systems', () => {
       expect(imperial.volume(v[0]).toString()).toBe(v[1]);
       expect(imperialUS.volume(v[0]).toString()).toBe(v[2]);
     });
+
+    expect(imperial.area(9999, { fixedUnit: true }).toString({precision: 1})).toBe("107,628.3 ft²");
   });
 });
 

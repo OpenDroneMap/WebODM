@@ -148,8 +148,8 @@ class ValueUnit{
         this.unit = unit;
     }
 
-    toString(){
-        const mul = Math.pow(10, this.unit.round);
+    toString(opts = {}){
+        const mul = Math.pow(10, opts.precision !== undefined ? opts.precision : this.unit.round);
         const rounded = (Math.round(this.value * mul) / mul).toString();
 
         let withCommas = "";
@@ -168,35 +168,35 @@ class NanUnit{
 }
 
 class UnitSystem{
-    lengthUnit(meters){ throw new Error("Not implemented"); }
-    areaUnit(sqmeters){ throw new Error("Not implemented"); }
-    volumeUnit(cbmeters){ throw new Error("Not implemented"); }
+    lengthUnit(meters, opts = {}){ throw new Error("Not implemented"); }
+    areaUnit(sqmeters, opts = {}){ throw new Error("Not implemented"); }
+    volumeUnit(cbmeters, opts = {}){ throw new Error("Not implemented"); }
     
     getName(){ throw new Error("Not implemented"); }
     
-    area(sqmeters){
+    area(sqmeters, opts = {}){
         sqmeters = parseFloat(sqmeters);
         if (isNaN(sqmeters)) return NanUnit();
 
-        const unit = this.areaUnit(sqmeters);
+        const unit = this.areaUnit(sqmeters, opts);
         const val = unit.factor * sqmeters;
         return new ValueUnit(val, unit);
     }
 
-    length(meters){
+    length(meters, opts = {}){
         meters = parseFloat(meters);
         if (isNaN(meters)) return NanUnit();
 
-        const unit = this.lengthUnit(meters);
+        const unit = this.lengthUnit(meters, opts);
         const val = unit.factor * meters;
         return new ValueUnit(val, unit);
     }
 
-    volume(cbmeters){
+    volume(cbmeters, opts = {}){
         cbmeters = parseFloat(cbmeters);
         if (isNaN(cbmeters)) return NanUnit();
 
-        const unit = this.volumeUnit(cbmeters);
+        const unit = this.volumeUnit(cbmeters, opts);
         const val = unit.factor * cbmeters;
         return new ValueUnit(val, unit);
     }
@@ -229,19 +229,23 @@ class MetricSystem extends UnitSystem{
         return _("Metric");
     }
 
-    lengthUnit(meters){
+    lengthUnit(meters, opts = {}){
+        if (opts.fixedUnit) return units.meters;
+
         if (meters < 1) return units.centimeters;
         else if (meters >= 1000) return units.kilometers;
         else return units.meters;
     }
 
-    areaUnit(sqmeters){
+    areaUnit(sqmeters, opts = {}){
+        if (opts.fixedUnit) return units.sqmeters;
+
         if (sqmeters >= 10000 && sqmeters < 1000000) return units.hectares;
         else if (sqmeters >= 1000000) return units.sqkilometers;
         return units.sqmeters;
     }
 
-    volumeUnit(cbmeters){
+    volumeUnit(cbmeters, opts = {}){
         return units.cbmeters;
     }
 }
@@ -275,20 +279,24 @@ class ImperialSystem extends UnitSystem{
         return units.cbyards;
     }
     
-    lengthUnit(meters){
+    lengthUnit(meters, opts = {}){
+        if (opts.fixedUnit) return this.feet();
+
         const feet = this.feet().factor * meters;
         if (feet >= 5280) return this.miles();
         else return this.feet();
     }
 
-    areaUnit(sqmeters){
+    areaUnit(sqmeters, opts = {}){
+        if (opts.fixedUnit) return this.sqfeet();
+
         const sqfeet = this.sqfeet().factor * sqmeters;
         if (sqfeet >= 43560 && sqfeet < 27878400) return this.acres();
         else if (sqfeet >= 27878400) return this.sqmiles();
         else return this.sqfeet();
     }
 
-    volumeUnit(cbmeters){
+    volumeUnit(cbmeters, opts = {}){
         return this.cbyards();
     }
 }
@@ -331,11 +339,11 @@ const systems = {
 
 // Expose to allow every part of the app to access this information
 function getUnitSystem(){
-    return localStorage.getItem("_unit_system") || "metric";
+    return localStorage.getItem("unit_system") || "metric";
 }
 function setUnitSystem(system){
     let prevSystem = getUnitSystem();
-    localStorage.setItem("_unit_system", system);
+    localStorage.setItem("unit_system", system);
     if (prevSystem !== system){
         document.dispatchEvent(new CustomEvent("onUnitSystemChanged", { detail: system }));
     }
@@ -349,10 +357,15 @@ function offUnitSystemChanged(callback){
     document.removeEventListener("onUnitSystemChanged", callback);
 }
 
+function unitSystem(){
+    return systems[getUnitSystem()];
+}
+
 export {
     systems,
     types,
     toMetric,
+    unitSystem,
     getUnitSystem,
     setUnitSystem,
     onUnitSystemChanged,
