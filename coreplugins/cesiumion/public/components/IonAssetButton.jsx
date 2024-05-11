@@ -16,6 +16,48 @@ export default class IonAssetButton extends PureComponent {
 
 	handleClick = asset => () => this.props.onSelect(asset);
 
+	// render() {
+	// 	const {
+	// 		assets,
+	// 		onSelect,
+	// 		children,
+	// 		assetComponent: AssetComponent
+	// 	} = this.props;
+
+	// 	const menuItems = assets
+	// 		.sort((a, b) =>
+	// 			AssetStyles[a].name.localeCompare(AssetStyles[b].name)
+	// 		)
+	// 		.map(asset => (
+	// 			<MenuItem
+	// 				key={asset}
+	// 				tag={"a"}
+	// 				onClick={this.handleClick(asset)}
+	// 			>
+	// 				<AssetComponent asset={asset} showIcon={true} />
+	// 			</MenuItem>
+	// 		));
+
+	// 	const title = (
+	// 		<Fragment>
+	// 			<i className={"fa fa-cesium"} />
+	// 			{children}
+	// 		</Fragment>
+	// 	);
+
+	// 	return (
+	// 		<DropdownButton
+	// 			id={"cesiumIonUploadDropdown"}
+	// 			bsStyle={"primary"}
+	// 			bsSize={"small"}
+	// 			className={"ion-btn"}
+	// 			title={title}
+	// 		>
+	// 			{menuItems}
+	// 		</DropdownButton>
+	// 	);
+	// }
+
 	render() {
 		const {
 			assets,
@@ -23,38 +65,38 @@ export default class IonAssetButton extends PureComponent {
 			children,
 			assetComponent: AssetComponent
 		} = this.props;
-
+	
 		const menuItems = assets
 			.sort((a, b) =>
 				AssetStyles[a].name.localeCompare(AssetStyles[b].name)
 			)
 			.map(asset => (
-				<MenuItem
-					key={asset}
-					tag={"a"}
-					onClick={this.handleClick(asset)}
-				>
-					<AssetComponent asset={asset} showIcon={true} />
-				</MenuItem>
+				<li key={asset}>
+					<a onClick={this.handleClick(asset)}>
+						<AssetComponent asset={asset} showIcon={true} />
+					</a>
+				</li>
 			));
-
+	
 		const title = (
 			<Fragment>
 				<i className={"fa fa-cesium"} />
 				{children}
 			</Fragment>
 		);
-
+	
 		return (
-			<DropdownButton
-				id={"cesiumIonUploadDropdown"}
-				bsStyle={"primary"}
-				bsSize={"small"}
-				className={"ion-btn"}
-				title={title}
-			>
-				{menuItems}
-			</DropdownButton>
+			<div className={"btn-group"}>
+				<button type="button" className={"btn btn-sm btn-primary"} data-toggle="dropdown">
+					{title}
+				</button>
+				<button type="button" className={"btn btn-sm dropdown-toggle btn-primary"} data-toggle="dropdown">
+					<span className="caret"></span>
+				</button>
+				<ul className="dropdown-menu">
+					{menuItems}
+				</ul>
+			</div>
 		);
 	}
 }
