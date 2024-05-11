@@ -263,7 +263,10 @@ export default class Histogram extends React.Component {
 
   handleUnitSystemChanged = e => {
     this.redraw();
-    this.forceUpdate();
+    this.setState({
+        minInput: this.props.unitForward(this.state.min).toFixed(3), 
+        maxInput: this.props.unitForward(this.state.max).toFixed(3)
+    });
   }
     
   componentDidUpdate(prevProps, prevState){
