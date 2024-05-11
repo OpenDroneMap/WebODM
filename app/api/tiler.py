@@ -481,7 +481,7 @@ class Tiles(TaskNestedView):
 
             if intensity is not None:
                 rgb = tile.post_process(in_range=(rescale_arr,))
-                rgb_data = rgb.data[:,tile_buffer:tilesize + tile_buffer, tile_buffer:tilesize + tile_buffer]
+                rgb_data = rgb.data[:,tile_buffer:tilesize+tile_buffer, tile_buffer:tilesize+tile_buffer]
                 if colormap:
                     rgb, _discard_ = apply_cmap(rgb_data, colormap.get(color_map))
                 if rgb.data.shape[0] != 3:
@@ -490,7 +490,7 @@ class Tiles(TaskNestedView):
                 intensity = intensity * 255.0
                 rgb = hsv_blend(rgb, intensity)
                 if rgb is not None:
-                    mask = tile.mask[tile_buffer:tilesize + tile_buffer, tile_buffer:tilesize + tile_buffer]
+                    mask = tile.mask[tile_buffer:tilesize+tile_buffer, tile_buffer:tilesize+tile_buffer]
                     return HttpResponse(
                         render(rgb, mask, img_format=driver, **options),
                         content_type="image/{}".format(ext)
