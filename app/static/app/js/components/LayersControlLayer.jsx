@@ -295,6 +295,8 @@ export default class LayersControlLayer extends React.Component {
             <Histogram width={274}
                         loading={histogramLoading}
                         statistics={tmeta.statistics}
+                        unitForward={meta.unitForward}
+                        unitBackward={meta.unitBackward}
                         colorMap={cmapValues}
                         min={hmin}
                         max={hmax}

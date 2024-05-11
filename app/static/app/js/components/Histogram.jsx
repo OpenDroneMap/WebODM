@@ -8,6 +8,8 @@ export default class Histogram extends React.Component {
   static defaultProps = {
       width: 280,
       colorMap: null,
+      unitForward: value => value,
+      unitBackward: value => value,
       onUpdate: null,
       loading: false,
       min: null,
@@ -16,6 +18,8 @@ export default class Histogram extends React.Component {
   static propTypes = {
       statistics: PropTypes.object.isRequired,
       colorMap: PropTypes.array,
+      unitForward: PropTypes.func,
+      unitBackward: PropTypes.func,
       width: PropTypes.number,
       onUpdate: PropTypes.func,
       loading: PropTypes.bool,
@@ -68,8 +72,8 @@ export default class Histogram extends React.Component {
     const st = {
         min: min,
         max: max,
-        minInput: min.toFixed(3),
-        maxInput: max.toFixed(3)
+        minInput: this.props.unitForward(min).toFixed(3),
+        maxInput: this.props.unitForward(max).toFixed(3)
     };
 
     if (!this.state){
@@ -113,11 +117,14 @@ export default class Histogram extends React.Component {
     let x = d3.scale.linear()
                 .domain(this.rangeX)
                 .range([0, width]);
+    let tickFormat = x => {
+        return this.props.unitForward(x).toFixed(0);
+    };
 
     svg.append("g")
         .attr("class", "x axis theme-fill-primary")
         .attr("transform", "translate(0," + (height - 5) + ")")
-        .call(d3.svg.axis().scale(x).tickValues(this.rangeX).orient("bottom"));
+        .call(d3.svg.axis().scale(x).tickValues(this.rangeX).tickFormat(tickFormat).orient("bottom"));
 
     // add the y Axis
     let y = d3.scale.linear()
@@ -250,7 +257,10 @@ export default class Histogram extends React.Component {
     
   componentDidUpdate(prevProps, prevState){
       if (prevState.min !== this.state.min || prevState.max !== this.state.max){
-        this.setState({minInput: this.state.min.toFixed(3), maxInput: this.state.max.toFixed(3)});
+        this.setState({
+            minInput: this.props.unitForward(this.state.min).toFixed(3), 
+            maxInput: this.props.unitForward(this.state.max).toFixed(3)
+        });
       }
 
       if (prevState.min !== this.state.min || 
@@ -295,6 +305,7 @@ export default class Histogram extends React.Component {
   handleMaxBlur = (e) => {
     let val = parseFloat(e.target.value);
     if (!isNaN(val)){
+        val = this.props.unitBackward(val);
         val = Math.max(this.state.min, Math.min(this.rangeX[1], val));
         this.setState({max: val, maxInput: val.toFixed(3)});
     }
@@ -311,6 +322,7 @@ export default class Histogram extends React.Component {
   handleMinBlur = (e) => {
     let val = parseFloat(e.target.value);
     if (!isNaN(val)){
+        val = this.props.unitBackward(val);
         val = Math.max(this.rangeX[0], Math.min(this.state.max, val));
         this.setState({min: val, minInput: val.toFixed(3)});
     }
