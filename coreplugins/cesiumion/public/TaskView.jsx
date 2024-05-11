@@ -236,8 +236,8 @@ export default class TaskView extends Component {
 					{({ isLoading, isError, data }) => {
 						const initialValues = {};
 
-						if (!isLoading && !isError && data.results.length > 0) {
-							const project = data.results[0];
+						if (!isLoading && !isError && data?.length > 0) {
+							const project = data[0];
 							initialValues.name = `${project.name} | ${task.name} ⁠— ${assetName}`;
 							initialValues.description = project.description;
 						}
