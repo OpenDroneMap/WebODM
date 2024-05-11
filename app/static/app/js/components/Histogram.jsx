@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import '../css/Histogram.scss';
 import d3 from 'd3';
 import { _ } from '../classes/gettext';
+import { onUnitSystemChanged, offUnitSystemChanged } from '../classes/Units';
 
 export default class Histogram extends React.Component {
   static defaultProps = {
@@ -253,6 +254,16 @@ export default class Histogram extends React.Component {
   
   componentDidMount(){
     this.redraw();
+    onUnitSystemChanged(this.handleUnitSystemChanged);
+  }
+
+  componentWillUnmount(){
+    offUnitSystemChanged(this.handleUnitSystemChanged);
+  }
+
+  handleUnitSystemChanged = e => {
+    this.redraw();
+    this.forceUpdate();
   }
     
   componentDidUpdate(prevProps, prevState){

@@ -20,6 +20,12 @@
         {% for field in form %}
             {% include 'registration/form_field.html' %}
         {% endfor %}
+        <input type="hidden" name="next" value="" id="loginNext" />
+        <script>
+            var loginNext = document.getElementById("loginNext");
+            var value = new URLSearchParams(new URL(window.location.href).search).get('next');
+            if (value) loginNext.value = value;
+        </script>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
               <button type="submit" class="btn btn-default">{% trans 'Log in' %}</button>
