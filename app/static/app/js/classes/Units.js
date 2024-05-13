@@ -162,6 +162,10 @@ class ValueUnit{
 }
 
 class NanUnit{
+    constructor(){
+        this.value = NaN;
+        this.unit = units.meters; // Don't matter
+    }
     toString(){
         return "NaN";
     }
