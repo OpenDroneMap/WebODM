@@ -45,6 +45,7 @@ _("Navigation cube");
 _("Remove all clipping volumes");
 _("Compass");
 _("Camera Animation");
+_("Remove last camera animation");
 _("Point budget");
 _("Point size");
 _("Minimum size");
