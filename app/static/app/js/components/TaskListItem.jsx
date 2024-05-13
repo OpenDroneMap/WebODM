@@ -650,14 +650,26 @@ class TaskListItem extends React.Component {
     // LOADING STATUS
 
     // @param type {String} one of: ['neutral', 'done', 'error']
+
+
+    // const getStatusLabel = (text, type = 'neutral', progress = 100) => {
+    //   let color = 'rgba(255, 255, 255, 0.0)';
+    //   if (type === 'done') color = this.backgroundSuccessColor;
+    //   else if (type === 'error') color = this.backgroundFailedColor;
+    //   return (<div
+    //     className={"status-label theme-border-primary " + type}
+    //     style={{ background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)` }}
+    //     title={text}><i className={statusIcon}></i> {text}</div>);
+    // }
+
     const getStatusLabel = (text, type = 'neutral', progress = 100) => {
       let color = 'rgba(255, 255, 255, 0.0)';
       if (type === 'done') color = this.backgroundSuccessColor;
       else if (type === 'error') color = this.backgroundFailedColor;
       return (<div
         className={"status-label theme-border-primary " + type}
-        style={{ background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)` }}
-        title={text}><i className={statusIcon}></i> {text}</div>);
+        style={{ background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)`, borderRadius: "100px", padding: "2px", display: "flex", justifyContent: "center", alignItems: "center" }}
+        title={text}><i className={statusIcon}></i> {progress.toFixed(1)}%</div>);
     }
 
     let statusLabel = "";
