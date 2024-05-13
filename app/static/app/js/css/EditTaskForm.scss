@@ -125,7 +125,7 @@
                 outline: none;
               }
             input[type="checkbox"]:checked {
-                background-color: #74B16F;
+                background-color: #319C41;
                 background-image: url("/static/app/img/checkbox.png");
                 background-repeat: no-repeat;
                 background-position: center;
@@ -138,18 +138,17 @@
             gap: 10px;
 
             .popup-btn-save {
-                background-color: #6B9262;
+                background-color: #319C41;
                 color: #fff;
                 padding: 18px 58px;
                 border: none;
                 border-radius: 100px;
             }
             .popup-btn-save:hover {
-                background-color: #319C41;
+                background-color: #319c41c5;
             }
         }
     }
-    
     .form-group {
         width: 100%;
         
