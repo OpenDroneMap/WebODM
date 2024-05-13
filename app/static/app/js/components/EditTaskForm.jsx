@@ -8,6 +8,7 @@ import Storage from '../classes/Storage';
 import TagsField from './TagsField';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
+import { hierarchy } from 'd3';
 
 
 class EditTaskForm extends React.Component {
@@ -715,7 +716,8 @@ class EditTaskForm extends React.Component {
         {/* Popup Config */}
         {this.state.isPopupOpen &&
           <div className='edit-task-form'>
-            <div className="popup">
+            <div className='modal-backdrop in' style={{zIndex: "100000"}}></div>
+            <div className="popup" style={{zIndex: "100001"}}>
               <header className='header-popup'>
                 <h1>GERAÇÃO DE ARQUIVOS</h1>
                 <button onClick={this.togglePopup}>
