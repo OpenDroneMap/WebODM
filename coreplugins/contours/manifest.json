@@ -1,6 +1,6 @@
 {
 	"name": "Contours",
-	"webodmMinVersion": "2.4.3",
+	"webodmMinVersion": "2.5.0",
 	"description": "Compute, preview and export contours from DEMs",
 	"version": "1.1.0",
 	"author": "Piero Toffanin",
