@@ -343,7 +343,7 @@ class ShareTaskView(TaskView):
 
         settings = get_settings(request)
 
-        available_assets = [task.get_asset_file_or_zipstream(f)[0] for f in list(set(task.available_assets) & set(DRONEDB_ASSETS))]
+        available_assets = [task.get_asset_file_or_stream(f) for f in list(set(task.available_assets) & set(DRONEDB_ASSETS))]
 
         if 'textured_model.zip' in task.available_assets:            
             texture_files = [join(task.assets_path('odm_texturing'), f) for f in listdir(task.assets_path('odm_texturing')) if isfile(join(task.assets_path('odm_texturing'), f))]

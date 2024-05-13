@@ -4,8 +4,6 @@ import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
-import '../vendor/leaflet/L.Control.MousePosition.css';
-import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
 // import '../vendor/leaflet/L.TileLayer.NoGap';
@@ -29,6 +27,8 @@ import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _ } from '../classes/gettext';
+import UnitSelector from './UnitSelector';
+import { unitSystem, toMetric } from '../classes/Units';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -135,6 +135,8 @@ class Map extends React.Component {
         const { url, meta, type } = tile;
         
         let metaUrl = url + "metadata";
+        let unitForward = value => value;
+        let unitBackward = value => value;
 
         if (type == "plant"){
           if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
@@ -150,6 +152,12 @@ class Map extends React.Component {
           }
         }else if (type == "dsm" || type == "dtm"){
           metaUrl += "?hillshade=6&color_map=viridis";
+          unitForward = value => {
+            return unitSystem().length(value, { fixedUnit: true }).value;
+          };
+          unitBackward = value => {
+            return toMetric(value).value;
+          };
         }
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
@@ -210,6 +218,8 @@ class Map extends React.Component {
             // Associate metadata with this layer
             meta.name = name + ` (${this.typeToHuman(type)})`;
             meta.metaUrl = metaUrl;
+            meta.unitForward = unitForward;
+            meta.unitBackward = unitBackward;
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 
@@ -385,7 +395,7 @@ class Map extends React.Component {
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
-      positionControl: true,
+      positionControl: false,
       zoomControl: false,
       minZoom: 0,
       maxZoom: 24
@@ -397,12 +407,23 @@ class Map extends React.Component {
 
     PluginsAPI.Map.triggerWillAddControls({
         map: this.map,
-        tiles
+        tiles,
+        mapView: this
     });
 
-    let scaleControl = Leaflet.control.scale({
-      maxWidth: 250,
-    }).addTo(this.map);
+    const UnitsCtrl = Leaflet.Control.extend({
+      options: {
+          position: 'bottomleft'
+      },
+  
+      onAdd: function () {
+          this.container = Leaflet.DomUtil.create('div', 'leaflet-control-units-selection leaflet-control');
+          Leaflet.DomEvent.disableClickPropagation(this.container);
+          ReactDOM.render(<UnitSelector />, this.container);
+          return this.container;
+      }
+    });
+    new UnitsCtrl().addTo(this.map);
 
     //add zoom control with your options
     let zoomControl = Leaflet.control.zoom({
@@ -524,6 +545,8 @@ _('Example:'),
         this.map.fitBounds(this.mapBounds);
 
         this.map.on('click', e => {
+          if (PluginsAPI.Map.handleClick(e)) return;
+          
           // Find first tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
@@ -577,7 +600,6 @@ _('Example:'),
       tiles: tiles,
       controls:{
         autolayers: this.autolayers,
-        scale: scaleControl,
         zoom: zoomControl
       }
     });
@@ -627,7 +649,7 @@ _('Example:'),
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 

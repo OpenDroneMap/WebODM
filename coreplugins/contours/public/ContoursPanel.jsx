@@ -6,6 +6,7 @@ import './ContoursPanel.scss';
 import ErrorMessage from 'webodm/components/ErrorMessage';
 import Workers from 'webodm/classes/Workers';
 import { _ } from 'webodm/classes/gettext';
+import { systems, getUnitSystem, onUnitSystemChanged, offUnitSystemChanged, toMetric } from 'webodm/classes/Units';
 
 export default class ContoursPanel extends React.Component {
   static defaultProps = {
@@ -20,13 +21,23 @@ export default class ContoursPanel extends React.Component {
   constructor(props){
     super(props);
 
+    const unitSystem = getUnitSystem();
+    const defaultInterval = unitSystem === "metric" ? "1" : "4";
+    const defaultSimplify = unitSystem === "metric" ? "0.2" : "0.6";
+
+    // Remove legacy parameters
+    Storage.removeItem("last_contours_interval");
+    Storage.removeItem("last_contours_custom_interval");
+    Storage.removeItem("last_contours_simplify");
+    Storage.removeItem("last_contours_custom_simplify");
+
     this.state = {
         error: "",
         permanentError: "",
-        interval: Storage.getItem("last_contours_interval") || "1",
-        customInterval: Storage.getItem("last_contours_custom_interval") || "1",
-        simplify: Storage.getItem("last_contours_simplify") || "0.2",
-        customSimplify: Storage.getItem("last_contours_custom_simplify") || "0.2",
+        interval: Storage.getItem("last_contours_interval_" + unitSystem) || defaultInterval,
+        customInterval: Storage.getItem("last_contours_custom_interval_" + unitSystem) || defaultInterval,
+        simplify: Storage.getItem("last_contours_simplify_" + unitSystem) || defaultSimplify,
+        customSimplify: Storage.getItem("last_contours_custom_simplify_" + unitSystem) || defaultSimplify,
         layer: "",
         epsg: Storage.getItem("last_contours_epsg") || "4326",
         customEpsg: Storage.getItem("last_contours_custom_epsg") || "4326",
@@ -36,13 +47,18 @@ export default class ContoursPanel extends React.Component {
         previewLoading: false,
         exportLoading: false,
         previewLayer: null,
+        unitSystem
     };
+  }
+
+  componentDidMount(){
+    onUnitSystemChanged(this.unitsChanged);
   }
 
   componentDidUpdate(){
     if (this.props.isShowed && this.state.loading){
       const {id, project} = this.state.task;
-
+      
       this.loadingReq = $.getJSON(`/api/projects/${project}/tasks/${id}/`)
           .done(res => {
               const { available_assets } = res;
@@ -76,6 +92,24 @@ export default class ContoursPanel extends React.Component {
       this.generateReq.abort();
       this.generateReq = null;
     }
+
+    offUnitSystemChanged(this.unitsChanged);
+  }
+
+  unitsChanged = e => {
+    this.saveInputValues();
+
+    const unitSystem = e.detail;
+
+    const defaultInterval = unitSystem === "metric" ? "1" : "4";
+    const defaultSimplify = unitSystem === "metric" ? "0.2" : "0.5";
+
+    const interval = Storage.getItem("last_contours_interval_" + unitSystem) || defaultInterval;
+    const customInterval = Storage.getItem("last_contours_custom_interval_" + unitSystem) || defaultInterval;
+    const simplify = Storage.getItem("last_contours_simplify_" + unitSystem) || defaultSimplify;
+    const customSimplify = Storage.getItem("last_contours_custom_simplify_" + unitSystem) || defaultSimplify;
+
+    this.setState({unitSystem, interval, customInterval, simplify, customSimplify });
   }
 
   handleSelectInterval = e => {
@@ -106,19 +140,31 @@ export default class ContoursPanel extends React.Component {
     this.setState({customEpsg: e.target.value});
   }
 
-  getFormValues = () => {
+  getFormValues = (preview) => {
     const { interval, customInterval, epsg, customEpsg, 
-      simplify, customSimplify, layer } = this.state;
+      simplify, customSimplify, layer, unitSystem } = this.state;
+    const su = systems[unitSystem];
+
+    let meterInterval = interval !== "custom" ? interval : customInterval;
+    let meterSimplify = simplify !== "custom" ? simplify : customSimplify;
+
+    meterInterval = toMetric(meterInterval, su.lengthUnit(1)).value;
+    meterSimplify = toMetric(meterSimplify, su.lengthUnit(1)).value;
+    
+    const zfactor = preview ? 1 : su.lengthUnit(1).factor;
+
     return {
-      interval: interval !== "custom" ? interval : customInterval,
+      interval: meterInterval,
       epsg: epsg !== "custom" ? epsg : customEpsg,
-      simplify: simplify !== "custom" ? simplify : customSimplify,
+      simplify: meterSimplify,
+      zfactor,
       layer
     };
   }
 
   addGeoJSONFromURL = (url, cb) => {
     const { map } = this.props;
+    const us = systems[this.state.unitSystem];
 
     $.getJSON(url)
      .done((geojson) => {
@@ -128,7 +174,7 @@ export default class ContoursPanel extends React.Component {
         this.setState({previewLayer: L.geoJSON(geojson, {
           onEachFeature: (feature, layer) => {
               if (feature.properties && feature.properties.level !== undefined) {
-                  layer.bindPopup(`<b>${_("Elevation:")}</b> ${feature.properties.level} ${_("meters")}`);
+                  layer.bindPopup(`<div style="margin-right: 32px;"><b>${_("Elevation:")}</b> ${us.length(feature.properties.level)}</div>`);
               }
           },
           style: feature => {
@@ -155,18 +201,23 @@ export default class ContoursPanel extends React.Component {
     }
   }
 
+  saveInputValues = () => {
+    const us = this.state.unitSystem;
+
+    // Save settings
+    Storage.setItem("last_contours_interval_" + us, this.state.interval);
+    Storage.setItem("last_contours_custom_interval_" + us, this.state.customInterval);
+    Storage.setItem("last_contours_simplify_" + us, this.state.simplify);
+    Storage.setItem("last_contours_custom_simplify_" + us, this.state.customSimplify);
+    Storage.setItem("last_contours_epsg", this.state.epsg);
+    Storage.setItem("last_contours_custom_epsg", this.state.customEpsg);
+  }
+
   generateContours = (data, loadingProp, isPreview) => {
     this.setState({[loadingProp]: true, error: ""});
     const taskId = this.state.task.id;
+    this.saveInputValues();
 
-    // Save settings for next time
-    Storage.setItem("last_contours_interval", this.state.interval);
-    Storage.setItem("last_contours_custom_interval", this.state.customInterval);
-    Storage.setItem("last_contours_simplify", this.state.simplify);
-    Storage.setItem("last_contours_custom_simplify", this.state.customSimplify);
-    Storage.setItem("last_contours_epsg", this.state.epsg);
-    Storage.setItem("last_contours_custom_epsg", this.state.customEpsg);
-    
     this.generateReq = $.ajax({
         type: 'POST',
         url: `/api/plugins/contours/task/${taskId}/contours/generate`,
@@ -203,7 +254,7 @@ export default class ContoursPanel extends React.Component {
 
   handleExport = (format) => {
     return () => {
-      const data = this.getFormValues();
+      const data = this.getFormValues(false);
       data.format = format;
       this.generateContours(data, 'exportLoading', false);
     };
@@ -212,7 +263,7 @@ export default class ContoursPanel extends React.Component {
   handleShowPreview = () => {
     this.setState({previewLoading: true});
 
-    const data = this.getFormValues();
+    const data = this.getFormValues(true);
     data.epsg = 4326;
     data.format = "GeoJSON";
     this.generateContours(data, 'previewLoading', true);
@@ -222,11 +273,15 @@ export default class ContoursPanel extends React.Component {
     const { loading, task, layers, error, permanentError, interval, customInterval, layer, 
             epsg, customEpsg, exportLoading,
             simplify, customSimplify,
-            previewLoading, previewLayer } = this.state;
-    const intervalValues = [0.25, 0.5, 1, 1.5, 2];
+            previewLoading, previewLayer, unitSystem } = this.state;
+    const us = systems[unitSystem];
+    const lengthUnit = us.lengthUnit(1); 
+
+    const intervalStart = unitSystem === "metric" ? 1 : 4;
+    const intervalValues = [intervalStart / 4, intervalStart / 2, intervalStart, intervalStart * 2, intervalStart * 4];
     const simplifyValues = [{label: _('Do not simplify'), value: 0},
-                            {label: _('Normal'), value: 0.2},
-                            {label: _('Aggressive'), value: 1}];
+                            {label: _('Normal'), value: unitSystem === "metric" ? 0.2 : 0.5},
+                            {label: _('Aggressive'), value: unitSystem === "metric" ? 1 : 4}];
 
     const disabled = (interval === "custom" && !customInterval) ||
                       (epsg === "custom" && !customEpsg) ||
@@ -242,7 +297,7 @@ export default class ContoursPanel extends React.Component {
           <label className="col-sm-3 control-label">{_("Interval:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={interval} onChange={this.handleSelectInterval}>
-              {intervalValues.map(iv => <option value={iv}>{iv} {_("meter")}</option>)}
+              {intervalValues.map(iv => <option value={iv}>{iv} {lengthUnit.label}</option>)}
               <option value="custom">{_("Custom")}</option>
             </select>
           </div>
@@ -251,7 +306,7 @@ export default class ContoursPanel extends React.Component {
           <div className="row form-group form-inline">
             <label className="col-sm-3 control-label">{_("Value:")}</label>
             <div className="col-sm-9 ">
-              <input type="number" className="form-control custom-interval" value={customInterval} onChange={this.handleChangeCustomInterval} /><span> {_("meter")}</span>
+              <input type="number" className="form-control custom-interval" value={customInterval} onChange={this.handleChangeCustomInterval} /><span> {lengthUnit.label}</span>
             </div>
           </div>
         : ""}
@@ -269,7 +324,7 @@ export default class ContoursPanel extends React.Component {
           <label className="col-sm-3 control-label">{_("Simplify:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={simplify} onChange={this.handleSelectSimplify}>
-              {simplifyValues.map(sv => <option value={sv.value}>{sv.label} ({sv.value} {_("meter")})</option>)}
+              {simplifyValues.map(sv => <option value={sv.value}>{sv.label} ({sv.value} {lengthUnit.label})</option>)}
               <option value="custom">{_("Custom")}</option>
             </select>
           </div>
@@ -278,7 +333,7 @@ export default class ContoursPanel extends React.Component {
           <div className="row form-group form-inline">
             <label className="col-sm-3 control-label">{_("Value:")}</label>
             <div className="col-sm-9 ">
-              <input type="number" className="form-control custom-interval" value={customSimplify} onChange={this.handleChangeCustomSimplify} /><span> {_("meter")}</span>
+              <input type="number" className="form-control custom-interval" value={customSimplify} onChange={this.handleChangeCustomSimplify} /><span> {lengthUnit.label}</span>
             </div>
           </div>
         : ""}

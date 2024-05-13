@@ -11,6 +11,11 @@
         margin-left: -100px;
         z-index: 999;
         padding-bottom: 6px;
+        .opacity-slider-label{
+            display: inline-block;
+            position: relative;
+            top: 2px;
+        }
     }
 
     .leaflet-touch .leaflet-control-layers-toggle, .leaflet-control-layers-toggle{

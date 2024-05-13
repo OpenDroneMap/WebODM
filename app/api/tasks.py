@@ -204,7 +204,6 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
 
         files = flatten_files(request.FILES)
-
         if len(files) == 0:
             raise exceptions.ValidationError(detail=_("No files uploaded"))
 
@@ -366,19 +365,20 @@ class TaskDownloads(TaskNestedView):
 
         # Check and download
         try:
-            asset_fs, is_zipstream = task.get_asset_file_or_zipstream(asset)
+            asset_fs = task.get_asset_file_or_stream(asset)
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
 
-        if not is_zipstream and not os.path.isfile(asset_fs):
+        is_stream = not isinstance(asset_fs, str) 
+        if not is_stream and not os.path.isfile(asset_fs):
             raise exceptions.NotFound(_("Asset does not exist"))
         
         download_filename = request.GET.get('filename', get_asset_download_filename(task, asset))
 
-        if not is_zipstream:
-            return download_file_response(request, asset_fs, 'attachment', download_filename=download_filename)
-        else:
+        if is_stream:
             return download_file_stream(request, asset_fs, 'attachment', download_filename=download_filename)
+        else:
+            return download_file_response(request, asset_fs, 'attachment', download_filename=download_filename)
 
 """
 Raw access to the task's asset folder resources

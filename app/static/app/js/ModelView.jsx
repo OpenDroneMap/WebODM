@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import * as THREE from 'THREE';
 import $ from 'jquery';
 import { _, interpolate } from './classes/gettext';
+import { getUnitSystem, setUnitSystem } from './classes/Units';
 
 require('./vendor/OBJLoader');
 require('./vendor/MTLLoader');
@@ -301,6 +302,20 @@ class ModelView extends React.Component {
     viewer.setPointBudget(10*1000*1000);
     viewer.setEDLEnabled(true);
     viewer.loadSettingsFromURL();
+
+    const currentUnit = getUnitSystem();
+    const origSetUnit = viewer.setLengthUnitAndDisplayUnit;
+    viewer.setLengthUnitAndDisplayUnit = (lengthUnit, displayUnit) => {
+        if (displayUnit === 'm') setUnitSystem('metric');
+        else if (displayUnit === 'ft'){
+            // Potree doesn't have US/international imperial, so 
+            // we default to international unless the user has previously
+            // selected US
+            if (currentUnit === 'metric') setUnitSystem("imperial");
+            else setUnitSystem(currentUnit);
+        }
+        origSetUnit.call(viewer, lengthUnit, displayUnit);
+    };
         
     viewer.loadGUI(() => {
       viewer.setLanguage('en');
@@ -335,7 +350,7 @@ class ModelView extends React.Component {
     directional.position.z = 99999999999;
     viewer.scene.scene.add( directional );
 
-    this.pointCloudFilePath(pointCloudPath => {
+    this.pointCloudFilePath(pointCloudPath =>{ 
         Potree.loadPointCloud(pointCloudPath, "Point Cloud", e => {
           if (e.type == "loading_failed"){
             this.setState({error: "Could not load point cloud. This task doesn't seem to have one. Try processing the task again."});
@@ -350,6 +365,12 @@ class ModelView extends React.Component {
           material.size = 1;
 
           viewer.fitToScreen();
+
+          if (getUnitSystem() === 'metric'){
+              viewer.setLengthUnitAndDisplayUnit('m', 'm');
+          }else{
+              viewer.setLengthUnitAndDisplayUnit('m', 'ft');
+          }
 
           // Load saved scene (if any)
           $.ajax({

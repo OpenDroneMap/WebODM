@@ -8,6 +8,7 @@ import ReactDOM from 'ReactDOM';
 import React from 'React';
 import $ from 'jquery';
 import { _, get_format } from 'webodm/classes/gettext';
+import { unitSystem } from 'webodm/classes/Units';
 
 export default class App{
     constructor(map){
@@ -51,6 +52,15 @@ export default class App{
         }).addTo(map);
 
         // measure.options.labels.
+
+        measure._getMeasurementDisplayStrings = measurement => {
+          const us = unitSystem();
+
+          return {
+            lengthDisplay: us.length(measurement.length).toString(),
+            areaDisplay: us.area(measurement.area).toString()
+          };
+        };
 
         const $btnExport = $(`<br/><a href='#' class='js-start start'>${_("Export Measurements")}</a>`);
         $btnExport.appendTo($(measure.$startPrompt).children("ul.tasks"));
