@@ -81,42 +81,42 @@ const units = {
       factor: 1 / (0.3048 * 0.3048),
       abbr: 'ft²',
       round: 2,
-      label: _("Squared Feet"),
+      label: _("Square Feet"),
       type: types.AREA
     },
     sqfeet_us: {
         factor: Math.pow(3937 / 1200, 2),
         abbr: 'ft² (US)',
         round: 2,
-        label: _("Squared Feet"),
+        label: _("Square Feet"),
         type: types.AREA
     },
     sqmeters: {
       factor: 1,
       abbr: 'm²',
       round: 2,
-      label: _("Squared Meters"),
+      label: _("Square Meters"),
       type: types.AREA
     },
     sqkilometers: {
         factor: 0.000001,
         abbr: 'km²',
         round: 5,
-        label: _("Squared Kilometers"),
+        label: _("Square Kilometers"),
         type: types.AREA
     },
     sqmiles: {
       factor: Math.pow((1 / 0.3048) / 5280, 2),
       abbr: 'mi²',
       round: 5,
-      label: _("Squared Miles"),
+      label: _("Square Miles"),
       type: types.AREA
     },
     sqmiles_us: {
         factor: Math.pow((3937 / 1200) / 5280, 2),
         abbr: 'mi² (US)',
         round: 5,
-        label: _("Squared Miles"),
+        label: _("Square Miles"),
         type: types.AREA
     },
     cbmeters:{
