@@ -7,8 +7,7 @@ import {
 	Button,
 	ListGroup,
 	ListGroupItem,
-	ProgressBar,
-	Glyphicon
+	ProgressBar
 } from "react-bootstrap";
 
 import IonAssetLabel from "./IonAssetLabel";
@@ -110,10 +109,7 @@ export default class TaskDialog extends Component {
 							bsStyle={"danger"}
 							onClick={onClearFailed}
 						>
-							<Glyphicon
-								style={{ marginRight: "0.5em" }}
-								glyph={"trash"}
-							/>
+							<i class="glyphicon glyphicon-trash"></i>
 							Remove Failed Tasks
 						</Button>
 					)}
