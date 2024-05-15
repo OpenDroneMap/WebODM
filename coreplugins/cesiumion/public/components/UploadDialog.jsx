@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from "react";
 
-import FormDialog from "webodm/components/FormDialog";
+import FormDialog from "../../../../app/static/app/js/components/FormDialog";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { Row, Col, Modal, Button } from "react-bootstrap";
 
 import BootstrapField from "./BootstrapField";
 import FormikErrorFocus from "./FormikErrorFocus";
@@ -159,67 +158,109 @@ export default class UploadDialog extends Component {
 			...initialValues
 		};
 
+		// return (
+		// 	<Modal className={"ion-upload"} onHide={onHide} {...options}>
+		// 		<Modal.Header closeButton>
+		// 			<Modal.Title>
+		// 				<i className={"fa fa-cesium"} /> {title}
+		// 			</Modal.Title>
+		// 		</Modal.Header>
+		// 		<Formik
+		// 			initialValues={mergedInitialValues}
+		// 			onSubmit={this.onSubmit}
+		// 			enableReinitialize
+		// 			validationSchema={this.getValidation()}
+		// 		>
+		// 			{({ handleSubmit = () => {} }) => (
+		// 				<form>
+		// 					<Modal.Body>
+		// 						<BootstrapField
+		// 							name={"name"}
+		// 							label={"Name: "}
+		// 							type={"text"}
+		// 						/>
+		// 						<BootstrapField
+		// 							name={"description"}
+		// 							label={"Description: "}
+		// 							type={"textarea"}
+		// 							rows={"3"}
+		// 						/>
+		// 						<BootstrapField
+		// 							name={"attribution"}
+		// 							label={"Attribution: "}
+		// 							type={"text"}
+		// 						/>
+		// 						{this.getSourceFields()}
+
+		// 						<FormikErrorFocus />
+		// 					</Modal.Body>
+
+		// 					<Modal.Footer>
+		// 						<Button onClick={onHide}>Close</Button>
+		// 						{isLoading && (
+		// 							<Button bsStyle="primary" disabled>
+		// 								<i
+		// 									className={"fa fa-sync fa-spin"}
+		// 								/>
+		// 								Submitting...
+		// 							</Button>
+		// 						)}
+		// 						{!isLoading && (
+		// 							<Button
+		// 								bsStyle="primary"
+		// 								onClick={handleSubmit}
+		// 							>
+		// 								<i className={"fa fa-upload"} />
+		// 								Submit
+		// 							</Button>
+		// 						)}
+		// 					</Modal.Footer>
+		// 				</form>
+		// 			)}
+		// 		</Formik>
+		// 	</Modal>
+		// );
 		return (
-			<Modal className={"ion-upload"} onHide={onHide} {...options}>
-				<Modal.Header closeButton>
-					<Modal.Title>
-						<i className={"fa fa-cesium"} /> {title}
-					</Modal.Title>
-				</Modal.Header>
-				<Formik
-					initialValues={mergedInitialValues}
-					onSubmit={this.onSubmit}
-					enableReinitialize
-					validationSchema={this.getValidation()}
-				>
-					{({ handleSubmit = () => {} }) => (
-						<form>
-							<Modal.Body>
-								<BootstrapField
-									name={"name"}
-									label={"Name: "}
-									type={"text"}
-								/>
-								<BootstrapField
-									name={"description"}
-									label={"Description: "}
-									type={"textarea"}
-									rows={"3"}
-								/>
-								<BootstrapField
-									name={"attribution"}
-									label={"Attribution: "}
-									type={"text"}
-								/>
-								{this.getSourceFields()}
+            <FormDialog
+                title={title}
+                show={this.props.show}
+                onHide={onHide}
+                handleSaveFunction={this.onSubmit}
+                saveLabel={isLoading ? "Submitting..." : "Submit"}
+                savingLabel="Submitting..."
+                saveIcon={isLoading ? "fa fa-sync fa-spin" : "fa fa-upload"}
+            >
+                <Formik
+                    initialValues={mergedInitialValues}
+                    onSubmit={this.onSubmit}
+                    enableReinitialize
+                    validationSchema={this.getValidation()}
+                >
+                    {({ handleSubmit = () => {} }) => (
+                        <form>
+                            <BootstrapField
+                                name={"name"}
+                                label={"Name: "}
+                                type={"text"}
+                            />
+                            <BootstrapField
+                                name={"description"}
+                                label={"Description: "}
+                                type={"textarea"}
+                                rows={"3"}
+                            />
+                            <BootstrapField
+                                name={"attribution"}
+                                label={"Attribution: "}
+                                type={"text"}
+                            />
+                            {this.getSourceFields()}
 
-								<FormikErrorFocus />
-							</Modal.Body>
-
-							<Modal.Footer>
-								<Button onClick={onHide}>Close</Button>
-								{isLoading && (
-									<Button bsStyle="primary" disabled>
-										<i
-											className={"fa fa-sync fa-spin"}
-										/>
-										Submitting...
-									</Button>
-								)}
-								{!isLoading && (
-									<Button
-										bsStyle="primary"
-										onClick={handleSubmit}
-									>
-										<i className={"fa fa-upload"} />
-										Submit
-									</Button>
-								)}
-							</Modal.Footer>
-						</form>
-					)}
-				</Formik>
-			</Modal>
-		);
+                            <FormikErrorFocus />
+                        </form>
+                    )}
+                </Formik>
+            </FormDialog>
+        );
 	}
 }

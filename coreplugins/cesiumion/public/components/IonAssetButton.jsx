@@ -22,12 +22,10 @@ export default class IonAssetButton extends PureComponent {
 		} = this.props;
 	
 		const menuItems = assets
-			.sort((a, b) =>
-				AssetStyles[a].name.localeCompare(AssetStyles[b].name)
-			)
+			.sort((a, b) => AssetStyles[a].name.localeCompare(AssetStyles[b].name))
 			.map(asset => (
-				<li key={asset}>
-					<a style={{cursor:'pointer'}} onClick={this.handleClick(asset)}>
+				<li>
+					<a key={asset} style={{cursor:'pointer'}} onClick={this.handleClick(asset)}>
 						<AssetComponent asset={asset} showIcon={true} />
 					</a>
 				</li>

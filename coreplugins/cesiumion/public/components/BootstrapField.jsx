@@ -1,12 +1,5 @@
 import { Formik, Field, getIn } from "formik";
-
-import {
-	FormGroup,
-	ControlLabel,
-	FormControl,
-	Checkbox,
-	HelpBlock
-} from "react-bootstrap";
+import { Checkbox } from "../../../../app/static/app/js/components/Toggle";
 
 const BootstrapFieldComponent = ({
 	field,
@@ -18,28 +11,26 @@ const BootstrapFieldComponent = ({
 	...props
 }) => {
 	const isError = getIn(errors, field.name) && getIn(touched, field.name);
-	const errorMsg = getIn(errors, field.name);
-	let ControlComponent = FormControl;
+    const errorMsg = getIn(errors, field.name);
+    let ControlComponent = 'input';
 
-	const testType = type.toLowerCase();
-	if (testType === "checkbox") ControlComponent = Checkbox;
-	else if (testType === "textarea" || testType === "select")
-		props.componentClass = testType;
-	else props.type = type;
+    const testType = type.toLowerCase();
+    if (testType === "checkbox") ControlComponent = Checkbox;
+    else if (testType === "textarea" || testType === "select")
+        ControlComponent = testType;
+    else props.type = type;
 
-	return (
-		<FormGroup
-			controlId={field.name}
-			validationState={isError ? "error" : null}
-			style={{ marginLeft: 0, marginRight: 0 }}
-		>
-			{label && <ControlLabel>{label}</ControlLabel>}
-			<ControlComponent {...field} {...props} />
-			{isError && <HelpBlock>{errorMsg}</HelpBlock>}
-			{help && !isError && <HelpBlock>{help}</HelpBlock>}
-			{isError && showIcon && <FormControl.Feedback />}
-		</FormGroup>
-	);
+    return (
+        <div
+            id={field.name}
+            style={{ marginLeft: 0, marginRight: 0 }}
+        >
+            {label && <label>{label}</label>}
+            <ControlComponent {...field} {...props} />
+            {isError && <span>{errorMsg}</span>}
+            {help && !isError && <span>{help}</span>}
+        </div>
+    );
 };
 
 const BootstrapField = props => (
