@@ -158,68 +158,6 @@ export default class UploadDialog extends Component {
 			...initialValues
 		};
 
-		// return (
-		// 	<Modal className={"ion-upload"} onHide={onHide} {...options}>
-		// 		<Modal.Header closeButton>
-		// 			<Modal.Title>
-		// 				<i className={"fa fa-cesium"} /> {title}
-		// 			</Modal.Title>
-		// 		</Modal.Header>
-		// 		<Formik
-		// 			initialValues={mergedInitialValues}
-		// 			onSubmit={this.onSubmit}
-		// 			enableReinitialize
-		// 			validationSchema={this.getValidation()}
-		// 		>
-		// 			{({ handleSubmit = () => {} }) => (
-		// 				<form>
-		// 					<Modal.Body>
-		// 						<BootstrapField
-		// 							name={"name"}
-		// 							label={"Name: "}
-		// 							type={"text"}
-		// 						/>
-		// 						<BootstrapField
-		// 							name={"description"}
-		// 							label={"Description: "}
-		// 							type={"textarea"}
-		// 							rows={"3"}
-		// 						/>
-		// 						<BootstrapField
-		// 							name={"attribution"}
-		// 							label={"Attribution: "}
-		// 							type={"text"}
-		// 						/>
-		// 						{this.getSourceFields()}
-
-		// 						<FormikErrorFocus />
-		// 					</Modal.Body>
-
-		// 					<Modal.Footer>
-		// 						<Button onClick={onHide}>Close</Button>
-		// 						{isLoading && (
-		// 							<Button bsStyle="primary" disabled>
-		// 								<i
-		// 									className={"fa fa-sync fa-spin"}
-		// 								/>
-		// 								Submitting...
-		// 							</Button>
-		// 						)}
-		// 						{!isLoading && (
-		// 							<Button
-		// 								bsStyle="primary"
-		// 								onClick={handleSubmit}
-		// 							>
-		// 								<i className={"fa fa-upload"} />
-		// 								Submit
-		// 							</Button>
-		// 						)}
-		// 					</Modal.Footer>
-		// 				</form>
-		// 			)}
-		// 		</Formik>
-		// 	</Modal>
-		// );
 		return (
             <FormDialog
                 title={title}
