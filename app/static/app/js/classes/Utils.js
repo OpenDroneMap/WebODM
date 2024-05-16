@@ -107,6 +107,10 @@ export default {
 
     isMobile: function(){
       return navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
+    },
+
+    userInputToFilename(text, extension = ""){
+      return text.replace(/[^0-9a-zA-Z-_]+/g, '').replace(/(\s|\/)+/g, "-") + extension;
     }
 };
 

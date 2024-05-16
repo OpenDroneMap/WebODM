@@ -187,6 +187,10 @@ class UnitSystem{
         return new ValueUnit(val, unit);
     }
 
+    elevation(meters){
+        return this.length(meters, { fixedUnit: true });
+    }
+
     length(meters, opts = {}){
         meters = parseFloat(meters);
         if (isNaN(meters)) return NanUnit();
