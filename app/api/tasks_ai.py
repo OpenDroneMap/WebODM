@@ -4,13 +4,13 @@ from django.http import HttpResponse
 from rest_framework import exceptions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+import json
 from .tasks import TaskNestedView
 
 # Serializer for the Detection data
 class DetectionSerializer(serializers.Serializer):
     field_number = serializers.CharField()
-    content = serializers.CharField()
+    content = serializers.JSONField()
 
 # Base class for AI detection-related views
 class TaskAiDetectionBase(TaskNestedView):
@@ -34,8 +34,13 @@ class TaskAiDetectionBase(TaskNestedView):
         if not os.path.exists(file_path):
             raise exceptions.NotFound(detail=f"File not found: {file_path}")
         
+        file_content = ""
         with open(file_path, 'rb') as file:
-            return file.read()
+            file_content = file.read()
+
+        # return the content as a json string
+        return file_content
+        
 
 # AI Detection for Cattle
 class TaskAiDetectionCattle(TaskAiDetectionBase):
@@ -47,7 +52,6 @@ class TaskAiDetectionCattle(TaskAiDetectionBase):
         file_path = self.get_file_path(project_pk, pk, 'cattle', 'cattle_detection.geojson')
         file_content = self.read_geojson_file(file_path)
         response = HttpResponse(file_content, content_type='application/json')
-        response['Content-Disposition'] = 'inline; filename=cattle_detection.geojson'
         return response
 
 # AI Detection for Weeds
@@ -77,9 +81,15 @@ class TaskAiDetectionWeed(TaskAiDetectionBase):
         """
         file_path = os.path.join(base_path, file_name)
         file_content = self.read_geojson_file(file_path)
+        try:
+            # Converte a string JSON para um objeto Python
+            json_content = json.loads(file_content.decode('utf-8'))
+        except json.JSONDecodeError:
+            raise exceptions.ParseError(detail="Error parsing JSON content from file")
+        
         return {
             'field_number': file_name.split('_')[2].split('.')[0],
-            'content': file_content
+            'content': json_content
         }
 
 # AI Detection for Field Polygon
