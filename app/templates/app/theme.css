@@ -12,6 +12,16 @@
 {% theme "success" as theme_success %}
 {% theme "failed" as theme_failed %}
 
+#navbar-top {
+    position: fixed;  /* Fixa a barra no topo da viewport */
+    width: 100%;  /* Faz a barra se estender por toda a largura da viewport */
+    top: 0;  /* Alinha a barra no topo da viewport */
+    z-index: 1050;  /* Um valor de z-index alto para manter a barra no topo sobre outros elementos */
+}
+#page-wrapper{
+	margin-top: 61px;
+}
+
 /* Primary */
 body,
 ul#side-menu.nav a,
