@@ -276,7 +276,7 @@ We have several channels of communication for people to ask questions and to get
  - [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm)
  - [Report Issues](https://github.com/OpenDroneMap/WebODM/issues)
 
-We also have a [Gitter Chat](https://gitter.im/OpenDroneMap/web-development), but the preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
+The preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
 
 ## Support the Project
 
