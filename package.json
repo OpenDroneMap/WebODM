@@ -61,14 +61,14 @@
     "regenerator-runtime": "^0.11.0",
     "sass": "^1.22.7",
     "sass-loader": "^14.2.1",
-    "shpjs": "^4.0.4",
+    "shpjs": "^5.0.1",
     "sinon": "^4.0.0",
     "statuses": "^1.3.1",
     "style-loader": "^4.0.0",
     "tween.js": "^16.6.0",
     "url-loader": "^4.1.1",
     "webpack": "5.89.0",
-    "webpack-bundle-tracker": "0.4.3",
+    "webpack-bundle-tracker": "^3.1.0",
     "webpack-livereload-plugin": "3.0.2"
   }
 }

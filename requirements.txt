@@ -4,20 +4,20 @@ APScheduler==3.2.0
 billiard==3.6.3.0
 celery==4.4.0
 coreapi>=2.3.3
-Django==4.2.11
+Django==3.2.25
 django-appconf==1.0.6
 django-codemirror2==0.2
 django-colorfield==0.11.0
 django-cors-headers==4.3.1
-django-filter==24.2
+django-filter==23.5
 django-guardian==2.4.0
 django-imagekit==5.0.0
 django-redis==4.12.1 #Não atualizado, talvez precise atualizar o redis
 django-webpack-loader==3.1.0
-djangorestframework==3.14
+djangorestframework==3.14.0
 drf-jwt==1.19.2
 djangorestframework-guardian==0.3.0
-drf-nested-routers==0.93.5
+drf-nested-routers==0.94.0
 funcsigs==1.0.2
 futures==3.1.1
 gunicorn==22.0.0
