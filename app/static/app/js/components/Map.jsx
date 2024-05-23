@@ -35,7 +35,8 @@ class Map extends React.Component {
     showBackground: false,
     mapType: "orthophoto",
     public: false,
-    shareButtons: true
+    shareButtons: true,
+    permissions: ["view"]
   };
 
   static propTypes = {
@@ -43,7 +44,8 @@ class Map extends React.Component {
     tiles: PropTypes.array.isRequired,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool,
-    shareButtons: PropTypes.bool
+    shareButtons: PropTypes.bool,
+    permissions: PropTypes.array
   };
 
   constructor(props) {
