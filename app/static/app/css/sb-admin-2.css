@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*!
  * Start Bootstrap - SB Admin 2 (http://startbootstrap.com/)
  * Copyright 2013-2016 Start Bootstrap
@@ -54,18 +55,12 @@ body {
   min-height: 0;
 }
 
-.navbar-top-links
-  .dropdown-menu
-  li
-  div.info-item {
+.navbar-top-links .dropdown-menu li div.info-item {
   padding: 3px 8px;
   min-height: 0;
 }
 
-.navbar-top-links
-  .dropdown-menu
-  li
-  div.info-item.quotas {
+.navbar-top-links .dropdown-menu li div.info-item.quotas {
   min-width: 232px;
 }
 
@@ -171,27 +166,15 @@ body {
 }
 
 @media (min-width: 768px) {
-  .white-screen {
-    position: absolute;
-    top: 60px;
-    z-index: -1;
-    width: fit-content;
-    height: 100%;
-    background-color: #fff;
-    box-shadow: 9px 0 5px -5px rgba(0, 0, 0, 0.1);
-  }
-}
-@media (min-width: 768px) {
   .sidebar {
     z-index: 1000; /* Ajuste para garantir que fique acima de outros conteúdos, se necessário */
     position: fixed; /* Fixa a barra lateral na viewport */
-    width: fit-content; /* Mantém a largura ajustada ao conteúdo */
-    height: calc(
-      100vh - 61px
-    ); /* Altura ajustada para subtrair a barra superior */
+    width: 452px;
+    height: calc(100vh - 61px); /* Altura ajustada para subtrair a barra superior */
     top: 61px; /* Posiciona a barra lateral logo abaixo da barra superior */
     padding-top: 10px; /* Espaço interno superior para a estética */
     overflow-y: auto; /* Permite rolagem dentro da barra lateral se o conteúdo exceder a altura */
+    box-shadow: 9px 0 5px -5px rgba(0, 0, 0, 0.1);
   }
   .navbar-top-links .dropdown-messages,
   .navbar-top-links .dropdown-tasks,
@@ -341,7 +324,7 @@ table.dataTable thead .sorting:after {
   line-height: 1.33;
 }
 
-.show-grid [class^="col-"] {
+.show-grid [class^=col-] {
   padding-top: 10px;
   padding-bottom: 10px;
   border: 1px solid #ddd;
