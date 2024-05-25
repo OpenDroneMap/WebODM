@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from "react";
 
 import FormDialog from "../../../../app/static/app/js/components/FormDialog";
-import { Formik } from "formik";
-import * as Yup from "yup";
 
 import BootstrapField from "./BootstrapField";
 import FormikErrorFocus from "./FormikErrorFocus";
@@ -122,23 +120,25 @@ export default class UploadDialog extends Component {
 	}
 
 	getValidation() {
-		const schema = {};
+		let errors = {};
+        if (!values.name) {
+            errors.name = "A name is required!";
+        }
 
-		switch (UploadDialog.AssetSourceType[this.props.asset]) {
-			case SourceType.RASTER_TERRAIN:
-				schema.baseTerrainId = Yup.string();
-				break;
-			case SourceType.CAPTURE:
-				schema.textureFormat = Yup.boolean();
-				break;
-		}
+        switch (UploadDialog.AssetSourceType[this.props.asset]) {
+            case SourceType.RASTER_TERRAIN:
+                if (typeof values.options.baseTerrainId !== "string") {
+                    errors.baseTerrainId = "Invalid value!";
+                }
+                break;
+            case SourceType.CAPTURE:
+                if (typeof values.options.textureFormat !== "boolean") {
+                    errors.textureFormat = "Invalid value!";
+                }
+                break;
+        }
 
-		return Yup.object().shape({
-			name: Yup.string().required("A name is required!"),
-			options: Yup.object()
-				.shape(schema)
-				.default({})
-		});
+        return errors;
 	}
 
 	render() {
@@ -168,36 +168,31 @@ export default class UploadDialog extends Component {
                 savingLabel="Submitting..."
                 saveIcon={isLoading ? "fa fa-sync fa-spin" : "fa fa-upload"}
             >
-                <Formik
-                    initialValues={mergedInitialValues}
-                    onSubmit={this.onSubmit}
-                    enableReinitialize
-                    validationSchema={this.getValidation()}
-                >
-                    {({ handleSubmit = () => {} }) => (
-                        <form>
-                            <BootstrapField
-                                name={"name"}
-                                label={"Name: "}
-                                type={"text"}
-                            />
-                            <BootstrapField
-                                name={"description"}
-                                label={"Description: "}
-                                type={"textarea"}
-                                rows={"3"}
-                            />
-                            <BootstrapField
-                                name={"attribution"}
-                                label={"Attribution: "}
-                                type={"text"}
-                            />
-                            {this.getSourceFields()}
-
-                            <FormikErrorFocus />
-                        </form>
-                    )}
-                </Formik>
+				<form onSubmit={this.onSubmit}>
+                    <BootstrapField
+                        name={"name"}
+                        label={"Name: "}
+                        type={"text"}
+                        value={mergedInitialValues.name}
+                        onChange={this.handleChange}
+                    />
+                    <BootstrapField
+                        name={"description"}
+                        label={"Description: "}
+                        type={"textarea"}
+                        rows={"3"}
+                        value={mergedInitialValues.description}
+                        onChange={this.handleChange}
+                    />
+                    <BootstrapField
+                        name={"attribution"}
+                        label={"Attribution: "}
+                        type={"text"}
+                        value={mergedInitialValues.attribution}
+                        onChange={this.handleChange}
+                    />
+                    {this.getSourceFields()}
+                </form>
             </FormDialog>
         );
 	}

@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from "react";
 
 import ErrorMessage from "webodm/components/ErrorMessage";
-import { Button } from "react-bootstrap";
 
 import IonAssetButton from "./components/IonAssetButton";
 import UploadDialog from "./components/UploadDialog";
@@ -197,28 +196,22 @@ export default class TaskView extends Component {
 										</IonAssetButton>
 									)}
 									{items.length <= 0 && (
-										<Button
-											className={"ion-btn"}
-											bsStyle={"primary"}
-											bsSize={"small"}
+										<button
+											className={"ion-btn btn btn-primary btn-sm"}
 											onClick={this.refreshAssets}
 										>
 											<i className={"fa fa-cesium"} />
 											Refresh Available ion Assets
-										</Button>
+										</button>
 									)}
 									{isTasks && (
-										<Button
-											className={"ion-btn"}
-											bsStyle={
-												isErrors ? "danger" : "primary"
-											}
-											bsSize={"small"}
+										<button
+											className={`ion-btn btn btn-sm ${isErrors ? "btn-danger" : "btn-primary"}`}
 											onClick={this.showTaskDialog}
 										>
 											<i className={"fa fa-cesium"} />
 											View ion Tasks
-										</Button>
+										</button>
 									)}
 									<TasksDialog
 										show={isTasksDialog}
