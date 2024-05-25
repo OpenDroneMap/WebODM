@@ -58,13 +58,14 @@ class Map extends React.Component {
       showLoading: false, // for drag&drop of files and first load
       opacity: 100,
       imageryLayers: [],
-      overlays: []
+      overlays: [],
+      annotations: []
     };
 
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
-    this.addedCameraShots = false;
+    this.addedCameraShots = {};
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
@@ -95,6 +96,19 @@ class Map extends React.Component {
       }
       return "";
   }
+
+  typeToIcon = (type) => {
+    switch(type){
+        case "orthophoto":
+            return "far fa-image fa-fw"
+        case "plant":
+            return "fa fa-seedling fa-fw";
+        case "dsm":
+        case "dtm":
+            return "fa fa-chart-area fa-fw";
+    }
+    return "";
+}
 
   hasBands = (bands, orthophoto_bands) => {
     if (!orthophoto_bands) return false;
@@ -218,10 +232,15 @@ class Map extends React.Component {
                 });
             
             // Associate metadata with this layer
-            meta.name = name + ` (${this.typeToHuman(type)})`;
+            meta.name = this.typeToHuman(type);
+            meta.icon = this.typeToIcon(type);
             meta.metaUrl = metaUrl;
             meta.unitForward = unitForward;
             meta.unitBackward = unitBackward;
+            if (this.props.tiles.length > 1){
+              // Assign to a group
+              meta.group = {id: meta.task.id, name: meta.task.name};
+            }
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 
@@ -277,8 +296,7 @@ class Map extends React.Component {
             this.mapBounds = mapBounds;
 
             // Add camera shots layer if available
-            if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
-
+            if (meta.task && meta.task.camera_shots && !this.addedCameraShots[meta.task.id]){
                 var camIcon = L.icon({
                   iconUrl: "/static/app/js/icons/marker-camera.png",
                   iconSize: [41, 46],
@@ -318,13 +336,17 @@ class Map extends React.Component {
                       shotsLayer.addMarkers(markers, this.map);
                     }
                   });
-                shotsLayer[Symbol.for("meta")] = {name: name + " " + _("(Cameras)"), icon: "fa fa-camera fa-fw"};
+                shotsLayer[Symbol.for("meta")] = {name: _("Cameras"), icon: "fa fa-camera fa-fw"};
+                if (this.props.tiles.length > 1){
+                  // Assign to a group
+                  shotsLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
+                }
 
                 this.setState(update(this.state, {
                     overlays: {$push: [shotsLayer]}
                 }));
 
-                this.addedCameraShots = true;
+                this.addedCameraShots[meta.task.id] = true;
             }
 
             // Add ground control points layer if available
@@ -368,7 +390,11 @@ class Map extends React.Component {
                       gcpLayer.addMarkers(markers, this.map);
                     }
                   });
-                gcpLayer[Symbol.for("meta")] = {name: name + " " + _("(GCPs)"), icon: "far fa-dot-circle fa-fw"};
+                gcpLayer[Symbol.for("meta")] = {name: _("Ground Control Points"), icon: "far fa-dot-circle fa-fw"};
+                if (this.props.tiles.length > 1){
+                  // Assign to a group
+                  gcpLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
+                }
 
                 this.setState(update(this.state, {
                     overlays: {$push: [gcpLayer]}
@@ -478,7 +504,8 @@ _('Example:'),
 
     this.layersControl = new LayersControl({
         layers: this.state.imageryLayers,
-        overlays: this.state.overlays
+        overlays: this.state.overlays,
+        annotations: this.state.annotations
     }).addTo(this.map);
 
     this.autolayers = Leaflet.control.autolayers({
@@ -614,6 +641,22 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
+
+    PluginsAPI.Map.didAddAnnotation([], (opts) => {
+      const layer = opts.layer;
+      const meta = {
+        name: opts.name || "", 
+        icon: opts.icon || "fa fa-sticky-note fa-fw"
+      };
+      if (this.props.tiles.length > 1 && opts.task){
+        meta.group = {id: opts.task.id, name: opts.task.name};
+      }
+      layer[Symbol.for("meta")] = meta;
+
+      this.setState(update(this.state, {
+        annotations: {$push: [layer]}
+     }));
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -627,8 +670,9 @@ _('Example:'),
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
-                            prevState.overlays !== this.state.overlays)){
-        this.layersControl.update(this.state.imageryLayers, this.state.overlays);
+                            prevState.overlays !== this.state.overlays ||
+                            prevState.annotations !== this.state.annotations)){
+        this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
     }
   }
 

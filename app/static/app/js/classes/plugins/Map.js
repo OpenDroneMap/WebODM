@@ -19,7 +19,8 @@ export default {
   endpoints: [
     ["willAddControls", leafletPreCheck],
     ["didAddControls", layersControlPreCheck],
-	  ["addActionButton", leafletPreCheck]
+	  ["addActionButton", leafletPreCheck],
+    ["didAddAnnotation"]
   ],
 
   functions: [

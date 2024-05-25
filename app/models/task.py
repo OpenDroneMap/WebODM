@@ -936,6 +936,7 @@ class Task(models.Model):
             'meta': {
                 'task': {
                     'id': str(self.id),
+                    'name': self.name,
                     'project': self.project.id,
                     'public': self.public,
                     'camera_shots': camera_shots,

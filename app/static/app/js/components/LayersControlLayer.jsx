@@ -287,8 +287,10 @@ export default class LayersControlLayer extends React.Component {
     }
 
     return (<div className="layers-control-layer">
-        {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="overlayIcon"><i className={meta.icon || "fa fa-vector-square fa-fw"}></i></div>}<Checkbox bind={[this, 'visible']}/>
-        <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
+        <div className="layer-control-title">
+            {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="paddingSpace"></div>}<Checkbox bind={[this, 'visible']}/>
+            <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}><i className={"layer-icon " + (meta.icon || "fa fa-vector-square fa-fw")}></i><div className="layer-title">{meta.name}</div></a>
+        </div>
 
         {this.state.expanded ? 
         <div className="layer-expanded">
