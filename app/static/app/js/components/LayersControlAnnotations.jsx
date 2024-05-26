@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/LayersControlAnnotations.scss';
+import PluginsAPI from '../classes/plugins/API';
 import { Checkbox, ExpandButton } from './Toggle';
 import { _ } from '../classes/gettext';
 
 class AnnotationLayer extends React.Component{
   static propTypes = {
+    parent: PropTypes.object,
     layer: PropTypes.object
   }
 
@@ -17,8 +19,32 @@ class AnnotationLayer extends React.Component{
     }
   }
 
+  componentDidUpdate(prevProps, prevState){
+    if (prevState.visible !== this.state.visible && this.props.parent.state.visible){
+      PluginsAPI.Map.toggleAnnotation(this.props.layer, this.state.visible);
+    }
+  }
+
+  componentDidMount(){
+    PluginsAPI.Map.onUpdateAnnotation(this.handleUpdate);
+  }
+
+  componentWillUnmount(){
+    PluginsAPI.Map.offUpdateAnnotation(this.handleUpdate);
+  }
+
+  handleUpdate = (layer, name) => {
+    if (this.props.layer === layer){
+      const meta = layer[Symbol.for("meta")];
+      meta.name = name;
+      this.forceUpdate();
+    }
+  }
+
   handleFocus = () => {
     const { layer } = this.props;
+    if (!layer._map) return;
+
     if (layer.options.bounds || layer.getBounds){
       const bounds = layer.options.bounds !== undefined ? 
                      layer.options.bounds :
@@ -32,7 +58,9 @@ class AnnotationLayer extends React.Component{
   }
 
   handleDelete = () => {
-
+    if (window.confirm(_('Are you sure you want to delete this?'))){
+      PluginsAPI.Map.deleteAnnotation(this.props.layer);
+    }
   }
 
   render(){
@@ -51,13 +79,13 @@ export default class LayersControlAnnotations extends React.Component {
   static defaultProps = {
     expanded: true,
     visible: true
-
-};
+  };
+  
   static propTypes = {
     expanded: PropTypes.bool,
     visible: PropTypes.bool,
     layers: PropTypes.array
-}
+  }
 
   constructor(props){
     super(props);
@@ -66,11 +94,21 @@ export default class LayersControlAnnotations extends React.Component {
         visible: props.visible,
         expanded: props.expanded
     };
+
+    this.annRefs = new Array(props.layers.length);
   }
 
+  handleAnnotationsClick = () => {
+    this.setState({expanded: !this.state.expanded});
+  }
 
-  handleLayerClick = () => {
-    console.log("TODO")
+  componentDidUpdate(prevProps, prevState){
+    if (prevState.visible !== this.state.visible){
+      this.annRefs.forEach(ann => {
+        let visible = this.state.visible ? ann.state.visible : false;
+        PluginsAPI.Map.toggleAnnotation(ann.props.layer, visible);
+      });
+    }
   }
 
 
@@ -81,12 +119,12 @@ export default class LayersControlAnnotations extends React.Component {
     return (<div className="layers-control-layer">
         <div className="layer-control-title">
           <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']}/>
-          <a title={_("Annotations")} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}><div className="layer-title"><i className="layer-icon fa fa-sticky-note fa-fw"></i> {_("Annotations")}</div></a>
+          <a title={_("Annotations")} className="layer-label" href="javascript:void(0);" onClick={this.handleAnnotationsClick}><div className="layer-title"><i className="layer-icon fa fa-sticky-note fa-fw"></i> {_("Annotations")}</div></a>
         </div>
 
         {this.state.expanded ? 
         <div className="layer-expanded">
-          {layers.map((layer, i) => <AnnotationLayer key={i} layer={layer} />)}
+          {layers.map((layer, i) => <AnnotationLayer parent={this} ref={domNode => this.annRefs[i] = domNode} key={i} layer={layer} />)}
         </div> : ""}
     </div>);
 

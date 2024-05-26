@@ -433,6 +433,9 @@ class Map extends React.Component {
     // leaflet bug?
     $(this.container).addClass("leaflet-touch");
 
+    PluginsAPI.Map.onAddAnnotation(this.handleAddAnnotation);
+    PluginsAPI.Map.onAnnotationDeleted(this.handleDeleteAnnotation);
+
     PluginsAPI.Map.triggerWillAddControls({
         map: this.map,
         tiles,
@@ -641,22 +644,25 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
+  }
 
-    PluginsAPI.Map.didAddAnnotation([], (opts) => {
-      const layer = opts.layer;
+  handleAddAnnotation = (layer, name, task) => {
       const meta = {
-        name: opts.name || "", 
-        icon: opts.icon || "fa fa-sticky-note fa-fw"
+        name: name || "", 
+        icon: "fa fa-sticky-note fa-fw"
       };
       if (this.props.tiles.length > 1 && opts.task){
-        meta.group = {id: opts.task.id, name: opts.task.name};
+        meta.group = {id: task.id, name: task.name};
       }
       layer[Symbol.for("meta")] = meta;
 
       this.setState(update(this.state, {
         annotations: {$push: [layer]}
      }));
-    });
+  }
+
+  handleDeleteAnnotation = (layer) => {
+    this.setState({annotations: this.state.annotations.filter(l => l !== layer)});
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -683,6 +689,10 @@ _('Example:'),
       this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
       this.tileJsonRequests = [];
     }
+
+    PluginsAPI.Map.offAddAnnotation(this.handleAddAnnotation);
+    PluginsAPI.Map.offAnnotationDeleted(this.handleAddAnnotation);
+    
   }
 
   handleMapMouseDown(e){
