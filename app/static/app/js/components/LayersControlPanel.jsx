@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/LayersControlPanel.scss';
 import LayersControlLayer from './LayersControlLayer';
-import LayersControlItem from './LayersControlItem';
+import LayersControlAnnotations from './LayersControlAnnotations';
 import { _ } from '../classes/gettext';
 
 export default class LayersControlPanel extends React.Component {
@@ -62,7 +62,7 @@ export default class LayersControlPanel extends React.Component {
 
           {group.annotations.length ? 
             <div className="annotations theme-border-primary">
-               <LayersControlItem icon="fa fa-sticky-note fa-fw" label={_("Annotations")} layers={group.annotations} />
+               <LayersControlAnnotations layers={group.annotations} />
             </div>
           : ""}
 
