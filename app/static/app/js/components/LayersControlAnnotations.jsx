@@ -15,7 +15,7 @@ class AnnotationLayer extends React.Component{
     super(props);
 
     this.state = {
-      visible: true
+      visible: !!props.layer._map
     }
   }
 
@@ -69,7 +69,7 @@ class AnnotationLayer extends React.Component{
 
     return (<div className="layers-control-layer layers-control-annotations">
       <div className="layer-control-title">
-        <Checkbox bind={[this, 'visible']}/> <a className="layer-label" href="javascript:void(0)" onClick={this.handleFocus}><div className="annotation-name">{meta.name}</div></a> <a href="javascript:void(0)" onClick={this.handleDelete}><i className="fa fa-trash"></i></a>
+        <Checkbox bind={[this, 'visible']}/> <a className="layer-label" href="javascript:void(0)" onClick={this.handleFocus}><div className="annotation-name">{meta.name}</div></a> <a href="javascript:void(0)" onClick={this.handleDelete} title={_("Delete")}><i className="fa fa-trash"></i></a>
       </div>
     </div>);
   }
@@ -90,8 +90,16 @@ export default class LayersControlAnnotations extends React.Component {
   constructor(props){
     super(props);
 
+    let visible = false;
+    for (let i = 0; i < props.layers.length; i++){
+      if (props.layers[i]._map){
+        visible = true;
+        break;
+      }
+    }
+
     this.state = {
-        visible: props.visible,
+        visible,
         expanded: props.expanded
     };
 
