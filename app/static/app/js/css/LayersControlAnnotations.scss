@@ -1,3 +1,7 @@
+.annotation-toggle{
+    margin-left: 3px;
+}
+
 .layers-control-annotations{
     .layer-control-title{
         align-items: baseline;
@@ -5,9 +9,9 @@
     }
 
     .layer-label{
-        margin-right: 12px;
         padding-left: 6px;
     }
+
 
     .annotation-name{
         display: inline;

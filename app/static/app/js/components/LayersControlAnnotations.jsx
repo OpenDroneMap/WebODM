@@ -69,7 +69,8 @@ class AnnotationLayer extends React.Component{
 
     return (<div className="layers-control-layer layers-control-annotations">
       <div className="layer-control-title">
-        <Checkbox bind={[this, 'visible']}/> <a className="layer-label" href="javascript:void(0)" onClick={this.handleFocus}><div className="annotation-name">{meta.name}</div></a> <a href="javascript:void(0)" onClick={this.handleDelete} title={_("Delete")}><i className="fa fa-trash"></i></a>
+        <Checkbox bind={[this, 'visible']}/> <a className="layer-label" href="javascript:void(0)" onClick={this.handleFocus}><div className="annotation-name">{meta.name}</div></a> 
+        <a className="layer-action" href="javascript:void(0)" onClick={this.handleDelete} title={_("Delete")}><i className="fa fa-trash"></i></a>
       </div>
     </div>);
   }
@@ -126,14 +127,15 @@ export default class LayersControlAnnotations extends React.Component {
     
     return (<div className="layers-control-layer">
         <div className="layer-control-title">
-          <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']}/>
-          <a title={_("Annotations")} className="layer-label" href="javascript:void(0);" onClick={this.handleAnnotationsClick}><div className="layer-title"><i className="layer-icon fa fa-sticky-note fa-fw"></i> {_("Annotations")}</div></a>
+          <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']} className="annotation-toggle" />
+          <a title={_("Annotations")} className="layer-label" href="javascript:void(0);" onClick={this.handleAnnotationsClick}><div className="layer-title"><i className="layer-icon fa fa-sticky-note fa-fw"></i> {_("Annotations")}</div></a> 
+          <a className="layer-action" href="javascript:void(0)" onClick={this.handleZoomToClick}><i title={_("Zoom To")} className="fa fa-expand"></i></a>
+          <a className="layer-action" href="javascript:void(0)" onClick={this.handleZoomToClick}><i title={_("Zoom To")} className="fa fa-expand"></i></a>
         </div>
 
-        {this.state.expanded ? 
-        <div className="layer-expanded">
+        <div className={"layer-expanded " + (!this.state.expanded ? "hide" : "")}>
           {layers.map((layer, i) => <AnnotationLayer parent={this} ref={domNode => this.annRefs[i] = domNode} key={i} layer={layer} />)}
-        </div> : ""}
+        </div>
     </div>);
 
    }

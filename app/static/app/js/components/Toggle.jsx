@@ -4,6 +4,7 @@ import '../css/Toggle.scss';
 
 class Toggle extends React.Component {
   static defaultProps = {
+    className: ""
   };
   static propTypes = {
     bind: PropTypes.array.isRequired, // two element array, 
@@ -11,7 +12,8 @@ class Toggle extends React.Component {
                                     // and the second the boolean property to determine visibility
                                     // ex. [this, 'visible']
     trueIcon: PropTypes.string,
-    falseIcon: PropTypes.string
+    falseIcon: PropTypes.string,
+    className: PropTypes.string,
   }
 
   constructor(props){
@@ -26,7 +28,7 @@ class Toggle extends React.Component {
   render(){
     const [parent, prop] = this.props.bind;
     const icon = parent.state[prop] ? this.props.trueIcon: this.props.falseIcon;
-    return (<a className="toggle" href="javascript:void(0);" onClick={this.handleClick}><i className={icon}></i></a>);
+    return (<a className={"toggle " + this.props.className} href="javascript:void(0);" onClick={this.handleClick}><i className={icon}></i></a>);
   }
 }
 
