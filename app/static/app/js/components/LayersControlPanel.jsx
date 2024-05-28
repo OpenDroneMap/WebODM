@@ -4,6 +4,7 @@ import '../css/LayersControlPanel.scss';
 import LayersControlLayer from './LayersControlLayer';
 import LayersControlAnnotations from './LayersControlAnnotations';
 import { _ } from '../classes/gettext';
+import L from 'leaflet';
 
 export default class LayersControlPanel extends React.Component {
   static defaultProps = {
@@ -21,6 +22,14 @@ export default class LayersControlPanel extends React.Component {
 
   constructor(props){
     super(props);
+  }
+
+  componentDidMount(){
+    L.DomEvent.on(this.domNode, 'mousewheel', L.DomEvent.stopPropagation);
+  }
+
+  componentWillUnmount(){
+    L.DomEvent.off(this.domNode, 'mousewheel', L.DomEvent.stopPropagation);
   }
 
   render(){
@@ -89,7 +98,7 @@ export default class LayersControlPanel extends React.Component {
       </div>);
     }
 
-    return (<div className="layers-control-panel">
+    return (<div className="layers-control-panel" ref={(domNode) => this.domNode = domNode}>
       <span className="close-button" onClick={this.props.onClose}/>
       <div className="title">{_("Layers")}</div>
       <hr/>
