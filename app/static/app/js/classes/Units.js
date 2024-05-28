@@ -177,6 +177,7 @@ class UnitSystem{
     volumeUnit(cbmeters, opts = {}){ throw new Error("Not implemented"); }
     
     getName(){ throw new Error("Not implemented"); }
+    getKey(){ throw new Error("Not implemented"); }
     
     area(sqmeters, opts = {}){
         sqmeters = parseFloat(sqmeters);
@@ -185,6 +186,10 @@ class UnitSystem{
         const unit = this.areaUnit(sqmeters, opts);
         const val = unit.factor * sqmeters;
         return new ValueUnit(val, unit);
+    }
+
+    elevation(meters){
+        return this.length(meters, { fixedUnit: true });
     }
 
     length(meters, opts = {}){
@@ -233,6 +238,10 @@ class MetricSystem extends UnitSystem{
         return _("Metric");
     }
 
+    getKey(){
+        return "metric";
+    }
+
     lengthUnit(meters, opts = {}){
         if (opts.fixedUnit) return units.meters;
 
@@ -257,6 +266,10 @@ class MetricSystem extends UnitSystem{
 class ImperialSystem extends UnitSystem{
     getName(){
         return _("Imperial");
+    }
+
+    getKey(){
+        return "imperial";
     }
 
     feet(){
@@ -308,6 +321,10 @@ class ImperialSystem extends UnitSystem{
 class ImperialUSSystem extends ImperialSystem{
     getName(){
         return _("Imperial (US)");
+    }
+
+    getKey(){
+        return "imperialUS";
     }
 
     feet(){

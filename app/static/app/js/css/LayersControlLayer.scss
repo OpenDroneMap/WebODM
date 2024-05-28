@@ -1,25 +1,24 @@
 .leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control{
     .layers-control-layer{
-        clear: both;
+        .layer-control-title{
+            display: flex;
+            flex-wrap: nowrap;
+        }
 
         .layer-label{
-            width: auto;
-            position: relative;
-            top: 1px;
+            width: 100%;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
-            display: block;
             text-align: left;
-            padding-left: 4px;
-            margin-left: 50px;
-            height: 22px;
-            line-height: 22px;
-            padding-top: 1px;
+            height: 28px;
+            margin-left: 1px;
         }
 
-        .layer-expanded{
-            clear: both;
+        .layer-action{
+            flex-basis: min-content;
+            padding-left: 6px;
+            padding-right: 6px;
         }
 
         select, input{
@@ -46,7 +45,6 @@
         }
       
         .toggle{
-          float: left;
           width: 22px;
           i{
               font-size: 18px;
@@ -57,15 +55,20 @@
           }
         }
 
-        .overlayIcon{
-            float: left;
+        .paddingSpace{
             width: 22px;
+            height: 22px;
+        }
 
-            i{
-                font-size: 16px;
-                margin-top: 4px;
-                margin-left: 1px;
-            }
+        i.layer-icon{
+            font-size: 16px;
+            margin-left: 4px;
+        }
+
+        .layer-title{
+            display: inline;
+            position: relative;
+            top: -1px;
         }
     }
 }

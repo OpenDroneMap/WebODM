@@ -444,6 +444,10 @@ class Task(models.Model):
                     logger.warning("Task {} doesn't have folder, will skip copying".format(self))
 
                 self.project.owner.profile.clear_used_quota_cache()
+
+                from app.plugins import signals as plugin_signals
+                plugin_signals.task_duplicated.send_robust(sender=self.__class__, task_id=task.id)
+
             return task
         except Exception as e:
             logger.warning("Cannot duplicate task: {}".format(str(e)))
@@ -936,6 +940,7 @@ class Task(models.Model):
             'meta': {
                 'task': {
                     'id': str(self.id),
+                    'name': self.name,
                     'project': self.project.id,
                     'public': self.public,
                     'camera_shots': camera_shots,
