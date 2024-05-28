@@ -651,7 +651,7 @@ _('Example:'),
         name: name || "", 
         icon: "fa fa-sticky-note fa-fw"
       };
-      if (this.props.tiles.length > 1 && opts.task){
+      if (this.props.tiles.length > 1 && task){
         meta.group = {id: task.id, name: task.name};
       }
       layer[Symbol.for("meta")] = meta;

@@ -54,7 +54,7 @@ class AnnotationLayer extends React.Component{
       layer._map.setView(layer._latlng, 22);
     }
 
-    if (layer.getPopup()) layer.openPopup();
+    // if (layer.getPopup()) layer.openPopup();
   }
 
   handleDelete = () => {
