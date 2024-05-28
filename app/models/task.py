@@ -1085,6 +1085,9 @@ class Task(models.Model):
         if self.resize_to < 0:
             logger.warning("We were asked to resize images to {}, this might be an error.".format(self.resize_to))
             return []
+        # Add a signal to notify that we are resizing images
+        from app.plugins import signals as plugin_signals
+        plugin_signals.task_resizing_images.send_robust(sender=self.__class__, task_id=self.id)
 
         images_path = self.find_all_files_matching(r'.*\.(jpe?g|tiff?)$')
         total_images = len(images_path)
