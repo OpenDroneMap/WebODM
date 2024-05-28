@@ -28,7 +28,8 @@ export default {
     "updateAnnotation",
     "deleteAnnotation",
     "toggleAnnotation",
-    "annotationDeleted"
+    "annotationDeleted",
+    "downloadAnnotations"
   ]
 };
 

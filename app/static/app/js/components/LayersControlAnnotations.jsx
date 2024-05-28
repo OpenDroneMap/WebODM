@@ -120,6 +120,21 @@ export default class LayersControlAnnotations extends React.Component {
     }
   }
 
+  handleExportGeoJSON = e => {
+    if (PluginsAPI.Map.downloadAnnotations("geojson")) return;
+    else{
+      // TODO?
+    }
+  }
+
+  handleDelete = () => {
+    if (window.confirm(_('Are you sure you want to delete this?'))){
+      this.props.layers.forEach(layer => {
+        PluginsAPI.Map.deleteAnnotation(layer);
+      });
+    }
+  }
+
 
   render(){
     const { layers } = this.props;
@@ -129,8 +144,8 @@ export default class LayersControlAnnotations extends React.Component {
         <div className="layer-control-title">
           <ExpandButton bind={[this, 'expanded']} /><Checkbox bind={[this, 'visible']} className="annotation-toggle" />
           <a title={_("Annotations")} className="layer-label" href="javascript:void(0);" onClick={this.handleAnnotationsClick}><div className="layer-title"><i className="layer-icon fa fa-sticky-note fa-fw"></i> {_("Annotations")}</div></a> 
-          <a className="layer-action" href="javascript:void(0)" onClick={this.handleZoomToClick}><i title={_("Zoom To")} className="fa fa-expand"></i></a>
-          <a className="layer-action" href="javascript:void(0)" onClick={this.handleZoomToClick}><i title={_("Zoom To")} className="fa fa-expand"></i></a>
+          <a className="layer-action" href="javascript:void(0)" onClick={this.handleExportGeoJSON}><i title={_("Export to GeoJSON")} className="fa fa-download"></i></a>
+          <a className="layer-action" href="javascript:void(0)" onClick={this.handleDelete}><i title={_("Delete")} className="fa fa-trash"></i></a>
         </div>
 
         <div className={"layer-expanded " + (!this.state.expanded ? "hide" : "")}>
