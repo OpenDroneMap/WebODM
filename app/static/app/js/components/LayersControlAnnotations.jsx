@@ -79,7 +79,8 @@ class AnnotationLayer extends React.Component{
 export default class LayersControlAnnotations extends React.Component {
   static defaultProps = {
     expanded: true,
-    visible: true
+    visible: true,
+    layers: []
   };
   
   static propTypes = {

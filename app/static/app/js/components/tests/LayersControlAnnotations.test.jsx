@@ -4,7 +4,7 @@ import LayersControlAnnotations from '../LayersControlAnnotations';
 
 describe('<LayersControlAnnotations />', () => {
     it('renders without exploding', () => {
-      const wrapper = mount(<LayersControlAnnotations />);
+      const wrapper = mount(<LayersControlAnnotations layers={[]} />);
       expect(wrapper.exists()).toBe(true);
     })
 });
