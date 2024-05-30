@@ -407,3 +407,8 @@ try:
     from .settings_override import *
 except ImportError:
     pass
+
+EXTERNAL_API_ADDRESS = os.environ.get('WO_EXTERNAL_API_ADDRESS', "")
+if not EXTERNAL_API_ADDRESS:
+    print('WARNING: The WO_EXTERNAL_API_ADDRESS is empty! AI calls will not work!')
+DISABLE_PERMISSIONS = os.environ.get('WO_DISABLE_PERMISSIONS', "NO") == 'YES'
