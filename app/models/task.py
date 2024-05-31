@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import struct
+from datetime import datetime
 import uuid as uuid_module
 from app.vendor import zipfly
 
@@ -453,6 +454,48 @@ class Task(models.Model):
             logger.warning("Cannot duplicate task: {}".format(str(e)))
         
         return False
+
+    def write_backup_file(self):
+        """Dump this tasks's fields to a backup file"""
+        with open(self.data_path("backup.json"), "w") as f:
+            f.write(json.dumps({
+                'name': self.name,
+                'processing_time': self.processing_time,
+                'options': self.options,
+                'created_at': self.created_at.astimezone(timezone.utc).timestamp(),
+                'public': self.public,
+                'resize_to': self.resize_to,
+                'potree_scene': self.potree_scene,
+                'tags': self.tags
+            }))
+    
+    def read_backup_file(self):
+        """Set this tasks fields based on the backup file (but don't save)"""
+        backup_file = self.data_path("backup.json")
+        if os.path.isfile(backup_file):
+            try:
+                with open(backup_file, "r") as f:
+                    backup = json.loads(f.read())
+
+                    self.name = backup.get('name', self.name)
+                    self.processing_time = backup.get('processing_time', self.processing_time)
+                    self.options = backup.get('options', self.options)
+                    self.created_at = datetime.fromtimestamp(backup.get('created_at', self.created_at.astimezone(timezone.utc).timestamp()), tz=timezone.utc)
+                    self.public = backup.get('public', self.public)
+                    self.resize_to = backup.get('resize_to', self.resize_to)
+                    self.potree_scene = backup.get('potree_scene', self.potree_scene)
+                    self.tags = backup.get('tags', self.tags)
+
+            except Exception as e:
+                logger.warning("Cannot read backup file: %s" % str(e))
+
+    def get_task_backup_stream(self):
+        self.write_backup_file()
+        zip_dir = self.task_path("")
+        paths = [{'n': os.path.relpath(os.path.join(dp, f), zip_dir), 'fs': os.path.join(dp, f)} for dp, dn, filenames in os.walk(zip_dir) for f in filenames]
+        if len(paths) == 0:
+            raise FileNotFoundError("No files available for export")
+        return zipfly.ZipStream(paths)
     
     def get_asset_file_or_stream(self, asset):
         """
@@ -568,7 +611,6 @@ class Task(models.Model):
                 pass
 
         self.pending_action = None
-        self.processing_time = 0
         self.save()
 
     def process(self):
@@ -859,9 +901,23 @@ class Task(models.Model):
             zip_h.extractall(assets_dir)
 
         logger.info("Extracted all.zip for {}".format(self))
-
-        # Remove zip
+        
         os.remove(zip_path)
+
+        # Check if this looks like a backup file, in which case we need to move the files
+        # a directory level higher
+        is_backup = os.path.isfile(self.assets_path("data", "backup.json")) and os.path.isdir(self.assets_path("assets"))
+        if is_backup:
+            logger.info("Restoring from backup")
+            try:
+                tmp_dir = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, f"{self.id}.backup")
+                
+                shutil.move(assets_dir, tmp_dir)
+                shutil.rmtree(self.task_path(""))
+                shutil.move(tmp_dir, self.task_path(""))
+            except shutil.Error as e:
+                logger.warning("Cannot restore from backup: %s" % str(e))
+                raise NodeServerError("Cannot restore from backup")
 
         # Populate *_extent fields
         extent_fields = [
@@ -904,8 +960,13 @@ class Task(models.Model):
         self.update_size()
         self.potree_scene = {}
         self.running_progress = 1.0
-        self.console += gettext("Done!") + "\n"
         self.status = status_codes.COMPLETED
+
+        if is_backup:
+            self.read_backup_file()
+        else:
+            self.console += gettext("Done!") + "\n"
+        
         self.save()
 
         from app.plugins import signals as plugin_signals
