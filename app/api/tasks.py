@@ -403,6 +403,26 @@ class TaskAssets(TaskNestedView):
         return download_file_response(request, asset_path, 'inline')
 
 """
+Task backup endpoint
+"""
+class TaskBackup(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Downloads a task's backup
+        """
+        task = self.get_and_check_task(request, pk)
+
+        # Check and download
+        try:
+            asset_fs = task.get_task_backup_stream()
+        except FileNotFoundError:
+            raise exceptions.NotFound(_("Asset does not exist"))
+
+        download_filename = request.GET.get('filename', get_asset_download_filename(task, "backup.zip"))
+
+        return download_file_stream(request, asset_fs, 'attachment', download_filename=download_filename)
+
+"""
 Task assets import
 """
 class TaskAssetsImport(APIView):
