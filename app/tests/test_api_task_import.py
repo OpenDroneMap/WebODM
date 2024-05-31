@@ -217,3 +217,95 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(file_import_task.import_url, "file://all.zip")
             self.assertEqual(file_import_task.images_count, 1)
 
+    def test_backup(self):
+        client = APIClient()
+
+        with start_processing_node():
+            user = User.objects.get(username="testuser")
+            self.assertFalse(user.is_superuser)
+            project = Project.objects.create(
+                owner=user,
+                name="test backup"
+            )
+
+            image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
+            image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
+
+            # Create processing node
+            pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+            client.login(username="testuser", password="test1234")
+
+            # Create task
+            res = client.post("/api/projects/{}/tasks/".format(project.id), {
+                'images': [image1, image2]
+            }, format="multipart")
+            image1.close()
+            image2.close()
+            task = Task.objects.get(id=res.data['id'])
+
+            # Wait for completion
+            c = 0
+            while c < 10:
+                worker.tasks.process_pending_tasks()
+                task.refresh_from_db()
+                if task.status == status_codes.COMPLETED:
+                    break
+                c += 1
+                time.sleep(1)
+
+            # Assign some fields
+            task.name = "Backup test"
+            task.potree_scene = {'saved': True}
+            task.public = True
+            task.save()
+
+            self.assertEqual(task.status, status_codes.COMPLETED)
+
+            # Download task backup
+            task_uuid = task.uuid
+            res = client.get("/api/projects/{}/tasks/{}/backup".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+            if not os.path.exists(settings.MEDIA_TMP):
+                os.mkdir(settings.MEDIA_TMP)
+
+            assets_path = os.path.join(settings.MEDIA_TMP, "backup.zip")
+
+            with open(assets_path, 'wb') as f:
+                f.write(res.content)
+
+            assets_file = open(assets_path, 'rb')
+
+            # Import with file upload method
+            res = client.post("/api/projects/{}/tasks/import".format(project.id), {
+                'file': [assets_file]
+            }, format="multipart")
+            self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+            assets_file.close()
+
+            file_import_task = Task.objects.get(id=res.data['id'])
+            # Wait for completion
+            c = 0
+            while c < 10:
+                worker.tasks.process_pending_tasks()
+                file_import_task.refresh_from_db()
+                if file_import_task.status == status_codes.COMPLETED:
+                    break
+                c += 1
+                time.sleep(1)
+
+            self.assertEqual(file_import_task.import_url, "file://all.zip")
+            self.assertEqual(file_import_task.images_count, 1)
+            self.assertEqual(file_import_task.processing_node, None)
+            self.assertEqual(file_import_task.auto_processing_node, False)
+            self.assertEqual(file_import_task.name, "Backup test")
+            self.assertTrue('saved' in file_import_task.potree_scene)
+            self.assertEqual(file_import_task.public, True)
+            
+            # Can access assets
+            res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, file_import_task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+            self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["orthophoto.tif"])))
+            self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["dsm.tif"])))
+            self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["dtm.tif"])))

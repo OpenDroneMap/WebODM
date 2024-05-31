@@ -462,7 +462,7 @@ class Task(models.Model):
                 'name': self.name,
                 'processing_time': self.processing_time,
                 'options': self.options,
-                'created_at': self.created_at.timestamp(),
+                'created_at': self.created_at.astimezone(timezone.utc).timestamp(),
                 'public': self.public,
                 'resize_to': self.resize_to,
                 'potree_scene': self.potree_scene,
@@ -480,7 +480,7 @@ class Task(models.Model):
                     self.name = backup.get('name', self.name)
                     self.processing_time = backup.get('processing_time', self.processing_time)
                     self.options = backup.get('options', self.options)
-                    self.created_at = datetime.fromtimestamp(backup.get('created_at', self.created_at.timestamp()))
+                    self.created_at = datetime.fromtimestamp(backup.get('created_at', self.created_at.astimezone(timezone.utc).timestamp()), tz=timezone.utc)
                     self.public = backup.get('public', self.public)
                     self.resize_to = backup.get('resize_to', self.resize_to)
                     self.potree_scene = backup.get('potree_scene', self.potree_scene)
@@ -960,11 +960,12 @@ class Task(models.Model):
         self.update_size()
         self.potree_scene = {}
         self.running_progress = 1.0
-        self.console += gettext("Done!") + "\n"
         self.status = status_codes.COMPLETED
 
         if is_backup:
             self.read_backup_file()
+        else:
+            self.console += gettext("Done!") + "\n"
         
         self.save()
 
