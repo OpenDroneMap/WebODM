@@ -1,59 +1,118 @@
-function getIn(obj, path) {
-    return path.split('.').reduce((o, p) => (o || {})[p], obj);
-}
+import React from 'react';
+import PropTypes from 'prop-types';
 
-function BootstrapFieldComponent({
-    field,
-    form: { touched, errors },
+const BootstrapFieldComponent = ({
+    name,
+    value,
     label,
     help,
-    type = "",
+    type = "text",
     showIcon = true,
+    error,
+    touched,
+    onChange,
+    onBlur,
     ...props
-}) {
-    const isError = getIn(errors, field.name) && getIn(touched, field.name);
-    const errorMsg = getIn(errors, field.name);
-    let ControlComponent = 'input';
+}) => {
+    const isError = error && touched;
+    const ControlComponent = type === "checkbox" ? "input" : type === "textarea" || type === "select" ? type : "input";
 
-    const testType = type.toLowerCase();
-    if (testType === "checkbox") ControlComponent = 'input';
-    else if (testType === "textarea" || testType === "select")
-        ControlComponent = testType;
-    else props.type = type;
-
-    const div = document.createElement('div');
-    div.id = field.name;
-    div.style.marginLeft = 0;
-    div.style.marginRight = 0;
-
-    if (label) {
-        const labelElement = document.createElement('label');
-        labelElement.textContent = label;
-        div.appendChild(labelElement);
-    }
-
-    const controlElement = document.createElement(ControlComponent);
-    controlElement.setAttribute('name', field.name);
-    controlElement.setAttribute('value', field.value);
-    div.appendChild(controlElement);
-
-    if (isError) {
-        const span = document.createElement('span');
-        span.textContent = errorMsg;
-        div.appendChild(span);
-    }
-
-    if (help && !isError) {
-        const span = document.createElement('span');
-        span.textContent = help;
-        div.appendChild(span);
-    }
-
-    return div;
+    return (
+        <div className={`form-group${isError ? ' has-error' : ''}`} style={{ marginLeft: 0, marginRight: 0 }}>
+            {label && <label htmlFor={name} className="control-label">{label}</label>}
+            <ControlComponent
+                id={name}
+                name={name}
+                className="form-control"
+                type={type}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                {...props}
+            />
+            {isError && <span className="help-block">{error}</span>}
+            {help && !isError && <span className="help-block">{help}</span>}
+            {isError && showIcon && <span className="glyphicon glyphicon-remove form-control-feedback"></span>}
+        </div>
+    );
 };
 
-function BootstrapField(props) {
-    return BootstrapFieldComponent(props);
+BootstrapFieldComponent.propTypes = {
+    name: PropTypes.string.isRequired,
+    value: PropTypes.any,
+    label: PropTypes.string,
+    help: PropTypes.string,
+    type: PropTypes.string,
+    showIcon: PropTypes.bool,
+    error: PropTypes.string,
+    touched: PropTypes.bool,
+    onChange: PropTypes.func.isRequired,
+    onBlur: PropTypes.func.isRequired
+};
+
+class BootstrapField extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            value: props.value || '',
+            touched: false,
+            error: ''
+        };
+    }
+
+    handleChange = (e) => {
+        const { value } = e.target;
+        this.setState({ value }, () => {
+            if (this.props.onChange) {
+                this.props.onChange(e);
+            }
+        });
+    };
+
+    handleBlur = (e) => {
+        this.setState({ touched: true }, () => {
+            if (this.props.onBlur) {
+                this.props.onBlur(e);
+            }
+        });
+    };
+
+    render() {
+        const { name, label, help, type, showIcon, validate, ...props } = this.props;
+        const { value, touched, error } = this.state;
+
+        let validationError = error;
+        if (validate) {
+            validationError = validate(value);
+        }
+
+        return (
+            <BootstrapFieldComponent
+                name={name}
+                value={value}
+                label={label}
+                help={help}
+                type={type}
+                showIcon={showIcon}
+                error={validationError}
+                touched={touched}
+                onChange={this.handleChange}
+                onBlur={this.handleBlur}
+                {...props}
+            />
+        );
+    }
+}
+
+BootstrapField.propTypes = {
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    help: PropTypes.string,
+    type: PropTypes.string,
+    showIcon: PropTypes.bool,
+    validate: PropTypes.func,
+    onChange: PropTypes.func,
+    onBlur: PropTypes.func
 };
 
 export { BootstrapFieldComponent };

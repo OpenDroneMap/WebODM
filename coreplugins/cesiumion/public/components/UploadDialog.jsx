@@ -32,6 +32,10 @@ export default class UploadDialog extends Component {
 		}
 	};
 
+    show(){
+        this.dialog.show();
+    }
+
 	handleError = msg => error => {
 		this.props.onError(msg);
 		console.error(error);
@@ -167,32 +171,31 @@ export default class UploadDialog extends Component {
                 saveLabel={isLoading ? "Submitting..." : "Submit"}
                 savingLabel="Submitting..."
                 saveIcon={isLoading ? "fa fa-sync fa-spin" : "fa fa-upload"}
+                ref={(domNode) => { this.dialog = domNode; }}
             >
-				<form onSubmit={this.onSubmit}>
-                    <BootstrapField
-                        name={"name"}
-                        label={"Name: "}
-                        type={"text"}
-                        value={mergedInitialValues.name}
-                        onChange={this.handleChange}
-                    />
-                    <BootstrapField
-                        name={"description"}
-                        label={"Description: "}
-                        type={"textarea"}
-                        rows={"3"}
-                        value={mergedInitialValues.description}
-                        onChange={this.handleChange}
-                    />
-                    <BootstrapField
-                        name={"attribution"}
-                        label={"Attribution: "}
-                        type={"text"}
-                        value={mergedInitialValues.attribution}
-                        onChange={this.handleChange}
-                    />
-                    {this.getSourceFields()}
-                </form>
+                <BootstrapField
+                    name={"name"}
+                    label={"Name: "}
+                    type={"text"}
+                    value={mergedInitialValues.name}
+                    onChange={this.handleChange}
+                />
+                <BootstrapField
+                    name={"description"}
+                    label={"Description: "}
+                    type={"textarea"}
+                    rows={"3"}
+                    value={mergedInitialValues.description}
+                    onChange={this.handleChange}
+                />
+                <BootstrapField
+                    name={"attribution"}
+                    label={"Attribution: "}
+                    type={"text"}
+                    value={mergedInitialValues.attribution}
+                    onChange={this.handleChange}
+                />
+                {this.getSourceFields()}
             </FormDialog>
         );
 	}

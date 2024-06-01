@@ -14,6 +14,11 @@ import { AssetStyles } from "./defaults";
 import { fetchCancelable, getCookie } from "./utils";
 
 export default class TaskView extends Component {
+    constructor(){
+        super();
+        this.onOpenUploadDialog = this.onOpenUploadDialog.bind(this);
+    }
+    
 	state = {
 		error: "",
 		currentAsset: null,
@@ -25,7 +30,10 @@ export default class TaskView extends Component {
 	timeoutHandler = null;
 	refreshAssets = null;
 
-	onOpenUploadDialog = asset => this.setState({ currentAsset: asset });
+	onOpenUploadDialog(asset) {
+		this.setState({ currentAsset: asset });
+		this.uploadDialog.show();
+	}
 
 	onHideUploadDialog = () =>
 		this.setState({ currentAsset: null, isUploadDialogLoading: false });
@@ -185,7 +193,7 @@ export default class TaskView extends Component {
 										</IonAssetButton>
 									)}
 
-									{exported.length > 0 && (
+									{/* {exported.length > 0 && (
 										<IonAssetButton
 											assets={exported}
 											onSelect={this.handleAssetSelect(
@@ -212,13 +220,13 @@ export default class TaskView extends Component {
 											<i className={"fa fa-cesium"} />
 											View ion Tasks
 										</button>
-									)}
-									<TasksDialog
+									)} */}
+									{/* <TasksDialog
 										show={isTasksDialog}
 										tasks={processing}
 										onHide={this.hideTaskDialog}
 										onClearFailed={this.onClearFailedAssets}
-									/>
+									/> */}
 								</Fragment>
 							);
 						}}
@@ -245,16 +253,17 @@ export default class TaskView extends Component {
 								onHide={this.onHideUploadDialog}
 								onSubmit={this.onUploadAsset}
 								onError={this.onErrorUploadDialog}
+                                ref={(domNode) => { this.uploadDialog = domNode; }}
 							/>
 						);
 					}}
 				</APIFetcher>
-				<TaskFetcher
+				{/* <TaskFetcher
 					method={"POST"}
 					path={"refresh"}
 					body={JSON.stringify({ token })}
 					onLoad={this.onCleanStatus}
-				/>
+				/> */}
 			</AppContext.Provider>
 		);
 	}
