@@ -276,7 +276,7 @@ We have several channels of communication for people to ask questions and to get
  - [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm)
  - [Report Issues](https://github.com/OpenDroneMap/WebODM/issues)
 
-We also have a [Gitter Chat](https://gitter.im/OpenDroneMap/web-development), but the preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
+The preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
 
 ## Support the Project
 
@@ -507,7 +507,7 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 2. Open the SSH terminal - Google offers SSH via the website.
 3. Run sudo apt-get update
 4. Run sudo apt-get upgrade
-5. Run sudo apt-get install docker-compose
+5. Install [docker-compose](https://docs.docker.com/compose/install/). Do not install via apt for 24.04 onward.
 6. Run sudo apt-get install python-pip
 7. Run git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
 8. cd WebODM (Linux is case sensitive)

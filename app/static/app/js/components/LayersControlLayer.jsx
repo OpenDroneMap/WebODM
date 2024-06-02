@@ -109,7 +109,7 @@ export default class LayersControlLayer extends React.Component {
     }
   }
 
-  handleLayerClick = () => {
+  handleZoomToClick = () => {
     const { layer } = this.props;
 
     const bounds = layer.options.bounds !== undefined ? 
@@ -118,6 +118,14 @@ export default class LayersControlLayer extends React.Component {
     this.map.fitBounds(bounds);
 
     if (layer.getPopup()) layer.openPopup();
+  }
+
+  handleLayerClick = () => {
+    if (this.props.overlay){
+        this.setState({visible: !this.state.visible});
+    }else{
+        this.setState({expanded: !this.state.expanded});
+    }
   }
 
   handleSelectColor = e => {
@@ -287,14 +295,18 @@ export default class LayersControlLayer extends React.Component {
     }
 
     return (<div className="layers-control-layer">
-        {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="overlayIcon"><i className={meta.icon || "fa fa-vector-square fa-fw"}></i></div>}<Checkbox bind={[this, 'visible']}/>
-        <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
+        <div className="layer-control-title">
+            {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="paddingSpace"></div>}<Checkbox bind={[this, 'visible']}/>
+            <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}><i className={"layer-icon " + (meta.icon || "fa fa-vector-square fa-fw")}></i><div className="layer-title">{meta.name}</div></a> <a className="layer-action" href="javascript:void(0)" onClick={this.handleZoomToClick}><i title={_("Zoom To")} className="fa fa-expand"></i></a>
+        </div>
 
         {this.state.expanded ? 
         <div className="layer-expanded">
             <Histogram width={274}
                         loading={histogramLoading}
                         statistics={tmeta.statistics}
+                        unitForward={meta.unitForward}
+                        unitBackward={meta.unitBackward}
                         colorMap={cmapValues}
                         min={hmin}
                         max={hmax}

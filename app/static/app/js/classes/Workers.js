@@ -21,7 +21,7 @@ export default {
           }).fail(error => {
               console.warn(error);
               if (errorCount++ < 10) setTimeout(() => check(), 2000);
-              else cb(JSON.stringify(error));
+              else cb(error.statusText);
           });
         };
     

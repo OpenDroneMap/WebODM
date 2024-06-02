@@ -19,7 +19,17 @@ export default {
   endpoints: [
     ["willAddControls", leafletPreCheck],
     ["didAddControls", layersControlPreCheck],
-	["addActionButton", leafletPreCheck],
+	  ["addActionButton", leafletPreCheck]
+  ],
+
+  functions: [
+    "handleClick",
+    "addAnnotation",
+    "updateAnnotation",
+    "deleteAnnotation",
+    "toggleAnnotation",
+    "annotationDeleted",
+    "downloadAnnotations"
   ]
 };
 

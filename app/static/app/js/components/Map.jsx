@@ -4,8 +4,6 @@ import '../css/Map.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
 import async from 'async';
-import '../vendor/leaflet/L.Control.MousePosition.css';
-import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
 // import '../vendor/leaflet/L.TileLayer.NoGap';
@@ -29,13 +27,16 @@ import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _ } from '../classes/gettext';
+import UnitSelector from './UnitSelector';
+import { unitSystem, toMetric } from '../classes/Units';
 
 class Map extends React.Component {
   static defaultProps = {
     showBackground: false,
     mapType: "orthophoto",
     public: false,
-    shareButtons: true
+    shareButtons: true,
+    permissions: ["view"]
   };
 
   static propTypes = {
@@ -43,7 +44,8 @@ class Map extends React.Component {
     tiles: PropTypes.array.isRequired,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool,
-    shareButtons: PropTypes.bool
+    shareButtons: PropTypes.bool,
+    permissions: PropTypes.array
   };
 
   constructor(props) {
@@ -56,13 +58,14 @@ class Map extends React.Component {
       showLoading: false, // for drag&drop of files and first load
       opacity: 100,
       imageryLayers: [],
-      overlays: []
+      overlays: [],
+      annotations: []
     };
 
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
-    this.addedCameraShots = false;
+    this.addedCameraShots = {};
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
@@ -93,6 +96,19 @@ class Map extends React.Component {
       }
       return "";
   }
+
+  typeToIcon = (type) => {
+    switch(type){
+        case "orthophoto":
+            return "far fa-image fa-fw"
+        case "plant":
+            return "fa fa-seedling fa-fw";
+        case "dsm":
+        case "dtm":
+            return "fa fa-chart-area fa-fw";
+    }
+    return "";
+}
 
   hasBands = (bands, orthophoto_bands) => {
     if (!orthophoto_bands) return false;
@@ -135,6 +151,8 @@ class Map extends React.Component {
         const { url, meta, type } = tile;
         
         let metaUrl = url + "metadata";
+        let unitForward = value => value;
+        let unitBackward = value => value;
 
         if (type == "plant"){
           if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
@@ -150,6 +168,12 @@ class Map extends React.Component {
           }
         }else if (type == "dsm" || type == "dtm"){
           metaUrl += "?hillshade=6&color_map=viridis";
+          unitForward = value => {
+            return unitSystem().length(value, { fixedUnit: true }).value;
+          };
+          unitBackward = value => {
+            return toMetric(value).value;
+          };
         }
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
@@ -208,8 +232,15 @@ class Map extends React.Component {
                 });
             
             // Associate metadata with this layer
-            meta.name = name + ` (${this.typeToHuman(type)})`;
+            meta.name = this.typeToHuman(type);
+            meta.icon = this.typeToIcon(type);
             meta.metaUrl = metaUrl;
+            meta.unitForward = unitForward;
+            meta.unitBackward = unitBackward;
+            if (this.props.tiles.length > 1){
+              // Assign to a group
+              meta.group = {id: meta.task.id, name: meta.task.name};
+            }
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 
@@ -265,8 +296,7 @@ class Map extends React.Component {
             this.mapBounds = mapBounds;
 
             // Add camera shots layer if available
-            if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
-
+            if (meta.task && meta.task.camera_shots && !this.addedCameraShots[meta.task.id]){
                 var camIcon = L.icon({
                   iconUrl: "/static/app/js/icons/marker-camera.png",
                   iconSize: [41, 46],
@@ -306,13 +336,17 @@ class Map extends React.Component {
                       shotsLayer.addMarkers(markers, this.map);
                     }
                   });
-                shotsLayer[Symbol.for("meta")] = {name: name + " " + _("(Cameras)"), icon: "fa fa-camera fa-fw"};
+                shotsLayer[Symbol.for("meta")] = {name: _("Cameras"), icon: "fa fa-camera fa-fw"};
+                if (this.props.tiles.length > 1){
+                  // Assign to a group
+                  shotsLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
+                }
 
                 this.setState(update(this.state, {
                     overlays: {$push: [shotsLayer]}
                 }));
 
-                this.addedCameraShots = true;
+                this.addedCameraShots[meta.task.id] = true;
             }
 
             // Add ground control points layer if available
@@ -356,7 +390,11 @@ class Map extends React.Component {
                       gcpLayer.addMarkers(markers, this.map);
                     }
                   });
-                gcpLayer[Symbol.for("meta")] = {name: name + " " + _("(GCPs)"), icon: "far fa-dot-circle fa-fw"};
+                gcpLayer[Symbol.for("meta")] = {name: _("Ground Control Points"), icon: "far fa-dot-circle fa-fw"};
+                if (this.props.tiles.length > 1){
+                  // Assign to a group
+                  gcpLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
+                }
 
                 this.setState(update(this.state, {
                     overlays: {$push: [gcpLayer]}
@@ -385,7 +423,7 @@ class Map extends React.Component {
 
     this.map = Leaflet.map(this.container, {
       scrollWheelZoom: true,
-      positionControl: true,
+      positionControl: false,
       zoomControl: false,
       minZoom: 0,
       maxZoom: 24
@@ -395,14 +433,28 @@ class Map extends React.Component {
     // leaflet bug?
     $(this.container).addClass("leaflet-touch");
 
+    PluginsAPI.Map.onAddAnnotation(this.handleAddAnnotation);
+    PluginsAPI.Map.onAnnotationDeleted(this.handleDeleteAnnotation);
+
     PluginsAPI.Map.triggerWillAddControls({
         map: this.map,
-        tiles
+        tiles,
+        mapView: this
     });
 
-    let scaleControl = Leaflet.control.scale({
-      maxWidth: 250,
-    }).addTo(this.map);
+    const UnitsCtrl = Leaflet.Control.extend({
+      options: {
+          position: 'bottomleft'
+      },
+  
+      onAdd: function () {
+          this.container = Leaflet.DomUtil.create('div', 'leaflet-control-units-selection leaflet-control');
+          Leaflet.DomEvent.disableClickPropagation(this.container);
+          ReactDOM.render(<UnitSelector />, this.container);
+          return this.container;
+      }
+    });
+    new UnitsCtrl().addTo(this.map);
 
     //add zoom control with your options
     let zoomControl = Leaflet.control.zoom({
@@ -455,7 +507,8 @@ _('Example:'),
 
     this.layersControl = new LayersControl({
         layers: this.state.imageryLayers,
-        overlays: this.state.overlays
+        overlays: this.state.overlays,
+        annotations: this.state.annotations
     }).addTo(this.map);
 
     this.autolayers = Leaflet.control.autolayers({
@@ -524,6 +577,8 @@ _('Example:'),
         this.map.fitBounds(this.mapBounds);
 
         this.map.on('click', e => {
+          if (PluginsAPI.Map.handleClick(e)) return;
+          
           // Find first tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
@@ -577,7 +632,6 @@ _('Example:'),
       tiles: tiles,
       controls:{
         autolayers: this.autolayers,
-        scale: scaleControl,
         zoom: zoomControl
       }
     });
@@ -592,6 +646,25 @@ _('Example:'),
     });
   }
 
+  handleAddAnnotation = (layer, name, task) => {
+      const meta = {
+        name: name || "", 
+        icon: "fa fa-sticky-note fa-fw"
+      };
+      if (this.props.tiles.length > 1 && task){
+        meta.group = {id: task.id, name: task.name};
+      }
+      layer[Symbol.for("meta")] = meta;
+
+      this.setState(update(this.state, {
+        annotations: {$push: [layer]}
+     }));
+  }
+
+  handleDeleteAnnotation = (layer) => {
+    this.setState({annotations: this.state.annotations.filter(l => l !== layer)});
+  }
+
   componentDidUpdate(prevProps, prevState) {
     this.state.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.state.opacity / 100);
@@ -603,8 +676,9 @@ _('Example:'),
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
-                            prevState.overlays !== this.state.overlays)){
-        this.layersControl.update(this.state.imageryLayers, this.state.overlays);
+                            prevState.overlays !== this.state.overlays ||
+                            prevState.annotations !== this.state.annotations)){
+        this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
     }
   }
 
@@ -615,6 +689,10 @@ _('Example:'),
       this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
       this.tileJsonRequests = [];
     }
+
+    PluginsAPI.Map.offAddAnnotation(this.handleAddAnnotation);
+    PluginsAPI.Map.offAnnotationDeleted(this.handleAddAnnotation);
+    
   }
 
   handleMapMouseDown(e){
@@ -627,7 +705,7 @@ _('Example:'),
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 

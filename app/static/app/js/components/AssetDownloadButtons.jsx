@@ -82,6 +82,9 @@ class AssetDownloadButtons extends React.Component {
                         </li>);
                 }
             })}
+            <li>
+                <a href={`/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/backup`}><i className="fa fa-file-download fa-fw"></i> {_("Backup")}</a>
+            </li>
           </ul>
         </div>);
     }

@@ -1,0 +1,21 @@
+.annotation-toggle{
+    margin-left: 3px;
+}
+
+.layers-control-annotations{
+    .layer-control-title{
+        align-items: baseline;
+        margin-left: 32px;
+    }
+
+    .layer-label{
+        padding-left: 6px;
+    }
+
+
+    .annotation-name{
+        display: inline;
+        position: relative;
+        top: -1px;
+    }
+}

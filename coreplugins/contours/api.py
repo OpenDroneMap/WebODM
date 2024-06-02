@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 class ContoursException(Exception):
     pass
 
-def calc_contours(dem, epsg, interval, output_format, simplify):
+def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1):
     import os
     import subprocess
     import tempfile
@@ -50,7 +50,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify):
     
     outfile = os.path.join(tmpdir, f"output.{ext}")
     p = subprocess.Popen([ogr2ogr_bin, outfile, contours_file, "-simplify", str(simplify), "-f", output_format, "-t_srs", f"EPSG:{epsg}", "-nln", "contours",
-                            "-dialect", "sqlite", "-sql", f"SELECT * FROM contour WHERE ST_Length(GEOM) >= {MIN_CONTOUR_LENGTH}"], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            "-dialect", "sqlite", "-sql", f"SELECT ID, ROUND(level * {zfactor}, 5) AS level, GeomFromGML(AsGML(ATM_Transform(GEOM, ATM_Scale(ATM_Create(), 1, 1, {zfactor})), 10)) as GEOM FROM contour WHERE ST_Length(GEOM) >= {MIN_CONTOUR_LENGTH}"], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
 
     out = out.decode('utf-8').strip()
@@ -102,8 +102,9 @@ class TaskContoursGenerate(TaskView):
             if not format in supported_formats:
                 raise ContoursException("Invalid format {} (must be one of: {})".format(format, ",".join(supported_formats)))
             simplify = float(request.data.get('simplify', 0.01))
+            zfactor = float(request.data.get('zfactor', 1))
 
-            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify).task_id
+            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify, zfactor).task_id
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
         except ContoursException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
