@@ -50,6 +50,161 @@ Esta API provê endpoints para acessar arquivos GeoJSON que contêm dados de det
 
 Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente para acessar os endpoints. Em ambiente de desenvolvimento é `http://localhost:8000`
 
+## API para iniciar processamento dos ortomosaicos
+
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/process`
+- **Método:** POST
+- **Query Parameters:**
+  - `project_pk` (integer, required): ID do projeto.
+  - `pk` (string, required): ID da tarefa.
+- **Headers:**
+  - `User-Agent: insomnia/8.6.1`
+- **Descrição:** Envia um `payload` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`. O `type` e `subtype` indentificam qual subrota será chamada. 
+
+- **Body Schema:**
+  ```json
+  {
+    "type": {
+      "type": "string"
+    },
+    "subtype": {
+      "type": "string"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "required": ["type", "payload"]
+  }
+  ```
+
+### Tipo: cattle
+
+- **Body Schema:**
+  ```json
+  {
+    "type": "cattle",
+    "payload": {
+      "processing_requests": {
+        "identification": { "type": "boolean" },
+        "weight": { "type": "boolean" }
+      },
+      "required": ["identification", "weight"]
+    },
+    "required": ["type", "payload"]
+  }
+  ```
+
+- **Example Body:**
+  ```json
+  {
+    "type": "cattle",
+    "payload": {
+      "processing_requests": {
+        "identification": true,
+        "weight": true
+      }
+    }
+  }
+  ```
+
+### Tipo: polynomial-health
+
+- **Body Schema:**
+  ```json
+  {
+    "type": "polynomial-health",
+    "payload": {
+        "processing_requests": {
+        "fields_to_process": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field_id": { "type": "number" },
+              "polynomial_degree": {
+                "type": "number"
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "x": { "type": "number" },
+                    "y": { "type": "number" }
+                  },
+                  "required": ["x", "y"]
+                }
+              }
+            },
+            "required": [
+              "field_id",
+              "polynomial_degree",
+              "points"
+            ]
+          }
+        }
+      },
+      "required": ["fields_to_process"]
+    },
+    "required": ["type", "payload"]
+  }
+  ```
+
+- **Example Body:**
+  ```json
+  {
+    "type": "polynomial-health",
+    "payload": {
+      "processing_requests": {
+        "fields_to_process": [
+          {
+            "field_id": 0,
+            "polynomial_degree": 2,
+            "points": [
+              { "x": 0, "y": 0 },
+              { "x": 1, "y": 1 }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  ```
+
+### Tipo: weeds; Subtipo: soy
+
+- **Body Schema:**
+  ```json
+  {
+    "type": "weeds",
+    "subtype": "soy",
+    "payload": {
+      "processing_requests": {
+       "fields_to_process": {
+         "type": "array",
+         "items": { "type": "number" }
+       }
+      },
+      "required": ["fields_to_process"]
+    },
+    "required": ["type", "payload"]
+  }
+  ```
+
+- **Example Body:**
+  ```json
+  {
+    "type": "weeds",
+    "subtype": "soy",
+    "payload": {
+        "processing_requests": {
+        "fields_to_process": [3, 4, 5]
+      }
+    }
+  }
+  ```
+
 ## Exibição do Mapa
 
 Ele é divido em dois componentes, o primeiro componente a `MapView` é responsável por exibir algumas informações adicionais além do mapa. Onde a magia realmente acontece é no componente chamado `Map`.
