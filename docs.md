@@ -59,7 +59,7 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
   - `project_pk` (integer, required): ID do projeto.
   - `pk` (string, required): ID da tarefa.
 - **Headers:**
-  - `User-Agent: insomnia/8.6.1`
+  - `Content-Type: application/json`
 - **Descrição:** Envia um `payload` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`. O `type` e `subtype` indentificam qual subrota será chamada. 
 
 - **Body Schema:**
@@ -116,33 +116,33 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
     "type": "polynomial-health",
     "payload": {
         "processing_requests": {
-        "fields_to_process": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "field_id": { "type": "number" },
-              "polynomial_degree": {
-                "type": "number"
-              },
-              "points": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "x": { "type": "number" },
-                    "y": { "type": "number" }
-                  },
-                  "required": ["x", "y"]
+          "fields_to_process": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field_id": { "type": "number" },
+                "polynomial_degree": {
+                  "type": "number"
+                },
+                "points": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "x": { "type": "number" },
+                      "y": { "type": "number" }
+                    },
+                    "required": ["x", "y"]
+                  }
                 }
-              }
-            },
-            "required": [
-              "field_id",
-              "polynomial_degree",
-              "points"
-            ]
-          }
+              },
+              "required": [
+                "field_id",
+                "polynomial_degree",
+                "points"
+              ]
+            }
         }
       },
       "required": ["fields_to_process"]
@@ -181,7 +181,7 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
     "subtype": "soy",
     "payload": {
       "processing_requests": {
-       "fields_to_process": {
+        "fields_to_process": {
          "type": "array",
          "items": { "type": "number" }
        }
