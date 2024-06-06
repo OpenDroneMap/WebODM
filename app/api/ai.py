@@ -42,7 +42,7 @@ def send_post_to_processing(typ: str, subtype: str, project_pk, pk, payload: dic
 
 class AiProcessing(APIView):
 
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, project_pk, pk):
 
