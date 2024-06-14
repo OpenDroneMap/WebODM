@@ -17,27 +17,27 @@ class MapView extends React.Component {
   };
 
   static propTypes = {
-      mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
-      selectedMapType: PropTypes.oneOf(['auto', 'orthophoto', 'plant', 'dsm', 'dtm']),
-      title: PropTypes.string,
-      public: PropTypes.bool,
-      shareButtons: PropTypes.bool
+    mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
+    selectedMapType: PropTypes.oneOf(['auto', 'orthophoto', 'plant', 'dsm', 'dtm', 'polyhealth']),
+    title: PropTypes.string,
+    public: PropTypes.bool,
+    shareButtons: PropTypes.bool
   };
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     let selectedMapType = props.selectedMapType;
 
     // Automatically select type based on available tiles
     // and preference order (below)
-    if (props.selectedMapType === "auto"){
-      let preferredTypes = ['orthophoto', 'dsm', 'dtm'];
+    if (props.selectedMapType === "auto") {
+      let preferredTypes = ['orthophoto', 'dsm', 'dtm', 'polyhealth'];
 
-      for (let i = 0; i < this.props.mapItems.length; i++){
+      for (let i = 0; i < this.props.mapItems.length; i++) {
         let mapItem = this.props.mapItems[i];
-        for (let j = 0; j < preferredTypes.length; j++){
-          if (mapItem.tiles.find(t => t.type === preferredTypes[j])){
+        for (let j = 0; j < preferredTypes.length; j++) {
+          if (mapItem.tiles.find(t => t.type === preferredTypes[j])) {
             selectedMapType = preferredTypes[j];
             break;
           }
@@ -61,12 +61,13 @@ class MapView extends React.Component {
     this.AITarget = ""
   }
 
-  getTilesByMapType(type){
+  getTilesByMapType(type) {
     // Go through the list of map items and return 
     // only those that match a particular type (in tile format)
     const tiles = [];
 
     this.props.mapItems.forEach(mapItem => {
+      console.log(mapItem);
       mapItem.tiles.forEach(tile => {
         if (tile.type === type) tiles.push({
           url: tile.url,
@@ -79,7 +80,7 @@ class MapView extends React.Component {
     return tiles;
   }
 
-  handleMapTypeButton(type){
+  handleMapTypeButton(type) {
     return () => {
       this.setState(update(this.state, {
         $merge: {
@@ -92,13 +93,13 @@ class MapView extends React.Component {
 
   async handleAIBtnClick(AITarget) {
     this.setState(update(this.state, {
-        AIEnabled: {$set: true}
+      AIEnabled: { $set: true }
     }));
 
     this.AITarget = AITarget
   }
 
-  render(){
+  render() {
     let mapTypeButtons = [
       {
         label: _("Orthophoto"),
@@ -119,12 +120,54 @@ class MapView extends React.Component {
         label: _("Terrain Model"),
         type: "dtm",
         icon: "fa fa-chart-area"
+      },
+      {
+        label: _("Polynomial Health"),
+        type: "polyhealth",
+        icon: "fa fa-image"
       }
-    ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0 );
+    ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0);
 
     // If we have only one button, hide it...
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
+    return (<div className="map-view">
+      <div className="map-header-wrapper">
+        <div className="map-type-selector" role="group">
+          {mapTypeButtons.map(mapType =>
+            <button
+              key={mapType.type}
+              onClick={this.handleMapTypeButton(mapType.type)}
+              className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
+          )}
+          <button
+            key={100}
+            onClick={this.handleAIBtnClick}
+            className={'btn rounded-corners AI-btn ' + (this.state.AIEnabled ? "selected-button" : "default-button")}
+          ><i className='glyphicon glyphicon-screenshot'></i> AI</button>
+        </div>
+
+        {this.props.title ?
+          <div className="text-wrapper">
+            <i className="fa fa-globe"></i>
+            <h3 className="force-montserrat-bold">{this.props.title}</h3>
+          </div>
+          : ""}
+      </div>
+
+      <div className="map-container">
+        <Map
+          tiles={this.state.tiles}
+          showBackground={true}
+          mapType={this.state.selectedMapType}
+          public={this.props.public}
+          shareButtons={this.props.shareButtons}
+          AIenabled={this.state.AIEnabled}
+        />
+      </div>
+    </div>);
+  }
+}
     return (
       <div className="map-view">
           <div className="map-header-wrapper">
@@ -185,7 +228,7 @@ class MapView extends React.Component {
     }
   }
 
-$(function(){
+  $(function(){
     $("[data-mapview]").each(function(){
         let props = $(this).data();
         delete(props.mapview);

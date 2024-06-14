@@ -178,6 +178,7 @@ class Task(models.Model):
                 'deferred_compress_dir': '.'
             },
             'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+            'polyhealth.tif': os.path.join('ai_detections','polynomial_health', 'polynomial_health.tif'),
             'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
             'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
             'orthophoto.kmz': os.path.join('odm_orthophoto', 'odm_orthophoto.kmz'),
@@ -918,12 +919,16 @@ class Task(models.Model):
         return "/api/projects/{}/tasks/{}/{}/".format(self.project.id, self.id, tile_type)
 
     def get_map_items(self):
+        self.update_available_assets_field()
         types = []
+
+
         if 'orthophoto.tif' in self.available_assets: 
             types.append('orthophoto')
             types.append('plant')
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
+        if 'polyhealth.tif' in self.available_assets: types.append('polyhealth')
 
         camera_shots = ''
         if 'shots.geojson' in self.available_assets: camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)
