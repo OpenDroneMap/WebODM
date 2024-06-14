@@ -93,7 +93,7 @@ class MapView extends React.Component {
 
   async handleAIBtnClick(AITarget) {
     this.setState(update(this.state, {
-      AIEnabled: { $set: true }
+      AIEnabled: { $set: !this.state.AIEnabled }
     }));
 
     this.AITarget = AITarget
@@ -131,115 +131,81 @@ class MapView extends React.Component {
     // If we have only one button, hide it...
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
-    return (<div className="map-view">
-      <div className="map-header-wrapper">
-        <div className="map-type-selector" role="group">
-          {mapTypeButtons.map(mapType =>
-            <button
-              key={mapType.type}
-              onClick={this.handleMapTypeButton(mapType.type)}
-              className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
-          )}
-          <button
-            key={100}
-            onClick={this.handleAIBtnClick}
-            className={'btn rounded-corners AI-btn ' + (this.state.AIEnabled ? "selected-button" : "default-button")}
-          ><i className='glyphicon glyphicon-screenshot'></i> AI</button>
-        </div>
-
-        {this.props.title ?
-          <div className="text-wrapper">
-            <i className="fa fa-globe"></i>
-            <h3 className="force-montserrat-bold">{this.props.title}</h3>
-          </div>
-          : ""}
-      </div>
-
-      <div className="map-container">
-        <Map
-          tiles={this.state.tiles}
-          showBackground={true}
-          mapType={this.state.selectedMapType}
-          public={this.props.public}
-          shareButtons={this.props.shareButtons}
-          AIenabled={this.state.AIEnabled}
-        />
-      </div>
-    </div>);
-  }
-}
     return (
       <div className="map-view">
-          <div className="map-header-wrapper">
-            <div className="map-type-selector" role="group">
-              {mapTypeButtons.map(mapType =>
-                <button 
-                  key={mapType.type}
-                  onClick={this.handleMapTypeButton(mapType.type)}
-                  className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
-              )}
-              <button 
-                key={"cattle"}
-                onClick={() => this.handleAIBtnClick("cattle")}
-                className={'btn rounded-corners AI-btn ' + (this.AITarget === "cattle" ? "selected-button" : "default-button")}
-              ><i className='glyphicon glyphicon-screenshot'></i> IA GADO</button>
-              <button 
-                key={"field"}
-                onClick={() => this.handleAIBtnClick("field")}
-                className={'btn rounded-corners AI-btn ' + (this.AITarget === "field" ? "selected-button" : "default-button")}
-              ><i className='glyphicon glyphicon-screenshot'></i> IA TALHÃO</button>
-              <button 
-                key={"soy"}
-                onClick={() => this.handleAIBtnClick("soy")}
-                className={'btn rounded-corners AI-btn ' + (this.AITarget === "soy" ? "selected-button" : "default-button")}
-              ><i className='glyphicon glyphicon-screenshot'></i> IA DANINHA (soja)</button>
-              <button 
-                key={"corn"}
-                onClick={() => this.handleAIBtnClick("corn")}
-                className={'btn rounded-corners AI-btn ' + (this.AITarget === "corn" ? "selected-button" : "default-button")}
-              ><i className='glyphicon glyphicon-screenshot'></i> IA DANINHA (milho)</button>
-            </div>
-            {this.state.AIEnabled && 
+        <div className="map-header-wrapper">
+          <div className="map-type-selector" role="group">
+            {mapTypeButtons.map(mapType =>
+              <button
+                key={mapType.type}
+                onClick={this.handleMapTypeButton(mapType.type)}
+                className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
+            )}
+            <button
+              key={"cattle"}
+              onClick={() => this.handleAIBtnClick("cattle")}
+              className={'btn rounded-corners AI-btn ' + (this.AITarget === "cattle" ? "selected-button" : "default-button")}
+            ><i className='glyphicon glyphicon-screenshot'></i> IA GADO</button>
+            <button
+              key={"field"}
+              onClick={() => this.handleAIBtnClick("field")}
+              className={'btn rounded-corners AI-btn ' + (this.AITarget === "field" ? "selected-button" : "default-button")}
+            ><i className='glyphicon glyphicon-screenshot'></i> IA TALHÃO</button>
+            <button
+              key={"soy"}
+              onClick={() => this.handleAIBtnClick("soy")}
+              className={'btn rounded-corners AI-btn ' + (this.AITarget === "soy" ? "selected-button" : "default-button")}
+            ><i className='glyphicon glyphicon-screenshot'></i> IA DANINHA (soja)</button>
+            <button
+              key={"corn"}
+              onClick={() => this.handleAIBtnClick("corn")}
+              className={'btn rounded-corners AI-btn ' + (this.AITarget === "corn" ? "selected-button" : "default-button")}
+            ><i className='glyphicon glyphicon-screenshot'></i> IA DANINHA (milho)</button>
+          </div>
+          {this.state.AIEnabled &&
             <p>
               {this.state.AIEnabled}
             </p>
           }
-  
-            {this.props.title ? 
-              <div className="text-wrapper">
-                <i className="fa fa-globe"></i>
-                <h3 className="force-montserrat-bold">{this.props.title}</h3>
-              </div>
-            : ""}
-          </div>
-        
-          <div className="map-container">
-              <Map 
-                  tiles={this.state.tiles} 
-                  showBackground={true} 
-                  mapType={this.state.selectedMapType} 
-                  public={this.props.public}
-                  shareButtons={this.props.shareButtons}
-                  AIenabled={this.state.AIEnabled}
-                  AITarget={this.AITarget}
-              />
-          </div>
-        </div>);
-    }
-  }
 
-  $(function(){
-    $("[data-mapview]").each(function(){
-        let props = $(this).data();
-        delete(props.mapview);
-        window.ReactDOM.render(<MapView {...props}/>, $(this).get(0));
-    });
-    $(".map-container").each(function() {
-      $(this).get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
-    });
-    window.addEventListener("resize", () => {
-      $(".map-container").get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
-    });
+          {this.props.title ?
+            <div className="text-wrapper">
+              <i className="fa fa-globe"></i>
+              <h3 className="force-montserrat-bold">{this.props.title}</h3>
+            </div>
+            : ""}
+        </div>
+
+        <div className="map-container">
+          <Map
+            tiles={this.state.tiles}
+            showBackground={true}
+            mapType={this.state.selectedMapType}
+            public={this.props.public}
+            shareButtons={this.props.shareButtons}
+            AIenabled={this.state.AIEnabled}
+            AITarget={this.AITarget}
+          />
+        </div>
+      </div>);
+  }
+}
+
+
+
+
+$(function () {
+  $("[data-mapview]").each(function () {
+    let props = $(this).data();
+    delete (props.mapview);
+    window.ReactDOM.render(<MapView {...props} />, $(this).get(0));
+  });
+  $(".map-container").each(function () {
+    $(this).get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
+  });
+  window.addEventListener("resize", () => {
+    $(".map-container").get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
+  });
 });
 
 export default MapView;
