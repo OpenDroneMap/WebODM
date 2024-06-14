@@ -17,7 +17,7 @@ import GCPPopup from './GCPPopup';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import AssetDownloads from '../classes/AssetDownloads';
-import {addTempLayer, addTempLayerUsingRequest} from '../classes/TempLayer';
+import {  addTempLayer, addTempLayerUsingRequest  } from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
@@ -42,7 +42,7 @@ class Map extends React.Component {
   static propTypes = {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
-    mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
+    mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm', 'polyhealth']),
     public: PropTypes.bool,
     shareButtons: PropTypes.bool,
     AIenabled: PropTypes.bool
@@ -71,6 +71,9 @@ class Map extends React.Component {
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
     this.loadStaticGeoJSON = this.loadStaticGeoJSON.bind(this);
+
+    this.activeAITarget = "";
+    this.layerInstance = null;
   }
 
   setOpacityForLayer(layer, opacity) {
@@ -89,23 +92,25 @@ class Map extends React.Component {
     });
   }
 
-  updatePopupFor(layer){
+  updatePopupFor(layer) {
     const popup = layer.getPopup();
     $('#layerOpacity', popup.getContent()).val(layer.options.opacity);
   }
 
   typeToHuman = (type) => {
-      switch(type){
-          case "orthophoto":
-              return _("Orthophoto");
-          case "plant":
-              return _("Plant Health");
-          case "dsm":
-              return _("DSM");
-          case "dtm":
-              return _("DTM");
-      }
-      return "";
+    switch (type) {
+      case "orthophoto":
+        return _("Orthophoto");
+      case "plant":
+        return _("Plant Health");
+      case "dsm":
+        return _("DSM");
+      case "dtm":
+        return _("DTM");
+      case "polyhealth":
+        return _("Polynomial Health");
+    }
+    return "";
   }
 
   hasBands = (bands, orthophoto_bands) => {
@@ -118,7 +123,38 @@ class Map extends React.Component {
     return true;
   }
 
-  loadImageryLayers(forceAddLayers = false){
+
+  loadTemplateLayer(error, tempLayer, filename) {
+    if (!error) {
+      if (this.layerInstance) this.layerInstance.remove()
+
+      this.setOpacityForLayer(tempLayer, 0);
+      tempLayer.addTo(this.map);
+      tempLayer[Symbol.for("meta")] = { name: filename };
+      this.setState(update(this.state, {
+        overlays: { $push: [tempLayer] }
+      }));
+      this.getAILayer = () => { return tempLayer; };
+      this.layerInstance = tempLayer
+
+    } else {
+      this.setState({ error: error.message || JSON.stringify(error) });
+    }
+
+    if (this.getAILayer != null) {
+      if (this.props.AIenabled) {
+        this.setOpacityForLayer(this.getAILayer(), 1);
+        this.map.fitBounds(this.getAILayer().getBounds());
+
+      } else {
+        this.setOpacityForLayer(this.getAILayer(), 0);
+      }
+    }
+  }
+
+
+
+  loadImageryLayers(forceAddLayers = false) {
     // Cancel previous requests
     if (this.tileJsonRequests) {
         this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
@@ -147,22 +183,22 @@ class Map extends React.Component {
 
       async.each(tiles, (tile, done) => {
         const { url, meta, type } = tile;
-        
+
         let metaUrl = url + "metadata";
 
-        if (type == "plant"){
-          if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
+        if (type == "plant")  {
+          if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2)  {
             // Single band, probably thermal dataset, in any case we can't render NDVI
             // because it requires 3 bands
             metaUrl += "?formula=Celsius&bands=L&color_map=magma";
-          }else if (meta.task && meta.task.orthophoto_bands){
+          }  else if (meta.task && meta.task.orthophoto_bands)  {
             let formula = this.hasBands(["red", "green", "nir"], meta.task.orthophoto_bands) ? "NDVI" : "VARI";
             metaUrl += `?formula=${formula}&bands=auto&color_map=rdylgn`;
-          }else{
+          }  else  {
             // This should never happen?
             metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
           }
-        }else if (type == "dsm" || type == "dtm"){
+        } else if (type == "dsm" || type == "dtm") {
           metaUrl += "?hillshade=6&color_map=viridis";
         }
 
@@ -212,13 +248,13 @@ class Map extends React.Component {
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 
-            if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
+            if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1)  {
               layer.addTo(this.map);
             }
 
             // Show 3D switch button only if we have a single orthophoto
-            if (tiles.length === 1){
-              this.setState({singleTask: meta.task});
+            if (tiles.length === 1)  {
+              this.setState({  singleTask: meta.task  });
             }
 
             // For some reason, getLatLng is not defined for tileLayer?
@@ -254,7 +290,7 @@ class Map extends React.Component {
             $('#layerOpacity', popup).on('change input', function() {
                 layer.setOpacity($('#layerOpacity', popup).val());
             });
-            
+
             this.setState(update(this.state, {
                 imageryLayers: {$push: [layer]}
             }));
@@ -264,7 +300,7 @@ class Map extends React.Component {
             this.mapBounds = mapBounds;
 
             // Add camera shots layer if available
-            if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
+            if (meta.task && meta.task.camera_shots && !this.addedCameraShots) {
 
                 var camIcon = L.icon({
                   iconUrl: "/static/app/js/icons/marker-camera.png",
@@ -311,7 +347,7 @@ class Map extends React.Component {
                     overlays: {$push: [shotsLayer]}
                 }));
 
-                this.addedCameraShots = true;
+              this.addedCameraShots = true;
             }
 
             // Add ground control points layer if available
@@ -361,7 +397,7 @@ class Map extends React.Component {
                     overlays: {$push: [gcpLayer]}
                 }));
 
-                this.addedGroundControlPoints = true;
+              this.addedGroundControlPoints = true;
             }
 
             done();
@@ -612,16 +648,36 @@ _('Example:'),
         this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
 
-    if (prevProps.AIenabled != this.props.AIenabled) {
-      if (this.getAILayer != null) {
-        if (this.props.AIenabled)
-        {
-          this.setOpacityForLayer(this.getAILayer(), 1);
-          this.map.fitBounds(this.getAILayer().getBounds());
-        } else {
-          this.setOpacityForLayer(this.getAILayer(), 0);
-        }
-      }
+    // if (prevProps.AIenabled != this.props.AIenabled) {
+
+    const { tiles } = this.props;
+    const id_map = tiles[0].meta.task.id
+    const project_id = tiles[0].meta.task.project;
+    let url = `http://localhost:8000/api/projects/${project_id}/tasks/${id_map}/ai/detections/`
+
+    if (this.props.AITarget === "cattle" && this.activeAITarget !== "cattle") {
+      addTempLayerUsingRequest(url + "cattle", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename))
+
+      this.activeAITarget = "cattle"
+    }
+
+    if (this.props.AITarget === "soy" && this.activeAITarget !== "soy") {
+      addTempLayerUsingRequest(url + "soy", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename));
+
+      this.activeAITarget = "soy"
+    }
+
+    if (this.props.AITarget === "corn" && this.activeAITarget !== "corn") {
+      addTempLayerUsingRequest(url + "corn", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename));
+
+      this.activeAITarget = "corn"
+    }
+
+    if (this.props.AITarget === "field" && this.activeAITarget !== "field") {
+      addTempLayerUsingRequest(url + "field", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename))
+
+      this.activeAITarget = "field"
+      // }
     }
   }
 
@@ -634,7 +690,7 @@ _('Example:'),
     }
   }
 
-  handleMapMouseDown(e){
+  handleMapMouseDown(e)  {
     // Make sure the share popup closes
     if (this.shareButton) this.shareButton.hidePopup();
   }
@@ -646,24 +702,24 @@ _('Example:'),
 
     const url = `${window.deploy_url}/${id}/detections.geojson`;
 
-    addTempLayerUsingRequest(url, (err, tempLayer, filename) => {
-      if (!err){
+    addTempLayerUsingRequest(url, (error, tempLayer, filename) => {
+      if (!error) {
         this.setOpacityForLayer(tempLayer, 0);
         tempLayer.addTo(this.map);
-        tempLayer[Symbol.for("meta")] = {name: filename};
+        tempLayer[Symbol.for("meta")] = {  name: filename  };
         this.setState(update(this.state, {
-           overlays: {$push: [tempLayer]}
+          overlays: { $push: [tempLayer] }
         }));
-        this.getAILayer = () => {return tempLayer;};
-      }else{
-        this.setState({ error: err.message || JSON.stringify(err) });
+        this.getAILayer = () => {  return tempLayer;  };
+      }  else  {
+        this.setState({ error: error.message || JSON.stringify(error) });
       }
     });
 };
 
   render() {
     return (
-      <div style={{height: "100%"}} className="map">
+      <div style={{ height: "100%" }} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider hidden-xs">
             {_("Opacidade:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />

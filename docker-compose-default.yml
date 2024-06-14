@@ -34,6 +34,8 @@ services:
       - WO_DEV
       - WO_DEV_WATCH_PLUGINS
       - WO_SECRET_KEY
+      - WO_AGROSMART_API_ADDRESS
+      - WO_DISABLE_PERMISSIONS
     restart: unless-stopped
     oom_score_adj: 0
 
