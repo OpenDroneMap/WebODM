@@ -32,7 +32,10 @@ export default class TaskView extends Component {
 
 	onOpenUploadDialog(asset) {
 		this.setState({ currentAsset: asset });
-		this.uploadDialog.show();
+		if (this.uploadDialog != null) 
+		{
+			this.uploadDialog.show();
+		}
 	}
 
 	onHideUploadDialog = () =>
@@ -42,7 +45,8 @@ export default class TaskView extends Component {
 
 	hideTaskDialog = () => this.setState({ isTasksDialog: false });
 
-	onUploadAsset = data => {
+	onUploadAsset = async data => {
+		console.log("TASKVIEW onUploadAsset data: ", data);
 		const { task, token, apiURL } = this.props;
 		const { currentAsset } = this.state;
 		const payload = Object.assign({}, data);
@@ -56,7 +60,7 @@ export default class TaskView extends Component {
 		payload.asset_type = currentAsset;
 
 		this.setState({ isUploadDialogLoading: true });
-		this.cancelableFetch = fetchCancelable(
+		this.cancelableFetch = await fetchCancelable(
 			`/api${apiURL}/task/${task.id}/share`,
 			{
 				method: "POST",
@@ -193,7 +197,7 @@ export default class TaskView extends Component {
 										</IonAssetButton>
 									)}
 
-									{/* {exported.length > 0 && (
+									{exported.length > 0 && (
 										<IonAssetButton
 											assets={exported}
 											onSelect={this.handleAssetSelect(
@@ -220,13 +224,13 @@ export default class TaskView extends Component {
 											<i className={"fa fa-cesium"} />
 											View ion Tasks
 										</button>
-									)} */}
-									{/* <TasksDialog
+									)}
+									<TasksDialog
 										show={isTasksDialog}
 										tasks={processing}
 										onHide={this.hideTaskDialog}
 										onClearFailed={this.onClearFailedAssets}
-									/> */}
+									/>
 								</Fragment>
 							);
 						}}
@@ -237,11 +241,18 @@ export default class TaskView extends Component {
 					{({ isLoading, isError, data }) => {
 						const initialValues = {};
 
+						if (isLoading || assetName === "")
+						{
+							console.log("TASKVIEW Loading project data");
+							return null;
+						}
+
 						if (!isLoading && !isError && data?.length > 0) {
 							const project = data[0];
 							initialValues.name = `${project.name} | ${task.name} ⁠— ${assetName}`;
 							initialValues.description = project.description;
 						}
+						console.log("TASKVIEW initialValues: ", initialValues);
 
 						return (
 							<UploadDialog
@@ -258,12 +269,12 @@ export default class TaskView extends Component {
 						);
 					}}
 				</APIFetcher>
-				{/* <TaskFetcher
+				<TaskFetcher
 					method={"POST"}
 					path={"refresh"}
 					body={JSON.stringify({ token })}
 					onLoad={this.onCleanStatus}
-				/> */}
+				/>
 			</AppContext.Provider>
 		);
 	}
