@@ -15,21 +15,24 @@ const BootstrapFieldComponent = ({
     ...props
 }) => {
     const isError = error && touched;
-    const ControlComponent = type === "checkbox" ? "input" : type === "textarea" || type === "select" ? type : "input";
+    const isCheckbox = type === "checkbox";
+    const ControlComponent = isCheckbox ? "input" : (type === "textarea" || type === "select") ? type : "input";
 
     return (
         <div className={`form-group${isError ? ' has-error' : ''}`} style={{ marginLeft: 0, marginRight: 0 }}>
-            {label && <label htmlFor={name} className="control-label">{label}</label>}
+            {label && !isCheckbox && <label htmlFor={name} className="control-label">{label}</label>}
             <ControlComponent
                 id={name}
                 name={name}
-                className="form-control"
+                className={isCheckbox ? "" : "form-control"}
                 type={type}
-                value={value}
+                value={isCheckbox ? undefined : value}
+                checked={isCheckbox ? value : undefined}
                 onChange={onChange}
                 onBlur={onBlur}
                 {...props}
             />
+            {label && isCheckbox && <label htmlFor={name} className="control-label">{label}</label>}
             {isError && <span className="help-block">{error}</span>}
             {help && !isError && <span className="help-block">{help}</span>}
             {isError && showIcon && <span className="glyphicon glyphicon-remove form-control-feedback"></span>}
@@ -54,15 +57,16 @@ class BootstrapField extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            value: props.value || '',
+            value: props.type === "checkbox" ? props.checked : props.value || '',
             touched: false,
             error: ''
         };
     }
 
     handleChange = (e) => {
-        const { value } = e.target;
-        this.setState({ value }, () => {
+        const { type, checked, value } = e.target;
+        const newValue = type === "checkbox" ? checked : value;
+        this.setState({ value: newValue }, () => {
             if (this.props.onChange) {
                 this.props.onChange(e);
             }

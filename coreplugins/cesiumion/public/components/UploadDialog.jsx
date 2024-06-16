@@ -32,8 +32,51 @@ export default class UploadDialog extends Component {
 		}
 	};
 
+	constructor(props) {
+		super(props);
+
+		this.mergedInitialValues = {
+			...UploadDialog.defaultProps.initialValues,
+			...this.props.initialValues
+		};
+
+		this.state = {
+			...this.mergedInitialValues
+		}
+
+		// this.state = {
+		// 	show: this.props.show,
+		// 	asset: null,
+		// 	loading: this.props.loading,
+		// 	...this.mergedInitialValues,
+		// 	hide: this.props.hide,
+		// 	title: this.props.title
+		// }	
+	}
+
     show(){
         this.dialog.show();
+    }
+
+    handleChange = (e) => {
+        const { value, name } = e.target;
+		
+		if (name === "options.textureFormat")
+		{
+			let options = {...this.state.options};
+			options["textureFormat"] = value === "Yes";
+			this.setState({ options });
+		}
+		else if (name === "options.baseTerrainId")
+		{
+			let options = {...this.state.options};
+			options["baseTerrainId"] = value;
+			this.setState({ options });
+		}
+		else
+		{
+			this.setState({ [name]: value });
+		}
     }
 
 	handleError = msg => error => {
@@ -43,7 +86,7 @@ export default class UploadDialog extends Component {
 
 	onSubmit = values => {
 		const { asset, onSubmit } = this.props;
-		values = JSON.parse(JSON.stringify(values));
+		values = JSON.parse(JSON.stringify(this.state));
 		const { options = {} } = values;
 
 		switch (UploadDialog.AssetSourceType[asset]) {
@@ -66,10 +109,10 @@ export default class UploadDialog extends Component {
 	getSourceFields() {
 		switch (UploadDialog.AssetSourceType[this.props.asset]) {
 			case SourceType.RASTER_TERRAIN:
-				const loadOptions = ({ isLoading, isError, data }) => {
+				let loadOptions = ({ isLoading, isError, data }) => {
 					if (isLoading || isError)
 						return <option disabled>LOADING...</option>;
-					const userItems = data.items
+					let userItems = data.items
 						.filter(item => item.type === "TERRAIN")
 						.map(item => (
 							<option key={item.id} value={item.id}>
@@ -89,6 +132,7 @@ export default class UploadDialog extends Component {
 						name={"options.baseTerrainId"}
 						label={"Base Terrain: "}
 						type={"select"}
+						onChange={this.handleChange}
 					>
 						<IonFetcher
 							path="assets"
@@ -105,7 +149,8 @@ export default class UploadDialog extends Component {
 				return (
 					<BootstrapField
 						name={"options.textureFormat"}
-						type={"checkbox"}
+						label={"Use WebP images"}
+						type={"select"}
 						help={
 							"Will produce WebP images, which are typically 25-34% smaller than " +
 							"equivalent JPEG images which leads to faster streaming and reduced " +
@@ -114,8 +159,10 @@ export default class UploadDialog extends Component {
 							"CesiumJS 1.54 or newer, and a browser that supports WebP, such as " +
 							"Chrome or Firefox 65 and newer."
 						}
+						onChange={this.handleChange}
 					>
-						Use WebP images
+						<option>No</option>
+						<option>Yes</option>
 					</BootstrapField>
 				);
 			default:
@@ -146,38 +193,22 @@ export default class UploadDialog extends Component {
 	}
 
 	render() {
-		const {
-			initialValues,
-			onHide,
-			title,
-			loading: isLoading,
-			...options
-		} = this.props;
-
-		delete options["asset"];
-		delete options["onSubmit"];
-
-		const mergedInitialValues = {
-			...UploadDialog.defaultProps.initialValues,
-			...initialValues
-		};
-
 		return (
             <FormDialog
-                title={title}
+                title={this.state.title}
                 show={this.props.show}
-                onHide={onHide}
+                onHide={this.props.onHide}
                 handleSaveFunction={this.onSubmit}
-                saveLabel={isLoading ? "Submitting..." : "Submit"}
+                saveLabel={this.state.loading ? "Submitting..." : "Submit"}
                 savingLabel="Submitting..."
-                saveIcon={isLoading ? "fa fa-sync fa-spin" : "fa fa-upload"}
+                saveIcon={this.state.loading ? "fa fa-sync fa-spin" : "fa fa-upload"}
                 ref={(domNode) => { this.dialog = domNode; }}
             >
                 <BootstrapField
                     name={"name"}
                     label={"Name: "}
                     type={"text"}
-                    value={mergedInitialValues.name}
+                    value={this.state.name}
                     onChange={this.handleChange}
                 />
                 <BootstrapField
@@ -185,14 +216,14 @@ export default class UploadDialog extends Component {
                     label={"Description: "}
                     type={"textarea"}
                     rows={"3"}
-                    value={mergedInitialValues.description}
+                    value={this.state.description}
                     onChange={this.handleChange}
                 />
                 <BootstrapField
                     name={"attribution"}
                     label={"Attribution: "}
                     type={"text"}
-                    value={mergedInitialValues.attribution}
+                    value={this.state.attribution}
                     onChange={this.handleChange}
                 />
                 {this.getSourceFields()}
