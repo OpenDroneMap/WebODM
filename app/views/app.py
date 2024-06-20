@@ -66,7 +66,6 @@ def map(request, project_pk=None, task_pk=None):
         else:
             title = project.name or project.id
             mapItems = project.get_map_items()
-        print('mapItems', mapItems)
 
     return render(request, 'app/map.html', {
             'title': title,
