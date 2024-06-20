@@ -79,7 +79,6 @@ def process_task(creating_task):
             creating_task.update_available_assets_field()
             creating_task.potree_scene = {}
             creating_task.running_progress = 1.0
-            creating_task.console_output += gettext("Done!") + "\n"
             creating_task.status = status_codes.COMPLETED
             creating_task.save()
 
