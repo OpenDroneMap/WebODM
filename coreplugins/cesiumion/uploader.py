@@ -19,7 +19,7 @@ def upload_to_ion(
     from shutil import rmtree
     from enum import Enum
     from app.plugins import logger
-    from .api_views import (
+    from coreplugins.cesiumion.api_views import (
         get_asset_info,
         set_asset_info,
         AssetType,
@@ -28,11 +28,11 @@ def upload_to_ion(
         ASSET_TO_FILE,
         pluck,
         )
-    from .model_tools import (
+    from coreplugins.cesiumion.model_tools import (
         to_ion_texture_model, 
         IonInvalidZip,
         )
-    from .globals import ION_API_URL
+    from coreplugins.cesiumion.globals import ION_API_URL
     class LoggerAdapter(logging.LoggerAdapter):
         def __init__(self, prefix, logger):
             super().__init__(logger, {})
