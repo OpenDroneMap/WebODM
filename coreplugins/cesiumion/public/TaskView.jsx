@@ -17,6 +17,7 @@ export default class TaskView extends Component {
     constructor(){
         super();
         this.onOpenUploadDialog = this.onOpenUploadDialog.bind(this);
+		this.showTaskDialog = this.showTaskDialog.bind(this);
     }
     
 	state = {
@@ -41,12 +42,17 @@ export default class TaskView extends Component {
 	onHideUploadDialog = () =>
 		this.setState({ currentAsset: null, isUploadDialogLoading: false });
 
-	showTaskDialog = () => this.setState({ isTasksDialog: true });
+	showTaskDialog() {
+		this.setState({ isTasksDialog: true });
+		if (this.tasksDialog != null) 
+		{
+			this.tasksDialog.show();
+		}	
+	}
 
 	hideTaskDialog = () => this.setState({ isTasksDialog: false });
 
 	onUploadAsset = async data => {
-		console.log("TASKVIEW onUploadAsset data: ", data);
 		const { task, token, apiURL } = this.props;
 		const { currentAsset } = this.state;
 		const payload = Object.assign({}, data);
@@ -226,10 +232,12 @@ export default class TaskView extends Component {
 										</button>
 									)}
 									<TasksDialog
+										title={"Cesium ion Tasks"}
 										show={isTasksDialog}
 										tasks={processing}
 										onHide={this.hideTaskDialog}
 										onClearFailed={this.onClearFailedAssets}
+										ref={(domNode) => { this.tasksDialog = domNode; }}
 									/>
 								</Fragment>
 							);
@@ -243,7 +251,6 @@ export default class TaskView extends Component {
 
 						if (isLoading || assetName === "")
 						{
-							console.log("TASKVIEW Loading project data");
 							return null;
 						}
 
@@ -252,7 +259,6 @@ export default class TaskView extends Component {
 							initialValues.name = `${project.name} | ${task.name} ⁠— ${assetName}`;
 							initialValues.description = project.description;
 						}
-						console.log("TASKVIEW initialValues: ", initialValues);
 
 						return (
 							<UploadDialog

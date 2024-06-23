@@ -3,7 +3,6 @@ import React, { Component, Fragment } from "react";
 import FormDialog from "../../../../app/static/app/js/components/FormDialog";
 
 import BootstrapField from "./BootstrapField";
-import FormikErrorFocus from "./FormikErrorFocus";
 import { ImplicitIonFetcher as IonFetcher } from "./Fetcher";
 import { AssetType, SourceType } from "../defaults";
 import "./UploadDialog.scss";
@@ -41,17 +40,9 @@ export default class UploadDialog extends Component {
 		};
 
 		this.state = {
+			title : props.title,
 			...this.mergedInitialValues
 		}
-
-		// this.state = {
-		// 	show: this.props.show,
-		// 	asset: null,
-		// 	loading: this.props.loading,
-		// 	...this.mergedInitialValues,
-		// 	hide: this.props.hide,
-		// 	title: this.props.title
-		// }	
 	}
 
     show(){
