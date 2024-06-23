@@ -123,6 +123,7 @@ export default class UploadDialog extends Component {
 						name={"options.baseTerrainId"}
 						label={"Base Terrain: "}
 						type={"select"}
+						value={this.state.options.baseTerrainId}
 						onChange={this.handleChange}
 					>
 						<IonFetcher
@@ -142,6 +143,7 @@ export default class UploadDialog extends Component {
 						name={"options.textureFormat"}
 						label={"Use WebP images"}
 						type={"select"}
+						value={this.state.options.textureFormat ? "Yes" : "No"}
 						help={
 							"Will produce WebP images, which are typically 25-34% smaller than " +
 							"equivalent JPEG images which leads to faster streaming and reduced " +
