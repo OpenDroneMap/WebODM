@@ -97,7 +97,6 @@ export function addTempLayerUsingRequest(api, cb) {
 
       
       value.json().then((geojson) => {
-        console.log(geojson);
         if (Array.isArray(geojson)) {
           geojson.forEach((el, idx) => {
             if (el.features.length != 0){
