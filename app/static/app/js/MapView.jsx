@@ -5,7 +5,6 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import { _, interpolate } from './classes/gettext';
 import update from 'immutability-helper';
-import { addTempLayerUsingRequest } from './classes/TempLayer';
 
 class MapView extends React.Component {
   static defaultProps = {
@@ -48,17 +47,29 @@ class MapView extends React.Component {
 
     if (selectedMapType === "auto") selectedMapType = "orthophoto"; // Hope for the best
 
+
+    let availableAISelections = ['ai_cattle', 'ai_corn', 'ai_field', 'ai_soy'];
+
+    this.selectableAI = new Set();
+
+    for (let i = 0; i < this.props.mapItems.length; i++) {
+      let mapItem = this.props.mapItems[i];
+      for (let j = 0; j < availableAISelections.length; j++) {
+        if (mapItem.tiles.find(t => t.type === availableAISelections[j])) {
+          this.selectableAI.add(availableAISelections[j]);
+        }
+      }
+    }
+
     this.state = {
       selectedMapType,
       tiles: this.getTilesByMapType(selectedMapType),
-      AIEnabled: false
+      aiSelected: new Set()
     };
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
-    this.handleAIBtnClick = this.handleAIBtnClick.bind(this);
-
-    this.AITarget = ""
+    this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
   }
 
   getTilesByMapType(type) {
@@ -67,7 +78,6 @@ class MapView extends React.Component {
     const tiles = [];
 
     this.props.mapItems.forEach(mapItem => {
-      console.log(mapItem);
       mapItem.tiles.forEach(tile => {
         if (tile.type === type) tiles.push({
           url: tile.url,
@@ -91,12 +101,19 @@ class MapView extends React.Component {
     };
   }
 
-  async handleAIBtnClick(AITarget) {
-    this.setState(update(this.state, {
-      AIEnabled: { $set: !this.state.AIEnabled }
-    }));
-
-    this.AITarget = AITarget
+  handleAiTypeButton(name) {
+    return () => {
+      if (this.state.aiSelected.has(name)){
+        this.setState(update(this.state, {
+          aiSelected: { $remove: [name]}
+        }));
+      }
+      else{
+        this.setState(update(this.state, {
+          aiSelected: { $add: [name]}
+        }));
+      }
+    }
   }
 
   render() {
@@ -128,6 +145,38 @@ class MapView extends React.Component {
       }
     ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0);
 
+
+    // label: what's written on the button
+    // type: corresponds to the internal representation of that type.
+    // name: the trailing name for the route.
+    // icon: the icon.
+    let aiTypeButtons = [
+      {
+        label: _("IA Gado"),
+        type: "ai_cattle",
+        name: "cattle", //route
+        icon: "glyphicon glyphicon-screenshot",
+      },
+      {
+        label: _("IA Talhão"),
+        type: "ai_field",
+        name: "field", //route
+        icon: "glyphicon glyphicon-screenshot",
+      },
+      {
+        label: _("IA Daninha (soja)"),
+        type: "ai_soy",
+        name: "soy", //route
+        icon: "glyphicon glyphicon-screenshot",
+      },
+      {
+        label: _("IA Daninha (milho)"),
+        type: "ai_corn",
+        name: "corn", //route
+        icon: "glyphicon glyphicon-screenshot",
+      }
+    ].filter(aiType => this.selectableAI.has(aiType['type']));
+
     // If we have only one button, hide it...
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
@@ -141,32 +190,16 @@ class MapView extends React.Component {
                 onClick={this.handleMapTypeButton(mapType.type)}
                 className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
             )}
-            <button
-              key={"cattle"}
-              onClick={() => this.handleAIBtnClick("cattle")}
-              className={'btn rounded-corners AI-btn ' + (this.AITarget === "cattle" ? "selected-button" : "default-button")}
-            ><i className='glyphicon glyphicon-screenshot'></i> IA GADO</button>
-            <button
-              key={"field"}
-              onClick={() => this.handleAIBtnClick("field")}
-              className={'btn rounded-corners AI-btn ' + (this.AITarget === "field" ? "selected-button" : "default-button")}
-            ><i className='glyphicon glyphicon-screenshot'></i> IA TALHÃO</button>
-            <button
-              key={"soy"}
-              onClick={() => this.handleAIBtnClick("soy")}
-              className={'btn rounded-corners AI-btn ' + (this.AITarget === "soy" ? "selected-button" : "default-button")}
-            ><i className='glyphicon glyphicon-screenshot'></i> IA DANINHA (soja)</button>
-            <button
-              key={"corn"}
-              onClick={() => this.handleAIBtnClick("corn")}
-              className={'btn rounded-corners AI-btn ' + (this.AITarget === "corn" ? "selected-button" : "default-button")}
-            ><i className='glyphicon glyphicon-screenshot'></i> IA DANINHA (milho)</button>
-          </div>
-          {this.state.AIEnabled &&
-            <p>
-              {this.state.AIEnabled}
-            </p>
-          }
+            {
+              aiTypeButtons.map(aiType => 
+                <button 
+                key={aiType.type}
+                onClick={this.handleAiTypeButton(aiType.name)}
+                className={"btn rounded-corners AI-btn " + (this.state.aiSelected.has(aiType.name) ? "selected-button" : "default-button")}>
+                  <i className={aiType.icon}></i> {aiType.label}
+                </button>
+            )}
+          </div> 
 
           {this.props.title ?
             <div className="text-wrapper">
@@ -183,8 +216,7 @@ class MapView extends React.Component {
             mapType={this.state.selectedMapType}
             public={this.props.public}
             shareButtons={this.props.shareButtons}
-            AIenabled={this.state.AIEnabled}
-            AITarget={this.AITarget}
+            aiSelected={this.state.aiSelected}
           />
         </div>
       </div>);

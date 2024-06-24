@@ -45,7 +45,7 @@ class Map extends React.Component {
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm', 'polyhealth']),
     public: PropTypes.bool,
     shareButtons: PropTypes.bool,
-    AIenabled: PropTypes.bool
+    aiSelected: PropTypes.object
   };
 
   constructor(props) {
@@ -70,25 +70,54 @@ class Map extends React.Component {
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
-    this.loadStaticGeoJSON = this.loadStaticGeoJSON.bind(this);
+    this.loadGeoJsonDetections = this.loadGeoJsonDetections.bind(this);
+    this.removeGeoJsonDetections = this.removeGeoJsonDetections.bind(this);
 
-    this.activeAITarget = "";
     this.layerInstance = null;
   }
 
   setOpacityForLayer(layer, opacity) {
-    if (opacity == 0)
-    {
-      layer.setStyle({opacity: opacity, fillOpacity: opacity});
-    }
-    else {
-      layer.setStyle({opacity: opacity, fillOpacity: 0.5});
-    }
+    layer.setStyle({opacity: opacity});
   }
 
   updateOpacity = (evt) => {
     this.setState({
       opacity: parseFloat(evt.target.value),
+    });
+  }
+
+
+  // types_to_be_loaded is a Set.
+  loadGeoJsonDetections(types_to_be_loaded) {
+    const { tiles } = this.props;
+    const task_id = tiles[0].meta.task.id;
+    const project_id = tiles[0].meta.task.project;
+
+    const base_url = `/api/projects/${project_id}/tasks/${task_id}/ai/detections/`;
+
+    types_to_be_loaded.forEach((typ) => {
+      addTempLayerUsingRequest(base_url + typ, (error, tempLayer, api_url) => {
+        if (!error) {
+          this.setOpacityForLayer(tempLayer, 1);
+          tempLayer.addTo(this.map);
+          tempLayer[Symbol.for("meta")] = {  name: typ  };
+          this.setState(update(this.state, {
+            overlays: { $push: [tempLayer] }
+          }));
+          this.map.fitBounds(tempLayer.options.bounds);
+        }  else  {
+          this.setState({ error: error.message || JSON.stringify(error) });
+        }
+      });
+    });
+  }
+
+  // types_to_be_removed is a Set.
+  removeGeoJsonDetections(types_to_be_removed) {
+    this.state.overlays.forEach(layer => {
+      if (layer[Symbol.for("meta")]["name"] != null && types_to_be_removed.has(layer[Symbol.for("meta")]["name"])){
+        this.map.removeLayer(layer);
+      }
     });
   }
 
@@ -122,36 +151,6 @@ class Map extends React.Component {
     
     return true;
   }
-
-
-  loadTemplateLayer(error, tempLayer, filename) {
-    if (!error) {
-      if (this.layerInstance) this.layerInstance.remove()
-
-      this.setOpacityForLayer(tempLayer, 0);
-      tempLayer.addTo(this.map);
-      tempLayer[Symbol.for("meta")] = { name: filename };
-      this.setState(update(this.state, {
-        overlays: { $push: [tempLayer] }
-      }));
-      this.getAILayer = () => { return tempLayer; };
-      this.layerInstance = tempLayer
-
-    } else {
-      this.setState({ error: error.message || JSON.stringify(error) });
-    }
-
-    if (this.getAILayer != null) {
-      if (this.props.AIenabled) {
-        this.setOpacityForLayer(this.getAILayer(), 1);
-        this.map.fitBounds(this.getAILayer().getBounds());
-
-      } else {
-        this.setOpacityForLayer(this.getAILayer(), 0);
-      }
-    }
-  }
-
 
 
   loadImageryLayers(forceAddLayers = false) {
@@ -625,12 +624,6 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
-
-    this.loadStaticGeoJSON();
-    
-    if (this.state.error) {
-      alert("AI detections not found!");
-    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -648,36 +641,20 @@ _('Example:'),
         this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
 
-    // if (prevProps.AIenabled != this.props.AIenabled) {
 
-    const { tiles } = this.props;
-    const id_map = tiles[0].meta.task.id
-    const project_id = tiles[0].meta.task.project;
-    let url = `http://localhost:8000/api/projects/${project_id}/tasks/${id_map}/ai/detections/`
-
-    if (this.props.AITarget === "cattle" && this.activeAITarget !== "cattle") {
-      addTempLayerUsingRequest(url + "cattle", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename))
-
-      this.activeAITarget = "cattle"
-    }
-
-    if (this.props.AITarget === "soy" && this.activeAITarget !== "soy") {
-      addTempLayerUsingRequest(url + "soy", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename));
-
-      this.activeAITarget = "soy"
-    }
-
-    if (this.props.AITarget === "corn" && this.activeAITarget !== "corn") {
-      addTempLayerUsingRequest(url + "corn", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename));
-
-      this.activeAITarget = "corn"
-    }
-
-    if (this.props.AITarget === "field" && this.activeAITarget !== "field") {
-      addTempLayerUsingRequest(url + "field", (error, templateLayer, filename) => this.loadTemplateLayer(error, templateLayer, filename))
-
-      this.activeAITarget = "field"
-      // }
+    if (this.props.tiles != null){
+      // Gives the new types to be loaded.
+      // props.aiSelected -prevProps.aiSelected
+      let currentAiSelected_minus_prevAiSelected = new Set([...this.props.aiSelected].filter(x => !prevProps.aiSelected.has(x)));
+      if (currentAiSelected_minus_prevAiSelected.size != 0){
+        this.loadGeoJsonDetections(currentAiSelected_minus_prevAiSelected);
+      }
+      // Gives the types to be removed
+      // prevProps.aiSelected - props.aiSelected
+      let prevAiSelected_minus_currentAiSelected = new Set([...prevProps.aiSelected].filter(x => !this.props.aiSelected.has(x)));
+      if (prevAiSelected_minus_currentAiSelected.size != 0){
+        this.removeGeoJsonDetections(prevAiSelected_minus_currentAiSelected);
+      }
     }
   }
 
@@ -694,28 +671,6 @@ _('Example:'),
     // Make sure the share popup closes
     if (this.shareButton) this.shareButton.hidePopup();
   }
-
-  loadStaticGeoJSON() {
-    const { tiles } = this.props;
-    const id = tiles[0].meta.task.id.replaceAll('-', '_');
-    // const project_id = tiles[0].meta.task.project;
-
-    const url = `${window.deploy_url}/${id}/detections.geojson`;
-
-    addTempLayerUsingRequest(url, (error, tempLayer, filename) => {
-      if (!error) {
-        this.setOpacityForLayer(tempLayer, 0);
-        tempLayer.addTo(this.map);
-        tempLayer[Symbol.for("meta")] = {  name: filename  };
-        this.setState(update(this.state, {
-          overlays: { $push: [tempLayer] }
-        }));
-        this.getAILayer = () => {  return tempLayer;  };
-      }  else  {
-        this.setState({ error: error.message || JSON.stringify(error) });
-      }
-    });
-};
 
   render() {
     return (
