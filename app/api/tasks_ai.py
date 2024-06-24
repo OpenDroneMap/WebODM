@@ -7,11 +7,6 @@ from rest_framework.views import APIView
 import json
 from .tasks import TaskNestedView
 
-# Serializer for the Detection data
-class DetectionSerializer(serializers.Serializer):
-    field_number = serializers.CharField()
-    content = serializers.JSONField()
-
 # Base class for AI detection-related views
 class TaskAiDetectionBase(TaskNestedView):
     """
@@ -64,33 +59,10 @@ class TaskAiDetectionWeed(TaskAiDetectionBase):
         if not detection_type:
             raise exceptions.NotFound(detail="Detection type not specified")
 
-        base_path = self.get_file_path(project_pk, pk, detection_type)
-        if not os.path.exists(base_path):
-            raise exceptions.NotFound(detail=f"{detection_type} detection folder not found")
-
-        files = [f for f in os.listdir(base_path) if f.startswith(f'{detection_type}_detection_') and f.endswith('.geojson')]
-        if not files:
-            raise exceptions.NotFound(detail=f"No detection files found for type: {detection_type}")
-
-        detections = [self._build_detection_data(file, base_path) for file in files]
-        return Response(DetectionSerializer(detections, many=True).data)
-
-    def _build_detection_data(self, file_name, base_path):
-        """
-        Builds and returns detection data dictionary for the given file.
-        """
-        file_path = os.path.join(base_path, file_name)
+        file_path = self.get_file_path(project_pk, pk, detection_type, f'{detection_type}_detection.geojson')
         file_content = self.read_geojson_file(file_path)
-        try:
-            # Converte a string JSON para um objeto Python
-            json_content = json.loads(file_content.decode('utf-8'))
-        except json.JSONDecodeError:
-            raise exceptions.ParseError(detail="Error parsing JSON content from file")
-        
-        return {
-            'field_number': file_name.split('_')[2].split('.')[0],
-            'content': json_content
-        }
+        response = HttpResponse(file_content, content_type='application/json')
+        return response
 
 # AI Detection for Field Polygon
 class TaskAiDetectionField(TaskAiDetectionBase):
