@@ -89,14 +89,28 @@ export function addTempLayer(file, cb) {
 export function addTempLayerUsingRequest(api, cb) {
     fetch(api).then((value) => {
       if (value.status == 404) {
+        let err = {};
         err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
         cb(err);
         return;
       }
 
+      
       value.json().then((geojson) => {
+        if (Array.isArray(geojson)) {
+          geojson.forEach((el, idx) => {
+            if (el.features.length != 0){
+              addLayer(el);
+            }
+            else {
+              console.warn(`Warning: The element of index ${idx} in the geojson list that has recently been loaded had no features!\nGeojson without features cannot be properly displayed in the map!\nSkipping index ${idx}!`);
+            }
+          });
+          return
+        }
         addLayer(geojson);
       }).catch((err) => {
+        console.error(err)
         err.message = interpolate(_("Not a proper JSON file at: %(url)s!"), { url: api });
         cb(err);
       });
@@ -134,8 +148,9 @@ export function addTempLayerUsingRequest(api, cb) {
             }
           }
         });
+        
       tempLayer.options.bounds = tempLayer.getBounds();
-      
+
       cb(null, tempLayer, api);
     }
 }

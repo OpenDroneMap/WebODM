@@ -178,6 +178,7 @@ class Task(models.Model):
                 'deferred_compress_dir': '.'
             },
             'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
+            'polyhealth.tif': os.path.join('ai_detections','polynomial_health', 'polynomial_health.tif'),
             'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
             'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
             'orthophoto.kmz': os.path.join('odm_orthophoto', 'odm_orthophoto.kmz'),
@@ -217,6 +218,13 @@ class Task(models.Model):
             'shots.geojson': os.path.join('odm_report', 'shots.geojson'),
             'report.pdf': os.path.join('odm_report', 'report.pdf'),
             'ground_control_points.geojson': os.path.join('odm_georeferencing', 'ground_control_points.geojson'),
+
+            #AVAILABLE AI LISTING
+            'cattle_detection.geojson': os.path.join('ai_detections','cattle', 'cattle_detection.geojson'),
+            'corn_detection.geojson': os.path.join('ai_detections','corn', 'corn_detection.geojson'),
+            'field_detection.geojson': os.path.join('ai_detections','fields', 'field_detection.geojson'),
+            'soy_detection.geojson': os.path.join('ai_detections','soy', 'soy_detection.geojson')
+
     }
 
     STATUS_CODES = (
@@ -918,12 +926,20 @@ class Task(models.Model):
         return "/api/projects/{}/tasks/{}/{}/".format(self.project.id, self.id, tile_type)
 
     def get_map_items(self):
+        self.update_available_assets_field()
         types = []
+
+
         if 'orthophoto.tif' in self.available_assets: 
             types.append('orthophoto')
             types.append('plant')
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
+        if 'polyhealth.tif' in self.available_assets: types.append('polyhealth')
+        if 'cattle_detection.geojson' in self.available_assets: types.append('ai_cattle')
+        if 'corn_detection.geojson' in self.available_assets: types.append('ai_corn')
+        if 'field_detection.geojson' in self.available_assets: types.append('ai_field')
+        if 'soy_detection.geojson' in self.available_assets: types.append('ai_soy')
 
         camera_shots = ''
         if 'shots.geojson' in self.available_assets: camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)
