@@ -34,6 +34,7 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     }
     [data-mapview], .model-view{
         height: calc(100vh);
+        height: calc(100dvh);
     }
 }
 
@@ -117,6 +118,9 @@ ul#side-menu.nav{
         padding-top: 4px;
         margin-top: 0;
     }
+    h3{
+        font-size: 24px;
+    }
 }
 
 .top-buffer { 
@@ -147,6 +151,7 @@ ul#side-menu.nav{
 
 .modal-body {
     max-height: calc(100vh - 220px);
+    max-height: calc(100dvh - 220px);
     overflow-y: auto;
 }
 
@@ -263,9 +268,16 @@ footer{
 
 .full-height{
     height: calc(100vh - 110px);
+    height: calc(100dvh - 110px);
     padding-bottom: 12px;
 }
 
 .floatfix{
     clear: both;
+}
+
+.model-title{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
