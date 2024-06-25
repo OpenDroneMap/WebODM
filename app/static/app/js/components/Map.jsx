@@ -114,9 +114,10 @@ class Map extends React.Component {
 
   // types_to_be_removed is a Set.
   removeGeoJsonDetections(types_to_be_removed) {
-    this.state.overlays.forEach(layer => {
+    this.state.overlays.forEach((layer, idx) => {
       if (layer[Symbol.for("meta")]["name"] != null && types_to_be_removed.has(layer[Symbol.for("meta")]["name"])){
         this.map.removeLayer(layer);
+        delete this.state.overlays[idx];
       }
     });
   }
