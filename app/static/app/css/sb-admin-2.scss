@@ -122,8 +122,7 @@ body {
         margin-left: $left-spacing;
     }
 
-    a.active::before {
-        content: " ";
+    a.active {
         position: absolute;
         top: 10%;
         left: 0;
@@ -135,6 +134,8 @@ body {
         background: #cce0e0;
         z-index: -1;
     }
+
+    
 
     a {
         z-index: 1;

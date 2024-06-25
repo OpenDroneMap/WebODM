@@ -1,0 +1,14 @@
+.toggle-button {
+    border: none;
+    background: none;
+    position: absolute;
+    top: 150%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+@media (max-width: 750px) {
+    .toggle-button {
+        display: none;
+    }
+}
