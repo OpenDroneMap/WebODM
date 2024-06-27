@@ -112,19 +112,21 @@ class MapView extends React.Component {
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
     return (<div className="map-view">
-        <div className="map-type-selector btn-group" role="group">
-          {mapTypeButtons.map(mapType =>
-            <button 
-              key={mapType.type}
-              onClick={this.handleMapTypeButton(mapType.type)}
-              title={mapType.label}
-              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i><span className="hidden-sm hidden-xs"> {mapType.label}</span></button>
-          )}
-        </div>
+        <div className="map-view-header">
+          {this.props.title ? 
+            <h3 className="map-title" title={this.props.title}><i className="fa fa-globe"></i> {this.props.title}</h3>
+          : ""}
 
-        {this.props.title ? 
-          <h3 className="map-title" title={this.props.title}><i className="fa fa-globe"></i> {this.props.title}</h3>
-        : ""}
+          <div className="map-type-selector btn-group" role="group">
+            {mapTypeButtons.map(mapType =>
+              <button 
+                key={mapType.type}
+                onClick={this.handleMapTypeButton(mapType.type)}
+                title={mapType.label}
+                className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i><span className="hidden-sm hidden-xs"> {mapType.label}</span></button>
+            )}
+          </div>
+        </div>
       
         <div className="map-container">
             <Map 

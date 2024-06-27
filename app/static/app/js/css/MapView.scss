@@ -20,15 +20,19 @@
         top: 6px;
     }
 
-    .map-type-selector{
-        float: right;
-    }
-
     .map-container{
         height: 100%;
         position: relative;
         .standby{
             z-index: 99999;
+        }
+    }
+
+    .map-view-header{
+        display: flex;
+        justify-content: space-between;
+        .map-type-selector{
+            flex: none;
         }
     }
 }
