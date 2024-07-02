@@ -41,9 +41,21 @@
         border-style: solid;
         border-width: 1px;
         border-radius: 2px;
+        margin-right: 16px;
+    }
 
-        @media screen and (max-width: 768px){
-            margin-top: 5px;
+    .actions{
+        display: flex;
+        align-items: center;
+        padding-right: 2px;
+    }
+
+    @media screen and (max-width: 576px){
+        .status-label {
+            & > span{
+                display: none;
+            }
+            text-align: center;
         }
     }
 

@@ -27,7 +27,7 @@
 	{% load render_bundle from webpack_loader %}
 	{% render_bundle 'ModelView' attrs='async' %}
 
-	<h3><i class="fa fa-cube"></i> {{title}}</h3>
+	<h3 class="model-title" title="{{title}}"><i class="fa fa-cube"></i> {{title}}</h3>
     
 	<div data-modelview class="full-height"
 		{% for key, value in params %}

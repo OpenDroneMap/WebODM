@@ -166,10 +166,10 @@ class FormDialog extends React.Component {
                 onClick={this.handleDelete}>
                 {this.state.deleting ? 
                     <span>
-                        <i className="fa fa-circle-notch fa-spin"></i> {_("Deleting...")}
+                        <i className="fa fa-circle-notch fa-spin"></i><span className="hidden-xs"> {_("Deleting...")}</span>
                     </span>
                 :   <span>
-                        <i className="fa fa-trash"></i> {_("Delete")}
+                        <i className="fa fa-trash"></i><span className="hidden-xs"> {_("Delete")}</span>
                     </span>}
             </button>);
         }

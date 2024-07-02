@@ -102,4 +102,8 @@
             right: 8px;
         }
     }
+
+    & > .leaflet-container{
+        width: 100%;
+    }
 }
