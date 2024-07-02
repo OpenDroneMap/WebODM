@@ -507,7 +507,7 @@ class TaskListItem extends React.Component {
 
               let buttonHtml = (<button type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
                                 <i className={button.icon}></i>
-                                {button.label}
+                                <span className="hidden-xs">{button.label}</span>
                             </button>);
               if (subItems.length > 0){
                   // The button expands sub items
@@ -654,7 +654,7 @@ class TaskListItem extends React.Component {
       return (<div 
             className={"status-label theme-border-primary " + type} 
             style={{background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)`}}
-            title={text}><i className={statusIcon}></i> {text}</div>);
+            title={text}><i className={statusIcon}></i><span> {text}</span></div>);
     }
 
     let statusLabel = "";
@@ -739,36 +739,22 @@ class TaskListItem extends React.Component {
             />
         : ""}
         <div className="row">
-          <div className="col-sm-5 col-xs-12 name">
+          <div className="col-xs-7 col-sm-6 col-md-5 name">
             <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
             {userTags.length > 0 ? 
               userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
               : ""}
           </div>
-          <div className="col-sm-1 col-xs-5 details">
+          <div className="col-md-1 hidden-xs hidden-sm details">
             <i className="far fa-image"></i> {task.images_count}
           </div>
-          <div className="col-sm-2 col-xs-5 details">
+          <div className="col-md-2 hidden-xs hidden-sm details">
             <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
-          <div className="col-xs-2 text-right visible-xs-block">
-            {taskActions.length > 0 ? 
-                <div className="btn-group">
-                <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i className={"fa " + taskActionsIcon}></i>
-                </button>
-                <ul className="dropdown-menu dropdown-menu-right">
-                    {taskActions}
-                </ul>
-                </div>
-            : ""}
-          </div>
-          <div className="col-sm-3 col-xs-12">
+          <div className="col-xs-5 col-sm-6 col-md-4 actions">
             {showEditLink ?
               <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
               : statusLabel}
-          </div>
-          <div className="col-sm-1 text-right hidden-xs">
             {taskActions.length > 0 ? 
                 <div className="btn-group">
                 <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
