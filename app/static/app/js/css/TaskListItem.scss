@@ -78,6 +78,12 @@
                 padding: 0;
             }
             margin-bottom: 12px;
+            @media screen and (min-width: 1200px) {
+                tr td:first-child {
+                    width: 20%;
+                    max-width: 150px;
+                }
+            }
         }
 
         .task-warning{

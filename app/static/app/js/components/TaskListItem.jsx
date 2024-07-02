@@ -739,7 +739,7 @@ class TaskListItem extends React.Component {
             />
         : ""}
         <div className="row">
-          <div className="col-xs-7 col-sm-6 col-md-5 name">
+          <div className="col-xs-7 col-sm-6 col-md-5 col-lg-6 name">
             <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
             {userTags.length > 0 ? 
               userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
@@ -751,7 +751,7 @@ class TaskListItem extends React.Component {
           <div className="col-md-2 hidden-xs hidden-sm details">
             <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
           </div>
-          <div className="col-xs-5 col-sm-6 col-md-4 actions">
+          <div className="col-xs-5 col-sm-6 col-md-4 col-lg-3 actions">
             {showEditLink ?
               <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
               : statusLabel}
