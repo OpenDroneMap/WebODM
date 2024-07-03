@@ -333,7 +333,7 @@ class TaskListItem extends React.Component {
     return items;
   }
 
-  genRestartAction(rerunFrom = null){
+  genRestartAction(rerunFrom = null, options = {}){
     const { task } = this.state;
 
     const restartAction = this.genActionApiCall("restart", {
@@ -388,9 +388,19 @@ class TaskListItem extends React.Component {
           });
     };
 
-    return () => {
+    let doAction = () => {
       setTaskRerunFrom(rerunFrom)
         .then(restartAction);
+    };
+
+    return () => {
+      if (options.confirm){
+        if (window.confirm(options.confirm)){
+          doAction();
+        }
+      }else{
+        doAction();
+      }
     };
   }
 
@@ -485,7 +495,7 @@ class TaskListItem extends React.Component {
                               task.can_rerun_from[1] :
                               null;
 
-          addActionButton(_("Restart"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
+          addActionButton(_("Restart"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom, {confirm: _("Are you sure you want to restart this task?")}), {
             subItems: this.getRestartSubmenuItems()
           });
       }
