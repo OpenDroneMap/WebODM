@@ -36,7 +36,8 @@ class Map extends React.Component {
     mapType: "orthophoto",
     public: false,
     shareButtons: true,
-    permissions: ["view"]
+    permissions: ["view"],
+    thermal: false
   };
 
   static propTypes = {
@@ -45,7 +46,8 @@ class Map extends React.Component {
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool,
     shareButtons: PropTypes.bool,
-    permissions: PropTypes.array
+    permissions: PropTypes.array,
+    thermal: PropTypes.bool
   };
 
   constructor(props) {
@@ -88,7 +90,7 @@ class Map extends React.Component {
           case "orthophoto":
               return _("Orthophoto");
           case "plant":
-              return _("Plant Health");
+              return this.props.thermal ? _("Thermal") : _("Plant Health");
           case "dsm":
               return _("DSM");
           case "dtm":
@@ -102,13 +104,13 @@ class Map extends React.Component {
         case "orthophoto":
             return "far fa-image fa-fw"
         case "plant":
-            return "fa fa-seedling fa-fw";
+            return this.props.thermal ? "fa fa-thermometer-half fa-fw" : "fa fa-seedling fa-fw";
         case "dsm":
         case "dtm":
             return "fa fa-chart-area fa-fw";
     }
     return "";
-}
+  }
 
   hasBands = (bands, orthophoto_bands) => {
     if (!orthophoto_bands) return false;
