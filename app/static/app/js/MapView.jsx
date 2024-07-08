@@ -62,7 +62,9 @@ class MapView extends React.Component {
     let thermalCount = 0;
     for (let item of this.props.mapItems){
       if (item.meta && item.meta.task && item.meta.task.orthophoto_bands){
-        if (item.meta.task.orthophoto_bands.length === 2 && item.meta.task.orthophoto_bands && item.meta.task.orthophoto_bands[0].description.toLowerCase() === "lwir"){
+        if (item.meta.task.orthophoto_bands.length === 2 && item.meta.task.orthophoto_bands && 
+            item.meta.task.orthophoto_bands[0] && typeof(item.meta.task.orthophoto_bands[0].description) === "string" &&
+            item.meta.task.orthophoto_bands[0].description.toLowerCase() === "lwir"){
           thermalCount++;
         }
       }
