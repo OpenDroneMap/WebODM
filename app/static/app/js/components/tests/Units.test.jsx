@@ -50,6 +50,15 @@ describe('Metric system', () => {
     });
 
     expect(metric.area(11005.09, { fixedUnit: true }).toString({precision: 1})).toBe("11,005.1 m²");
+
+    const temperatures = [
+      [1, "1 °C"],
+      [100.255, "100.3 °C"]
+    ];
+
+    temperatures.forEach(v => {
+      expect(metric.temperature(v[0]).toString()).toBe(v[1]);
+    });
   })
 });
 
@@ -98,6 +107,15 @@ describe('Imperial systems', () => {
     });
 
     expect(imperial.area(9999, { fixedUnit: true }).toString({precision: 1})).toBe("107,628.3 ft²");
+
+    const temperatures = [
+      [1, "33.8 °F"],
+      [100.255, "212.5 °F"]
+    ];
+
+    temperatures.forEach(v => {
+      expect(imperial.temperature(v[0]).toString()).toBe(v[1]);
+    });
   });
 });
 
@@ -118,5 +136,13 @@ describe('Metric conversion', () => {
 
     expect(toMetric(km).value).toBe(2000);
     expect(toMetric(mi).value).toBe(3220);
+
+    const celsius = metric.temperature(50);
+    const fahrenheit = imperial.temperature(50);
+
+    expect(celsius.unit.abbr).toBe("°C");
+    expect(fahrenheit.unit.abbr).toBe("°F");
+    expect(toMetric(celsius).value).toBe(50);
+    expect(toMetric(fahrenheit).value).toBe(50);
   });
 });
