@@ -33,6 +33,7 @@ class MapView extends React.Component {
     // and preference order (below)
     if (props.selectedMapType === "auto"){
       let preferredTypes = ['orthophoto', 'dsm', 'dtm'];
+      if (this.isThermalMap()) preferredTypes = ['plant'].concat(preferredTypes);
 
       for (let i = 0; i < this.props.mapItems.length; i++){
         let mapItem = this.props.mapItems[i];
@@ -55,6 +56,19 @@ class MapView extends React.Component {
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
+  }
+
+  isThermalMap = () => {
+    let thermalCount = 0;
+    for (let item of this.props.mapItems){
+      if (item.meta && item.meta.task && item.meta.task.orthophoto_bands){
+        if (item.meta.task.orthophoto_bands.length === 2 && item.meta.task.orthophoto_bands && item.meta.task.orthophoto_bands[0].description.toLowerCase() === "lwir"){
+          thermalCount++;
+        }
+      }
+    }
+
+    return thermalCount === this.props.mapItems.length;
   }
 
   getTilesByMapType(type){
@@ -85,6 +99,8 @@ class MapView extends React.Component {
   }
 
   render(){
+    const isThermal = this.isThermalMap();
+    
     let mapTypeButtons = [
       {
         label: _("Orthophoto"),
@@ -92,9 +108,9 @@ class MapView extends React.Component {
         icon: "far fa-image"
       },
       {
-        label: _("Plant Health"),
+        label: isThermal ? _("Thermal") : _("Plant Health"),
         type: "plant",
-        icon: "fa fa-seedling"
+        icon: isThermal ? "fa fa-thermometer-half" : "fa fa-seedling"
       },
       {
         label: _("Surface Model"),
@@ -123,7 +139,7 @@ class MapView extends React.Component {
                 key={mapType.type}
                 onClick={this.handleMapTypeButton(mapType.type)}
                 title={mapType.label}
-                className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i><span className="hidden-sm hidden-xs"> {mapType.label}</span></button>
+                className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon + " fa-fw"}></i><span className="hidden-sm hidden-xs"> {mapType.label}</span></button>
             )}
           </div>
         </div>
@@ -136,6 +152,7 @@ class MapView extends React.Component {
                 public={this.props.public}
                 shareButtons={this.props.shareButtons}
                 permissions={this.props.permissions}
+                thermal={isThermal}
             />
         </div>
       </div>);
