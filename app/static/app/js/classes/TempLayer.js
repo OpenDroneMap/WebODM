@@ -1,5 +1,6 @@
 import shp from 'shpjs';
 import { _, interpolate } from './gettext';
+import createFieldLayerControlPopup from '../components/FieldLayerControlPopup'
 
 export function addTempLayer(file, cb) {
   let maxSize = 5242880;
@@ -86,7 +87,7 @@ export function addTempLayer(file, cb) {
   }
 }
 
-export function addTempLayerUsingRequest(api, cb) {
+export function addTempLayerUsingRequest(api, api_type, aiTypes, cb) {
     fetch(api).then((value) => {
       if (value.status == 404) {
         let err = {};
@@ -137,14 +138,10 @@ export function addTempLayerUsingRequest(api, cb) {
           },
           //
           onEachFeature: function (feature, layer) {
-            if (feature.properties) {
-              if (feature.properties) {
-                layer.bindPopup(Object.keys(feature.properties).map(function (k) {
-                  return "<strong>" + k + ":</strong> " + feature.properties[k];
-                }).join("<br />"), {
+            if (feature.properties && api_type == 'field') {
+                layer.bindPopup(createFieldLayerControlPopup(aiTypes, layer), {
                     maxHeight: 200
-                  });
-              }
+              });
             }
           }
         });

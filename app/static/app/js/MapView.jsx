@@ -150,31 +150,48 @@ class MapView extends React.Component {
     // type: corresponds to the internal representation of that type.
     // name: the trailing name for the route.
     // icon: the icon.
-    let aiTypeButtons = [
+    // checkboxLabel: the label that appears with the checkbox when the detections popup is opened. (Optional)
+    // checkboxSelectable: whether a checkbox should be visible or not.
+    // fieldColor: Color that should appear in the geojson if the checkbox was selected
+    let aiTypes = [
       {
         label: _("IA Gado"),
         type: "ai_cattle",
         name: "cattle", //route
         icon: "glyphicon glyphicon-screenshot",
+        checkboxLabel: _("IA Gado"),
+        checkboxSelectable: true,
+        fieldColor: [0x00, 0xff, 0x00]
       },
       {
         label: _("IA Talhão"),
         type: "ai_field",
         name: "field", //route
         icon: "glyphicon glyphicon-screenshot",
+        checkboxSelectable: false,
       },
       {
         label: _("IA Daninha (soja)"),
         type: "ai_soy",
         name: "soy", //route
         icon: "glyphicon glyphicon-screenshot",
+        checkboxLabel: _("IA Soja"),
+        checkboxSelectable: true,
+        fieldColor: [0xff, 0x00, 0x00]
       },
       {
         label: _("IA Daninha (milho)"),
         type: "ai_corn",
         name: "corn", //route
         icon: "glyphicon glyphicon-screenshot",
+        checkboxLabel: _("IA Milho"),
+        checkboxSelectable: true,
+        fieldColor: [0x00, 0x00, 0xff]
       }
+    ]
+
+    let aiTypeButtons = [
+      ...aiTypes
     ].filter(aiType => this.selectableAI.has(aiType['type']));
 
     // If we have only one button, hide it...
@@ -217,6 +234,7 @@ class MapView extends React.Component {
             public={this.props.public}
             shareButtons={this.props.shareButtons}
             aiSelected={this.state.aiSelected}
+            aiTypes={aiTypes}
           />
         </div>
       </div>);

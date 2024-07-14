@@ -36,7 +36,7 @@ class Map extends React.Component {
     mapType: "orthophoto",
     public: false,
     shareButtons: true,
-    AIenabled: false
+    aiSelected: new Set()
   };
 
   static propTypes = {
@@ -45,7 +45,8 @@ class Map extends React.Component {
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm', 'polyhealth']),
     public: PropTypes.bool,
     shareButtons: PropTypes.bool,
-    aiSelected: PropTypes.object
+    aiSelected: PropTypes.object,
+    aiTypes: PropTypes.array.isRequired,
   };
 
   constructor(props) {
@@ -96,7 +97,7 @@ class Map extends React.Component {
     const base_url = `/api/projects/${project_id}/tasks/${task_id}/ai/detections/`;
 
     types_to_be_loaded.forEach((typ) => {
-      addTempLayerUsingRequest(base_url + typ, (error, tempLayer, api_url) => {
+      addTempLayerUsingRequest(base_url + typ, typ, this.props.aiTypes, (error, tempLayer, api_url) => {
         if (!error) {
           this.setOpacityForLayer(tempLayer, 1);
           tempLayer.addTo(this.map);
