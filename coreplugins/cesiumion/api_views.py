@@ -217,6 +217,7 @@ class ShareTaskView(TaskView):
         return Response({"items": assets}, status=status.HTTP_200_OK)
 
     def post(self, request, pk=None):
+        from app.plugins import logger
         task = self.get_and_check_task(request, pk)
         serializer = UploadSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -235,6 +236,13 @@ class ShareTaskView(TaskView):
         # Skip already processing tasks
         if asset_type not in get_processing_assets(task.id):
             if asset_type == AssetType.TEXTURED_MODEL and "position" not in options:
+                value = task.ASSETS_MAP[ASSET_TO_FILE[asset_type]]
+                if isinstance(value, dict):
+                    if 'deferred_compress_dir' in value:
+                        odm_path = value['deferred_compress_dir']
+                        asset_path = task.generate_deferred_asset(asset_path, odm_path, False)
+                        logger.info(f"generate_deferred_asset at  {asset_path}")
+                
                 extent = None
                 if task.dsm_extent is not None:
                     extent = task.dsm_extent.extent
@@ -252,6 +260,7 @@ class ShareTaskView(TaskView):
             asset_info["upload"]["active"] = True
             set_asset_info(task.id, asset_type, asset_info)
 
+            logger.info(f"artychoke  ShareTaskView  {asset_path}")
             run_function_async(upload_to_ion,
                 task.id,
                 asset_type,
