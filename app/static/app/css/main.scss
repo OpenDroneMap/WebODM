@@ -34,6 +34,7 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     }
     [data-mapview], .model-view{
         height: calc(100vh);
+        height: calc(100dvh);
     }
 }
 
@@ -110,12 +111,14 @@ ul#side-menu.nav{
 }
 
 .content{
-    clear: both;
     padding-top: 8px;
 
     h1,h2,h3,h4,h5{
         padding-top: 4px;
         margin-top: 0;
+    }
+    h3{
+        font-size: 24px;
     }
 }
 
@@ -147,6 +150,7 @@ ul#side-menu.nav{
 
 .modal-body {
     max-height: calc(100vh - 220px);
+    max-height: calc(100dvh - 220px);
     overflow-y: auto;
 }
 
@@ -216,7 +220,7 @@ button i.glyphicon{
     float: right;
     margin-right: 15px;
     padding: 9px 10px;
-    margin-top: 5px;
+    margin-top: 7px;
     margin-bottom: 5px;
 }
 
@@ -263,9 +267,16 @@ footer{
 
 .full-height{
     height: calc(100vh - 110px);
+    height: calc(100dvh - 110px);
     padding-bottom: 12px;
 }
 
 .floatfix{
     clear: both;
+}
+
+.model-title{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }

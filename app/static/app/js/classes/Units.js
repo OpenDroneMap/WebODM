@@ -3,7 +3,8 @@ import { _ } from './gettext';
 const types = {
     LENGTH: 1,
     AREA: 2,
-    VOLUME: 3
+    VOLUME: 3,
+    TEMPERATURE: 4
 };
 
 const units = {
@@ -139,6 +140,26 @@ const units = {
         round: 4,
         label: _("Cubic Yards"),
         type: types.VOLUME
+    },
+    celsius:{
+        conversion:{
+            forward: celsius => celsius,
+            backward: celsius => celsius
+        },
+        abbr: '°C',
+        round: 1,
+        label: _("Celsius"),
+        type: types.TEMPERATURE
+    },
+    fahrenheit:{
+        conversion: {
+            forward: celsius => (9.0 / 5.0) * celsius + 32.0,
+            backward: fahrenheit => (fahrenheit - 32.0) * (5.0 / 9.0)
+        },
+        abbr: '°F',
+        round: 1,
+        label: _("Fahrenheit"),
+        type: types.TEMPERATURE
     }
 };
 
@@ -175,8 +196,10 @@ class UnitSystem{
     lengthUnit(meters, opts = {}){ throw new Error("Not implemented"); }
     areaUnit(sqmeters, opts = {}){ throw new Error("Not implemented"); }
     volumeUnit(cbmeters, opts = {}){ throw new Error("Not implemented"); }
+    temperatureUnit(celsius, opts = {}){ throw new Error("Not implemented"); }
     
     getName(){ throw new Error("Not implemented"); }
+    getKey(){ throw new Error("Not implemented"); }
     
     area(sqmeters, opts = {}){
         sqmeters = parseFloat(sqmeters);
@@ -185,6 +208,10 @@ class UnitSystem{
         const unit = this.areaUnit(sqmeters, opts);
         const val = unit.factor * sqmeters;
         return new ValueUnit(val, unit);
+    }
+
+    elevation(meters){
+        return this.length(meters, { fixedUnit: true });
     }
 
     length(meters, opts = {}){
@@ -204,6 +231,15 @@ class UnitSystem{
         const val = unit.factor * cbmeters;
         return new ValueUnit(val, unit);
     }
+
+    temperature(celsius, opts = {}){
+        celsius = parseFloat(celsius);
+        if (isNaN(celsius)) return NanUnit();
+
+        const unit = this.temperatureUnit(celsius, opts);
+        const val = unit.conversion.forward(celsius);
+        return new ValueUnit(val, unit);
+    }
 };
 
 function toMetric(valueUnit, unit){
@@ -216,13 +252,23 @@ function toMetric(valueUnit, unit){
     }
     if (isNaN(value)) return NanUnit();
 
-    const val = value / unit.factor;
+    let val;
+    if (unit.factor !== undefined){
+        val = value / unit.factor;
+    }else if (unit.conversion !== undefined){
+        val = unit.conversion.backward(value);
+    }else{
+        throw new Error(`No unit factor or conversion: ${unit.type}`);
+    }
+
     if (unit.type === types.LENGTH){
         return new ValueUnit(val, units.meters);
     }else if (unit.type === types.AREA){
         return new ValueUnit(val, unit.sqmeters);
     }else if (unit.type === types.VOLUME){
         return new ValueUnit(val, unit.cbmeters);
+    }else if (unit.type === types.TEMPERATURE){
+        return new ValueUnit(val, units.celsius);
     }else{
         throw new Error(`Unrecognized unit type: ${unit.type}`);
     }
@@ -231,6 +277,10 @@ function toMetric(valueUnit, unit){
 class MetricSystem extends UnitSystem{
     getName(){
         return _("Metric");
+    }
+
+    getKey(){
+        return "metric";
     }
 
     lengthUnit(meters, opts = {}){
@@ -252,11 +302,19 @@ class MetricSystem extends UnitSystem{
     volumeUnit(cbmeters, opts = {}){
         return units.cbmeters;
     }
+
+    temperatureUnit(celsius, opts = {}){
+        return units.celsius;
+    }
 }
 
 class ImperialSystem extends UnitSystem{
     getName(){
         return _("Imperial");
+    }
+
+    getKey(){
+        return "imperial";
     }
 
     feet(){
@@ -303,11 +361,19 @@ class ImperialSystem extends UnitSystem{
     volumeUnit(cbmeters, opts = {}){
         return this.cbyards();
     }
+
+    temperatureUnit(celsius, opts = {}){
+        return units.fahrenheit;
+    }
 }
 
 class ImperialUSSystem extends ImperialSystem{
     getName(){
         return _("Imperial (US)");
+    }
+
+    getKey(){
+        return "imperialUS";
     }
 
     feet(){

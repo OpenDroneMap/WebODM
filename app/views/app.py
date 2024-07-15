@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django import forms
+from app.views.utils import get_permissions
 from webodm import settings
 
 def index(request):
@@ -73,7 +74,8 @@ def map(request, project_pk=None, task_pk=None):
                 'map-items': json.dumps(mapItems),
                 'title': title,
                 'public': 'false',
-                'share-buttons': 'false' if settings.DESKTOP_MODE else 'true'
+                'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
+                'permissions': json.dumps(get_permissions(request.user, project))
             }.items()
         })
 

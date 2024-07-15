@@ -13,7 +13,8 @@
         }
     }
     .btn-group.open > .dropdown-menu{
-        top: 22px;
+        top: 24px;
+        padding-right: 4px;
         a{
             border: none;
         }
@@ -31,6 +32,10 @@
         max-width: 210px;
     }
 
+    .pagination>li{
+        display: inline-block;
+    }
+
     .search-popup{
         min-width: 256px;
 
@@ -45,6 +50,12 @@
                     left: -3px;
                 }
             }
+        }
+    }
+
+    @media (max-width: 576px) { 
+        .search-popup{
+            min-width: 180px;
         }
     }
 

@@ -22,7 +22,7 @@ class UnitSelector extends React.Component {
 
   render() {
     return (
-      <select className="unit-selector" value={this.state.system} onChange={this.handleChange}>
+      <select className="unit-selector theme-secondary" value={this.state.system} onChange={this.handleChange}>
             {Object.keys(systems).map(k => 
                 <option value={k} key={k}>{systems[k].getName()}</option>)}
         </select>

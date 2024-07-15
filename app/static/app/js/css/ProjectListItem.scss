@@ -3,13 +3,6 @@
 
     .project-name{
         font-weight: bold;
-
-        @media screen and (max-width: 768px){
-            font-size: x-large;
-            text-align: center;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        } 
     }
 
     .project-description{
@@ -85,21 +78,6 @@
 
     .project-buttons {
         float: right;
-
-        @media screen and (max-width: 768px){
-
-            .asset-download-buttons {
-                width: 100%;
-            }
-
-            float: none;      
-            
-            width: 100%;
-
-            .btn {
-                width: 100%;
-            }
-        }
     }
 
     .task-filters{
@@ -167,5 +145,10 @@
 
     .quick-clear-filter{
         margin-right: 6px !important;
+    }
+
+    .asset-download-buttons > button:last-child{
+        border-top-right-radius: 3px !important;
+        border-bottom-right-radius: 3px !important;
     }
 }

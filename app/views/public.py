@@ -7,6 +7,7 @@ from django.shortcuts import render
 
 from app.api.tasks import TaskSerializer
 from app.models import Task
+from app.views.utils import get_permissions
 from django.views.decorators.csrf import ensure_csrf_cookie
 from webodm import settings
 
@@ -31,6 +32,7 @@ def handle_map(request, template, task_pk=None, hide_title=False):
             'public': 'true',
             'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
             'selected-map-type': request.GET.get('t', 'auto'),
+            'permissions': json.dumps(get_permissions(request.user, task.project))
         }.items()
     })
 

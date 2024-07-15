@@ -23,7 +23,13 @@ export default {
   ],
 
   functions: [
-    "handleClick"
+    "handleClick",
+    "addAnnotation",
+    "updateAnnotation",
+    "deleteAnnotation",
+    "toggleAnnotation",
+    "annotationDeleted",
+    "downloadAnnotations"
   ]
 };
 

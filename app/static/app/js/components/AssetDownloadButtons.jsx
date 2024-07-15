@@ -53,7 +53,7 @@ class AssetDownloadButtons extends React.Component {
             : ""}
 
           <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
-            <i className="glyphicon glyphicon-download"></i>{this.props.showLabel ? " " + _("Download Assets") : ""}
+            <i className="glyphicon glyphicon-download"></i><span className="hidden-xs hidden-sm">{this.props.showLabel ? " " + _("Download Assets") : ""}</span>
           </button>
           {this.props.showLabel ? 
           <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
@@ -82,6 +82,9 @@ class AssetDownloadButtons extends React.Component {
                         </li>);
                 }
             })}
+            <li>
+                <a href={`/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/backup`}><i className="fa fa-file-download fa-fw"></i> {_("Backup")}</a>
+            </li>
           </ul>
         </div>);
     }

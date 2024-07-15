@@ -174,7 +174,7 @@ export default class ContoursPanel extends React.Component {
         this.setState({previewLayer: L.geoJSON(geojson, {
           onEachFeature: (feature, layer) => {
               if (feature.properties && feature.properties.level !== undefined) {
-                  layer.bindPopup(`<div style="margin-right: 32px;"><b>${_("Elevation:")}</b> ${us.length(feature.properties.level)}</div>`);
+                  layer.bindPopup(`<div style="margin-right: 32px;"><b>${_("Elevation:")}</b> ${us.elevation(feature.properties.level)}</div>`);
               }
           },
           style: feature => {
