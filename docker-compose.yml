@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     oom_score_adj: -100
   webapp:
-    image: webodm_webapp
+    image: webodm_webapp:latest
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
     volumes:
