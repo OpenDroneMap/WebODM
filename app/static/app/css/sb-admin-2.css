@@ -114,10 +114,25 @@ body {
   height: 100%;
   margin-left: 5px;
 }
-
-.navbar-collapse ul li a,
-.sidebar ul li a {
-  z-index: 1;
+.navbar-collapse ul li a.active::before,
+.sidebar ul li a.active::before {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80%;
+  width: calc(95% + 5px + 5px);
+  border-radius: 25px;
+  background: #cce0e0;
+  z-index: -1;
+  content: " ";
+  transition: width 0.2s;
+}
+.navbar-collapse ul li a.active.collapsed::before,
+.sidebar ul li a.active.collapsed::before {
+  width: 80%;
+  transition: width 0.2s;
 }
 
 @media (min-width: 768px) {
