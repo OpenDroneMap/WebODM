@@ -8,124 +8,131 @@ import update from 'immutability-helper';
 class FieldLayerControlPopup extends React.Component {
   static propTypes = {
     aiTypes: PropTypes.array.isRequired,
-    boundLayer: PropTypes.object.isRequired
+    boundLayer: PropTypes.object.isRequired,
+    stateSelectedLayers: PropTypes.array.isRequired,
   }
 
   constructor(props){
     super(props);
 
+    this.boundLayer = this.props.boundLayer;
+    this.handleOnChangeAi = this.handleOnChangeAi.bind(this);
+    this.changeLayerColor = this.changeLayerColor.bind(this);
+    this.handleOnChangeRadio = this.handleOnChangeRadio.bind(this);
+
+    // checkboxLabel: the label that appears with the checkbox when the detections popup is opened. (Optional)
+    this.aiOptions = [
+      {
+        checkboxLabel: "Daninha",
+        category: 'weed',
+      },
+    ];
+
+    // checkboxLabel: the label that appears with the checkbox when the detections popup is opened. (Optional)
+    // fieldColor: Color that should appear in the geojson if the checkbox was selected
+    this.cropType = [
+      {
+        checkboxLabel: "Milho",
+        type: 'corn',
+        fieldColor: '#F4D35E',
+      },
+      {
+        checkboxLabel: "Soja",
+        type: 'soy',
+        fieldColor: '#2E1E0F',
+      },
+      {
+        checkboxLabel: "Cana",
+        type: 'sugarcane',
+        fieldColor: '#596F62',
+      },
+    ];
+
     this.checked = {};
-    this.props.aiTypes.forEach(typ => {
-      this.checked[typ.type] = false;
+    this.aiOptions.forEach(option => {
+      this.checked[option.category] = false;
     });
 
-    this.boundLayer = this.props.boundLayer;
-    this.boundLayer.options.processing = new Set();
-    this.handleOnChange = this.handleOnChange.bind(this);
-    this.changeLayerColor = this.changeLayerColor.bind(this);
-    this.updateColorSchema = this.updateColorSchema.bind(this);
-  }
+    this.state = {
+      cropType: null,
+    };
 
-  convertToHex(integer) {
-    const hexString = integer.toString(16);
+    this.getSelectedLayers = this.props.stateSelectedLayers[0];
+    this.setSelectedLayers = this.props.stateSelectedLayers[1];
 
-    return hexString.length === 1 ? "0" + hexString : hexString;
-}
-
-  // By: Aaron Harris (https://stackoverflow.com/questions/14819058/mixing-two-colors-naturally-in-javascript)
-  //colorChannelA and colorChannelB are ints ranging from 0 to 255
-  colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
-    let channelA = colorChannelA*amountToMix;
-    let channelB = colorChannelB*(1-amountToMix);
-    return parseInt(channelA+channelB);
-  }
-
-  //rgbA and rgbB are arrays, amountToMix ranges from 0.0 to 1.0
-  //example (red): rgbA = [255,0,0]
-  colorMixer(rgbA, rgbB, amountToMix){
-    let r = this.colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
-    let g = this.colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
-    let b = this.colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
-    return [r, g, b];
-  }
-
-  colorFromComponents(color) {
-    let r = this.convertToHex(color[0]);
-    let g = this.convertToHex(color[1]);
-    let b = this.convertToHex(color[2]);
-
-    return `#${r}${g}${b}`;
+    this.selectedIndex = this.getSelectedLayers().length;
+    this.setSelectedLayers(this.getSelectedLayers().length, {
+      bounds: this.boundLayer.getBounds(),
+      cropType: null,
+      aiOptions: new Set(),
+    });
   }
 
   changeLayerColor(color) {
     this.boundLayer.setStyle({color: color});
   }
 
-  updateColorSchema() {
-    let colorToBeMixed = [];
-     this.boundLayer.options.processing.forEach((id) => {
-      for (let i = 0; i < this.props.aiTypes.length; i++) {
-        if (this.props.aiTypes[i].type == id) {
-          colorToBeMixed.push(this.props.aiTypes[i].fieldColor);
-        }
-      }
-    });
-
-    colorToBeMixed = colorToBeMixed.sort();
-
-    if (colorToBeMixed.length == 0) {
-      this.changeLayerColor('#99ff99');
-      return;
-    }
-
-    if (colorToBeMixed.length == 1) {
-      this.changeLayerColor(this.colorFromComponents(colorToBeMixed[0]));
-      return;
-    }
-    
-    const mixingConstant = 0.5;
-
-    let clr = this.colorMixer(colorToBeMixed[0], colorToBeMixed[1], mixingConstant);
-    for (let i = 2; i < colorToBeMixed.length; i++) {
-      clr = this.colorMixer(clr, colorToBeMixed[i], mixingConstant);
-    }
-
-    this.changeLayerColor(this.colorFromComponents(clr));
-  }
-
-  handleOnChange(id) {
+  handleOnChangeAi(id) {
     this.checked[id] = !this.checked[id];
 
     if (this.checked[id]) {
-      this.boundLayer.options.processing.add(id);
+      this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {aiOptions: {$add: [id]}}));
     }
     else {
-      this.boundLayer.options.processing.delete(id);
+      this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {aiOptions: {$remove: [id]}}));
     }
-    this.updateColorSchema();
+  }
+
+  handleOnChangeRadio(id) {
+    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {$merge: {cropType: id}}));
+    this.setState({cropType: id});
+    let color;
+
+    for (let i = 0; i < this.cropType.length; i++) {
+      if (this.cropType[i].type == id) {
+        color = this.cropType[i].fieldColor;
+        break;
+      }
+    }
+
+    this.changeLayerColor(color);
   }
 
   render() {
     return (
     <div className='field-layer'>
+      <fieldset>
+        <legend>Tipo de cultivo:</legend>
         {
-            this.props.aiTypes.map(typ => {
-                if (!typ.checkboxSelectable)
-                    return null;
+          this.cropType.map(typ => {
+              return (
+                <div key={typ.type}>
+                  <input type="radio" id={typ.type} checked={this.state.cropType == typ.type} onChange={() => this.handleOnChangeRadio(typ.type)} />
+                  <label htmlFor={typ.type}>{typ.checkboxLabel}</label>
+                </div>
+              )
+          })
+        }
+      </fieldset>
 
-                return (<div key={typ.type}>
-                    <input type='checkbox' id={typ.type} onChange={() => this.handleOnChange(typ.type)}></input>
-                    <label htmlFor={typ.type}>{typ.checkboxLabel}</label>
-                </div>)
-            })
+      <p>IAs para processar:</p>
+      {
+          this.aiOptions.map(option => {
+            return (
+              <div key={option.category}>
+                <input type='checkbox' id={option.category} onChange={() => this.handleOnChangeAi(option.category)}></input>
+                <label htmlFor={option.category}>{option.checkboxLabel}</label>
+              </div>
+            )
+          })
         }
     </div>)
   }
 }
 
-export default function createFieldLayerControlPopup(aiTypes, boundLayer)
+export default function createFieldLayerControlPopup(aiTypes, boundLayer, stateSelectedLayers)
 {
   let container = L.DomUtil.create('div');
-  ReactDOM.render(<FieldLayerControlPopup aiTypes={aiTypes} boundLayer={boundLayer}/>, container);
+  ReactDOM.render(<FieldLayerControlPopup aiTypes={aiTypes} boundLayer={boundLayer} stateSelectedLayers={stateSelectedLayers}/>, container);
   return container;
 }
