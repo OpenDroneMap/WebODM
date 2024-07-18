@@ -176,25 +176,19 @@ body {
     padding-left: 52px;
 }
 
-@media(min-width: 768px) {
-    $top: 60px;
-    .white-screen {
-        position: absolute;
-        top: $top;
-        z-index: -1;
-        width: $navbar-size;
-        height: calc(100vh - $top);
-        background-color: #fff;
-        box-shadow: 9px 0 5px -5px rgba(0, 0, 0, 0.1);
-    }
-}
-
 @media(min-width:768px) {
+    $top: 61px;
     .sidebar {
-        z-index: 1;
-        position: absolute;
+        z-index: 1000; /* Ajuste para garantir que fique acima de outros conteúdos, se necessário */
+        position: fixed; /* Fixa a barra lateral na viewport */        
         width: $navbar-size;
-        top: 70px;
+        height: calc(
+          100vh - $top
+        ); /* Altura ajustada para subtrair a barra superior */
+        top: $top; /* Posiciona a barra lateral logo abaixo da barra superior */
+        padding-top: 10px; /* Espaço interno superior para a estética */
+        overflow-y: auto; /* Permite rolagem dentro da barra lateral se o conteúdo exceder a altura */
+        box-shadow: 9px 0 5px -5px rgba(0, 0, 0, 0.1);
     }
 
     .navbar-top-links .dropdown-messages,

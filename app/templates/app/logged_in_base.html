@@ -2,228 +2,160 @@
 {% load i18n static settings %}
 
 {% block navbar-top-links %}
-    {% is_single_user_mode as single_user %}
+{% is_single_user_mode as single_user %}
 
-    {% if not single_user %}
-    <ul class="nav navbar-top-links navbar-right">
-        <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <i data-sidebar="icons" class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-user">
-                <li class="user-profile">
-                    <div class="info-item">
-                        {% blocktrans with user=user.username %}Olá, {{ user }}!{% endblocktrans %}<br/>
-                        <span class="email">{{ user.email }}</span>
-                    </div>
-                </li>
-                {% if user.profile.has_quota %}
-                    <li class="divider"></li>
+{% if not single_user %}
+<ul class="nav navbar-top-links navbar-right">
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-user">
+            <li class="user-profile">
+                <div class="info-item">
+                    {% blocktrans with user=user.username %}Olá, {{ user }}!{% endblocktrans %}<br />
+                    <span class="email">{{ user.email }}</span>
+                </div>
+            </li>
+            {% if user.profile.has_quota %}
+            <li class="divider"></li>
 
-                    {% with tot_quota=user.profile.quota used_quota=user.profile.used_quota_cached %}
-                    {% percentage used_quota tot_quota as perc_quota %}
-                    {% percentage used_quota tot_quota 100 as bar_width %}
-                    
-                    <li>
-                        <div class="info-item quotas">
-                            {% with usage=perc_quota|floatformat:0 used=used_quota|disk_size total=tot_quota|disk_size %}
-                            <i data-sidebar="icons" class="fa fa-database fa-fw plugin-icon"></i> {% blocktrans %}{{used}} of {{total}} used{% endblocktrans %}
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-{% if perc_quota <= 100 %}success{% else %}warning{% endif %} active" style="width: {{ bar_width }}%">
-                                    {{usage}}%
-                                </div>
-                            </div>
-                            {% endwith %}
+            {% with tot_quota=user.profile.quota used_quota=user.profile.used_quota_cached %}
+            {% percentage used_quota tot_quota as perc_quota %}
+            {% percentage used_quota tot_quota 100 as bar_width %}
+
+            <li>
+                <div class="info-item quotas">
+                    {% with usage=perc_quota|floatformat:0 used=used_quota|disk_size total=tot_quota|disk_size %}
+                    <i class="fa fa-database fa-fw plugin-icon"></i> {% blocktrans %}{{used}} of {{total}}
+                    used{% endblocktrans %}
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-{% if perc_quota <= 100 %}success{% else %}warning{% endif %} active"
+                            style="width: {{ bar_width }}%">
+                            {{usage}}%
                         </div>
-                    </li>
-
+                    </div>
                     {% endwith %}
-                {% endif %}
-                <li class="divider"></li>
-                <li>
-                    <a data-sidebar="link" href="/logout/">
-                        <i data-sidebar="icons" class="fa fa-sign-out-alt fa-fw"></i> Sair
-                    </a>
-                </li>
-            </ul>
-            <!-- /.dropdown-user -->
-        </li>
-        <!-- /.dropdown -->
-    </ul>
-    {% endif %}
+                </div>
+            </li>
+
+            {% endwith %}
+            {% endif %}
+            <li class="divider"></li>
+            <li><a href="/logout/"><i class="fa fa-sign-out-alt fa-fw"></i> Sair</a>
+            </li>
+        </ul>
+        <!-- /.dropdown-user -->
+    </li>
+    <!-- /.dropdown -->
+</ul>
+{% endif %}
 {% endblock %}
 {% block navbar-sidebar %}
-    <div data-sidebar="background" class="white-screen"></div>
-    <div class="navbar-default sidebar" data-sidebar="menu_items" id="sidebar" role="navigation">
-        <button
-            class="toggle-button"
-            data-sidebar="toggle">
-            <img 
-                width="50px"
-                src="/static/app/img/toggle.png" 
-                alt="Toggle Image"/>
-        </button>
-        <div data-sidebar="nav" class="sidebar-nav navbar-collapse">
-            <ul class="nav" id="side-menu">
-                <li>
-                    <a data-sidebar="link" href="/dashboard/">
-                        <i data-sidebar="icons" class="fa fa-tachometer-alt fa-fw plugin-icon"></i>
-                        <span data-sidebar="link-text">
-                            {% trans 'Dashboard' %}</a>
-                        </span>
-                </li>
-                {% load processingnode_extras plugins %}
-                {% can_view_processing_nodes as view_nodes %}
-                {% can_add_processing_nodes as add_nodes %}
-                {% get_visible_processing_nodes as nodes %}
+<div class="navbar-default sidebar" role="navigation">
+    <div class="sidebar-nav navbar-collapse">
+        <ul class="nav" id="side-menu">
+            <li>
+                <a href="/dashboard/"><i class="fa fa-tachometer-alt fa-fw plugin-icon"></i> {% trans 'Dashboard' %}</a>
+            </li>
+            {% load processingnode_extras plugins %}
+            {% can_view_processing_nodes as view_nodes %}
+            {% can_add_processing_nodes as add_nodes %}
+            {% get_visible_processing_nodes as nodes %}
 
-                {% get_plugins_main_menus as plugin_menus %}
-                {% for menu in plugin_menus %}
+            {% get_plugins_main_menus as plugin_menus %}
+            {% for menu in plugin_menus %}
+            <li>
+                <a href="{{menu.link}}"><i class="{{menu.css_icon}} plugin-icon"></i>
+                    {{menu.label}}{% if menu.has_submenu %}<span class="fa arrow"></span>{% endif %}</a>
+
+                {% if menu.has_submenu %}
+                <ul class="nav nav-second-level">
+                    {% for menu in menu.submenu %}
                     <li>
-                        <a data-sidebar="link" href="{{menu.link}}">
-                            <i data-sidebar="icons" class="{{menu.css_icon}} plugin-icon"></i> 
-
-                            <span data-sidebar="link-text">
-                                {{menu.label}}
-                            </span>
-                            
-                            {% if menu.has_submenu %}
-                                <span class="fa arrow"></span>
-                            {% endif %}
-                        </a>
-
-                        {% if menu.has_submenu %}
-                            <ul class="nav nav-second-level">
-                            {% for menu in menu.submenu %}
-                                <li>
-                                    <a data-sidebar="link" href="{{menu.link}}">
-                                        <i data-sidebar="icons" class="{{menu.css_icon}} plugin-icon"></i> 
-                                        <span data-sidebar="link-text">
-                                            {{menu.label}}
-                                        </span>
-
-                                        {% if menu.has_submenu %}
-                                            <span class="fa arrow"></span>
-                                        {% endif %}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                            </ul>
-                        {% endif %}
+                        <a href="{{menu.link}}"><i class="{{menu.css_icon}} plugin-icon"></i>
+                            {{menu.label}}{% if menu.has_submenu %}<span class="fa arrow"></span>{% endif %}</a>
                     </li>
-                {% endfor %}
-
-                {% if view_nodes %}
-                <li>
-                    <a data-sidebar="link" href="#">
-                        <i data-sidebar="icons" class="fa fa-wrench fa-fw plugin-icon"></i> 
-                        <span data-sidebar="link-text">
-                            {% trans 'Processing Nodes' %}<span class="fa arrow"></span></a>
-                        </span>
-                    <ul class="nav nav-second-level">
-                        {% for node in nodes %}
-                        <li>
-                            <a data-sidebar="link" href="{% url 'processing_node' node.id %}"><span class="fa fa-laptop plugin-icon {% if not node.is_online %}theme-color-button-danger{% endif %}"></span> 
-                                <span data-sidebar="link-text">
-                                    {{node}}
-                                </span>
-                            </a>
-                        </li>
-                        {% endfor %}
-
-                        {% if add_nodes %}
-                        <li>
-                            <a data-sidebar="link" href="{% url 'admin:nodeodm_processingnode_add' %}"><span class="fa fa-plus-circle plugin-icon"></span> 
-                                <span data-sidebar="link-text">
-                                    {% trans 'Add New' %}</a>
-                                </span>
-                        </li>
-                        {% endif %}
-                    </ul>
-                    <!-- /.nav-second-level -->
-                </li>
+                    {% endfor %}
+                </ul>
                 {% endif %}
+            </li>
+            {% endfor %}
 
-                {% if user.is_staff %}
-                <li>
-                    <a data-sidebar="link" href="#">
-                        <i data-sidebar="icons" class="fa fa-cogs fa-fw plugin-icon"></i> 
-                        <span data-sidebar="link-text">
-                            {% trans 'Administration' %}<span class="fa arrow"></span></a>
-                        </span>
-                    <ul class="nav nav-second-level">
-                        {% is_single_user_mode as hide_users %}
-                        {% if not hide_users %}
-                        <li>
-                            <a data-sidebar="link" href="/admin/auth/user/">
-                                <i data-sidebar="icons" class="fa fa-user fa-fw plugin-icon"></i> 
-                                <span data-sidebar="link-text">
-                                    {% trans 'Accounts' %}</a>
-                                </span>
-                        </li>
-                        <li>
-                            <a data-sidebar="link" href="/admin/auth/group/">
-                                <i data-sidebar="icons" class="fa fa-users fa-fw plugin-icon"></i> 
-                                <span data-sidebar="link-text">
-                                    {% trans 'Groups' %}</a>
-                                </span>
-                        </li>
-                        {% endif %}
+            {% if view_nodes %}
+            <li>
+                <a href="#"><i class="fa fa-wrench fa-fw plugin-icon"></i> {% trans 'Processing Nodes' %}<span
+                        class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    {% for node in nodes %}
+                    <li>
+                        <a href="{% url 'processing_node' node.id %}"><span
+                                class="fa fa-laptop plugin-icon {% if not node.is_online %}theme-color-button-danger{% endif %}"></span>
+                            {{node}}</a>
+                    </li>
+                    {% endfor %}
 
-                        <li>
-                            <a data-sidebar="link" href="{% url 'admin:app_setting_change' SETTINGS.id %}">
-                                <i data-sidebar="icons" class="fa fa-magic fa-fw plugin-icon"></i> 
-                                <span data-sidebar="link-text">
-                                    {% trans 'Brand' %}</a>
-                                </span>
-                        </li>
-                        <li>
-                            <a data-sidebar="link" href="{% url 'admin:app_theme_change' SETTINGS.theme.id %}">
-                                <i data-sidebar="icons" class="fa fa-paint-brush fa-fw plugin-icon"></i> 
-                                <span data-sidebar="link-text">
-                                    {% trans 'Theme' %}</a>
-                                </span>
-                        </li>
-                        <li>
-                            <a data-sidebar="link" href="/admin/app/plugin/">
-                                <i data-sidebar="icons" class="fa fa-plug fa-fw plugin-icon"></i> 
-                                <span data-sidebar="link-text">
-                                    {% trans 'Plugins' %}</a>
-                                </span>
-                        </li>
-                        <li>
-                            <a data-sidebar="link" href="/admin/app/">
-                                <i data-sidebar="icons" class="fa fa-cog fa-fw plugin-icon"></i> 
-                                <span data-sidebar="link-text">
-                                    {% trans 'Application' %}</a>
-                                </span>
-                        </li>
-                    </ul>
-                </li>
-                {% endif %}
+                    {% if add_nodes %}
+                    <li>
+                        <a href="{% url 'admin:nodeodm_processingnode_add' %}"><span
+                                class="fa fa-plus-circle plugin-icon"></span> {% trans 'Add New' %}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <!-- /.nav-second-level -->
+            </li>
+            {% endif %}
 
-                {% is_dev_mode as dev_mode %}
-                {% if dev_mode and user.is_superuser %}
-                <li>
-                    <a data-sidebar="link" href="/dev-tools/">
-                        <i data-sidebar="icons" class="fa fa-bug fa-fw plugin-icon"></i> 
-                        <span data-sidebar="link-text">
-                            {% trans 'Developer Tools' %}</a>
-                        </span>
-                </li>
-                {% endif %}
-                <li id="about-menu">
-                    <a data-sidebar="link" href="/about/">
-                        <i data-sidebar="icons" class="fa fa-info-circle fa-fw plugin-icon"></i> 
-                        <span data-sidebar="link-text">
-                            {% trans 'About' %}</a>
-                        </span>
-                </li>
-            </ul>
-        </div>
-        <!-- /.sidebar-collapse -->
+            {% if user.is_staff %}
+            <li>
+                <a href="#"><i class="fa fa-cogs fa-fw plugin-icon"></i> {% trans 'Administration' %}<span
+                        class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    {% is_single_user_mode as hide_users %}
+                    {% if not hide_users %}
+                    <li>
+                        <a href="/admin/auth/user/"><i class="fa fa-user fa-fw plugin-icon"></i> {% trans 'Accounts'
+                            %}</a>
+                    </li>
+                    <li>
+                        <a href="/admin/auth/group/"><i class="fa fa-users fa-fw plugin-icon"></i> {% trans 'Groups'
+                            %}</a>
+                    </li>
+                    {% endif %}
+
+                    <li>
+                        <a href="{% url 'admin:app_setting_change' SETTINGS.id %}"><i
+                                class="fa fa-magic fa-fw plugin-icon"></i> {% trans 'Brand' %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'admin:app_theme_change' SETTINGS.theme.id %}"><i
+                                class="fa fa-paint-brush fa-fw plugin-icon"></i> {% trans 'Theme' %}</a>
+                    </li>
+                    <li>
+                        <a href="/admin/app/plugin/"><i class="fa fa-plug fa-fw plugin-icon"></i> {% trans 'Plugins'
+                            %}</a>
+                    </li>
+                    <li>
+                        <a href="/admin/app/"><i class="fa fa-cog fa-fw plugin-icon"></i> {% trans 'Application' %}</a>
+                    </li>
+                </ul>
+            </li>
+            {% endif %}
+
+            {% is_dev_mode as dev_mode %}
+            {% if dev_mode and user.is_superuser %}
+            <li>
+                <a href="/dev-tools/"><i class="fa fa-bug fa-fw plugin-icon"></i> {% trans 'Developer Tools' %}</a>
+            </li>
+            {% endif %}
+            <li id="about-menu">
+                <a href="/about/"><i class="fa fa-info-circle fa-fw plugin-icon"></i> {% trans 'About' %}</a>
+            </li>
+        </ul>
     </div>
-    <!-- /.navbar-static-side -->
+    <!-- /.sidebar-collapse -->
+</div>
+<!-- /.navbar-static-side -->
 {% endblock %}
 
 {% block page-wrapper %}
@@ -233,19 +165,17 @@
             {{ SETTINGS.theme.html_after_header|safe }}
 
             {% block messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        {{ message }}
-                    </div>
-                {% endfor %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                {{ message }}
+            </div>
+            {% endfor %}
             {% endblock %}
 
             {% block content %}{% endblock %}
         </div>
     </section>
 </div>
-
-<script src="/static/app/js/classes/ToggleSidebar.js"></script>
-
 {% endblock %}
