@@ -59,22 +59,22 @@ class Map extends React.Component {
       showLoading: false, // for drag&drop of files and first load
       opacity: 100,
       imageryLayers: [],
-      overlays: []
+      overlays: [],
+      selectedLayers: [],
     };
 
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
     this.addedCameraShots = false;
-    this.getAILayer = null;
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
     this.loadGeoJsonDetections = this.loadGeoJsonDetections.bind(this);
     this.removeGeoJsonDetections = this.removeGeoJsonDetections.bind(this);
-
-    this.layerInstance = null;
+    this.setSelectedLayers = this.setSelectedLayers.bind(this);
+    this.getSelectedLayers = this.getSelectedLayers.bind(this);
   }
 
   setOpacityForLayer(layer, opacity) {
@@ -87,6 +87,21 @@ class Map extends React.Component {
     });
   }
 
+  setSelectedLayers(idx, el) {
+    if (idx >= this.state.selectedLayers.length) {
+      this.setState(update(this.state, 
+        {selectedLayers: {$push: [el]}}
+      ));
+    }
+
+    this.setState(update(this.state, 
+      {selectedLayers: {idx: {$set: el}}}
+    ));
+  }
+
+  getSelectedLayers() {
+    return this.state.selectedLayers;
+  }
 
   // types_to_be_loaded is a Set.
   loadGeoJsonDetections(types_to_be_loaded) {
@@ -97,7 +112,7 @@ class Map extends React.Component {
     const base_url = `/api/projects/${project_id}/tasks/${task_id}/ai/detections/`;
 
     types_to_be_loaded.forEach((typ) => {
-      addTempLayerUsingRequest(base_url + typ, typ, this.props.aiTypes, (error, tempLayer, api_url) => {
+      addTempLayerUsingRequest(base_url + typ, typ, this.props.aiTypes, [this.getSelectedLayers, this.setSelectedLayers], (error, tempLayer, api_url) => {
         if (!error) {
           this.setOpacityForLayer(tempLayer, 1);
           tempLayer.addTo(this.map);
@@ -119,6 +134,9 @@ class Map extends React.Component {
       if (layer[Symbol.for("meta")]["name"] != null && types_to_be_removed.has(layer[Symbol.for("meta")]["name"])){
         this.map.removeLayer(layer);
         delete this.state.overlays[idx];
+      }
+      if (layer[Symbol.for("meta")["name"]] != null && layer[Symbol.for("meta")]["name"] == "field") {
+        this.selectedLayers = [];
       }
     });
   }
@@ -643,6 +661,12 @@ _('Example:'),
         this.layersControl.update(this.state.imageryLayers, this.state.overlays);
     }
 
+    if (this.selectionOverviewControl &&
+              (prevState.selectedLayers.length == this.state.selectedLayers.length ||
+              this.state.selectedLayers.length == 0) &&
+              prevState.selectedLayers !== this.state.selectedLayers) {
+      this.selectionOverviewControl.update(this.state.selectedLayers);
+    }
 
     if (this.props.tiles != null){
       // Gives the new types to be loaded.

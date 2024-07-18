@@ -52,6 +52,7 @@
 {% endif %}
 {% endblock %}
 {% block navbar-sidebar %}
+<<<<<<< HEAD
 <div class="navbar-default sidebar" role="navigation">
     <div class="sidebar-nav navbar-collapse">
         <ul class="nav" id="side-menu">
@@ -62,6 +63,31 @@
             {% can_view_processing_nodes as view_nodes %}
             {% can_add_processing_nodes as add_nodes %}
             {% get_visible_processing_nodes as nodes %}
+=======
+    <div data-sidebar="background" class="white-screen"></div>
+    <div class="navbar-default sidebar" data-sidebar="menu_items" id="sidebar" role="navigation">
+        <!-- <button
+            class="toggle-button"
+            data-sidebar="toggle">
+            <img 
+                width="50px"
+                src="/static/app/img/toggle.png" 
+                alt="Toggle Image"/>
+        </button> -->
+        <div data-sidebar="nav" class="sidebar-nav navbar-collapse">
+            <ul class="nav" id="side-menu">
+                <li>
+                    <a data-sidebar="link" href="/dashboard/">
+                        <i data-sidebar="icons" class="fa fa-tachometer-alt fa-fw plugin-icon"></i>
+                        <span data-sidebar="link-text">
+                            {% trans 'Dashboard' %}</a>
+                        </span>
+                </li>
+                {% load processingnode_extras plugins %}
+                {% can_view_processing_nodes as view_nodes %}
+                {% can_add_processing_nodes as add_nodes %}
+                {% get_visible_processing_nodes as nodes %}
+>>>>>>> ae4e748c43b9f144e60f44296fc55ba687218bca
 
             {% get_plugins_main_menus as plugin_menus %}
             {% for menu in plugin_menus %}

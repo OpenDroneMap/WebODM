@@ -87,7 +87,7 @@ export function addTempLayer(file, cb) {
   }
 }
 
-export function addTempLayerUsingRequest(api, api_type, aiTypes, cb) {
+export function addTempLayerUsingRequest(api, apiType, aiTypes, stateSelectedLayers, cb) {
     fetch(api).then((value) => {
       if (value.status == 404) {
         let err = {};
@@ -138,8 +138,8 @@ export function addTempLayerUsingRequest(api, api_type, aiTypes, cb) {
           },
           //
           onEachFeature: function (feature, layer) {
-            if (feature.properties && api_type == 'field') {
-                layer.bindPopup(createFieldLayerControlPopup(aiTypes, layer), {
+            if (feature.properties && apiType == 'field') {
+                layer.bindPopup(createFieldLayerControlPopup(aiTypes, layer, stateSelectedLayers), {
                     maxHeight: 200
               });
             }
