@@ -4,6 +4,7 @@ from app.api.presets import PresetViewSet
 from app.plugins.views import api_view_handler
 from .projects import ProjectViewSet
 from .tasks import TaskViewSet, TaskDownloads, TaskAssets, TaskAssetsImport
+from .tasks_ai import TaskAiDetectionCattle, TaskAiDetectionWeed,TaskAiDetectionField
 from .imageuploads import Thumbnail, ImageDownload
 from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
 from .admin import AdminUserViewSet, AdminGroupViewSet, AdminProfileViewSet
@@ -14,6 +15,7 @@ from .potree import Scene, CameraView
 from .workers import CheckTask, GetTaskResult
 from .users import UsersList
 from .externalauth import ExternalTokenAuth
+from .ai import AiProcessing
 from webodm import settings
 
 router = routers.DefaultRouter()
@@ -36,12 +38,12 @@ urlpatterns = [
     url(r'^', include(tasks_router.urls)),
     url(r'^', include(admin_router.urls)),
 
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles\.json$', TileJson.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/bounds$', Bounds.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/metadata$', Metadata.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)@(?P<scale>[\d]+)x\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<asset_type>orthophoto|dsm|dtm|georeferenced_model)/export$', Export.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles\.json$', TileJson.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/bounds$', Bounds.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/metadata$', Metadata.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)@(?P<scale>[\d]+)x\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<asset_type>polyhealth|orthophoto|dsm|dtm|georeferenced_model)/export$', Export.as_view()),
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/download/(?P<asset>.+)$', TaskDownloads.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/assets/(?P<unsafe_asset_path>.+)$', TaskAssets.as_view()),
@@ -51,6 +53,13 @@ urlpatterns = [
 
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/scene$', Scene.as_view()),
     url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/cameraview$', CameraView.as_view()),
+
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/cattle$', TaskAiDetectionCattle.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn)$', TaskAiDetectionWeed.as_view()),
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/field$', TaskAiDetectionField.as_view()),
+
+    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process$', AiProcessing.as_view()),
+
 
     url(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
     url(r'workers/get/(?P<celery_task_id>.+)', GetTaskResult.as_view()),

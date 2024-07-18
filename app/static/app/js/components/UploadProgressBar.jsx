@@ -28,9 +28,26 @@ class UploadProgressBar extends React.Component {
 
     return (
       <div className="upload-progress-bar">
-        <div className="progress">
-          <div className={'progress-bar progress-bar-success progress-bar-striped ' + active} style={{width: percentage + '%'}}>
-            {percentage}%
+        <div className="progress" style={{
+          display: "flex",
+          justifyContent: "start",
+          alignItems: "center",
+          height: "40px",
+          borderRadius: "80px", 
+          backgroundColor: "#E3E3E3",
+          padding: "5px",
+        }}>
+          <div className={'progress-bar progress-bar-success progress-bar-striped ' + active} style={{
+            width: percentage + '%', 
+            backgroundImage: "linear-gradient(to bottom, #17A398, #269F64, #2C9D4F)", 
+            borderRadius: "80px", 
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            }}
+          >
+            {/* PERCENTAGE */}
+            {(this.props.progress !== undefined ? this.props.progress : 0).toFixed(0)}%
           </div>
         </div>
         <div className="text-left small upload-label">

@@ -122,22 +122,26 @@ body {
         margin-left: $left-spacing;
     }
 
-    a.active::before {
-        content: " ";
-        position: absolute;
-        top: 10%;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 80%;
-        width: calc(95% + $left-spacing + 5px);
-        border-radius: 25px;
-        background: #cce0e0;
-        z-index: -1;
-    }
+    a.active {
+        &::before {
+            position: absolute;
+            top: 10%;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 80%;
+            width: calc(95% + $left-spacing + 5px);
+            border-radius: 25px;
+            background: #cce0e0;
+            z-index: -1;
+            content: " ";
+            transition: width 0.2s;
+        }
 
-    a {
-        z-index: 1;
+        &.collapsed::before {
+            width: calc(80%);
+            transition: width 0.2s;
+        }
     }
 }
 

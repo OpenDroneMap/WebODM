@@ -47,21 +47,145 @@
         }
     }
 
-    .form-group {
-        width: 100%;
+    .popup {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: fixed;
+        width: 550px;
+        height: 450px;
+        background-color: rgba(255, 255, 255, 0.919);
+        border-radius: 20px;
+        padding: 30px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 
-        .option-container {
-            padding: 0  15px 0 7px;
-        }
+        // animation: popup-enter 0.5s ease-out;
+        // @keyframes popup-enter {
+        //     0% {
+        //       transform: translate(-50%, -50%) scale(0);
+        //       opacity: 0;
+        //     }
+        //     100% {
+        //       transform: translate(-50%, -50%) scale(1);
+        //       opacity: 1;
+        //     }
+        //   }
 
-        @media (max-width: 600px) {
-            .option-container {
-                padding: 0px 15px;
+        .header-popup {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            h1 {
+                font-size: 20px;
+                font-weight: bold;
+                color: #14A5A2;
+                text-align: center;
+            }
+
+            button {
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 0;
+                padding: 30px;
+                border: none;
+                background: none;
             }
         }
 
+        .popup-content {
+            height: 230px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: start;
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 30px 50px;
+            
+            label {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 15px;
+                font-weight: light;
+            }
+
+            input[type="checkbox"] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                padding: 15px;
+                border: 1px solid #74B16F;
+                cursor: pointer;
+                outline: none;
+              }
+            input[type="checkbox"]:checked {
+                background-color: #319C41;
+                background-image: url("/static/app/img/checkbox.png");
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+        }
+        .buttons-container {
+            display: flex;
+            justify-content: end;
+            align-items: center;
+            gap: 10px;
+
+            .popup-btn-save {
+                background-color: #319C41;
+                color: #fff;
+                padding: 18px 58px;
+                border: none;
+                border-radius: 100px;
+            }
+            .popup-btn-save:hover {
+                background-color: #319c41c5;
+            }
+        }
+    }
+    .form-group {
+        width: 100%;
+        
+        .select-container {
+            display: flex;
+
+            .options-select {
+                width: 100px;
+            }
+        }
+        .option-container {
+            padding: 0;
+
+        }
+
+        
         .pad-this {
             padding: 0 30px;
+        }
+        
+        .selectBtn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            background-position: calc(100% - 0.75rem) center !important;
+            -moz-appearance:none !important;
+            -webkit-appearance: none !important; 
+            appearance: none !important;
+        }
+        
+        .ai-label {
+            width: 400px;
+            @media (max-width: 600px) {
+                .ai-label {
+                }
+            }
         }
     }
     
@@ -116,6 +240,7 @@
 
     .select-container {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         margin-bottom: 15px;
 
