@@ -23,6 +23,9 @@ RUN ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && \
     chmod +x /webodm/nginx/letsencrypt-autogen.sh
 
 # Setup NodeODM and install JavaScript dependencies
+RUN chmod +x /webodm/nodeodm/setup.sh && \
+    chmod +x /webodm/nodeodm/cleanup.sh 
+
 RUN /webodm/nodeodm/setup.sh && \
     /webodm/nodeodm/cleanup.sh && \
     cd /webodm && \

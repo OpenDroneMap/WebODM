@@ -16,7 +16,7 @@ services:
     oom_score_adj: -100
 
   webapp:
-    image: webodm_webapp
+    image: webodm_webapp:latest
     build:
       context: .
       dockerfile: Dockerfile
