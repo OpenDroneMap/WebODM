@@ -1,8 +1,14 @@
 [data-mapview]{
     height: calc(100vh - 100px);
+    height: calc(100dvh - 100px);
 }
 
 .map-view{
+    .map-title{
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
     height: calc(100% - 20px);
     position: relative;
 
@@ -14,15 +20,19 @@
         top: 6px;
     }
 
-    .map-type-selector{
-        float: right;
-    }
-
     .map-container{
         height: 100%;
         position: relative;
         .standby{
             z-index: 99999;
+        }
+    }
+
+    .map-view-header{
+        display: flex;
+        justify-content: space-between;
+        .map-type-selector{
+            flex: none;
         }
     }
 }

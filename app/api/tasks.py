@@ -11,6 +11,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.http import FileResponse
 from django.http import HttpResponse
+from django.http import StreamingHttpResponse
+from app.vendor import zipfly
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -340,8 +342,13 @@ def download_file_response(request, filePath, content_disposition, download_file
 
 
 def download_file_stream(request, stream, content_disposition, download_filename=None):
-    response = HttpResponse(FileWrapper(stream),
-                            content_type=(mimetypes.guess_type(download_filename)[0] or "application/zip"))
+    if isinstance(stream, zipfly.ZipStream):
+        f = stream.generator()
+    else:
+        # This should never happen, but just in case..
+        raise exceptions.ValidationError("stream not a zipstream instance")
+    
+    response = StreamingHttpResponse(f, content_type=(mimetypes.guess_type(download_filename)[0] or "application/zip"))
 
     response['Content-Type'] = mimetypes.guess_type(download_filename)[0] or "application/zip"
     response['Content-Disposition'] = "{}; filename={}".format(content_disposition, download_filename)

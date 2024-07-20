@@ -1,5 +1,6 @@
 .tags-field{
     height: auto;
+    min-height: 45px;
     padding-bottom: 2px;
 
     &:hover{
@@ -31,6 +32,7 @@
     }
     .inputText{
         display: inline-block;
+        position: fixed;
         outline: none;
         border: none;
         margin-bottom: 10px;

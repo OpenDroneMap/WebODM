@@ -162,7 +162,7 @@ class EditProjectDialog extends React.Component {
                 getFormData={this.getFormData}
                 reset={this.reset}
                 onShow={this.onShow}
-                leftButtons={this.props.showDuplicate ? [<button key="duplicate" disabled={this.duplicating} onClick={this.handleDuplicate} className="btn btn-default"><i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i> Duplicate</button>] : undefined}
+                leftButtons={this.props.showDuplicate ? [<button key="duplicate" disabled={this.duplicating} onClick={this.handleDuplicate} className="btn btn-default"><i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i><span className="hidden-xs"> {_("Duplicate")}</span></button>] : undefined}
                 ref={(domNode) => { this.dialog = domNode; }}>
               <ErrorMessage bind={[this, "error"]} />
               <div className="form-group edit-project-dialog">

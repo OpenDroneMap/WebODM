@@ -74,7 +74,7 @@ class TestApiTask(BootTransactionTestCase):
             assets_path = os.path.join(settings.MEDIA_TMP, "all.zip")
 
             with open(assets_path, 'wb') as f:
-                f.write(res.content)
+                f.write(b''.join(res.streaming_content))
 
             remove_perm('change_project', user, project)
 
@@ -272,7 +272,7 @@ class TestApiTask(BootTransactionTestCase):
             assets_path = os.path.join(settings.MEDIA_TMP, "backup.zip")
 
             with open(assets_path, 'wb') as f:
-                f.write(res.content)
+                f.write(b''.join(res.streaming_content))
 
             assets_file = open(assets_path, 'rb')
 

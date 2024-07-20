@@ -638,12 +638,12 @@ class ProjectListItem extends React.Component {
                       onClick={this.handleUpload}
                       ref={this.setRef("uploadButton")}>
                   <i className="glyphicon glyphicon-upload"></i>
-                  {_("Select Images and GCP")}
+                  <span className="hidden-xs">{_("Select Images and GCP")}</span>
                 </button>
                 <button type="button" 
                       className="btn btn-default btn-sm"
                       onClick={this.handleImportTask}>
-                  <i className="glyphicon glyphicon-import"></i> {_("Import")}
+                  <i className="glyphicon glyphicon-import"></i> <span className="hidden-xs">{_("Import")}</span>
                 </button>
                 {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
               </div>
