@@ -51,8 +51,7 @@ export default class TaskDialog extends React.Component {
             showModal: props.show,
             error: ''
         };
-        console.log("artychoke - TaskDialog constructor")
-        console.log("showModal", this.state.showModal)
+
         this.setModal = this.setModal.bind(this);
         this.show = this.show.bind(this);
         this.hide = this.hide.bind(this);
@@ -144,7 +143,6 @@ export default class TaskDialog extends React.Component {
     render() {
         const { onClearFailed } = this.props;
         const { taskItems, hasErrors } = this.renderTaskItems();
-        console.log("artychoke - TaskDialog render")
 
         return (
             <div ref={this.setModal} className="modal task-dialog" tabIndex="-1" data-backdrop="static">

@@ -2,7 +2,7 @@
 	"name": "Cesium Ion",
 	"webodmMinVersion": "0.6.0",
 	"description": "Upload and tile ODM assets with Cesium ion.",
-	"version": "1.2.1",
+	"version": "1.3.0",
 	"author": "Cesium GS, Inc",
 	"email": "hello@cesium.com",
 	"repository": "",

@@ -260,7 +260,6 @@ class ShareTaskView(TaskView):
             asset_info["upload"]["active"] = True
             set_asset_info(task.id, asset_type, asset_info)
 
-            logger.info(f"artychoke  ShareTaskView  {asset_path}")
             run_function_async(upload_to_ion,
                 task.id,
                 asset_type,
