@@ -1,22 +1,88 @@
+
+
 .leaflet-control-measure,
 .leaflet-measure-resultpopup{
     h3{
         font-size: 120%;
-    } 
+        color: #14a5a2;
+        text-transform: uppercase;
+        border: none !important;
+        font-family: inherit !important;
+    }
 }
 
+
+
+.leaflet-control-measure-toggle {
+    display: block  !important;
+}
+
+.leaflet-control-measure.leaflet-control.leaflet-control-active .leaflet-control-measure-interaction {
+    background-color: #fff;
+    position: absolute;
+    right: 45px;
+    top: -43.3px;
+    min-width: 240px;
+    border-radius: 15px;
+    
+}
+
+.leaflet-control-measure .leaflet-control-measure-interaction {
+    display: none;
+}
+
+.leaflet-control-measure.leaflet-control-active .leaflet-control-measure-interaction {
+    display: block;
+}
+
+
 .leaflet-control-measure-interaction{
+
     a{
+
         width: auto !important;
         height: auto !important;
         line-height: auto !important;
-        display: initial !important;
+        display: block !important;
+        line-height: normal !important;
+        background-color: transparent !important;
+        border: none !important;
+        display: flex !important;
+        color: black !important;
+        align-items: center;
+        
 
         &:hover{
-            background-color: inherit !important;
+            text-align: left !important;
         }
     }
+
+    .tasks {
+        display: flex !important;
+        flex-direction: column;
+    }
 }
+
+.leaflet-retina .leaflet-control-measure a.start {
+    background-image: url(play_icon.svg) !important;
+}
+
+
+.leaflet-control-measure .close-button, .leaflet-control-measure .close-button-measure {
+    background-image: url(close_icon.svg) !important;
+    background-repeat: no-repeat;
+    background-size: 20px 20px !important;
+    
+}
+
+.horizontal-bar {
+    height: 2px; 
+    background-color: #74b06f; 
+    margin-top: 5px; 
+    margin-bottom: 10px; 
+    opacity: 0.3;
+}
+
 
 .leaflet-control-measure .leaflet-control-measure-toggle {
     background-image: url(measure_icon.svg) !important;
