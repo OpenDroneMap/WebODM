@@ -52,18 +52,6 @@
 {% endif %}
 {% endblock %}
 {% block navbar-sidebar %}
-<<<<<<< HEAD
-<div class="navbar-default sidebar" role="navigation">
-    <div class="sidebar-nav navbar-collapse">
-        <ul class="nav" id="side-menu">
-            <li>
-                <a href="/dashboard/"><i class="fa fa-tachometer-alt fa-fw plugin-icon"></i> {% trans 'Dashboard' %}</a>
-            </li>
-            {% load processingnode_extras plugins %}
-            {% can_view_processing_nodes as view_nodes %}
-            {% can_add_processing_nodes as add_nodes %}
-            {% get_visible_processing_nodes as nodes %}
-=======
     <div data-sidebar="background" class="white-screen"></div>
     <div class="navbar-default sidebar" data-sidebar="menu_items" id="sidebar" role="navigation">
         <!-- <button
@@ -87,7 +75,6 @@
                 {% can_view_processing_nodes as view_nodes %}
                 {% can_add_processing_nodes as add_nodes %}
                 {% get_visible_processing_nodes as nodes %}
->>>>>>> ae4e748c43b9f144e60f44296fc55ba687218bca
 
             {% get_plugins_main_menus as plugin_menus %}
             {% for menu in plugin_menus %}
@@ -140,12 +127,10 @@
                     {% is_single_user_mode as hide_users %}
                     {% if not hide_users %}
                     <li>
-                        <a href="/admin/auth/user/"><i class="fa fa-user fa-fw plugin-icon"></i> {% trans 'Accounts'
-                            %}</a>
+                        <a href="/admin/auth/user/"><i class="fa fa-user fa-fw plugin-icon"></i> {% trans 'Accounts' %}</a>
                     </li>
                     <li>
-                        <a href="/admin/auth/group/"><i class="fa fa-users fa-fw plugin-icon"></i> {% trans 'Groups'
-                            %}</a>
+                        <a href="/admin/auth/group/"><i class="fa fa-users fa-fw plugin-icon"></i> {% trans 'Groups' %}</a>
                     </li>
                     {% endif %}
 
@@ -158,8 +143,7 @@
                                 class="fa fa-paint-brush fa-fw plugin-icon"></i> {% trans 'Theme' %}</a>
                     </li>
                     <li>
-                        <a href="/admin/app/plugin/"><i class="fa fa-plug fa-fw plugin-icon"></i> {% trans 'Plugins'
-                            %}</a>
+                        <a href="/admin/app/plugin/"><i class="fa fa-plug fa-fw plugin-icon"></i> {% trans 'Plugins' %}</a>
                     </li>
                     <li>
                         <a href="/admin/app/"><i class="fa fa-cog fa-fw plugin-icon"></i> {% trans 'Application' %}</a>
