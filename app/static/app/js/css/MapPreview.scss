@@ -1,0 +1,12 @@
+.map-preview{
+    position: relative;
+    margin-bottom: 16px;
+    border-radius: 3px;
+    .leaflet-container, .standby .cover{
+        border-radius: 3px;
+    }
+
+    .standby{
+        z-index: 1001;
+    }
+}

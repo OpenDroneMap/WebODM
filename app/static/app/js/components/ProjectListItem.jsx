@@ -476,7 +476,7 @@ class ProjectListItem extends React.Component {
     this.setState({importing: false});
   }
 
-  handleTaskTitleHint = () => {
+  handleTaskTitleHint = (hasGPSCallback) => {
       return new Promise((resolve, reject) => {
           if (this.state.upload.files.length > 0){
 
@@ -506,6 +506,8 @@ class ProjectListItem extends React.Component {
                     reject();
                     return;
                 }
+
+                if (hasGPSCallback !== undefined) hasGPSCallback();
 
                 let dateTime = gps["36867"];
 

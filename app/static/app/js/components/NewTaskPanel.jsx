@@ -4,6 +4,7 @@ import EditTaskForm from './EditTaskForm';
 import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
 import ResizeModes from '../classes/ResizeModes';
+import MapPreview from './MapPreview';
 import update from 'immutability-helper';
 import PluginsAPI from '../classes/plugins/API';
 import { _, interpolate } from '../classes/gettext';
@@ -34,6 +35,7 @@ class NewTaskPanel extends React.Component {
       taskInfo: {},
       inReview: false,
       loading: false,
+      showMapPreview: false
     };
 
     this.save = this.save.bind(this);
@@ -123,6 +125,13 @@ class NewTaskPanel extends React.Component {
     this.setState({taskInfo: this.getTaskInfo()});
   }
 
+  handleSuggestedTaskName = () => {
+    return this.props.suggestedTaskName(() => {
+      // Has GPS
+      this.setState({showMapPreview: true});
+    });
+  }
+
   render() {
     let filesCountOk = true;
     if (this.taskForm && !this.taskForm.checkFilesCount(this.props.filesCount)) filesCountOk = false;
@@ -142,12 +151,16 @@ class NewTaskPanel extends React.Component {
             </div>
             : ""}
 
+            {this.state.showMapPreview ? <MapPreview 
+              getFiles={this.props.getFiles} 
+            /> : ""}
+
             <EditTaskForm
               selectedNode={Storage.getItem("last_processing_node") || "auto"}
               onFormLoaded={this.handleFormTaskLoaded}
               onFormChanged={this.handleFormChanged}
               inReview={this.state.inReview}
-              suggestedTaskName={this.props.suggestedTaskName}
+              suggestedTaskName={this.handleSuggestedTaskName}
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
 
