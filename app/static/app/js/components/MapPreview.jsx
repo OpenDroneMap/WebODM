@@ -121,13 +121,12 @@ _('Example:'),
           color: "#fcfcff", //ff9e67
           fillColor: "#4b96f3",
           weight: 1.5,
-        });
+        }).bindPopup(exif.image.name);
       });
-      console.log(hasDateTime);
+
       // Only show line if we have reliable date/time info
       if (hasDateTime){
         let coords = exifData.map(exif => [exif.gps.latitude, exif.gps.longitude]);
-        console.log(coords)
         const capturePath = L.polyline(coords, {
           color: "#4b96f3",
           weight: 3
@@ -228,7 +227,7 @@ _('Example:'),
 
   render() {
     return (
-      <div style={{height: "320px"}} className="map-preview">
+      <div style={{height: "280px"}} className="map-preview">
         <ErrorMessage bind={[this, 'error']} />
 
         <Standby 
