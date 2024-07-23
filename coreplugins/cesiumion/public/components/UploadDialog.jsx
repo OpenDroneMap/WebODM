@@ -90,7 +90,7 @@ export default class UploadDialog extends Component {
 				options.waterMask = false;
 				break;
 			case SourceType.CAPTURE:
-				options.textureFormat = options.textureFormat ? "WEBP" : "AUTO";
+				options.textureFormat = options.textureFormat ? "KTX2" : "AUTO";
 				break;
 		}
 
@@ -141,16 +141,12 @@ export default class UploadDialog extends Component {
 				return (
 					<BootstrapField
 						name={"options.textureFormat"}
-						label={"Use WebP images"}
+						label={"Use KTX2 Compression"}
 						type={"select"}
 						value={this.state.options.textureFormat ? "Yes" : "No"}
 						help={
-							"Will produce WebP images, which are typically 25-34% smaller than " +
-							"equivalent JPEG images which leads to faster streaming and reduced " +
-							"data usage. 3D Tiles produced with this option require a client " +
-							"that supports the glTF EXT_texture_webp extension, such as " +
-							"CesiumJS 1.54 or newer, and a browser that supports WebP, such as " +
-							"Chrome or Firefox 65 and newer."
+							"KTX v2.0 is an image container format that supports Basis Universal supercompression. " +
+							"Use KTX2 compression to create a smaller tileset with better streaming performance."
 						}
 						onChange={this.handleChange}
 					>
