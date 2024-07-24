@@ -8,7 +8,7 @@
 
 ### Overview
 The Cesium Ion WebODM plugin enables seamless integratIon to upload processed WebODM tasks to your Cesium Ion account.
-Using the Cesium Ion ecosystem, multi-gigabite models can be streamed to any device using Cesium clients to load 3D tiles.
+Using the Cesium Ion ecosystem, multi-gigabit models can be streamed to any device using Cesium clients to load 3D tiles.
 
 Learn more at https://Cesium.com
 
@@ -34,9 +34,10 @@ Example:
 3. Edit the WebODM task options and make sure to enable `texturing-single-material`.
 4. Start the WebODM processing (this will take a while to complete).
 3. Once finished, select the `Tile in CesiumIon` dropdown button for a list of available asset uploads.
-4. Click on a dropdown item to start the upload to your Cesium Ion assets account.
-5. You can view the progress of the upload by clicking the `Cesium Tasks`. 
-6. Once complete you can then click on the `View in Cesium` dropdown button to open a new browser tab to view your Cesium Ion assets 
+4. Click on a dropdown item to show the popup dialogue where you can rename the asset, add a description/attribute, or enable an Cesium Ion option before uploading.
+5. Submit to start the upload to your Cesium Ion assets account.
+6. You can view the progress of the upload by clicking the `View Ion Tasks` button. 
+7. Once complete you can then click on the `View in Cesium` dropdown button to open a new browser tab to view your Cesium Ion assets 
 
 > **NOTE:** There are 2 phases to a Cesium task: **uploading** and **processing**. Uploading is the transfer of processed WebODM data to Cesium Ion. Processing is the tiling/rendering Cesium Ion does to generate streamable models.
 
@@ -49,7 +50,7 @@ Cesium Ion upgraded their streaming pipeline to automatically use their `1.1` ti
 
 ### Common Issues
 
-> - **Issue:** texturer model uploads to cesium ion but fails to process/render it.
+> - **Issue:** texture model uploads to cesium ion but fails to process/render it.
 > - **Solution:** Ensure that you have enabled `texturing-single-material` before WebODM processing on a *new* project task as WebODM stores previously processed textured models in the same odm_textured data folder. (Cesium Ion only accepts single textured materials for a 3D_CAPTURE)
 
 ## 6. FAQ
