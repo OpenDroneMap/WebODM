@@ -1,25 +1,60 @@
 <p align="center">
-  <img src="https://github.com/AnalyticalGraphicsInc/cesium/wiki/logos/Cesium_Logo_Color.jpg" width="50%" />
+  <img src="https://github.com/AnalyticalGraphicsInc/Cesium/wiki/logos/Cesium_Logo_Color.jpg" width="50%" />
 </p>
 
-The Cesium Ion WebODM add-on enables you to publish and stream even the most massive of 3D Content on the web thanks to Cesium Ion.
+# Cesium Ion WebODM Plugin
 
-With 3D Tiles, even multi-gigabyte models can be streamed to any device without having to download the entire model up front. By loading 3D Tiles into CesiumJS, you can fuse your model with other datasets, add geospatial context to place it at a real world location, or overlay additional details and analysis.
+## 1. Introduction
 
-Learn more at https://cesium.com
+### Overview
+The Cesium Ion WebODM plugin enables seamless integratIon to upload processed WebODM tasks to your Cesium Ion account.
+Using the Cesium Ion ecosystem, multi-gigabite models can be streamed to any device using Cesium clients to load 3D tiles.
 
-## Setup
+Learn more at https://Cesium.com
 
-1. Grab a token with, `assets:list, assets:read, assets:write` permissions from [Cesium Ion](https://cesium.com/ion/tokens).
+### Prerequisites
+> - WebODM versIon 2.5.0 or later
+> - [Cesium Ion](https://Cesium.com/ion/tokens) token with `assets:list, assets:read, assets:write` permissions 
+> - Internet connection
 
-1. Under the Cesium Ion tab in WebODM set the token to the code generated in ion.
+## 2. Initial Setup
 
-## Testing
+### Enabling Plugin
+1. Go to "AdministratIon -> Plugins" and enable Cesium ion.
+2. Select the left Cesium Ion tab 
+3. Copy and paste your Cesium Ion token then `Set Token`.
 
-1. WebODM provides open datasets which can be used as a testbench for the add-on. You will have to create an account in order to access the data. Download datasets [here](https://demo.webodm.org/dashboard/).
+## 3. Usage
 
-1. To use the dataset click on a **task**, then in the **download assets** dropdown, select all. This should download a zip on to your machine.
+### Basic Usage
 
-1. In your instance of WebODM, create a project, click import in the upper-right hand corner, and selet the zip we just downloaded from the demo.
+Example:
+1. Create a new project in the WebODM dashboard.
+2. Upload your images.
+3. Edit the WebODM task options and make sure to enable `texturing-single-material`.
+4. Start the WebODM processing (this will take a while to complete).
+3. Once finished, select the `Tile in CesiumIon` dropdown button for a list of available asset uploads.
+4. Click on a dropdown item to start the upload to your Cesium Ion assets account.
+5. You can view the progress of the upload by clicking the `Cesium Tasks`. 
+6. Once complete you can then click on the `View in Cesium` dropdown button to open a new browser tab to view your Cesium Ion assets 
 
-1. After the import completes and a website reload all Cesium Ion functions should be available for testing.
+> **NOTE:** There are 2 phases to a Cesium task: **uploading** and **processing**. Uploading is the transfer of processed WebODM data to Cesium Ion. Processing is the tiling/rendering Cesium Ion does to generate streamable models.
+
+## 4. New Feature: CesiumIon Plugin v1.3.0
+
+### KVX 2.0
+Cesium Ion upgraded their streaming pipeline to automatically use their `1.1` tileset version. The new standardize tileset version comes with [`KTX2`](https://www.khronos.org/ktx/), a texture format compression option to create a smaller tilset for better streaming performance. 
+
+## 5. Troubleshooting
+
+### Common Issues
+
+> - **Issue:** texturer model uploads to cesium ion but fails to process/render it.
+> - **Solution:** Ensure that you have enabled `texturing-single-material` before WebODM processing on a *new* project task as WebODM stores previously processed textured models in the same odm_textured data folder. (Cesium Ion only accepts single textured materials for a 3D_CAPTURE)
+
+## 6. FAQ
+
+### Frequently Asked Questions
+
+> - **Q:** Can I use the plugin with older versions of WebODM?
+> - **A:** No, the updated plugin is compatible only with WebODM versIon 2.5.0 or later.
