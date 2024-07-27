@@ -34,6 +34,7 @@ class MapPreview extends React.Component {
 
     this.basemaps = {};
     this.mapBounds = null;
+
   }
 
   componentDidMount() {
@@ -112,20 +113,28 @@ _('Example:'),
     this.setState({showLoading: true});
 
     this.readExifData().then(res => {
-      const { exifData, hasDateTime } = res;
+      const { exifData, hasTimestamp } = res;
 
-      let circles = exifData.map(exif => {
-        return L.circleMarker([exif.gps.latitude, exif.gps.longitude], {
+      this.hasTimestamp = hasTimestamp;
+
+      let images = exifData.map(exif => {
+        let layer = L.circleMarker([exif.gps.latitude, exif.gps.longitude], {
           radius: 8,
           fillOpacity: 1,
           color: "#fcfcff", //ff9e67
           fillColor: "#4b96f3",
           weight: 1.5,
         }).bindPopup(exif.image.name);
+        layer.feature = layer.feature || {};
+        layer.feature.type = "Feature";
+        layer.feature.properties = layer.feature.properties || {};
+        layer.feature.properties["Filename"] = exif.image.name;
+        if (hasTimestamp) layer.feature.properties["Timestamp"] = exif.timestamp;
+        return layer;
       });
 
       // Only show line if we have reliable date/time info
-      if (hasDateTime){
+      if (hasTimestamp){
         let coords = exifData.map(exif => [exif.gps.latitude, exif.gps.longitude]);
         const capturePath = L.polyline(coords, {
           color: "#4b96f3",
@@ -134,9 +143,9 @@ _('Example:'),
         capturePath.addTo(this.map);
       }
 
-      let circlesGroup = L.featureGroup(circles).addTo(this.map);
+      this.imagesGroup = L.featureGroup(images).addTo(this.map);
 
-      this.map.fitBounds(circlesGroup.getBounds());
+      this.map.fitBounds(this.imagesGroup.getBounds());
 
       this.setState({showLoading: false});
 
@@ -151,7 +160,7 @@ _('Example:'),
       const files = this.props.getFiles();
       const images = [];
       const exifData = [];
-      let hasDateTime = true;
+      let hasTimestamp = true;
       // TODO: gcps? geo files?
 
       for (let i = 0; i < files.length; i++){
@@ -177,19 +186,21 @@ _('Example:'),
           }
 
           let dateTime = gps["36867"];
+          let timestamp = null;
 
           // Try to parse the date from EXIF to JS
           const parts = dateTime.split(" ");
+          
           if (parts.length == 2){
               let [ d, t ] = parts;
               d = d.replace(/:/g, "-");
               const tm = Date.parse(`${d} ${t}`);
               if (!isNaN(tm)){
-                  dateTime = new Date(tm).toLocaleDateString();
+                  timestamp = new Date(tm).getTime();
               }
           }
           
-          if (!dateTime) hasDateTime = false;
+          if (!timestamp) hasTimestamp = false;
 
           exifData.push({
             image: img,
@@ -197,32 +208,50 @@ _('Example:'),
               latitude: gps.latitude,
               longitude: gps.longitude
             },
-            dateTime
+            timestamp
           });
 
           if (i < images.length - 1) parseImage(i+1);
           else{
             // Sort by date/time
-            if (hasDateTime){
+            if (hasTimestamp){
               exifData.sort((a, b) => {
-                if (a.dateTime < b.dateTime) return -1;
-                else if (a.dateTime > b.dateTime) return 1;
+                if (a.timestamp < b.timestamp) return -1;
+                else if (a.timestamp > b.timestamp) return 1;
                 else return 0;
               });
             }
 
-            resolve({exifData, hasDateTime});
+            resolve({exifData, hasTimestamp});
           }
         }).catch(reject);
       };
 
       if (images.length > 0) parseImage(0);
-      else resolve({exifData, hasDateTime});
+      else resolve({exifData, hasTimestamp});
     });
   }
 
   componentWillUnmount() {
     this.map.remove();
+  }
+
+  download = format => {
+    let output = "";
+    let filename = `images.${format}`;
+    const feats = this.imagesGroup.toGeoJSON(14);
+
+    if (format === 'geojson'){
+      output = JSON.stringify(feats, null, 4);
+    }else if (format === 'csv'){
+      output = `Filename,Timestamp,Latitude,Longitude\r\n${feats.features.map(feat => {
+        return `${feat.properties.Filename},${feat.properties.Timestamp},${feat.geometry.coordinates[1]},${feat.geometry.coordinates[0]}`
+      }).join("\r\n")}`;
+    }else{
+      console.error("Invalid format");
+    }
+
+    Utils.saveAs(output, filename);
   }
 
   render() {
@@ -234,11 +263,24 @@ _('Example:'),
             message={_("Plotting GPS locations...")}
             show={this.state.showLoading}
             />
+
+        {this.state.error === "" ? <div className="download-control">
+          <button type="button" className="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
+            <i className="fa fa-download"></i>
+          </button>
+          <ul className="dropdown-menu">
+            <li>
+              <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> GeoJSON</a>
+              <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> CSV</a>
+            </li>
+          </ul>
+        </div> : ""}
             
         <div 
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}
-        />
+          />
+
       </div>
     );
   }
