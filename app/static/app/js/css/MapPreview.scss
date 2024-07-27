@@ -14,6 +14,25 @@
         position: absolute;
         left: 8px;
         top: 8px;
-        z-index: 999;
+        z-index: 1000;
+        .btn:active, .btn:focus{
+            outline: none;
+        }
     }
+
+    .crop-control{
+        position: absolute;
+        top: 50px;
+        left: 8px;
+        z-index: 999;
+        .btn:active, .btn:focus{
+            outline: none;
+        }
+    }
+
+    .leaflet-control-layers-expanded{
+        height: 200px;
+        overflow: hidden;
+    }
+
 }

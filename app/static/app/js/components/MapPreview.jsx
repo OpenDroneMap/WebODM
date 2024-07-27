@@ -29,7 +29,8 @@ class MapPreview extends React.Component {
     
     this.state = {
         showLoading: true,
-        error: ""
+        error: "",
+        cropping: false
     };
 
     this.basemaps = {};
@@ -236,6 +237,15 @@ _('Example:'),
     this.map.remove();
   }
 
+  toggleCrop = () => {
+    const { cropping } = this.state;
+
+    let crop = !cropping;
+    if (!crop) this.cropButton.blur();
+
+    this.setState({cropping: !cropping});
+  }
+
   download = format => {
     let output = "";
     let filename = `images.${format}`;
@@ -265,7 +275,7 @@ _('Example:'),
             />
 
         {this.state.error === "" ? <div className="download-control">
-          <button type="button" className="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
+          <button title={_("Download")} type="button" className="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
             <i className="fa fa-download"></i>
           </button>
           <ul className="dropdown-menu">
@@ -275,11 +285,22 @@ _('Example:'),
             </li>
           </ul>
         </div> : ""}
-            
+
+        {this.state.error === "" ? 
+            <div className="crop-control">
+              <button ref={(domNode) => {this.cropButton = domNode; }} type="button" onClick={this.toggleCrop} className={"btn btn-sm " + (this.state.cropping ? "btn-default" : "btn-secondary")} title={_("Set Crop Area (optional)")}>
+              <i className="fa fa-crop-alt"></i>
+            </button>
+            </div>
+          : ""}
+
         <div 
           style={{height: "100%"}}
           ref={(domNode) => (this.container = domNode)}
-          />
+        >
+          
+        </div>
+
 
       </div>
     );
