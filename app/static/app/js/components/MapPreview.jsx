@@ -215,7 +215,7 @@ _('Example:'),
         const img = images[i];
         exifr.parse(img, options).then(gps => {
           if (!gps.latitude || !gps.longitude){
-              reject(new Error(interpolate(_("Cannot extract GPS data from %(file)s"), {file: img.name})));
+              // reject(new Error(interpolate(_("Cannot extract GPS data from %(file)s"), {file: img.name})));
               return;
           }
 
