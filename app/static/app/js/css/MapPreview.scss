@@ -52,4 +52,13 @@
     .map-preview-delete{
         min-width: 70px;
     }
+
+    .plot-warning{
+        position: absolute;
+        z-index: 999;
+        left: 58px;
+        top: 8px;
+        padding: 8px;
+        border-radius: 4px;
+    }
 }

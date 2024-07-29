@@ -44,6 +44,7 @@ class MapPreview extends React.Component {
     this.mapBounds = null;
     this.exifData = [];
     this.hasTimestamp = true;
+    this.MaxImagesPlot = 10000;
   }
 
   componentDidMount() {
@@ -125,6 +126,20 @@ _('Example:'),
     this.loadNewFiles();
   }
 
+  sampled = (arr, N) => {
+    // Return a uniformly sampled array with max N elements
+    if (arr.length <= N) return arr;
+    else{
+      const res = [];
+      const step = arr.length / N;
+      for (let i = 0; i < N; i++){
+        res.push(arr[Math.floor(i * step)]);
+      }
+
+      return res;
+    }
+  };
+
   loadNewFiles = () => {
     this.setState({showLoading: true});
 
@@ -134,7 +149,7 @@ _('Example:'),
     }
 
     this.readExifData().then(() => {
-      let images = this.exifData.map(exif => {
+      let images = this.sampled(this.exifData, this.MaxImagesPlot).map(exif => {
         let layer = L.circleMarker([exif.gps.latitude, exif.gps.longitude], {
           radius: 8,
           fillOpacity: 1,
@@ -469,7 +484,25 @@ _('Example:'),
   download = format => {
     let output = "";
     let filename = `images.${format}`;
-    const feats = this.imagesGroup.toGeoJSON(14);
+    const feats = {
+      type: "FeatureCollection",
+      features: this.exifData.map(ed => {
+        return {
+          type: "Feature",
+          properties: {
+            Filename: ed.image.name,
+            Timestamp: ed.timestamp
+          },
+          geometry:{
+            type: "Point",
+            coordinates: [
+              ed.gps.longitude,
+              ed.gps.latitude
+            ]
+          }
+        }
+      })
+    };
 
     if (format === 'geojson'){
       output = JSON.stringify(feats, null, 4);
@@ -493,6 +526,12 @@ _('Example:'),
             message={_("Plotting GPS locations...")}
             show={this.state.showLoading}
             />
+
+        {this.state.error === "" && this.exifData.length > this.MaxImagesPlot ? 
+        <div className="plot-warning btn-warning" title={interpolate(_("For performance reasons, only %(num)s images are plotted"), {num: this.MaxImagesPlot})}>
+          <i className="fa fa-exclamation-triangle"></i>
+        </div>
+        : ""}
 
         {this.state.error === "" ? <div className="download-control">
           <button title={_("Download")} type="button" className="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
