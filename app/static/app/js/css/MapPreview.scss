@@ -31,8 +31,25 @@
     }
 
     .leaflet-control-layers-expanded{
+        .leaflet-control-layers-base{
+            overflow: hidden;
+        }
         height: 200px;
         overflow: hidden;
     }
 
+    .map-preview-marker-layer{
+        &:hover{
+            cursor: crosshair;
+        }
+    }
+
+    .map-preview-accept-button{
+        &:hover{
+            cursor: pointer;
+        }
+    }
+    .map-preview-delete{
+        min-width: 70px;
+    }
 }
