@@ -360,7 +360,7 @@ class EditTaskForm extends React.Component {
       const poly = this.props.getCropPolygon();
       if (poly && optionNames['crop'] && optionNames['boundary']){
         let cropOpt = optsCopy.find(opt => opt.name === 'crop');
-        if (!cropOpt) optsCopy.push({name: 'crop', value: 0});
+        if (!cropOpt) optsCopy.push({name: 'crop', value: "0"});
         
         let boundaryOpt = optsCopy.find(opt => opt.name === 'boundary');
         if (!boundaryOpt) optsCopy.push({name: 'boundary', value: JSON.stringify(poly)});
