@@ -1,10 +1,10 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import MapPreview from '../MapPreview';
 
 describe('<MapPreview />', () => {
   it('renders without exploding', () => {
-    const wrapper = shallow(<MapPreview getFiles={() => []} />);
+    const wrapper = mount(<MapPreview getFiles={() => []} />);
     expect(wrapper.exists()).toBe(true);
   })
 });
