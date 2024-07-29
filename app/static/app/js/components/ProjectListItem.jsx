@@ -140,7 +140,7 @@ class ProjectListItem extends React.Component {
           url : 'TO_BE_CHANGED',
           parallelUploads: 6,
           uploadMultiple: false,
-          acceptedFiles: "image/*,text/*,.las,.laz,video/*,.srt",
+          acceptedFiles: "image/*,text/plain,.las,.laz,video/*,.srt",
           autoProcessQueue: false,
           createImageThumbnails: false,
           clickable: this.uploadButton,
@@ -501,34 +501,27 @@ class ProjectListItem extends React.Component {
                 interop: false,
                 ifd1: false // thumbnail
               };
-              exifr.parse(f, options).then(gps => {
-                if (!gps.latitude || !gps.longitude){
+              exifr.parse(f, options).then(exif => {
+                if (!exif.latitude || !exif.longitude){
                     reject();
                     return;
                 }
 
                 if (hasGPSCallback !== undefined) hasGPSCallback();
 
-                let dateTime = gps["36867"];
-
-                // Try to parse the date from EXIF to JS
-                const parts = dateTime.split(" ");
-                if (parts.length == 2){
-                    let [ d, t ] = parts;
-                    d = d.replace(/:/g, "-");
-                    const tm = Date.parse(`${d} ${t}`);
-                    if (!isNaN(tm)){
-                        dateTime = new Date(tm).toLocaleDateString();
-                    }
-                }
+                let dateTime = exif.DateTimeOriginal;
+                if (dateTime && dateTime.toLocaleDateString) dateTime = dateTime.toLocaleDateString();
                 
                 // Fallback to file modified date if 
                 // no exif info is available
-                if (!dateTime) dateTime = f.lastModifiedDate.toLocaleDateString();
+                if (!dateTime){
+                  if (f.lastModifiedDate) dateTime = f.lastModifiedDate.toLocaleDateString();
+                  else if (f.lastModified) dateTime = new Date(f.lastModified).toLocaleDateString();
+                }
 
                 // Query nominatim OSM
                 $.ajax({
-                    url: `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${gps.latitude}&lon=${gps.longitude}`,
+                    url: `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${exif.latitude}&lon=${exif.longitude}`,
                     contentType: 'application/json',
                     type: 'GET'
                 }).done(json => {

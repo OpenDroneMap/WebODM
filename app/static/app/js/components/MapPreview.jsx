@@ -179,10 +179,11 @@ _('Example:'),
         });
         this.capturePath.addTo(this.map);
       }
-
-      this.imagesGroup = L.featureGroup(images).addTo(this.map);
-
-      this.map.fitBounds(this.imagesGroup.getBounds());
+      
+      if (images.length > 0){
+        this.imagesGroup = L.featureGroup(images).addTo(this.map);
+        this.map.fitBounds(this.imagesGroup.getBounds());
+      }
 
       this.setState({showLoading: false});
 
@@ -206,59 +207,56 @@ _('Example:'),
       const options = {
         ifd0: false,
         exif: [0x9003],
-        gps: [0x0001, 0x0002, 0x0003, 0x0004],
+        gps: [0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006],
         interop: false,
         ifd1: false // thumbnail
+      };
+
+      const next = (i) => {
+        if (i < images.length - 1) parseImage(i+1);
+        else{
+          // Sort by date/time
+          if (this.hasTimestamp){
+            this.exifData.sort((a, b) => {
+              if (a.timestamp < b.timestamp) return -1;
+              else if (a.timestamp > b.timestamp) return 1;
+              else return 0;
+            });
+          }
+
+          resolve();
+        }
       };
       
       const parseImage = i => {
         const img = images[i];
-        exifr.parse(img, options).then(gps => {
-          if (!gps.latitude || !gps.longitude){
+        exifr.parse(img, options).then(exif => {
+          if (!exif.latitude || !exif.longitude){
               // reject(new Error(interpolate(_("Cannot extract GPS data from %(file)s"), {file: img.name})));
+              next(i);
               return;
           }
 
-          let dateTime = gps["36867"];
+          let dateTime = exif.DateTimeOriginal;
           let timestamp = null;
-
-          // Try to parse the date from EXIF to JS
-          const parts = dateTime.split(" ");
-          
-          if (parts.length == 2){
-              let [ d, t ] = parts;
-              d = d.replace(/:/g, "-");
-              const tm = Date.parse(`${d} ${t}`);
-              if (!isNaN(tm)){
-                  timestamp = new Date(tm).getTime();
-              }
-          }
-          
+          if (dateTime && dateTime.getTime) timestamp = dateTime.getTime();
           if (!timestamp) this.hasTimestamp = false;
 
           this.exifData.push({
             image: img,
             gps: {
-              latitude: gps.latitude,
-              longitude: gps.longitude
+              latitude: exif.latitude,
+              longitude: exif.longitude,
+              altitude: exif.GPSAltitude !== undefined ? exif.GPSAltitude : null,
             },
             timestamp
           });
 
-          if (i < images.length - 1) parseImage(i+1);
-          else{
-            // Sort by date/time
-            if (this.hasTimestamp){
-              this.exifData.sort((a, b) => {
-                if (a.timestamp < b.timestamp) return -1;
-                else if (a.timestamp > b.timestamp) return 1;
-                else return 0;
-              });
-            }
-
-            resolve();
-          }
-        }).catch(reject);
+          next(i);
+        }).catch((e) => {
+          console.warn(e);
+          next(i);
+        });
       };
 
       if (images.length > 0) parseImage(0);
@@ -497,7 +495,8 @@ _('Example:'),
             type: "Point",
             coordinates: [
               ed.gps.longitude,
-              ed.gps.latitude
+              ed.gps.latitude,
+              ed.gps.altitude !== null ? ed.gps.altitude : 0
             ]
           }
         }
@@ -507,8 +506,8 @@ _('Example:'),
     if (format === 'geojson'){
       output = JSON.stringify(feats, null, 4);
     }else if (format === 'csv'){
-      output = `Filename,Timestamp,Latitude,Longitude\r\n${feats.features.map(feat => {
-        return `${feat.properties.Filename},${feat.properties.Timestamp},${feat.geometry.coordinates[1]},${feat.geometry.coordinates[0]}`
+      output = `Filename,Timestamp,Latitude,Longitude,Altitude\r\n${feats.features.map(feat => {
+        return `${feat.properties.Filename},${feat.properties.Timestamp},${feat.geometry.coordinates[1]},${feat.geometry.coordinates[0]},${feat.geometry.coordinates[2]}`
       }).join("\r\n")}`;
     }else{
       console.error("Invalid format");
