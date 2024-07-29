@@ -21,7 +21,7 @@ export default [
   {
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 21,
+    maxZoom: 19,
     minZoom: 0,
     label: _("OpenStreetMap"),
     url: "//tile.openstreetmap.org/{z}/{x}/{y}.png"

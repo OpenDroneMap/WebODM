@@ -27,7 +27,8 @@ class EditTaskForm extends React.Component {
       onFormChanged: PropTypes.func,
       inReview: PropTypes.bool,
       task: PropTypes.object,
-      suggestedTaskName: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
+      suggestedTaskName: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+      getCropPolygon: PropTypes.func
   };
 
   constructor(props){
@@ -350,14 +351,32 @@ class EditTaskForm extends React.Component {
   // from a processing node)
   getAvailableOptionsOnly(options, availableOptions){
     const optionNames = {};
+    let optsCopy = Utils.clone(options);
 
     availableOptions.forEach(opt => optionNames[opt.name] = true);
-    return options.filter(opt => optionNames[opt.name]);
+
+    // Override boundary and crop options (if they are available)
+    if (this.props.getCropPolygon){
+      const poly = this.props.getCropPolygon();
+      if (poly && optionNames['crop'] && optionNames['boundary']){
+        let cropOpt = optsCopy.find(opt => opt.name === 'crop');
+        if (!cropOpt) optsCopy.push({name: 'crop', value: "0"});
+        
+        let boundaryOpt = optsCopy.find(opt => opt.name === 'boundary');
+        if (!boundaryOpt) optsCopy.push({name: 'boundary', value: JSON.stringify(poly)});
+        else boundaryOpt.value = JSON.stringify(poly);
+      }
+    }
+
+    return optsCopy.filter(opt => optionNames[opt.name]);
   }
 
   getAvailableOptionsOnlyText(options, availableOptions){
     const opts = this.getAvailableOptionsOnly(options, availableOptions);
-    let res = opts.map(opt => `${opt.name}:${opt.value}`).join(", ");
+    let res = opts.map(opt => {
+      if (opt.name === "boundary") return `${opt.name}:geojson`;
+      else return `${opt.name}:${opt.value}`;
+    }).join(", ");
     if (!res) res = _("Default");
     return res;
   }
