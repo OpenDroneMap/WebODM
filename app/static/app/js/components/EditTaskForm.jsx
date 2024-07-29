@@ -373,7 +373,10 @@ class EditTaskForm extends React.Component {
 
   getAvailableOptionsOnlyText(options, availableOptions){
     const opts = this.getAvailableOptionsOnly(options, availableOptions);
-    let res = opts.map(opt => `${opt.name}:${opt.value}`).join(", ");
+    let res = opts.map(opt => {
+      if (opt.name === "boundary") return `${opt.name}:geojson`;
+      else return `${opt.name}:${opt.value}`;
+    }).join(", ");
     if (!res) res = _("Default");
     return res;
   }
