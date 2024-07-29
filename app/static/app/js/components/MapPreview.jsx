@@ -22,11 +22,13 @@ const Colors = {
 
 class MapPreview extends React.Component {
   static defaultProps = {
-    getFiles: null
+    getFiles: null,
+    onPolygonChange: () => {}
   };
-
+    
   static propTypes = {
-    getFiles: PropTypes.func.isRequired
+    getFiles: PropTypes.func.isRequired,
+    onPolygonChange: PropTypes.func
   };
 
   constructor(props) {
@@ -40,7 +42,8 @@ class MapPreview extends React.Component {
 
     this.basemaps = {};
     this.mapBounds = null;
-
+    this.exifData = [];
+    this.hasTimestamp = true;
   }
 
   componentDidMount() {
@@ -119,14 +122,19 @@ _('Example:'),
      45.664591558975154]]);
     this.map.attributionControl.setPrefix("");
 
+    this.loadNewFiles();
+  }
+
+  loadNewFiles = () => {
     this.setState({showLoading: true});
 
-    this.readExifData().then(res => {
-      const { exifData, hasTimestamp } = res;
+    if (this.imagesGroup){
+      this.map.removeLayer(this.imagesGroup);
+      this.imagesGroup = null;
+    }
 
-      this.hasTimestamp = hasTimestamp;
-
-      let images = exifData.map(exif => {
+    this.readExifData().then(() => {
+      let images = this.exifData.map(exif => {
         let layer = L.circleMarker([exif.gps.latitude, exif.gps.longitude], {
           radius: 8,
           fillOpacity: 1,
@@ -138,18 +146,23 @@ _('Example:'),
         layer.feature.type = "Feature";
         layer.feature.properties = layer.feature.properties || {};
         layer.feature.properties["Filename"] = exif.image.name;
-        if (hasTimestamp) layer.feature.properties["Timestamp"] = exif.timestamp;
+        if (this.hasTimestamp) layer.feature.properties["Timestamp"] = exif.timestamp;
         return layer;
       });
+      
+      if (this.capturePath){
+        this.map.removeLayer(this.capturePath);
+        this.capturePath = null;
+      }
 
       // Only show line if we have reliable date/time info
-      if (hasTimestamp){
-        let coords = exifData.map(exif => [exif.gps.latitude, exif.gps.longitude]);
-        const capturePath = L.polyline(coords, {
+      if (this.hasTimestamp){
+        let coords = this.exifData.map(exif => [exif.gps.latitude, exif.gps.longitude]);
+        this.capturePath = L.polyline(coords, {
           color: "#4b96f3",
           weight: 3
         });
-        capturePath.addTo(this.map);
+        this.capturePath.addTo(this.map);
       }
 
       this.imagesGroup = L.featureGroup(images).addTo(this.map);
@@ -161,15 +174,12 @@ _('Example:'),
     }).catch(e => {
       this.setState({showLoading: false, error: e.message});
     });
-
   }
 
   readExifData = () => {
     return new Promise((resolve, reject) => {
       const files = this.props.getFiles();
       const images = [];
-      const exifData = [];
-      let hasTimestamp = true;
       // TODO: gcps? geo files?
 
       for (let i = 0; i < files.length; i++){
@@ -209,9 +219,9 @@ _('Example:'),
               }
           }
           
-          if (!timestamp) hasTimestamp = false;
+          if (!timestamp) this.hasTimestamp = false;
 
-          exifData.push({
+          this.exifData.push({
             image: img,
             gps: {
               latitude: gps.latitude,
@@ -223,26 +233,31 @@ _('Example:'),
           if (i < images.length - 1) parseImage(i+1);
           else{
             // Sort by date/time
-            if (hasTimestamp){
-              exifData.sort((a, b) => {
+            if (this.hasTimestamp){
+              this.exifData.sort((a, b) => {
                 if (a.timestamp < b.timestamp) return -1;
                 else if (a.timestamp > b.timestamp) return 1;
                 else return 0;
               });
             }
 
-            resolve({exifData, hasTimestamp});
+            resolve();
           }
         }).catch(reject);
       };
 
       if (images.length > 0) parseImage(0);
-      else resolve({exifData, hasTimestamp});
+      else resolve();
     });
   }
 
   componentWillUnmount() {
     this.map.remove();
+  }
+
+  getCropPolygon = () => {
+    if (!this.polygon) return null;
+    return this.polygon.toGeoJSON(14);
   }
 
   toggleCrop = () => {
@@ -299,6 +314,7 @@ _('Example:'),
       if (this.polygon){
         this.group.removeLayer(this.polygon);
         this.polygon = null;
+        this.props.onPolygonChange();
       }
 
       // Reset latlngs
@@ -382,6 +398,7 @@ _('Example:'),
         if (this.polygon){
           this.group.removeLayer(this.polygon);
           this.polygon = null;
+          this.props.onPolygonChange();
         }
       };
       popupContainer.appendChild(deleteLink);
@@ -394,6 +411,8 @@ _('Example:'),
         fillColor: "#ffa716",
         fillOpacity: 0.2
       }).bindPopup(popupContainer).addTo(this.group);
+
+      this.props.onPolygonChange();
     }
 
     this.toggleCrop();

@@ -46,6 +46,12 @@ class NewTaskPanel extends React.Component {
     this.handleFormChanged = this.handleFormChanged.bind(this);
   }
 
+  componentDidUpdate(prevProps, prevState){
+    if (this.props.filesCount !== prevProps.filesCount && this.mapPreview){
+      this.mapPreview.loadNewFiles();
+    }
+  }
+
   componentDidMount(){
     PluginsAPI.Dashboard.triggerAddNewTaskPanelItem({}, (item) => {
         if (!item) return;
@@ -132,6 +138,15 @@ class NewTaskPanel extends React.Component {
     });
   }
 
+  getCropPolygon = () => {
+    if (!this.mapPreview) return null;
+    return this.mapPreview.getCropPolygon();
+  };
+
+  handlePolygonChange = () => {
+    if (this.taskForm) this.taskForm.forceUpdate();
+  }
+
   render() {
     let filesCountOk = true;
     if (this.taskForm && !this.taskForm.checkFilesCount(this.props.filesCount)) filesCountOk = false;
@@ -152,7 +167,9 @@ class NewTaskPanel extends React.Component {
             : ""}
 
             {this.state.showMapPreview ? <MapPreview 
-              getFiles={this.props.getFiles} 
+              getFiles={this.props.getFiles}
+              onPolygonChange={this.handlePolygonChange}
+              ref={(domNode) => {this.mapPreview = domNode; }}
             /> : ""}
 
             <EditTaskForm
@@ -161,6 +178,7 @@ class NewTaskPanel extends React.Component {
               onFormChanged={this.handleFormChanged}
               inReview={this.state.inReview}
               suggestedTaskName={this.handleSuggestedTaskName}
+              getCropPolygon={this.getCropPolygon}
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
 
