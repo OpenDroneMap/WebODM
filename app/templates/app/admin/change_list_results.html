@@ -1,4 +1,5 @@
-{% load i18n static %}
+
+{% load i18n admin_urls static admin_list %}
 {% if result_hidden_fields %}
 <div class="hiddenfields">{# DIV for HTML validation #}
 {% for item in result_hidden_fields %}{{ item }}{% endfor %}
@@ -34,5 +35,6 @@
 {% endfor %}
 </tbody>
 </table>
+
 </div>
 {% endif %}

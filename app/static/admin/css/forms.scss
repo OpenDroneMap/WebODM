@@ -4,7 +4,6 @@
 .admin-area{
     .form-row {
         overflow: hidden;
-        padding: 10px;
         font-size: 13px;
         border-bottom: 1px solid #eee;
     }
@@ -240,14 +239,9 @@
     /* SUBMIT ROW */
 
     .submit-row {
-        padding-left: 14px;
-        padding-right: 14px;
-        padding-bottom: 10px;
-        //padding: 12px 14px;
+        
         margin: 0 0 20px;
-        background: #f8f8f8;
-        border: 1px solid #eee;
-        border-radius: 4px;
+        background: transparent;
         text-align: right;
         overflow: hidden;
     }
@@ -259,16 +253,34 @@
     .submit-row input {
         height: 35px;
         line-height: 15px;
-        margin: 10px 0 0 5px;
     }
 
     .submit-row input.default {
-        margin: 10px 0 0 8px;
-        text-transform: uppercase;
+        box-sizing: border-box;
+        width: 185px !important;
+        height: 60px !important;
+        background-color: #319c41;
     }
 
+    .submit-row input.default:hover {
+        opacity: 0.9;
+    }
+    .submit-row input.cancel {
+        width: 125px !important;
+        height: 60px !important;
+        background-color: #afafaf !important;
+        margin-right: 10px;
+    }
+
+    .submit-row input.cancel:hover {
+        opacity: 0.9;
+    }
+    
     .submit-row p {
         margin: 0.3em;
+    }
+    .submit-row input.continue, .submit-row input.addanother {
+        display: none;
     }
 
     .submit-row p.deletelink-box {
