@@ -204,30 +204,21 @@
 .admin-area .submit-row input {
   height: 35px;
   line-height: 15px;
+  border-radius: 40px;
+  background-color: #319c41 !important;
+  width: 220px;
+}
+.admin-area .submit-row input:hover {
+  opacity: 0.8 !important;
 }
 .admin-area .submit-row input.default {
-  box-sizing: border-box;
-  width: 185px !important;
-  height: 60px !important;
-  background-color: #319c41;
+  margin-left: 5px;
 }
 .admin-area .submit-row input.default:hover {
   opacity: 0.9;
 }
-.admin-area .submit-row input.cancel {
-  width: 125px !important;
-  height: 60px !important;
-  background-color: #afafaf !important;
-  margin-right: 10px;
-}
-.admin-area .submit-row input.cancel:hover {
-  opacity: 0.9;
-}
 .admin-area .submit-row p {
   margin: 0.3em;
-}
-.admin-area .submit-row input.continue, .admin-area .submit-row input.addanother {
-  display: none;
 }
 .admin-area .submit-row p.deletelink-box {
   float: left;

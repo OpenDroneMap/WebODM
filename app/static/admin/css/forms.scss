@@ -239,7 +239,6 @@
     /* SUBMIT ROW */
 
     .submit-row {
-        
         margin: 0 0 20px;
         background: transparent;
         text-align: right;
@@ -253,34 +252,26 @@
     .submit-row input {
         height: 35px;
         line-height: 15px;
+        border-radius: 40px;
+        background-color: #319c41 !important;
+        width: 220px;
+    }
+
+    .submit-row input:hover {
+        opacity: 0.8 !important;
     }
 
     .submit-row input.default {
-        box-sizing: border-box;
-        width: 185px !important;
-        height: 60px !important;
-        background-color: #319c41;
+        margin-left: 5px;
     }
 
     .submit-row input.default:hover {
         opacity: 0.9;
     }
-    .submit-row input.cancel {
-        width: 125px !important;
-        height: 60px !important;
-        background-color: #afafaf !important;
-        margin-right: 10px;
-    }
 
-    .submit-row input.cancel:hover {
-        opacity: 0.9;
-    }
     
     .submit-row p {
         margin: 0.3em;
-    }
-    .submit-row input.continue, .submit-row input.addanother {
-        display: none;
     }
 
     .submit-row p.deletelink-box {

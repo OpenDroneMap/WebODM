@@ -273,10 +273,11 @@
 }
 .admin-area table thead th.sorted .sortoptions a {
   position: relative;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   display: inline-block;
-  background: url(./icons/caret-down-fill.svg) 0 0 no-repeat !important;
+  background: url(../img/sorting-icons.svg) 0 0 no-repeat;
+  background-size: 14px auto;
 }
 .admin-area table thead th.sorted .sortoptions a.sortremove:after {
   content: "\\";
@@ -286,6 +287,29 @@
   font-weight: 200;
   font-size: 18px;
   color: #999;
+}
+.admin-area table thead th.sorted .sortoptions a.sortremove:focus:after,
+.admin-area table thead th.sorted .sortoptions a.sortremove:hover:after {
+  color: #447e9b;
+}
+.admin-area table thead th.sorted .sortoptions a.sortremove:focus,
+.admin-area table thead th.sorted .sortoptions a.sortremove:hover {
+  background-position: 0 -14px;
+}
+.admin-area table thead th.sorted .sortoptions a.ascending {
+  background-position: 0 -28px;
+}
+.admin-area table thead th.sorted .sortoptions a.ascending:focus,
+.admin-area table thead th.sorted .sortoptions a.ascending:hover {
+  background-position: 0 -42px;
+}
+.admin-area table thead th.sorted .sortoptions a.descending {
+  top: 1px;
+  background-position: 0 -56px;
+}
+.admin-area table thead th.sorted .sortoptions a.descending:focus,
+.admin-area table thead th.sorted .sortoptions a.descending:hover {
+  background-position: 0 -70px;
 }
 .admin-area input, .admin-area textarea, .admin-area select, .admin-area .form-row p, .admin-area form .button {
   margin: 2px 0;
@@ -772,17 +796,6 @@
   font-size: 12px;
   margin-left: 5px;
 }
-.admin-area .content.colM #content-main input {
-  width: 290px;
-  border: none;
-  border-radius: 40px;
-  background-color: #e3e3e3;
-  padding-left: 20px;
-}
-.admin-area .content.colM #content-main input:focus {
-  outline: none;
-  border: none;
-}
 .admin-area .content.colM #content-main .form-row {
   margin-left: 5px;
 }
@@ -817,12 +830,6 @@
   margin-left: 160px !important;
   font-size: 10px;
   color: #000;
-}
-.admin-area .content.colM #content-main .submit-row {
-  background-color: transparent !important;
-}
-.admin-area .content.colM #content-main .submit-row input {
-  background-color: #319c41;
 }
 
 /*# sourceMappingURL=base.css.map */
