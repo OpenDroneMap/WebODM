@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { _, interpolate } from './classes/gettext';
 import update from 'immutability-helper';
 
+
 class MapView extends React.Component {
   static defaultProps = {
     mapItems: [],
@@ -47,7 +48,6 @@ class MapView extends React.Component {
 
     if (selectedMapType === "auto") selectedMapType = "orthophoto"; // Hope for the best
 
-
     let availableAISelections = ['ai_cattle', 'ai_corn', 'ai_field', 'ai_soy'];
 
     this.selectableAI = new Set();
@@ -69,7 +69,7 @@ class MapView extends React.Component {
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
-    this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
+    this.handleAiTypeButton = this.handleAiTypeButton.bind(this);
   }
 
   getTilesByMapType(type) {
@@ -103,17 +103,16 @@ class MapView extends React.Component {
 
   handleAiTypeButton(name) {
     return () => {
-      if (this.state.aiSelected.has(name)){
+      if (this.state.aiSelected.has(name)) {
         this.setState(update(this.state, {
-          aiSelected: { $remove: [name]}
+          aiSelected: { $remove: [name] }
+        }));
+      } else {
+        this.setState(update(this.state, {
+          aiSelected: { $add: [name] }
         }));
       }
-      else{
-        this.setState(update(this.state, {
-          aiSelected: { $add: [name]}
-        }));
-      }
-    }
+    };
   }
 
   render() {
@@ -144,35 +143,35 @@ class MapView extends React.Component {
         icon: "fa fa-image"
       }
     ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0);
-
-
+    
     // label: what's written on the button
     // type: corresponds to the internal representation of that type.
     // name: the trailing name for the route.
     // icon: the icon.
+
     let aiTypes = [
       {
         label: _("IA Gado"),
         type: "ai_cattle",
-        name: "cattle", //route
+        name: "cattle", // route
         icon: "glyphicon glyphicon-screenshot",
       },
       {
         label: _("IA Talhão"),
         type: "ai_field",
-        name: "field", //route
+        name: "field", // route
         icon: "glyphicon glyphicon-screenshot",
       },
       {
         label: _("IA Daninha (soja)"),
         type: "ai_soy",
-        name: "soy", //route
+        name: "soy", // route
         icon: "glyphicon glyphicon-screenshot",
       },
       {
         label: _("IA Daninha (milho)"),
         type: "ai_corn",
-        name: "corn", //route
+        name: "corn", // route
         icon: "glyphicon glyphicon-screenshot",
       }
     ]
@@ -181,6 +180,15 @@ class MapView extends React.Component {
       ...aiTypes
     ].filter(aiType => this.selectableAI.has(aiType['type']));
 
+    let aiDropdownItems = aiTypeButtons.map(aiType => (
+      <button
+        key={aiType.type}
+        className="dropdown-item"
+        onClick={this.handleAiTypeButton(aiType.name)}
+      >
+        <i className={aiType.icon}></i> {aiType.label}
+      </button>
+    ));
 
     // If we have only one button, hide it...
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
@@ -193,18 +201,28 @@ class MapView extends React.Component {
               <button
                 key={mapType.type}
                 onClick={this.handleMapTypeButton(mapType.type)}
-                className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}><i className={mapType.icon}></i> {mapType.label}</button>
+                className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}
+              >
+                <i className={mapType.icon}></i> {mapType.label}
+              </button>
             )}
-            {
-              aiTypeButtons.map(aiType => 
-                <button 
-                key={aiType.type}
-                onClick={this.handleAiTypeButton(aiType.name)}
-                className={"btn rounded-corners AI-btn " + (this.state.aiSelected.has(aiType.name) ? "selected-button" : "default-button")}>
-                  <i className={aiType.icon}></i> {aiType.label}
-                </button>
-            )}
-          </div> 
+            
+            
+            <div className="btn-group">
+              <button
+                type="button"
+                className="btn btn-secondary dropdown-toggle"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                IA Types
+              </button>
+              <div className="dropdown-menu dropdown-menu-right">
+                {aiDropdownItems}
+              </div>
+            </div>
+          </div>
 
           {this.props.title ?
             <div className="text-wrapper">
@@ -225,12 +243,10 @@ class MapView extends React.Component {
             aiTypes={aiTypes}
           />
         </div>
-      </div>);
+      </div>
+    );
   }
 }
-
-
-
 
 $(function () {
   $("[data-mapview]").each(function () {

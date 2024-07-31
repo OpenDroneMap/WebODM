@@ -127,7 +127,43 @@
                     }
                 }
             }
+            .btn-group {
+                display: flex;
+                justify-content: center;
+                margin-left:7px;
+                margin-bottom: 5px;
+                font-size: 10px;
+                background-color: #74b06f;
+                border-radius: 25px;
+                
+                &:hover,
+                    &:focus {
+                        background: #6b9262
+                    }
+                
+
+                button {
+                    margin: 0 5px;
+                    background: transparent;
+                    border-width: 2px;
+                    border-radius: 25px;
+                    border-color: transparent;
+                    &:hover,
+                    &:focus {
+                        background: #6b9262
+                    }
+                    
+                }
+            }   
+            .dropdown-menu.dropdown-menu-right{
+                background-color: rgba(116, 176, 111, 0.5);
+                border-color: transparent;
+            }
+            .dropdown-item{
+               background: transparent;
+            }
         }
+
 
         .text-wrapper {
             display: flex;
@@ -172,3 +208,4 @@
         }
     }
 }
+
