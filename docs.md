@@ -222,45 +222,36 @@ Ele é divido em dois componentes, o primeiro componente a `MapView` é respons�
 
 ## Botões de IA
 
-Os botões de IA que ficam na parte superior do mapa são controlados em um único lugar: [MapView.jsx](https://github.com/LSIIM/WebODM/blob/master/app/static/app/js/MapView.jsx "MapView.jsx"). O código de controle das checkboxes, das rotas de acesso e labels estão todas a seguir:
+Os botões de IA que ficam na parte superior do mapa são controlados em um único lugar: [MapView.jsx](https://github.com/LSIIM/WebODM/blob/master/app/static/app/js/MapView.jsx "MapView.jsx"). O código de controle das rotas de acesso e labels estão todas a seguir:
   ```javascript
     // label: what's written on the button
     // type: corresponds to the internal representation of that type.
     // name: the trailing name for the route.
     // icon: the icon.
-    // checkboxLabel: the label that appears with the checkbox when the detections popup is opened. (Optional)
-    // checkboxSelectable: whether a checkbox should be visible or not.
     let aiTypes = [
       {
         label: _("IA Gado"),
         type: "ai_cattle",
         name: "cattle", //route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxLabel: _("IA Gado"),
-        checkboxSelectable: true,
       },
       {
         label: _("IA Talhão"),
         type: "ai_field",
         name: "field", //route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxSelectable: false,
       },
       {
         label: _("IA Daninha (soja)"),
         type: "ai_soy",
         name: "soy", //route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxLabel: _("IA Soja"),
-        checkboxSelectable: true,
       },
       {
         label: _("IA Daninha (milho)"),
         type: "ai_corn",
         name: "corn", //route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxLabel: _("IA Milho"),
-        checkboxSelectable: true,
       }
     ]
 ```

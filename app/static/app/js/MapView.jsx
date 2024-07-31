@@ -143,6 +143,11 @@ class MapView extends React.Component {
         icon: "fa fa-image"
       }
     ].filter(mapType => this.getTilesByMapType(mapType.type).length > 0);
+    
+    // label: what's written on the button
+    // type: corresponds to the internal representation of that type.
+    // name: the trailing name for the route.
+    // icon: the icon.
 
     let aiTypes = [
       {
@@ -150,34 +155,24 @@ class MapView extends React.Component {
         type: "ai_cattle",
         name: "cattle", // route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxLabel: _("IA Gado"),
-        checkboxSelectable: true,
-        fieldColor: [0x00, 0xff, 0x00]
       },
       {
         label: _("IA Talhão"),
         type: "ai_field",
         name: "field", // route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxSelectable: false,
       },
       {
         label: _("IA Daninha (soja)"),
         type: "ai_soy",
         name: "soy", // route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxLabel: _("IA Soja"),
-        checkboxSelectable: true,
-        fieldColor: [0xff, 0x00, 0x00]
       },
       {
         label: _("IA Daninha (milho)"),
         type: "ai_corn",
         name: "corn", // route
         icon: "glyphicon glyphicon-screenshot",
-        checkboxLabel: _("IA Milho"),
-        checkboxSelectable: true,
-        fieldColor: [0x00, 0x00, 0xff]
       }
     ]
 

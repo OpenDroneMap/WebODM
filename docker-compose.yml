@@ -14,8 +14,12 @@ services:
       - ${WO_DB_DIR}:/var/lib/postgresql/data:Z
     restart: unless-stopped
     oom_score_adj: -100
+
   webapp:
-    image: webodm_webapp
+    image: webodm_webapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
     volumes:
@@ -42,7 +46,10 @@ services:
     oom_score_adj: 0
 
   node-odm:
-    image: opendronemap/nodeodm:gpu
+    image: global_drones/nodeodm:gpu
+    build:
+      context: ${NODEODM_DIR}
+      dockerfile: Dockerfile
     expose:
       - "3000"
     ports:
@@ -56,14 +63,19 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    
 
   broker:
     image: redis:7.0.10
     container_name: broker
     restart: unless-stopped
     oom_score_adj: -500
+
   worker:
     image: webodm_webapp
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: worker
     entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/wait-for-it.sh -t 0 webapp:8000 -- /webodm/worker.sh start"
     volumes:
