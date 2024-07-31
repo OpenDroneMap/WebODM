@@ -37,7 +37,7 @@ export default class LightningPanel extends React.Component {
         { !apiKey ? 
         <div>
             <h4><i className="fa fa-bolt"/> {_("Lightning")}</h4>
-            {_("Lightning is a service that allows you to quickly process small and large datasets using high performance servers in the cloud.")}
+            <p>{_("Lightning is a service that allows you to quickly process small and large datasets using high performance servers in the cloud.")}</p>
             <Trans params={{ link: '<a href="https://webodm.net" target="_blank">webodm.net</a>', register: `<a href="https://webodm.net/register" target="_blank">${_("register")}</a>`}}>
             {_("Below you can enter your %(link)s credentials to sync your account and automatically setup a new processing node. If you don't have an account, you can %(register)s for free.")}</Trans>
             <Login onLogin={this.handleLogin} />
