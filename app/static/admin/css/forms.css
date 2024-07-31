@@ -217,6 +217,9 @@
 .admin-area .submit-row input.default:hover {
   opacity: 0.9;
 }
+.admin-area .submit-row input.cancel {
+  background-color: #afafaf !important;
+}
 .admin-area .submit-row p {
   margin: 0.3em;
 }
