@@ -68,9 +68,6 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
     "type": {
       "type": "string"
     },
-    "subtype": {
-      "type": "string"
-    },
     "payload": {
       "type": "object"
     },
@@ -172,13 +169,14 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
   }
   ```
 
-### Tipo: weeds; Subtipo: soy
+### Tipo: weeds
+
+O weed_type podem ser ("soy", "corn", "cane").
 
 - **Body Schema:**
   ```json
   {
-    "type": "weeds",
-    "subtype": "soy",
+    "type": "{weed_type}",
     "payload": {
       "processing_requests": {
         "fields_to_process": {
@@ -195,8 +193,31 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
 - **Example Body:**
   ```json
   {
-    "type": "weeds",
-    "subtype": "soy",
+    "type": "soy",
+    "payload": {
+        "processing_requests": {
+        "fields_to_process": [3, 4, 5]
+      }
+    }
+  }
+  ```
+
+- **Example Body:**
+  ```json
+  {
+    "type": "corn",
+    "payload": {
+        "processing_requests": {
+        "fields_to_process": [3, 4, 5]
+      }
+    }
+  }
+  ```
+
+  - **Example Body:**
+  ```json
+  {
+    "type": "cane",
     "payload": {
         "processing_requests": {
         "fields_to_process": [3, 4, 5]
