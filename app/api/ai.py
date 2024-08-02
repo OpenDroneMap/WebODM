@@ -18,13 +18,11 @@ def crash_with_style(message: str, status):
         'detail': message
     }, status = status)
 
-def send_post_to_processing(typ: str, subtype: str, project_pk, pk, payload: dict):
+def send_post_to_processing(typ: str, project_pk, pk, payload: dict):
     if not AGROSMART_API_ADDRESS:
         return crash_with_style('No <AGROSMART_API_ADDRESS> was supplied.', status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     url = f'{AGROSMART_API_ADDRESS}/process/{typ}'
-    if subtype:
-        url += f'/{subtype}'
     headers = {'content-type': 'application/json'}
     params = {
         'project_id': project_pk,
@@ -36,8 +34,6 @@ def send_post_to_processing(typ: str, subtype: str, project_pk, pk, payload: dic
         return Response(res, status=response.status_code)
     except ValueError:
         url_tail = f'{typ}'
-        if subtype:
-            url_tail += f'/{subtype}'
         return crash_with_style(f"The '/{url_tail}' endpoint does not exist!", status.HTTP_400_BAD_REQUEST)
 
 class AiProcessing(APIView):
@@ -58,8 +54,7 @@ class AiProcessing(APIView):
             typ = request.data.get('type', "")
             if not typ:
                 return crash_with_style("Required <type> was not provided in the body.", status=status.HTTP_400_BAD_REQUEST)
-            sub_type = request.data.get('subtype', "")
             payload = request.data.get('payload', "")
-            return send_post_to_processing(typ, sub_type, project_pk, pk, payload)
+            return send_post_to_processing(typ, project_pk, pk, payload)
         else:
             return crash_with_style(f"You don't have permission to access project: {project_pk}", status.HTTP_401_UNAUTHORIZED) 
