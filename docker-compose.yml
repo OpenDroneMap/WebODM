@@ -46,10 +46,11 @@ services:
     oom_score_adj: 0
 
   node-odm:
+  # para usar sem gpu só deletar as referencias "gpu" do image e do dockerfile e remover o deploy
     image: global_drones/nodeodm:gpu
     build:
       context: ${NODEODM_DIR}
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.gpu
     expose:
       - "3000"
     ports:
