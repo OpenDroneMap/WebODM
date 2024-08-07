@@ -22,8 +22,10 @@
                     {% if field.field.help_text %}
                         <p class="help">{{ field.field.help_text|safe }}</p>
                     {% endif %}
-                    {% if field.field.name != 'password1' %}
-                        <span class="horizontal-bar bar-{{ field.field.name }}"></span>
+                    {% if request.path == '/admin/auth/user/add/' %}
+                        {% if field.field.name != 'password1'  %}
+                            <span class="horizontal-bar bar-{{ field.field.name }}"></span>
+                        {% endif %}
                     {% endif %}
                 </div>
             {% endfor %}

@@ -26,6 +26,7 @@
 				text-align: center;
 			}
 			tr.selected {
+				margin-right: 20px  !important;
 				background-color: #d9d9d9;
 			}
 		}
@@ -85,7 +86,7 @@
 			}
 			#searchbar {
 				padding: 5px 20px 5px 40px;
-				width: 220px;
+				width: 260px;
 				border: none;
 				background-color: #e3e3e3;
 
@@ -148,7 +149,7 @@
 			border-radius: 30px; 
            	box-sizing: border-box; 
             outline: none; 
-			width: 220px;
+			width: 265px;
 			border: none;
 			background-color: #e3e3e3;
 			appearance: none; 
@@ -159,6 +160,7 @@
 			background-position: right 10px center;
     		background-size: 18px;
     		padding-right: 40px;
+			font-family: "Montserrat Bold";
 		
 			&:focus {
 				border-color: #999;

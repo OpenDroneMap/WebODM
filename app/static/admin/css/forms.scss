@@ -249,17 +249,6 @@
         overflow: auto;
     }
 
-    .submit-row input {
-        height: 35px;
-        line-height: 15px;
-        border-radius: 40px;
-        background-color: #319c41 !important;
-        width: 220px;
-    }
-
-    .submit-row input:hover {
-        opacity: 0.8 !important;
-    }
 
     .submit-row input.default {
         margin-left: 5px;
@@ -295,6 +284,22 @@
     .submit-row a.deletelink:hover,
     .submit-row a.deletelink:active {
         background: #a41515;
+    }
+
+
+    .submit-row .add-btn {
+        height: 35px;
+        line-height: 15px;
+        border-radius: 40px;
+        background-color: #319c41 !important;
+        width: 220px;
+    }
+    .submit-row .cancel-btn.add-btn {
+        background-color: #afafaf !important;
+    }
+
+    .submit-row .add-btn:hover {
+        opacity: 0.8 !important;
     }
 
     /* CUSTOM FORM FIELDS */

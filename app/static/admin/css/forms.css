@@ -201,16 +201,6 @@
 .admin-area body.popup .submit-row {
   overflow: auto;
 }
-.admin-area .submit-row input {
-  height: 35px;
-  line-height: 15px;
-  border-radius: 40px;
-  background-color: #319c41 !important;
-  width: 220px;
-}
-.admin-area .submit-row input:hover {
-  opacity: 0.8 !important;
-}
 .admin-area .submit-row input.default {
   margin-left: 5px;
 }
@@ -239,6 +229,19 @@
 .admin-area .submit-row a.deletelink:hover,
 .admin-area .submit-row a.deletelink:active {
   background: #a41515;
+}
+.admin-area .submit-row .add-btn {
+  height: 35px;
+  line-height: 15px;
+  border-radius: 40px;
+  background-color: #319c41 !important;
+  width: 220px;
+}
+.admin-area .submit-row .cancel-btn.add-btn {
+  background-color: #afafaf !important;
+}
+.admin-area .submit-row .add-btn:hover {
+  opacity: 0.8 !important;
 }
 .admin-area .vSelectMultipleField {
   vertical-align: top;
