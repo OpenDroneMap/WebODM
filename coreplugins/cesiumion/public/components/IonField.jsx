@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const BootstrapFieldComponent = ({
+const IonFieldComponent = ({
     name,
     value,
     label,
@@ -40,7 +40,7 @@ const BootstrapFieldComponent = ({
     );
 };
 
-BootstrapFieldComponent.propTypes = {
+IonFieldComponent.propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.any,
     label: PropTypes.string,
@@ -53,7 +53,7 @@ BootstrapFieldComponent.propTypes = {
     onBlur: PropTypes.func.isRequired
 };
 
-class BootstrapField extends React.Component {
+class IonField extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -91,7 +91,7 @@ class BootstrapField extends React.Component {
         }
 
         return (
-            <BootstrapFieldComponent
+            <IonFieldComponent
                 name={name}
                 value={value}
                 label={label}
@@ -108,7 +108,7 @@ class BootstrapField extends React.Component {
     }
 }
 
-BootstrapField.propTypes = {
+IonField.propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.string,
     help: PropTypes.string,
@@ -119,5 +119,5 @@ BootstrapField.propTypes = {
     onBlur: PropTypes.func
 };
 
-export { BootstrapFieldComponent };
-export default BootstrapField;
+export { IonFieldComponent };
+export default IonField;

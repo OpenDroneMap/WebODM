@@ -10,7 +10,7 @@ import {
 	ImplicitTaskFetcher as TaskFetcher,
 	APIFetcher
 } from "./components/Fetcher";
-import { AssetStyles } from "./defaults";
+import {AssetConfig, AssetStyles} from "./defaults";
 import { fetchCancelable, getCookie } from "./utils";
 
 export default class TaskView extends Component {
@@ -30,6 +30,23 @@ export default class TaskView extends Component {
 	cancelableFetch = null;
 	timeoutHandler = null;
 	refreshAssets = null;
+
+	componentWillUnmount() {
+		if (this.timeoutHandler !== null) {
+			clearTimeout(this.timeoutHandler);
+			this.timeoutHandler = null;
+		}
+		if (this.cancelableFetch !== null) {
+			try {
+				this.cancelableFetch.cancel();
+				this.cancelableFetch = null;
+			} catch (exception) {
+				console.error(exception);
+			}
+		}
+
+		this.refreshAssets = null;
+	}
 
 	onOpenUploadDialog(asset) {
 		this.setState({ currentAsset: asset });
@@ -55,10 +72,9 @@ export default class TaskView extends Component {
 	onUploadAsset = async data => {
 		const { task, token, apiURL } = this.props;
 		const { currentAsset } = this.state;
-		const payload = Object.assign({}, data);
+		const payload = {...data};
 
 		if (currentAsset === null) {
-			console.warning("Submissions on invalid asset");
 			return;
 		}
 
@@ -104,7 +120,10 @@ export default class TaskView extends Component {
 		const { isTasksDialog } = this.state;
 		const hasTasks = items.some(item => item.isTask);
 
-		if (!hasTasks) this.hideTaskDialog();
+		if (! hasTasks){
+			this.hideTaskDialog();
+		}
+
 		if (items.some(item => item.isTask && !item.isError)) {
 			const timeout = 4000 / (isTasksDialog ? 2 : 1);
 			this.timeoutHandler = setTimeout(this.refreshAssets, timeout);
@@ -112,7 +131,10 @@ export default class TaskView extends Component {
 	};
 
 	onCleanStatus = ({ updated = false }) => {
-		if (!updated || this.refreshAssets == null) return;
+		if (! updated || this.refreshAssets == null){
+			return;
+		}
+
 		this.refreshAssets();
 	};
 
@@ -128,37 +150,23 @@ export default class TaskView extends Component {
 				accum[item.type] = item.id;
 				return accum;
 			}, {});
-		window.open(`https://cesium.com/ion/assets/${idMap[asset]}`);
+
+		if (idMap[asset] === undefined) {
+			console.warn('Asset not found.', asset);
+		}
+
+		window.open(`https://cesium.com/ion/assets/${idMap[asset] ?? ''}`);
 	};
-
-	componentWillUnmount() {
-		if (this.timeoutHandler !== null) {
-			clearTimeout(this.timeoutHandler);
-			this.timeoutHandler = null;
-		}
-		if (this.cancelableFetch !== null) {
-			try {
-				this.cancelableFetch.cancel();
-				this.cancelableFetch = null;
-			} catch (exception) {
-				console.warning("Failed to clear dead requests");
-				console.warning(exception);
-			}
-		}
-
-		this.refreshAssets = null;
-	}
 
 	render() {
 		const { task, token } = this.props;
 		const {
 			isTasksDialog,
 			isUploadDialogLoading,
-			isRefreshTask,
 			currentAsset
 		} = this.state;
 		const isUploadDialog = currentAsset !== null;
-		const assetName = isUploadDialog ? AssetStyles[currentAsset].name : "";
+		const assetName = isUploadDialog ? AssetConfig[currentAsset].name : "";
 
 		return (
 			<AppContext.Provider value={this.props}>
@@ -174,23 +182,20 @@ export default class TaskView extends Component {
 							const { items = [] } = data;
 							const available = items
 								.filter(
-									item =>
-										(!item.isExported && !item.isTask) ||
-										item.isError
+									item => {
+										return (! item.isExported && ! item.isTask) || item.isError
+									}
 								)
 								.map(item => item.type);
+
 							const exported = items
 								.filter(item => item.isExported)
 								.map(item => item.type);
 
 							// Tasks Selector
-							const processing = items.filter(
-								item => item.isTask
-							);
-							const isTasks = processing.length > 0;
-							const isErrors = processing.some(
-								item => item.isError
-							);
+							const processing = items.filter(item => item.isTask);
+							const hasProcessingTasks = processing.length > 0;
+							const hasErrors = processing.some(item => item.isError);
 
 							return (
 								<Fragment>
@@ -222,9 +227,9 @@ export default class TaskView extends Component {
 											Refresh Available ion Assets
 										</button>
 									)}
-									{isTasks && (
+									{hasProcessingTasks && (
 										<button
-											className={`ion-btn btn btn-sm ${isErrors ? "btn-danger" : "btn-primary"}`}
+											className={`ion-btn btn btn-sm ${hasErrors ? "btn-danger" : "btn-primary"}`}
 											onClick={this.showTaskDialog}
 										>
 											<i className={"fa fa-cesium"} />
@@ -249,8 +254,7 @@ export default class TaskView extends Component {
 					{({ isLoading, isError, data }) => {
 						const initialValues = {};
 
-						if (isLoading || assetName === "")
-						{
+						if (isLoading || assetName === "") {
 							return null;
 						}
 

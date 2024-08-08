@@ -1,6 +1,6 @@
 import AssetType from "./AssetType";
 
-const AssetStyles = {
+const AssetConfig = {
 	[AssetType.ORTHOPHOTO]: {
 		name: "Orthophoto",
 		icon: "far fa-image"
@@ -23,4 +23,4 @@ const AssetStyles = {
 	}
 };
 
-export default AssetStyles;
+export default AssetConfig;

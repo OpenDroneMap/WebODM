@@ -1,5 +1,5 @@
 import AssetType from "./AssetType";
 import SourceType from "./SourceType";
-import AssetStyles from "./AssetStyles";
+import AssetConfig from "./AssetConfig";
 
-export { AssetType, SourceType, AssetStyles };
+export { AssetType, SourceType, AssetConfig };

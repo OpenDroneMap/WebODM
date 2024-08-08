@@ -2,7 +2,7 @@ import React, { Component, Fragment } from "react";
 
 import FormDialog from "../../../../app/static/app/js/components/FormDialog";
 
-import BootstrapField from "./BootstrapField";
+import IonField from "./IonField";
 import { ImplicitIonFetcher as IonFetcher } from "./Fetcher";
 import { AssetType, SourceType } from "../defaults";
 import "./UploadDialog.scss";
@@ -72,12 +72,11 @@ export default class UploadDialog extends Component {
 
 	handleError = msg => error => {
 		this.props.onError(msg);
-		console.error(error);
 	};
 
 	onSubmit = values => {
 		const { asset, onSubmit } = this.props;
-		values = JSON.parse(JSON.stringify(this.state));
+		values = {...this.state};
 		const { options = {} } = values;
 
 		switch (UploadDialog.AssetSourceType[asset]) {
@@ -101,8 +100,10 @@ export default class UploadDialog extends Component {
 		switch (UploadDialog.AssetSourceType[this.props.asset]) {
 			case SourceType.RASTER_TERRAIN:
 				let loadOptions = ({ isLoading, isError, data }) => {
-					if (isLoading || isError)
+					if (isLoading || isError){
 						return <option disabled>LOADING...</option>;
+					}
+
 					let userItems = data.items
 						.filter(item => item.type === "TERRAIN")
 						.map(item => (
@@ -110,6 +111,7 @@ export default class UploadDialog extends Component {
 								{item.name}
 							</option>
 						));
+
 					return [
 						<option key={"mean-sea-level"} value={""}>
 							Mean Sea Level
@@ -119,7 +121,7 @@ export default class UploadDialog extends Component {
 				};
 
 				return (
-					<BootstrapField
+					<IonField
 						name={"options.baseTerrainId"}
 						label={"Base Terrain: "}
 						type={"select"}
@@ -128,57 +130,29 @@ export default class UploadDialog extends Component {
 					>
 						<IonFetcher
 							path="assets"
-							onError={this.handleError(
-								"Failed to load terrain options. " +
-									"Please check your token!"
-							)}
+							onError={this.handleError('Failed to load terrain options. Please check your token!')}
 						>
 							{loadOptions}
 						</IonFetcher>
-					</BootstrapField>
+					</IonField>
 				);
 			case SourceType.CAPTURE:
 				return (
-					<BootstrapField
+					<IonField
 						name={"options.textureFormat"}
 						label={"Use KTX2 Compression"}
 						type={"select"}
 						value={this.state.options.textureFormat ? "Yes" : "No"}
-						help={
-							"KTX v2.0 is an image container format that supports Basis Universal supercompression. " +
-							"Use KTX2 compression to create a smaller tileset with better streaming performance."
-						}
+						help={'KTX v2.0 is an image container format that supports Basis Universal supercompression. Use KTX2 compression to create a smaller tileset with better streaming performance.'}
 						onChange={this.handleChange}
 					>
 						<option>No</option>
 						<option>Yes</option>
-					</BootstrapField>
+					</IonField>
 				);
 			default:
 				return null;
 		}
-	}
-
-	getValidation() {
-		let errors = {};
-        if (!values.name) {
-            errors.name = "A name is required!";
-        }
-
-        switch (UploadDialog.AssetSourceType[this.props.asset]) {
-            case SourceType.RASTER_TERRAIN:
-                if (typeof values.options.baseTerrainId !== "string") {
-                    errors.baseTerrainId = "Invalid value!";
-                }
-                break;
-            case SourceType.CAPTURE:
-                if (typeof values.options.textureFormat !== "boolean") {
-                    errors.textureFormat = "Invalid value!";
-                }
-                break;
-        }
-
-        return errors;
 	}
 
 	render() {
@@ -193,14 +167,14 @@ export default class UploadDialog extends Component {
                 saveIcon={this.state.loading ? "fa fa-sync fa-spin" : "fa fa-upload"}
                 ref={(domNode) => { this.dialog = domNode; }}
             >
-                <BootstrapField
+                <IonField
                     name={"name"}
                     label={"Name: "}
                     type={"text"}
                     value={this.state.name}
                     onChange={this.handleChange}
                 />
-                <BootstrapField
+                <IonField
                     name={"description"}
                     label={"Description: "}
                     type={"textarea"}
@@ -208,7 +182,7 @@ export default class UploadDialog extends Component {
                     value={this.state.description}
                     onChange={this.handleChange}
                 />
-                <BootstrapField
+                <IonField
                     name={"attribution"}
                     label={"Attribution: "}
                     type={"text"}
