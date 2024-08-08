@@ -2,11 +2,10 @@
     DJANGO Admin styles
 */
 .admin-area {
-  background-color: #fff;
+  padding: 0 !important;
   /* GLOBAL DEFAULTS */
   /* TEXT STYLES & MODIFIERS */
   /* TABLES */
-  /* SORTABLE TABLES */
   /* FORM DEFAULTS */
   /* FORM BUTTONS */
   /* MODULES */
@@ -20,6 +19,32 @@
   /* HEADER */
   /* SIDEBAR */
   /* POPUP */
+}
+.admin-area .main {
+  position: relative;
+  box-sizing: border-box;
+  padding-bottom: 13vh;
+  padding-top: 7vh;
+  padding-right: 6vw;
+  height: calc(100vh - 61px) !important;
+}
+.admin-area .main .content.flex {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.admin-area .main .content.flex #content-main {
+  flex: 1;
+  display: flex;
+}
+.admin-area .main .content.flex #changelist-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.admin-area .main .content.flex .results {
+  flex: 1;
 }
 .admin-area .CodeMirror-scroll, .admin-area .CodeMirror {
   height: 150px !important;
@@ -47,21 +72,20 @@
 .admin-area a.section:focus, .admin-area a.section:hover {
   text-decoration: underline;
 }
-.admin-area p, .admin-area ol, .admin-area ul, .admin-area dl {
-  margin: 0.2em 0 0.8em 0;
-}
 .admin-area p {
   padding: 0;
   line-height: 140%;
 }
-.admin-area h1, .admin-area h2, .admin-area h3, .admin-area h4, .admin-area h5 {
-  font-weight: bold;
-}
 .admin-area h1 {
-  margin: 0 0 20px;
+  padding: 0 !important;
+  margin-top: 40px !important;
+  margin-bottom: 20px !important;
+  margin-left: 20px;
   font-weight: 300;
-  font-size: 20px;
+  font-size: 16px;
   color: #666;
+  font-family: inherit !important;
+  display: block;
 }
 .admin-area h2 {
   font-size: 16px;
@@ -200,74 +224,110 @@
 .admin-area .nowrap {
   white-space: nowrap;
 }
-.admin-area table {
-  border-collapse: collapse;
-  border-color: #ccc;
+.admin-area .user-form .results, .admin-area .group-form .results {
+  margin-left: 5px;
+  border: 1px solid #14a5a2;
+  padding: 5px 20px 5px 20px;
+  border-radius: 25px;
 }
-.admin-area td, .admin-area th {
-  font-size: 13px;
-  line-height: 16px;
-  border-bottom: 1px solid #eee;
-  vertical-align: top;
-  padding: 8px;
-  font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
-}
-.admin-area th {
-  font-weight: 600;
+.admin-area .user-form .results table, .admin-area .group-form .results table {
+  border-collapse: separate !important;
+  width: 100%;
   text-align: left;
+  position: relative;
 }
-.admin-area thead th,
-.admin-area tfoot td {
-  color: #666;
-  padding: 5px 10px;
-  font-size: 11px;
-  background: #fff;
-  border: none;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+.admin-area .user-form .results table a, .admin-area .group-form .results table a {
+  text-decoration: none;
+  color: inherit;
 }
-.admin-area tfoot td {
-  border-bottom: none;
-  border-top: 1px solid #eee;
+.admin-area .user-form .results table th, .admin-area .group-form .results table th {
+  line-height: 50px;
+  box-sizing: border-box;
+  position: relative;
 }
-.admin-area thead th.required {
-  color: #000;
+.admin-area .user-form .results table th:not(:first-of-type) .text a, .admin-area .user-form .results table th:not(:first-of-type) .text span, .admin-area .group-form .results table th:not(:first-of-type) .text a, .admin-area .group-form .results table th:not(:first-of-type) .text span {
+  display: inline-block;
+  background-color: #e3e3e3;
+  border-radius: 5px;
+  width: 100%;
+  line-height: 35px;
 }
-.admin-area tr.alt {
-  background: #f6f6f6;
+.admin-area .user-form .results table th:not(:first-of-type) .text a:hover, .admin-area .user-form .results table th:not(:first-of-type) .text span:hover, .admin-area .group-form .results table th:not(:first-of-type) .text a:hover, .admin-area .group-form .results table th:not(:first-of-type) .text span:hover {
+  background-color: #d9d9d9;
 }
-.admin-area .row1 {
-  background: #fff;
+.admin-area .user-form .results table td, .admin-area .group-form .results table td {
+  line-height: 50px;
 }
-.admin-area .row2 {
-  background: #f9f9f9;
+.admin-area .user-form .results table tr, .admin-area .group-form .results table tr {
+  position: relative;
+  width: 98%;
 }
-.admin-area thead th {
-  padding: 5px 10px;
-  line-height: normal;
-  text-transform: uppercase;
-  background: #f6f6f6;
+.admin-area .user-form .results table thead::after, .admin-area .user-form .results table tbody tr::after, .admin-area .group-form .results table thead::after, .admin-area .group-form .results table tbody tr::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: #81c9c9;
+  top: 50px;
+  left: 0;
+  z-index: 999;
 }
-.admin-area thead th a:link, .admin-area thead th a:visited {
-  color: #666;
+.admin-area .user-form .results table th, .admin-area .user-form .results table td, .admin-area .group-form .results table th, .admin-area .group-form .results table td {
+  border-right: 5px solid transparent;
 }
-.admin-area thead th.sorted {
-  background: #eee;
+.admin-area .user-form .results th.column-username, .admin-area .group-form .results th.column-username {
+  width: 20%;
 }
-.admin-area thead th.sorted .text {
-  padding-right: 42px;
+.admin-area .user-form .results th.column-username .text a, .admin-area .group-form .results th.column-username .text a {
+  padding-left: 5px;
 }
-.admin-area table thead th .text span {
-  padding: 8px 10px;
-  display: block;
+.admin-area .user-form .results th.column-email_display, .admin-area .group-form .results th.column-email_display {
+  width: 20%;
 }
-.admin-area table thead th .text a {
-  display: block;
-  cursor: pointer;
-  padding: 8px 10px;
+.admin-area .user-form .results th.column-email_display .text a, .admin-area .group-form .results th.column-email_display .text a {
+  padding-left: 5px;
 }
-.admin-area table thead th .text a:focus, .admin-area table thead th .text a:hover {
-  background: #eee;
+.admin-area .user-form .results th.column-first_name, .admin-area .group-form .results th.column-first_name {
+  width: 15%;
+}
+.admin-area .user-form .results th.column-first_name .text a, .admin-area .group-form .results th.column-first_name .text a {
+  padding-left: 5px;
+}
+.admin-area .user-form .results th.column-last_name, .admin-area .group-form .results th.column-last_name {
+  width: 15%;
+}
+.admin-area .user-form .results th.column-last_name .text a, .admin-area .group-form .results th.column-last_name .text a {
+  padding-left: 5px;
+}
+.admin-area .user-form .results th.column-is_staff, .admin-area .group-form .results th.column-is_staff {
+  width: 15%;
+  text-align: center;
+}
+.admin-area .user-form .results th.column-status, .admin-area .group-form .results th.column-status {
+  width: 7%;
+  text-align: center;
+}
+.admin-area .user-form .results th.column-edit, .admin-area .group-form .results th.column-edit {
+  width: 8%;
+  text-align: center;
+  vertical-align: middle;
+}
+.admin-area .user-form .results td.field-is_staff, .admin-area .user-form .results td.field-status, .admin-area .user-form .results td.field-edit, .admin-area .group-form .results td.field-is_staff, .admin-area .group-form .results td.field-status, .admin-area .group-form .results td.field-edit {
+  text-align: center;
+  vertical-align: middle;
+}
+.admin-area .user-form .results td.field-email_display, .admin-area .user-form .results td.field-first_name, .admin-area .user-form .results td.field-last_name, .admin-area .user-form .results th.field-username, .admin-area .group-form .results td.field-email_display, .admin-area .group-form .results td.field-first_name, .admin-area .group-form .results td.field-last_name, .admin-area .group-form .results th.field-username {
+  padding-left: 5px;
+}
+.admin-area table .field-is_staff img[alt=True] {
+  content: url(./icons/check.svg);
+  width: 22px;
+  height: 22px;
+}
+.admin-area table .field-is_staff img[alt=False] {
+  content: url(./icons/X.svg);
+  width: 22px;
+  height: 22px;
 }
 .admin-area thead th.sorted a.sortremove {
   visibility: hidden;
@@ -276,29 +336,29 @@
   visibility: visible;
 }
 .admin-area table thead th.sorted .sortoptions {
-  display: block;
-  padding: 9px 5px 0 5px;
-  float: right;
-  text-align: right;
+  position: absolute;
+  right: 5px;
 }
-.admin-area table thead th.sorted .sortpriority {
-  font-size: 0.8em;
-  min-width: 12px;
-  text-align: center;
-  vertical-align: 3px;
-  margin-left: 2px;
-  margin-right: 2px;
+.admin-area table thead th.sorted .sortoptions .sortpriority {
+  display: none;
 }
 .admin-area table thead th.sorted .sortoptions a {
   position: relative;
-  width: 14px;
+  width: 20px;
   height: 14px;
   display: inline-block;
   background: url(../img/sorting-icons.svg) 0 0 no-repeat;
   background-size: 14px auto;
 }
-.admin-area table thead th.sorted .sortoptions a.sortremove {
-  background-position: 0 0;
+.admin-area table thead th.sorted.descending .toggle.descending {
+  background-image: url(./icons/caret-down-fill.svg) !important;
+  background-repeat: no-repeat;
+  background-size: 17px;
+}
+.admin-area table thead th.sorted.ascending .toggle.ascending {
+  background-image: url(./icons/caret-up-fill.svg) !important;
+  background-repeat: no-repeat;
+  background-size: 17px;
 }
 .admin-area table thead th.sorted .sortoptions a.sortremove:after {
   content: "\\";
@@ -317,20 +377,8 @@
 .admin-area table thead th.sorted .sortoptions a.sortremove:hover {
   background-position: 0 -14px;
 }
-.admin-area table thead th.sorted .sortoptions a.ascending {
-  background-position: 0 -28px;
-}
-.admin-area table thead th.sorted .sortoptions a.ascending:focus,
-.admin-area table thead th.sorted .sortoptions a.ascending:hover {
-  background-position: 0 -42px;
-}
-.admin-area table thead th.sorted .sortoptions a.descending {
-  top: 1px;
-  background-position: 0 -56px;
-}
-.admin-area table thead th.sorted .sortoptions a.descending:focus,
-.admin-area table thead th.sorted .sortoptions a.descending:hover {
-  background-position: 0 -70px;
+.admin-area .column-__str__ .text span {
+  background-color: transparent !important;
 }
 .admin-area input, .admin-area textarea, .admin-area select, .admin-area .form-row p, .admin-area form .button {
   margin: 2px 0;
@@ -398,8 +446,6 @@
 }
 .admin-area .module {
   border: none;
-  margin-bottom: 30px;
-  background: #fff;
 }
 .admin-area .module p, .admin-area .module ul, .admin-area .module h3, .admin-area .module h4, .admin-area .module dl, .admin-area .module pre {
   padding-left: 10px;
@@ -520,14 +566,30 @@
   padding: 5px 0 0 12px;
 }
 .admin-area div.breadcrumbs {
-  padding: 10px 0px;
   border: none;
   font-size: 14px;
   color: #000;
   text-align: left;
+  margin-left: 20px;
+  font-family: "Montserrat Regular";
 }
 .admin-area div.breadcrumbs a {
   color: #000;
+  position: relative;
+  text-decoration: none;
+  font-family: "Montserrat Regular";
+}
+.admin-area div.breadcrumbs a::after {
+  content: "";
+  background-image: url(./icons/caret-right-fill.svg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 .admin-area div.breadcrumbs a:focus, .admin-area div.breadcrumbs a:hover {
   color: #000;
@@ -555,9 +617,10 @@
   font-size: 10px;
   font-weight: bold;
   padding-left: 0;
-  float: right;
-  position: relative;
-  margin-top: -48px;
+  position: absolute;
+  right: 6vw;
+  top: 7vh;
+  z-index: 999;
 }
 .admin-area .form-row .object-tools {
   margin-top: 5px;
@@ -587,7 +650,7 @@
   color: #fff;
 }
 .admin-area .object-tools a:focus, .admin-area .object-tools a:hover {
-  background-color: #417690;
+  opacity: 0.9;
 }
 .admin-area .object-tools a:focus {
   text-decoration: none;
@@ -780,6 +843,87 @@
 }
 .admin-area .popup #header {
   padding: 10px 20px;
+}
+.admin-area .content.colM {
+  padding: 0 !important;
+  margin-left: 2vw;
+}
+.admin-area .content.colM .breadcrumbs {
+  margin-left: 5px !important;
+  font-size: 14px;
+}
+.admin-area .content.colM h1 {
+  margin-left: 5px !important;
+  font-size: 16px;
+}
+.admin-area .content.colM #content-main .horizontal-bar {
+  display: block;
+  height: 2px !important;
+  background-color: #81c9c9;
+  margin-bottom: 15px;
+  margin-top: 10px;
+}
+.admin-area .content.colM #content-main p {
+  font-size: 12px;
+  margin-left: 5px;
+  font-family: "Montserrat Regular" !important;
+}
+.admin-area .content.colM #content-main .field-password1 ul li {
+  font-family: "Montserrat Regular" !important;
+  font-size: 12px;
+}
+.admin-area .content.colM #content-main .form-row {
+  margin-left: 5px;
+}
+.admin-area .content.colM #content-main #user_form .field-username input,
+.admin-area .content.colM #content-main #user_form .field-password1 input,
+.admin-area .content.colM #content-main #user_form .field-password2 input,
+.admin-area .content.colM #content-main #user_form .field-email input,
+.admin-area .content.colM #content-main #user_form .field-full_name input,
+.admin-area .content.colM #content-main #user_form .field-quota input {
+  width: 295px;
+  height: 37px;
+  border-radius: 40px;
+  border: none;
+  outline: none;
+  padding-left: 20px;
+  background-color: #e3e3e3;
+}
+.admin-area .content.colM #content-main .form-row.field-username .help {
+  margin-left: 200px !important;
+  font-size: 10px;
+  color: #000;
+}
+.admin-area .content.colM #content-main .form-row.field-password1 ul {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.admin-area .content.colM #content-main .form-row.field-password2 p {
+  display: none;
+}
+.admin-area .content.colM #content-main .js-inline-admin-formset.inline-group .module h2 {
+  background-color: #64b7b6 !important;
+  border-radius: 40px;
+  margin-top: 20px;
+}
+.admin-area .content.colM #content-main .js-inline-admin-formset.inline-group h3 {
+  color: #00a8a3;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-left: 5px;
+  background-color: transparent;
+  padding: 0 !important;
+}
+.admin-area .content.colM #content-main .js-inline-admin-formset.inline-group .module.aligned {
+  background-color: transparent;
+}
+.admin-area .content.colM #content-main .js-inline-admin-formset.inline-group .module.aligned .help {
+  margin-left: 200px !important;
+  font-size: 10px;
+  color: #000;
+}
+.admin-area .content.colM #content-main .js-inline-admin-formset.inline-group .module.aligned .field-quota label {
+  width: 200px;
 }
 
 /*# sourceMappingURL=base.css.map */

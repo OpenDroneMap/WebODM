@@ -2,8 +2,43 @@
     DJANGO Admin styles
 */
 
+
 .admin-area{
-    background-color: #fff;
+
+    padding: 0 !important;
+
+    .main {
+        position: relative;
+        box-sizing: border-box;
+        padding-bottom: 13vh;
+        padding-top: 7vh;
+        padding-right: 6vw;
+        height: calc(100vh - 61px) !important;
+
+        .content.flex {
+        padding: 0 !important;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+
+            #content-main {
+                flex: 1;
+                display: flex;
+            }
+        
+
+            #changelist-form {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .results {
+                flex: 1;
+            }
+        }
+    }   
     
     .CodeMirror-scroll, .CodeMirror{
         height: 150px !important;
@@ -41,24 +76,22 @@
 
     /* GLOBAL DEFAULTS */
 
-    p, ol, ul, dl {
-        margin: .2em 0 .8em 0;
-    }
 
     p {
         padding: 0;
         line-height: 140%;
     }
 
-    h1,h2,h3,h4,h5 {
-        font-weight: bold;
-    }
-
     h1 {
-        margin: 0 0 20px;
+        padding: 0 !important;
+        margin-top: 40px !important;
+        margin-bottom: 20px  !important;
+        margin-left: 20px;
         font-weight: 300;
-        font-size: 20px;
+        font-size: 16px;
         color: #666;
+        font-family: inherit !important;
+        display: block;
     }
 
     h2 {
@@ -235,92 +268,148 @@
 
     /* TABLES */
 
-    table {
-        border-collapse: collapse;
-        border-color: #ccc;
+    .user-form .results, .group-form .results {
+        margin-left: 5px;
+        border: 1px solid #14a5a2;
+        padding: 5px 20px 5px 20px;
+        border-radius: 25px;
+        
+
+        table {
+            border-collapse: separate !important;
+            width: 100%;
+            text-align: left;
+            position: relative;
+
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+        
+
+            th {
+                line-height: 50px;
+                box-sizing: border-box;
+                position: relative;
+
+
+                &:not(:first-of-type) {
+                    .text {
+                        a, span {
+                            display: inline-block;
+                            background-color: #e3e3e3;
+                            border-radius: 5px;
+                            width: 100%; 
+                            line-height: 35px;
+                            
+                            
+                            &:hover {
+                                background-color: #d9d9d9;
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+            td {
+                line-height: 50px;
+            }
+
+            tr {
+                position: relative;
+                width: 98%;
+            }
+
+            thead::after, tbody tr::after{
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 1px;
+                background-color: #81c9c9;
+                top: 50px;
+                left: 0;
+                z-index: 999;
+            }
+
+
+            th, td  {
+                border-right: 5px solid transparent;
+            }
+        }
+
+        th.column-username {
+            width: 20%;
+
+            .text a {
+                padding-left: 5px;
+            }
+        }
+        
+        th.column-email_display {
+            width: 20%;
+
+            .text a {
+                padding-left: 5px;
+            }
+        }
+        
+        th.column-first_name {
+            width: 15%;
+
+            .text a {
+                padding-left: 5px;
+            }
+        }
+        
+        th.column-last_name {
+            width: 15%;
+
+            .text a {
+                padding-left: 5px;
+            }
+        }
+        
+        th.column-is_staff {
+            width: 15%;
+            text-align: center;
+        }
+        
+        th.column-status {
+            width: 7%;
+            text-align: center;
+
+        }
+        
+        th.column-edit {
+            width: 8%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td.field-is_staff, td.field-status, td.field-edit {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+
+        td.field-email_display, td.field-first_name, td.field-last_name, th.field-username {
+            padding-left: 5px;
+        }
     }
 
-    td, th {
-        font-size: 13px;
-        line-height: 16px;
-        border-bottom: 1px solid #eee;
-        vertical-align: top;
-        padding: 8px;
-        font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    table .field-is_staff img[alt="True"] {
+        content: url(./icons/check.svg);
+        width: 22px;
+        height: 22px;  
     }
 
-    th {
-        font-weight: 600;
-        text-align: left;
+    table .field-is_staff img[alt="False"] {
+        content: url(./icons/X.svg);
+        width: 22px;
+        height: 22px;  
     }
 
-    thead th,
-    tfoot td {
-        color: #666;
-        padding: 5px 10px;
-        font-size: 11px;
-        background: #fff;
-        border: none;
-        border-top: 1px solid #eee;
-        border-bottom: 1px solid #eee;
-    }
-
-    tfoot td {
-        border-bottom: none;
-        border-top: 1px solid #eee;
-    }
-
-    thead th.required {
-        color: #000;
-    }
-
-    tr.alt {
-        background: #f6f6f6;
-    }
-
-    .row1 {
-        background: #fff;
-    }
-
-    .row2 {
-        background: #f9f9f9;
-    }
-
-    /* SORTABLE TABLES */
-
-    thead th {
-        padding: 5px 10px;
-        line-height: normal;
-        text-transform: uppercase;
-        background: #f6f6f6;
-    }
-
-    thead th a:link, thead th a:visited {
-        color: #666;
-    }
-
-    thead th.sorted {
-        background: #eee;
-    }
-
-    thead th.sorted .text {
-        padding-right: 42px;
-    }
-
-    table thead th .text span {
-        padding: 8px 10px;
-        display: block;
-    }
-
-    table thead th .text a {
-        display: block;
-        cursor: pointer;
-        padding: 8px 10px;
-    }
-
-    table thead th .text a:focus, table thead th .text a:hover {
-        background: #eee;
-    }
 
     thead th.sorted a.sortremove {
         visibility: hidden;
@@ -331,33 +420,37 @@
     }
 
     table thead th.sorted .sortoptions {
-        display: block;
-        padding: 9px 5px 0 5px;
-        float: right;
-        text-align: right;
+        position: absolute;
+        right: 5px;
+
+    }
+    table thead th.sorted .sortoptions .sortpriority {
+        display: none;;
     }
 
-    table thead th.sorted .sortpriority {
-        font-size: .8em;
-        min-width: 12px;
-        text-align: center;
-        vertical-align: 3px;
-        margin-left: 2px;
-        margin-right: 2px;
-    }
 
     table thead th.sorted .sortoptions a {
         position: relative;
-        width: 14px;
+        width: 20px;
         height: 14px;
         display: inline-block;
         background: url(../img/sorting-icons.svg) 0 0 no-repeat;
         background-size: 14px auto;
     }
 
-    table thead th.sorted .sortoptions a.sortremove {
-        background-position: 0 0;
+    table thead th.sorted.descending .toggle.descending {
+        background-image: url(./icons/caret-down-fill.svg) !important;
+        background-repeat: no-repeat;
+        background-size: 17px;
     }
+
+    table thead th.sorted.ascending .toggle.ascending {
+        background-image: url(./icons/caret-up-fill.svg) !important;
+        background-repeat: no-repeat;
+        background-size: 17px;
+        
+    } 
+    
 
     table thead th.sorted .sortoptions a.sortremove:after {
         content: '\\';
@@ -379,24 +472,11 @@
         background-position: 0 -14px;
     }
 
-    table thead th.sorted .sortoptions a.ascending {
-        background-position: 0 -28px;
+
+    .column-__str__ .text span {
+        background-color: transparent !important
     }
 
-    table thead th.sorted .sortoptions a.ascending:focus,
-    table thead th.sorted .sortoptions a.ascending:hover {
-        background-position: 0 -42px;
-    }
-
-    table thead th.sorted .sortoptions a.descending {
-        top: 1px;
-        background-position: 0 -56px;
-    }
-
-    table thead th.sorted .sortoptions a.descending:focus,
-    table thead th.sorted .sortoptions a.descending:hover {
-        background-position: 0 -70px;
-    }
 
     /* FORM DEFAULTS */
 
@@ -484,8 +564,8 @@
 
     .module {
         border: none;
-        margin-bottom: 30px;
-        background: #fff;
+        
+        
     }
 
     .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
@@ -635,15 +715,34 @@
     /* BREADCRUMBS */
 
     div.breadcrumbs {
-        padding: 10px 0px;
         border: none;
         font-size: 14px;
         color: #000;
         text-align: left;
+        margin-left: 20px;
+        font-family: "Montserrat Regular";
+        
     }
 
     div.breadcrumbs a {
         color: #000;
+        position: relative;
+        text-decoration: none;
+        font-family: "Montserrat Regular";
+    }
+
+    div.breadcrumbs a::after {
+        content: '';
+        background-image: url(./icons/caret-right-fill.svg);
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+        margin-right: 5px;
+        margin-left: 5px;
+
     }
 
     div.breadcrumbs a:focus, div.breadcrumbs a:hover {
@@ -682,9 +781,11 @@
         font-size: 10px;
         font-weight: bold;
         padding-left: 0;
-        float: right;
-        position: relative;
-        margin-top: -48px;
+        position: absolute;
+        right: 6vw;
+        top: 7vh;
+        z-index: 999;
+        
     }
 
     .form-row .object-tools {
@@ -719,7 +820,7 @@
     }
 
     .object-tools a:focus, .object-tools a:hover {
-        background-color: #417690;
+        opacity: 0.9;
     }
 
     .object-tools a:focus{
@@ -967,4 +1068,120 @@
     .popup #header {
         padding: 10px 20px;
     }
+
+
+    .content.colM {
+        padding: 0 !important;
+        margin-left: 2vw;
+
+        .breadcrumbs {
+            margin-left: 5px !important;
+            font-size: 14px;
+        }
+
+        h1 {
+            margin-left: 5px !important;
+            font-size: 16px;
+        }
+
+        #content-main {
+
+            .horizontal-bar {
+                display: block;
+                height: 2px !important;
+                background-color: #81c9c9;
+                margin-bottom: 15px;
+                margin-top: 10px;
+            }
+
+
+            p{
+                font-size: 12px;
+                margin-left: 5px;
+                font-family: "Montserrat Regular" !important ;
+                
+            }
+
+            .field-password1 ul li {
+                font-family: "Montserrat Regular" !important;
+                font-size: 12px;
+            }
+
+            .form-row {
+                margin-left: 5px
+            }
+
+            #user_form .field-username input, 
+            #user_form .field-password1 input,
+            #user_form .field-password2 input,
+            #user_form .field-email input,
+            #user_form .field-full_name input,
+            #user_form .field-quota input {
+                width: 295px;
+                height: 37px;
+                border-radius: 40px;
+                border: none;
+                outline: none;
+                padding-left: 20px;
+                background-color: #e3e3e3;
+            }
+
+
+
+            .form-row.field-username .help {
+                margin-left: 200px !important;
+                font-size: 10px;
+                color: #000;
+                
+            }
+
+
+            .form-row.field-password1 ul {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .form-row.field-password2 p {
+                display: none;
+            }
+
+            .js-inline-admin-formset.inline-group {
+                .module h2 {
+                    background-color: #64b7b6 !important;
+                    border-radius: 40px;
+                    margin-top: 20px;
+                }
+
+
+                h3 {
+                    color: #00a8a3;
+                    margin-top: 15px;
+                    margin-bottom: 15px;
+                    margin-left: 5px;
+                    background-color: transparent;
+                    padding: 0 !important;
+                }
+
+                .module.aligned {
+                    background-color: transparent;
+
+                    .help {
+                        margin-left: 200px !important;
+                        font-size: 10px;
+                        color: #000;
+                    }
+
+                    .field-quota label {
+                        width: 200px;
+                    }
+                }
+            }
+        }
+    }
+
+
+    
 }
+
+
+

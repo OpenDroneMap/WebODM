@@ -2,7 +2,7 @@
 {% if cl.search_fields %}
 <div id="toolbar"><form id="changelist-search" method="get">
 <div class="search-container"><!-- DIV needed for valid HTML -->
-<label for="searchbar"><img src="{% static "admin/img/search.svg" %}" alt="Search" /></label>
+<label for="searchbar"><span class="glyphicon glyphicon-search"></span></label>
 <input type="text" size="20" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" autofocus />
 <input type="submit" value="{% trans 'Search' %}" />
 {% if show_result_count %}

@@ -25,7 +25,8 @@
   text-align: center;
 }
 #changelist table tbody tr.selected {
-  background-color: #FFFFCC;
+  margin-right: 20px !important;
+  background-color: #d9d9d9;
 }
 #changelist table tfoot {
   color: #666;
@@ -43,130 +44,130 @@
 #changelist .paginator {
   color: #666;
   border-bottom: 1px solid #eee;
-  background: #fff;
   overflow: hidden;
+  display: none;
 }
 #changelist #toolbar {
-  padding: 8px 10px;
-  margin-bottom: 15px;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  background: #f8f8f8;
-  color: #666;
+  margin-left: 20px;
+  margin-bottom: 20px;
+  background-color: #edeeef;
 }
 #changelist #toolbar .search-container {
   display: flex;
   align-items: center;
+  position: relative;
+}
+#changelist #toolbar .search-container label span {
+  top: 50%;
+  left: 10px;
+  font-size: 18px;
+  position: absolute;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #14a5a2;
 }
 #changelist #toolbar form input {
-  border-radius: 4px;
-  font-size: 14px;
-  padding: 5px;
-  color: #333;
+  border-radius: 30px;
+  box-sizing: border-box;
+  outline: none;
+  font-family: "Montserrat Bold" !important;
 }
 #changelist #toolbar form #searchbar {
-  height: 19px;
-  border: 1px solid #ccc;
-  padding: 2px 5px;
-  margin-right: 8px;
-  margin-left: 8px;
-  vertical-align: top;
-  font-size: 13px;
+  padding: 5px 20px 5px 40px;
+  width: 260px;
+  border: none;
+  background-color: #e3e3e3;
 }
 #changelist #toolbar form #searchbar:focus {
-  border-color: #999;
+  border: none;
 }
 #changelist #toolbar form input[type=submit] {
-  border: 1px solid #ccc;
-  padding: 2px 10px;
-  margin: 0;
-  vertical-align: middle;
-  background: #fff;
-  box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
-  cursor: pointer;
-  color: #333;
-}
-#changelist #toolbar form input[type=submit]:focus {
-  border-color: #999;
+  padding: 5px 30px 5px 30px;
+  margin-left: 20px;
+  background-color: #74b06f;
+  width: 130px;
 }
 #changelist #toolbar form input[type=submit]:hover {
-  border-color: #999;
+  background-color: #6b9262;
 }
-#changelist .actions {
-  padding: 10px;
-  background: #fff;
-  border-top: none;
+
+.actions {
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  background-color: #edeeef;
+  margin-bottom: 40px !important;
+}
+.actions span.all {
+  font-size: 13px;
+  margin: 0 0.5em;
+  display: none;
+}
+.actions span.action-counter {
+  font-size: 13px;
+  margin: 0 0.5em;
+  display: none !important;
+}
+.actions span.clear {
+  font-size: 13px;
+  margin: 0 0.5em;
+  display: none;
+}
+.actions span.question {
+  font-size: 13px;
+  margin: 0 0.5em;
+  display: none;
+}
+.actions:last-child {
   border-bottom: none;
-  line-height: 24px;
-  color: #999;
 }
-#changelist .actions span.all {
-  font-size: 13px;
-  margin: 0 0.5em;
-  display: none;
-}
-#changelist .actions span.action-counter {
-  font-size: 13px;
-  margin: 0 0.5em;
-  display: none;
-}
-#changelist .actions span.clear {
-  font-size: 13px;
-  margin: 0 0.5em;
-  display: none;
-}
-#changelist .actions span.question {
-  font-size: 13px;
-  margin: 0 0.5em;
-  display: none;
-}
-#changelist .actions:last-child {
-  border-bottom: none;
-}
-#changelist .actions label {
+.actions label {
   margin: 0;
 }
-#changelist .actions select {
-  vertical-align: top;
-  height: 24px;
-  background: none;
-  color: #000;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  padding: 0 0 0 4px;
-  margin: 0;
-  margin-left: 8px;
-  margin-right: 8px;
+.actions select {
+  border-radius: 30px;
+  box-sizing: border-box;
+  outline: none;
+  width: 265px;
+  border: none;
+  background-color: #e3e3e3;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url(./icons/caret-down-fill.svg);
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 18px;
+  padding-right: 40px;
+  font-family: "Montserrat Bold";
 }
-#changelist .actions select:focus {
+.actions select:focus {
   border-color: #999;
 }
-#changelist .actions label {
+.actions label {
   display: inline-block;
   vertical-align: middle;
   font-size: 13px;
 }
-#changelist .actions .button {
-  font-size: 13px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: #fff;
-  box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
-  cursor: pointer;
-  height: 24px;
-  line-height: 1;
-  padding: 4px 8px;
-  margin: 0;
-  color: #333;
+.actions .button {
+  border-radius: 30px;
+  box-sizing: border-box;
+  outline: none;
+  padding: 5px 30px 5px 30px !important;
+  font-weight: 600 !important;
+  margin-left: 20px !important;
+  background-color: #74b06f;
+  width: 130px;
+  font-family: "Montserrat Bold" !important;
 }
-#changelist .actions .button:focus {
+.actions .button:focus {
   border-color: #999;
 }
-#changelist .actions .button:hover {
-  border-color: #999;
+.actions .button:hover {
+  background-color: #6b9262;
 }
-#changelist .actions.selected {
+
+.actions.selected {
   background: #fffccf;
   border-top: 1px solid #fffee8;
   border-bottom: 1px solid #edecd6;

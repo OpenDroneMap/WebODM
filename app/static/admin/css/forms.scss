@@ -4,7 +4,6 @@
 .admin-area{
     .form-row {
         overflow: hidden;
-        padding: 10px;
         font-size: 13px;
         border-bottom: 1px solid #eee;
     }
@@ -240,14 +239,8 @@
     /* SUBMIT ROW */
 
     .submit-row {
-        padding-left: 14px;
-        padding-right: 14px;
-        padding-bottom: 10px;
-        //padding: 12px 14px;
         margin: 0 0 20px;
-        background: #f8f8f8;
-        border: 1px solid #eee;
-        border-radius: 4px;
+        background: transparent;
         text-align: right;
         overflow: hidden;
     }
@@ -256,17 +249,19 @@
         overflow: auto;
     }
 
-    .submit-row input {
-        height: 35px;
-        line-height: 15px;
-        margin: 10px 0 0 5px;
-    }
 
     .submit-row input.default {
-        margin: 10px 0 0 8px;
-        text-transform: uppercase;
+        margin-left: 5px;
     }
 
+    .submit-row input.default:hover {
+        opacity: 0.9;
+    }
+
+    .submit-row input.cancel {
+        background-color: #afafaf !important;
+    }
+    
     .submit-row p {
         margin: 0.3em;
     }
@@ -289,6 +284,22 @@
     .submit-row a.deletelink:hover,
     .submit-row a.deletelink:active {
         background: #a41515;
+    }
+
+
+    .submit-row .add-btn {
+        height: 35px;
+        line-height: 15px;
+        border-radius: 40px;
+        background-color: #319c41 !important;
+        width: 220px;
+    }
+    .submit-row .cancel-btn.add-btn {
+        background-color: #afafaf !important;
+    }
+
+    .submit-row .add-btn:hover {
+        opacity: 0.8 !important;
     }
 
     /* CUSTOM FORM FIELDS */
