@@ -10,11 +10,6 @@
 		"license": "MIT"
 	},
 	{
-		"name": "react-bootstrap",
-		"url": "https://github.com/react-bootstrap/react-bootstrap",
-		"license": "MIT"
-	},
-	{
 		"name": "boto3",
 		"url": "https://github.com/boto/boto3",
 		"license": "Apache-2.0"
