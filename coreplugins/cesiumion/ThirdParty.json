@@ -1,0 +1,17 @@
+[
+	{
+		"name": "formik",
+		"url": "https://github.com/jaredpalmer/formik",
+		"license": "MIT"
+	},
+	{
+		"name": "yup",
+		"url": "https://github.com/jquense/yup",
+		"license": "MIT"
+	},
+	{
+		"name": "boto3",
+		"url": "https://github.com/boto/boto3",
+		"license": "Apache-2.0"
+	}
+]

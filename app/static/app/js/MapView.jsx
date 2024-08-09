@@ -62,7 +62,7 @@ class MapView extends React.Component {
     let thermalCount = 0;
     for (let item of this.props.mapItems){
       if (item.meta && item.meta.task && item.meta.task.orthophoto_bands){
-        if (item.meta.task.orthophoto_bands.length === 2 && item.meta.task.orthophoto_bands && 
+        if (item.meta.task.orthophoto_bands.length === 2 && item.meta.task.orthophoto_bands &&
             item.meta.task.orthophoto_bands[0] && typeof(item.meta.task.orthophoto_bands[0].description) === "string" &&
             item.meta.task.orthophoto_bands[0].description.toLowerCase() === "lwir"){
           thermalCount++;
@@ -102,7 +102,7 @@ class MapView extends React.Component {
 
   render(){
     const isThermal = this.isThermalMap();
-    
+
     let mapTypeButtons = [
       {
         label: _("Orthophoto"),
@@ -131,13 +131,13 @@ class MapView extends React.Component {
 
     return (<div className="map-view">
         <div className="map-view-header">
-          {this.props.title ? 
+          {this.props.title ?
             <h3 className="map-title" title={this.props.title}><i className="fa fa-globe"></i> {this.props.title}</h3>
           : ""}
 
           <div className="map-type-selector btn-group" role="group">
             {mapTypeButtons.map(mapType =>
-              <button 
+              <button
                 key={mapType.type}
                 onClick={this.handleMapTypeButton(mapType.type)}
                 title={mapType.label}
