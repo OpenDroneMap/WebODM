@@ -1,0 +1,85 @@
+{% extends "app/plugins/templates/base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h2>{% trans 'Align file from task image' %}</h2>
+    <p>
+        This plugin allows you to get the align file.
+        It is necessary to have a service that provides the required DEM to obtain the rectifying TIFF.
+    </p>
+    Please, configure the service URL, token and buffer size to start using the plugin.
+    <hr>
+    <form action="/plugins/align-service/" method="post" class="mt-6">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group mb-3">
+                    <label for="service_url">{{ form.service_url.label }}</label>
+                    <input name="service_url" value="{{ form.service_url.value }}" type="text" class="form-control"
+                           placeholder="https://you_url_service"/>
+                    {{ form.service_url.errors }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group mb-3">
+                    <label for="coverage_id">{{ form.coverage_id.label }}</label>
+                    <input name="coverage_id" value="{{ form.coverage_id.value }}" type="text" class="form-control"
+                           placeholder="space__coverage"/>
+                    {{ form.coverage_id.errors }}
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group mb-3">
+                    <label for="token">{{ form.token.label }}</label>
+                    <input name="token" value="{{ form.token.value }}" type="text" class="form-control"
+                           placeholder="token_service"/>
+                    {{ form.token.errors }}
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group mb-3">
+                    <label for="task_id">{{ form.task_id.label }}</label>
+                    <input name="task_id" value="{{ form.task_id.value }}" type="text" class="form-control"
+                           placeholder="task_id to genera example tif"/>
+                    {{ form.task_id.errors }}
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group mb-3">
+                    <label for="buffer_size">{{ form.buffer_size.label }}</label>
+                    <input name="buffer_size" value="{{ form.buffer_size.value }}" type="number"
+                           class="form-control"
+                           placeholder="Buffer Size"/>
+                    {{ form.buffer_size.errors }}
+                </div>
+            </div>
+        </div>
+
+        <div class="checkbox mb-3">
+            <label for="bot_task_resizing_images">
+                <input name="bot_task_resizing_images" {% if form.bot_task_resizing_images.value %} checked {% endif %}
+                       type="checkbox"> {{ form.bot_task_resizing_images.label }}
+            </label>
+            {{ form.bot_task_resizing_images.errors }}
+        </div>
+        <p>
+            {{ form.non_field_errors }}
+        </p>
+        <div>
+            <button name="apply_configuration" value="yes" class="btn btn-primary">Apply Settings</button>
+            <button name="test_signal" value="yes" class="btn btn-info">Generate example tif</button>
+        </div>
+    </form>
+{% endblock %}
