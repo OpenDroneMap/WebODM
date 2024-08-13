@@ -1,0 +1,17 @@
+{
+  "name": "Align generator service",
+  "webodmMinVersion": "0.6.2",
+  "description": "Plugin to get align from external service for WebODM",
+  "version": "1.0.0",
+  "author": "Diego Acuña, Greenbot Labs",
+  "email": "contacto@greenbot.cl",
+  "repository": "https://github.com/OpenDroneMap/WebODM",
+  "tags": [
+    "service",
+    "orthophoto",
+    "dem"
+  ],
+  "homepage": "https://github.com/OpenDroneMap/WebODM",
+  "experimental": true,
+  "deprecated": false
+}
