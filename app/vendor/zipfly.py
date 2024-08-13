@@ -46,7 +46,6 @@ class ZipflyStream(io.RawIOBase):
     def size(self):
         return self._size
 
-
 class ZipFly:
 
     def __init__(self,
@@ -280,13 +279,17 @@ class ZipFly:
 class ZipStream:
     def __init__(self, paths):
         self.paths = paths
-        self.generator = None
+        self._generator = None
 
     def lazy_load(self, chunksize):
-        if self.generator is None:
+        if self._generator is None:
             zfly = ZipFly(paths=self.paths, mode='w', chunksize=chunksize)
-            self.generator = zfly.generator()
+            self._generator = zfly.generator()
 
     def read(self, count):
         self.lazy_load(count)
-        return next(self.generator)
+        return next(self._generator)
+
+    def generator(self):
+        self.lazy_load(0x8000)
+        return self._generator

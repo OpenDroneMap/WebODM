@@ -4,6 +4,7 @@ import EditTaskForm from './EditTaskForm';
 import PropTypes from 'prop-types';
 import Storage from '../classes/Storage';
 import ResizeModes from '../classes/ResizeModes';
+import MapPreview from './MapPreview';
 import update from 'immutability-helper';
 import PluginsAPI from '../classes/plugins/API';
 import { _, interpolate } from '../classes/gettext';
@@ -34,6 +35,7 @@ class NewTaskPanel extends React.Component {
       taskInfo: {},
       inReview: false,
       loading: false,
+      showMapPreview: false
     };
 
     this.save = this.save.bind(this);
@@ -42,6 +44,12 @@ class NewTaskPanel extends React.Component {
     this.setResizeMode = this.setResizeMode.bind(this);
     this.handleResizeSizeChange = this.handleResizeSizeChange.bind(this);
     this.handleFormChanged = this.handleFormChanged.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if (this.props.filesCount !== prevProps.filesCount && this.mapPreview){
+      this.mapPreview.loadNewFiles();
+    }
   }
 
   componentDidMount(){
@@ -123,6 +131,22 @@ class NewTaskPanel extends React.Component {
     this.setState({taskInfo: this.getTaskInfo()});
   }
 
+  handleSuggestedTaskName = () => {
+    return this.props.suggestedTaskName(() => {
+      // Has GPS
+      this.setState({showMapPreview: true});
+    });
+  }
+
+  getCropPolygon = () => {
+    if (!this.mapPreview) return null;
+    return this.mapPreview.getCropPolygon();
+  };
+
+  handlePolygonChange = () => {
+    if (this.taskForm) this.taskForm.forceUpdate();
+  }
+
   render() {
     let filesCountOk = true;
     if (this.taskForm && !this.taskForm.checkFilesCount(this.props.filesCount)) filesCountOk = false;
@@ -142,12 +166,19 @@ class NewTaskPanel extends React.Component {
             </div>
             : ""}
 
+            {this.state.showMapPreview ? <MapPreview 
+              getFiles={this.props.getFiles}
+              onPolygonChange={this.handlePolygonChange}
+              ref={(domNode) => {this.mapPreview = domNode; }}
+            /> : ""}
+
             <EditTaskForm
               selectedNode={Storage.getItem("last_processing_node") || "auto"}
               onFormLoaded={this.handleFormTaskLoaded}
               onFormChanged={this.handleFormChanged}
               inReview={this.state.inReview}
-              suggestedTaskName={this.props.suggestedTaskName}
+              suggestedTaskName={this.handleSuggestedTaskName}
+              getCropPolygon={this.getCropPolygon}
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
 

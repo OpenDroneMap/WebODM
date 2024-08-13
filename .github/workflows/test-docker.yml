@@ -17,7 +17,7 @@ jobs:
         swap-size-gb: 12
     - name: Build and Test
       run: |
-        docker-compose -f docker-compose.yml -f docker-compose.build.yml build --build-arg TEST_BUILD=ON
-        docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d
+        docker compose -f docker-compose.yml -f docker-compose.build.yml build --build-arg TEST_BUILD=ON
+        docker compose -f docker-compose.yml -f docker-compose.build.yml up -d
         sleep 20
-        docker-compose exec -T webapp /webodm/webodm.sh test
+        docker compose exec -T webapp /webodm/webodm.sh test

@@ -113,7 +113,7 @@ export default class Dashboard extends React.Component {
     let balance = "";
     if (user){
         balance = (<span><strong>{ user.balance }</strong> {_("credits")}</span>);
-        if (user.plan !== null){
+        if (user.plan !== null && !user.node.limits.freeTasksPerMonth){
             balance = (<span><strong>{_("Unlimited")}</strong></span>);
         }
     }

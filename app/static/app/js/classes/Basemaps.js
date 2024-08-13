@@ -20,10 +20,10 @@ export default [
   },
   {
     attribution:
-      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 21,
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
     minZoom: 0,
-    label: _("OSM Mapnik"),
-    url: "//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    label: _("OpenStreetMap"),
+    url: "//tile.openstreetmap.org/{z}/{x}/{y}.png"
   }
 ];

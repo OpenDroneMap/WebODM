@@ -1,0 +1,13 @@
+{
+	"name": "Cesium Ion",
+	"webodmMinVersion": "2.5.0",
+	"description": "Upload and tile ODM assets with Cesium ion.",
+	"version": "1.3.0",
+	"author": "Cesium GS, Inc",
+	"email": "hello@cesium.com",
+	"repository": " https://github.com/OpenDroneMap/WebODM",
+	"tags": ["cesium ion", "cesium"],
+	"homepage": "https://cesium.com",
+	"experimental": false,
+	"deprecated": false
+}

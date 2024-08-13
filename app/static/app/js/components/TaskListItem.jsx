@@ -238,7 +238,10 @@ class TaskListItem extends React.Component {
     if (!Array.isArray(options)) return "";
     else if (options.length === 0) return "Default";
     else {
-      return options.map(opt => `${opt.name}: ${opt.value}`).join(", ");
+      return options.map(opt => {
+        if (opt.name === "boundary") return `${opt.name}:geojson`;
+        else return `${opt.name}:${opt.value}`
+      }).join(", ");
     }
   }
 
