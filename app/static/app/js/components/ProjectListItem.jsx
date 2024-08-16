@@ -17,6 +17,16 @@ import Tags from '../classes/Tags';
 import exifr from '../vendor/exifr';
 import { _, interpolate } from '../classes/gettext';
 import $ from 'jquery';
+import JSZip from 'jszip';
+import { fileTypeFromBuffer } from 'file-type';
+
+
+
+
+
+
+
+
 
 class ProjectListItem extends React.Component {
   static propTypes = {
@@ -130,6 +140,82 @@ class ProjectListItem extends React.Component {
   hasPermission(perm){
     return this.state.data.permissions.indexOf(perm) !== -1;
   }
+  
+  handleUploadfolders = (e) => {
+    // use the UPLOAD FOLDERS BUTTON to send items inside the folder to the dropzone
+    e.persist();
+    const files = e.target.files; 
+    const fileArray = Array.from(files); 
+    console.log(fileArray);
+
+    fileArray.forEach((file) => {
+        this.dz.addFile(file);
+    });
+    
+    this.dz.emit('addedfiles', files);
+    e.target.value = "";
+  }
+
+  handleUploadFiles = async (e) => {
+    // use the UPLOAD FILES BUTTON to send files to the dropzone
+    e.persist();
+    const files = e.target.files;
+    const filesArray = Array.from(files);
+
+    let FilesToDrozoneArray = [];
+
+    for (const file of filesArray) {
+        if (file.name.endsWith(".zip")) {
+            const unzipFiles = await this.unzipZipFile(file);
+            FilesToDrozoneArray = [...FilesToDrozoneArray, ...unzipFiles];
+        } 
+        
+        else if (file.name.endsWith(".rar")) {
+          // codigo para descompactar arquivos .rar
+        }
+        
+        else {
+            FilesToDrozoneArray = [...FilesToDrozoneArray, file];
+        }
+    }
+    FilesToDrozoneArray.forEach((file) => {
+        this.dz.addFile(file);
+    })
+    const fileListToDropzone = FilesToDrozoneArray.reduce((obj, file, index) => {
+        obj[index] = file;
+        return obj;
+    }, {});
+    fileListToDropzone.length = FilesToDrozoneArray.length;
+
+    this.dz.emit('addedfiles', fileListToDropzone);
+    e.target.value = "";
+  }
+
+  unzipZipFile = async (file) => {
+    // function to unzip zip
+    const zip = new JSZip();
+    const content = await zip.loadAsync(file);
+    const filesArray = [];
+
+    const promises = content.file(/.*/).map(async (zipEntry) => {
+        if (!zipEntry.dir) {
+
+          const fileData = await zipEntry.async("blob");
+
+          const buffer = await fileData.arrayBuffer();
+          const fileType = await fileTypeFromBuffer(Buffer.from(buffer));
+          const mimeType = fileType ? fileType.mime : '';
+
+          const fileObj = new File([fileData], zipEntry.name, { type: mimeType });
+          filesArray.push(fileObj);
+        }
+    });
+
+    await Promise.all(promises);
+    console.log("Arquivos ZIP descompactados: ", filesArray);
+    return filesArray; 
+  }
+
 
   componentDidMount(){
     Dropzone.autoDiscover = false;
@@ -140,10 +226,10 @@ class ProjectListItem extends React.Component {
           url : 'TO_BE_CHANGED',
           parallelUploads: 6,
           uploadMultiple: false,
-          acceptedFiles: "image/*,text/*,.las,.laz,video/*,.srt",
+          acceptedFiles: "image/*,text/*,.las,.laz,video/*,.srt,.zip",
           autoProcessQueue: false,
           createImageThumbnails: false,
-          clickable: this.uploadButton,
+          clickable: false,
           maxFilesize: 131072, // 128G
           chunkSize: 2147483647,
           timeout: 2147483647,
@@ -154,12 +240,14 @@ class ProjectListItem extends React.Component {
       });
 
       this.dz.on("addedfiles", files => {
+          console.log("addedfiles executado: ", files);
+
           let totalBytes = 0;
           for (let i = 0; i < files.length; i++){
-              totalBytes += files[i].size;
-              files[i].deltaBytesSent = 0;
-              files[i].trackedBytesSent = 0;
-              files[i].retries = 0;
+            totalBytes += files[i].size;
+            files[i].deltaBytesSent = 0;
+            files[i].trackedBytesSent = 0;
+            files[i].retries = 0;
           }
 
           this.setUploadState({
@@ -168,28 +256,28 @@ class ProjectListItem extends React.Component {
             files,
             totalBytes: this.state.upload.totalBytes + totalBytes
           });
-        })
-        .on("uploadprogress", (file, progress, bytesSent) => {
-            const now = new Date().getTime();
+      })
+      .on("uploadprogress", (file, progress, bytesSent) => {
+          const now = new Date().getTime();
 
-            if (bytesSent > file.size) bytesSent = file.size;
-            
-            if (progress === 100 || now - this.state.upload.lastUpdated > 500){
-                const deltaBytesSent = bytesSent - file.deltaBytesSent;
-                file.trackedBytesSent += deltaBytesSent;
+          if (bytesSent > file.size) bytesSent = file.size;
+          
+          if (progress === 100 || now - this.state.upload.lastUpdated > 500){
+              const deltaBytesSent = bytesSent - file.deltaBytesSent;
+              file.trackedBytesSent += deltaBytesSent;
 
-                const totalBytesSent = this.state.upload.totalBytesSent + deltaBytesSent;
-                const progress = totalBytesSent / this.state.upload.totalBytes * 100;
+              const totalBytesSent = this.state.upload.totalBytesSent + deltaBytesSent;
+              const progress = totalBytesSent / this.state.upload.totalBytes * 100;
 
-                this.setUploadState({
-                    progress,
-                    totalBytesSent,
-                    lastUpdated: now
-                });
+              this.setUploadState({
+                  progress,
+                  totalBytesSent,
+                  lastUpdated: now
+              });
 
-                file.deltaBytesSent = bytesSent;
-            }
-        })
+              file.deltaBytesSent = bytesSent;
+          }
+      })
         .on("complete", (file) => {
             // Retry
             const retry = () => {
@@ -595,6 +683,8 @@ class ProjectListItem extends React.Component {
     }
   }
 
+
+
   render() {
     const { refreshing, data, filterTags } = this.state;
     const numTasks = data.tasks.length;
@@ -634,12 +724,39 @@ class ProjectListItem extends React.Component {
           <div className="btn-group project-buttons">
             {this.hasPermission("add") ? 
               <div className={"asset-download-buttons " + (this.state.upload.uploading ? "hide" : "")}>
+                <button type='button'
+                        className='btn btn-sm rounded-corners upload-file upload-folder bg-success'
+                        onClick={() => {
+                          document.querySelector('#folderpicker').click();
+                          this.handleUpload();
+                          }}>
+                          <i className="content-upload-glyphicon" aria-hidden="true"></i>
+                          Upload Folder
+                        <input 
+                          type="file" 
+                          id="folderpicker" 
+                          name="fileList" 
+                          webkitdirectory='true' 
+                          multiple 
+                          style={{display:'none'}} 
+                          onChange={this.handleUploadfolders}/>
+                </button>
                 <button type="button" 
-                      className="btn btn-sm rounded-corners upload-file"
-                      onClick={this.handleUpload}
-                      ref={this.setRef("uploadButton")}>
-                  <i className="content-upload-glyphicon" aria-hidden="true"></i>
-                  {_("Selecionar imagens e Ponto de Controle")}
+                    className="btn btn-sm rounded-corners upload-file"
+                    onClick={() => {
+                      document.querySelector('#filepicker').click();
+                      this.handleUpload();
+                    }}>
+                    <i className="content-upload-glyphicon" aria-hidden="true"></i>
+                    {_("Selecionar imagens e Ponto de Controle")}
+                    <input 
+                        type="file" 
+                        id="filepicker" 
+                        name="fileList" 
+                        accept="image/*,text/*,.las,.laz,video/*,.srt,.rar,.zip"
+                        multiple 
+                        style={{display:'none'}} 
+                        onChange={this.handleUploadFiles}/>
                 </button>
                 <button type="button" 
                       className="btn btn-sm rounded-corners import-file"
