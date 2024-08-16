@@ -62,9 +62,10 @@
   display: block;
   padding: 4px 10px 0 0;
   float: left;
-  width: 160px;
+  width: 200px;
   word-wrap: break-word;
   line-height: 1;
+  color: #666;
 }
 .admin-area .aligned label:not(.vCheckboxLabel):after {
   content: "";
@@ -153,9 +154,6 @@
 .admin-area fieldset .field-box {
   float: left;
   margin-right: 20px;
-}
-.admin-area .wide label {
-  width: 200px;
 }
 .admin-area form .wide p, .admin-area form .wide input + p.help {
   margin-left: 200px;

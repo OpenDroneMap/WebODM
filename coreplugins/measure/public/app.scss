@@ -7,7 +7,7 @@
         color: #14a5a2;
         text-transform: uppercase;
         border: none !important;
-        font-family: inherit !important;
+        font-family: "Montserrat SemiBold" !important;
     }
 }
 
@@ -60,18 +60,22 @@
     .tasks {
         display: flex !important;
         flex-direction: column;
+
+        a.js-start.start {
+            background-image: url(play_icon.svg) !important;
+            font-family: "Montserrat SemiBold" !important;
+        }
     }
 }
 
-.leaflet-retina .leaflet-control-measure a.start {
-    background-image: url(play_icon.svg) !important;
-}
+
 
 
 .leaflet-control-measure .close-button, .leaflet-control-measure .close-button-measure {
     background-image: url(close_icon.svg) !important;
     background-repeat: no-repeat;
     background-size: 20px 20px !important;
+    margin-left: 5px !important;
     
 }
 
