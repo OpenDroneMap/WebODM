@@ -63,6 +63,8 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     }
 
     .navbar-top-links{
+        display: flex;
+        justify-content: flex-end;
         clear: both;
         a.dropdown-toggle{
             color: white;
