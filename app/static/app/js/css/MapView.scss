@@ -4,13 +4,14 @@
 }
 
 .map-view{
+    height: calc(100% - 20px);
+    position: relative;
+    
     .map-title{
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
     }
-    height: calc(100% - 20px);
-    position: relative;
 
     input[type="range"]{
         margin-left: 4px;

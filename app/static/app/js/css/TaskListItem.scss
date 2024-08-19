@@ -52,10 +52,10 @@
 
     @media screen and (max-width: 576px){
         .status-label {
+            text-align: center;
             & > span{
                 display: none;
             }
-            text-align: center;
         }
     }
 
@@ -70,6 +70,7 @@
         padding-right: 16px;
 
         .info-table {
+            margin-bottom: 12px;
             tr td:first-child {
                 width: 33%;
                 max-width: 150px;
@@ -77,7 +78,6 @@
             td{
                 padding: 0;
             }
-            margin-bottom: 12px;
             @media screen and (min-width: 1200px) {
                 tr td:first-child {
                     width: 20%;

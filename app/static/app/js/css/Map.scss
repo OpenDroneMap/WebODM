@@ -33,23 +33,22 @@
         }
 
         .asset-links{
-            li:first-child{
-                display: none;
-            }
-            &.loading{
-                li{ display: none }
-                li:first-child{
-                    display: block;
-                }
-                padding-left: 0;
-                list-style-type: none;
-            }
             margin-top: 8px;
             padding-left: 16px;
 
             columns: 2;
             -webkit-columns: 2;
             -moz-columns: 2;
+            li:first-child{
+                display: none;
+            }
+            &.loading{
+                padding-left: 0;
+                list-style-type: none;li{ display: none }
+                li:first-child{
+                    display: block;
+                }
+            }
         }
         .switchModeButton{
             bottom: 12px;

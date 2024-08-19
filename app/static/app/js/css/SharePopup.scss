@@ -1,4 +1,6 @@
 .sharePopup{
+	right: 0;
+	pointer-events: none;
 	position: absolute;
 	&.top{
 		bottom: 0;
@@ -6,8 +8,6 @@
 	&.bottom{
 		top: 0;
 	}
-	right: 0;
-	pointer-events: none;
 
 	.sharePopupContainer{
 		pointer-events: auto;
@@ -52,15 +52,15 @@
 		}
 
 		.share-links{
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 1s ease-in-out;
 			& > div{
 				margin-top: 8px;
 				&:first-child{
 					margin-top: 4px;
 				}
 			}
-			max-height: 0;
-			overflow: hidden;
-			transition: max-height 1s ease-in-out;
 			
 			&.show{
 				max-height: 800px;

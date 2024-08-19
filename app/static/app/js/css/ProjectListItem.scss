@@ -1,5 +1,7 @@
 .project-list-item{
     min-height: 60px;
+    -webkit-transition: background-color 1s ease;
+    transition: background-color 1s ease;
 
     .project-name{
         font-weight: bold;
@@ -40,14 +42,11 @@
         background-color: #eee;
     }
 
-     -webkit-transition: background-color 1s ease;
-    transition: background-color 1s ease;
-
     &.dz-drag-hover{
+        background-color: #f7f7f7;
         .drag-drop-icon{
             display: block;
         }
-        background-color: #f7f7f7;
     }
 
     .project-links{

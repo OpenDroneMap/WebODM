@@ -153,7 +153,9 @@
 
         #sidebar_root{
             width: 300px;
-
+            position: absolute; 
+            min-height: 100%; 
+            height: 100%;
             .pv-menu-list{
                 padding-right: 12px;
 
@@ -169,10 +171,6 @@
             .measurement-panel-remove:hover{
                 cursor: pointer;
             }
-
-            position: absolute; 
-            min-height: 100%; 
-            height: 100%;
 
             .potree_sidebar_brand{
                 display: flex; 

@@ -7,9 +7,6 @@
         cursor: text;
     }
     .tag-badge{
-        &:hover{
-            cursor: grab;
-        }
         display: inline-block;
         width: auto;
         padding-left: 6px;
@@ -19,7 +16,10 @@
         margin-right: 4px;
         margin-bottom: 8px;
         border-radius: 6px;
-
+        
+        &:hover{
+            cursor: grab;
+        }
         a{
             margin-top: 2px;
             font-weight: bold;
