@@ -1,1 +1,1 @@
-module.exports = require('exifr/dist/mini.umd');
+module.exports = require('exifr/dist/full.legacy.umd');
