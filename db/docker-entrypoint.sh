@@ -321,6 +321,8 @@ _main() {
 	fi
 
 	exec "$@"
+	docker_process_sql --dbname="$POSTGRES_DB" <<<'CREATE extension postgis_raster CASCADE;'
+
 }
 
 if ! _is_sourced; then
