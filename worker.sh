@@ -52,7 +52,7 @@ start(){
 	action=$1
 
 	echo "Starting worker using broker at $WO_BROKER"
-	celery -A worker worker --autoscale $(grep -c '^processor' /proc/cpuinfo),2 --max-tasks-per-child 1000 --loglevel=warn > /dev/null
+	celery -A worker worker --autoscale $(grep -c '^processor' /proc/cpuinfo),2 --max-tasks-per-child 1000 --loglevel=WARNING > /dev/null
 }
 
 start_scheduler(){
