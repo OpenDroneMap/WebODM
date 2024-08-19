@@ -11,6 +11,12 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     margin-right: 12px;
     position: relative;
     top: -14px;
+
+    .map-view{
+        .map-type-selector{
+            top: 20px;
+        }
+    }
 }
 
 #iframe{
