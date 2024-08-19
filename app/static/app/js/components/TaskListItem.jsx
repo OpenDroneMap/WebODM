@@ -137,8 +137,8 @@ class TaskListItem extends React.Component {
 
       this.setAutoRefresh();
     })
-    .fail(( _, __, errorThrown) => {
-      if (errorThrown === "Not Found"){ // Don't translate this one
+    .fail((result, __, errorThrown) => {
+      if (result.status === 404 || errorThrown === "Not Found"){ // Don't translate this one
         // Assume this has been deleted
         if (this.props.onDelete) this.props.onDelete(this.state.task.id);
       }else{
