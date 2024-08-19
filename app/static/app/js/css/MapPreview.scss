@@ -1,0 +1,64 @@
+.map-preview{
+    position: relative;
+    margin-bottom: 16px;
+    border-radius: 3px;
+    .leaflet-container, .standby .cover{
+        border-radius: 3px;
+    }
+
+    .standby{
+        z-index: 1001;
+    }
+
+    .download-control{
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        z-index: 1000;
+        .btn:active, .btn:focus{
+            outline: none;
+        }
+    }
+
+    .crop-control{
+        position: absolute;
+        top: 50px;
+        left: 8px;
+        z-index: 999;
+        .btn:active, .btn:focus{
+            outline: none;
+        }
+    }
+
+    .leaflet-control-layers-expanded{
+        .leaflet-control-layers-base{
+            overflow: hidden;
+        }
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .map-preview-marker-layer{
+        &:hover{
+            cursor: crosshair;
+        }
+    }
+
+    .map-preview-accept-button{
+        &:hover{
+            cursor: pointer;
+        }
+    }
+    .map-preview-delete{
+        min-width: 70px;
+    }
+
+    .plot-warning{
+        position: absolute;
+        z-index: 999;
+        left: 58px;
+        top: 8px;
+        padding: 8px;
+        border-radius: 4px;
+    }
+}
