@@ -28,6 +28,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Check GDAL version
+echo $(gdalinfo --version)
 python -c "import sys;import re;import subprocess;version = subprocess.Popen([\"gdalinfo\", \"--version\"], stdout=subprocess.PIPE).communicate()[0].decode().rstrip();ret = 0 if re.compile('^GDAL [2-9]\.[0-9]+').match(version) else 1; print('Checking GDAL version... ' + ('{}, excellent!'.format(version) if ret == 0 else version));sys.exit(ret);"
 if [ $? -ne 0 ]; then
 	almost_there
@@ -54,6 +55,9 @@ if [ "$1" = "--setup-devenv" ] || [ "$2" = "--setup-devenv" ]; then
 
     echo Build translations...
     python manage.py translate build --safe
+
+    echo Running makemigrations
+    python manage.py makemigrations app
 
     echo Setup webpack watch...
     webpack --watch &
