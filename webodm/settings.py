@@ -15,6 +15,7 @@ import os, sys, json
 import datetime
 
 import tzlocal
+from datetime import timedelta
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -108,7 +109,7 @@ INSTALLED_APPS = [
     'guardian',
     'rest_framework',
     'rest_framework_nested',
-    'drf_yasg',
+    # 'drf_yasg',
     'webpack_loader',
     'corsheaders',
     'colorfield',
@@ -136,6 +137,8 @@ WSGI_APPLICATION = 'webodm.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 DATABASES = {
     'default': {
@@ -314,23 +317,23 @@ REST_FRAMEWORK = {
     'rest_framework.permissions.DjangoObjectPermissions',
   ],
   'DEFAULT_FILTER_BACKENDS': [
-    'rest_framework_guardian.filters.ObjectPermissionsFilter',
     'django_filters.rest_framework.DjangoFilterBackend',
     'rest_framework.filters.OrderingFilter',
   ],
   'DEFAULT_AUTHENTICATION_CLASSES': (
-    'rest_framework.authentication.SessionAuthentication',
     'rest_framework.authentication.BasicAuthentication',
-    'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-    'app.api.authentication.JSONWebTokenAuthenticationQS',
+    'rest_framework_simplejwt.authentication.JWTAuthentication',
   ),
   'PAGE_SIZE': 10,
   'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=6),
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "UPDATE_LAST_LOGIN": True
 }
+
 
 # Celery
 CELERY_BROKER_URL = os.environ.get('WO_BROKER', 'redis://localhost')
