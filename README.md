@@ -8,6 +8,7 @@ A user-friendly, commercial grade software for drone image processing. Generate 
 
 
 - [Getting Started](#getting-started)
+   * [Recommended Machine Specs](#recommended-machine-specs)
    * [Manual installation (Docker)](#manual-installation-docker)
       + [Requirements](#requirements)
       + [Installation with Docker](#installation-with-docker)
@@ -24,7 +25,6 @@ A user-friendly, commercial grade software for drone image processing. Generate 
    * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
    * [Run it natively](#run-it-natively)
    * [Run it on the cloud (Google Compute, Amazon AWS)](#run-it-on-the-cloud-google-compute-amazon-aws)
-- [Recommended Machine Specs](#recommended-machine-specs)
 - [Customizing and Extending](#customizing-and-extending)
 - [API Docs](#api-docs)
 - [Roadmap](#roadmap)
@@ -36,6 +36,7 @@ A user-friendly, commercial grade software for drone image processing. Generate 
 - [License](#license)
 - [Trademark](#trademark)
 
+
 ![image](https://user-images.githubusercontent.com/1951843/174504771-b0bcfd29-3960-41f7-8d44-103b63050bd5.png)
 
 ![image](https://user-images.githubusercontent.com/1951843/174504773-f8d8febb-7a45-4d9c-89b6-7d2404c5b8fd.png)
@@ -45,6 +46,20 @@ A user-friendly, commercial grade software for drone image processing. Generate 
 Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
 
 There's also a cloud-hosted version of WebODM available from [webodm.net](https://webodm.net).
+
+## Recommended Machine Specs
+
+To run a standalone installation of WebODM (the user interface), including the processing component (NodeODM), we recommend at a minimum:
+
+* 100 GB free disk space
+* 16 GB RAM
+
+Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is also supported. To make use of your CUDA-compatible graphics card, make sure to pass `--gpu` when starting WebODM. You need the nvidia-docker installed in this case, see https://github.com/NVIDIA/nvidia-docker and https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker for information on docker/NVIDIA setup.
+
+WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
+
+WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
+
 
 ## Manual installation (Docker)
 To install WebODM manually on your machine with docker:
@@ -60,6 +75,7 @@ To install WebODM manually on your machine with docker:
     1. make sure Linux containers are enabled (Switch to Linux Containers...)
 
     2.  give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced
+
     3.  select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes).
 
 ### Installation with Docker
@@ -420,19 +436,6 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 To setup the firewall on Google Cloud, open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
 
 
-
-# Recommended Machine Specs
-
-To run a standalone installation of WebODM (the user interface), including the processing component (NodeODM), we recommend at a minimum:
-
-* 100 GB free disk space
-* 16 GB RAM
-
-Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is also supported. To make use of your CUDA-compatible graphics card, make sure to pass `--gpu` when starting WebODM. You need the nvidia-docker installed in this case, see https://github.com/NVIDIA/nvidia-docker and https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker for information on docker/NVIDIA setup.
-
-WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
-
-WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
 
 # Customizing and Extending
 
