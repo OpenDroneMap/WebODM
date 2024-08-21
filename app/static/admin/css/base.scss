@@ -708,18 +708,18 @@
     div.breadcrumbs {
         border: none;
         font-size: 14px;
-        color: #000;
+        color: #666;
         text-align: left;
         margin-left: 20px;
-        font-family: "Montserrat Regular";
-        
+        font-family: "Montserrat Medium";
+
     }
 
     div.breadcrumbs a {
-        color: #000;
+        color: #666;
         position: relative;
         text-decoration: none;
-        font-family: "Montserrat Regular";
+        font-family: "Montserrat Medium";
     }
 
     div.breadcrumbs a::after {
@@ -1083,6 +1083,10 @@
                 background-color: #81c9c9;
                 margin-bottom: 15px;
                 margin-top: 10px;
+            }
+
+            .horizontal-bar.bar-title {
+                margin-left: 5px;
             }
 
 

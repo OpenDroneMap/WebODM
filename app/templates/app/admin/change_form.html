@@ -39,7 +39,7 @@
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 
 {% if request.path == '/admin/auth/user/add/' %}
-    <span class="horizontal-bar"></span>
+    <span class="horizontal-bar bar-title"></span>
 {% endif %}
   
 <div>

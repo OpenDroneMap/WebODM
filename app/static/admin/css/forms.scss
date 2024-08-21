@@ -70,9 +70,10 @@
         display: block;
         padding: 4px 10px 0 0;
         float: left;
-        width: 160px;
+        width: 200px;
         word-wrap: break-word;
         line-height: 1;
+        color: #666;
     }
 
     .aligned label:not(.vCheckboxLabel):after {
@@ -182,10 +183,6 @@
     }
 
     /* WIDE FIELDSETS */
-
-    .wide label {
-        width: 200px;
-    }
 
     form .wide p, form .wide input + p.help {
         margin-left: 200px;
