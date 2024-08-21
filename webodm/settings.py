@@ -412,3 +412,14 @@ AGROSMART_API_ADDRESS = os.environ.get('WO_AGROSMART_API_ADDRESS', "")
 if not AGROSMART_API_ADDRESS:
     print('WARNING: The WO_AGROSMART_API_ADDRESS is empty! AI calls will not work!')
 DISABLE_PERMISSIONS = os.environ.get('WO_DISABLE_PERMISSIONS', "NO") == 'YES'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+"""
+    WARNING!
+    Following code is stop-gap measure so that some of the new functionality from the django doesn't break some geriatric dependencies!
+"""
+
+# import django
+# from django.utils.encoding import smart_str
+# django.utils.encoding.smart_text = smart_str

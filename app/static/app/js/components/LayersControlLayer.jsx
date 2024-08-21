@@ -65,7 +65,6 @@ export default class LayersControlLayer extends React.Component {
         exportLoading: false,
         error: ""
     };
-
     this.rescale = params.rescale || "";
   }
 
@@ -170,7 +169,14 @@ export default class LayersControlLayer extends React.Component {
             // Update rescale values
             const { statistics } = this.tmeta;
             if (statistics && statistics["1"]){
-                this.rescale = `${statistics["1"]["min"]},${statistics["1"]["max"]}`;
+                let min = Infinity;
+                let max = -Infinity;
+
+                for (let b in statistics){
+                    min = Math.min(statistics[b]["percentiles"][0]);
+                    max = Math.max(statistics[b]["percentiles"][1]);
+                }
+                this.rescale = `${min},${max}`;
             }
 
             this.updateLayer();
@@ -270,6 +276,16 @@ export default class LayersControlLayer extends React.Component {
         cmapValues = (color_maps.find(c => c.key === colorMap) || {}).color_map;
     }
 
+    let hmin = null;
+    let hmax = null;
+    if (this.rescale){
+        let parts = decodeURIComponent(this.rescale).split(",");
+        if (parts.length === 2 && parts[0] && parts[1]){
+            hmin = parseFloat(parts[0]);
+            hmax = parseFloat(parts[1]);
+        }
+    }
+
     return (<div className="layers-control-layer">
         {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="overlayIcon"><i className={meta.icon || "fa fa-vector-square fa-fw"}></i></div>}<Checkbox bind={[this, 'visible']}/>
         <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
@@ -278,8 +294,10 @@ export default class LayersControlLayer extends React.Component {
         <div className="layer-expanded">
             <Histogram width={274}
                         loading={histogramLoading}
-                        statistics={tmeta.statistics} 
+                        statistics={tmeta.statistics}
                         colorMap={cmapValues}
+                        min={hmin}
+                        max={hmax}
                         onUpdate={this.handleHistogramUpdate} />
 
             <ErrorMessage bind={[this, "error"]} />

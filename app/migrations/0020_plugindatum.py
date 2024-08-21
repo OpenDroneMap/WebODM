@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('key', models.CharField(db_index=True, help_text='Setting key', max_length=255)),
                 ('int_value', models.IntegerField(blank=True, default=None, help_text='Integer value', null=True)),
                 ('float_value', models.FloatField(blank=True, default=None, help_text='Float value', null=True)),
-                ('bool_value', models.NullBooleanField(default=None, help_text='Bool value')),
+                ('bool_value', models.BooleanField(default=None, help_text='Bool value')),
                 ('string_value', models.TextField(blank=True, default=None, help_text='String value', null=True)),
                 ('json_value', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=None, help_text='JSON value', null=True)),
                 ('user', models.ForeignKey(help_text='The user this setting belongs to. If NULL, the setting is global.', on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
