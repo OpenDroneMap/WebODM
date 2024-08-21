@@ -1,0 +1,9 @@
+{% load i18n admin_urls %}
+
+<div class="submit-row">
+    <a href="/admin/auth/user/"><input type="button" value="{% trans 'Cancel' %}" class="cancel-btn add-btn" name="_continue" /></a>
+    <input type="submit" value="{% trans 'Save and add another' %}" class="save-addanother-btn add-btn" name="_addanother" />
+    <input type="submit" value="{% trans 'Save and continue editing' %}" class="save-continue-btn add-btn" name="_continue" />
+    <input type="submit" value="{% trans 'Save' %}" class="save-btn add-btn" name="_save" />
+    
+</div>

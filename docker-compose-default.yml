@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     oom_score_adj: -100
   webapp:
-    image: opendronemap/webodm_webapp
+    image: webodm_webapp:latest
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
     volumes:
@@ -34,6 +34,8 @@ services:
       - WO_DEV
       - WO_DEV_WATCH_PLUGINS
       - WO_SECRET_KEY
+      - WO_AGROSMART_API_ADDRESS
+      - WO_DISABLE_PERMISSIONS
     restart: unless-stopped
     oom_score_adj: 0
 
@@ -43,7 +45,7 @@ services:
     restart: unless-stopped
     oom_score_adj: -500
   worker:
-    image: opendronemap/webodm_webapp
+    image: webodm_webapp:latest
     container_name: worker
     entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/wait-for-it.sh -t 0 webapp:8000 -- /webodm/worker.sh start"
     volumes:

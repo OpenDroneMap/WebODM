@@ -51,8 +51,11 @@ export default class App{
         }).addTo(map);
 
         // measure.options.labels.
+        const $span = $('<span class="horizontal-bar"></span>');
+        $span.appendTo($(measure.$startPrompt).children("ul.tasks"));
 
-        const $btnExport = $(`<br/><a href='#' class='js-start start'>${_("Export Measurements")}</a>`);
+
+        const $btnExport = $(`<a href='#' class='js-start start'>${_("Export Measurements")}</a>`);
         $btnExport.appendTo($(measure.$startPrompt).children("ul.tasks"));
         $btnExport.on('click', () => {
           const features = [];
@@ -87,5 +90,26 @@ export default class App{
                                 resultFeature={resultFeature} 
                                 map={map} />, $container.get(0));
         });
+
+        // Function to open and close the measurement control
+
+        const heandleMeasurePopUp = () => {
+          const measureContainer = document.querySelector(".leaflet-control-measure");
+          if (measureContainer.classList.contains("leaflet-control-active")) {
+              measureContainer.classList.remove("leaflet-control-active");
+          } else {
+              measureContainer.classList.add("leaflet-control-active");
+          }
+        }
+        
+        document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", heandleMeasurePopUp);
+        document.querySelector(".leaflet-control-measure-close-button").addEventListener("click",heandleMeasurePopUp);
+        document.querySelector(".map").addEventListener("click", heandleMeasurePopUp);
+
+    
     }
+
 }
+
+
+

@@ -8,6 +8,7 @@ import Storage from '../classes/Storage';
 import TagsField from './TagsField';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
+import { hierarchy } from 'd3';
 
 
 class EditTaskForm extends React.Component {
@@ -50,6 +51,7 @@ class EditTaskForm extends React.Component {
 
       steps: ["settingsStep", "aiStep", "loadingStep"],
       isPopupOpen: false,
+      checkboxSaveTextValue: 'Uso em drones',
 
       editingPreset: false,
 
@@ -79,6 +81,7 @@ class EditTaskForm extends React.Component {
     this.getAvailableOptionsOnlyText = this.getAvailableOptionsOnlyText.bind(this);
     this.saveLastPresetToStorage = this.saveLastPresetToStorage.bind(this);
     this.formReady = this.formReady.bind(this);
+    this.handleCheckboxSaveValue = this.handleCheckboxSaveValue.bind(this);
   }
 
   formReady() {
@@ -513,6 +516,38 @@ class EditTaskForm extends React.Component {
     this.setState({ showTagsField: !this.state.showTagsField });
   }
 
+  togglePopup = () => {
+    this.setState({ isPopupOpen: !this.state.isPopupOpen });
+  };
+
+  handleCheckboxChange = (event) => {
+    const target = event.target;
+
+    const checkboxButtons = document.querySelectorAll('input[type="checkbox"]');
+    checkboxButtons.forEach((rb) => {
+      rb.checked = false;
+    });
+    target.checked = true;
+  }
+
+  handleCheckboxSaveValue() {
+    const checkboxButtons = document.querySelectorAll('input[type="checkbox"]');
+    let selectedValue = null;
+
+    checkboxButtons.forEach(rb => {
+      if (rb.checked) {
+        selectedValue = rb.value;
+      }
+    });
+
+    if (selectedValue !== null) {
+      this.setState({ checkboxSaveTextValue: selectedValue });
+      this.togglePopup();
+    } else {
+      console.error("Error: No checkbox selected");
+    }
+  }
+
   render() {
     if (this.state.error) {
       return (<div className="edit-task-panel">
@@ -526,14 +561,13 @@ class EditTaskForm extends React.Component {
     }
 
     let taskOptions = "";
-    let iaOptions = "";
     if (this.formReady()) {
 
       const optionsSelector = (
         <div className='select-container' style={{ display: "flex", justifyContent: "start", alignItems: "center", }}>
           <select
             title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
-            className="form-control input-field"
+            className="form-control input-field options-select"
             value={this.state.selectedPreset.id}
             onChange={this.handleSelectPreset}>
             {this.state.presets.map(preset =>
@@ -612,7 +646,7 @@ class EditTaskForm extends React.Component {
               </button>
             </div>
           </div>
-          {/* <div>
+          <div className='form-group col-sm-10'>
               <label className="col-sm-2 control-label">{_("Options")}</label>
               <div className="col-sm-10 option-container">
                 {!this.props.inReview ? optionsSelector :
@@ -620,7 +654,7 @@ class EditTaskForm extends React.Component {
                     {this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
                   </div>}
               </div>
-            </div> */}
+            </div>
 
           <div className='form-group col-sm-10'>
             <label className="col-sm-2 control-label">{_("Data")}</label>
@@ -662,11 +696,12 @@ class EditTaskForm extends React.Component {
               <select className='btn btn-default-s selectBtn dropdown-toggle' style={{ backgroundColor: "#74B16F" }}>
                 <option>Sim</option>
                 <option>Não</option>
+                <img src="/static/app/img/down-arrow.png" alt="down-arrow" />
               </select>
             </div>
             <div className='form-group'>
               <label className="col-sm-2 control-label ai-label">{_("Geração de Arquivos")}</label>
-              <button className='btn btn-default-s selectBtn dropdown-toggle'>Uso em Drones</button>
+              <button className='btn btn-default-s selectBtn dropdown-toggle' onClick={this.togglePopup}>{this.state.checkboxSaveTextValue}</button>
             </div>
             <div className="form-group">
               <label className="col-sm-2 control-label ai-label" >{_("Detecção de Subtalhões:")}</label>
@@ -678,8 +713,40 @@ class EditTaskForm extends React.Component {
           </div >
         </div>}
 
-        {/* Loading Panel */}
-        {this.props.currentStep === "loadingStep" && <div></div>}
+        {/* Popup Config */}
+        {this.state.isPopupOpen &&
+          <div className='edit-task-form'>
+            <div className='modal-backdrop in' style={{zIndex: "100000"}}></div>
+            <div className="popup" style={{zIndex: "100001"}}>
+              <header className='header-popup'>
+                <h1>GERAÇÃO DE ARQUIVOS</h1>
+                <button onClick={this.togglePopup}>
+                  <img src="/static/app/img/x.png" alt="x" />
+                </button>
+              </header>
+              <main className='popup-content'>
+                <label>
+                  <input type="checkbox" name="uso-em-drones" value="Uso Em Drones" onChange={this.handleCheckboxChange} />
+                  Uso em drones
+                </label>
+                <label>
+                  <input type="checkbox" name="pulverizadores" value="Pulverizadores" onChange={this.handleCheckboxChange} />
+                  Pulverizadores
+                </label>
+                <label>
+                  <input type="checkbox" name="pulverizadores-terrestres" value="Pulverizadores Terrestres" onChange={this.handleCheckboxChange} />
+                  Pulverizadores Terrestres
+                </label>
+              </main>
+              <div className="buttons-container">
+                <button className="btn btn-danger" onClick={this.togglePopup}>Cancelar</button>
+                <button className="popup-btn-save" onClick={() => this.handleCheckboxSaveValue()}>Salvar</button>
+              </div>
+            </div >
+          </div >
+        }
+        {/* Loading Panel !!!! */}
+        {/* {this.props.currentStep === "loadingStep" && <div></div>} */}
       </>
     );
   }

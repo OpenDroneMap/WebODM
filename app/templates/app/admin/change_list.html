@@ -29,8 +29,8 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
-&rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+<a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
+{{ cl.opts.verbose_name_plural|capfirst }}
 </div>
 {% endblock %}
 {% endif %}
@@ -72,7 +72,12 @@
         {% endif %}
       {% endblock %}
 
-      <form id="changelist-form" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+      <form id="changelist-form" 
+            method="post"{% if cl.formset.is_multipart %} 
+            enctype="multipart/form-data"{% endif %} 
+            novalidate
+            class="{% if request.path == '/admin/auth/user/' %}user-form{% elif request.path == '/admin/auth/group/' %}group-form{% else %}default-form{% endif %}">
+            {% csrf_token %}
       {% if cl.formset %}
         <div>{{ cl.formset.management_form }}</div>
       {% endif %}
@@ -86,4 +91,13 @@
       </form>
     </div>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let actionSelect = document.querySelector("select[name='action']");
+        if (actionSelect) {
+            actionSelect.options[0].text = "";
+        }
+    });
+  </script>
 {% endblock %}

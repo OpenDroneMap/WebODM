@@ -27,6 +27,7 @@
     <link rel="icon" type="image/png" href="{% static 'app/img/favicon.png' %}" sizes="79x32">
 
     <link rel="stylesheet" type="text/css" href="{% static 'app/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'app/css/logged_in_base.css' %}" />
 
     <link href="{% static 'app/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'app/css/metisMenu.min.css' %}" rel="stylesheet">
@@ -62,7 +63,7 @@
     <!-- Hide top nav bar -->
     <style type="text/css">
         .navbar-header { display: none; }
-        #navbar-top .navbar-default.sidebar{ top: 0; position: fixed; margin-top: 1px; }
+        #navbar-top .navbar-default.sidebar{ top: 0; position: absolute; margin-top: 1px; }
         #navbar-top { height: 0; min-height: 0; }
         .map-view { height: calc(100% + 30px) !important; }
         .model-view { height: calc(100% + 50px) !important; }

@@ -76,7 +76,6 @@ class NewTaskPanel extends React.Component {
     }
 
     this.setState({ currentStep: "aiStep" });
-    if (this.props.onSave) this.props.onSave(taskInfo);
   }
 
   cancel = (e) => {
@@ -185,7 +184,6 @@ class NewTaskPanel extends React.Component {
                   />
                 </div>)}
               </div>
-
               : ""}
           </div>
 

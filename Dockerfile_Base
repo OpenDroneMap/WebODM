@@ -10,15 +10,30 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH $PYTHONPATH:/webodm
 ENV PROJ_LIB=/usr/share/proj
 
+# Configura o repositório de pacotes para evitar erros de timeout
+RUN echo '\
+    Acquire::Retries "1000";\
+    Acquire::https::Timeout "2400";\
+    Acquire::http::Timeout "2400";\
+    APT::Get::Assume-Yes "true";\
+    APT::Install-Recommends "false";\
+    APT::Install-Suggests "false";\
+    Debug::Acquire::https "true";\
+    ' > /etc/apt/apt.conf.d/99custom
 
-# Update sources to old releases for Ubuntu 21.04 with retry logic
-RUN for i in {1..5}; do echo "Updating sources list for Ubuntu 21.04 old releases ($i attempt)" && \
-    printf "deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute universe\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates universe\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute multiverse\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates multiverse\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-backports main restricted universe multiverse" > /etc/apt/sources.list && \
-    apt-get update && break || sleep 15; done
 
-# Install essential packages with retry logic
-RUN for i in {1..5}; do echo "Installing wget, curl, ca-certificates, and gnupg ($i attempt)" && \
-    apt-get install -y --no-install-recommends wget curl ca-certificates gnupg && break || sleep 15; done
+# Prepare directory structure
+ADD . /webodm/
+WORKDIR /webodm
+
+# Update sources to old releases for Ubuntu 21.04
+RUN echo "Updating sources list for Ubuntu 21.04 old releases" && \
+    printf "deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute universe\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates universe\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute multiverse\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates multiverse\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-backports main restricted universe multiverse" > /etc/apt/sources.list  && \
+    apt-get update
+
+# Install essential packages
+RUN echo "Installing wget, curl, ca-certificates, and gnupg" && \
+    apt-get install -y --no-install-recommends wget curl ca-certificates gnupg
 
 # Add Node.js repository
 RUN mkdir -p /etc/apt/keyrings && \
@@ -26,27 +41,22 @@ RUN mkdir -p /etc/apt/keyrings && \
     NODE_MAJOR=20 && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
-# Install Node.js with retry logic
-RUN for i in {1..5}; do echo "Installing Node.js ($i attempt)" && \
-    apt-get update && apt-get install -y nodejs && break || sleep 15; done
+# Install Node.js
+RUN echo "Installing Node.js" && \
+    apt-get update && apt-get install -y nodejs
 
-# Install Python and other necessary packages with retry logic
-RUN for i in {1..5}; do echo "Installing Python3, GDAL, PDAL, Nginx, LetsEncrypt, Postgresql ($i attempt)" && \
-    apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin pdal libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata && \
-    break || sleep 15; done
-
-# Prepare directory structure
-ADD . /webodm/
-WORKDIR /webodm
+# Install Python and other necessary packages
+RUN echo "Installing Python3, GDAL, PDAL, Nginx, LetsEncrypt, Postgresql" && \
+    apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin pdal libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata
 
 # Update alternatives for Python
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2
 
-# Install Python requirements with retry logic
-RUN for i in {1..5}; do echo "Installing Python dependencies ($i attempt)" && \
-    pip install -U pip && \
-    pip install -r requirements.txt "boto3==1.14.14" && break || sleep 15; done
+# Install Python requirements
+RUN echo "Installing Python dependencies" && \
+    pip install -U pip==24.0 && \
+    pip install -r requirements.txt "boto3==1.14.14"
 
 
 # Cleanup to reduce image size
