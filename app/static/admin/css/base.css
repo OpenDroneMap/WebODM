@@ -300,17 +300,23 @@
   padding-left: 5px;
 }
 .admin-area .user-form .results th.column-is_staff, .admin-area .group-form .results th.column-is_staff {
-  width: 15%;
-  text-align: center;
+  width: 16%;
+}
+.admin-area .user-form .results th.column-is_staff a, .admin-area .group-form .results th.column-is_staff a {
+  padding-left: 5px;
 }
 .admin-area .user-form .results th.column-status, .admin-area .group-form .results th.column-status {
   width: 7%;
-  text-align: center;
+}
+.admin-area .user-form .results th.column-status span, .admin-area .group-form .results th.column-status span {
+  padding-left: 5px;
 }
 .admin-area .user-form .results th.column-edit, .admin-area .group-form .results th.column-edit {
   width: 8%;
-  text-align: center;
   vertical-align: middle;
+}
+.admin-area .user-form .results th.column-edit span, .admin-area .group-form .results th.column-edit span {
+  padding-left: 5px;
 }
 .admin-area .user-form .results td.field-is_staff, .admin-area .user-form .results td.field-status, .admin-area .user-form .results td.field-edit, .admin-area .group-form .results td.field-is_staff, .admin-area .group-form .results td.field-status, .admin-area .group-form .results td.field-edit {
   text-align: center;
@@ -330,6 +336,7 @@
   height: 22px;
 }
 .admin-area thead th.sorted a.sortremove {
+  left: 10px;
   visibility: hidden;
 }
 .admin-area table thead th.sorted:hover a.sortremove {
@@ -359,23 +366,6 @@
   background-image: url(./icons/caret-up-fill.svg) !important;
   background-repeat: no-repeat;
   background-size: 17px;
-}
-.admin-area table thead th.sorted .sortoptions a.sortremove:after {
-  content: "\\";
-  position: absolute;
-  top: -6px;
-  left: 3px;
-  font-weight: 200;
-  font-size: 18px;
-  color: #999;
-}
-.admin-area table thead th.sorted .sortoptions a.sortremove:focus:after,
-.admin-area table thead th.sorted .sortoptions a.sortremove:hover:after {
-  color: #447e9b;
-}
-.admin-area table thead th.sorted .sortoptions a.sortremove:focus,
-.admin-area table thead th.sorted .sortoptions a.sortremove:hover {
-  background-position: 0 -14px;
 }
 .admin-area .column-__str__ .text span {
   background-color: transparent !important;

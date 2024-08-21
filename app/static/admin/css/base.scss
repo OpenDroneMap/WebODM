@@ -340,6 +340,7 @@
 
         th.column-username {
             width: 20%;
+            // text-align: center;
 
             .text a {
                 padding-left: 5px;
@@ -348,6 +349,7 @@
         
         th.column-email_display {
             width: 20%;
+            // text-align: center;
 
             .text a {
                 padding-left: 5px;
@@ -356,6 +358,7 @@
         
         th.column-first_name {
             width: 15%;
+            // text-align: center;
 
             .text a {
                 padding-left: 5px;
@@ -364,6 +367,7 @@
         
         th.column-last_name {
             width: 15%;
+            // text-align: center;
 
             .text a {
                 padding-left: 5px;
@@ -371,20 +375,28 @@
         }
         
         th.column-is_staff {
-            width: 15%;
-            text-align: center;
+            width: 16%;
+            // text-align: center;
+            a {
+                padding-left: 5px;
+            }
         }
         
         th.column-status {
             width: 7%;
-            text-align: center;
-
+            // text-align: center;
+            span {
+                padding-left: 5px;
+            }
         }
         
         th.column-edit {
             width: 8%;
-            text-align: center;
+            // text-align: center;
             vertical-align: middle;
+            span {
+                padding-left: 5px;
+            }
         }
 
         td.field-is_staff, td.field-status, td.field-edit {
@@ -412,6 +424,7 @@
 
 
     thead th.sorted a.sortremove {
+        left: 10px;
         visibility: hidden;
     }
 
@@ -450,28 +463,6 @@
         background-size: 17px;
         
     } 
-    
-
-    table thead th.sorted .sortoptions a.sortremove:after {
-        content: '\\';
-        position: absolute;
-        top: -6px;
-        left: 3px;
-        font-weight: 200;
-        font-size: 18px;
-        color: #999;
-    }
-
-    table thead th.sorted .sortoptions a.sortremove:focus:after,
-    table thead th.sorted .sortoptions a.sortremove:hover:after {
-        color: #447e9b;
-    }
-
-    table thead th.sorted .sortoptions a.sortremove:focus,
-    table thead th.sorted .sortoptions a.sortremove:hover {
-        background-position: 0 -14px;
-    }
-
 
     .column-__str__ .text span {
         background-color: transparent !important
