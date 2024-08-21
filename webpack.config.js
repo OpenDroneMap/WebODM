@@ -72,18 +72,13 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|jpeg|svg)/,
-        use: {
-          loader: 'url-loader',
-          options: {
-            limit: 100000,
-          },
-        },
+        type: "asset/inline"
       },
       {
         // shaders
         test: /\.(frag|vert|glsl)$/,
-        loader: 'raw-loader'
-      }
+        type: "asset/source"
+      },
     ]
   },
 
