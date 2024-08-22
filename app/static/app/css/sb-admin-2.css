@@ -162,7 +162,7 @@ body {
   transition: width 0.2s;
 }
 
-.horizontal-bar {
+.horizontal-bar-sidebar {
   display: block;
   height: 1px !important;
   background-color: #96c6c6;
