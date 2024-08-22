@@ -143,13 +143,6 @@ body {
   font-size: 18px;
 }
 
-.navbar-collapse ul li::after,
-.sidebar ul li::after {
-  content: " ";
-  display: block;
-  border-bottom: 1px solid #96c6c6;
-  height: 100%;
-}
 .navbar-collapse ul li a.active::before,
 .sidebar ul li a.active::before {
   position: absolute;
@@ -167,6 +160,12 @@ body {
 .navbar-collapse ul li a.active.collapsed::before,
 .sidebar ul li a.active.collapsed::before {
   transition: width 0.2s;
+}
+
+.horizontal-bar {
+  display: block;
+  height: 1px !important;
+  background-color: #96c6c6;
 }
 
 @media (min-width: 768px) {

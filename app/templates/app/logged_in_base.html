@@ -64,6 +64,7 @@
                         </span>
                     </div>
                 </a>
+                <span class="horizontal-bar"></span>
             </li>
             {% load processingnode_extras plugins %}
             {% can_view_processing_nodes as view_nodes %}
@@ -84,6 +85,7 @@
                     <span class="fa arrow"></span>
                     {% endif %}
                 </a>
+                <span class="horizontal-bar"></span>
 
                 {% if menu.has_submenu %}
                 <ul class="nav nav-second-level" data-sidebar="dropdown">
@@ -100,6 +102,7 @@
                             <span class="fa arrow"></span>
                             {% endif %}
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     {% endfor %}
                 </ul>
@@ -118,6 +121,7 @@
                     </div>
                     <span class="fa arrow"></span>
                 </a>
+                <span class="horizontal-bar"></span>
                 <ul class="nav nav-second-level" data-sidebar="dropdown">
                     {% for node in nodes %}
                     <li>
@@ -129,6 +133,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     {% endfor %}
 
@@ -142,6 +147,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     {% endif %}
                 </ul>
@@ -160,6 +166,7 @@
                     </div>
                     <span class="fa arrow"></span>
                 </a>
+                <span class="horizontal-bar"></span>
                 <ul class="nav nav-second-level" data-sidebar="dropdown">
                     {% is_single_user_mode as hide_users %}
                     {% if not hide_users %}
@@ -172,6 +179,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     <li>
                         <a href="/admin/auth/group/">
@@ -182,6 +190,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     {% endif %}
                     <li>
@@ -193,6 +202,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     <li>
                         <a href="{% url 'admin:app_theme_change' SETTINGS.theme.id %}">
@@ -203,6 +213,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     <li>
                         <a href="/admin/app/plugin/">
@@ -213,6 +224,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                     <li>
                         <a href="/admin/app/">
@@ -223,6 +235,7 @@
                                 </span>
                             </div>
                         </a>
+                        <span class="horizontal-bar"></span>
                     </li>
                 </ul>
             </li>
@@ -239,6 +252,7 @@
                         </span>
                     </div>
                 </a>
+                <span class="horizontal-bar"></span>
             </li>
             {% endif %}
             <li id="about-menu">
@@ -250,6 +264,7 @@
                         </span>
                     </div>
                 </a>
+                <span class="horizontal-bar"></span>
             </li>
         </ul>
     </div>

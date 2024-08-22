@@ -152,14 +152,14 @@ body {
 .sidebar ul li {
     $left-spacing: 5px;
 
-    &::after {
-        content: " ";
-        display: block;
-        border-bottom: 1px solid #96c6c6;
-        // width: 95%;
-        height: 100%;
-        // margin-left: $left-spacing;
-    }
+    // &::after {
+    //     content: " ";
+    //     display: block;
+    //     border-bottom: 1px solid #96c6c6;
+    //     // width: 95%;
+    //     height: 100%;
+    //     // margin-left: $left-spacing;
+    // }
 
     a.active {
         &::before {
@@ -182,6 +182,12 @@ body {
             transition: width 0.2s;
         }
     }
+}
+
+.horizontal-bar {
+    display: block;
+    height: 1px !important;
+    background-color: #96c6c6;
 }
 
 @media(min-width: 768px) {
