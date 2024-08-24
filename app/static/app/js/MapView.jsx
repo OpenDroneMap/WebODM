@@ -214,7 +214,6 @@ class MapView extends React.Component {
             
             
             <div className="btn-group">
-          
               <button
                 type="button"
                 className="btn btn-secondary dropdown-toggle"
@@ -222,7 +221,7 @@ class MapView extends React.Component {
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                IA Types 
+                IA Types
                 <span class="glyphicon glyphicon-chevron-down"></span>
               </button>
               

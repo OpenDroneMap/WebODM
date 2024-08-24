@@ -129,51 +129,79 @@
             }
             .btn-group {
                 justify-content: center;
-                
                 font-size: 10px;
                 background-color: #74b06f;
                 border-radius: 25px;
                 margin-left:7px;
                 
+                
                 &:hover,
-                    &:focus {
-                        background: #6b9262
-                    }
-                
-
+                &:focus,
+                &:active,
+                &.show {
+                    background-color: #6b9262;
+                    
+                }
+                &:focus {
+                    outline: none;
+                }
+            
                 button {
-                
                     justify-content: center;
                     background: transparent;
-                    
                     border-radius: 25px;
                     border-color: transparent;
-                    
                     margin-bottom: 2px;    
+                    flex-grow: 1;
+                    height: 100%;
+                    margin-left: 0 !important;
+                    align-items: center;
+                    
                     
                     &:hover,
-                    &:focus {
-                        background: #6b9262
+                    &:focus,
+                    &:active,
+                    &.show {
+                        background-color: #6b9262;
+                        
                     }
-                    span{
+                    &:focus {
+                        outline: none;
+                        
+                    }
+            
+                    span {
                         margin-left: 7px;
                         font-size: 10px;
                     }
                 }
-                
-            }   
-            .dropdown-menu.dropdown-menu-right{
+                .btn.btn-secondary.dropdown-toggle{
+                    font-size: 10px;
+                    margin-left: 7px;
+                    color: #fff;
+                    margin-bottom: 5px;
+                    text-align: center;
+                    justify-content: center;
+                    display: flex;
+                    vertical-align: middle;
+                    transition: all 0.3s;
+    }
+            }
+            
+            
+            .dropdown-menu.dropdown-menu-right {
                 background-color: rgba(116, 176, 111, 0.9);
                 border-color: transparent;
                 z-index: 99999;
                 border-radius: 25px;
+
+                
             }
-            .dropdown-item{
+            .dropdown-item {
                background: transparent;
             }
         }
-
-
+        
         .text-wrapper {
             display: flex;
             flex-grow: 0;
@@ -188,12 +216,7 @@
                 word-wrap: break-word;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                // padding-left: 20px;
-
-
-                // @media (min-width: 1360px) {
-                //     width: 40%;
-                // }
+                
             }
 
             i.fa-globe {
@@ -203,7 +226,7 @@
             }
         }
     }
-
+    
     .map-container{
         //Note that this property is changed using javascript to be responsive. Tale a look at the MapView.jsx
         height: calc(100% - $top-spacing - $bottom-spacing);
@@ -216,5 +239,7 @@
             width: 100%;
         }
     }
+
+    
 }
 
