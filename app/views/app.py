@@ -11,7 +11,7 @@ from nodeodm.models import ProcessingNode
 from app.models import Project, Task
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext_lazy as _
 from django import forms
 from app.views.utils import get_permissions
 from webodm import settings

@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from app.plugins import GlobalDataStore
 from django.http import Http404
 from django.shortcuts import redirect
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import logging
 

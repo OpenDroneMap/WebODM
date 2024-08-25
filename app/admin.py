@@ -3,11 +3,10 @@ import tempfile
 import zipfile
 import shutil
 
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, path, re_path
 from django.utils.html import format_html
 from guardian.admin import GuardedModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -129,23 +128,23 @@ class PluginAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            url(
-                r'^(?P<plugin_name>.+)/enable/$',
+            re_path(
+                '(?P<plugin_name>.+)/enable/',
                 self.admin_site.admin_view(self.plugin_enable),
                 name='plugin-enable',
             ),
-            url(
-                r'^(?P<plugin_name>.+)/disable/$',
+            re_path(
+                '(?P<plugin_name>.+)/disable/',
                 self.admin_site.admin_view(self.plugin_disable),
                 name='plugin-disable',
             ),
-            url(
-                r'^(?P<plugin_name>.+)/delete/$',
+            re_path(
+                '(?P<plugin_name>.+)/delete/',
                 self.admin_site.admin_view(self.plugin_delete),
                 name='plugin-delete',
             ),
-            url(
-                r'^actions/upload/$',
+            re_path(
+                'actions/upload/',
                 self.admin_site.admin_view(self.plugin_upload),
                 name='plugin-upload',
             ),
