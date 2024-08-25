@@ -6,56 +6,84 @@ A user-friendly, commercial grade software for drone image processing. Generate 
 
 ![image](https://user-images.githubusercontent.com/1951843/174504753-6869e56e-7b65-4775-bb23-6c1dc256575c.png)
 
-* [Getting Started](#getting-started)
-    * [Manage Processing Nodes](#manage-processing-nodes)
-    * [Enable MicMac](#enable-micmac)
-    * [Enable SSL](#enable-ssl)
-    * [Where Are My Files Stored?](#where-are-my-files-stored)
-    * [Common Troubleshooting](#common-troubleshooting)
-    * [Backup and Restore](#backup-and-restore)
-    * [Reset Password](#reset-password)
-    * [Manage Plugins](#manage-plugins)
-    * [Update](#update)
- * [Recommended Machine Specs](#recommended-machine-specs)
- * [Customizing and Extending](#customizing-and-extending)
- * [API Docs](#api-docs)
- * [Roadmap](#roadmap)
- * [Getting Help](#getting-help)
- * [Support the Project](#support-the-project)
- * [Translations](#translations)
- * [Become a Contributor](#become-a-contributor)
- * [Architecture Overview](#architecture-overview)
- * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
- * [Run it natively](#run-it-natively)
- * [Run it on the cloud (Google Compute, Amazon AWS)](#run-it-on-the-cloud-google-compute-amazon-aws)
- * [License](#license)
- 
+
+- [Getting Started](#getting-started)
+   * [Recommended Machine Specs](#recommended-machine-specs)
+   * [Manual installation (Docker)](#manual-installation-docker)
+      + [Requirements](#requirements)
+      + [Installation with Docker](#installation-with-docker)
+      + [Manage Processing Nodes](#manage-processing-nodes)
+      + [Enable MicMac](#enable-micmac)
+      + [Enable SSL](#enable-ssl)
+      + [Where Are My Files Stored?](#where-are-my-files-stored)
+      + [Common Troubleshooting](#common-troubleshooting)
+         - [Images Missing from Lightning Assets](#images-missing-from-lightning-assets)
+      + [Backup and Restore](#backup-and-restore)
+      + [Reset Password](#reset-password)
+      + [Manage Plugins](#manage-plugins)
+      + [Update](#update)
+   * [Run the docker version as a Linux Service](#run-the-docker-version-as-a-linux-service)
+   * [Run it natively](#run-it-natively)
+   * [Run it on the cloud (Google Compute, Amazon AWS)](#run-it-on-the-cloud-google-compute-amazon-aws)
+- [Customizing and Extending](#customizing-and-extending)
+- [API Docs](#api-docs)
+- [Roadmap](#roadmap)
+- [Getting Help](#getting-help)
+- [Support the Project](#support-the-project)
+- [Translations](#translations)
+- [Become a Contributor](#become-a-contributor)
+- [Architecture Overview](#architecture-overview)
+- [License](#license)
+- [Trademark](#trademark)
+
+
 ![image](https://user-images.githubusercontent.com/1951843/174504771-b0bcfd29-3960-41f7-8d44-103b63050bd5.png)
 
 ![image](https://user-images.githubusercontent.com/1951843/174504773-f8d8febb-7a45-4d9c-89b6-7d2404c5b8fd.png)
 
-## Getting Started
+# Getting Started
 
 Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
 
 There's also a cloud-hosted version of WebODM available from [webodm.net](https://webodm.net).
 
-To install WebODM manually on your machine:
+## Recommended Machine Specs
 
-* Install the following applications:
+To run a standalone installation of WebODM (the user interface), including the processing component (NodeODM), we recommend at a minimum:
+
+* 100 GB free disk space
+* 16 GB RAM
+
+Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is also supported. To make use of your CUDA-compatible graphics card, make sure to pass `--gpu` when starting WebODM. You need the nvidia-docker installed in this case, see https://github.com/NVIDIA/nvidia-docker and https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker for information on docker/NVIDIA setup.
+
+WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
+
+WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
+
+
+## Manual installation (Docker)
+To install WebODM manually on your machine with docker:
+
+### Requirements
   - [Git](https://git-scm.com/downloads)
   - [Docker](https://www.docker.com/)
   - [Docker-compose](https://docs.docker.com/compose/install/)
   - Python
   - Pip
 
-* Windows users should install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows) and 1) make sure Linux containers are enabled (Switch to Linux Containers...), 2) give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced, and 3) select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes).
+* Windows users should install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows) and :
+    1. make sure Linux containers are enabled (Switch to Linux Containers...)
 
+    2.  give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to Settings -- Advanced
+
+    3.  select where on your hard drive you want virtual hard drives to reside (Settings -- Advanced -- Images & Volumes).
+
+### Installation with Docker
 * From the Docker Quickstart Terminal or Git Bash (Windows), or from the command line (Mac / Linux), type:
 ```bash
 git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
 cd WebODM
-./webodm.sh start 
+./webodm.sh start
 ```
 * If you face any issues at the last step on Linux, make sure your user is part of the docker group:
 ```bash
@@ -97,7 +125,7 @@ You can also setup a [ClusterODM](https://github.com/OpenDroneMap/ClusterODM) no
 
 If you don't need the default "node-odm-1" node, simply pass `--default-nodes 0` flag when starting WebODM:
 
-`./webodm.sh restart --default-nodes 0`. 
+`./webodm.sh restart --default-nodes 0`.
 
 Then from the web interface simply manually remove the "node-odm-1" node.
 
@@ -133,7 +161,7 @@ When using Docker, all processing results are stored in a docker volume and are 
 1. Media (called webodm_appmedia): This is where all files related to a project and task are stored.
 2. Postgres DB (called webodm_dbdata): This is what Postgres database uses to store its data.
 
-For more information on how these two volumes are used and in which containers, please refer to the [docker-compose.yml](docker-compose.yml) file. 
+For more information on how these two volumes are used and in which containers, please refer to the [docker-compose.yml](docker-compose.yml) file.
 
 For various reasons such as ease of backup/restore, if you want to store your files on the host filesystem instead of a docker volume, you need to pass a path via the `--media-dir` and/or the `--db-dir` options:
 
@@ -233,117 +261,6 @@ webpack --mode production
 python manage.py collectstatic --noinput
 python manage.py migrate
 ```
-
-## Recommended Machine Specs
-
-To run a standalone installation of WebODM (the user interface), including the processing component (NodeODM), we recommend at a minimum:
-
-* 100 GB free disk space
-* 16 GB RAM
-
-Don't expect to process more than a few hundred images with these specifications. To process larger datasets, add more RAM linearly to the number of images you want to process. A CPU with more cores will speed up processing, but can increase memory usage. GPU acceleration is also supported. To make use of your CUDA-compatible graphics card, make sure to pass `--gpu` when starting WebODM. You need the nvidia-docker installed in this case, see https://github.com/NVIDIA/nvidia-docker and https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker for information on docker/NVIDIA setup.
-
-WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
-
-WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
-
-## Customizing and Extending
-
-Small customizations such as changing the application colors, name, logo, or adding custom CSS/HTML/Javascript can be performed directly from the Customize -- Brand/Theme panels within WebODM. No need to fork or change the code.
-
-More advanced customizations can be achieved by writing [plugins](https://github.com/OpenDroneMap/WebODM/tree/master/coreplugins). This is the preferred way to add new functionality to WebODM since it requires less effort than maintaining a separate fork. The plugin system features server-side [signals](https://github.com/OpenDroneMap/WebODM/blob/master/app/plugins/signals.py) that can be used to be notified of various events, a ES6/React build system, a dynamic [client-side API](https://github.com/OpenDroneMap/WebODM/tree/master/app/static/app/js/classes/plugins) for adding elements to the UI, a built-in data store, an async task runner, a GRASS engine, hooks to add menu items and functions to rapidly inject CSS, Javascript and Django views.
-
-For plugins, the best source of documentation currently is to look at existing [code](https://github.com/OpenDroneMap/WebODM/tree/master/coreplugins). If a particular hook / entrypoint for your plugin does not yet exist, [request it](https://github.com/OpenDroneMap/WebODM/issues). We are adding hooks and entrypoints as we go.
-
-To create a plugin simply copy the `plugins/test` plugin into a new directory (for example, `plugins/myplugin`), then modify `manifest.json`, `plugin.py` and issue a `./webodm.sh restart`.
-
-## API Docs
-
-See the [API documentation page](http://docs.webodm.org).
-
-## Roadmap
-
-We follow a bottom-up approach to decide what new features are added to WebODM. User feedback guides us in the decision making process and we collect such feedback via [improvement requests](https://github.com/OpenDroneMap/WebODM/issues?q=is%3Aopen+is%3Aissue+label%3Aimprovements).
-
-Don't see a feature that you want? [Open a feature request](https://github.com/OpenDroneMap/WebODM/issues) or [help us build it](/CONTRIBUTING.md).
-
-Sometimes we also prioritize work that has received financial backing. If your organization is in the position to financially support the development of a particular feature, [get in touch](https://community.opendronemap.org) and we'll make it happen.
-
-## Getting Help
-
-We have several channels of communication for people to ask questions and to get involved with the community:
-
- - [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm)
- - [Report Issues](https://github.com/OpenDroneMap/WebODM/issues)
-
-The preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
-
-## Support the Project
-
-There are many ways to contribute back to the project:
-
- - Help us test new and existing features and report [bugs](https://www.github.com/OpenDroneMap/WebODM/issues) and [feedback](http://community.opendronemap.org/c/webodm).
- - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
- - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
- - ⭐️ us on GitHub.
- - Help us [translate](#translations) WebODM in your language.
- - Help us classify [point cloud datasets](https://github.com/OpenDroneMap/ODMSemantic3D).
- - Spread the word about WebODM and OpenDroneMap on social media.
- - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
- - You can [pledge funds](https://fund.webodm.org) for getting new features built and bug fixed.
- - Become a contributor 🤘
-
-## Translations
-
-It's easy to translate WebODM in a different language!
-
- - Visit https://hosted.weblate.org/engage/webodm/ and register an account (it's free)
- - Pick a language to translate, or [start a new translation](https://hosted.weblate.org/new-lang/webodm/webodm/)
- - Start translating! It's that easy.
-
-If you want to preview your translation work, start WebODM in developer mode:
-
-```
-./webodm.sh restart --dev
-```
-
-Then edit the [LOCALES](https://github.com/OpenDroneMap/WebODM/blob/master/LOCALES) file to include your translation locale code. Finally, visit the `Developer Tools` panel from WebODM's dashboard and press the `Download and Replace Translation Files` button:
-
-![image](https://user-images.githubusercontent.com/1951843/102927263-a294a100-4464-11eb-956e-888b73dc5b94.png)
-
-The latest translation files from weblate.org will be downloaded and applied to the installation of WebODM.
-
-## Become a Contributor
-
-The easiest way to get started is to take a look at our list of [outstanding issues](https://github.com/OpenDroneMap/WebODM/labels/help%20wanted) and pick one. You can also fix/improve something entirely new based on your experience with WebODM. All ideas are considered and people of all skill levels are welcome to contribute. 
-
-You don't necessarily need to be a developer to become a contributor. We can use your help to write better documentation and improve the user interface texts and visuals. 
-
-If you know how to code, we primarily use Python (Django), Javascript (React), HTML and SCSS. See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information.
-
-To make a contribution, you will need to open a pull request ([here's how](https://github.com/Roshanjossey/first-contributions#fork-this-repository)). To make changes to WebODM, make a clone of the repository and run `./webodm.sh start --dev`.
-
-If you have questions visit us on the [forum](http://community.opendronemap.org/c/webodm) and we'll be happy to help you out with your first contribution.
-
-## Architecture Overview
-
-The [OpenDroneMap project](https://github.com/OpenDroneMap/) is composed of several components.
-
-- [ODM](https://github.com/OpenDroneMap/ODM) is a command line toolkit that processes aerial images. Users comfortable with the command line are probably OK using this component alone.
-- [NodeODM](https://github.com/OpenDroneMap/NodeODM) is a lightweight interface and API (Application Program Interface) built directly on top of [ODM](https://github.com/OpenDroneMap/ODM). Users not comfortable with the command line can use this interface to process aerial images and developers can use the API to build applications. Features such as user authentication, map displays, etc. are not provided.
-- [WebODM](https://github.com/OpenDroneMap/WebODM) adds more features such as user authentication, map displays, 3D displays, a higher level API and the ability to orchestrate multiple processing nodes (run jobs in parallel). Processing nodes are simply servers running [NodeODM](https://github.com/OpenDroneMap/NodeODM).
-
-![webodm](https://cloud.githubusercontent.com/assets/1951843/25567386/5aeec7aa-2dba-11e7-9169-aca97b70db79.png)
-
-WebODM is built with scalability and performance in mind. While the default setup places all databases and applications on the same machine, users can separate its components for increased performance (ex. place a Celery worker on a separate machine for running background tasks).
-
-![Architecture](https://user-images.githubusercontent.com/1951843/36916884-3a269a7a-1e23-11e8-997a-a57cd6ca7950.png)
-
-A few things to note:
- * We use Celery workers to do background tasks such as resizing images and processing task results, but we use an ad-hoc scheduling mechanism to communicate with NodeODM (which processes the orthophotos, 3D models, etc.). The choice to use two separate systems for task scheduling is due to the flexibility that an ad-hoc mechanism gives us for certain operations (capture task output, persistent data and ability to restart tasks mid-way, communication via REST calls, etc.).
- * If loaded on multiple machines, Celery workers should all share their `app/media` directory with the Django application (via network shares). You can manage workers via `./worker.sh`
-
-
 ## Run the docker version as a Linux Service
 
 If you wish to run the docker version with auto start/monitoring/stop, etc, as a systemd style Linux Service, a systemd unit file is included in the service folder of the repo.
@@ -461,9 +378,9 @@ Finally, start at least one celery worker:
 ./worker.sh start
 ```
 
-The `start.sh` script will use Django's built-in server if you pass the `--no-gunicorn` parameter. This is good for testing, but bad for production. 
+The `start.sh` script will use Django's built-in server if you pass the `--no-gunicorn` parameter. This is good for testing, but bad for production.
 
-In production, if you have nginx installed, modify the configuration file in `nginx/nginx.conf` to match your system's configuration and just run `start.sh` without parameters. 
+In production, if you have nginx installed, modify the configuration file in `nginx/nginx.conf` to match your system's configuration and just run `start.sh` without parameters.
 
 Windows users should refer to [this guide](https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/modwsgi/) to install Apache + mod_wsgi and run gunicorn:
 
@@ -519,10 +436,108 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 To setup the firewall on Google Cloud, open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
 
 
-## License
+
+# Customizing and Extending
+
+Small customizations such as changing the application colors, name, logo, or adding custom CSS/HTML/Javascript can be performed directly from the Customize -- Brand/Theme panels within WebODM. No need to fork or change the code.
+
+More advanced customizations can be achieved by writing [plugins](https://github.com/OpenDroneMap/WebODM/tree/master/coreplugins). This is the preferred way to add new functionality to WebODM since it requires less effort than maintaining a separate fork. The plugin system features server-side [signals](https://github.com/OpenDroneMap/WebODM/blob/master/app/plugins/signals.py) that can be used to be notified of various events, a ES6/React build system, a dynamic [client-side API](https://github.com/OpenDroneMap/WebODM/tree/master/app/static/app/js/classes/plugins) for adding elements to the UI, a built-in data store, an async task runner, a GRASS engine, hooks to add menu items and functions to rapidly inject CSS, Javascript and Django views.
+
+For plugins, the best source of documentation currently is to look at existing [code](https://github.com/OpenDroneMap/WebODM/tree/master/coreplugins). If a particular hook / entrypoint for your plugin does not yet exist, [request it](https://github.com/OpenDroneMap/WebODM/issues). We are adding hooks and entrypoints as we go.
+
+To create a plugin simply copy the `plugins/test` plugin into a new directory (for example, `plugins/myplugin`), then modify `manifest.json`, `plugin.py` and issue a `./webodm.sh restart`.
+
+# API Docs
+
+See the [API documentation page](http://docs.webodm.org).
+
+# Roadmap
+
+We follow a bottom-up approach to decide what new features are added to WebODM. User feedback guides us in the decision making process and we collect such feedback via [improvement requests](https://github.com/OpenDroneMap/WebODM/issues?q=is%3Aopen+is%3Aissue+label%3Aimprovements).
+
+Don't see a feature that you want? [Open a feature request](https://github.com/OpenDroneMap/WebODM/issues) or [help us build it](/CONTRIBUTING.md).
+
+Sometimes we also prioritize work that has received financial backing. If your organization is in the position to financially support the development of a particular feature, [get in touch](https://community.opendronemap.org) and we'll make it happen.
+
+# Getting Help
+
+We have several channels of communication for people to ask questions and to get involved with the community:
+
+ - [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm)
+ - [Report Issues](https://github.com/OpenDroneMap/WebODM/issues)
+
+The preferred way to communicate is via the [OpenDroneMap Community Forum](http://community.opendronemap.org/c/webodm).
+
+# Support the Project
+
+There are many ways to contribute back to the project:
+
+ - Help us test new and existing features and report [bugs](https://www.github.com/OpenDroneMap/WebODM/issues) and [feedback](http://community.opendronemap.org/c/webodm).
+ - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
+ - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm) and [chat](https://gitter.im/OpenDroneMap/web-development).
+ - ⭐️ us on GitHub.
+ - Help us [translate](#translations) WebODM in your language.
+ - Help us classify [point cloud datasets](https://github.com/OpenDroneMap/ODMSemantic3D).
+ - Spread the word about WebODM and OpenDroneMap on social media.
+ - While we don't accept donations, you can purchase an [installer](https://webodm.org/download#installer), a [book](https://odmbook.com/) or a [sponsor package](https://github.com/users/pierotofy/sponsorship).
+ - You can [pledge funds](https://fund.webodm.org) for getting new features built and bug fixed.
+ - Become a contributor 🤘
+
+# Translations
+
+It's easy to translate WebODM in a different language!
+
+ - Visit https://hosted.weblate.org/engage/webodm/ and register an account (it's free)
+ - Pick a language to translate, or [start a new translation](https://hosted.weblate.org/new-lang/webodm/webodm/)
+ - Start translating! It's that easy.
+
+If you want to preview your translation work, start WebODM in developer mode:
+
+```
+./webodm.sh restart --dev
+```
+
+Then edit the [LOCALES](https://github.com/OpenDroneMap/WebODM/blob/master/LOCALES) file to include your translation locale code. Finally, visit the `Developer Tools` panel from WebODM's dashboard and press the `Download and Replace Translation Files` button:
+
+![image](https://user-images.githubusercontent.com/1951843/102927263-a294a100-4464-11eb-956e-888b73dc5b94.png)
+
+The latest translation files from weblate.org will be downloaded and applied to the installation of WebODM.
+
+# Become a Contributor
+
+The easiest way to get started is to take a look at our list of [outstanding issues](https://github.com/OpenDroneMap/WebODM/labels/help%20wanted) and pick one. You can also fix/improve something entirely new based on your experience with WebODM. All ideas are considered and people of all skill levels are welcome to contribute.
+
+You don't necessarily need to be a developer to become a contributor. We can use your help to write better documentation and improve the user interface texts and visuals.
+
+If you know how to code, we primarily use Python (Django), Javascript (React), HTML and SCSS. See the [Development Quickstart](http://docs.webodm.org/#development-quickstart) and [Contributing](/CONTRIBUTING.md) documents for more information.
+
+To make a contribution, you will need to open a pull request ([here's how](https://github.com/Roshanjossey/first-contributions#fork-this-repository)). To make changes to WebODM, make a clone of the repository and run `./webodm.sh start --dev`.
+
+If you have questions visit us on the [forum](http://community.opendronemap.org/c/webodm) and we'll be happy to help you out with your first contribution.
+
+# Architecture Overview
+
+The [OpenDroneMap project](https://github.com/OpenDroneMap/) is composed of several components.
+
+- [ODM](https://github.com/OpenDroneMap/ODM) is a command line toolkit that processes aerial images. Users comfortable with the command line are probably OK using this component alone.
+- [NodeODM](https://github.com/OpenDroneMap/NodeODM) is a lightweight interface and API (Application Program Interface) built directly on top of [ODM](https://github.com/OpenDroneMap/ODM). Users not comfortable with the command line can use this interface to process aerial images and developers can use the API to build applications. Features such as user authentication, map displays, etc. are not provided.
+- [WebODM](https://github.com/OpenDroneMap/WebODM) adds more features such as user authentication, map displays, 3D displays, a higher level API and the ability to orchestrate multiple processing nodes (run jobs in parallel). Processing nodes are simply servers running [NodeODM](https://github.com/OpenDroneMap/NodeODM).
+
+![webodm](https://cloud.githubusercontent.com/assets/1951843/25567386/5aeec7aa-2dba-11e7-9169-aca97b70db79.png)
+
+WebODM is built with scalability and performance in mind. While the default setup places all databases and applications on the same machine, users can separate its components for increased performance (ex. place a Celery worker on a separate machine for running background tasks).
+
+![Architecture](https://user-images.githubusercontent.com/1951843/36916884-3a269a7a-1e23-11e8-997a-a57cd6ca7950.png)
+
+A few things to note:
+ * We use Celery workers to do background tasks such as resizing images and processing task results, but we use an ad-hoc scheduling mechanism to communicate with NodeODM (which processes the orthophotos, 3D models, etc.). The choice to use two separate systems for task scheduling is due to the flexibility that an ad-hoc mechanism gives us for certain operations (capture task output, persistent data and ability to restart tasks mid-way, communication via REST calls, etc.).
+ * If loaded on multiple machines, Celery workers should all share their `app/media` directory with the Django application (via network shares). You can manage workers via `./worker.sh`
+
+
+# License
 
 WebODM is licensed under the terms of the [GNU Affero General Public License v3.0](https://github.com/OpenDroneMap/WebODM/blob/master/LICENSE.md).
 
-## Trademark
+# Trademark
 
 See [Trademark Guidelines](https://github.com/OpenDroneMap/documents/blob/master/TRADEMARK.md)

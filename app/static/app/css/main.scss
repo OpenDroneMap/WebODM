@@ -11,6 +11,12 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     margin-right: 12px;
     position: relative;
     top: -14px;
+
+    .map-view{
+        .map-type-selector{
+            top: 20px;
+        }
+    }
 }
 
 #iframe{
@@ -63,6 +69,8 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     }
 
     .navbar-top-links{
+        display: flex;
+        justify-content: flex-end;
         clear: both;
         a.dropdown-toggle{
             color: white;
