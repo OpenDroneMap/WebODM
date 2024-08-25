@@ -8,6 +8,7 @@ import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
+from django.contrib.postgres.operations import CreateExtension
 
 
 class Migration(migrations.Migration):
@@ -21,6 +22,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        CreateExtension("postgis_raster"),
         migrations.CreateModel(
             name='ImageUpload',
             fields=[
