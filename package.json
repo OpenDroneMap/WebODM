@@ -35,6 +35,7 @@
     "css-loader": "^0.25.0",
     "d3": "^3.5.5",
     "enzyme": "^3.3.0",
+    "cheerio": "1.0.0-rc.6",
     "enzyme-adapter-react-16": "^1.15.1",
     "exifr": "^6.0.0",
     "fbemitter": "^2.1.1",
