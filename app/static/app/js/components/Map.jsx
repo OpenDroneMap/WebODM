@@ -23,6 +23,7 @@ import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
+import OverviewControl from './OverviewControl';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
@@ -92,6 +93,8 @@ class Map extends React.Component {
       this.setState(update(this.state, 
         {selectedLayers: {$push: [el]}}
       ));
+
+      console.log(this.state.selectedLayers)
     }
 
     this.setState(update(this.state, 
@@ -512,6 +515,7 @@ _('Example:'),
         overlays: this.state.overlays
     }).addTo(this.map);
 
+
     this.autolayers = Leaflet.control.autolayers({
       overlays: {},
       selectedOverlays: [],
@@ -644,6 +648,16 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
+
+    // SetTimeOut Momentaneo
+    setTimeout(() => { 
+      this.overviewControl = new OverviewControl({
+        selectedLayers: this.state.selectedLayers
+      }).addTo(this.map);
+  
+      console.log("selectedLayers: ", this.state.selectedLayers)
+    }, 1000);
+    
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -666,6 +680,10 @@ _('Example:'),
               this.state.selectedLayers.length == 0) &&
               prevState.selectedLayers !== this.state.selectedLayers) {
       this.selectionOverviewControl.update(this.state.selectedLayers);
+    }
+
+    if (this.overviewControl && prevState.selectedLayers !== this.state.selectedLayers) {
+      this.overviewControl.update(this.state.selectedLayers);
     }
 
     if (this.props.tiles != null){
