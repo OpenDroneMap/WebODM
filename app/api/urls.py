@@ -31,7 +31,7 @@ admin_router.register(r'admin/groups', AdminGroupViewSet, basename='admin-groups
 admin_router.register(r'admin/profiles', AdminProfileViewSet, basename='admin-profiles')
 
 urlpatterns = [
-    re_path(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
+    path('processingnodes/options/', ProcessingNodeOptionsView.as_view()),
 
     re_path(r'^', include(router.urls)),
     re_path(r'^', include(tasks_router.urls)),
