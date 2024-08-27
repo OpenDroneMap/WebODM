@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ENV POSTGRES_PASSWORD=postgres
@@ -20,7 +20,7 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/docker-entrypoint.sh / # backwards compat
 
 # Setup system
-RUN apt-get update; \
+RUN apt-get update > /dev/null; \
     set -eux; \
 	groupadd -r postgres --gid=999; \
 	useradd -r -g postgres --uid=999 --home-dir=/var/lib/postgresql --shell=/bin/bash postgres; \
@@ -64,12 +64,11 @@ RUN apt-get update; \
     # this 777 will be replaced by 700 at runtime (allows semi-arbitrary "--user" values)
     mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 777 "$PGDATA"; \
     # Build PostGIS from source
-	apt-get install -o Acquire::Retries=3 -y --no-install-recommends libgdal-dev libjson-c-dev protobuf-c-compiler libprotobuf-c-dev; \
+	apt-get install -o Acquire::Retries=3 -y --no-install-recommends libgdal-dev libjson-c-dev protobuf-c-compiler libprotobuf-c-dev > /dev/null; \
 	cd /staging; \
 	wget --no-check-certificate -q https://download.osgeo.org/postgis/source/postgis-$POSTGIS_VERSION.tar.gz; \
 	wget --no-check-certificate -q -O /usr/include/json-c/json_object_private.h https://raw.githubusercontent.com/json-c/json-c/json-c-0.16/json_object_private.h; \
 	tar -zxf postgis-$POSTGIS_VERSION.tar.gz; \
-	sed -i 's/#error.*/#define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H 1/' /usr/include/proj_api.h; \
 	cd /staging/postgis-$POSTGIS_VERSION; \
 	./configure --with-pgconfig=/usr/local/pgsql/bin/pg_config --with-gdalconfig=/usr/bin/gdal-config > /dev/null; \
 	make; \
