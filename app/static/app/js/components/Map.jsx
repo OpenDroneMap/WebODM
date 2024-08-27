@@ -88,18 +88,33 @@ class Map extends React.Component {
     });
   }
 
+  // Codigo setSelectedLayers que não atualiza diretamente o array SelectedLayers
+  // setSelectedLayers(idx, el) {
+  //   if (idx >= this.state.selectedLayers.length) {
+  //     this.setState(update(this.state, 
+  //       {selectedLayers: {$push: [el]}}
+  //     ));
+  //   }
+
+  //   this.setState(update(this.state, 
+  //     {selectedLayers: {idx: {$set: el}}}
+  //   ));
+  // }
+
+
   setSelectedLayers(idx, el) {
     if (idx >= this.state.selectedLayers.length) {
       this.setState(update(this.state, 
         {selectedLayers: {$push: [el]}}
       ));
-
-      console.log(this.state.selectedLayers)
+    } else {
+      // Atualiza o elemento no índice idx
+      this.setState(update(this.state, 
+        {selectedLayers: {[idx]: {$set: el}}}
+      ));
     }
 
-    this.setState(update(this.state, 
-      {selectedLayers: {idx: {$set: el}}}
-    ));
+    console.log("SelectedLayers: ",this.state.selectedLayers)
   }
 
   getSelectedLayers() {
@@ -709,6 +724,7 @@ _('Example:'),
       this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
       this.tileJsonRequests = [];
     }
+
   }
 
   handleMapMouseDown(e)  {
