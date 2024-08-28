@@ -134,7 +134,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0 10px 15px !important;
+    padding: 10px 15px 10px 15px !important;
     
 }
 
@@ -151,15 +151,6 @@ body {
 .navbar-collapse ul li,
 .sidebar ul li {
     $left-spacing: 5px;
-
-    // &::after {
-    //     content: " ";
-    //     display: block;
-    //     border-bottom: 1px solid #96c6c6;
-    //     // width: 95%;
-    //     height: 100%;
-    //     // margin-left: $left-spacing;
-    // }
 
     a.active {
         &::before {
