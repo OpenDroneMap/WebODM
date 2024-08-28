@@ -135,8 +135,8 @@ class Map extends React.Component {
         this.map.removeLayer(layer);
         delete this.state.overlays[idx];
       }
-      if (layer[Symbol.for("meta")["name"]] != null && layer[Symbol.for("meta")]["name"] == "field") {
-        this.selectedLayers = [];
+      if (layer[Symbol.for("meta")]["name"] != null && layer[Symbol.for("meta")]["name"] == "field") {
+        this.state.selectedLayers = [];
       }
     });
   }
