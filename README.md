@@ -85,6 +85,14 @@ git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --
 cd WebODM
 ./webodm.sh start
 ```
+If you have a 'dial unix /var/run/docker.sock: connect: permission denied' error on windows, you can try  
+```
+./webodm.sh update
+```
+before 
+```
+./webodm.sh start
+```
 * If you face any issues at the last step on Linux, make sure your user is part of the docker group:
 ```bash
 sudo usermod -aG docker $USER
