@@ -8,7 +8,9 @@ import OverviewControlPanel from './OverviewControlPanel';
 
 class OverviewControl extends React.Component {
     static propTypes = {
-
+        selectedLayers: PropTypes.array.isRequired,
+        removeGeoJsonDetections: PropTypes.func,
+        loadGeoJsonDetections: PropTypes.func
     }
 
     constructor(props){
@@ -17,7 +19,6 @@ class OverviewControl extends React.Component {
         this.state = {
             showPanel: false
         };
-
     }
 
 
@@ -45,12 +46,16 @@ class OverviewControl extends React.Component {
                 title="Overview"
                 onClick={this.handleOpen} 
                 className="leaflet-control-overview-control-button leaflet-bar-part theme-secondary"></a>
-                <OverviewControlPanel onClose={this.handleClose} selectedLayers={this.props.selectedLayers}/>
+                <OverviewControlPanel 
+                    tiles={this.props.tiles}
+                    onClose={this.handleClose} 
+                    selectedLayers={this.props.selectedLayers} 
+                    removeGeoJsonDetections={this.props.removeGeoJsonDetections}
+                    loadGeoJsonDetections={this.props.loadGeoJsonDetections}/>
             </div>);
         
     }
 }
-
 
 
 export default L.Control.extend({
@@ -64,15 +69,21 @@ export default L.Control.extend({
 
         L.DomEvent.disableClickPropagation(this.container);
 
-        this.update(this.options.selectedLayers);
-
+        this.update(this.options.selectedLayers, 
+                    this.options.removeGeoJsonDetections, 
+                    this.options.loadGeoJsonDetections,
+                    this.options.tiles);
 
         return this.container;
     },
 
-    update: function(selectedLayers){
-        ReactDOM.render(<OverviewControl map={this.map} selectedLayers={selectedLayers}/>, this.container);
+    update: function(selectedLayers, removeGeoJsonDetections, loadGeoJsonDetections, tiles ){
+        ReactDOM.render(<OverviewControl 
+                            map={this.map} 
+                            selectedLayers={selectedLayers} 
+                            removeGeoJsonDetections={removeGeoJsonDetections}
+                            loadGeoJsonDetections={loadGeoJsonDetections}
+                            tiles={tiles}/>, 
+                            this.container);
     }
-
-    
 });

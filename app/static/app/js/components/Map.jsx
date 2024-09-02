@@ -52,7 +52,7 @@ class Map extends React.Component {
 
   constructor(props) {
     super(props);
-    
+
     this.state = {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
@@ -88,20 +88,6 @@ class Map extends React.Component {
     });
   }
 
-  // Codigo setSelectedLayers que não atualiza diretamente o array SelectedLayers
-  // setSelectedLayers(idx, el) {
-  //   if (idx >= this.state.selectedLayers.length) {
-  //     this.setState(update(this.state, 
-  //       {selectedLayers: {$push: [el]}}
-  //     ));
-  //   }
-
-  //   this.setState(update(this.state, 
-  //     {selectedLayers: {idx: {$set: el}}}
-  //   ));
-  // }
-
-
   setSelectedLayers(idx, el) {
     if (idx >= this.state.selectedLayers.length) {
       this.setState(update(this.state, 
@@ -113,8 +99,6 @@ class Map extends React.Component {
         {selectedLayers: {[idx]: {$set: el}}}
       ));
     }
-
-    console.log("SelectedLayers: ",this.state.selectedLayers)
   }
 
   getSelectedLayers() {
@@ -503,11 +487,11 @@ class Map extends React.Component {
         const defaultCustomBm = window.localStorage.getItem('lastCustomBasemap') || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
       
         let url = window.prompt([_('Enter a tile URL template. Valid coordinates are:'),
-_('{z}, {x}, {y} for Z/X/Y tile scheme'),
-_('{-y} for flipped TMS-style Y coordinates'),
-'',
-_('Example:'),
-'https://tile.openstreetmap.org/{z}/{x}/{y}.png'].join("\n"), defaultCustomBm);
+          _('{z}, {x}, {y} for Z/X/Y tile scheme'),
+          _('{-y} for flipped TMS-style Y coordinates'),
+          '',
+          _('Example:'),
+          'https://tile.openstreetmap.org/{z}/{x}/{y}.png'].join("\n"), defaultCustomBm);
         
         if (url){
           customLayer.clearLayers();
@@ -663,16 +647,12 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
-
-    // SetTimeOut Momentaneo
-    setTimeout(() => { 
-      this.overviewControl = new OverviewControl({
-        selectedLayers: this.state.selectedLayers
-      }).addTo(this.map);
-  
-      console.log("selectedLayers: ", this.state.selectedLayers)
-    }, 1000);
-    
+    this.overviewControl = new OverviewControl({
+      tiles: tiles,
+      selectedLayers: this.state.selectedLayers,
+      loadGeoJsonDetections: this.loadGeoJsonDetections,
+      removeGeoJsonDetections: this.removeGeoJsonDetections,
+    }).addTo(this.map);
   }
 
   componentDidUpdate(prevProps, prevState) {
