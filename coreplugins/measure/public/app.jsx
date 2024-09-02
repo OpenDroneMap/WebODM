@@ -13,6 +13,10 @@ export default class App{
     constructor(map){
         this.map = map;
 
+        this.state = {
+          show: true,
+        }
+
         const measure = L.control.measure({
           labels:{
             measureDistancesAndAreas: _('Measure volume, area and length'),
@@ -93,19 +97,17 @@ export default class App{
 
         // Function to open and close the measurement control
 
-        const heandleMeasurePopUp = () => {
-          const measureContainer = document.querySelector(".leaflet-control-measure");
-          if (measureContainer.classList.contains("leaflet-control-active")) {
-              measureContainer.classList.remove("leaflet-control-active");
-          } else {
-              measureContainer.classList.add("leaflet-control-active");
-          }
+        const openMeasurePopUp = () => {
+          document.querySelector(".leaflet-control-measure").classList.add("leaflet-control-active");
+        }
+
+        const closeMeasurePopUp = () => {
+          document.querySelector(".leaflet-control-measure").classList.remove("leaflet-control-active");
         }
         
-        document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", heandleMeasurePopUp);
-        document.querySelector(".leaflet-control-measure-close-button").addEventListener("click",heandleMeasurePopUp);
-        document.querySelector(".map").addEventListener("click", heandleMeasurePopUp);
-
+        document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", openMeasurePopUp);
+        document.querySelector(".leaflet-control-measure-close-button").addEventListener("click", closeMeasurePopUp);
+        
     
     }
 
