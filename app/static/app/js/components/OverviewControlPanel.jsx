@@ -5,9 +5,11 @@ import '../css/OverviewControlPanel.scss';
 export default class OverviewControlPanel extends React.Component {
     static propTypes = {
         selectedLayers: PropTypes.array.isRequired,
-        onClose: PropTypes.func.isRequired,
         removeGeoJsonDetections: PropTypes.func,
-        loadGeoJsonDetections: PropTypes.func
+        loadGeoJsonDetections: PropTypes.func,
+        overlays: PropTypes.array.isRequired,
+        tiles:PropTypes.array,
+        onClose: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -87,9 +89,37 @@ export default class OverviewControlPanel extends React.Component {
         })
     }
 
+    handlePopUp = (e) => {
+        const {overlays} = this.props
+        const layerSelected = this.state.filteredSelectedLayers.filter(layer => layer.index == e.target.id);
+
+        if(overlays[1]) {
+            const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+            const reflayerLeafLeat = leafleatLayers.filter(layer => {
+                return (
+                    layer._bounds &&
+                    layerSelected[0] && 
+                    layerSelected[0].layer &&
+                    layerSelected[0].layer.bounds &&
+                    layer._bounds._northEast.lat === layerSelected[0].layer.bounds._northEast.lat &&
+                    layer._bounds._northEast.lng === layerSelected[0].layer.bounds._northEast.lng &&
+                    layer._bounds._southWest.lat === layerSelected[0].layer.bounds._southWest.lat &&
+                    layer._bounds._southWest.lng === layerSelected[0].layer.bounds._southWest.lng
+                );
+            });
+
+            if (reflayerLeafLeat.length > 0) {
+                const layer = reflayerLeafLeat[0];
+                if (layer.getPopup()) {
+                    if (!layer.isPopupOpen()) {
+                        layer.openPopup();
+                    }
+                } 
+            }
+        }
+    }
+
     render() {
-
-
         return (
             <div className="overview-control-panel">
                 <span className="close-button" onClick={this.props.onClose} />
@@ -102,8 +132,10 @@ export default class OverviewControlPanel extends React.Component {
                                 <button className='collapsed-infos-btn' onClick={() => this.handleCollapsedlistLayerItems(index)}>
                                     {this.state.collapsedLayers[index] ? "-" : "+"}
                                 </button>
-                                {names[index] + ` - Layer ${index}` || `Layer ${index}`}
-                                <ul className={`list-layer-items ${!this.state.collapsedLayers[index] ? 'collapsed' : ''}`}>
+                                <a href="javascript:void(0)" id={index} onClick={this.handlePopUp} className='link-item'> 
+                                    {names[index] + ` - Layer ${index}` || `Layer ${index}`}
+                                </a>
+                                <ul className={`list-layer-items ${!this.state.collapsedLayers[index] ? 'collapsed' : ''}`} onClick={this.handlePopUp}>
                                     <li>
                                         Coordenadas:
                                         <ul>

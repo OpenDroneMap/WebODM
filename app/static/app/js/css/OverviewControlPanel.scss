@@ -64,5 +64,15 @@
       padding: 0px 4px;
     }
 
+    a.link-item {
+      display: inline;
+      background-color: transparent !important;
+      border: none;
+    }
+
+    a.link-item:hover {
+      color: #74b06f !important
+    }
+
   }
   

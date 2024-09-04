@@ -647,9 +647,11 @@ class Map extends React.Component {
         pluginActionButtons: {$push: [button]}
       }));
     });
+
     this.overviewControl = new OverviewControl({
       tiles: tiles,
       selectedLayers: this.state.selectedLayers,
+      overlays: this.state.overlays,
       loadGeoJsonDetections: this.loadGeoJsonDetections,
       removeGeoJsonDetections: this.removeGeoJsonDetections,
     }).addTo(this.map);
@@ -678,7 +680,11 @@ class Map extends React.Component {
     }
 
     if (this.overviewControl && prevState.selectedLayers !== this.state.selectedLayers) {
-      this.overviewControl.update(this.state.selectedLayers);
+      this.overviewControl.updateSelectedLayers(this.state.selectedLayers, this.state.overlays);
+    }
+
+    if (this.overviewControl && prevState.overlays !== this.state.overlays) {
+      this.overviewControl.updateOverlays(this.state.overlays, this.state.selectedLayers);
     }
 
     if (this.props.tiles != null){
