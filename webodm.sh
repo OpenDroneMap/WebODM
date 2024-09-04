@@ -473,13 +473,9 @@ start(){
 down(){
 	command="$docker_compose -f docker-compose.yml"
 
-	if [ "${GPU_NVIDIA}" = true ]; then
-		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-	elif [ "${GPU_INTEL}" = true ]; then
-		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
-	else
-		command+=" -f docker-compose.nodeodm.yml"
-	fi
+	command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+	command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+	command+=" -f docker-compose.nodeodm.yml"
 
 	command+=" -f docker-compose.nodemicmac.yml down --remove-orphans"
 
@@ -576,13 +572,11 @@ elif [[ $1 = "stop" ]]; then
 
 	command="$docker_compose -f docker-compose.yml"
 
-	if [ "${GPU_NVIDIA}" = true ]; then
-		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-	elif [ "${GPU_INTEL}" = true ]; then
-		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
-	else
-		command+=" -f docker-compose.nodeodm.yml"
-	fi
+
+	command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
+	command+=" -f docker-compose.nodeodm.gpu.intel.yml"
+	command+=" -f docker-compose.nodeodm.yml"
+
 
 	command+=" -f docker-compose.nodemicmac.yml stop"
 	run "${command}"

@@ -13,6 +13,7 @@ services:
     environment:
       - RENDER_GROUP_ID
     image: opendronemap/nodeodm:gpu.intel
+    container_name: node-odm-1
     devices:
       - "/dev/dri"
     expose:
