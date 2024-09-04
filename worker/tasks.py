@@ -38,25 +38,6 @@ def update_nodes_info():
         return
     
     processing_nodes = ProcessingNode.objects.all()
-
-    # Check hostname if default webodm-node-odm-1 is offline,
-    # but don't affect other behavior
-    if not processing_nodes.first().is_online() and processing_nodes.count() == 1:
-        processing_node = processing_nodes.first()
-        if processing_node.hostname == 'webodm-node-odm-1':
-            prefixs = ['webodm',settings.BASE_DIR]
-            suffixs = ['-node-odm-1','_node-odm-1',]
-            for prefix, suffix in zip(prefixs,suffixs):
-                try:
-                    processing_node.hostname = prefix+suffix
-                    processing_node.update_node_info()
-                    if processing_node.is_online():
-                        logger.info("Found and fixed default hostname")
-                        processing_node.save()
-                        return
-                except:
-                    pass
-    
     for processing_node in processing_nodes:
         processing_node.update_node_info()
 
