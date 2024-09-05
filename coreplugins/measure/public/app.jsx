@@ -104,7 +104,6 @@ export default class App{
         
         document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", heandleMeasurePopUp);
         document.querySelector(".leaflet-control-measure-close-button").addEventListener("click",heandleMeasurePopUp);
-        document.querySelector(".map").addEventListener("click", heandleMeasurePopUp);
 
     
     }

@@ -211,10 +211,17 @@ export default class ContoursPanel extends React.Component {
 
   handleShowPreview = () => {
     this.setState({previewLoading: true});
-
+    
     const data = this.getFormValues();
     data.epsg = 4326;
     data.format = "GeoJSON";
+
+    const previewButton = document.querySelector('.btn.btn-sm.btn-primary.btn-preview');
+    if (previewButton){
+      previewButton.style.backgroundImage = 'none';
+      previewButton.style.paddingLeft = '10px';
+    }
+
     this.generateContours(data, 'previewLoading', true);
   }
 
@@ -249,7 +256,7 @@ export default class ContoursPanel extends React.Component {
         </div>
         {interval === "custom" ? 
           <div className="row form-group form-inline">
-            <label className="col-sm-3 control-label">{_("Value:")}</label>
+            <label className="col-sm-3 control-label">{_("Valor:")}</label>
             <div className="col-sm-9 ">
               <input type="number" className="form-control custom-interval" value={customInterval} onChange={this.handleChangeCustomInterval} /><span> {_("meter")}</span>
             </div>
@@ -257,7 +264,7 @@ export default class ContoursPanel extends React.Component {
         : ""}
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">{_("Layer:")}</label>
+          <label className="col-sm-3 control-label">{_("Camada:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={layer} onChange={this.handleSelectLayer}>
               {layers.map(l => <option value={l}>{l}</option>)}
@@ -266,7 +273,7 @@ export default class ContoursPanel extends React.Component {
         </div>
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">{_("Simplify:")}</label>
+          <label className="col-sm-3 control-label">{_("Simplificar:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={simplify} onChange={this.handleSelectSimplify}>
               {simplifyValues.map(sv => <option value={sv.value}>{sv.label} ({sv.value} {_("meter")})</option>)}
@@ -284,7 +291,7 @@ export default class ContoursPanel extends React.Component {
         : ""}
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">{_("Projection:")}</label>
+          <label className="col-sm-3 control-label">{_("Projeção:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
               <option value="4326">{_("Lat/Lon")} (EPSG:4326)</option>
@@ -303,22 +310,22 @@ export default class ContoursPanel extends React.Component {
         : ""}
 
         <div className="row action-buttons">
-          <div className="col-sm-3">
             {previewLayer ? <a title="Delete Preview" href="javascript:void(0);" onClick={this.handleRemovePreview}>
               <i className="fa fa-trash"></i>
             </a> : ""}
-          </div>
           <div className="col-sm-9 text-right">
+           <div className="btn-group">
             <button onClick={this.handleShowPreview}
                     disabled={disabled || previewLoading} type="button" className="btn btn-sm btn-primary btn-preview">
-              {previewLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-eye-open"/>} {_("Preview")}
+              {previewLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className=""/>} {_("Visualização")}
+    
             </button>
+          
 
-            <div className="btn-group">
-              <button disabled={disabled || exportLoading} type="button" className="btn btn-sm btn-primary" data-toggle="dropdown">
-                {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-download" />} {_("Export")}
+            
+              <button disabled={disabled || exportLoading} type="button" className="btn btn-sm btn-primary btn-export" data-toggle="dropdown">
+                {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-download" />} {_("Exportar")}
               </button>
-              <button disabled={disabled|| exportLoading} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
               <ul className="dropdown-menu  pull-right">
                 <li>
                   <a href="javascript:void(0);" onClick={this.handleExport("GPKG")}>
@@ -349,8 +356,8 @@ export default class ContoursPanel extends React.Component {
 
     return (<div className="contours-panel">
       <span className="close-button" onClick={this.props.onClose}/>
-      <div className="title">{_("Contours")}</div>
-      <hr/>
+      <div className="title">{_("CONTORNOS")}</div>
+      
       {content}
     </div>);
   }
