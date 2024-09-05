@@ -60,6 +60,7 @@ export default class OverviewControlPanel extends React.Component {
         const task_id = this.tiles[0].meta.task.id;
         const project_id = this.tiles[0].meta.task.project;
         const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
+        const csrfToken = getCsrfToken(); 
     
         const requests = filteredSelectedLayers.map(({ layer }) => {
             const payload = {
@@ -68,7 +69,10 @@ export default class OverviewControlPanel extends React.Component {
             };
             return fetch(url, {
                 method: 'POST',
-                headers: { 'content-type': 'application/json' },
+                headers: { 
+                    'content-type': 'application/json',
+                    'X-CSRFToken': csrfToken, // Adicionando o CSRF token ao cabeçalho
+                },
                 body: JSON.stringify(payload)
             });
         });
@@ -165,6 +169,17 @@ export default class OverviewControlPanel extends React.Component {
             </div>
         );
     }
+}
+
+const getCsrfToken = () => {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith('csrftoken=')) {
+            return cookie.split('=')[1];
+        }
+    }
+    return null;
 }
 
 const names = [
