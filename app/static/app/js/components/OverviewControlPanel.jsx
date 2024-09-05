@@ -17,7 +17,8 @@ export default class OverviewControlPanel extends React.Component {
 
         this.state = {
             collapsedLayers: {},
-            filteredSelectedLayers: [], 
+            filteredSelectedLayers: [],
+            processing: false,
         };
 
         this.removeGeoJsonDetections = this.props.removeGeoJsonDetections;
@@ -55,39 +56,34 @@ export default class OverviewControlPanel extends React.Component {
         this.loadGeoJsonDetections(fieldSet);
     }
 
-    handleSendData = () => {
-        const {filteredSelectedLayers} = this.state;
-
+    handleSendData = async () => {
+        const { filteredSelectedLayers } = this.state;
         const task_id = this.tiles[0].meta.task.id;
         const project_id = this.tiles[0].meta.task.project;
-
         const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
-
-        filteredSelectedLayers.forEach(({layer}) => {
-            
+    
+        const requests = filteredSelectedLayers.map(({ layer }) => {
             const payload = {
                 type: layer.cropType,
-                payload: {
-                    processing_requests: {
-                        fields_to_process: [] //Adicionar id dos talhoes 
-                    }
-                }
+                payload: { processing_requests: { fields_to_process: [] } } // Adicionar IDs aqui
             };
-
-            fetch(url , {
+            return fetch(url, {
                 method: 'POST',
-                headers: {
-                    'content-type': 'application/json'
-                },
+                headers: { 'content-type': 'application/json' },
                 body: JSON.stringify(payload)
-            })
-            .then(Response => Response.json())
-            .then(data => {
-                console.log('sucess: ', data)
-            })
-            .catch(error => console.error('Error:', error));
-        })
-    }
+            });
+        });
+    
+        try {
+            const responses = await Promise.all(requests);
+            const results = await Promise.all(responses.map(res => res.json()));
+            console.log('sucess: ', results);
+            alert("Talhões enviados para o processamento com sucesso.");
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     handlePopUp = (e) => {
         const {overlays} = this.props
@@ -125,6 +121,7 @@ export default class OverviewControlPanel extends React.Component {
                 <span className="close-button" onClick={this.props.onClose} />
                 <div className="title">Overview</div>
                 <hr />
+                {}
                 {this.state.filteredSelectedLayers.length > 0 ? (
                     <ul className='list-overview'>
                         {this.state.filteredSelectedLayers.map(({ layer, index }) => (
