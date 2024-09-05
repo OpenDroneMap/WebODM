@@ -6,7 +6,7 @@ from app.api.workers import GetTaskResult as GetTaskResult
 
 from django.http import HttpResponse, Http404
 from .functions import get_plugin_by_name, get_active_plugins
-from django.conf.urls import url
+from django.urls import re_path
 from django.views.static import serve
 from urllib.parse import urlparse
 
@@ -26,7 +26,7 @@ def app_view_handler(request, plugin_name=None):
 
     # Try mountpoints first
     for mount_point in plugin.app_mount_points():
-        view, args, kwargs = try_resolve_url(request, url(r'^/plugins/{}/{}'.format(plugin_name, mount_point.url),
+        view, args, kwargs = try_resolve_url(request, re_path(r'^/plugins/{}/{}'.format(plugin_name, mount_point.url),
                                                  mount_point.view,
                                                  *mount_point.args,
                                                  **mount_point.kwargs))
@@ -35,7 +35,7 @@ def app_view_handler(request, plugin_name=None):
 
     # Try public assets
     if os.path.exists(plugin.get_path("public")) and plugin.serve_public_assets(request):
-        view, args, kwargs = try_resolve_url(request, url('^/plugins/{}/(.*)'.format(plugin_name),
+        view, args, kwargs = try_resolve_url(request, re_path('^/plugins/{}/(.*)'.format(plugin_name),
                                                             serve,
                                                             {'document_root': plugin.get_path("public")}))
         if view:
@@ -50,7 +50,7 @@ def api_view_handler(request, plugin_name=None):
         raise Http404("Plugin not found")
 
     for mount_point in plugin.api_mount_points():
-        view, args, kwargs = try_resolve_url(request, url(r'^/api/plugins/{}/{}'.format(plugin_name, mount_point.url),
+        view, args, kwargs = try_resolve_url(request, re_path(r'^/api/plugins/{}/{}'.format(plugin_name, mount_point.url),
                                                  mount_point.view,
                                                  *mount_point.args,
                                                  **mount_point.kwargs))
@@ -64,6 +64,6 @@ def root_url_patterns():
     result = []
     for p in get_active_plugins():
         for mount_point in p.root_mount_points():
-            result.append(url(mount_point.url, mount_point.view, *mount_point.args, **mount_point.kwargs))
+            result.append(re_path(mount_point.url, mount_point.view, *mount_point.args, **mount_point.kwargs))
             
     return result

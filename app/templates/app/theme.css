@@ -345,6 +345,19 @@ pre.prettyprint:focus,
 }
 
 @font-face {
+	font-family: "Montserrat Medium";
+	src: url( {% static 'app/fonts/Montserrat-Medium.ttf' %} );
+	font-weight: 500;
+}
+
+@font-face {
+	font-family: "Montserrat SemiBold";
+	src: url( {% static 'app/fonts/Montserrat-SemiBold.ttf' %} );
+	font-weight: 600;
+}
+
+
+@font-face {
 	font-family: "Montserrat ExtraBold";
 	src: url( {% static 'app/fonts/Montserrat-ExtraBold.ttf' %} );
 	font-weight: 800;

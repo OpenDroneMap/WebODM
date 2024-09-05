@@ -3,7 +3,7 @@ import tempfile
 import zipfile
 import shutil
 
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -26,6 +26,8 @@ from webodm import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext_lazy as _, gettext
 
+from django.templatetags.static import static
+from .formCustom import CustomUserCreationForm
 
 class ProjectAdmin(GuardedModelAdmin):
     list_display = ('id', 'name', 'owner', 'created_at', 'tasks_count', 'tags')
@@ -129,22 +131,22 @@ class PluginAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            url(
+            re_path(
                 r'^(?P<plugin_name>.+)/enable/$',
                 self.admin_site.admin_view(self.plugin_enable),
                 name='plugin-enable',
             ),
-            url(
+            re_path(
                 r'^(?P<plugin_name>.+)/disable/$',
                 self.admin_site.admin_view(self.plugin_disable),
                 name='plugin-disable',
             ),
-            url(
+            re_path(
                 r'^(?P<plugin_name>.+)/delete/$',
                 self.admin_site.admin_view(self.plugin_delete),
                 name='plugin-delete',
             ),
-            url(
+            re_path(
                 r'^actions/upload/$',
                 self.admin_site.admin_view(self.plugin_upload),
                 name='plugin-upload',
@@ -181,7 +183,7 @@ class PluginAdmin(admin.ModelAdmin):
             delete_plugin(plugin_name)
         except Exception as e:
             messages.warning(request, _("Cannot delete plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
-                                                                                           'message': str(e)})
+                                                                                            'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
@@ -270,6 +272,37 @@ class ProfileInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = [ProfileInline]
+    add_form = CustomUserCreationForm
+    list_display = ('username', 'email_display', 'first_name', 'last_name', 'is_staff', 'status', 'edit')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+
+    
+    def email_display(self, obj):
+        return obj.email
+    email_display.short_description = 'E-mail'
+    email_display.admin_order_field = 'email'
+
+    # Método personalizado para o campo status
+    def status(self, obj):
+        return ""
+    status.short_description = 'Status'
+
+    def edit(self, obj):
+        return format_html(
+            '<a href="{}"><img src="{}" alt="Edit" style="width:20px;height:20px;" /></a>',
+            f'/admin/auth/user/{obj.id}/change/',
+            static('admin/css/icons/three-dots.svg')  # Usar static para resolver o caminho
+        )
+    edit.short_description = 'Editar'
+    
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2', 'email', 'full_name')}
+        ),
+    )
+
 
 # Re-register UserAdmin
 admin.site.unregister(User)

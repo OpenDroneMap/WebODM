@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="29" viewBox="0 0 30 29">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Retângulo_105" data-name="Retângulo 105" width="20.659" height="15.976" fill="#319c41"/>
+    </clipPath>
+  </defs>
+  <g id="Grupo_188" data-name="Grupo 188" transform="translate(0.232 -0.094)">
+    <g id="Elipse_6" data-name="Elipse 6" transform="translate(-0.232 0.094)" fill="none" stroke="#319c41" stroke-width="1">
+      <ellipse cx="15" cy="14.5" rx="15" ry="14.5" stroke="none"/>
+      <ellipse cx="15" cy="14.5" rx="14.5" ry="14" fill="none"/>
+    </g>
+    <g id="Grupo_190" data-name="Grupo 190" transform="translate(4.439 7.682)">
+      <g id="Grupo_189" data-name="Grupo 189" clip-path="url(#clip-path)">
+        <path id="Caminho_88" data-name="Caminho 88" d="M2.853,5.646a1.218,1.218,0,0,1,.983.46C4.985,7.256,6.142,8.4,7.279,9.559c.206.21.308.2.509,0Q12.295,5.036,16.815.524a1.25,1.25,0,0,1,2.059.037c.442.466.906.911,1.357,1.368a1.212,1.212,0,0,1-.011,1.858q-2.686,2.692-5.376,5.38-3.153,3.152-6.306,6.3a1.237,1.237,0,0,1-1.986.017q-2.7-2.7-5.4-5.4C.9,9.839.633,9.611.4,9.353A1.207,1.207,0,0,1,.425,7.542c.5-.511,1.012-1.013,1.517-1.519a1.115,1.115,0,0,1,.911-.377" transform="translate(0 -0.001)" fill="#319c41"/>
+      </g>
+    </g>
+  </g>
+</svg>

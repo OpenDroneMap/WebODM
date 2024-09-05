@@ -16,6 +16,7 @@ body {
   padding: 0 15px;
   min-height: 568px;
   background-color: #edeeef;
+  transition: margin 0.5s ease;
 }
 
 @media (min-width: 768px) {
@@ -97,24 +98,51 @@ body {
   left: auto;
 }
 
-.sidebar .sidebar-nav.navbar-collapse {
-  padding-right: 0;
-  padding-left: 10px;
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 15px;
+  transition: width 0.5s ease;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar .nav {
+  flex: 1;
 }
 
 .sidebar .sidebar-search {
   padding: 15px;
 }
 
-.navbar-collapse ul li::after,
-.sidebar ul li::after {
-  content: " ";
-  display: block;
-  border-bottom: 1px solid #96c6c6;
-  width: 95%;
-  height: 100%;
-  margin-left: 5px;
+.sidebar ul {
+  white-space: nowrap;
 }
+
+.sidebar {
+  overflow: hidden;
+}
+
+.sidebar ul li a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px 10px 15px !important;
+}
+
+.sidebar ul li a div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sidebar ul li a div i {
+  font-size: 18px;
+}
+
 .navbar-collapse ul li a.active::before,
 .sidebar ul li a.active::before {
   position: absolute;
@@ -123,7 +151,6 @@ body {
   right: 0;
   bottom: 0;
   height: 80%;
-  width: calc(95% + 5px + 5px);
   border-radius: 25px;
   background: #cce0e0;
   z-index: -1;
@@ -132,8 +159,13 @@ body {
 }
 .navbar-collapse ul li a.active.collapsed::before,
 .sidebar ul li a.active.collapsed::before {
-  width: 80%;
   transition: width 0.2s;
+}
+
+.horizontal-bar-sidebar {
+  display: block;
+  height: 1px !important;
+  background-color: #96c6c6;
 }
 
 @media (min-width: 768px) {
@@ -160,11 +192,11 @@ body {
 }
 
 .sidebar .nav-second-level li a {
-  padding-left: 37px;
+  padding-left: 37px !important;
 }
 
 .sidebar .nav-third-level li a {
-  padding-left: 52px;
+  padding-left: 52px !important;
 }
 
 @media (min-width: 768px) {
@@ -174,7 +206,6 @@ body {
     width: 452px;
     height: calc(100vh - 61px); /* Altura ajustada para subtrair a barra superior */
     top: 61px; /* Posiciona a barra lateral logo abaixo da barra superior */
-    padding-top: 10px; /* Espaço interno superior para a estética */
     overflow-y: auto; /* Permite rolagem dentro da barra lateral se o conteúdo exceder a altura */
     box-shadow: 9px 0 5px -5px rgba(0, 0, 0, 0.1);
   }
