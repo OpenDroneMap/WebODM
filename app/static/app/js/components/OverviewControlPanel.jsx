@@ -18,7 +18,6 @@ export default class OverviewControlPanel extends React.Component {
         this.state = {
             collapsedLayers: {},
             filteredSelectedLayers: [],
-            processing: false,
         };
 
         this.removeGeoJsonDetections = this.props.removeGeoJsonDetections;
@@ -121,7 +120,6 @@ export default class OverviewControlPanel extends React.Component {
                 <span className="close-button" onClick={this.props.onClose} />
                 <div className="title">Overview</div>
                 <hr />
-                {}
                 {this.state.filteredSelectedLayers.length > 0 ? (
                     <ul className='list-overview'>
                         {this.state.filteredSelectedLayers.map(({ layer, index }) => (
