@@ -17,6 +17,7 @@ import Tags from '../classes/Tags';
 import exifr from '../vendor/exifr';
 import { _, interpolate } from '../classes/gettext';
 import $ from 'jquery';
+import ProjectPluginActionButtons from "./ProjectPluginActionButtons";
 
 class ProjectListItem extends React.Component {
   static propTypes = {
@@ -641,6 +642,7 @@ class ProjectListItem extends React.Component {
                   <i className="glyphicon glyphicon-import"></i> <span className="hidden-xs">{_("Import")}</span>
                 </button>
                 {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
+                <ProjectPluginActionButtons project={data} />
               </div>
             : ""}
 
