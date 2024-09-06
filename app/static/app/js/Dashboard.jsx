@@ -3,6 +3,7 @@ import './css/Dashboard.scss';
 import ProjectList from './components/ProjectList';
 import EditProjectDialog from './components/EditProjectDialog';
 import Utils from './classes/Utils';
+import PropTypes from 'prop-types';
 import {
   BrowserRouter as Router,
   Route
@@ -11,9 +12,17 @@ import $ from 'jquery';
 import { _ } from './classes/gettext';
 
 class Dashboard extends React.Component {
-  constructor(){
-    super();
-    
+  static defaultProps = {
+    permissions: ["view"]
+  };
+
+  static propTypes = {
+      permissions: PropTypes.array
+  };
+
+  constructor(props){
+    super(props);
+    this.permissions = props.permissions
     this.handleAddProject = this.handleAddProject.bind(this);
     this.addNewProject = this.addNewProject.bind(this);
   }
@@ -54,19 +63,26 @@ class Dashboard extends React.Component {
                 />;
     };
 
+    const add_projetc_button = (() => {
+      if (this.permissions){
+       return <div className="text-right add-button">
+                <button type="button" 
+                        className="btn btn-primary btn-sm"
+                        onClick={this.handleAddProject}>
+                  <i className="glyphicon glyphicon-plus"></i>
+                  {_("Add Project")}
+                </button>
+              </div>;
+      } else {
+        return null;
+      }
+    });
+
 
     return (
       <Router basename="/dashboard">
         <div>
-          <div className="text-right add-button">
-            <button type="button" 
-                    className="btn btn-primary btn-sm"
-                    onClick={this.handleAddProject}>
-              <i className="glyphicon glyphicon-plus"></i>
-              {_("Add Project")}
-            </button>
-          </div>
-
+          <Route path="/" component={add_projetc_button} />
           <EditProjectDialog 
             saveAction={this.addNewProject}
             ref={(domNode) => { this.projectDialog = domNode; }}
