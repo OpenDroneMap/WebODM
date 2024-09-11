@@ -72,6 +72,27 @@ class MapView extends React.Component {
     this.handleAiTypeButton = this.handleAiTypeButton.bind(this);
   }
 
+  componentDidMount() {
+    this.hideDropdownIfNoAI();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.mapItems !== this.props.mapItems || prevState.aiSelected !== this.state.aiSelected) {
+      this.hideDropdownIfNoAI();
+    }
+  }
+
+  hideDropdownIfNoAI() {
+    const aiItems = this.selectableAI.size;
+
+    if (aiItems === 0) {
+      const aiDropdownButton = document.querySelector('.btn-group');
+      if (aiDropdownButton) {
+        aiDropdownButton.style.display = 'none';
+      }
+    }
+  }
+
   getTilesByMapType(type) {
     // Go through the list of map items and return 
     // only those that match a particular type (in tile format)
