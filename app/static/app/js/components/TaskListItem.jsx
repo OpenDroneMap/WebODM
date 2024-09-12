@@ -417,6 +417,18 @@ class TaskListItem extends React.Component {
     }
   }
 
+  handleToggleSwitch = (event) => {
+    const isChecked = event.target.checked;
+
+    // Dispara o botão "On" se estiver marcado, ou "Off" se desmarcado
+    if (isChecked) {
+      document.getElementById(`console-on-${this.props.data.id}`).click();
+    } else {
+      document.getElementById(`basic-off-${this.props.data.id}`).click();
+    }
+  };
+
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -455,7 +467,7 @@ class TaskListItem extends React.Component {
 
       if (task.status === statusCodes.COMPLETED) {
         if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1) {
-          addActionButton(" " + _("View Map"), "btn-primary", "fa fa-globe", () => {
+          addActionButton(" " + _("Vier Mapa"), "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         } else {
@@ -468,7 +480,7 @@ class TaskListItem extends React.Component {
       }
 
       if (editable || (!task.processing_node)) {
-        addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
+        addActionButton(_("Editar"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
         }, {
           className: "inline"
@@ -477,7 +489,7 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
         (task.processing_node || imported) && this.props.hasPermission("change")) {
-        addActionButton(_("Cancel"), "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
+        addActionButton(_("Cancelar"), "btn-primary", "fa fa-times", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
@@ -496,21 +508,23 @@ class TaskListItem extends React.Component {
       }
 
       if (this.props.hasPermission("delete")) {
-        addActionButton(_("Delete"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
+        addActionButton(_("Excluir"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
           confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
           defaultError: _("Cannot delete task.")
         }));
       }
-
+      
       actionButtons = (<div className="action-buttons">
         {task.status === statusCodes.COMPLETED ?
           <AssetDownloadButtons task={this.state.task} disabled={disabled} />
           : ""}
         {actionButtons.map(button => {
+
+          
           const subItems = button.options.subItems || [];
           const className = button.options.className || "";
 
-          let buttonHtml = (<button type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
+          let buttonHtml = (<button type="button" className={"btn btn-sm " + button.className + " " + button.label} onClick={button.onClick} disabled={disabled}>
             <i className={button.icon}></i>
             {button.label}
           </button>);
@@ -551,49 +565,70 @@ class TaskListItem extends React.Component {
               <table className="table table-condensed info-table">
                 <tbody>
                   <tr>
-                    <td><strong>{_("Created on:")}</strong></td>
+                    <td><strong>{_("Criado em:")}</strong></td>
                     <td>{(new Date(task.created_at)).toLocaleString()}</td>
                   </tr>
-                  <tr>
+                  {/* <tr>
                     <td><strong>{_("Processing Node:")}</strong></td>
                     <td>{task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})</td>
-                  </tr>
-                  {Array.isArray(task.options) &&
+                  </tr> */}
+                  {/* {Array.isArray(task.options) &&
                     <tr>
                       <td><strong>{_("Options:")}</strong></td>
                       <td>{this.optionsToList(task.options)}</td>
-                    </tr>}
-                  {stats && stats.gsd &&
+                    </tr>} */}
+                  {/* {stats && stats.gsd &&
                     <tr>
                       <td><strong>{_("Average GSD:")}</strong></td>
                       <td>{parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm</td>
+                    </tr>} */}
+                    {task.size > 0 &&
+                    <tr>
+                      <td><strong>{_("Uso do Disco:")}</strong></td>
+                      <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
                     </tr>}
                   {stats && stats.area &&
                     <tr>
                       <td><strong>{_("Area:")}</strong></td>
                       <td>{parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;</td>
                     </tr>}
-                  {stats && stats.pointcloud && stats.pointcloud.points &&
+                  {/* {stats && stats.pointcloud && stats.pointcloud.points &&
                     <tr>
                       <td><strong>{_("Reconstructed Points:")}</strong></td>
                       <td>{stats.pointcloud.points.toLocaleString()}</td>
-                    </tr>}
-                  {task.size > 0 &&
-                    <tr>
-                      <td><strong>{_("Disk Usage:")}</strong></td>
-                      <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
-                    </tr>}
+                    </tr>} */}
                   <tr>
-                    <td><strong>{_("Task Output:")}</strong></td>
-                    <td><div className="btn-group btn-toggle">
-                      <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
-                      <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>{_("Off")}</button>
-                    </div></td>
+                    <td><strong>{_("Resultado da Tarefa:")}</strong></td>
+                    <td>
+                      <div className="btn-group btn-toggle switch-toggle" style={{display:'none'}}>
+                        <button id={`console-on-${this.props.data.id}`}
+                                onClick={this.setView("console")} 
+                                className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>
+                                  {_("On")}
+                        </button>
+                        <button id={`basic-off-${this.props.data.id}`}
+                                onClick={this.setView("basic")} 
+                                className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>
+                                  {_("Off")}
+                              </button>
+                      </div>
+
+                      <div className="toggle-switch">
+                        <input 
+                          type="checkbox" 
+                          id={`toggle-switch-${this.props.data.id}`}
+                          checked={this.state.view === "console"} 
+                          onChange={this.handleToggleSwitch} 
+                        />
+                        <label htmlFor={`toggle-switch-${this.props.data.id}`} className="switch"></label>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
 
               {this.state.view === 'console' ?
+            
                 <Console
                   className="floatfix"
                   source={this.consoleOutputUrl}
@@ -712,18 +747,18 @@ class TaskListItem extends React.Component {
 
     if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
       (task.processing_node || imported) && this.props.hasPermission("change")) {
-      addTaskAction(_("Cancel"), "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
+      addTaskAction(_("Cancelar"), "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
     }
 
     // Ability to change options
     if (editable || (!task.processing_node && this.props.hasPermission("change"))) {
-      taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
+      taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Editar")}</a></li>);
     }
 
     if (editable) {
       taskActions.push(
-        <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Move")}</a></li>,
-        <li key="duplicate"><a href="javascript:void(0)" onClick={this.handleDuplicateTask}><i className="fa fa-copy"></i>{_("Duplicate")}</a></li>
+        <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Mover")}</a></li>,
+        <li key="duplicate"><a href="javascript:void(0)" onClick={this.handleDuplicateTask}><i className="fa fa-copy"></i>{_("Duplicar")}</a></li>
       );
     }
 
@@ -733,7 +768,7 @@ class TaskListItem extends React.Component {
         <li key="sep" role="separator" className="divider"></li>,
       );
 
-      addTaskAction(_("Delete"), "fa fa-trash", this.genActionApiCall("remove", {
+      addTaskAction(_("Deletar"), "fa fa-trash", this.genActionApiCall("remove", {
         confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
         defaultError: _("Cannot delete task.")
       }));
@@ -755,7 +790,20 @@ class TaskListItem extends React.Component {
           : ""}
         <div className="row">
           <div className="col-sm-5 col-xs-12 name">
-            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
+            <div onClick={this.toggleExpanded} className="clickable icon">
+              {this.state.expanded ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" stroke="currentColor" strokeWidth="1" className="bi bi-minus-circle" viewBox="0 0 20 20">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                  <path d="M5 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" stroke="currentColor" strokeWidth="1" className="bi bi-plus-circle" viewBox="0 0 20 20">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                </svg>
+              )}
+            </div> 
+            <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
             {userTags.length > 0 ?
               userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
               : ""}
@@ -783,11 +831,11 @@ class TaskListItem extends React.Component {
               <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
               : statusLabel}
           </div>
-          <div className="col-sm-1 text-right hidden-xs">
+          <div className="col-sm-1 text-right hidden-xs options">
             {taskActions.length > 0 ?
               <div className="btn-group">
                 <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i className={"fa " + taskActionsIcon}></i>
+                  <i className={"options-icon fa " + taskActionsIcon}></i>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-right">
                   {taskActions}

@@ -1,7 +1,11 @@
 .task-list-item{
+    background-color: transparent !important;
     .row{
-        margin: 0;
-        padding: 4px;
+        margin-top: 15px;
+        margin-left: 10px;
+        display: flex;
+        align-items: flex-start;
+        
 
         .no-padding{
             padding: 0;
@@ -10,6 +14,60 @@
         &.no-padding{
             padding: 0;
         }
+
+        .name {
+            margin-top: 0;
+            display: flex;
+            
+
+            .clickable.icon {
+                color: #4ca2a1;
+                margin-top: 3.5px;
+            }
+
+            svg {
+                overflow: visible;
+            }
+
+            .name-link {
+                color: #707070;
+            }
+        }
+
+        .details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-family: "Montserrat Medium";
+            margin-top: 0;
+
+
+            i.far {
+                font-size: 18px;
+                color: #4ca2a1;
+            }
+        }
+
+        .options {
+            button {
+                background-color: transparent;
+                border: none;
+            }
+
+            button:hover {
+                opacity: 0.8;
+                background-color: transparent;
+            }
+            button:focus {
+                background-color: transparent;
+            }
+            .options-icon {
+                font-size: 25px;
+            }
+        }
+        
+
     }
 
     .name{
@@ -32,6 +90,21 @@
             }
         }
     }
+
+    .dropdown-menu.dropdown-menu-right {
+        padding: 10px;
+        min-width: 120px;
+        border-radius: 10px;
+        
+
+        li a i {
+            color: #4ca2a1;
+        }
+
+        .divider {
+            background-color: #4ca2a1;
+        }
+    }
     
     .status-label{
         padding: 4px;
@@ -52,20 +125,66 @@
     }
 
     .expanded-panel{
-        padding-top: 4px;
-        padding-bottom: 16px;
-        padding-left: 16px;
-        padding-right: 16px;
+        margin-top: 20px;
+        background-color: #e3e3e3;
+        border-radius: 30px;
+        padding: 5px 50px 10px 50px;
 
         .info-table {
-            tr td:first-child {
-                width: 33%;
-                max-width: 150px;
+            width: 50% !important;
+            margin-bottom: 12px;
+
+            tr {
+                height: 30px;
             }
             td{
                 padding: 0;
+                font-family: "Montserrat SemiBold";
             }
-            margin-bottom: 12px;
+            
+
+            .toggle-switch {
+                position: relative;
+                width: 50px;
+                display: inline-block;
+            }
+
+            .toggle-switch input {
+                display: none;
+            }
+
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+                background-color: #ccc;
+                border-radius: 24px;
+                transition: background-color 0.3s ease-in-out;
+                cursor: pointer;
+            }
+
+
+            .switch:before {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 20px;
+                height: 20px;
+                background-color: white;
+                border-radius: 50%;
+                transition: transform 0.2s ease-in-out;
+            }
+
+            input:checked + .switch {
+                background-color: #4CAF50;
+            }
+
+            input:checked + .switch:before {
+                transform: translateX(26px);
+            }
+
         }
 
         .task-warning{
@@ -87,10 +206,31 @@
         }
 
         .action-buttons{
+            button i.glyphicon {
+                margin: 0;
+            }
+
             button{
                 margin-right: 4px;
                 margin-top: 4px;
+                height: 40px;
+                border-radius: 20px;
+                min-width: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
             }
+
+            button i {
+                font-size: 16px;
+                margin-right: 5px !important;
+            }
+
+            button:hover {
+                opacity: 0.65;
+            }
+
 
             .btn-group{
                 button:first-child{
@@ -105,6 +245,21 @@
             .asset-download-buttons{
                 margin-right: 4px;
             }
+
+
+            .btn.Cancelar {
+                background-color: #afafaf;
+                color: white;
+                border: none;
+                
+            }
+
+            .btn.Excluir {
+                background-color: #d80101;
+                color: white;
+                border: none;
+            }
+
         }
     }
 
