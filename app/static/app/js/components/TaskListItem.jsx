@@ -417,16 +417,6 @@ class TaskListItem extends React.Component {
     }
   }
 
-  handleToggleSwitch = (event) => {
-    const isChecked = event.target.checked;
-
-    // Dispara o botão "On" se estiver marcado, ou "Off" se desmarcado
-    if (isChecked) {
-      document.getElementById(`console-on-${this.props.data.id}`).click();
-    } else {
-      document.getElementById(`basic-off-${this.props.data.id}`).click();
-    }
-  };
 
 
   render() {
@@ -600,25 +590,23 @@ class TaskListItem extends React.Component {
                   <tr>
                     <td><strong>{_("Resultado da Tarefa:")}</strong></td>
                     <td>
-                      <div className="btn-group btn-toggle switch-toggle" style={{display:'none'}}>
-                        <button id={`console-on-${this.props.data.id}`}
-                                onClick={this.setView("console")} 
+                      {/* <div className="btn-group btn-toggle switch-toggle">
+                        <button onClick={this.setView("console")} 
                                 className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>
                                   {_("On")}
                         </button>
-                        <button id={`basic-off-${this.props.data.id}`}
-                                onClick={this.setView("basic")} 
+                        <button onClick={this.setView("basic")} 
                                 className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>
                                   {_("Off")}
                               </button>
-                      </div>
+                      </div> */}
 
                       <div className="toggle-switch">
                         <input 
                           type="checkbox" 
                           id={`toggle-switch-${this.props.data.id}`}
                           checked={this.state.view === "console"} 
-                          onChange={this.handleToggleSwitch} 
+                          onChange={() => this.setState({ view: this.state.view === "console" ? "basic" : "console" })}
                         />
                         <label htmlFor={`toggle-switch-${this.props.data.id}`} className="switch"></label>
                       </div>
