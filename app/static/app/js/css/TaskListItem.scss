@@ -5,6 +5,33 @@
         margin-left: 10px;
         display: flex;
         align-items: flex-start;
+
+
+        @media (min-width: 768px) {
+            .col-sm-5 {
+                width: 32.66666667%;
+            }
+
+            .col-sm-1 {
+                width: 8.33333333%;
+            }
+
+            .col-sm-2 {
+                width: 12.66666667%;
+            }
+
+            .col-xs-2 {
+                width: 16.66666667%;
+            }
+
+            .col-sm-3 {
+                width: 40%;
+            }
+
+            .col-sm-1 {
+                width: 8.33333333%;
+            }
+        }
         
 
         .no-padding{
@@ -206,13 +233,14 @@
         }
 
         .action-buttons{
+            
+
             button i.glyphicon {
                 margin: 0;
             }
 
             button{
                 margin-right: 4px;
-                margin-top: 4px;
                 height: 40px;
                 border-radius: 20px;
                 min-width: 100px;
@@ -258,6 +286,24 @@
                 background-color: #d80101;
                 color: white;
                 border: none;
+            }
+
+            .withdrop-container {
+                
+                margin-bottom: 3px;
+                
+
+                .btn-drop-label {
+                    min-width: 80px !important;
+
+                }
+
+                .dropdown-toggle {
+                    min-width: 20px !important;
+                    border-bottom-left-radius: 0px !important;
+                    border-top-left-radius: 0px !important;
+                }
+
             }
 
         }
