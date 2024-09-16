@@ -8,20 +8,24 @@
 
 
         @media (min-width: 768px) {
+            .col-sm-5, .col-sm-1, .col-sm-2, .col-xs-2, .col-sm-3 {
+                padding: 0;
+                margin-right: 20px;
+            }
             .col-sm-5 {
-                width: 32.66666667%;
+                width: 30%;
             }
 
             .col-sm-1 {
-                width: 8.33333333%;
+                width: 10%;
             }
 
             .col-sm-2 {
-                width: 12.66666667%;
+                width: 15%;
             }
 
             .col-xs-2 {
-                width: 16.66666667%;
+                width: 0%;
             }
 
             .col-sm-3 {
@@ -29,7 +33,7 @@
             }
 
             .col-sm-1 {
-                width: 8.33333333%;
+                width: 5%;
             }
         }
         
@@ -234,6 +238,7 @@
 
         .action-buttons{
             
+            height: 40px;
 
             button i.glyphicon {
                 margin: 0;
@@ -241,7 +246,7 @@
 
             button{
                 margin-right: 4px;
-                height: 40px;
+                height: 40px !important;
                 border-radius: 20px;
                 min-width: 100px;
                 display: flex;
@@ -270,10 +275,6 @@
                 margin-right: 0px;
             }
 
-            .asset-download-buttons{
-                margin-right: 4px;
-            }
-
 
             .btn.Cancelar {
                 background-color: #afafaf;
@@ -288,22 +289,20 @@
                 border: none;
             }
 
+            .btn.View.Model {
+                display: none;
+            }
+
+
+            .dropdown-toggle {
+                border-top-left-radius: 0px;
+                border-bottom-left-radius: 0px;
+                min-width: 30px;
+
+
+            }
             .withdrop-container {
-                
                 margin-bottom: 3px;
-                
-
-                .btn-drop-label {
-                    min-width: 80px !important;
-
-                }
-
-                .dropdown-toggle {
-                    min-width: 20px !important;
-                    border-bottom-left-radius: 0px !important;
-                    border-top-left-radius: 0px !important;
-                }
-
             }
 
         }

@@ -686,14 +686,48 @@ class TaskListItem extends React.Component {
     // }
 
     const getStatusLabel = (text, type = 'neutral', progress = 100) => {
-      let color = 'rgba(255, 255, 255, 0.0)';
-      if (type === 'done') color = this.backgroundSuccessColor;
-      else if (type === 'error') color = this.backgroundFailedColor;
-      return (<div
-        className={"status-label theme-border-primary " + type}
-        style={{ background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)`, borderRadius: "100px", padding: "2px", display: "flex", justifyContent: "center", alignItems: "center" }}
-        title={text}><i className={statusIcon}></i> {progress.toFixed(1)}%</div>);
-    }
+      const percentage = progress.toFixed(1);
+      const active = type === 'done' ? 'active' : '';
+
+          // Define a largura mínima para a barra
+      const minWidth = 20; // 20% como exemplo
+
+      // Calcula a largura da barra com base no progresso e na largura mínima
+      const barWidth = Math.max(progress, minWidth);
+      
+      return (
+        <div className="upload-progress-bar">
+          <div className="progress" style={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+            height: "40px",
+            borderRadius: "80px", 
+            backgroundColor: "#E3E3E3",
+            padding: "5px",
+            
+          }}>
+            <div className={`progress-bar progress-bar-striped ${active}`} style={{
+              width: `${barWidth}%`,
+              backgroundImage: type === 'done'
+                ? "linear-gradient(to bottom, #17A398, #269F64, #2C9D4F)"
+                : "linear-gradient(to bottom, #FF4E4E, #D93636, #B32A2A)",
+              borderRadius: "80px", 
+              display: "flex",
+              gap: "8px",
+              justifyContent: "center",
+              alignItems: "center",
+              whiteSpace: "nowrap", // Impede quebra de linha
+              overflow: "hidden", // Esconde o excesso de texto, se necessário
+              textOverflow: "ellipsis",
+            }}>
+              <i className={statusIcon}></i> {progress < 100 ? `${percentage}%` : `${text}`}
+              
+            </div>
+          </div>
+        </div>
+      );
+    };
 
     let statusLabel = "";
     let showEditLink = false;
