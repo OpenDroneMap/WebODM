@@ -171,10 +171,12 @@ class Map extends React.Component {
         }else if (type == "dsm" || type == "dtm"){
           metaUrl += "?hillshade=6&color_map=viridis";
           unitForward = value => {
-            return unitSystem().length(value, { fixedUnit: true }).value;
+            return unitSystem().elevation(value).value;
           };
           unitBackward = value => {
-            return toMetric(value).value;
+            let unitValue = unitSystem().elevation(0);
+            unitValue.value = value;
+            return toMetric(unitValue).value;
           };
         }
 
