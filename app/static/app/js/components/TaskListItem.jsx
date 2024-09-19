@@ -464,18 +464,11 @@ class TaskListItem extends React.Component {
           showOrthophotoMissingWarning = task.available_assets.indexOf("orthophoto.tif") === -1;
         }
 
-        addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
-          location.href = `/3d/project/${task.project}/task/${task.id}/`;
-        });
+        // addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
+        //   location.href = `/3d/project/${task.project}/task/${task.id}/`;
+        // });
       }
 
-      if (editable || (!task.processing_node)) {
-        addActionButton(_("Editar"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
-          this.startEditing();
-        }, {
-          className: "inline"
-        });
-      }
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
         (task.processing_node || imported) && this.props.hasPermission("change")) {
@@ -502,6 +495,14 @@ class TaskListItem extends React.Component {
           confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
           defaultError: _("Cannot delete task.")
         }));
+      }
+
+      if (editable || (!task.processing_node)) {
+        addActionButton(_("Editar"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
+          this.startEditing();
+        }, {
+          className: "inline"
+        });
       }
       
       actionButtons = (<div className="action-buttons">
@@ -689,11 +690,39 @@ class TaskListItem extends React.Component {
       const percentage = progress.toFixed(1);
       const active = type === 'done' ? 'active' : '';
 
-          // Define a largura mínima para a barra
-      const minWidth = 20; // 20% como exemplo
+      const minWidth = 20; // 20% 
 
-      // Calcula a largura da barra com base no progresso e na largura mínima
-      const barWidth = Math.max(progress, minWidth);
+      let barWidth = Math.max(progress, minWidth);
+
+      if(text === "Importing...") {
+        barWidth = 100;
+        text = "Fazendo Upload...";
+      }
+
+      if(text == "Deleting...") {
+        barWidth = 100;
+        type = " ";
+        text = "Deletando...";
+      }
+
+      if(text == "Canceling...") {
+        barWidth = 100;
+        type = " ";
+        text = "Cancelando...";
+      }
+
+      if(text == "Canceled") {
+        text = "Cancelado";
+      }
+
+      if(text == "Completed") {
+        text = "Completo";
+      }
+
+      if(text == "Cannot process dataset") {
+        text = "Erro ao processar os dados"
+      }
+
       
       return (
         <div className="upload-progress-bar">
@@ -701,7 +730,7 @@ class TaskListItem extends React.Component {
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
-            height: "40px",
+            height: "30px",
             borderRadius: "80px", 
             backgroundColor: "#E3E3E3",
             padding: "5px",
@@ -717,11 +746,12 @@ class TaskListItem extends React.Component {
               gap: "8px",
               justifyContent: "center",
               alignItems: "center",
-              whiteSpace: "nowrap", // Impede quebra de linha
-              overflow: "hidden", // Esconde o excesso de texto, se necessário
+              whiteSpace: "nowrap", 
+              overflow: "hidden", 
               textOverflow: "ellipsis",
+              fontSize:"12px"
             }}>
-              <i className={statusIcon}></i> {progress < 100 ? `${percentage}%` : `${text}`}
+              <i className={statusIcon}></i> {barWidth < 100 ? `${percentage}%` : `${text}`}
               
             </div>
           </div>
@@ -830,23 +860,25 @@ class TaskListItem extends React.Component {
               userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
               : ""}
           </div>
-          <div className="col-sm-1 col-xs-5 details">
-            <i className="far fa-image"></i> {task.images_count}
-          </div>
-          <div className="col-sm-2 col-xs-5 details">
-            <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
-          </div>
-          <div className="col-xs-2 text-right visible-xs-block">
-            {taskActions.length > 0 ?
-              <div className="btn-group">
-                <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i className={"fa " + taskActionsIcon}></i>
-                </button>
-                <ul className="dropdown-menu dropdown-menu-right">
-                  {taskActions}
-                </ul>
-              </div>
-              : ""}
+          <div className='col'>
+            <div className="col-sm-1 col-xs-5 details">
+              <i className="far fa-image"></i> {task.images_count}
+            </div>
+            <div className="col-sm-2 col-xs-5 details">
+              <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
+            </div>
+            <div className="col-xs-2 text-right visible-xs-block">
+              {taskActions.length > 0 ?
+                <div className="btn-group">
+                  <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i className={"fa " + taskActionsIcon}></i>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-right">
+                    {taskActions}
+                  </ul>
+                </div>
+                : ""}
+            </div>
           </div>
           <div className="col-sm-3 col-xs-12">
             {showEditLink ?

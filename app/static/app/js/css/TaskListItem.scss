@@ -1,45 +1,141 @@
 .task-list-item{
     background-color: transparent !important;
-    .row{
-        margin-top: 15px;
-        margin-left: 10px;
-        display: flex;
-        align-items: flex-start;
+
+    @media (max-width: 768px) {
+        .row {
+            justify-content: flex-start !important;
+        }
+
+        .expanded-panel {
+            margin-left: 22px !important;
+            margin-right: 20px !important; 
+        }
+
+        .expanded-panel .info-table { 
+            width: 99% !important; 
+        }
+    }
+
+    .row{ 
+        margin-top: 15px; 
+        margin-left: 10px; 
+        display: flex; 
+        align-items: flex-start; 
+        flex-wrap: wrap; 
+        justify-content: space-between;
 
 
-        @media (min-width: 768px) {
+        @media (min-width: 1100px) and (max-width: 1234px) {
+            .col-sm-5 {
+                width: 25% !important;
+            }
+        }
+
+
+        @media (min-width: 1100px) { 
+            .col-sm-5, .col-sm-1, .col-sm-2, .col-xs-2, .col-sm-3 { 
+                padding: 0; 
+                margin-right: 20px; 
+            }
+            .col-sm-5 { 
+                width: 30%; 
+            }
+            .col { 
+                width: 22%; 
+                display: flex; 
+                justify-content: space-between; 
+            } 
+
+            .col-sm-1 { 
+                width: 20%; 
+            }
+
+            .col-sm-2 { 
+                width: 75%; 
+            }
+
+            .col-xs-2 { 
+                width: 0%; 
+            }
+
+            .col-sm-3 { 
+                width: 35%; 
+            }
+
+            .col-sm-1.hidden-xs { 
+                width: 6%; 
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            
+            .col-xs-2.text-right.visible-xs-block .btn-group, 
+            .col-xs-2.text-right.visible-xs-block .btn-group .btn.task-actions {
+                background-color: transparent !important;
+                border: none;
+            }
+
+            .col {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+
+        }
+
+        @media (min-width: 768px) and (max-width: 1100px) {
             .col-sm-5, .col-sm-1, .col-sm-2, .col-xs-2, .col-sm-3 {
                 padding: 0;
-                margin-right: 20px;
+                margin: 0;
+            }
+            .col {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
             }
             .col-sm-5 {
-                width: 30%;
+                width: 100% 
             }
-
+        
             .col-sm-1 {
-                width: 10%;
+                width: 100px; 
             }
-
+        
             .col-sm-2 {
-                width: 15%;
+                width: 100px;
+                justify-content: center;
             }
-
+        
             .col-xs-2 {
-                width: 0%;
+                width: 100px;
             }
 
+        
             .col-sm-3 {
-                width: 40%;
+                width: 100%; 
             }
 
-            .col-sm-1 {
-                width: 5%;
+            .hidden-xs {
+                display: none !important;
             }
+
+            .visible-xs-block {
+                display: flex !important;
+                justify-content: flex-end;
+                
+            }
+        }
+
+        .visible-xs-block .btn.task-actions {
+            background-color: transparent !important;
+            border: none;
         }
         
 
         .no-padding{
             padding: 0;
+            overflow: hidden;
         }
 
         &.no-padding{
@@ -52,7 +148,7 @@
             
 
             .clickable.icon {
-                color: #4ca2a1;
+                color: #64c0be;
                 margin-top: 3.5px;
             }
 
@@ -62,25 +158,30 @@
 
             .name-link {
                 color: #707070;
+                font-size: 14px;
             }
         }
 
         .details {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 18px;
+            gap: 5px;
+            font-size: 15px;
             font-family: "Montserrat Medium";
             margin-top: 0;
+            white-space: nowrap;
 
 
             i.far {
-                font-size: 18px;
-                color: #4ca2a1;
+                font-size: 15px;
+                color: #64c0be;
             }
         }
 
         .options {
+            display: flex;
+            justify-content: flex-end;
+            margin-right: 0px;
             button {
                 background-color: transparent;
                 border: none;
@@ -94,11 +195,14 @@
                 background-color: transparent;
             }
             .options-icon {
-                font-size: 25px;
+                font-size: 18px;
             }
         }
-        
+    }
 
+
+    .row.clearfix {
+        justify-content: flex-start;
     }
 
     .name{
@@ -129,11 +233,11 @@
         
 
         li a i {
-            color: #4ca2a1;
+            color: #64c0be;
         }
 
         .divider {
-            background-color: #4ca2a1;
+            background-color: #64c0be;
         }
     }
     
@@ -157,12 +261,18 @@
 
     .expanded-panel{
         margin-top: 20px;
+        margin-left: 9px;
         background-color: #e3e3e3;
         border-radius: 30px;
         padding: 5px 50px 10px 50px;
+        display: flex;
+        flex-direction: column;
+        min-height: auto !important;
+        
+
 
         .info-table {
-            width: 50% !important;
+            width: 50% ;
             margin-bottom: 12px;
 
             tr {
@@ -237,15 +347,15 @@
         }
 
         .action-buttons{
-            
-            height: 40px;
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
 
             button i.glyphicon {
                 margin: 0;
             }
 
             button{
-                margin-right: 4px;
                 height: 40px !important;
                 border-radius: 20px;
                 min-width: 100px;
@@ -299,12 +409,7 @@
                 border-bottom-left-radius: 0px;
                 min-width: 30px;
 
-
             }
-            .withdrop-container {
-                margin-bottom: 3px;
-            }
-
         }
     }
 
