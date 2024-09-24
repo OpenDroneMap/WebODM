@@ -101,6 +101,7 @@ class FieldLayerControlPopup extends React.Component {
   render() {
     return (
     <div className='field-layer'>
+      <h1>{names[this.selectedIndex] + ` - Layer ${this.selectedIndex}` || `Layer ${this.selectedIndex}`}</h1>
       <fieldset>
         <legend>Tipo de cultivo:</legend>
         {
@@ -136,3 +137,26 @@ export default function createFieldLayerControlPopup(aiTypes, boundLayer, stateS
   ReactDOM.render(<FieldLayerControlPopup aiTypes={aiTypes} boundLayer={boundLayer} stateSelectedLayers={stateSelectedLayers}/>, container);
   return container;
 }
+
+
+const names = [
+  "Ana", "Beatriz", "Carlos", "Daniela", "Eduardo",
+  "Fernanda", "Gabriel", "Helena", "Igor", "Juliana",
+  "Kleber", "Luana", "Marcos", "Natalia", "Otávio",
+  "Priscila", "Roberto", "Samantha", "Thiago", "Vanessa",
+  "Wesley", "Yasmin", "Zé", "Amanda", "Bruno",
+  "Camila", "Diego", "Eliane", "Flávio", "Gustavo",
+  "Heloísa", "Isabela", "João", "Karine", "Leonardo",
+  "Maria", "Nicolas", "Olga", "Pedro", "Queila",
+  "Raul", "Sabrina", "Tiago", "Vânia", "William",
+  "Zilda", "André", "Barbara", "Célia", "David",
+  "Emanuelle", "Felipe", "Giovana", "Henrique", "Irene",
+  "Júlio", "Larissa", "Marcelo", "Nayara", "Olavo",
+  "Paula", "Ricardo", "Silvia", "Tânia", "Vinícius",
+  "Wagner", "Yara", "Zeca", "Adriana", "Bernardo",
+  "Cristiane", "Douglas", "Elena", "Flávia", "Gisele",
+  "Hugo", "Jéssica", "Lucas", "Márcia", "Nando",
+  "Patrícia", "Rafael", "Silvia", "Tatiane", "Valter",
+  "Wellington", "Zuleica", "Aline", "Bruna", "César",
+  "Daniel", "Evelyn", "Fábio", "Gisele", "Helena"
+];

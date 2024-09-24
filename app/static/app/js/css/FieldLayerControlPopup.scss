@@ -1,4 +1,11 @@
 .field-layer {
+
+  h1 {
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: bolder;
+    line-height: inherit;
+  }
   .leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control {
     z-index: 999;
     
@@ -8,8 +15,9 @@
       background-position-y: -8px;
     }
   
-    div.layers-control-panel{ display: none; }
-    
+    div.layers-control-panel{ 
+      display: none; 
+    }
     .open{
       a.leaflet-control-layers-control-button{
         display: none;
