@@ -689,7 +689,7 @@ class EditTaskForm extends React.Component {
         {this.props.currentStep === "settingsStep" && <div>{taskOptions}</div>}
 
         {/* Ai Panel */}
-        {this.props.currentStep === "aiStep" && <div>
+        {/* {this.props.currentStep === "aiStep" && <div>
           <div className='edit-task-form'>
             <div className="form-group">
               <label className="col-sm-2 control-label ai-label">{_("Detecção de Daninhas e Obstáculos com IA:")}</label>
@@ -711,7 +711,7 @@ class EditTaskForm extends React.Component {
               </select>
             </div>
           </div >
-        </div>}
+        </div>} */}
 
         {/* Popup Config */}
         {this.state.isPopupOpen &&

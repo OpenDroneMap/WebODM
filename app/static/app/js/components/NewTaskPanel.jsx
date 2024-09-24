@@ -56,40 +56,32 @@ class NewTaskPanel extends React.Component {
   }
 
   save(e) {
-    if (!this.state.inReview) {
-      this.setState({ inReview: true });
+    this.setState({ inReview: false, loading: true });
+    e.preventDefault();
+    this.taskForm.saveLastPresetToStorage();
+    Storage.setItem('resize_size', this.state.resizeSize);
+    Storage.setItem('resize_mode', this.state.resizeMode);
+
+    const taskInfo = this.getTaskInfo();
+    if (taskInfo.selectedNode.key != "auto") {
+      Storage.setItem('last_processing_node', taskInfo.selectedNode.id);
     } else {
-      this.setState({ inReview: false, loading: true });
-      e.preventDefault();
-      this.taskForm.saveLastPresetToStorage();
-      Storage.setItem('resize_size', this.state.resizeSize);
-      Storage.setItem('resize_mode', this.state.resizeMode);
-
-      const taskInfo = this.getTaskInfo();
-      if (taskInfo.selectedNode.key != "auto") {
-        Storage.setItem('last_processing_node', taskInfo.selectedNode.id);
-      } else {
-        Storage.setItem('last_processing_node', '');
-      }
-
-      if (this.props.onSave) this.props.onSave(taskInfo);
+      Storage.setItem('last_processing_node', '');
     }
 
-    this.setState({ currentStep: "aiStep" });
+    if (this.props.onSave) this.props.onSave(taskInfo);
   }
+
 
   cancel = (e) => {
-    if (this.state.inReview) {
-      this.setState({ inReview: false });
-    } else {
-      if (this.props.onCancel) {
-        if (window.confirm(_("Are you sure you want to cancel?"))) {
-          this.props.onCancel();
-        }
+    if (this.props.onCancel) {
+      if (window.confirm(_("Are you sure you want to cancel?"))) {
+        this.props.onCancel();
       }
     }
-    this.setState({ currentStep: "settingsStep" });
   }
+  
+
 
   getTaskInfo() {
     return Object.assign(this.taskForm.getTaskInfo(), {
@@ -189,29 +181,14 @@ class NewTaskPanel extends React.Component {
 
           {this.state.editTaskFormLoaded ?
             <div className="form-group">
-              {/* SETTINGS STEP BUTTON CANCEL | NEXT */}
-              {this.state.currentStep === "settingsStep" &&
                 <div className="col-sm-offset-2 col-sm-10 text-right">
                   {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{_("Cancel")}</button>}
                   {this.state.loading ?
                     <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
                     :
-                    <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{_("Próximo")}</button>
+                    <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{_("Start Processing")}</button>
                   }
                 </div>
-              }
-
-              {/* AI STEP BUTTON CANCEL | NEXT */}
-              {this.state.currentStep === "aiStep" &&
-                <div className="col-sm-offset-2 col-sm-10 text-right">
-                  {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{_("Cancel")}</button>}
-                  {this.state.loading ?
-                    <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
-                    :
-                    <button type="submit" className="btn btn-confirm" style={{ backgroundColor: "#529A4C" }} onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{_("Start Processing")}</button>
-                  }
-                </div>
-              }
             </div>
             : ""}
         </div>
@@ -219,5 +196,6 @@ class NewTaskPanel extends React.Component {
     );
   }
 }
+
 
 export default NewTaskPanel;
