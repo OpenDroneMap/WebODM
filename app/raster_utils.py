@@ -72,12 +72,14 @@ def export_raster(input, output, **opts):
         elif export_format == "gtiff-rgb":
             compress = "JPEG"
             profile.update(jpeg_quality=90)
+            profile.update(BIGTIFF='IF_SAFER')
             band_count = 4
             rgb = True
         else:
             compress = "DEFLATE"
+            profile.update(BIGTIFF='IF_SAFER')
             band_count = src.count
-        
+
         if compress is not None:
             profile.update(compress=compress)
             profile.update(predictor=2 if compress == "DEFLATE" else 1)
@@ -163,7 +165,8 @@ def export_raster(input, output, **opts):
                         src_crs=src.crs,
                         dst_transform=transform,
                         dst_crs=dst_crs,
-                        resampling=Resampling.nearest)
+                        resampling=Resampling.nearest,
+                        num_threads=4)
 
         else:
             # No reprojection needed
