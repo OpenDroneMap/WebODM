@@ -51,3 +51,14 @@ class Console:
                     f.write(text)
             except IOError:
                 logger.warn("Cannot reset console file: %s" % self.file)
+
+    def delink(self):
+        try:
+            if os.path.isfile(self.file) and os.stat(self.file).st_nlink > 1:
+                with open(self.file, "r", encoding="utf-8") as f:
+                    text = f.read()
+                os.unlink(self.file)
+                with open(self.file, "w", encoding="utf-8") as f:
+                    f.write(text)
+        except OSError:
+            logger.warn("Cannot delink console file: %s" % self.file)
