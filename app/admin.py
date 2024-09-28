@@ -268,8 +268,18 @@ class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
 
+    # Hide "quota" profile field when adding (show during editing)
+    def get_fields(self, request, obj=None):
+        if obj is None:
+            fields = list(super().get_fields(request, obj))
+            fields.remove('quota')
+            return fields
+        else:
+            return super().get_fields(request, obj)
+
 class UserAdmin(BaseUserAdmin):
     inlines = [ProfileInline]
+
 
 # Re-register UserAdmin
 admin.site.unregister(User)
