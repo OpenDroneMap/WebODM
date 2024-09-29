@@ -1,6 +1,6 @@
 <img alt="WebODM" src="https://user-images.githubusercontent.com/1951843/34074943-8f057c3c-e287-11e7-924d-3ccafa60c43a.png" width="180">
 
-![Build Status](https://img.shields.io/github/actions/workflow/status/OpenDroneMap/WebODM/build-and-publish.yml?branch=master) ![Version](https://img.shields.io/github/v/release/OpenDroneMap/WebODM) [![Translated](https://hosted.weblate.org/widgets/webodm/-/svg-badge.svg)](https://hosted.weblate.org/engage/webodm/)
+![Build Status](https://img.shields.io/github/actions/workflow/status/OpenDroneMap/WebODM/build-and-publish.yml?branch=master) ![Version](https://img.shields.io/github/v/release/OpenDroneMap/WebODM) [![Translated](https://hosted.weblate.org/widgets/webodm/-/svg-badge.svg)](https://hosted.weblate.org/engage/webodm/) [![Download](https://img.shields.io/badge/Download-%E2%86%93-pink)](#manual-installation-docker) [![Purchase](https://img.shields.io/badge/Purchase-%F0%9F%9B%92-white)](https://opendronemap.org/webodm/download/)
 
 A user-friendly, commercial grade software for drone image processing. Generate georeferenced maps, point clouds, elevation models and textured 3D models from aerial images. It supports multiple engines for processing, currently [ODM](https://github.com/OpenDroneMap/ODM) and [MicMac](https://github.com/OpenDroneMap/NodeMICMAC/).
 
