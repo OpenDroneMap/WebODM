@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './css/Dashboard.scss';
 import ProjectList from './components/ProjectList';
 import EditProjectDialog from './components/EditProjectDialog';
@@ -11,9 +12,16 @@ import $ from 'jquery';
 import { _ } from './classes/gettext';
 
 class Dashboard extends React.Component {
-  constructor(){
-    super();
-    
+  static defaultProps = {
+    permissions: []
+  };
+  static propTypes = {
+    permissions: PropTypes.array.isRequired,
+  };
+
+  constructor(props){
+    super(props);
+
     this.handleAddProject = this.handleAddProject.bind(this);
     this.addNewProject = this.addNewProject.bind(this);
   }
@@ -58,14 +66,15 @@ class Dashboard extends React.Component {
     return (
       <Router basename="/dashboard">
         <div>
+          {this.props.permissions.indexOf("add_project") !== -1 ? 
           <div className="text-right add-button">
-            <button type="button" 
+             <button type="button" 
                     className="btn btn-primary btn-sm"
                     onClick={this.handleAddProject}>
               <i className="glyphicon glyphicon-plus"></i>
               {_("Add Project")}
             </button>
-          </div>
+          </div> : ""}
 
           <EditProjectDialog 
             saveAction={this.addNewProject}
@@ -80,9 +89,10 @@ class Dashboard extends React.Component {
 
 $(function(){
     $("[data-dashboard]").each(function(){
-        window.ReactDOM.render(<Dashboard/>, $(this).get(0));
+        let props = $(this).data();
+        delete(props.dashboard);
+        window.ReactDOM.render(<Dashboard {...props}/>, $(this).get(0));
     });
-
 
     // Warn users if there's any sort of work in progress before
     // they press the back button on the browser
