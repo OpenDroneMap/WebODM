@@ -4,7 +4,7 @@ import Dashboard from '../Dashboard';
 
 describe('<Dashboard />', () => {
   it('renders without exploding', () => {
-    const wrapper = shallow(<Dashboard />);
+    const wrapper = shallow(<Dashboard permissions={['add_project']} />);
     expect(wrapper.exists()).toBe(true);
   })
 });

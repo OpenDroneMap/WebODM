@@ -43,7 +43,11 @@
 			</p>
 		{% endif %}
 		
-		<div id="dashboard-app" data-dashboard></div>
+		<div id="dashboard-app" data-dashboard
+			{% for key, value in params %}
+				data-{{key}}="{{value}}"
+			{% endfor %}
+		></div>
 
 	{% endif %}
 {% endblock %}

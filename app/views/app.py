@@ -41,13 +41,20 @@ def dashboard(request):
     no_tasks = Task.objects.filter(project__owner=request.user).count() == 0
     no_projects = Project.objects.filter(owner=request.user).count() == 0
 
+    permissions = []
+    if request.user.has_perm('app.add_project'):
+        permissions.append('add_project')
+    
     # Create first project automatically
-    if no_projects and request.user.has_perm('app.add_project'):
+    if no_projects and 'add_project' in permissions:
         Project.objects.create(owner=request.user, name=_("First Project"))
 
     return render(request, 'app/dashboard.html', {'title': _('Dashboard'),
         'no_processingnodes': no_processingnodes,
-        'no_tasks': no_tasks
+        'no_tasks': no_tasks,
+        'params': {
+            'permissions': json.dumps(permissions)
+        }.items()
     })
 
 
