@@ -135,7 +135,7 @@ export default class OverviewControlPanel extends React.Component {
                                     {names[index] + ` - Layer ${index}` || `Layer ${index}`}
                                 </a>
                                 <ul className={`list-layer-items ${!this.state.collapsedLayers[index] ? 'collapsed' : ''}`} onClick={this.handlePopUp}>
-                                    <li>
+                                    {/* <li>
                                         Coordenadas:
                                         <ul>
                                             <li>
@@ -153,7 +153,7 @@ export default class OverviewControlPanel extends React.Component {
                                                 </ul>
                                             </li>
                                         </ul>
-                                    </li>
+                                    </li> */}
                                     <li>Tipo de colheita: {translate(layer.cropType, 'cropType')}</li>
                                     <li>Opções de IA: {Array.from(layer.aiOptions).map(option => translate(option, 'aiOptions')).join(', ')}</li>
                                 </ul>
