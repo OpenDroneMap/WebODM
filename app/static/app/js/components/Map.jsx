@@ -23,6 +23,7 @@ import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
+import OverviewControl from './OverviewControl';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
@@ -51,7 +52,7 @@ class Map extends React.Component {
 
   constructor(props) {
     super(props);
-    
+
     this.state = {
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
@@ -92,11 +93,12 @@ class Map extends React.Component {
       this.setState(update(this.state, 
         {selectedLayers: {$push: [el]}}
       ));
+    } else {
+      // Atualiza o elemento no índice idx
+      this.setState(update(this.state, 
+        {selectedLayers: {[idx]: {$set: el}}}
+      ));
     }
-
-    this.setState(update(this.state, 
-      {selectedLayers: {idx: {$set: el}}}
-    ));
   }
 
   getSelectedLayers() {
@@ -135,8 +137,8 @@ class Map extends React.Component {
         this.map.removeLayer(layer);
         delete this.state.overlays[idx];
       }
-      if (layer[Symbol.for("meta")["name"]] != null && layer[Symbol.for("meta")]["name"] == "field") {
-        this.selectedLayers = [];
+      if (layer[Symbol.for("meta")]["name"] != null && layer[Symbol.for("meta")]["name"] == "field") {
+        this.state.selectedLayers = [];
       }
     });
   }
@@ -238,7 +240,22 @@ class Map extends React.Component {
                 const params = Utils.queryParams({search: tileUrl.slice(tileUrl.indexOf("?"))});
                 if (statistics["1"]){
                     // Add rescale
-                    params["rescale"] = encodeURIComponent(`${statistics["1"]["min"]},${statistics["1"]["max"]}`);              
+                    let min = Infinity;
+                    let max = -Infinity;
+                    if (type === 'plant'){
+                      // percentile
+                      for (let b in statistics){
+                        min = Math.min(statistics[b]["percentiles"][0]);
+                        max = Math.max(statistics[b]["percentiles"][1]);
+                      }
+                    }else{
+                      // min/max
+                      for (let b in statistics){
+                        min = Math.min(statistics[b]["min"]);
+                        max = Math.max(statistics[b]["max"]);
+                      }
+                    }
+                    params["rescale"] = encodeURIComponent(`${min},${max}`);              
                 }else{
                     console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
                     params["rescale"] = encodeURIComponent("-1,1");
@@ -485,11 +502,11 @@ class Map extends React.Component {
         const defaultCustomBm = window.localStorage.getItem('lastCustomBasemap') || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
       
         let url = window.prompt([_('Enter a tile URL template. Valid coordinates are:'),
-_('{z}, {x}, {y} for Z/X/Y tile scheme'),
-_('{-y} for flipped TMS-style Y coordinates'),
-'',
-_('Example:'),
-'https://tile.openstreetmap.org/{z}/{x}/{y}.png'].join("\n"), defaultCustomBm);
+          _('{z}, {x}, {y} for Z/X/Y tile scheme'),
+          _('{-y} for flipped TMS-style Y coordinates'),
+          '',
+          _('Example:'),
+          'https://tile.openstreetmap.org/{z}/{x}/{y}.png'].join("\n"), defaultCustomBm);
         
         if (url){
           customLayer.clearLayers();
@@ -511,6 +528,7 @@ _('Example:'),
         layers: this.state.imageryLayers,
         overlays: this.state.overlays
     }).addTo(this.map);
+
 
     this.autolayers = Leaflet.control.autolayers({
       overlays: {},
@@ -644,6 +662,14 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
+
+    this.overviewControl = new OverviewControl({
+      tiles: tiles,
+      selectedLayers: this.state.selectedLayers,
+      overlays: this.state.overlays,
+      loadGeoJsonDetections: this.loadGeoJsonDetections,
+      removeGeoJsonDetections: this.removeGeoJsonDetections,
+    }).addTo(this.map);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -666,6 +692,14 @@ _('Example:'),
               this.state.selectedLayers.length == 0) &&
               prevState.selectedLayers !== this.state.selectedLayers) {
       this.selectionOverviewControl.update(this.state.selectedLayers);
+    }
+
+    if (this.overviewControl && prevState.selectedLayers !== this.state.selectedLayers) {
+      this.overviewControl.updateSelectedLayers(this.state.selectedLayers, this.state.overlays);
+    }
+
+    if (this.overviewControl && prevState.overlays !== this.state.overlays) {
+      this.overviewControl.updateOverlays(this.state.overlays, this.state.selectedLayers);
     }
 
     if (this.props.tiles != null){
@@ -691,6 +725,7 @@ _('Example:'),
       this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
       this.tileJsonRequests = [];
     }
+
   }
 
   handleMapMouseDown(e)  {
@@ -724,6 +759,7 @@ _('Example:'),
               ref={(ref) => { this.shareButton = ref; }}
               task={this.state.singleTask} 
               linksTarget="map"
+              queryParams={{t: this.props.mapType}}
             />
           : ""}
           <SwitchModeButton 

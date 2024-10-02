@@ -13,6 +13,10 @@ export default class App{
     constructor(map){
         this.map = map;
 
+        this.state = {
+          show: true,
+        }
+
         const measure = L.control.measure({
           labels:{
             measureDistancesAndAreas: _('Measure volume, area and length'),
@@ -51,8 +55,11 @@ export default class App{
         }).addTo(map);
 
         // measure.options.labels.
+        const $span = $('<span class="horizontal-bar"></span>');
+        $span.appendTo($(measure.$startPrompt).children("ul.tasks"));
 
-        const $btnExport = $(`<br/><a href='#' class='js-start start'>${_("Export Measurements")}</a>`);
+
+        const $btnExport = $(`<a href='#' class='js-start start'>${_("Export Measurements")}</a>`);
         $btnExport.appendTo($(measure.$startPrompt).children("ul.tasks"));
         $btnExport.on('click', () => {
           const features = [];
@@ -87,5 +94,30 @@ export default class App{
                                 resultFeature={resultFeature} 
                                 map={map} />, $container.get(0));
         });
+
+        // Function to open and close the measurement control
+
+        const openMeasurePopUp = () => {
+          document.querySelector(".leaflet-control-measure").classList.add("leaflet-control-active");
+        }
+
+        const closeMeasurePopUp = () => {
+          document.querySelector(".leaflet-control-measure").classList.remove("leaflet-control-active");
+        }
+        
+<<<<<<< HEAD
+        document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", heandleMeasurePopUp);
+        document.querySelector(".leaflet-control-measure-close-button").addEventListener("click",heandleMeasurePopUp);
+
+=======
+        document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", openMeasurePopUp);
+        document.querySelector(".leaflet-control-measure-close-button").addEventListener("click", closeMeasurePopUp);
+        
+>>>>>>> start-ai-processing
+    
     }
+
 }
+
+
+

@@ -63,6 +63,7 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    
 
   broker:
     image: redis:7.0.10

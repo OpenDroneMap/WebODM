@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='plugindatum',
             name='bool_value',
-            field=models.NullBooleanField(default=None, verbose_name='Bool value'),
+            field=models.BooleanField(default=None, verbose_name='Bool value'),
         ),
         migrations.AlterField(
             model_name='plugindatum',

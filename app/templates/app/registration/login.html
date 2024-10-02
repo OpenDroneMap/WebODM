@@ -23,6 +23,11 @@
         font-size: 16px;
     }
 
+    strong {
+        color: #58595b;
+    }
+
+
     .login-help {
         padding-top: 10px;
     }
@@ -59,21 +64,19 @@
                     {% else %}
                         <p class="text-center login-help redirect-link"><a class="redirect-link" href="javascript:toggleForgotPasswordHint();">Esqueceu a senha?</a></p>
                         <script>function toggleForgotPasswordHint(){ $("#forgotPasswordHint").toggle(); }</script>
-                        <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 4px;" class="theme-secondary">
-                            You can reset the administrator password by running the following command:
-                            <span class="theme-background-highlight" style="padding: 4px; margin: 8px 0; display: inline-block;">./webodm.sh resetadminpassword yournewpass</span><br/>
-                            If you used WebODM Manager to launch WebODM, find the "Reset Password" button within the maintenance panel or within one of WebODM Manager menus.
+                        <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 8px; border-radius: 25px; color: #1d1c1c;" class="theme-secondary">
+                            Contate: <a href="tel:+5599999999999"> <strong>(99) 99999-9999</strong></a>
                         </div>
                     {% endif %}
                 </div>
             </div>
         </form>
-        <div>
+        <!-- <div>
             <a type="submit" href="{% url 'new_account_registration' %}" class="btn rounded-corners btn-block center-block new-account btn-custom" >Criar nova conta</a>
         </div>
         <div>
             <p class="text-center login-help redirect-link"><a>Suporte</a></p>
-        </div>
+        </div> -->
     </div>
 
     {% if ext_auth %}

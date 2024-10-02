@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import re_path, include
 
 from app.api.presets import PresetViewSet
 from app.plugins.views import api_view_handler
@@ -32,47 +32,47 @@ admin_router.register(r'admin/groups', AdminGroupViewSet, basename='admin-groups
 admin_router.register(r'admin/profiles', AdminProfileViewSet, basename='admin-groups')
 
 urlpatterns = [
-    url(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
+    re_path(r'processingnodes/options/$', ProcessingNodeOptionsView.as_view()),
 
-    url(r'^', include(router.urls)),
-    url(r'^', include(tasks_router.urls)),
-    url(r'^', include(admin_router.urls)),
+    re_path(r'^', include(router.urls)),
+    re_path(r'^', include(tasks_router.urls)),
+    re_path(r'^', include(admin_router.urls)),
 
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles\.json$', TileJson.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/bounds$', Bounds.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/metadata$', Metadata.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)@(?P<scale>[\d]+)x\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<asset_type>polyhealth|orthophoto|dsm|dtm|georeferenced_model)/export$', Export.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles\.json$', TileJson.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/bounds$', Bounds.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/metadata$', Metadata.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<tile_type>polyhealth|orthophoto|dsm|dtm)/tiles/(?P<z>[\d]+)/(?P<x>[\d]+)/(?P<y>[\d]+)@(?P<scale>[\d]+)x\.?(?P<ext>png|jpg|webp)?$', Tiles.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/(?P<asset_type>polyhealth|orthophoto|dsm|dtm|georeferenced_model)/export$', Export.as_view()),
 
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/download/(?P<asset>.+)$', TaskDownloads.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/assets/(?P<unsafe_asset_path>.+)$', TaskAssets.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/import$', TaskAssetsImport.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/images/thumbnail/(?P<image_filename>.+)$', Thumbnail.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/images/download/(?P<image_filename>.+)$', ImageDownload.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/download/(?P<asset>.+)$', TaskDownloads.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/assets/(?P<unsafe_asset_path>.+)$', TaskAssets.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/import$', TaskAssetsImport.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/images/thumbnail/(?P<image_filename>.+)$', Thumbnail.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/images/download/(?P<image_filename>.+)$', ImageDownload.as_view()),
 
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/scene$', Scene.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/cameraview$', CameraView.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/scene$', Scene.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/cameraview$', CameraView.as_view()),
 
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/cattle$', TaskAiDetectionCattle.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn)$', TaskAiDetectionWeed.as_view()),
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/field$', TaskAiDetectionField.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/cattle$', TaskAiDetectionCattle.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn)$', TaskAiDetectionWeed.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/field$', TaskAiDetectionField.as_view()),
 
-    url(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process$', AiProcessing.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process$', AiProcessing.as_view()),
 
 
-    url(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
-    url(r'workers/get/(?P<celery_task_id>.+)', GetTaskResult.as_view()),
+    re_path(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
+    re_path(r'workers/get/(?P<celery_task_id>.+)', GetTaskResult.as_view()),
 
-    url(r'^auth/', include('rest_framework.urls')),
-    url(r'^token-auth/', obtain_jwt_token),
+    re_path(r'^auth/', include('rest_framework.urls')),
+    re_path(r'^token-auth/', obtain_jwt_token),
 
-    url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler),
+    re_path(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler),
 ]
 
 if settings.ENABLE_USERS_API:
-    urlpatterns.append(url(r'users', UsersList.as_view()))
+    urlpatterns.append(re_path(r'users', UsersList.as_view()))
 
 if settings.EXTERNAL_AUTH_ENDPOINT != '':
-    urlpatterns.append(url(r'^external-token-auth/', ExternalTokenAuth.as_view()))
+    urlpatterns.append(re_path(r'^external-token-auth/', ExternalTokenAuth.as_view()))
 

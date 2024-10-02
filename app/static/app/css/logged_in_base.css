@@ -1,77 +1,111 @@
-.white-screen {
-    transition: width 0.5s;
-}
-
 .sidebar {
-    transition: width 0.5s !important;
+    transition: all 0.5s ease !important;
+
 }
 
 .toggle-button {
+    padding: 0 !important;
     border: none;
     background: none;
-    transition: transform 0.1s;
+    display: flex;
+    justify-content: start;
+    margin-left: 0;
+    transition: margin-left 0.5s ease;
 }
 
-button.toggle-button:hover {
-    transform: scale(1.2);
-    transition: transform 0.1s;
+.toggle-button img {
+    transition: transform 0.3s ease, opacity 0.1s ease;
 }
 
-.collapsed {
+.toggle-button img:hover {
+    opacity: 0.8;
+}
+
+.collapsed-side .toggle-button img {
+    transform: rotate(-360deg);
+}
+
+
+.collapsed-side {
     width: 65px !important;
-    transition: width 0.5s;
+    padding: 10px !important;
 }
 
-.collapsed-margin {
+.collapsed-side-margin {
     margin-left: 65px !important;
-    transition: margin-left 0.5s;
 }
 
-[data-sidebar='link-text'] {
-    position: relative;
+.collapsed-side ul  {
+    white-space: nowrap;
+    width: 100%;
+
+}
+
+.sidebar ul li a {
+    transition: padding 0.5s ease;
+}
+
+.sidebar.collapsed-side ul li a {
+    display: flex;
+    align-items: center;
+    padding: 10px 11.25px !important;
+
+}
+[data-sidebar="link-text"] {
     opacity: 1;
-    left: 0px;
+    transition: opacity 0.5s ease;
 }
 
-[data-sidebar='link-text'].collapsed {
-    position: absolute;
+.collapsed-side [data-sidebar="link-text"] {
     opacity: 0;
-    left: -1000px;
 }
 
-[data-sidebar='link'].collapsed {
-    min-width: none;
-    padding-right: 0px !important;
+.sidebar-nav.navbar-collapse.collapse.in [data-sidebar="link-text"] {
+    opacity: 1;
 }
 
-.toggle-button.toggle-btn-collapsed {
-    position: fixed;
-    left: 3px;
-    bottom: 5px;
-    transition: all 0.3s;
+.nav.nav-second-level.collapse {
+    transition: height 0.5s ease;
 }
 
-.toggle-button.toggle-btn-expanded {
-    position: fixed;
-    left: 15px;
-    bottom: 5px;
-    transition: all 0.3s;
+.collapsed-side [data-sidebar="dropdown"] {
+    visibility: hidden;
+    opacity: 0;
+    height: 0 !important;
+    overflow: hidden;
+    transition: visibility 0.5s, opacity 0.5s ease;
 }
 
-[data-sidebar='icons'] {
-    transition: all 0.1s;
-}
 
-@media (max-width: 750px) {
+@media (max-width: 767px) {
     .toggle-button {
-        display: none;
+        display: none !important;
     }
 
     .collapsed {
         width: 0px !important;
+        background-color: red !important;
     }
     
     .collapsed-margin {
         margin-left: 0px !important;
     }
+
+    .sidebar {
+        display: block !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    .sidebar-nav.collapse.in {
+        display: block !important;
+        
+    }
+
+    .sidebar-nav.collapse {
+        display: none !important;
+
+    }
+
+    
 }
