@@ -23,27 +23,50 @@ export default class LayersControlPanel extends React.Component {
   render(){
     let content = "";
 
-    if (!this.props.layers.length) content = (<span><i className="loading fa fa-circle-notch fa-spin"></i> {_("Loading…")}</span>);
-    else{
-      content = (<div>
-        {this.props.overlays.length ? 
-            <div className="overlays theme-border-primary">
-                {this.props.overlays.map((layer, i) => <LayersControlLayer map={this.props.map} expanded={false} overlay={true} layer={layer} key={i} />)}
+    if (!this.props.layers.length) {
+        content = (
+            <span>
+                <i className="loading fa fa-circle-notch fa-spin"></i> 
+                {_("Loading…")}
+            </span>
+        );
+    } else {
+        content = (
+            <div>
+                {this.props.overlays.length ? 
+                    <div className="overlays theme-border-primary">
+                        {console.log(this.props.overlays)}
+                        {this.props.overlays.map((layer, i) => (
+                            
+                            <div key={i}>
+                                <LayersControlLayer map={this.props.map} expanded={false} overlay={true} layer={layer} />
+                                {i < this.props.overlays.length && <span className='horizontal-bar'></span>} 
+                            </div>
+                        ))}
+                    </div>
+                : ""}
+                {this.props.layers.sort((a, b) => {
+                    const m_a = a[Symbol.for("meta")] || {};
+                    const m_b = b[Symbol.for("meta")] || {};
+                    return m_a.name > m_b.name ? -1 : 1;
+                }).map((layer, i) => (
+                    <div key={(layer[Symbol.for("meta")] || {}).name || i}>
+                        <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} />
+                        {/* {i < this.props.layers.length && <span className='horizontal-bar'></span>}  */}
+                    </div>
+                ))}
             </div>
-        : ""}
-        {this.props.layers.sort((a, b) => {
-            const m_a = a[Symbol.for("meta")] || {};
-            const m_b = b[Symbol.for("meta")] || {};
-            return m_a.name > m_b.name ? -1 : 1;
-        }).map((layer, i) => <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} key={(layer[Symbol.for("meta")] || {}).name || i} />)}
-      </div>);
+        );
     }
+
+
 
     return (<div className="layers-control-panel">
       <span className="close-button" onClick={this.props.onClose}/>
-      <div className="title">{_("Layers")}</div>
-      <hr/>
+      <div className="title">{_("CAMADAS")}</div>
+      
       {content}
+     
     </div>);
   }
 }

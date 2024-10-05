@@ -115,9 +115,12 @@ export default class Histogram extends React.Component {
                 .range([0, width]);
 
     svg.append("g")
-        .attr("class", "x axis theme-fill-primary")
-        .attr("transform", "translate(0," + (height - 5) + ")")
-        .call(d3.svg.axis().scale(x).tickValues(this.rangeX).orient("bottom"));
+    .attr("class", "x axis theme-fill-primary")
+    .attr("transform", "translate(0," + (height - 5) + ")")
+    .call(d3.svg.axis().scale(x).tickValues(this.rangeX).orient("bottom"))
+    .selectAll("text")  
+    .filter(function(d, i) { return i === 0; })  
+    .attr("x", 2);  
 
     // add the y Axis
     let y = d3.scale.linear()
@@ -324,8 +327,8 @@ export default class Histogram extends React.Component {
     return (<div className={"histogram " + (this.props.loading ? "disabled" : "")}>
         <div ref={(domNode) => { this.hgContainer = domNode; }}>
         </div>
-        <label>{_("Min:")}</label> <input onKeyDown={this.handleMinKeyDown} onBlur={this.handleMinBlur} onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.minInput} />
-        <label>{_("Max:")}</label> <input onKeyDown={this.handleMaxKeyDown} onBlur={this.handleMaxBlur} onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.maxInput} />
+        {/* <label>{_("Min:")}</label> <input onKeyDown={this.handleMinKeyDown} onBlur={this.handleMinBlur} onChange={this.handleChangeMin} type="number" className="form-control min-max" size={5} value={this.state.minInput} />
+        <label>{_("Max:")}</label> <input onKeyDown={this.handleMaxKeyDown} onBlur={this.handleMaxBlur} onChange={this.handleChangeMax} type="number" className="form-control min-max" size={5} value={this.state.maxInput} /> */}
     </div>);
   }
 }

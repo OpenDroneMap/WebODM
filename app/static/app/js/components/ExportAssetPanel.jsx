@@ -176,7 +176,7 @@ export default class ExportAssetPanel extends React.Component {
     const disabled = (epsg === "custom" && !customEpsg) || exporting;
 
     let projection = utmEPSG ? (<div><div className="row form-group form-inline">
-    <label className="col-sm-3 control-label">{_("Projection:")}</label>
+    <label className="col-sm-3 control-label">{_("Projeção:")}</label>
     <div className="col-sm-9 ">
       <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
         {utmEPSG ? <option value={utmEPSG}>UTM (EPSG:{utmEPSG})</option> : ""}
@@ -199,7 +199,7 @@ export default class ExportAssetPanel extends React.Component {
   let exportSelector = null;
   if (this.props.selectorOnly){
     exportSelector = (<div className="row form-group form-inline">
-        <label className="col-sm-3 control-label">{_("Format:")}</label>
+        <label className="col-sm-3 control-label">{_("Formato:")}</label>
         <div className="col-sm-9 ">
         <select className="form-control" value={format} onChange={this.handleSelectFormat}>
             {exportFormats.map(ef => <option key={ef} value={ef}>{this.efInfo[ef].label}</option>)}
@@ -208,14 +208,14 @@ export default class ExportAssetPanel extends React.Component {
     </div>);
   }else{
     exportSelector = (<div className="row form-group form-inline">
-        <label className="col-sm-3 control-label">{_("Export:")}</label>
+        <label className="col-sm-3 control-label">{_("Exportar:")}</label>
         <div className="col-sm-9">
             <div className={"btn-group " + (this.props.dropUp ?  "dropup" : "")}>
                 <button onClick={this.handleExport(exportFormats[0])}
                     disabled={disabled} type="button" className="btn btn-sm btn-primary btn-export">
                     {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exporting...") : this.efInfo[exportFormats[0]].label}
                 </button>
-                <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
+                <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className=""></span></button>
                 <ul className="dropdown-menu pull-right">
                 {exportFormats.map(ef => <li key={ef}>
                         <a href="javascript:void(0);" onClick={this.handleExport(ef)}>
