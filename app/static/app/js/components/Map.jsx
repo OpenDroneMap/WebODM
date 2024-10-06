@@ -670,6 +670,13 @@ class Map extends React.Component {
       loadGeoJsonDetections: this.loadGeoJsonDetections,
       removeGeoJsonDetections: this.removeGeoJsonDetections,
     }).addTo(this.map);
+
+
+    window.addEventListener("sidebarToggle", () => {
+      setTimeout(() => {
+          this.map.invalidateSize();
+      }, 500); 
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
