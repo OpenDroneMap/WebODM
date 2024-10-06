@@ -35,9 +35,7 @@ export default class LayersControlPanel extends React.Component {
             <div>
                 {this.props.overlays.length ? 
                     <div className="overlays theme-border-primary">
-                        {console.log(this.props.overlays)}
                         {this.props.overlays.map((layer, i) => (
-                            
                             <div key={i}>
                                 <LayersControlLayer map={this.props.map} expanded={false} overlay={true} layer={layer} />
                                 {i < this.props.overlays.length && <span className='horizontal-bar'></span>} 

@@ -286,8 +286,6 @@ export default class LayersControlLayer extends React.Component {
         }
     }
 
-    console.log("metaicon: ", meta.icon)
-
     return (<div className="layers-control-layer">
         {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="overlayIcon"><i className={meta.icon || "fa fa-vector-square fa-fw"}></i></div>}<Checkbox bind={[this, 'visible']}/>
         <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
