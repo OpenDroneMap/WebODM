@@ -1,4 +1,8 @@
 
+.leaflet-control-layers-control {
+  border: 2px solid transparent !important;
+}
+
 .open.layer-container {
   max-height: 350px;
   background-color: red;
@@ -6,9 +10,6 @@
   border-radius: 20px;
 
 }
-
-
-
 
 .leaflet-control-layers-control .layers-control-panel{
   padding: 15px 20px 15px 25px;
@@ -20,10 +21,6 @@
   z-index: 99999;
   max-height: 320px; 
   
-  
-  
-  
-
 
   .loading{
       margin-top: 6px;
@@ -44,8 +41,8 @@
     margin-top: 0px;
     margin-left: 16px;
     position: relative;
-    left: 12px;
-    top: -10px;
+    left: 7px;
+    top: -7px;
 
     &:hover{
       opacity: 0.7;
