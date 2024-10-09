@@ -147,9 +147,9 @@ class EditPermissionsPanel extends React.Component {
   }
 
   permissionLabel = simPerm => {
-      if (simPerm === "rw") return _("Read/Write");
-      else if (simPerm === "r") return _("Read");
-      else if (simPerm === "") return _("No Access");
+    if (simPerm === "rw") return _("Leitura/Escrita");
+    else if (simPerm === "r") return _("Leitura");
+    else if (simPerm === "") return _("Sem Acesso");
   }
 
   allPermissions = () => {
@@ -221,7 +221,7 @@ class EditPermissionsPanel extends React.Component {
                     onBlur={this.onBlur(p)}
                     disabled={p.owner} 
                     value={p.username} 
-                    className="form-control username" 
+                    className="form-control username border-radius-5" 
                     placeholder={_("Username")}
                     ref={(domNode) => this.lastTextbox = domNode} />
                 {p.autocomplete && p.autocomplete.length > 0 ? <div className="autocomplete" style={{borderColor: this.autocompleteBorderColor, backgroundColor: this.backgroundColor}}>
@@ -235,7 +235,7 @@ class EditPermissionsPanel extends React.Component {
                 {!p.owner ? <a onClick={this.handleDeletePermission(p)}><i className="fa fa-times"></i></a> : ""}
             </div>
             <div className="role-container">
-                <select disabled={p.owner} className="form-control" value={this.simplifiedPermission(p.permissions)} onChange={this.handleChangePermissionRole(p)}>
+                <select disabled={p.owner} className="form-control border-radius-5" value={this.simplifiedPermission(p.permissions)} onChange={this.handleChangePermissionRole(p)}>
                     {this.allPermissions().map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
                 </select>
             </div>
@@ -245,15 +245,17 @@ class EditPermissionsPanel extends React.Component {
     return (
       <div className="edit-permissions-panel">
         <div className="form-group">
-          <label className="col-sm-2 control-label">{_("Permissions")}</label>
-          <div className="col-sm-10">
+          <div className='form-container'>
+            <label className="control-label">{_("Permissions")}</label>
+            <div className='add-new-btn' key="add-new">
+                  <button onClick={this.addNewPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-user-plus"></i></button>
+            </div>
+          </div>
+          <div className="permissions-user-container">
             <ErrorMessage bind={[this, 'error']} />
-
             {this.state.loading ? 
             <i className="fa fa-circle-notch fa-spin fa-fw perms-loading"></i>
-            : [permissions, <div key="add-new">
-                <button onClick={this.addNewPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-user-plus"></i></button>
-            </div>]}
+            : permissions}
           </div>
         </div>
       </div>

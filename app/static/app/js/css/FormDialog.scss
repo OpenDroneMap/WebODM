@@ -47,7 +47,55 @@
     
     #edit-project-popup {
         padding-bottom: 5px;
-    }    
+        
+    }
+
+    .btn-danger, .btn-default {
+        border-radius: 25px;
+        font-size: 12px;
+
+    }
+
+    @media (max-width: 767px) {
+            
+        .modal-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+
+
+            .pull-right {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                button {
+                    margin: 0;
+                }
+            }
+
+
+            .text-left {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                button:first-of-type {
+                    order: 2; 
+                }
+            
+                button:last-of-type {
+                    order: 1; 
+                }
+
+                button {
+                    margin: 0;
+                }
+            }
+        }
+        
+    }
 }
 
 .modal-title {
