@@ -1,3 +1,19 @@
+
+.leaflet-popup-content-wrapper {
+  border-radius: 25px !important;
+}
+
+.leaflet-popup-scrolled {
+  border: none !important;
+  width: 200px !important;
+  height: 250px !important;
+  
+}
+
+.leaflet-popup-content {
+  line-height: normal !important;
+}
+
 .field-layer {
 
   h1 {
@@ -5,7 +21,72 @@
     font-size: 16px;
     font-weight: bolder;
     line-height: inherit;
+    font-size: 15px !important;
+    margin-bottom: 17px !important;
+    
+
+    div {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .NameField {
+      color: #4ca2a1;
+    }
+
+    .vertical-bar {
+      height: 16px;
+      width: 2px;
+      background-color: #2c3e50;
+      display: inline-block;
+      border: none;
+    }
   }
+
+  legend {
+    color: #4ca2a1 !important;
+    font-size: 20px !important;
+    margin-bottom: 10px !important;
+  }
+
+  label {
+    margin: 0 !important;
+    font-size: 14px !important;
+  }
+
+  .croType-container div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+  }
+
+  .horizontal-bar {
+    height: 1px;
+    background-color: #74b06f;
+    margin-bottom: 6px;
+    margin-top: 8px;
+    opacity: 1;
+    margin-right: 20px;
+    display: block;
+    border-radius: 1px
+  }
+
+  .IAprocess-info {
+    color: #4ca2a1 !important;
+    font-size: 14px;
+  }
+
+
+  .IAprocess-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+
+
   .leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control {
     z-index: 999;
     
