@@ -55,6 +55,7 @@ class FieldLayerControlPopup extends React.Component {
 
     this.state = {
       cropType: null,
+      isChecked: false,
     };
 
     this.getSelectedLayers = this.props.stateSelectedLayers[0];
@@ -66,6 +67,12 @@ class FieldLayerControlPopup extends React.Component {
       cropType: null,
       aiOptions: new Set(),
     });
+  }
+
+  handleCheck(category) {
+
+    this.setState({isChecked: !this.state.isChecked});
+    this.handleOnChangeAi(category);
   }
 
   changeLayerColor(color) {
@@ -101,29 +108,52 @@ class FieldLayerControlPopup extends React.Component {
   render() {
     return (
     <div className='field-layer'>
-      <h1>{names[this.selectedIndex] + ` - Layer ${this.selectedIndex}` || `Layer ${this.selectedIndex}`}</h1>
+      {/* <h1>{names[this.selectedIndex] + ` - Layer ${this.selectedIndex}` || `Layer ${this.selectedIndex}`}</h1> */}
+      <h1>
+        {names[this.selectedIndex] 
+        ?
+          <div>
+            <span className='NameField'> {names[this.selectedIndex]} </span> 
+            <span className='vertical-bar'></span>
+            <span> Layer {this.selectedIndex} </span>
+          </div> 
+        : 
+          <span> 
+            Layer {this.selectedIndex} 
+          </span>}
+      </h1>
+
       <fieldset>
-        <legend>Tipo de cultivo:</legend>
+        <legend>TIPO DE CULTIVO</legend>
         {
-          this.cropType.map(typ => {
+          this.cropType.map((typ, index ) => {
+              const lastTyp = this.cropType.length - 1 !== index
+              console.log(lastTyp);
               return (
-                <div key={typ.type}>
-                  <input type="radio" id={typ.type} checked={this.state.cropType == typ.type} onChange={() => this.handleOnChangeRadio(typ.type)} />
-                  <label htmlFor={typ.type}>{typ.checkboxLabel}</label>
-                </div>
+                <div className="croType-container" key={typ.type}>
+                  <div onClick={() => this.handleOnChangeRadio(typ.type)} style={{ cursor: "pointer" }}>
+                    <i className={this.state.cropType === typ.type ? "fas fa-check-square" : "far fa-square"}></i>
+                    <label htmlFor={typ.type} style={{ cursor: "pointer" }}>
+                      {typ.checkboxLabel}
+                    </label>
+                  </div>
+                  {lastTyp ? <span className='horizontal-bar'></span> : ""}
+              </div>
               )
           })
         }
       </fieldset>
 
-      <p>IAs para processar:</p>
+      <p className='IAprocess-info'>IAs para processar</p>
       {
           this.aiOptions.map(option => {
+            {console.log(option.category)}
             return (
-              <div key={option.category}>
-                <input type='checkbox' id={option.category} onChange={() => this.handleOnChangeAi(option.category)}></input>
-                <label htmlFor={option.category}>{option.checkboxLabel}</label>
+              <div className='IAprocess-container' key={option.category} onClick={() => this.handleCheck(option.category)}> 
+                <i className={this.state.isChecked ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
+                <label htmlFor={option.category} style={{ cursor: "pointer" }} > {option.checkboxLabel}</label>
               </div>
+              
             )
           })
         }

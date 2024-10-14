@@ -1,3 +1,27 @@
+
+.leaflet-popup-content-wrapper {
+  border-radius: 25px !important;
+}
+
+.leaflet-popup-scrolled {
+  border: none !important;
+  width: 200px !important;
+  height: 235px !important;
+  
+}
+
+@media screen and (max-width: 768px){ 
+  .leaflet-popup-scrolled {
+    width: 190px !important;
+    height: 220px !important;
+  }
+}
+
+.leaflet-popup-content {
+  line-height: normal !important;
+}
+
+
 .field-layer {
 
   h1 {
@@ -5,7 +29,81 @@
     font-size: 16px;
     font-weight: bolder;
     line-height: inherit;
+    font-size: 15px !important;
+    margin-bottom: 17px !important;
+    
+
+    div {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .NameField {
+      color: #4ca2a1;
+    }
+
+    .vertical-bar {
+      height: 16px;
+      width: 2px;
+      background-color: #2c3e50;
+      display: inline-block;
+      border: none;
+    }
   }
+
+  legend {
+    color: #4ca2a1 !important;
+    font-size: 20px !important;
+    margin-bottom: 10px !important;
+  }
+
+  label {
+    margin: 0 !important;
+    font-size: 14px !important;
+  }
+
+  .croType-container div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+  }
+
+  i {
+    color: #74b06f;
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  .horizontal-bar {
+    height: 1px;
+    background-color: #74b06f;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    opacity: 1;
+    margin-right: 20px;
+    display: block;
+    border-radius: 1px
+  }
+
+  .IAprocess-info {
+    color: #4ca2a1 !important;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+
+  .IAprocess-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+
+
   .leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control {
     z-index: 999;
     
