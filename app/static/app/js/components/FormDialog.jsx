@@ -161,15 +161,15 @@ class FormDialog extends React.Component {
         if (this.props.deleteAction){
             leftButtons.push(<button 
                 disabled={this.state.deleting}
-                className="btn btn-danger"
+                className="btn btn-danger btn-delete-editProject"
                 key="delete" 
                 onClick={this.handleDelete}>
                 {this.state.deleting ? 
                     <span>
-                        <i className="fa fa-circle-notch fa-spin"></i> {_("Deleting...")}
+                        <i className="fa fa-circle-notch fa-spin"></i> {_("Deletando...")}
                     </span>
                 :   <span>
-                        <i className="fa fa-trash"></i> {_("Delete")}
+                        <i className="fa fa-trash"></i> {_("Deletar")}
                     </span>}
             </button>);
         }
@@ -186,7 +186,7 @@ class FormDialog extends React.Component {
                 <div className="modal-content rounded-corners">
                   <div className="modal-header no-border">
                     <button type="button" className="close" onClick={this.hide}><span className="x-close">&times;</span></button>
-                    <h4 className="modal-title text-center force-montserrat-bold">{this.props.title}</h4>
+                    <h4 className="modal-title text-center force-montserrat-bold">{this.props.title === "Edit Project" ? "Editar Projeto" : this.props.title }</h4>
                   </div>
                   <div id="edit-project-popup" className="modal-body">
                     <ErrorMessage bind={[this, "error"]} />
@@ -196,16 +196,16 @@ class FormDialog extends React.Component {
                   </div>
                   <div className="modal-footer">
                     <div className="pull-right">
-                        <button type="button" className="btn btn-cancel btn-default rounded-corners font-12" onClick={this.hide} disabled={this.state.saving}>{_("Cancel")}</button>
                         <button type="button" className="btn save rounded-corners font-12" onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
                                 <span>
-                                    <i className="fa fa-circle-notch fa-spin"></i> {this.props.savingLabel}
+                                    <i className="fa fa-circle-notch fa-spin"></i> Salvar Mudanças
                                 </span>
                             :   <span>
-                                    <i className={this.props.saveIcon}></i> {this.props.saveLabel}
+                                    <i className={this.props.saveIcon}></i> Salvar Mudanças
                                 </span>}
                         </button>
+                        <button type="button" className="btn btn-cancel btn-default rounded-corners font-12" onClick={this.hide} disabled={this.state.saving}>{_("Cancelar")}</button>
                     </div>
                     
                     {leftButtons.length > 0 ?

@@ -1,11 +1,55 @@
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 8px;
+    margin-right: 5px;}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #ffffff;
+    border-radius: 8px;
+    
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
 .edit-permissions-panel{
     .perms-loading{
         margin-top: 14px;
     }
+
+    .form-group {
+
+        .form-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+
+
+
+            .control-label {
+                padding: 0;
+            }
+
+        }
+    }
+
     .permission{
         position: relative;
-        margin-bottom: 4px;
+        margin-bottom: 7px;
         display: flex;
+        gap: 20px;
+    }
+
+    .permissions-user-container {
+        padding: 5px 15px;
     }
     .user-indicator{
         position: absolute;
@@ -18,13 +62,21 @@
 
         a{
             position: absolute;
-            left: -36px;
+            left: -55px;
             top: -12px;
             padding: 12px;
             &:hover{
                 cursor: pointer;
             }
         }
+    }
+
+    .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+        background-color: #DCDCDC;
+    }
+
+    .border-radius-5 {
+        border-radius: 5px !important;
     }
 
     .username{
@@ -71,7 +123,18 @@
         flex-grow: 0.33;
     }
 
-    .add-new{
-        margin-top: 4px;
+    .add-new {
+        width: 35px;
+        height: 35px;
+        border-radius: 50% !important;
+        background-color: #529a4c;
+        border-color: #4b8b45;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:hover {
+            background-color: #4b8b45;
+        }
     }
 }
