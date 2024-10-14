@@ -1,4 +1,21 @@
+.leaflet-control-measure {
+    background: transparent !important;
+    border: 2px solid transparent !important;
+    
 
+}
+
+.leaflet-control-measure-interaction.js-interaction {
+    padding: 15px 20px 15px 25px !important;
+    background-color: #fff;
+    min-width: 300px;
+    z-index: 99999;
+    border-radius: 20px !important;
+    position: relative;
+    left: -22px !important;
+    
+    
+}
 
 .leaflet-control-measure,
 .leaflet-measure-resultpopup{
@@ -13,27 +30,27 @@
 
 
 
-.leaflet-control-measure-toggle {
-    display: block  !important;
-}
+// .leaflet-control-measure-toggle {
+//     display: block  !important;
+// }
 
-.leaflet-control-measure.leaflet-control.leaflet-control-active .leaflet-control-measure-interaction {
-    background-color: #fff;
-    position: absolute;
-    right: 45px;
-    top: -43.3px;
-    min-width: 240px;
-    border-radius: 15px;
+// .leaflet-control-measure.leaflet-control.leaflet-control-active .leaflet-control-measure-interaction {
+//     background-color: #fff;
+//     position: absolute;
+//     right: 45px;
+//     top: -43.3px;
+//     min-width: 240px;
+//     border-radius: 15px;
     
-}
+// }
 
-.leaflet-control-measure .leaflet-control-measure-interaction {
-    display: none;
-}
+// .leaflet-control-measure .leaflet-control-measure-interaction {
+//     display: none;
+// }
 
-.leaflet-control-measure.leaflet-control-active .leaflet-control-measure-interaction {
-    display: block;
-}
+// .leaflet-control-measure.leaflet-control-active .leaflet-control-measure-interaction {
+//     display: block;
+// }
 
 
 .leaflet-control-measure-interaction{
@@ -43,6 +60,7 @@
         width: auto !important;
         height: auto !important;
         line-height: auto !important;
+        // display: initial !important;
         display: block !important;
         line-height: normal !important;
         background-color: transparent !important;
@@ -53,6 +71,7 @@
         
 
         &:hover{
+            // background-color: inherit !important;
             text-align: left !important;
         }
     }
@@ -72,10 +91,13 @@
 
 
 .leaflet-control-measure .close-button, .leaflet-control-measure .close-button-measure {
-    background-image: url(close_icon.svg) !important;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAUklEQVQ4jWNgGAXYgC4DA4M5FnFzqBxBYM7AwPCKgYHBAUnMASqGzWCswIaBgeElAwODExqbJOAA1fgSzTUogIlUU4kFtgwUeIHiQKQ4GkcaAAC8Jw8GjeNLuQAAAABJRU5ErkJggg==) !important;
     background-repeat: no-repeat;
-    background-size: 20px 20px !important;
-    margin-left: 5px !important;
+    background-size: contain;
+    height: 25px !important;
+    width: 25px !important;
+    left: 13px !important;
+    top: -13px !important;
     
 }
 

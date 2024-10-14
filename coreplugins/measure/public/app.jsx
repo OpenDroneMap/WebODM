@@ -94,26 +94,6 @@ export default class App{
                                 resultFeature={resultFeature} 
                                 map={map} />, $container.get(0));
         });
-
-        // Function to open and close the measurement control
-
-        const openMeasurePopUp = () => {
-          document.querySelector(".leaflet-control-measure").classList.add("leaflet-control-active");
-        }
-
-        const closeMeasurePopUp = () => {
-          document.querySelector(".leaflet-control-measure").classList.remove("leaflet-control-active");
-        }
-        
-<<<<<<< HEAD
-        document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", heandleMeasurePopUp);
-        document.querySelector(".leaflet-control-measure-close-button").addEventListener("click",heandleMeasurePopUp);
-
-=======
-        document.querySelector(".leaflet-control-measure-toggle").addEventListener("click", openMeasurePopUp);
-        document.querySelector(".leaflet-control-measure-close-button").addEventListener("click", closeMeasurePopUp);
-        
->>>>>>> start-ai-processing
     
     }
 

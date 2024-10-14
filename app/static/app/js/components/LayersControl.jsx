@@ -31,12 +31,12 @@ class LayersControlButton extends React.Component {
   render(){
     const { showPanel } = this.state;
 
-    return (<div className={showPanel ? "open" : ""}>
+    return (<div className=  {showPanel ? "open layer-container" : "layer-container"}>
+        <LayersControlPanel map={this.props.map} layers={this.props.layers} overlays={this.props.overlays} onClose={this.handleClose} />
         <a href="javascript:void(0);" 
             title="Layers"
             onClick={this.handleOpen} 
             className="leaflet-control-layers-control-button leaflet-bar-part theme-secondary"></a>
-        <LayersControlPanel map={this.props.map} layers={this.props.layers} overlays={this.props.overlays} onClose={this.handleClose} />
     </div>);
   }
 }

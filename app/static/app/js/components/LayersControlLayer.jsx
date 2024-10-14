@@ -292,7 +292,7 @@ export default class LayersControlLayer extends React.Component {
 
         {this.state.expanded ? 
         <div className="layer-expanded">
-            <Histogram width={274}
+            <Histogram width={244}
                         loading={histogramLoading}
                         statistics={tmeta.statistics}
                         colorMap={cmapValues}
@@ -304,7 +304,7 @@ export default class LayersControlLayer extends React.Component {
 
             {formula !== "" && algorithms ? 
             <div className="row form-group form-inline">
-                <label className="col-sm-3 control-label">{_("Algorithm:")}</label>
+                <label className="col-sm-3 control-label">{_("Algoritimo:")}</label>
                 <div className="col-sm-9 ">
                     {histogramLoading ? 
                     <i className="fa fa-circle-notch fa-spin fa-fw" /> :
@@ -316,7 +316,7 @@ export default class LayersControlLayer extends React.Component {
 
             {bands !== "" && algo ? 
             <div className="row form-group form-inline">
-                <label className="col-sm-3 control-label">{_("Bands:")}</label>
+                <label className="col-sm-3 control-label">{_("Bandas:")}</label>
                 <div className="col-sm-9 ">
                     {histogramLoading ? 
                     <i className="fa fa-circle-notch fa-spin fa-fw" /> :
@@ -332,7 +332,7 @@ export default class LayersControlLayer extends React.Component {
 
             {colorMap && color_maps.length ? 
             <div className="row form-group form-inline">
-                <label className="col-sm-3 control-label">{_("Color:")}</label>
+                <label className="col-sm-3 control-label">{_("Cor:")}</label>
                 <div className="col-sm-9 ">
                     {histogramLoading ? 
                     <i className="fa fa-circle-notch fa-spin fa-fw" /> :
@@ -344,7 +344,7 @@ export default class LayersControlLayer extends React.Component {
 
             {hillshade !== "" ? 
             <div className="row form-group form-inline">
-                <label className="col-sm-3 control-label">{_("Shading:")}</label>
+                <label className="col-sm-3 control-label">{_("Sombra:")}</label>
                 <div className="col-sm-9 ">
                     <select className="form-control" value={hillshade} onChange={this.handleSelectHillshade}>
                         <option value="0">{_("None")}</option>

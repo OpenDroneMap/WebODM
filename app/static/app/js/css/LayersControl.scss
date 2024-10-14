@@ -1,3 +1,4 @@
+
 .leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control{
   z-index: 999;
   
@@ -8,7 +9,9 @@
     
   }
 
-  div.layers-control-panel{ display: none; }
+  div.layers-control-panel{ 
+    display: none;
+  }
   
   .open{
     a.leaflet-control-layers-control-button{
