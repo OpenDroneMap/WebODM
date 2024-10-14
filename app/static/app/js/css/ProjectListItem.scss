@@ -38,7 +38,7 @@
         50% {opacity: 1.0;}
         100% {opacity: 0.5;}
     }
-     @keyframes pulsate {
+    @keyframes pulsate {
         0% {opacity: 0.5;}
         50% {opacity: 1.0;}
         100% {opacity: 0.5;}
@@ -48,7 +48,7 @@
         background-color: #eee;
     }
 
-     -webkit-transition: background-color 1s ease;
+    -webkit-transition: background-color 1s ease;
     transition: background-color 1s ease;
 
     &.dz-drag-hover{
@@ -59,22 +59,16 @@
     }
 
     .project-links{
-        margin-top: 10px;
+        margin-top: 20px;
         margin-bottom: 10px;
         margin-left: 10px !important;
 
         font-size: 90%;
-        i{
-            margin-right: 4px;
-        }
-        a{
-            margin-right: 12px;
-        }
     }
 
     .btn-danger .fa-trash{
-        margin-right: 2px;
-        margin-left: 0px;
+        // margin-right: 2px;
+        // margin-left: 0px;
     }
     
     .dz-preview{
@@ -220,12 +214,64 @@
 
     .project-links
     {
+
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        
+
+        span, .task-filters {
+            display: flex;
+            align-items: center;
+        }
+
+        span {
+            margin-right: 1vw;
+            gap: 10px;
+        }
+
+        .task-filters .btn-group {
+            margin-right: 1vw;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .task-container {
+            a {
+                text-decoration: none !important;
+                
+                span {
+                    display: flex;
+                    align-items: center;
+                    margin-right: 0 !important;
+
+                    
+                }
+
+                p{
+                    margin: 0 !important;
+                    font-size: 15px;
+                    font-family: "Montserrat Medium";
+                }
+
+                p:hover {
+                    text-decoration: underline !important;
+                }
+            }
+            
+        }
+
+
         a {
             color: #707070 !important;
+            font-size: 15px;
+            font-family: "Montserrat Medium";
         }
 
         .fa, .far {
-            color: #4ca2a1;
+            color: #64c0be;
+            font-size: 18px;
         }
     }
 }

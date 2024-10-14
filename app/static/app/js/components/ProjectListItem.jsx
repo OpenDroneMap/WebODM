@@ -787,10 +787,13 @@ class ProjectListItem extends React.Component {
           </div>
           <div className="row project-links">
             {numTasks > 0 ? 
-              <span>
+              <span className='task-container'>
                 <i className='fa fa-tasks'></i>
                 <a href="javascript:void(0);" onClick={this.toggleTaskList}>
-                  {interpolate(_("%(count)s Tarefas"), { count: numTasks})} <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                  <span>
+                    <p>{interpolate(_("%(count)s Tarefas"), { count: numTasks})}</p>
+                    <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+                  </span>
                 </a>
               </span>
               : ""}
@@ -835,18 +838,23 @@ class ProjectListItem extends React.Component {
                 </div>
               </div> : ""}
 
-              {numTasks > 0 ? 
-                [<i key="edit-icon" className='fa fa-globe'></i>
-                ,<a key="edit-text" href="javascript:void(0);" onClick={this.viewMap}>
-                  {_("View Map")}
-                </a>]
-              : ""}
+              {numTasks > 0 ?
+                <span>
+                  <i key="edit-icon" className='fa fa-globe'></i>
+                  <a key="edit-text" href="javascript:void(0);" onClick={this.viewMap}>
+                    {_("Ver mapa")}
+                  </a>
+                </span>
+                : ""}
               
             {canEdit ? 
-                [<i key="edit-icon" className='far fa-edit'></i>
-                ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> {_("Edit")}
-                </a>]
-            : ""}
+              <span>
+                <i key="edit-icon" className='far fa-edit'></i>
+                <a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> 
+                  {_("Editar")}
+                </a>
+              </span>
+              : ""}
 
             {!canEdit && !data.owned ? 
               [<i key="edit-icon" className='far fa-eye-slash'></i>

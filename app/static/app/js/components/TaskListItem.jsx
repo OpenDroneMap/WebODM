@@ -417,6 +417,8 @@ class TaskListItem extends React.Component {
     }
   }
 
+
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -455,29 +457,22 @@ class TaskListItem extends React.Component {
 
       if (task.status === statusCodes.COMPLETED) {
         if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1) {
-          addActionButton(" " + _("View Map"), "btn-primary", "fa fa-globe", () => {
+          addActionButton(" " + _("Vier Mapa"), "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         } else {
           showOrthophotoMissingWarning = task.available_assets.indexOf("orthophoto.tif") === -1;
         }
 
-        addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
-          location.href = `/3d/project/${task.project}/task/${task.id}/`;
-        });
+        // addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
+        //   location.href = `/3d/project/${task.project}/task/${task.id}/`;
+        // });
       }
 
-      if (editable || (!task.processing_node)) {
-        addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
-          this.startEditing();
-        }, {
-          className: "inline"
-        });
-      }
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
         (task.processing_node || imported) && this.props.hasPermission("change")) {
-        addActionButton(_("Cancel"), "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
+        addActionButton(_("Cancelar"), "btn-primary", "fa fa-times", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
@@ -496,27 +491,37 @@ class TaskListItem extends React.Component {
       }
 
       if (this.props.hasPermission("delete")) {
-        addActionButton(_("Delete"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
+        addActionButton(_("Excluir"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
           confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
           defaultError: _("Cannot delete task.")
         }));
       }
 
+      if (editable || (!task.processing_node)) {
+        addActionButton(_("Editar"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
+          this.startEditing();
+        }, {
+          className: "inline"
+        });
+      }
+      
       actionButtons = (<div className="action-buttons">
         {task.status === statusCodes.COMPLETED ?
           <AssetDownloadButtons task={this.state.task} disabled={disabled} />
           : ""}
         {actionButtons.map(button => {
+
+
           const subItems = button.options.subItems || [];
           const className = button.options.className || "";
 
-          let buttonHtml = (<button type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
+          let buttonHtml = (<button type="button" className={"btn btn-sm " + button.className + " " + button.label} onClick={button.onClick} disabled={disabled}>
             <i className={button.icon}></i>
             {button.label}
           </button>);
           if (subItems.length > 0) {
             // The button expands sub items
-            buttonHtml = (<button type="button" className={"btn btn-sm " + button.className} data-toggle="dropdown" disabled={disabled}>
+            buttonHtml = (<button type="button" className={"btn btn-sm  btn-drop-label " + button.className} data-toggle="dropdown" disabled={disabled}>
               <i className={button.icon}></i>
               {button.label}
             </button>);
@@ -524,7 +529,7 @@ class TaskListItem extends React.Component {
 
           return (
             <div key={button.label} className={"inline-block " +
-              (subItems.length > 0 ? "btn-group" : "") + " " +
+              (subItems.length > 0 ? "btn-group withdrop-container" : "") + " " +
               className}>
               {buttonHtml}
               {subItems.length > 0 &&
@@ -551,49 +556,68 @@ class TaskListItem extends React.Component {
               <table className="table table-condensed info-table">
                 <tbody>
                   <tr>
-                    <td><strong>{_("Created on:")}</strong></td>
+                    <td><strong>{_("Criado em:")}</strong></td>
                     <td>{(new Date(task.created_at)).toLocaleString()}</td>
                   </tr>
-                  <tr>
+                  {/* <tr>
                     <td><strong>{_("Processing Node:")}</strong></td>
                     <td>{task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})</td>
-                  </tr>
-                  {Array.isArray(task.options) &&
+                  </tr> */}
+                  {/* {Array.isArray(task.options) &&
                     <tr>
                       <td><strong>{_("Options:")}</strong></td>
                       <td>{this.optionsToList(task.options)}</td>
-                    </tr>}
-                  {stats && stats.gsd &&
+                    </tr>} */}
+                  {/* {stats && stats.gsd &&
                     <tr>
                       <td><strong>{_("Average GSD:")}</strong></td>
                       <td>{parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm</td>
+                    </tr>} */}
+                    {task.size > 0 &&
+                    <tr>
+                      <td><strong>{_("Uso do Disco:")}</strong></td>
+                      <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
                     </tr>}
                   {stats && stats.area &&
                     <tr>
                       <td><strong>{_("Area:")}</strong></td>
                       <td>{parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;</td>
                     </tr>}
-                  {stats && stats.pointcloud && stats.pointcloud.points &&
+                  {/* {stats && stats.pointcloud && stats.pointcloud.points &&
                     <tr>
                       <td><strong>{_("Reconstructed Points:")}</strong></td>
                       <td>{stats.pointcloud.points.toLocaleString()}</td>
-                    </tr>}
-                  {task.size > 0 &&
-                    <tr>
-                      <td><strong>{_("Disk Usage:")}</strong></td>
-                      <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
-                    </tr>}
+                    </tr>} */}
                   <tr>
-                    <td><strong>{_("Task Output:")}</strong></td>
-                    <td><div className="btn-group btn-toggle">
-                      <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
-                      <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>{_("Off")}</button>
-                    </div></td>
+                    <td><strong>{_("Resultado da Tarefa:")}</strong></td>
+                    <td>
+                      {/* <div className="btn-group btn-toggle switch-toggle">
+                        <button onClick={this.setView("console")} 
+                                className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>
+                                  {_("On")}
+                        </button>
+                        <button onClick={this.setView("basic")} 
+                                className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>
+                                  {_("Off")}
+                              </button>
+                      </div> */}
+
+                      <div className="toggle-switch">
+                        <input 
+                          type="checkbox" 
+                          id={`toggle-switch-${this.props.data.id}`}
+                          checked={this.state.view === "console"} 
+                          onChange={() => this.setState({ view: this.state.view === "console" ? "basic" : "console" })}
+                        />
+                        <label htmlFor={`toggle-switch-${this.props.data.id}`} className="switch"></label>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
 
               {this.state.view === 'console' ?
+            
                 <Console
                   className="floatfix"
                   source={this.consoleOutputUrl}
@@ -663,14 +687,77 @@ class TaskListItem extends React.Component {
     // }
 
     const getStatusLabel = (text, type = 'neutral', progress = 100) => {
-      let color = 'rgba(255, 255, 255, 0.0)';
-      if (type === 'done') color = this.backgroundSuccessColor;
-      else if (type === 'error') color = this.backgroundFailedColor;
-      return (<div
-        className={"status-label theme-border-primary " + type}
-        style={{ background: `linear-gradient(90deg, ${color} ${progress}%, rgba(255, 255, 255, 0) ${progress}%)`, borderRadius: "100px", padding: "2px", display: "flex", justifyContent: "center", alignItems: "center" }}
-        title={text}><i className={statusIcon}></i> {progress.toFixed(1)}%</div>);
-    }
+      const percentage = progress.toFixed(1);
+      const active = type === 'done' ? 'active' : '';
+
+      const minWidth = 20; // 20% 
+
+      let barWidth = Math.max(progress, minWidth);
+
+      if(text === "Importing...") {
+        barWidth = 100;
+        text = "Fazendo Upload...";
+      }
+
+      if(text == "Deleting...") {
+        barWidth = 100;
+        type = " ";
+        text = "Deletando...";
+      }
+
+      if(text == "Canceling...") {
+        barWidth = 100;
+        type = " ";
+        text = "Cancelando...";
+      }
+
+      if(text == "Canceled") {
+        text = "Cancelado";
+      }
+
+      if(text == "Completed") {
+        text = "Completo";
+      }
+
+      if(text == "Cannot process dataset") {
+        text = "Erro ao processar os dados"
+      }
+
+      
+      return (
+        <div className="upload-progress-bar">
+          <div className="progress" style={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+            height: "30px",
+            borderRadius: "80px", 
+            backgroundColor: "#E3E3E3",
+            padding: "5px",
+            
+          }}>
+            <div className={`progress-bar progress-bar-striped ${active}`} style={{
+              width: `${barWidth}%`,
+              backgroundImage: type === 'done'
+                ? "linear-gradient(to bottom, #17A398, #269F64, #2C9D4F)"
+                : "linear-gradient(to bottom, #FF4E4E, #D93636, #B32A2A)",
+              borderRadius: "80px", 
+              display: "flex",
+              gap: "8px",
+              justifyContent: "center",
+              alignItems: "center",
+              whiteSpace: "nowrap", 
+              overflow: "hidden", 
+              textOverflow: "ellipsis",
+              fontSize:"12px"
+            }}>
+              <i className={statusIcon}></i> {barWidth < 100 ? `${percentage}%` : `${text}`}
+              
+            </div>
+          </div>
+        </div>
+      );
+    };
 
     let statusLabel = "";
     let showEditLink = false;
@@ -712,18 +799,18 @@ class TaskListItem extends React.Component {
 
     if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
       (task.processing_node || imported) && this.props.hasPermission("change")) {
-      addTaskAction(_("Cancel"), "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
+      addTaskAction(_("Cancelar"), "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
     }
 
     // Ability to change options
     if (editable || (!task.processing_node && this.props.hasPermission("change"))) {
-      taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
+      taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Editar")}</a></li>);
     }
 
     if (editable) {
       taskActions.push(
-        <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Move")}</a></li>,
-        <li key="duplicate"><a href="javascript:void(0)" onClick={this.handleDuplicateTask}><i className="fa fa-copy"></i>{_("Duplicate")}</a></li>
+        <li key="move"><a href="javascript:void(0)" onClick={this.handleMoveTask}><i className="fa fa-arrows-alt"></i>{_("Mover")}</a></li>,
+        <li key="duplicate"><a href="javascript:void(0)" onClick={this.handleDuplicateTask}><i className="fa fa-copy"></i>{_("Duplicar")}</a></li>
       );
     }
 
@@ -733,7 +820,7 @@ class TaskListItem extends React.Component {
         <li key="sep" role="separator" className="divider"></li>,
       );
 
-      addTaskAction(_("Delete"), "fa fa-trash", this.genActionApiCall("remove", {
+      addTaskAction(_("Deletar"), "fa fa-trash", this.genActionApiCall("remove", {
         confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
         defaultError: _("Cannot delete task.")
       }));
@@ -755,39 +842,54 @@ class TaskListItem extends React.Component {
           : ""}
         <div className="row">
           <div className="col-sm-5 col-xs-12 name">
-            <i onClick={this.toggleExpanded} className={"clickable far " + (this.state.expanded ? "fa-minus-square" : " fa-plus-square")}></i> <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
+            <div onClick={this.toggleExpanded} className="clickable icon">
+              {this.state.expanded ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" stroke="currentColor" strokeWidth="1" className="bi bi-minus-circle" viewBox="0 0 20 20">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                  <path d="M5 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" stroke="currentColor" strokeWidth="1" className="bi bi-plus-circle" viewBox="0 0 20 20">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                </svg>
+              )}
+            </div> 
+            <a href="javascript:void(0);" onClick={this.toggleExpanded} className="name-link">{name}</a>
             {userTags.length > 0 ?
               userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
               : ""}
           </div>
-          <div className="col-sm-1 col-xs-5 details">
-            <i className="far fa-image"></i> {task.images_count}
-          </div>
-          <div className="col-sm-2 col-xs-5 details">
-            <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
-          </div>
-          <div className="col-xs-2 text-right visible-xs-block">
-            {taskActions.length > 0 ?
-              <div className="btn-group">
-                <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i className={"fa " + taskActionsIcon}></i>
-                </button>
-                <ul className="dropdown-menu dropdown-menu-right">
-                  {taskActions}
-                </ul>
-              </div>
-              : ""}
+          <div className='col'>
+            <div className="col-sm-1 col-xs-5 details">
+              <i className="far fa-image"></i> {task.images_count}
+            </div>
+            <div className="col-sm-2 col-xs-5 details">
+              <i className="far fa-clock"></i> {this.hoursMinutesSecs(this.state.time)}
+            </div>
+            <div className="col-xs-2 text-right visible-xs-block">
+              {taskActions.length > 0 ?
+                <div className="btn-group">
+                  <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i className={"fa " + taskActionsIcon}></i>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-right">
+                    {taskActions}
+                  </ul>
+                </div>
+                : ""}
+            </div>
           </div>
           <div className="col-sm-3 col-xs-12">
             {showEditLink ?
               <a href="javascript:void(0);" onClick={this.startEditing}>{statusLabel}</a>
               : statusLabel}
           </div>
-          <div className="col-sm-1 text-right hidden-xs">
+          <div className="col-sm-1 text-right hidden-xs options">
             {taskActions.length > 0 ?
               <div className="btn-group">
                 <button disabled={disabled || actionLoading} className="btn task-actions btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i className={"fa " + taskActionsIcon}></i>
+                  <i className={"options-icon fa " + taskActionsIcon}></i>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-right">
                   {taskActions}

@@ -5,6 +5,15 @@
     text-align: right;
     a{
         margin-left: 4px;
+        background-color: #52994c;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+
+        &:hover {
+            background-color: #4b8b45 !important;
+        }
     }
 }
 
