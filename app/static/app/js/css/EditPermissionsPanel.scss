@@ -1,3 +1,24 @@
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 8px;
+    margin-right: 5px;}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #ffffff;
+    border-radius: 8px;
+    
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
 .edit-permissions-panel{
     .perms-loading{
         margin-top: 14px;

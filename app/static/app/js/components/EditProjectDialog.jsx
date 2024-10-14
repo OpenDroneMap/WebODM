@@ -168,7 +168,7 @@ class EditProjectDialog extends React.Component {
                   disabled={this.duplicating}
                   onClick={this.handleDuplicate}
                   className="btn btn-default">
-                    <i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i> Duplicate
+                    <i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i> Duplicar
                   </button>
                 ] : undefined
                 }
