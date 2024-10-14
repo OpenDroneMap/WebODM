@@ -1,7 +1,5 @@
-
 class Sidebar {
     constructor() {
-        
         const pageWrapper = document.querySelector("#page-wrapper");
         const toggle = document.querySelector("[data-sidebar='toggle']");
         const menu_items = document.querySelector("[data-sidebar='menu_items']");
@@ -14,10 +12,9 @@ class Sidebar {
 
         toggle.addEventListener("click", () => this.handleToggleClick());
         itens_collapse.forEach(item => {
-            item.addEventListener("click", () => this.handleItemCollapse())
-        })
+            item.addEventListener("click", () => this.handleItemCollapse());
+        });
     }
-
 
     handleToggleClick() {
         this.menu_items.classList.toggle("collapsed-side");
@@ -27,15 +24,26 @@ class Sidebar {
         } else {
             this.pageWrapper.classList.remove("collapsed-side-margin");
         }
+
+        
+        const event = new CustomEvent("sidebarToggle", {
+            detail: { collapsed: this.menu_items.classList.contains("collapsed-side") }
+        });
+        window.dispatchEvent(event);
     }
 
     handleItemCollapse() {
         if (this.menu_items.classList.contains("collapsed-side")) {
             this.menu_items.classList.remove("collapsed-side");
             this.pageWrapper.classList.remove("collapsed-side-margin");
+
+            
+            const event = new CustomEvent("sidebarToggle", {
+                detail: { collapsed: false }
+            });
+            window.dispatchEvent(event);
         }
     }
 }
 
-window.addEventListener("load", () =>  new Sidebar());
-
+window.addEventListener("load", () => new Sidebar());
