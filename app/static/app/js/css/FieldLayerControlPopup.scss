@@ -6,13 +6,21 @@
 .leaflet-popup-scrolled {
   border: none !important;
   width: 200px !important;
-  height: 250px !important;
+  height: 235px !important;
   
+}
+
+@media screen and (max-width: 768px){ 
+  .leaflet-popup-scrolled {
+    width: 190px !important;
+    height: 220px !important;
+  }
 }
 
 .leaflet-popup-content {
   line-height: normal !important;
 }
+
 
 .field-layer {
 

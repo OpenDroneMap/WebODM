@@ -149,18 +149,6 @@ class FieldLayerControlPopup extends React.Component {
           this.aiOptions.map(option => {
             {console.log(option.category)}
             return (
-              // <div className='IAprocess-container' key={option.category}>
-              //   <input type='checkbox' id={option.category} onChange={() => this.handleOnChangeAi(option.category)}></input>
-              //   <label htmlFor={option.category}>{option.checkboxLabel}</label>
-              // </div>
-              // <div className='IAprocess-container' key={option.category} onClick={() => this.handleOnChangeAi(option.category)} style={{ cursor: "pointer" }}>
-              //   <i className={this.checked[option.category] ? "fas fa-check-square" : "far fa-square"}></i>
-              //   <label htmlFor={option.category} style={{ marginLeft: "8px", cursor: "pointer" }}>
-              //     {option.checkboxLabel}
-              //   </label>
-              // </div>
-
-              
               <div className='IAprocess-container' key={option.category} onClick={() => this.handleCheck(option.category)}> 
                 <i className={this.state.isChecked ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
                 <label htmlFor={option.category} style={{ cursor: "pointer" }} > {option.checkboxLabel}</label>
