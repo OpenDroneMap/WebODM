@@ -80,18 +80,46 @@
     }
     </style>
 
-<div id='stars'></div>
-<div id='stars2'></div>
-<div id='stars3'></div>
+
 
 {% load i18n %}
 
-<div class="text-center about-text">
-    <h2 class="theme-secondary">WebODM {{ version }}</h2>
+<div class=" about-text">
+    <h1 class="text-center theme-secondary">AgroSmart</h1>
     
-    <div style="margin-bottom: 16px; margin-top: 16px;"><i class="fab fa-github"></i> <a target="_blank" href="https://github.com/OpenDroneMap/WebODM">https://github.com/OpenDroneMap/WebODM</a></div>
+    <div class="text-center" style="margin-bottom: 16px; margin-top: 16px;"><i class="fas fa-globe"></i> <a target="_blank" href="https://www.globaldrones.com.br/home/drones/">Global Drones</a></div>
 
-    <div style="font-size: 90%; opacity: 0.9;" class="theme-secondary">{% blocktrans with link_start="<a href='https://raw.githubusercontent.com/OpenDroneMap/WebODM/master/LICENSE.md'>" link_end='</a>' %}This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See {{link_start}}the GNU Affero General Public License{{link_end}} for more details.{% endblocktrans %}</div>
+    <div style="font-size: 90%; opacity: 0.9;" class="">
+      {% blocktrans with link_start="<a href='https://raw.githubusercontent.com/OpenDroneMap/WebODM/master/LICENSE.md'>" link_end='</a>' %} 
+      <p>
+        A <span class="highlight">Global AgroSmart</span> é uma plataforma inovadora voltada para o agronegócio, desenvolvida pela Global Drones, que oferece soluções avançadas para otimizar o uso de tecnologia tanto nas propriedades agrícolas quanto pecuárias. Por meio de imagens de mapeamento geradas por drones, a plataforma permite a criação de ortomosaicos, mapas detalhados das áreas cultivadas e pastagens, essenciais para identificar com precisão problemas como a necessidade de pulverização de defensivos, correção de solo ou irrigação.
+    </p>
+
+    <p>
+        No setor agrícola, os produtores podem visualizar suas terras de forma inteligente, usando essas informações para tomar decisões mais precisas e informadas. A flexibilidade do Global AgroSmart permite que o agricultor escolha o método de pulverização mais adequado, seja por drone, avião ou outros recursos disponíveis, garantindo maior eficiência no manejo da lavoura e redução de custos.
+    </p>
+
+    <p>
+        A plataforma também se destaca no segmento pecuário. Após o mapeamento da área, o Global AgroSmart oferece funcionalidades avançadas para o manejo do gado, como:
+    </p>
+
+    <ul>
+        <li>Detecção de animais;</li>
+        <li>Contagem precisa do rebanho;</li>
+        <li>Estimativa de peso dos animais;</li>
+        <li>Avaliação da adequação da área de pastagem;</li>
+        <li>Identificação de deficiências nutricionais no pasto.</li>
+    </ul>
+
+    <p>
+        Além disso, a plataforma oferece análises detalhadas das imagens capturadas, permitindo monitorar o crescimento das culturas, prever colheitas e ajustar práticas agrícolas para maximizar a produtividade. O mesmo nível de análise pode ser aplicado às áreas de pastagem, otimizando o uso dos recursos disponíveis para o gado.
+    </p>
+
+    <p>
+        Com a <span class="highlight">Global AgroSmart</span>, tanto agricultores quanto pecuaristas têm em mãos uma ferramenta poderosa e flexível, projetada para transformar seus processos e alcançar resultados superiores.
+    </p>
+      {% endblocktrans %}
+    </div>
 </div>
 
 {% endblock %}
