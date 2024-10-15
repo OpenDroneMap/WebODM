@@ -119,6 +119,19 @@ class NewTaskPanel extends React.Component {
     this.setState({ taskInfo: this.getTaskInfo() });
   }
 
+  changeButtonColor = () => {
+    const resizeMode = ResizeModes.toHuman(this.state.resizeMode);
+
+    console.log('resizeMode: ', resizeMode);
+    console.log("cor do botaALSFOASFHOASFHOASIFHAOI: ")
+
+    if(resizeMode == 'Sim'){
+      return '#52994C';
+    }else{
+      return '#95a5a6';
+    }
+  }
+
   render() {
     let filesCountOk = true;
     if (this.taskForm && !this.taskForm.checkFilesCount(this.props.filesCount)) filesCountOk = false;
@@ -154,7 +167,7 @@ class NewTaskPanel extends React.Component {
                   <label className="col-sm-2 control-label">{_("Resize Images")}</label>
                   <div className="col-sm-10">
                     <div className="btn-group">
-                      <button type="button" className="btn btn-default-s dropdown-toggle" data-toggle="dropdown">
+                      <button type="button" className="btn btn-default-s dropdown-toggle" style={{backgroundColor:this.changeButtonColor()}} data-toggle="dropdown">
                         {ResizeModes.toHuman(this.state.resizeMode)} <span className="caret"></span>
                       </button>
                       <ul className="dropdown-menu">
