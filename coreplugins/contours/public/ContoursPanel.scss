@@ -133,5 +133,20 @@
   font-size: 14px;
   vertical-align: -1.5px;
 }
+
+@media (max-height: 810px) {
+  .dropdown {
+    position: relative;
+  }
+  .dropdown-menu {
+    bottom: 100%;
+    top: auto;
+    margin-bottom: 5px;
+  }
+}
+
+.underExport{
+  margin-left: 82px;
+}
 }
   
