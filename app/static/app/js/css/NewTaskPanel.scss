@@ -135,6 +135,54 @@
         justify-content: space-between;
         outline: none;
     }
+    .option-container {
+        padding: 0;
+
+    }
+
+    .form-group {
+        width: 100%;
+        
+        .select-container {
+            display: flex;
+
+            .options-select {
+                width: 100px;
+            }
+        }
+        .option-container {
+            padding: 0;
+
+        }
+
+        
+        .pad-this {
+            padding: 0 30px;
+        }
+        
+        .selectBtn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            background-position: calc(100% - 0.75rem) center !important;
+            -moz-appearance:none !important;
+            -webkit-appearance: none !important; 
+            appearance: none !important;
+        }
+        
+        .ai-label {
+            width: 400px;
+            @media (max-width: 600px) {
+                .ai-label {
+                }
+            }
+        }
+    }
+    
+    .form-group-data {
+        justify-content: start;
+    }
 
     @media (max-width: 600px) {
         .resize-images-container {

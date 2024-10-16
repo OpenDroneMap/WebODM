@@ -163,9 +163,9 @@ class NewTaskPanel extends React.Component {
 
             {this.state.editTaskFormLoaded && this.props.showResize && this.state.currentStep !== "aiStep" ?
               <div>
-                <div className="form-group resize-images-container">
+                <div className="form-group col-sm-10">
                   <label className="col-sm-2 control-label">{_("Resize Images")}</label>
-                  <div className="col-sm-10">
+                  <div className="col-sm-10 option-container">
                     <div className="btn-group">
                       <button type="button" className="btn btn-default-s dropdown-toggle" style={{backgroundColor:this.changeButtonColor()}} data-toggle="dropdown">
                         {ResizeModes.toHuman(this.state.resizeMode)} <span className="caret"></span>
