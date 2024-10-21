@@ -1,0 +1,23 @@
+.leaflet-touch .leaflet-control-markFields-control, .leaflet-control-markFields-control{
+    z-index: 999;
+    
+    a.leaflet-control-markFields-control-button{
+      background: no-repeat center url();
+      background-size: 50px 50px;
+      background-position-y: -8px;
+      
+    }
+  
+    div.markFields-control-panel{ display: none; }
+    
+    .open{
+      a.leaflet-control-markFields-control-button{
+        display: none;
+      }
+  
+      div.markFields-control-panel{
+        display: block;
+      }
+    }
+  }
+  

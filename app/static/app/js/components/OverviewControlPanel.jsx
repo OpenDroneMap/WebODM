@@ -57,6 +57,12 @@ export default class OverviewControlPanel extends React.Component {
 
     handleSendData = async () => {
         const { filteredSelectedLayers } = this.state;
+
+        if (filteredSelectedLayers.length == 0 ){
+            alert("Nenhum talhão selecionado.");
+            return;
+        } 
+
         const task_id = this.tiles[0].meta.task.id;
         const project_id = this.tiles[0].meta.task.project;
         const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
