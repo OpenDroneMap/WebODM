@@ -705,7 +705,7 @@ class ModelView extends React.Component {
                             task={this.props.task} 
                             direction="up" 
                             showLabel={false}
-                            buttonClass="btn-secondary"
+                            buttonClass="btnAssetDownloadButton rounded-corners selected-button"
                             onModalOpen={() => this.setState({modalOpen: true})}
                             onModalClose={() => this.setState({modalOpen: false})} />
             {(this.props.shareButtons && !this.props.public) ? 
