@@ -48,7 +48,7 @@ class MapView extends React.Component {
 
     if (selectedMapType === "auto") selectedMapType = "orthophoto"; // Hope for the best
 
-    let availableAISelections = ['ai_cattle', 'ai_corn', 'ai_field', 'ai_soy'];
+    let availableAISelections = ['ai_cattle', 'ai_corn', 'ai_field', 'ai_soy', 'ai_cane'];
 
     this.selectableAI = new Set();
 
@@ -193,7 +193,13 @@ class MapView extends React.Component {
         type: "ai_corn",
         name: "corn", // route
         icon: "glyphicon glyphicon-screenshot",
-      }
+      },
+      {
+        label: _("IA Daninha (cana)"),
+        type: "ai_cane",
+        name: "cane", // route
+        icon: "glyphicon glyphicon-screenshot",
+      },
     ]
 
     let aiTypeButtons = [

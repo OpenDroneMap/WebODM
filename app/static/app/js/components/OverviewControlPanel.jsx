@@ -57,6 +57,82 @@ export default class OverviewControlPanel extends React.Component {
     this.loadGeoJsonDetections(fieldSet);
   };
 
+    handleSendData = async () => {
+        const { filteredSelectedLayers } = this.state;
+
+        if (filteredSelectedLayers.length == 0 ){
+            alert("Nenhum talhão selecionado.");
+            return;
+        } 
+
+        const task_id = this.tiles[0].meta.task.id;
+        const project_id = this.tiles[0].meta.task.project;
+        const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
+        const csrfToken = getCsrfToken(); 
+    
+        const requests = filteredSelectedLayers.map(({ layer }) => {
+            const payload = {
+                type: layer.cropType,
+                payload: { processing_requests: { fields_to_process: [] } } // Adicionar IDs aqui
+            };
+            return fetch(url, {
+                method: 'POST',
+                headers: { 
+                    'content-type': 'application/json',
+                    'X-CSRFToken': csrfToken, // Adicionando o CSRF token ao cabeçalho
+                },
+                body: JSON.stringify(payload)
+            });
+        });
+    
+        try {
+            const responses = await Promise.all(requests);
+            const results = await Promise.all(responses.map(res => res.json()));
+            console.log('sucess: ', results);
+            alert("Talhões enviados para o processamento com sucesso.");
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    
+
+    this.removeGeoJsonDetections = this.props.removeGeoJsonDetections;
+    this.loadGeoJsonDetections = this.props.loadGeoJsonDetections;
+    this.tiles = this.props.tiles;
+  }
+
+  componentDidUpdate = (prevProps) => {
+    if (prevProps.selectedLayers !== this.props.selectedLayers) {
+      const filteredLayers = this.props.selectedLayers
+        .map((layer, index) => ({ layer, index }))
+        .filter(
+          ({ layer }) =>
+            layer.cropType !== null &&
+            layer.aiOptions &&
+            layer.aiOptions.size > 0
+        );
+
+      this.setState({ filteredSelectedLayers: filteredLayers });
+    }
+  };
+
+  handleCollapsedlistLayerItems = (index) => {
+    this.setState((prevState) => ({
+      collapsedLayers: {
+        ...prevState.collapsedLayers,
+        [index]: !prevState.collapsedLayers[index], // Toggle o estado de colapsado para esse índice
+      },
+    }));
+  };
+
+  handleClearOverviewLayers = () => {
+    const fieldSet = new Set(["field"]);
+
+    this.setState({ filteredSelectedLayers: [] });
+    this.removeGeoJsonDetections(fieldSet);
+    this.loadGeoJsonDetections(fieldSet);
+  };
+
   handleSendData = async () => {
     const { filteredSelectedLayers } = this.state;
     const task_id = this.tiles[0].meta.task.id;

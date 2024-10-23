@@ -223,7 +223,8 @@ class Task(models.Model):
             'cattle_detection.geojson': os.path.join('ai_detections','cattle', 'cattle_detection.geojson'),
             'corn_detection.geojson': os.path.join('ai_detections','corn', 'corn_detection.geojson'),
             'field_detection.geojson': os.path.join('ai_detections','fields', 'field_detection.geojson'),
-            'soy_detection.geojson': os.path.join('ai_detections','soy', 'soy_detection.geojson')
+            'soy_detection.geojson': os.path.join('ai_detections','soy', 'soy_detection.geojson'),
+            'cane_detection.geojson': os.path.join('ai_detections', 'cane', 'cane_detection.geojson')
 
     }
 
@@ -940,6 +941,7 @@ class Task(models.Model):
         if 'corn_detection.geojson' in self.available_assets: types.append('ai_corn')
         if 'field_detection.geojson' in self.available_assets: types.append('ai_field')
         if 'soy_detection.geojson' in self.available_assets: types.append('ai_soy')
+        if 'cane_detection.geojson' in self.available_assets: types.append('ai_cane')
 
         camera_shots = ''
         if 'shots.geojson' in self.available_assets: camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)

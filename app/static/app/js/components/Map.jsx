@@ -24,6 +24,7 @@ import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
 import OverviewControl from './OverviewControl';
+import MarkFieldsControl from './MarkFieldsControl';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
@@ -677,6 +678,12 @@ class Map extends React.Component {
           this.map.invalidateSize();
       }, 500); 
     });
+
+    // novo popup para marcar talhões 
+    this.MarkFieldsControl = new MarkFieldsControl({
+      
+    }).addTo(this.map);
+
   }
 
   componentDidUpdate(prevProps, prevState) {
