@@ -73,6 +73,12 @@
 
             {% get_plugins_main_menus as plugin_menus %}
             {% for menu in plugin_menus %}
+
+            {# 
+            Verifica se o menu não é "Diagnóstico" ou se o usuário é Administrador (is_staff True). 
+            Se qualquer uma das condições for verdadeira, o item do menu será exibido na lista.
+            Se o menu for Diagnóstico e o usuário não for administrador o item não será exibido. 
+            #}
             {% if menu.label != "Diagnóstico" or user.is_staff != False %}
         
             <li>

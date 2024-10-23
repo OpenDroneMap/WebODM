@@ -3,6 +3,8 @@
 
 {% block content %}
 <script src="./Chart.min.js"></script>
+
+{# Se o usuário for administrador mostra as informações normalmente #}
 {% if user.is_staff %}
 <h2>{% trans 'Diagnostic Information' %}</h2>
 
