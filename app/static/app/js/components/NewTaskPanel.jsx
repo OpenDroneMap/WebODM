@@ -164,7 +164,7 @@ class NewTaskPanel extends React.Component {
             {this.state.editTaskFormLoaded && this.props.showResize && this.state.currentStep !== "aiStep" ?
               <div>
                 <div className="form-group col-sm-10">
-                  <label className="col-sm-2 control-label">{_("Resize Images")}</label>
+                  <label className="col-sm-2 control-label noPadding">{_("Resize Images")}</label>
                   <div className="col-sm-10 option-container">
                     <div className="btn-group">
                       <button type="button" className="btn btn-default-s dropdown-toggle" style={{backgroundColor:this.changeButtonColor()}} data-toggle="dropdown">
@@ -194,7 +194,7 @@ class NewTaskPanel extends React.Component {
 
           {this.state.editTaskFormLoaded ?
             <div className="form-group">
-                <div className="col-sm-offset-2 col-sm-10 text-right">
+                <div className=" textMoveRight">
                   {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{_("Cancel")}</button>}
                   {this.state.loading ?
                     <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
