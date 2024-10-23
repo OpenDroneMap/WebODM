@@ -1,10 +1,10 @@
+
 .leaflet-touch .leaflet-control-overview-control, .leaflet-control-overview-control{
     z-index: 999;
-    
     a.leaflet-control-overview-control-button{
-      // background: no-repeat center url(Icon/path);
-      background-size: 50px 50px;
-      background-position-y: -8px;
+      background: no-repeat center url(../icons/overview.svg);
+      background-size: 25px 25px;
+      // background-position-y: 1px;
     }
   
     div.overview-control-panel{ display: none; }
