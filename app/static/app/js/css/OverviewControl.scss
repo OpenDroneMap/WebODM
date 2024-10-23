@@ -4,16 +4,19 @@
     a.leaflet-control-overview-control-button{
       background: no-repeat center url(../icons/overview.svg);
       background-size: 25px 25px;
-      // background-position-y: 1px;
+      //background-position-y: 0px;
     }
-
-  .open {
-    a.leaflet-control-overview-control-button {
-      display: none;
+  
+    div.overview-control-panel{ display: none; }
+    
+    .open{
+      a.leaflet-control-overview-control-button{
+        display: none;
+      }
+  
+      div.overview-control-panel{
+        display: block;
+      }
     }
-
-    div.overview-control-panel {
-      display: block;
-    }
-  }
 }
+  
