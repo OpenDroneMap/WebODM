@@ -33,92 +33,9 @@ Essa api é usada no front-end com uma biblioteca chamada de leaflet que é util
   ```json
   {
     "payload": {
-      "type": "object",
-      "properties": {
-        "type": { "const": "FeatureCollection" },
-        "features": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": { "const": "Feature" },
-              "properties": {
-                "type": "object",
-                "properties": {
-                  "Length": { "type": "number" },
-                  "Area": { "type": "number" },
-                  "field_id": { "type": "number" }
-                },
-                "required": ["Length", "Area", "field_id"]
-              },
-              "geometry": {
-                "type": "object",
-                "properties": {
-                  "type": { "const": "Polygon" },
-                  "coordinates": {
-                    "type": "array",
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "type": "array",
-                        "items": { "type": "number" },
-                        "minItems": 2,
-                        "maxItems": 2
-                      }
-                    }
-                  }
-                },
-                "required": ["type", "coordinates"]
-              }
-            },
-            "required": ["type", "properties", "geometry"]
-          }
-        }
-      },
-      "required": ["type", "features"]
+      `field_detection.geojson`
     },
     "required": ["payload"]
-  }
-  ```
-- **Example Body:**
-  ```json
-  {
-    "payload": {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "properties": {
-            "Length": 10,
-            "Area": 10,
-            "field_id": 0
-          },
-          "geometry": {
-              "type": "Polygon",
-              "coordinates": [
-              ]
-              [
-                [
-                  -1,
-                  -15
-                ],
-                [
-                  10,
-                  -15
-                ],
-                [
-                  10,
-                  -2
-                ],
-                [
-                  -1,
-                  -2
-                ],
-              ]
-          }
-        }
-      ]
-    }
   }
   ```
 
