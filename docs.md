@@ -75,8 +75,9 @@ Essa api é usada no front-end com uma biblioteca chamada de leaflet que é util
           }
         }
       },
-    }
-    "required": ["type", "features"]
+      "required": ["type", "features"]
+    },
+    "required": ["payload"]
   }
   ```
 - **Example Body:**
