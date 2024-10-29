@@ -3,7 +3,7 @@
     background: #fff;
     width: 300px;
     min-height: 74px;
-    max-height: 418px;
+    max-height: 300px;
     overflow-y: auto;
   
     .close-button{
@@ -80,6 +80,18 @@
 
     .form-container input {
       width: 80px;
+    }
+
+    .dropdown-menu.pull-right {
+      right: 136px !important;
+    }
+
+    .dropdown-menu a {
+      width: 100%;
+      text-align: left;
+      display: block;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
   }

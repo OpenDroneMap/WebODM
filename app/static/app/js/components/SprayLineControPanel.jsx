@@ -143,6 +143,11 @@ export default class SprayLineControlPanel extends React.Component {
 
     }
 
+
+    handleExport = (format) => {
+        console.log(format);
+    }
+
     render() {
         
         return (
@@ -181,7 +186,26 @@ export default class SprayLineControlPanel extends React.Component {
                 )}
                 <hr />
                 <button onClick={this.handleProcess}>Processar</button>
-                <button>Exportar</button>
+                <button className="btn btn-sm btn-primary btn-export" data-toggle="dropdown">
+                    Exportar
+                </button>
+                <ul className="dropdown-menu  pull-right">
+                    <li>
+                    <a href="javascript:void(0);" onClick={() => this.handleExport("GeoJSON")}>
+                        <i className="fa fa-code fa-fw"></i> GeoJSON (.JSON)
+                    </a>
+                    </li>
+                    <li>
+                    <a href="javascript:void(0);" onClick={() => this.handleExport("Shapefile")}>
+                        <i className="far fa-file-archive fa-fw"></i> ShapeFile (.SHP)
+                    </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0);" onClick={() => this.handleExport("xml")}>
+                            <i className="fa fa-file-code fa-fw"></i> XML (.XML)
+                        </a>
+                    </li>
+                </ul>
             </div>
         );
     }
