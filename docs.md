@@ -20,6 +20,25 @@ Ele também pode ser feito por outra classe que ainda não foi identificada mas 
 
 Essa api é usada no front-end com uma biblioteca chamada de leaflet que é utilizada para desenhar o mapa. Para mais informações: [Leaflet](https://leafletjs.com/reference.html "Leaflet")
 
+
+### API para salvar field_detection.geojson para processamentos AI
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/save/field`
+- **Método:** POST
+- **Headers:**
+  - `Content-Type: application/json`
+- **Descrição:** Esta API permite salvar dados geoespaciais no formate GeoJSON, utilizado nos processamentos AI. O que estiver dentro do `payload` será salvo em `/media/project/<project_id>/task/<task_id>/assets/ai_detections/fields/field_detection.geojson`.
+
+- **Body Schema:**
+  ```json
+  {
+    "payload": {
+      `field_detection.geojson`
+    },
+    "required": ["payload"]
+  }
+  ```
+
 ### Documentação da API para Recuperação dos Dados de Detecção de AI
 
 Esta API provê endpoints para acessar arquivos GeoJSON que contêm dados de detecções AI realizadas em tarefas específicas dentro de projetos. Cada endpoint suporta o método HTTP GET e retorna informações específicas conforme descrito abaixo:

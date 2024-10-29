@@ -7,9 +7,10 @@
     .btn-custom {
         background-color: #009f32;
         color: #fff;
+        margin-bottom: 20px;
     }
     .btn-custom:hover {
-        color: #000;
+        background-color: #01832a;
     }
     .btn.new-account {
         background-color: #5fb367;
@@ -60,9 +61,9 @@
                 </div>
                 <div>
                     {% if reset_pwd_link != '' %}
-                        <p class="text-center login-help redirect-link"><a href="{{ reset_pwd_link }}">Esqueceu a senha?</a></p>
+                        <p class="text-center "><a href="{{ reset_pwd_link }}">Esqueceu a senha?</a></p>
                     {% else %}
-                        <p class="text-center login-help redirect-link"><a class="redirect-link" href="javascript:toggleForgotPasswordHint();">Esqueceu a senha?</a></p>
+                        <p class="text-center "><a class="redirect-link" href="javascript:toggleForgotPasswordHint();">Esqueceu a senha?</a></p>
                         <script>function toggleForgotPasswordHint(){ $("#forgotPasswordHint").toggle(); }</script>
                         <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 8px; border-radius: 25px; color: #1d1c1c;" class="theme-secondary">
                             Contate: <a href="tel:+5599999999999"> <strong>(99) 99999-9999</strong></a>
