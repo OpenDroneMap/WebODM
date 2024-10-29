@@ -23,6 +23,8 @@ export default class SprayLineControlPanel extends React.Component {
         this.distanceRef = React.createRef();
         this.directionRef = React.createRef();
         this.flightHeightRef = React.createRef();
+
+
     }
 
     componentDidUpdate = (prevProps) => {
@@ -33,10 +35,12 @@ export default class SprayLineControlPanel extends React.Component {
 
             this.setState({ filteredSelectedLayers: filteredLayers });
         }
+
     }
 
     handlePopUp = (e) => {
         const { overlays } = this.props;
+        
         const layerSelected = this.state.filteredSelectedLayers.filter(layer => layer.index == e.target.id);
 
         if (overlays[1]) {
@@ -66,37 +70,81 @@ export default class SprayLineControlPanel extends React.Component {
     }
 
     handleProcess = async () => {
-        const distance = this.distanceRef.current.value;
-        const direction = this.directionRef.current.value;
-        const flightHeight = this.flightHeightRef.current.value;
-        const url = '';
 
+        const { overlays } = this.props;
+        const { tiles } = this.props
+        const { filteredSelectedLayers } = this.state;
+    
 
-        const payload = {
-        
-        };
+        if (overlays[1] && filteredSelectedLayers.length > 0) {
+            const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+            const fieldIds = [];
 
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+            leafleatLayers.forEach(leafletLayer => {
+                filteredSelectedLayers.forEach(selectedLayer => {
+                    const bounds1 = leafletLayer._bounds;
+                    const bounds2 = selectedLayer.layer.bounds;
+    
+                    const isBoundsEqual = (
+                        bounds1._northEast.lat === bounds2._northEast.lat &&
+                        bounds1._northEast.lng === bounds2._northEast.lng &&
+                        bounds1._southWest.lat === bounds2._southWest.lat &&
+                        bounds1._southWest.lng === bounds2._southWest.lng
+                    );
+    
+                    if (isBoundsEqual) {
+                        fieldIds.push(leafletLayer.feature.properties.Field_id);
+                    }
+                });
             });
+    
+            
+            console.log("Field IDs: ", fieldIds);  
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Processamento bem-sucedido:', data);
-            } else {
-                console.error('Erro no processamento');
+
+            const task_id = tiles[0].meta.task.id;
+            const project_id = tiles[0].meta.task.project;
+            const distance = this.distanceRef.current.value;
+            const direction = this.directionRef.current.value;
+            // const flightHeight = this.flightHeightRef.current.value;
+            const URL = '';
+
+
+
+            const payload = {
+                processing_requests: {
+                    distancia: distance,
+                    angulo: direction,
+                    fields_to_process: fieldIds
+                }
+            };
+
+            console.log("payload: ", payload);
+
+            try {
+                const response = await fetch(URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Processamento bem-sucedido:', data);
+                } else {
+                    console.error('Erro no processamento');
+                }
+            } catch (error) {
+                console.error('Erro na requisição:', error);
             }
-        } catch (error) {
-            console.error('Erro na requisição:', error);
         }
+
     }
 
     render() {
+        
         return (
             <div className="sprayline-control-panel">
                 <span className="close-button" onClick={this.props.onClose} />
@@ -109,7 +157,7 @@ export default class SprayLineControlPanel extends React.Component {
                             {this.state.filteredSelectedLayers.map(({ layer, index }) => (
                                 <li key={index} className='layer-item'>
                                     <a href="javascript:void(0)" id={index} onClick={this.handlePopUp} className='link-item'>
-                                        {`Layer ${index}`}
+                                        {names[index] + ` - Layer ${index}` || `Layer ${index}`}
                                     </a>
                                 </li>
                             ))}

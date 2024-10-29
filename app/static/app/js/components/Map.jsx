@@ -108,16 +108,12 @@ class Map extends React.Component {
     return this.state.selectedLayers;
   }
 
-  // types_to_be_loaded is a Set.
   loadGeoJsonDetections(types_to_be_loaded) {
     const { tiles } = this.props;
     const task_id = tiles[0].meta.task.id;
     const project_id = tiles[0].meta.task.project;
 
-
-
     const base_url = `/api/projects/${project_id}/tasks/${task_id}/ai/detections/`;
-
 
     types_to_be_loaded.forEach((typ) => {
       addTempLayerUsingRequest(base_url + typ, typ, this.props.aiTypes, [this.getSelectedLayers, this.setSelectedLayers], (error, tempLayer, api_url) => {
@@ -135,6 +131,7 @@ class Map extends React.Component {
       });
     });
   }
+
 
   // types_to_be_removed is a Set.
   removeGeoJsonDetections(types_to_be_removed) {

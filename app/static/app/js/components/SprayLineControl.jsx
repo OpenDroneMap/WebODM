@@ -43,7 +43,8 @@ class SprayLineControl extends React.Component {
                 <SprayLineControlPanel
                     onClose={this.handleClose}
                     selectedLayers={this.props.selectedLayers}
-                    overlays={this.props.overlays}/>
+                    overlays={this.props.overlays}
+                    tiles={this.props.tiles}/>
             </div>);
         
     }
