@@ -122,10 +122,7 @@ class NewTaskPanel extends React.Component {
   changeButtonColor = () => {
     const resizeMode = ResizeModes.toHuman(this.state.resizeMode);
 
-    console.log('resizeMode: ', resizeMode);
-    console.log("cor do botaALSFOASFHOASFHOASIFHAOI: ")
-
-    if(resizeMode == 'Sim'){
+    if(this.state.resizeMode == 1){
       return '#52994C';
     }else{
       return '#95a5a6';

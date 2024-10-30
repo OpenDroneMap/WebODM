@@ -631,7 +631,7 @@ class EditTaskForm extends React.Component {
               </div>
           </div> */}
           <div className="form-group col-sm-10">
-            <label className="col-sm-2 control-label noPadding">{_("Name")}</label>
+            <label className="col-sm-2 control-label newPad">{_("Name")}</label>
             <div className="col-sm-10 name-fields input-field">
               {this.state.loadingTaskName ?
                 <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
@@ -647,7 +647,7 @@ class EditTaskForm extends React.Component {
             </div>
           </div>
           <div className='form-group col-sm-10'>
-              <label className="col-sm-2 control-label noPadding">{_("Options")}</label>
+              <label className="col-sm-2 control-label newPad">{_("Options")}</label>
               <div className="col-sm-10 option-container">
                 {!this.props.inReview ? optionsSelector :
                   <div className="review-options">
