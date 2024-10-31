@@ -4,24 +4,29 @@
     }
 }
 
-.modal-dialog {
-
+.modal-dialog { 
+    
+    
     button {
         transition: all 0.3s;
     }
+
 
     padding-top: 10%;
 
     .modal-content {
         background-color: rgba($color: #fff, $alpha: 0.85);
+        display: flex;
+        min-width: 100% ;
     }
     
     .close {
         opacity: 1.0;
+        
     }
     
     .x-close {
-        color: #7c7c7c;
+        color: #ffffff;
         opacity: 1.0;
         font-family: "Montserrat Bold";
     }
@@ -35,10 +40,14 @@
     .save:hover {
         background-color: #4b8b45;
     }
-    
+    .btn{
+        width: 100%;
+    }
     .btn-cancel {
         background-color: #afafaf;
         border-color: #a0a0a0;
+        margin: 0 !important;
+        margin-top: 5px !important;
 
         &:hover {
             background-color: #a0a0a0;
@@ -47,6 +56,7 @@
     
     #edit-project-popup {
         padding-bottom: 5px;
+        // display: flex;
         
     }
 
@@ -56,7 +66,14 @@
 
     }
 
+
+
     @media (max-width: 767px) {
+        .modal-content {
+            display: flex;
+            min-width: 100% ;
+            flex-direction: column;
+        }
             
         .modal-footer {
             display: flex;
@@ -65,13 +82,14 @@
 
 
 
-            .pull-right {
+            .btn {
                 display: flex;
-                flex-direction: column;
+                flex-direction: column !important; 
                 gap: 5px;
 
                 button {
                     margin: 0;
+
                 }
             }
 
@@ -95,7 +113,9 @@
             }
         }
         
+
     }
+
 }
 
 .modal-title {

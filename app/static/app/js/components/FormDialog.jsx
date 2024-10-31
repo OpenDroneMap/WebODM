@@ -179,34 +179,32 @@ class FormDialog extends React.Component {
 
         return (
             <div ref={this.setModal}
-                className="modal form-dialog" tabIndex="-1"
+                className="modal fade form-dialog" tabIndex="-1"
                 data-backdrop="static"
             >
               <div className="modal-dialog">
                 <div className="modal-content rounded-corners">
                   <div className="modal-header no-border">
-                    <button type="button" className="close" onClick={this.hide}><span className="x-close">&times;</span></button>
+                    {/* <button type="button" className="close" onClick={this.hide}><span className="x-close">&times;</span></button> EXCLUIDO POR FALTA DE ULTILIDADE, POIS JA EXISTE UM BOTAO CANCELAR */}
                     <h4 className="modal-title text-center force-montserrat-bold">{this.props.title === "Edit Project" ? "Editar Projeto" : this.props.title }</h4>
                   </div>
-                  <div id="edit-project-popup" className="modal-body">
+                  <div id="edit-project-popup" >
                     <ErrorMessage bind={[this, "error"]} />
-                    <div className="form-horizontal" onSubmit={this.handleSave}>
+                    <div className="" onSubmit={this.handleSave}>
                       {this.props.children}
                     </div>
                   </div>
-                  <div className="modal-footer">
-                    <div className="pull-right">
-                        <button type="button" className="btn save rounded-corners font-12" onClick={this.handleSave} disabled={this.state.saving}>
+                  <div className="btn">
+                        <button type="button" className="btn save font-12" onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
                                 <span>
-                                    <i className="fa fa-circle-notch fa-spin"></i> Salvar Mudanças
+                                    Salvar Mudanças
                                 </span>
                             :   <span>
-                                    <i className={this.props.saveIcon}></i> Salvar Mudanças
+                                   Salvar Mudanças
                                 </span>}
                         </button>
-                        <button type="button" className="btn btn-cancel btn-default rounded-corners font-12" onClick={this.hide} disabled={this.state.saving}>{_("Cancelar")}</button>
-                    </div>
+                        <button type="button" className="btn btn-cancel font-12" onClick={this.hide} disabled={this.state.saving}>{_("Cancelar")}</button>
                     
                     {leftButtons.length > 0 ?
                         <div className="text-left">
