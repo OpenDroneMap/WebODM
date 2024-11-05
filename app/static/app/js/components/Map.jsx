@@ -31,6 +31,7 @@ import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _ } from '../classes/gettext';
+import ProcessingCard from './ProcessingCard';
 
 class Map extends React.Component {
   static defaultProps = {
@@ -750,6 +751,7 @@ class Map extends React.Component {
   render() {
     return (
       <div style={{ height: "100%" }} className="map">
+        <ProcessingCard/>
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider hidden-xs">
             {_("Opacidade:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
