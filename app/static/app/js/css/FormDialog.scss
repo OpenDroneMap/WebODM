@@ -16,8 +16,6 @@
 
     .modal-content {
         background-color: rgba($color: #fff, $alpha: 0.85);
-        display: flex;
-        min-width: 100% ;
     }
     
     .close {
@@ -41,13 +39,20 @@
         background-color: #4b8b45;
     }
     .btn{
-        width: 100%;
+        margin: 0px;
+        
+        .btn-S-C
+        {
+            display: flex;
+            flex-direction: column;
+        }
     }
+
     .btn-cancel {
         background-color: #afafaf;
         border-color: #a0a0a0;
-        margin: 0 !important;
-        margin-top: 5px !important;
+        margin-left: 5px !important;
+        margin-right: 5px !important;
 
         &:hover {
             background-color: #a0a0a0;
@@ -63,6 +68,7 @@
     .btn-danger, .btn-default {
         border-radius: 25px;
         font-size: 12px;
+ 
 
     }
 

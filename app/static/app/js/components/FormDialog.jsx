@@ -159,7 +159,8 @@ class FormDialog extends React.Component {
     render(){
         let leftButtons = [];
         if (this.props.deleteAction){
-            leftButtons.push(<button 
+            leftButtons.push(
+            <button 
                 disabled={this.state.deleting}
                 className="btn btn-danger btn-delete-editProject"
                 key="delete" 
@@ -194,10 +195,10 @@ class FormDialog extends React.Component {
                       {this.props.children}
                     </div>
                   </div>
-                  <div className="btn">
-                        <button type="button" className="btn save font-12" onClick={this.handleSave} disabled={this.state.saving}>
+                  <div className="btn btn-S-C" >
+                        <button type="button" className="btn save font-12"  onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
-                                <span>
+                                <span >
                                     Salvar Mudanças
                                 </span>
                             :   <span>

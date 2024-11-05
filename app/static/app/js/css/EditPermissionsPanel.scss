@@ -50,6 +50,10 @@
 
     .permissions-user-container {
         padding: 5px 15px;
+        
+            display: flex;
+            flex-direction: column;
+        
     }
     .user-indicator{
         position: absolute;
@@ -132,6 +136,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 5px;
 
         &:hover {
             background-color: #4b8b45;

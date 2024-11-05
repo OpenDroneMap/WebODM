@@ -1,4 +1,5 @@
 .edit-project-dialog{
+    
     .name-fields{
         display: flex;
         .btn.toggle-tags{
@@ -44,4 +45,11 @@
             box-shadow: none;
         }
     }
+}
+.btn-S-C
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
 }

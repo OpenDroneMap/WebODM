@@ -208,7 +208,7 @@ class EditPermissionsPanel extends React.Component {
   }
 
   render() {
-    const permissions = this.state.permissions.map((p, i) => <form autoComplete="off" key={i}>
+    const permissions = this.state.permissions.map((p, i) => <form autoComplete="off" key={i}> 
         <div className="permission">
             <div className="username-container">
                 <i className="fa fa-user user-indicator"/>
@@ -246,13 +246,14 @@ class EditPermissionsPanel extends React.Component {
       <div className="edit-permissions-panel">
         <div className="form-group">
           <div className='form-container'>
-            <label className="control-label">{_("Permissions")}</label>
-            <div className='add-new-btn' key="add-new">
-                  <button onClick={this.addNewPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-user-plus"></i></button>
-            </div>
+       
           </div>
           <div className="permissions-user-container">
             <ErrorMessage bind={[this, 'error']} />
+              <label className="control-label">{_("Permissions")}</label>
+              <div className='add-new-btn' key="add-new">
+                    <button onClick={this.addNewPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-user-plus"></i></button>
+              </div>
             {this.state.loading ? 
             <i className="fa fa-circle-notch fa-spin fa-fw perms-loading"></i>
             : permissions}
