@@ -766,6 +766,19 @@ class TestApiTask(BootTransactionTestCase):
             res = other_client.post("/api/projects/{}/tasks/{}/3d/scene".format(project.id, task.id), json.dumps({ "type": "Potree", "modified": True }), content_type="application/json")
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
+            # Original owner enables edits
+            res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+                'public': True,
+                'public_edit': True
+            })
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            
+            # He can now save scene / change camera view
+            res = other_client.post("/api/projects/{}/tasks/{}/3d/cameraview".format(project.id, task.id), json.dumps({ "position": [0,0,0], "target": [0,0,0] }), content_type="application/json")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            res = other_client.post("/api/projects/{}/tasks/{}/3d/scene".format(project.id, task.id), json.dumps({ "type": "Potree", "modified": True }), content_type="application/json")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
             # User logs out
             other_client.logout()
 

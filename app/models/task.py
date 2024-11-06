@@ -1027,6 +1027,7 @@ class Task(models.Model):
             'project': self.project.id,
             'available_assets': self.available_assets,
             'public': self.public,
+            'public_edit': self.public_edit,
             'epsg': self.epsg
         }
 
