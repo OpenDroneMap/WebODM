@@ -11,6 +11,7 @@ class MapView extends React.Component {
     selectedMapType: 'auto',
     title: "",
     public: false,
+    publicEdit: false,
     shareButtons: true,
     permissions: ["view"]
   };
@@ -20,6 +21,7 @@ class MapView extends React.Component {
       selectedMapType: PropTypes.oneOf(['auto', 'orthophoto', 'plant', 'dsm', 'dtm']),
       title: PropTypes.string,
       public: PropTypes.bool,
+      publicEdit: PropTypes.bool,
       shareButtons: PropTypes.bool,
       permissions: PropTypes.array
   };
@@ -152,6 +154,7 @@ class MapView extends React.Component {
                 showBackground={true} 
                 mapType={this.state.selectedMapType} 
                 public={this.props.public}
+                publicEdit={this.props.publicEdit}
                 shareButtons={this.props.shareButtons}
                 permissions={this.props.permissions}
                 thermal={isThermal}
