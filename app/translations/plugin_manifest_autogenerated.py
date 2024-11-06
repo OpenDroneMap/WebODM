@@ -1,6 +1,7 @@
 // Auto-generated with extract_plugin_manifest_strings.py, do not edit!
 
 from django.utils.translation import gettext as _
+_("Upload and tile ODM assets with Cesium ion.")
 _("Import images from external sources directly")
 _("Compute, preview and export contours from DEMs")
 _("Display program version, memory and disk space usage statistics")
@@ -18,3 +19,4 @@ _("Get notified when a task has finished processing, has been removed or has fai
 _("A plugin to create GCP files from images")
 _("Annotate and measure on 2D maps with ease")
 _("Add a GPS location button to the 2D map view")
+_("Plugin to get align from external service for WebODM")
