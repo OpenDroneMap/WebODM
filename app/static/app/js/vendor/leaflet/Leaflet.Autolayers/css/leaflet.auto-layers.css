@@ -1,17 +1,29 @@
 .leaflet-control-autolayers-title {
-    cursor: pointer;
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+    font-size: 120% !important;
+    margin-right: 60px !important;
+    height: auto !important;
+    color: #14a5a2;
+    text-transform: uppercase;
 }
 
 .leaflet-control-autolayers-close {
     display: inline-block;
-    background-image: url(../images/close.png);
-    height: 18px;
-    width: 18px;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAUklEQVQ4jWNgGAXYgC4DA4M5FnFzqBxBYM7AwPCKgYHBAUnMASqGzWCswIaBgeElAwODExqbJOAA1fgSzTUogIlUU4kFtgwUeIHiQKQ4GkcaAAC8Jw8GjeNLuQAAAABJRU5ErkJggg==);
+    height: 25px;
+    width: 25px;
     margin-right: 0;
     float: right;
     vertical-align: middle;
     text-align: right;
-    margin-top: 1px;
+    margin-top: 0px;
+    margin-left: 16px;
+    position: relative;
+    left: 8px;
+    top: -53px;
+    background-size: contain;
+    cursor: pointer;
 }
 
 .leaflet-control-autolayers-title {
@@ -67,9 +79,6 @@
     cursor: pointer;
 }
 
-.leaflet-control-layers-overlays label:hover {
-    background-color: #CCC;
-}
 
 .leaflet-control-layers-selected {
     padding-bottom: 1px;
@@ -180,3 +189,108 @@
     background: #eee;
     cursor: pointer;
 }
+
+.leaflet-control-layers-selector {
+    display: none;
+}
+
+.leaflet-control-layers-expanded {
+    max-width: 300px;
+    padding: 15px 20px 15px 25px;
+    border-radius: 25px;
+    max-height: 350px;
+    
+}
+
+.map-filter-box-base {
+    padding: 5px;
+    height: auto !important;
+    border: 2px solid #14a5a2;
+    border-radius: 25px;
+    margin-bottom: 15px;
+}
+
+.basemapsIcon {
+    color: #74b16f;
+    font-size: 16px;
+}
+
+.horizontal-bar {
+    display: block;
+    opacity: 1;
+    height: 1px;
+    width: 70%;
+} 
+
+.leaflet-control-layers-base label {
+    height: auto !important;
+}
+
+.leaflet-control-layers-base label:hover {
+    background-color: transparent !important;
+}
+
+@media (max-width: 768px) {
+
+    .leaflet-control-layers-base {
+        height: auto !important;
+        width: auto !important;
+    }
+
+    .leaflet-control-layers-expanded {
+        max-width: 200px;
+        padding: 5px 10px 5px 15px;
+        border-radius: 25px;
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: auto;
+        
+    }
+
+    .leaflet-control-autolayers-title {
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
+        font-size: 90% !important;
+        margin-right: 0px !important;
+    }
+
+    .map-filter {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .map-filter-box-base {
+        padding: 1px;
+        border: 1px solid #14a5a2;
+        border-radius: 25px;
+        font-size: 80% !important;
+        height: 16px !important;
+    }
+
+
+    .leaflet-control-layers-base {
+        font-size: 80%;
+    }
+
+    .basemapsIcon {
+        font-size: 12px
+    } 
+
+
+    .horizontal-bar {
+        width: 40%;
+        margin-top: 1px;
+        margin-bottom: 1px;
+    } 
+
+    .leaflet-control-autolayers-close {
+        width: 20px;
+        height: 20px;
+        left: 2px;
+        top: -25px;
+    }
+
+}
+
+
+

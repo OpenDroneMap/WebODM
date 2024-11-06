@@ -132,7 +132,7 @@ class FieldLayerControlPopup extends React.Component {
               return (
                 <div className="croType-container" key={typ.type}>
                   <div onClick={() => this.handleOnChangeRadio(typ.type)} style={{ cursor: "pointer" }}>
-                    <i className={this.state.cropType === typ.type ? "fas fa-check-square" : "far fa-square"}></i>
+                    <i className={this.state.cropType === typ.type ? "fas fa-check-circle" : "far fa-circle"}></i>
                     <label htmlFor={typ.type} style={{ cursor: "pointer" }}>
                       {typ.checkboxLabel}
                     </label>

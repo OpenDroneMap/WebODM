@@ -853,8 +853,17 @@ L.Control.AutoLayers = L.Control.extend({
 		var name = document.createElement('span');
 		name.innerHTML = ' ' + obj.name;
 
+		var iconCustom = document.createElement('i');
+		iconCustom.className = `${checked ? "fas fa-check-circle basemapsIcon" : "far fa-circle basemapsIcon"}`;
+
+		var horizontalBar = document.createElement('span');
+		horizontalBar.className = 'horizontal-bar';
+
 		wrapper.appendChild(input);
+		wrapper.appendChild(iconCustom);
 		wrapper.appendChild(name);
+		wrapper.appendChild(horizontalBar);
+		
 
 		var container = obj.overlay ? this._overlaysList : this._baseLayersList;
 		container.appendChild(wrapper);
@@ -862,31 +871,68 @@ L.Control.AutoLayers = L.Control.extend({
 		return wrapper;
 	},
 
+	// _onInputClick: function(e) {
+
+	// 	console.log("clicado", e)
+	// 	var i, input, obj,
+	// 		inputs = this._form.getElementsByTagName('input'),
+	// 		inputsLen = inputs.length;
+	// 	if (e) e.stopPropagation();
+
+	// 	this._handlingClick = true;
+
+	// 	for (var i = 0; i < inputsLen; i++) {
+	// 		input = inputs[i];
+	// 		obj = this._layers[input.layerId];
+	// 		if (input.type === 'checkbox' || input.type === "radio") {
+	// 			if (input.checked && !this._map.hasLayer(obj.layer)) {
+	// 				this._map.addLayer(obj.layer);
+
+	// 			} else if (!input.checked && this._map.hasLayer(obj.layer)) {
+	// 				this._map.removeLayer(obj.layer);
+	// 			}
+	// 		}
+	// 	}
+
+	// 	this._handlingClick = false;
+	// 	//keep this commented out so we don't lose focus
+	// 	//this._refocusOnMap();
+	// },
+
 	_onInputClick: function(e) {
-		var i, input, obj,
-			inputs = this._form.getElementsByTagName('input'),
-			inputsLen = inputs.length;
 		if (e) e.stopPropagation();
-
+	
 		this._handlingClick = true;
-
+	
+		var inputs = this._form.getElementsByTagName('input'),
+			inputsLen = inputs.length;
+	
 		for (var i = 0; i < inputsLen; i++) {
-			input = inputs[i];
-			obj = this._layers[input.layerId];
+			var input = inputs[i],
+				obj = this._layers[input.layerId];
+	
 			if (input.type === 'checkbox' || input.type === "radio") {
-				if (input.checked && !this._map.hasLayer(obj.layer)) {
-					this._map.addLayer(obj.layer);
-
-				} else if (!input.checked && this._map.hasLayer(obj.layer)) {
-					this._map.removeLayer(obj.layer);
+				var iconElement = input.nextElementSibling; 
+	
+				if (input.checked) {
+					if (!this._map.hasLayer(obj.layer)) {
+						this._map.addLayer(obj.layer);
+					}
+					iconElement.className = "fas fa-check-circle basemapsIcon";
+				} else {
+					if (this._map.hasLayer(obj.layer)) {
+						this._map.removeLayer(obj.layer);
+					}
+					iconElement.className = "far fa-circle basemapsIcon";
 				}
 			}
 		}
-
+	
 		this._handlingClick = false;
 		//keep this commented out so we don't lose focus
 		//this._refocusOnMap();
 	},
+	
 	_expand: function() {
 		L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
 	},
