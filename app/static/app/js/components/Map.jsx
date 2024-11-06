@@ -63,6 +63,7 @@ class Map extends React.Component {
       imageryLayers: [],
       overlays: [],
       selectedLayers: [],
+      isDrawing: false,
     };
 
     this.basemaps = {};
@@ -591,6 +592,16 @@ class Map extends React.Component {
      45.664591558975154]]);
     this.map.attributionControl.setPrefix("");
 
+    this.map.on('draw:drawstart', () => {
+      this.state.isDrawing = true;
+      console.log(this.state.isDrawing);
+    });
+
+    this.map.on('draw:drawstop', () => {
+      this.state.isDrawing = false;
+      console.log(this.state.isDrawing);
+    });
+
     this.setState({showLoading: true});
     this.loadImageryLayers(true).then(() => {
         this.setState({showLoading: false});
@@ -599,7 +610,7 @@ class Map extends React.Component {
         this.map.on('click', e => {
           // Find first tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
-            if (layer._map && layer.options.bounds.contains(e.latlng)){
+            if (layer._map && layer.options.bounds.contains(e.latlng) && this.state.isDrawing == false){
               this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
               layer.openPopup();
