@@ -260,6 +260,8 @@ class Task(models.Model):
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text=_("A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration."), verbose_name=_("Pending Action"))
 
     public = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is available to the public"), verbose_name=_("Public"))
+    public_edit = models.BooleanField(default=False, help_text=_("A flag indicating whether this public task can be edited"), verbose_name=_("Public Edit"))
+
     resize_to = models.IntegerField(default=-1, help_text=_("When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing."), verbose_name=_("Resize To"))
 
     upload_progress = models.FloatField(default=0.0,
@@ -1007,6 +1009,7 @@ class Task(models.Model):
                     'name': self.name,
                     'project': self.project.id,
                     'public': self.public,
+                    'public_edit': self.public_edit,
                     'camera_shots': camera_shots,
                     'ground_control_points': ground_control_points,
                     'epsg': self.epsg,
