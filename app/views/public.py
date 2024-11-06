@@ -30,6 +30,7 @@ def handle_map(request, template, task_pk=None, hide_title=False):
             'map-items': json.dumps([task.get_map_items()]),
             'title': task.name if not hide_title else '',
             'public': 'true',
+            'public-edit': str(task.public_edit).lower(),
             'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
             'selected-map-type': request.GET.get('t', 'auto'),
             'permissions': json.dumps(get_permissions(request.user, task.project))
@@ -51,6 +52,7 @@ def handle_model_display(request, template, task_pk=None):
             'params': {
                 'task': json.dumps(task.get_model_display_params()),
                 'public': 'true',
+                'public-edit': str(task.public_edit).lower(),
                 'share-buttons': 'false' if settings.DESKTOP_MODE else 'true'
             }.items()
         })

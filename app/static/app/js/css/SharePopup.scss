@@ -34,21 +34,29 @@
 
 		h3.popover-title{
 			padding-top: 8px;
+			display: flex;
+			justify-content: space-between;
+		}
+
+		.checkboxes{
+			display: flex;
+			justify-content: space-between;
+		}
+
+		.btn-qr{
+			max-height: 32px;
 		}
 
 		.checkbox{
 			margin-top: 0;
+			&.last{
+				margin-left: 12px;
+			}
 		}
 
 		.fa-sync{
 			margin-left: -25px;
 			margin-right: 5px;
-		}
-
-		.btn-qrcode{
-			position: absolute;
-			right: 0px;
-			top: -6px;
 		}
 
 		.share-links{

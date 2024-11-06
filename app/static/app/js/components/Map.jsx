@@ -35,6 +35,7 @@ class Map extends React.Component {
     showBackground: false,
     mapType: "orthophoto",
     public: false,
+    publicEdit: false,
     shareButtons: true,
     permissions: ["view"],
     thermal: false
@@ -45,6 +46,7 @@ class Map extends React.Component {
     tiles: PropTypes.array.isRequired,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
     public: PropTypes.bool,
+    publicEdit: PropTypes.bool,
     shareButtons: PropTypes.bool,
     permissions: PropTypes.array,
     thermal: PropTypes.bool
