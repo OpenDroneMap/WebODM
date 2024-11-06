@@ -594,21 +594,15 @@ class Map extends React.Component {
 
     this.map.on('draw:drawstart', () => {
       this.state.isDrawing = true;
-      console.log(this.state.isDrawing);
     });
-
     this.map.on('draw:drawstop', () => {
       this.state.isDrawing = false;
-      console.log(this.state.isDrawing);
     });
     this.map.on('draw:editstart', () => {
       this.state.isDrawing = true;
-      console.log(this.state.isDrawing);
     });
-
     this.map.on('draw:editstop', () => {
       this.state.isDrawing = false;
-      console.log(this.state.isDrawing);
     });
 
     this.setState({showLoading: true});
@@ -701,7 +695,8 @@ class Map extends React.Component {
 
     // novo popup para marcar talhões 
     this.MarkFieldsControl = new MarkFieldsControl({
-      
+      task_id: this.props.tiles?.[0]?.meta?.task?.id || "ID padrão",
+      project_id: this.props.tiles[0].meta.task.project
     }).addTo(this.map);
 
   }

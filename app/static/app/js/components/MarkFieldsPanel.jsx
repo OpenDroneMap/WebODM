@@ -13,7 +13,9 @@ export default class LayersControlPanel extends React.Component {
 
     static propTypes = {
         onClose: PropTypes.func.isRequired,
-        map: PropTypes.object.isRequired
+        map: PropTypes.object.isRequired,
+        task_id: PropTypes.string.isRequired,
+        project_id: PropTypes.number.isRequired
     }
 
     constructor(props) {
@@ -55,7 +57,7 @@ export default class LayersControlPanel extends React.Component {
           layer.feature = layer.feature || {}; // Ensure feature object exists
           layer.feature.type = "Feature"; // Set type to Feature for GeoJSON
           layer.feature.properties = layer.feature.properties || {}; // Ensure properties object exists
-          layer.feature.properties.Field_id = this.polygonIdCounter++; // Assign unique Field_id
+          layer.feature.properties.field_id = this.polygonIdCounter++; // Assign unique field_id
           this.drawnItems.addLayer(layer);
           
       });
@@ -99,6 +101,13 @@ export default class LayersControlPanel extends React.Component {
         downloadAnchor.click();
         downloadAnchor.remove();
     };
+    
+    savePolygon = () => {
+        const task_id = this.props.task_id;
+        const project_id = this.props.project_id;
+
+        
+    }
 
     render() {
         return (
@@ -112,6 +121,7 @@ export default class LayersControlPanel extends React.Component {
                 <button id="edit-polygon" onClick={this.editPolygon}>Editar Talhões</button>
                 <button id="delete-polygon" onClick={this.deletePolygon}>Deletar Talhões</button>
                 <button id="export-polygon" onClick={this.exportPolygons}>Exportar</button>
+                <button id="save-polygon" onClick={this.savePolygon}>Salvar</button>
             </div>
         );
     }

@@ -9,7 +9,9 @@ import MarkFieldsPanel from './MarkFieldsPanel';
 
 class MarkFieldslButton extends React.Component {
   static propTypes = {
-    map: PropTypes.object.isRequired
+    map: PropTypes.object.isRequired,
+    task_id: PropTypes.string.isRequired,
+    project_id: PropTypes.number.isRequired
   }
 
   constructor(props){
@@ -30,6 +32,7 @@ class MarkFieldslButton extends React.Component {
 
   render(){
     const { showPanel } = this.state;
+    console.log(this.props.task_id);
 
     return (<div className={showPanel ? "open" : ""}>
               <a href="javascript:void(0);" 
@@ -37,14 +40,16 @@ class MarkFieldslButton extends React.Component {
                   onClick={this.handleOpen} 
                   className="leaflet-control-markFields-control-button leaflet-bar-part theme-secondary">
               </a>
-              <MarkFieldsPanel map={this.props.map} onClose={this.handleClose} />
+              <MarkFieldsPanel map={this.props.map} task_id={this.props.task_id}  project_id={this.props.project_id} onClose={this.handleClose} />
             </div>);
   }
 }
 
 export default L.Control.extend({
     options: {
-        position: 'topright'
+        position: 'topright',
+        task_id: 'erro',
+        project_id: -1
     },
 
     onAdd: function (map) {
@@ -58,7 +63,7 @@ export default L.Control.extend({
     },
 
     update: function(){
-        ReactDOM.render(<MarkFieldslButton map={this.map}/>, this.container);
+        ReactDOM.render(<MarkFieldslButton map={this.map} project_id={this.options.project_id} task_id={this.options.task_id}/>, this.container);
     }
 });
 
