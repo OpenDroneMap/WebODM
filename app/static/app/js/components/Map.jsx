@@ -749,9 +749,10 @@ class Map extends React.Component {
   }
 
   render() {
+    
     return (
       <div style={{ height: "100%" }} className="map">
-        <ProcessingCard/>
+        <ProcessingCard task_id = {this.props.tiles[0].meta.task.id} project_id = {this.props.tiles[0].meta.task.project}/>
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider hidden-xs">
             {_("Opacidade:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
