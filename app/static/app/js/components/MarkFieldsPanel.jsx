@@ -105,8 +105,23 @@ export default class LayersControlPanel extends React.Component {
     savePolygon = () => {
         const task_id = this.props.task_id;
         const project_id = this.props.project_id;
+        const geojsonData = this.drawnItems.toGeoJSON();
+        const url = "http://localhost:8000/api/projects/"+ project_id + "/tasks/"+ task_id +"/save/field";
+        const csrfToken = getCsrfToken(); 
 
-        
+        const body = {
+            payload: geojsonData,
+            required: ["payload"]
+        }
+    
+        fetch(url, {
+            method: 'POST',
+            headers: { 
+                'content-type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify(body,null,2)
+        });   
     }
 
     render() {
@@ -124,5 +139,16 @@ export default class LayersControlPanel extends React.Component {
                 <button id="save-polygon" onClick={this.savePolygon}>Salvar</button>
             </div>
         );
-    }
+    } 
 }
+
+const getCsrfToken = () => {
+    const cookies = document.cookie.split(";");
+    for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith("csrftoken=")) {
+        return cookie.split("=")[1];
+    }
+    }
+    return null;
+};
