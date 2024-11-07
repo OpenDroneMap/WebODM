@@ -195,7 +195,7 @@ class FormDialog extends React.Component {
                       {this.props.children}
                     </div>
                   </div>
-                  <div className="btn btn-S-C" >
+                  <div className="btn-S-C" >
                         <button type="button" className="btn save font-12"  onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
                                 <span >

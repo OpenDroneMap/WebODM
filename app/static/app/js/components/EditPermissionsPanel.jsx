@@ -250,8 +250,9 @@ class EditPermissionsPanel extends React.Component {
           </div>
           <div className="permissions-user-container">
             <ErrorMessage bind={[this, 'error']} />
-              <label className="control-label">{_("Permissions")}</label>
               <div className='add-new-btn' key="add-new">
+                    <label  className="control-label">{_("Permissions")}</label>
+
                     <button onClick={this.addNewPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-user-plus"></i></button>
               </div>
             {this.state.loading ? 

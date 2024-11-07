@@ -36,6 +36,7 @@
 
             .control-label {
                 padding: 0;
+
             }
 
         }
@@ -137,9 +138,20 @@
         justify-content: center;
         align-items: center;
         margin: 5px;
+        float: right;
+        
 
         &:hover {
             background-color: #4b8b45;
         }
     }
+}
+.control-label{
+    margin: 10px;
+
+}
+.add-new-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

@@ -41,11 +41,7 @@
     .btn{
         margin: 0px;
         
-        .btn-S-C
-        {
-            display: flex;
-            flex-direction: column;
-        }
+        
     }
 
     .btn-cancel {
@@ -127,3 +123,10 @@
 .modal-title {
     color: #4ca2a1;
 }
+
+.btn-S-C
+        {
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+        }
