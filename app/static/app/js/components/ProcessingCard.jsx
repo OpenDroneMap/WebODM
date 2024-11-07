@@ -10,7 +10,6 @@ class ProcessingCard extends React.Component{
   constructor (props){
     super(props);
     
-    console.log("testeProcessingCard")
     this.state = {
       items: [],
       loading: true
@@ -19,29 +18,60 @@ class ProcessingCard extends React.Component{
   
 
   componentDidMount(){
-    fetch('http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/getProcess').then(response => response.json());
+    this.timeToWait = setInterval(this.getProcess, 5000);
+    this.getProcess();
   }
+
+  getProcess = () => {
+    const url = '/api/projects/' + this.props.project_id + '/tasks/'+ this.props.task_id +'/getProcess';
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Erro na requisição");
+        }
+        return response.json();
+      })
+      .then(data => {
+        
+        this.setState({
+          items: data.filter(item => item.finishedOn == null)
+        })
+      })
+      .catch(error => {
+        console.error("Erro:", error);
+      });
+  }
+
   render(){
-      return (
-        <div className="card">
+
+    const { items } = this.state;
+    const translateTypes = {
+      "weeds" : "Daninha"
+    }
+   
+    if(items.length === 0){
+      return null;
+    }
+
+    return (
+      <div className="card">
         <div className="loading-container">
           <h2 className="cardTitle"> Processamentos </h2>
-          <div className="processando-item">
-            <span>Soja...</span>
-            <div className="spinner"></div>
-          </div>
-          <div className="processando-item">
-            <span>Milho...</span>
-            <div className="spinner"></div>
-          </div>
-          <div className="processando-item">
-            <span>Boi...</span>
-            <div className="spinner"></div>
-          </div>
-          <div className="processando-item">
-            <span>Assim?...</span>
-            <div className="spinner"></div>
-          </div>
+          {items.length > 0 ? (
+            items.map((task, index) => (
+              <div key={index} className="processando-item">
+                <span>{index+1}. Processando {translateTypes[task.task_type] || task.task_type} </span>
+                <div className="spinner"></div>
+              </div>
+            ))
+          ) : (
+            <div> nada aq </div>
+          )}
         </div>
       </div>
     );
