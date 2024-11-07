@@ -122,6 +122,8 @@ export default class LayersControlPanel extends React.Component {
             },
             body: JSON.stringify(body,null,2)
         });   
+
+        location.reload(true);
     }
 
     render() {
