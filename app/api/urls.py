@@ -17,6 +17,7 @@ from .users import UsersList
 from .externalauth import ExternalTokenAuth
 from .ai import AiProcessing
 from .geojson import SaveGeoJson
+from .process_status import GetProcess
 from webodm import settings
 
 router = routers.DefaultRouter()
@@ -62,6 +63,8 @@ urlpatterns = [
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process$', AiProcessing.as_view()),
 
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/save/field$', SaveGeoJson.as_view()),
+
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/getProcess$', GetProcess.as_view()),
 
     re_path(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
     re_path(r'workers/get/(?P<celery_task_id>.+)', GetTaskResult.as_view()),
