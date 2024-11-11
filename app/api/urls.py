@@ -16,6 +16,7 @@ from .workers import CheckTask, GetTaskResult
 from .users import UsersList
 from .externalauth import ExternalTokenAuth
 from .ai import AiProcessing
+from .spray_lines import SprayLinesProcessing
 from webodm import settings
 
 router = routers.DefaultRouter()
@@ -58,6 +59,7 @@ urlpatterns = [
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn)$', TaskAiDetectionWeed.as_view()),
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/field$', TaskAiDetectionField.as_view()),
 
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process/spraylines$', SprayLinesProcessing.as_view()),
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process$', AiProcessing.as_view()),
 
 
