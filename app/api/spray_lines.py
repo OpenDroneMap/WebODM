@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import exceptions
 from rest_framework import status
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from rest_framework import exceptions
 
 from app import models
@@ -42,18 +42,29 @@ def send_post_to_processing(project_pk, pk, processing_requests: dict):
         return crash_with_style(f"The response from the server was malformed on the /sprayline endpoint!", status.HTTP_400_BAD_REQUEST)
 
 class SprayLinesProcessing(APIView):
-
+    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', )
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, project_pk, pk):
 
         project = None
         if not DISABLE_PERMISSIONS:
+            
+            task = None
             try:
-                project = models.Project.objects.get(pk=project_pk, deleting=False)
-                if not request.user.has_perm('view_project', project): raise ObjectDoesNotExist()
-            except ObjectDoesNotExist:
+                task = self.queryset.annotate().get(pk=pk)
+            except (ObjectDoesNotExist, ValidationError):
                 raise exceptions.NotFound()
+            
+            if task is None:
+                raise exceptions.NotFound()
+            elif not task.public:
+                try:
+                    project_pk = task.project.id
+                    project = models.Project.objects.get(pk=project_pk, deleting=False)
+                    if not request.user.has_perm('view_project', project): raise ObjectDoesNotExist()
+                except ObjectDoesNotExist:
+                    raise exceptions.NotFound()
 
         if request.user.is_staff or request.user.has_perm('change_project', project) or DISABLE_PERMISSIONS:
             processing_requests = request.data.get('processing_requests', "")
