@@ -161,7 +161,7 @@ class NewTaskPanel extends React.Component {
             {this.state.editTaskFormLoaded && this.props.showResize && this.state.currentStep !== "aiStep" ?
               <div>
                 <div className="form-group col-sm-10">
-                  <label className="col-sm-2 control-label noPadding">{_("Resize Images")}</label>
+                  <label className="col-sm-2 control-label noPadding">{("Redimensionar Imagens")}</label>
                   <div className="col-sm-10 option-container">
                     <div className="btn-group">
                       <button type="button" className="btn btn-default-s dropdown-toggle" style={{backgroundColor:this.changeButtonColor()}} data-toggle="dropdown">
@@ -192,11 +192,11 @@ class NewTaskPanel extends React.Component {
           {this.state.editTaskFormLoaded ?
             <div className="form-group">
                 <div className=" textMoveRight">
-                  {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{_("Cancel")}</button>}
+                  {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{("Cancelar")}</button>}
                   {this.state.loading ?
                     <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
                     :
-                    <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{_("Start Processing")}</button>
+                    <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{("Iniciar o processamento")}</button>
                   }
                 </div>
             </div>
