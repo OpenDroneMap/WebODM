@@ -313,7 +313,7 @@ export default class ContoursPanel extends React.Component {
             {previewLayer ? <a title="Delete Preview" href="javascript:void(0);" onClick={this.handleRemovePreview}>
               <i className="fa fa-trash"></i>
             </a> : ""}
-          <div className="col-sm-9 text-right">
+          <div className="col-sm-12 text-right">
            <div className="btn-group">
             <button onClick={this.handleShowPreview}
                     disabled={disabled || previewLoading} type="button" className="btn btn-sm btn-primary btn-preview">
@@ -326,7 +326,7 @@ export default class ContoursPanel extends React.Component {
               <button disabled={disabled || exportLoading} type="button" className="btn btn-sm btn-primary btn-export" data-toggle="dropdown">
                 {exportLoading ? <i className="fa fa-spin fa-circle-notch"/> : <i className="glyphicon glyphicon-download" />} {_("Exportar")}
               </button>
-              <ul className="dropdown-menu  pull-right">
+              <ul className="dropdown-menu underExport">
                 <li>
                   <a href="javascript:void(0);" onClick={this.handleExport("GPKG")}>
                     <i className="fa fa-globe fa-fw"></i> GeoPackage (.GPKG)

@@ -242,12 +242,25 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        margin-bottom: 15px;
 
         .presets-dropdown {
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+    }
+
+    .newPad{
+        @media(max-width:800px){
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
+    .littleScreen{
+        
+        @media (max-width:768px){
+            margin-left:10px;
+            margin-top:0px;
         }
     }
 }

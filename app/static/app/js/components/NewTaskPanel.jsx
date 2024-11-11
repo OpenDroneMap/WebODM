@@ -119,6 +119,16 @@ class NewTaskPanel extends React.Component {
     this.setState({ taskInfo: this.getTaskInfo() });
   }
 
+  changeButtonColor = () => {
+    const resizeMode = ResizeModes.toHuman(this.state.resizeMode);
+
+    if(this.state.resizeMode == 1){
+      return '#52994C';
+    }else{
+      return '#95a5a6';
+    }
+  }
+
   render() {
     let filesCountOk = true;
     if (this.taskForm && !this.taskForm.checkFilesCount(this.props.filesCount)) filesCountOk = false;
@@ -150,11 +160,11 @@ class NewTaskPanel extends React.Component {
 
             {this.state.editTaskFormLoaded && this.props.showResize && this.state.currentStep !== "aiStep" ?
               <div>
-                <div className="form-group resize-images-container">
-                  <label className="col-sm-2 control-label">{_("Resize Images")}</label>
-                  <div className="col-sm-10">
+                <div className="form-group col-sm-10">
+                  <label className="col-sm-2 control-label noPadding">{("Redimensionar Imagens")}</label>
+                  <div className="col-sm-10 option-container">
                     <div className="btn-group">
-                      <button type="button" className="btn btn-default-s dropdown-toggle" data-toggle="dropdown">
+                      <button type="button" className="btn btn-default-s dropdown-toggle buttonHover" style={{backgroundColor:this.changeButtonColor()}} data-toggle="dropdown">
                         {ResizeModes.toHuman(this.state.resizeMode)} <span className="caret"></span>
                       </button>
                       <ul className="dropdown-menu">
@@ -181,12 +191,12 @@ class NewTaskPanel extends React.Component {
 
           {this.state.editTaskFormLoaded ?
             <div className="form-group">
-                <div className="col-sm-offset-2 col-sm-10 text-right">
-                  {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{_("Cancel")}</button>}
+                <div className=" textMoveRight">
+                  {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{("Cancelar")}</button>}
                   {this.state.loading ?
                     <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
                     :
-                    <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{_("Start Processing")}</button>
+                    <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{("Iniciar o processamento")}</button>
                   }
                 </div>
             </div>
