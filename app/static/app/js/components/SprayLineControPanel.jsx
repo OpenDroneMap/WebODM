@@ -69,17 +69,16 @@ export default class SprayLineControlPanel extends React.Component {
         }
     }
 
-    handleProcess = async () => {
 
+    handleProcess = async () => {
         const { overlays } = this.props;
-        const { tiles } = this.props
+        const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
     
-
         if (overlays[1] && filteredSelectedLayers.length > 0) {
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const fieldIds = [];
-
+    
             leafleatLayers.forEach(leafletLayer => {
                 filteredSelectedLayers.forEach(selectedLayer => {
                     const bounds1 = leafletLayer._bounds;
@@ -98,19 +97,22 @@ export default class SprayLineControlPanel extends React.Component {
                 });
             });
     
-            
-            console.log("Field IDs: ", fieldIds);  
-
-
+            console.log("Field IDs: ", fieldIds);
+    
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
             const distance = this.distanceRef.current.value;
             const direction = this.directionRef.current.value;
-            // const flightHeight = this.flightHeightRef.current.value;
-            const URL = '';
+            
 
+            // /api/projects/<project_id>/tasks/<task_id>/process/spraylines$
+            
+            const URL = `/api/projects/${project_id}/tasks/${task_id}/process/spraylines`
+            
+            
+            console.log(URL);
 
-
+    
             const payload = {
                 processing_requests: {
                     distancia: distance,
@@ -118,18 +120,20 @@ export default class SprayLineControlPanel extends React.Component {
                     fields_to_process: fieldIds
                 }
             };
-
+    
             console.log("payload: ", payload);
-
+    
             try {
                 const response = await fetch(URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'User-Agent': 'insomnia/8.6.1',
+                    
                     },
                     body: JSON.stringify(payload),
                 });
-
+    
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Processamento bem-sucedido:', data);
@@ -140,12 +144,91 @@ export default class SprayLineControlPanel extends React.Component {
                 console.error('Erro na requisição:', error);
             }
         }
+    };
 
-    }
 
 
-    handleExport = (format) => {
+    handleExport = async (format) => {
         console.log(format);
+
+
+        const { overlays } = this.props;
+        const { tiles } = this.props;
+        const { filteredSelectedLayers } = this.state;
+    
+        if (overlays[1] && filteredSelectedLayers.length > 0) {
+            const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+            const fieldIds = [];
+    
+            leafleatLayers.forEach(leafletLayer => {
+                filteredSelectedLayers.forEach(selectedLayer => {
+                    const bounds1 = leafletLayer._bounds;
+                    const bounds2 = selectedLayer.layer.bounds;
+    
+                    const isBoundsEqual = (
+                        bounds1._northEast.lat === bounds2._northEast.lat &&
+                        bounds1._northEast.lng === bounds2._northEast.lng &&
+                        bounds1._southWest.lat === bounds2._southWest.lat &&
+                        bounds1._southWest.lng === bounds2._southWest.lng
+                    );
+    
+                    if (isBoundsEqual) {
+                        fieldIds.push(leafletLayer.feature.properties.Field_id);
+                    }
+                });
+            });
+    
+            console.log("Field IDs: ", fieldIds);
+            console.log("Field ID: ", fieldIds[0]);
+    
+            const task_id = tiles[0].meta.task.id;
+            const project_id = tiles[0].meta.task.project;
+
+
+            const URL = `http://localhost:3333/export/spray-lines?project_id=${project_id}&task_id=${task_id}`;
+
+
+            
+
+            
+            const payload = {
+                processing_requests: {
+                    field_id: fieldIds[0],
+                    export_format: format,
+                    
+                },
+            };
+
+            try {
+                const response = await fetch(URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'User-Agent': 'insomnia/8.6.1',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const data = await response.blob(); 
+
+                    
+                    const url = window.URL.createObjectURL(data);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `spray_lines.${format}`; 
+                    document.body.appendChild(a);
+                    a.click(); 
+                    document.body.removeChild(a); 
+
+                    console.log('Arquivo exportado com sucesso!');
+                } else {
+                    console.error('Erro no processamento da exportação:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+            }
+        }
     }
 
     render() {
@@ -177,8 +260,8 @@ export default class SprayLineControlPanel extends React.Component {
                             <input type="number" id="direction" name="direction" min="0" max="360" step="1" ref={this.directionRef} required />
                             <br />
 
-                            <label htmlFor="flightHeight">Altura de voo:</label>
-                            <input type="number" id="flightHeight" name="flightHeight" min="0" step="0.1" ref={this.flightHeightRef} required />
+                            {/* <label htmlFor="flightHeight">Altura de voo:</label>
+                            <input type="number" id="flightHeight" name="flightHeight" min="0" step="0.1" ref={this.flightHeightRef} required /> */}
                         </form>
                     </div>
                 ) : (
@@ -191,18 +274,21 @@ export default class SprayLineControlPanel extends React.Component {
                 </button>
                 <ul className="dropdown-menu  pull-right">
                     <li>
-                    <a href="javascript:void(0);" onClick={() => this.handleExport("GeoJSON")}>
-                        <i className="fa fa-code fa-fw"></i> GeoJSON (.JSON)
-                    </a>
+                        <a href="javascript:void(0);" onClick={() => this.handleExport("GeoJSON")}>
+                            <i className="fa fa-code fa-fw"></i> 
+                            GeoJSON (.JSON)
+                        </a>
                     </li>
                     <li>
-                    <a href="javascript:void(0);" onClick={() => this.handleExport("Shapefile")}>
-                        <i className="far fa-file-archive fa-fw"></i> ShapeFile (.SHP)
-                    </a>
+                        <a href="javascript:void(0);" onClick={() => this.handleExport("Shapefile")}>
+                            <i className="far fa-file-archive fa-fw"></i> 
+                            ShapeFile (.SHP)
+                        </a>
                     </li>
                     <li>
                         <a href="javascript:void(0);" onClick={() => this.handleExport("xml")}>
-                            <i className="fa fa-file-code fa-fw"></i> XML (.XML)
+                            <i className="fa fa-file-code fa-fw"></i> 
+                            XML (.XML)
                         </a>
                     </li>
                 </ul>
