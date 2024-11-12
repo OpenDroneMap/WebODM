@@ -174,9 +174,10 @@ export default class ExportAssetPanel extends React.Component {
     const utmEPSG = this.props.task.epsg;
 
     const disabled = (epsg === "custom" && !customEpsg) || exporting;
-
-    let projection = utmEPSG ? (<div><div className="row form-group form-inline">
-    <label className="col-sm-3 control-label">{_("Projeção:")}</label>
+    
+    // comentado Classename form-group form-inline
+    let projection = utmEPSG ? (<div><div className=""> 
+    <label style={{ margin:"5px" }} className="col-sm-3 control-label">{_("Projeção:")}</label>
     <div className="col-sm-9 ">
       <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
         {utmEPSG ? <option value={utmEPSG}>UTM (EPSG:{utmEPSG})</option> : ""}
@@ -198,7 +199,8 @@ export default class ExportAssetPanel extends React.Component {
 
   let exportSelector = null;
   if (this.props.selectorOnly){
-    exportSelector = (<div className="row form-group form-inline">
+        // comentado Classename form-group form-inline
+    exportSelector = (<div className="">
         <label className="col-sm-3 control-label">{_("Formato:")}</label>
         <div className="col-sm-9 ">
         <select className="form-control" value={format} onChange={this.handleSelectFormat}>

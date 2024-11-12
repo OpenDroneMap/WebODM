@@ -564,7 +564,7 @@ class EditTaskForm extends React.Component {
     if (this.formReady()) {
 
       const optionsSelector = (
-        <div className='select-container' style={{ display: "flex", justifyContent: "start", alignItems: "center", }}>
+        <div className='select-container' style={{ display: "flex", justifyContent: "start", alignItems: "  ", }}>
           <select
             title={this.getAvailableOptionsOnlyText(this.state.selectedPreset.options, this.state.selectedNode.options)}
             className="form-control input-field options-select"
@@ -576,7 +576,7 @@ class EditTaskForm extends React.Component {
           </select>
 
           {!this.state.presetActionPerforming ?
-            <div className="btn-group presets-dropdown">
+            <div className="btn-group presets-dropdown littleScreen">
               <button type="button" className="btn btn-sm btn-default" title={_("Edit Task Options")} onClick={this.handleEditPreset}>
                 <i className="fa fa-sliders-h"></i> {_("Edit")}
               </button>
@@ -631,7 +631,7 @@ class EditTaskForm extends React.Component {
               </div>
           </div> */}
           <div className="form-group col-sm-10">
-            <label className="col-sm-2 control-label">{_("Name")}</label>
+            <label className="col-sm-2 control-label newPad">{_("Name")}</label>
             <div className="col-sm-10 name-fields input-field">
               {this.state.loadingTaskName ?
                 <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
@@ -647,7 +647,7 @@ class EditTaskForm extends React.Component {
             </div>
           </div>
           <div className='form-group col-sm-10'>
-              <label className="col-sm-2 control-label">{_("Options")}</label>
+              <label className="col-sm-2 control-label newPad">{_("Options")}</label>
               <div className="col-sm-10 option-container">
                 {!this.props.inReview ? optionsSelector :
                   <div className="review-options">
@@ -656,12 +656,12 @@ class EditTaskForm extends React.Component {
               </div>
             </div>
 
-          <div className='form-group col-sm-10'>
+          {/*<div className='form-group col-sm-10'>
             <label className="col-sm-2 control-label">{_("Data")}</label>
             <div className="col-sm-10 option-container">
               <input type="text" className="col-sm-10 input-field data-input" />
             </div>
-          </div>
+          </div>*/}
 
           {
             this.state.editingPreset ?

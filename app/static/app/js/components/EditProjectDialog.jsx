@@ -167,7 +167,8 @@ class EditProjectDialog extends React.Component {
                   <button key="duplicate"
                   disabled={this.duplicating}
                   onClick={this.handleDuplicate}
-                  className="btn btn-default">
+                  className="btn btn-default"
+                  style={{ margin: '5px' }}>
                     <i className={"fa " + (this.state.duplicating ? "fa-circle-notch fa-spin fa-fw" : "fa-copy")}></i> Duplicar
                   </button>
                 ] : undefined
@@ -175,7 +176,7 @@ class EditProjectDialog extends React.Component {
                 ref={(domNode) => { this.dialog = domNode; }}>
               <ErrorMessage bind={[this, "error"]} />
               <div className="form-group edit-project-dialog">
-                <label className="col-sm-3 field-label-default">{_("Nome")}</label>
+                <label className="col-sm-3 field-label-default" style={{margin: "10px"}}>{_("Nome")}</label>
                 <div className="col-sm-12 name-fields">
                   <input type="text" className="form-control rounded-corners" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} onKeyPress={e => this.dialog.handleEnter(e)} />
                   <button type="button" title={_("Adicionar tags")} onClick={this.toggleTagsField} className="btn btn-sm toggle-tags">
@@ -185,9 +186,9 @@ class EditProjectDialog extends React.Component {
               </div>
               {tagsField}
               <div className="form-group">
-                <label className="col-sm-4 field-label-default">{_("Descrição (opcional)")}</label>
+                <label className="col-sm-4 field-label-default" style={{margin: "10px"}}>{_("Descrição (opcional)")}</label>
                 <div className="col-sm-12">
-                  <textarea className="form-control rounded-corners" rows="3" value={this.state.descr} onChange={this.handleChange('descr')} />
+                  <textarea className="form-control rounded-corners" style={{ resize: 'none' }} rows="3" value={this.state.descr} onChange={this.handleChange('descr')} />
                 </div>
               </div>
               {this.props.showPermissions ? 
