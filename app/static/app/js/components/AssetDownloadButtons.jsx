@@ -8,8 +8,8 @@ import { _ } from '../classes/gettext';
 class AssetDownloadButtons extends React.Component {
     static defaultProps = {
         disabled: false,
-        direction: "down", // or "up",
-        buttonClass: "btn-primary",
+        direction: "up", // or "up",
+        buttonClass: "", // cortando a cor primaria
         task: null,
         showLabel: true
     };
@@ -40,7 +40,8 @@ class AssetDownloadButtons extends React.Component {
     render(){
         const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
 
-        return (<div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
+        return (
+        <div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
           
           {this.state.exportDialogProps ? 
             <ExportAssetDialog task={this.props.task}
@@ -52,13 +53,40 @@ class AssetDownloadButtons extends React.Component {
             /> 
             : ""}
 
-          <button type="button" className={"btn " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
-            <i className="glyphicon glyphicon-download"></i>Download{this.props.showLabel ? " " + _("Download Assets") : ""}
-          </button>
-          {this.props.showLabel ? 
-          <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
-                <span className="caret"></span>
-          </button> : ""}
+                <button
+                type="button"
+                className={"" + this.props.buttonClass}
+                disabled={this.props.disabled}
+                data-toggle="dropdown"
+                style={{ display: "flex", alignItems: "center" ,borderRadius:'10px'}} // Centraliza verticalmente
+                    >
+                    <i className="glyphicon glyphicon-download-alt" style={{ fontSize: "1em" }}></i>
+                    {this.props.showLabel ? (
+                        <>
+                        {" " + _("Download Assets")}
+                        {/* Divisor vertical */}
+                        <span
+                            style={{
+                            margin: "0 5px",
+                            borderLeft: "1px solid #ccc",
+                            height: "20px",
+                            }}
+                        ></span>
+                        </>
+                    ) : null}
+                    <span
+                        className="glyphicon glyphicon-chevron-up"
+                        style={{
+                        fontSize: "1em", // Aumenta o tamanho da caret
+                        // marginLeft: "10px", // Espaçamento entre a caret e o divisor
+                        }}
+                    ></span>
+                </button>
+
+          {/* {this.props.showLabel ? 
+          <button type="button" className={"dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
+                
+          </button> : ""} */}
           <ul className="dropdown-menu">
             {assetDownloads.map((asset, i) => {
                 if (asset.separator){

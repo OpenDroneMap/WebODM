@@ -1,4 +1,6 @@
 .edit-project-dialog{
+   
+    
     .name-fields{
         display: flex;
         .btn.toggle-tags{
@@ -45,3 +47,28 @@
         }
     }
 }
+.btn-S-C
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+ .btn-cancel {
+        background-color: #afafaf;
+        border-color: #a0a0a0;
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+
+        &:hover {
+            background-color: #a0a0a0;
+        }
+    }
+    .modal-dialog .btn-cancel{
+        color: #fff !important;
+    }
+    .modal-dialog .btn-cancel:hover{
+        opacity: 0.65 !important;
+        background-color: #a0a0a0 !important;
+    }

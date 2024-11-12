@@ -126,7 +126,7 @@ class EditPresetDialog extends React.Component {
                   {this.state.showSearch ? 
                     <div className="row search-controls">
                         <div className="col-sm-12">
-                            <input type="text" className="form-control" value={this.state.search} ref={(node) => { this.searchControl = node}} onChange={this.handleChange('search')} />
+                            <input type="text" className="form-control"  value={this.state.search} ref={(node) => { this.searchControl = node}} onChange={this.handleChange('search')} />
                         </div>
                     </div> 
                   : ""}
