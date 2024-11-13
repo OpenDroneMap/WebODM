@@ -67,6 +67,16 @@ export default class LayersControlPanel extends React.Component {
         document.querySelector('.leaflet-draw-toolbar').style.display = 'none';
         document.querySelector('.leaflet-draw-toolbar a.leaflet-draw-edit-edit').style.display = 'none';
         document.querySelector('.leaflet-draw-toolbar a.leaflet-draw-edit-remove').style.display = 'none';
+
+        const savedPolygons = localStorage.getItem('savedPolygons');
+    if (savedPolygons) {
+        const geojsonData = JSON.parse(savedPolygons);
+        L.geoJSON(geojsonData, {
+            onEachFeature: (feature, layer) => {
+                this.drawnItems.addLayer(layer);
+            }
+        }).addTo(map);
+     }
     }
 
     componentWillUnmount() {
@@ -83,6 +93,7 @@ export default class LayersControlPanel extends React.Component {
 
     deletePolygon = () => {
         this.drawControl._toolbars.edit._modes.remove.handler.enable();
+        localStorage.removeItem('savedPolygons');
     };
 
     drawPolygon = () => {
@@ -121,10 +132,11 @@ export default class LayersControlPanel extends React.Component {
                 'X-CSRFToken': csrfToken,
             },
             body: JSON.stringify(body,null,2)
-        });   
-
-        location.reload(true);
-    }
+        }).then(() => {
+            localStorage.setItem('savedPolygons', JSON.stringify(geojsonData)); // Save to local storage
+            location.reload(true);
+        });
+    };
 
     render() {
         return (
