@@ -1,5 +1,6 @@
 .leaflet-control-markFields-control .markFields-control-panel{
-  padding: 6px 10px 6px 6px;
+  padding: 15px 20px 15px 25px;
+  margin: 10px 12px 0 0;
   background: #fff;
   width: 300px;
   min-height: 74px;
@@ -11,9 +12,9 @@
 
   .close-button{
     display: inline-block;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQAAAD8x0bcAAAAkUlEQVR4AZWRxQGDUBAFJ9pMflNIP/iVSkIb2wgccXd7g7O+3JXCQUgqBAfFSl8CMooJGQHfuUlEwZpoahZQ7ODTSXWJQkxyioock7BL2tXmdF4moJNX6IDZfbUBQNrX7qfeXfPuqwBAQjEz60w64htGJ+luFH48gt+NYe6v5b/cnr9asM+HlRQ2Qlwh2CjuqQQ9vKsKTwhQ1wAAAABJRU5ErkJggg==);
-    height: 18px;
-    width: 18px;
+    font-size:17px;
+    height: 30px;
+    width: 30px;
     margin-right: 0;
     float: right;
     vertical-align: middle;
@@ -30,16 +31,17 @@
   }
   
   .title{
-    font-size: 120%;
+    font-size: 14.4px;
+    color:#14a5a2;
     margin-right: 60px;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #74b06f;
+    margin-bottom: 20px;
     width: 100%;
+    padding-top: 15px;
   }
 
   hr{
     clear: both;
-    margin: 6px 0px;
+    margin: 6px 0px 10px;
     border-color: #ddd;
   }
 
@@ -53,24 +55,26 @@
     cursor: pointer;
     padding: 8px 0;
     transition: color 0.3s ease;
-    font-family: "Montserrat SemiBold" !important;
+    font-family: "Montserrat Bold" !important;
     margin: 0 4px 0 0;
-    padding: 0 0 0 10px;
-}
+  }
 
-.panel-button:hover {
-    opacity: .5;
-}
-.corIcons{
-  color: #14a5a2;
-}
-.corIconDelete{
-  color: #E74c3c;
-}
-hr {
-    border: none;
-    border-top: 1px solid #74b06f;
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
+  .panel-button:hover {
+      opacity: .5;
+  }
+  .corIcons{
+    color: #14a5a2;
+  }
+  .corIconDelete{
+    color: #E74c3c;
+  }
+  hr {
+      border: none;
+      border-top: 1px solid #74b06f;
+      margin-top: 5px;
+      margin-bottom: 7px;
+  }
+  .spaceBetween{
+    margin-bottom: 20px;
+  }
 }

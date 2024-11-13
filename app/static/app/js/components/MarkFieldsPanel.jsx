@@ -129,8 +129,8 @@ export default class LayersControlPanel extends React.Component {
     render() {
         return (
             <div className="markFields-control-panel">
-                <span className="close-button" onClick={this.props.onClose}/>
-                <div className="title">{_("Marcar Talhões")}</div>
+                <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
+                <div className="title">{_("MARCAR TALHÕES")}</div>
                 <span className="panel-button" onClick={this.drawPolygon}> <i className="corIcons fas fa-thumbtack"></i> Marcar Talhões</span>
                 <hr />
                 <span className="panel-button" onClick={this.editPolygon}><i className="corIcons fas fa-edit"></i> Editar Talhões</span>
@@ -140,6 +140,7 @@ export default class LayersControlPanel extends React.Component {
                 <span className="panel-button" onClick={this.exportPolygons}><i className="corIcons fas fa-download"></i> Exportar</span>
                 <hr />
                 <span className="panel-button" onClick={this.deletePolygon}><i className="corIconDelete fas fa-trash-alt"></i> Deletar Talhões</span>
+                <hr />
             </div>
         );
     } 
