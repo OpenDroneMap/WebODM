@@ -28,10 +28,12 @@ def send_post_to_processing(project_pk, pk, processing_requests: dict):
         'project_id': project_pk,
         'task_id' : pk
     }
+    
+    print(processing_requests)
 
     response = None
     try:
-        response = requests.post(url=url, params=params, data=json.dumps(processing_requests), headers=headers)
+        response = requests.post(url=url, params=params, data=json.dumps({'processing_requests' : processing_requests}), headers=headers)
     except requests.exceptions.ConnectionError:
         return crash_with_style(f"The '{url}' endpoint does not exist!", status.HTTP_400_BAD_REQUEST)
 
