@@ -101,16 +101,17 @@ export default class SprayLineControlPanel extends React.Component {
     
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
-            const distance = this.distanceRef.current.value;
-            const direction = this.directionRef.current.value;
-            
-
-            // /api/projects/<project_id>/tasks/<task_id>/process/spraylines$
-            
-            const URL = `/api/projects/${project_id}/tasks/${task_id}/process/spraylines`
+            const distance = parseFloat(this.distanceRef.current.value);
+            const direction = parseFloat(this.directionRef.current.value);
+            const csrfToken = getCsrfToken();
             
             
-            console.log(URL);
+            
+            
+            const URL = `/api/projects/${project_id}/tasks/${task_id}/process/spraylines`;
+            
+            
+            console.log("URL: ", URL);
 
     
             const payload = {
@@ -129,7 +130,7 @@ export default class SprayLineControlPanel extends React.Component {
                     headers: {
                         'Content-Type': 'application/json',
                         'User-Agent': 'insomnia/8.6.1',
-                    
+                        'X-CSRFToken': csrfToken,
                     },
                     body: JSON.stringify(payload),
                 });
@@ -184,11 +185,11 @@ export default class SprayLineControlPanel extends React.Component {
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
 
+            // /api/projects/<project_id>/tasks/<task_id>/export/spraylines
 
-            const URL = `http://localhost:3333/export/spray-lines?project_id=${project_id}&task_id=${task_id}`;
+            const URL = `/api/projects/${project_id}/tasks/${task_id}/export/spraylines`;
 
-
-            
+            const csrfToken = getCsrfToken();
 
             
             const payload = {
@@ -205,21 +206,26 @@ export default class SprayLineControlPanel extends React.Component {
                     headers: {
                         'Content-Type': 'application/json',
                         'User-Agent': 'insomnia/8.6.1',
+                        'X-CSRFToken': csrfToken,
+                        
                     },
                     body: JSON.stringify(payload),
                 });
 
                 if (response.ok) {
-                    const data = await response.blob(); 
+                    // const data = await response.blob(); 
 
                     
-                    const url = window.URL.createObjectURL(data);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `spray_lines.${format}`; 
-                    document.body.appendChild(a);
-                    a.click(); 
-                    document.body.removeChild(a); 
+                    // const url = window.URL.createObjectURL(data);
+                    // const a = document.createElement('a');
+                    // a.href = url;
+                    // a.download = `spray_lines.${format}`; 
+                    // document.body.appendChild(a);
+                    // a.click(); 
+                    // document.body.removeChild(a); 
+
+                    const data = await response.json();
+                    console.log('Processamento bem-sucedido:', data);
 
                     console.log('Arquivo exportado com sucesso!');
                 } else {
@@ -295,6 +301,17 @@ export default class SprayLineControlPanel extends React.Component {
             </div>
         );
     }
+}
+
+const getCsrfToken = () => {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith('csrftoken=')) {
+            return cookie.split('=')[1];
+        }
+    }
+    return null;
 }
 
 
