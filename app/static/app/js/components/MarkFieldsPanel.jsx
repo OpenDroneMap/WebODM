@@ -130,15 +130,16 @@ export default class LayersControlPanel extends React.Component {
         return (
             <div className="markFields-control-panel">
                 <span className="close-button" onClick={this.props.onClose}/>
-                <div className="title">{_("Mark Fields")}</div>
-                <hr/>
-                algum conteudo ?
-                <hr/>
-                <button id="draw-polygon" onClick={this.drawPolygon}>Marcar Talhões</button>
-                <button id="edit-polygon" onClick={this.editPolygon}>Editar Talhões</button>
-                <button id="delete-polygon" onClick={this.deletePolygon}>Deletar Talhões</button>
-                <button id="export-polygon" onClick={this.exportPolygons}>Exportar</button>
-                <button id="save-polygon" onClick={this.savePolygon}>Salvar</button>
+                <div className="title">{_("Marcar Talhões")}</div>
+                <span className="panel-button" onClick={this.drawPolygon}> <i className="corIcons fas fa-thumbtack"></i> Marcar Talhões</span>
+                <hr />
+                <span className="panel-button" onClick={this.editPolygon}><i className="corIcons fas fa-edit"></i> Editar Talhões</span>
+                <hr />
+                <span className="panel-button" onClick={this.savePolygon}><i className="corIcons fas fa-save"></i> Salvar</span>
+                <hr />
+                <span className="panel-button" onClick={this.exportPolygons}><i className="corIcons fas fa-download"></i> Exportar</span>
+                <hr />
+                <span className="panel-button" onClick={this.deletePolygon}><i className="corIconDelete fas fa-trash-alt"></i> Deletar Talhões</span>
             </div>
         );
     } 

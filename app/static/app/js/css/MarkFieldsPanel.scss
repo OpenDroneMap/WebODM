@@ -5,6 +5,9 @@
   min-height: 74px;
   max-height: 418px;
   overflow-y: auto;
+  border-radius: 12px;
+  overflow-x: hidden;
+
 
   .close-button{
     display: inline-block;
@@ -29,6 +32,9 @@
   .title{
     font-size: 120%;
     margin-right: 60px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #74b06f;
+    width: 100%;
   }
 
   hr{
@@ -41,4 +47,30 @@
       font-size: 12px;
   }
 
+  .panel-button {
+    font-size: 1em;
+    color: #707070;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: color 0.3s ease;
+    font-family: "Montserrat SemiBold" !important;
+    margin: 0 4px 0 0;
+    padding: 0 0 0 10px;
+}
+
+.panel-button:hover {
+    opacity: .5;
+}
+.corIcons{
+  color: #14a5a2;
+}
+.corIconDelete{
+  color: #E74c3c;
+}
+hr {
+    border: none;
+    border-top: 1px solid #74b06f;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
 }
