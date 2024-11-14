@@ -13,9 +13,11 @@ export default class LayersControlPanel extends React.Component {
 
     static propTypes = {
         onClose: PropTypes.func.isRequired,
+        onOpen: PropTypes.func.isRequired,
         map: PropTypes.object.isRequired,
         task_id: PropTypes.string.isRequired,
-        project_id: PropTypes.number.isRequired
+        project_id: PropTypes.number.isRequired,
+        showPanel: PropTypes.bool.isRequired
     }
 
     constructor(props) {
@@ -24,7 +26,8 @@ export default class LayersControlPanel extends React.Component {
         this.drawnItems = new L.FeatureGroup();
         this.polygonIdCounter = 1;
         this.state = {
-          isDrawing: false
+          isDrawing: false,
+          showPanel: false
         };
     }
 
@@ -68,15 +71,32 @@ export default class LayersControlPanel extends React.Component {
         document.querySelector('.leaflet-draw-toolbar a.leaflet-draw-edit-edit').style.display = 'none';
         document.querySelector('.leaflet-draw-toolbar a.leaflet-draw-edit-remove').style.display = 'none';
 
-        const savedPolygons = localStorage.getItem('savedPolygons');
-    if (savedPolygons) {
-        const geojsonData = JSON.parse(savedPolygons);
-        L.geoJSON(geojsonData, {
-            onEachFeature: (feature, layer) => {
-                this.drawnItems.addLayer(layer);
+        fetch('/api/projects/' + this.props.project_id + '/tasks/'+ this.props.task_id +'/ai/detections/field').then((value) => {
+            if (value.status == 404) {
+              let err = {};
+              err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
+              cb(err);
+              return;
             }
-        }).addTo(map);
-     }
+            value.json().then((geojson) =>{
+                L.geoJSON(geojson, {
+                    onEachFeature: (feature, layer) => {
+                        feature.properties.field_id = this.polygonIdCounter++;
+                        this.drawnItems.addLayer(layer);
+                    }
+                });
+
+            })
+        })
+        const getReload = localStorage.getItem('reloadMarkField');
+        console.log(getReload);
+        if(getReload == "false"){
+            console.log('teste2')
+            map.removeLayer(this.drawnItems);
+        }else{
+            this.props.onOpen();
+            localStorage.setItem('reloadMarkField', false);
+        }
     }
 
     componentWillUnmount() {
@@ -87,13 +107,20 @@ export default class LayersControlPanel extends React.Component {
         map.removeLayer(this.drawnItems);
     }
 
+    componentDidUpdate(prevProps, prevState){
+        if(this.props.showPanel === true){
+            this.props.map.addLayer(this.drawnItems);
+        }else {
+            this.props.map.removeLayer(this.drawnItems);
+        }
+    }
+
     editPolygon = () => {
         this.drawControl._toolbars.edit._modes.edit.handler.enable();
     };
 
     deletePolygon = () => {
         this.drawControl._toolbars.edit._modes.remove.handler.enable();
-        localStorage.removeItem('savedPolygons');
     };
 
     drawPolygon = () => {
@@ -133,9 +160,10 @@ export default class LayersControlPanel extends React.Component {
             },
             body: JSON.stringify(body,null,2)
         }).then(() => {
-            localStorage.setItem('savedPolygons', JSON.stringify(geojsonData)); // Save to local storage
+            localStorage.setItem('reloadMarkField', true);
             location.reload(true);
         });
+        
     };
 
     render() {
