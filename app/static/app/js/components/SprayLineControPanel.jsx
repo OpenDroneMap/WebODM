@@ -18,7 +18,11 @@ export default class SprayLineControlPanel extends React.Component {
 
         this.state = {
             filteredSelectedLayers: [],
-            isProcessing: true,
+            isProcessing: false,
+            processingCompleted: false,
+            isExporting: false,
+            exportingCompleted: false,
+            enableExport: false,
         };
 
         this.distanceRef = React.createRef();
@@ -68,11 +72,17 @@ export default class SprayLineControlPanel extends React.Component {
 
 
     handleProcess = async () => {
+
         const { overlays } = this.props;
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
     
         if (overlays[1] && filteredSelectedLayers.length > 0) {
+            this.setState({isProcessing: true});
+            this.setState({enableExport: false});
+            this.setState({processingCompleted: false});
+            this.setState({exportingCompleted: false});
+
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const fieldIds = [];
     
@@ -121,12 +131,25 @@ export default class SprayLineControlPanel extends React.Component {
                     body: JSON.stringify(payload),
                 });
                 if (response.ok) {
+                    
                     const data = await response.json();
                     console.log('Processamento bem-sucedido:', data);
                     // Aqui vai a função que chama o endpoint para ver se já foi terminado de processar o talhão e criado o geojson dele
+                    // setTimeout(() => {
+                    //     // this.getProcess(project_id, task_id); // Vai verificar se tem algo processando ESPERAR OARA IMPLEMENTAR
+
+                    // IMPLEMENTAR RESTANTE DO CÓDIGO
+
+                    // }, 5000);
+                    
+                    // SIMULANDO O TEMPO DE PROCESSAMENTO DO TALHÃO
                     setTimeout(() => {
-                        this.setState({ isProcessing: false }); 
-                    }, 20000);
+                        this.setState({processingCompleted:true});
+                        this.setState({isProcessing: false});
+                        this.setState({enableExport: true});
+                    }, 20000)
+
+
                 } else {
                     console.error('Erro no processamento');
                 }
@@ -138,11 +161,13 @@ export default class SprayLineControlPanel extends React.Component {
 
 
     handleExport = async (format) => {
+
         const { overlays } = this.props;
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
     
         if (overlays[1] && filteredSelectedLayers.length > 0) {
+            this.setState({processingCompleted: false});
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const fieldIds = [];
     
@@ -173,6 +198,9 @@ export default class SprayLineControlPanel extends React.Component {
 
             try {
                 for (let field_id of fieldIds) {
+                    this.setState({isExporting: true});
+                    this.setState({exportingCompleted:false});
+                    this.setState({enableExport:false});
                     const payload = {
                         processing_requests: {
                             field_id: field_id,
@@ -202,6 +230,7 @@ export default class SprayLineControlPanel extends React.Component {
                             link.click();
                             link.remove();
                             console.log(`Arquivo ZIP exportado com sucesso para o field_id: ${field_id}`);
+                
                         } else if (contentType.includes('application/json')) {
                             const geoJsonResponse = await response.json();
                             if (geoJsonResponse && geoJsonResponse.type === 'FeatureCollection') {
@@ -219,12 +248,38 @@ export default class SprayLineControlPanel extends React.Component {
                     } else {
                         console.error(`Erro no processamento da exportação para o field_id ${field_id}:`, response.statusText);
                     }
+
+                    this.setState({exportingCompleted: true});
+                    this.setState({isExporting: false});
+                    this.setState({enableExport: true});
                 }
             } catch (error) {
                 console.error('Erro na requisição:', error);
             }
         }
     }
+
+    getProcess = (project_id, task_id) => {
+        const url = '/api/projects/' + project_id + '/tasks/'+ task_id +'/getProcess';
+        fetch(url, {
+          method: "GET",
+          headers: {
+            "content-type": "application/json",
+          }
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Erro na requisição");
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log(data);
+          })
+          .catch(error => {
+            console.error("Erro:", error);
+          });
+      }
 
 
     render() {
@@ -261,8 +316,8 @@ export default class SprayLineControlPanel extends React.Component {
                 )}
                 <hr />
                 <button onClick={this.handleProcess}>Processar</button>
-                <button disabled={this.state.isProcessing} 
-                        className={this.state.isProcessing ? 'export-disable btn-export' : 'btn-export'}  
+                <button disabled={!this.state.enableExport} 
+                        className={this.state.enableExport ? 'btn-export' : 'btn-export export-disable'}  
                         data-toggle="dropdown">
                     Exportar
                 </button>
@@ -286,6 +341,14 @@ export default class SprayLineControlPanel extends React.Component {
                         </a>
                     </li>
                 </ul>
+
+                <div>
+                    {this.state.isProcessing ? 'Processando Talhões, aguarde...' : '' }
+                    {this.state.processingCompleted && !this.state.isExporting ? 'Processamento concluido!' : ''}
+                    {this.state.isExporting ? 'Exportando Arquivos, aguarde...' : ''}
+                    {this.state.exportingCompleted ? 'Arquivos exportados!' : ''}
+                </div>
+
             </div>
         );
     }
