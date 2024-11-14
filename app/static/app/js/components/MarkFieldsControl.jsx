@@ -39,6 +39,7 @@ class MarkFieldslButton extends React.Component {
                   title="Mark Fields"
                   onClick={this.handleOpen} 
                   className="leaflet-control-markFields-control-button leaflet-bar-part theme-secondary">
+                  <i class="fas fa-draw-polygon fixIcon" ></i>
               </a>
               <MarkFieldsPanel map={this.props.map} task_id={this.props.task_id}  project_id={this.props.project_id} onClose={this.handleClose} />
             </div>);
