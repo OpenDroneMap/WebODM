@@ -167,46 +167,58 @@ export default class SprayLineControlPanel extends React.Component {
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
 
-
             const URL = `/api/projects/${project_id}/tasks/${task_id}/export/spraylines`;
 
             const csrfToken = getCsrfToken();
 
-            const payload = {
-                processing_requests: {
-                    field_id: fieldIds[0],
-                    export_format: format,
-                },
-            };
-
             try {
-                const response = await fetch(URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'User-Agent': 'insomnia/8.6.1',
-                        'X-CSRFToken': csrfToken,
-                        
-                    },
-                    body: JSON.stringify(payload),
-                });
+                for (let field_id of fieldIds) {
+                    const payload = {
+                        processing_requests: {
+                            field_id: field_id,
+                            export_format: format,
+                        },
+                    };
 
+                    const response = await fetch(URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'User-Agent': 'insomnia/8.6.1',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify(payload),
+                    });
 
-                if (response.ok) {
-
-                    console.log(response);
-                    const blob = await response.blob();
-                    const downloadUrl = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.download = `exported_file.zip`;
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                    console.log('Arquivo exportado com sucesso!');
-                
-                } else {
-                    console.error('Erro no processamento da exportação:', response.statusText);
+                    if (response.ok) {
+                        const contentType = response.headers.get('Content-Type');
+                        if (contentType.includes('application/zip')) {
+                            const blob = await response.blob();
+                            const downloadUrl = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = downloadUrl;
+                            link.download = `pulverizacao_${field_id}.zip`; 
+                            document.body.appendChild(link);
+                            link.click();
+                            link.remove();
+                            console.log(`Arquivo ZIP exportado com sucesso para o field_id: ${field_id}`);
+                        } else if (contentType.includes('application/json')) {
+                            const geoJsonResponse = await response.json();
+                            if (geoJsonResponse && geoJsonResponse.type === 'FeatureCollection') {
+                                const geoJsonBlob = new Blob([JSON.stringify(geoJsonResponse)], { type: 'application/geo+json' });
+                                const downloadUrl = window.URL.createObjectURL(geoJsonBlob);
+                                const link = document.createElement('a');
+                                link.href = downloadUrl;
+                                link.download = `pulverizacao_${field_id}.geojson`;
+                                document.body.appendChild(link);
+                                link.click();
+                                link.remove();
+                                console.log(`GeoJSON exportado com sucesso para o field_id: ${field_id}`);
+                            } 
+                        }
+                    } else {
+                        console.error(`Erro no processamento da exportação para o field_id ${field_id}:`, response.statusText);
+                    }
                 }
             } catch (error) {
                 console.error('Erro na requisição:', error);
