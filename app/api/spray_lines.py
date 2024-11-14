@@ -29,7 +29,6 @@ def send_post_to_processing(project_pk, pk, processing_requests: dict):
         'task_id' : pk
     }
     
-    print(processing_requests)
 
     response = None
     try:

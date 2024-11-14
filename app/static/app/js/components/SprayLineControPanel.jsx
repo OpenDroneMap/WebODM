@@ -18,6 +18,7 @@ export default class SprayLineControlPanel extends React.Component {
 
         this.state = {
             filteredSelectedLayers: [],
+            isProcessing: true,
         };
 
         this.distanceRef = React.createRef();
@@ -35,14 +36,11 @@ export default class SprayLineControlPanel extends React.Component {
 
             this.setState({ filteredSelectedLayers: filteredLayers });
         }
-
     }
 
     handlePopUp = (e) => {
         const { overlays } = this.props;
-        
         const layerSelected = this.state.filteredSelectedLayers.filter(layer => layer.index == e.target.id);
-
         if (overlays[1]) {
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const reflayerLeafLeat = leafleatLayers.filter(layer => {
@@ -57,7 +55,6 @@ export default class SprayLineControlPanel extends React.Component {
                     layer._bounds._southWest.lng === layerSelected[0].layer.bounds._southWest.lng
                 );
             });
-
             if (reflayerLeafLeat.length > 0) {
                 const layer = reflayerLeafLeat[0];
                 if (layer.getPopup()) {
@@ -97,23 +94,14 @@ export default class SprayLineControlPanel extends React.Component {
                 });
             });
     
-            console.log("Field IDs: ", fieldIds);
-    
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
             const distance = parseFloat(this.distanceRef.current.value);
             const direction = parseFloat(this.directionRef.current.value);
             const csrfToken = getCsrfToken();
-            
-            
-            
-            
-            const URL = `/api/projects/${project_id}/tasks/${task_id}/process/spraylines`;
-            
-            
-            console.log("URL: ", URL);
 
-    
+            const URL = `/api/projects/${project_id}/tasks/${task_id}/process/spraylines`;
+
             const payload = {
                 processing_requests: {
                     distancia: distance,
@@ -121,8 +109,6 @@ export default class SprayLineControlPanel extends React.Component {
                     fields_to_process: fieldIds
                 }
             };
-    
-            console.log("payload: ", payload);
     
             try {
                 const response = await fetch(URL, {
@@ -134,10 +120,13 @@ export default class SprayLineControlPanel extends React.Component {
                     },
                     body: JSON.stringify(payload),
                 });
-    
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Processamento bem-sucedido:', data);
+                    // Aqui vai a função que chama o endpoint para ver se já foi terminado de processar o talhão e criado o geojson dele
+                    setTimeout(() => {
+                        this.setState({ isProcessing: false }); 
+                    }, 20000);
                 } else {
                     console.error('Erro no processamento');
                 }
@@ -148,11 +137,7 @@ export default class SprayLineControlPanel extends React.Component {
     };
 
 
-
     handleExport = async (format) => {
-        console.log(format);
-
-
         const { overlays } = this.props;
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
@@ -179,24 +164,18 @@ export default class SprayLineControlPanel extends React.Component {
                 });
             });
     
-            console.log("Field IDs: ", fieldIds);
-            console.log("Field ID: ", fieldIds[0]);
-    
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
 
-            // /api/projects/<project_id>/tasks/<task_id>/export/spraylines
 
             const URL = `/api/projects/${project_id}/tasks/${task_id}/export/spraylines`;
 
             const csrfToken = getCsrfToken();
 
-            
             const payload = {
                 processing_requests: {
                     field_id: fieldIds[0],
                     export_format: format,
-                    
                 },
             };
 
@@ -212,22 +191,20 @@ export default class SprayLineControlPanel extends React.Component {
                     body: JSON.stringify(payload),
                 });
 
+
                 if (response.ok) {
-                    // const data = await response.blob(); 
 
-                    
-                    // const url = window.URL.createObjectURL(data);
-                    // const a = document.createElement('a');
-                    // a.href = url;
-                    // a.download = `spray_lines.${format}`; 
-                    // document.body.appendChild(a);
-                    // a.click(); 
-                    // document.body.removeChild(a); 
-
-                    const data = await response.json();
-                    console.log('Processamento bem-sucedido:', data);
-
+                    console.log(response);
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = `exported_file.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
                     console.log('Arquivo exportado com sucesso!');
+                
                 } else {
                     console.error('Erro no processamento da exportação:', response.statusText);
                 }
@@ -237,8 +214,8 @@ export default class SprayLineControlPanel extends React.Component {
         }
     }
 
+
     render() {
-        
         return (
             <div className="sprayline-control-panel">
                 <span className="close-button" onClick={this.props.onClose} />
@@ -262,12 +239,9 @@ export default class SprayLineControlPanel extends React.Component {
                             <input type="number" id="distance" name="distance" min="0" step="0.1" ref={this.distanceRef} required />
                             <br />
 
-                            <label htmlFor="direction">Direção das linhas:</label>
+                            <label htmlFor="direction">Angulo:</label>
                             <input type="number" id="direction" name="direction" min="0" max="360" step="1" ref={this.directionRef} required />
                             <br />
-
-                            {/* <label htmlFor="flightHeight">Altura de voo:</label>
-                            <input type="number" id="flightHeight" name="flightHeight" min="0" step="0.1" ref={this.flightHeightRef} required /> */}
                         </form>
                     </div>
                 ) : (
@@ -275,18 +249,20 @@ export default class SprayLineControlPanel extends React.Component {
                 )}
                 <hr />
                 <button onClick={this.handleProcess}>Processar</button>
-                <button className="btn btn-sm btn-primary btn-export" data-toggle="dropdown">
+                <button disabled={this.state.isProcessing} 
+                        className={this.state.isProcessing ? 'export-disable btn-export' : 'btn-export'}  
+                        data-toggle="dropdown">
                     Exportar
                 </button>
                 <ul className="dropdown-menu  pull-right">
                     <li>
-                        <a href="javascript:void(0);" onClick={() => this.handleExport("GeoJSON")}>
+                        <a href="javascript:void(0);" onClick={() => this.handleExport("geojson")}>
                             <i className="fa fa-code fa-fw"></i> 
                             GeoJSON (.JSON)
                         </a>
                     </li>
                     <li>
-                        <a href="javascript:void(0);" onClick={() => this.handleExport("Shapefile")}>
+                        <a href="javascript:void(0);" onClick={() => this.handleExport("shp")}>
                             <i className="far fa-file-archive fa-fw"></i> 
                             ShapeFile (.SHP)
                         </a>
