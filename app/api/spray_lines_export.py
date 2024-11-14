@@ -45,7 +45,7 @@ class SprayLinesExport(APIView):
     queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', )
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, project_pk, pk):
+    def post(self, request, project_pk, pk):
 
         project = None
         if not DISABLE_PERMISSIONS:
