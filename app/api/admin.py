@@ -28,7 +28,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         data = request.data.copy()
         password = data.get('password')
         data['password'] = make_password(password)
-        user = UserSerializer(data=data)
+        user = UserSerializer(data=data, context={'request': request})
         user.is_valid(raise_exception=True)
         user.save()
         return Response(user.data, status=status.HTTP_201_CREATED)
