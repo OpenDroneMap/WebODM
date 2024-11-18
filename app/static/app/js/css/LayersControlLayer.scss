@@ -1,4 +1,8 @@
 .leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control{
+    .fixFlexDirection .export-asset-panel{
+        display:flex;
+        flex-direction: column;
+    }
     .layers-control-layer{
         clear: both;
 
