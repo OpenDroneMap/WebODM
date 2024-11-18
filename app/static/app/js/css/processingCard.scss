@@ -1,0 +1,76 @@
+.card {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%); 
+    z-index: 2000;
+    width: 400px;
+    height: 140px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: "montserrat";
+    background-color: #f9f9f9;
+    overflow-y: auto;
+  }
+.cardTitle {
+  font-size: 1.5em;       /* Tamanho da fonte */
+  font-weight: bold;      /* Negrito */
+  margin-bottom: 10px;    /* Espaço abaixo do título */
+  color: #333;            /* Cor do texto */
+  text-align: center;
+  border-bottom: 1px solid #14A5A2;
+}
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ddd;
+  border-top: 3px solid #14A5A2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.texto {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #555;
+}
+
+.processando-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+  color: #555;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Design da Barra Lateral */
+.card::-webkit-scrollbar {
+  width: 8px; /* Largura da barra de rolagem */
+}
+
+/* Cor do track da barra de rolagem */
+.card::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Cor de fundo da trilha */
+  border-radius: 4px;
+}
+
+/* Cor e estilo do thumb (parte que você arrasta) */
+.card::-webkit-scrollbar-thumb {
+  background-color: #14A5A2; /* Cor principal */
+  border-radius: 4px;
+  border: 2px solid #f1f1f1; /* Bordas para destacar */
+}
