@@ -78,11 +78,16 @@ export default class SprayLineControlPanel extends React.Component {
         const { filteredSelectedLayers } = this.state;
     
         if (overlays[1] && filteredSelectedLayers.length > 0) {
-            this.setState({isProcessing: true});
-            this.setState({enableExport: false});
-            this.setState({processingCompleted: false});
-            this.setState({exportingCompleted: false});
 
+            const inputDirection = this.directionRef.current.value;
+            const inputDistance = this.distanceRef.current.value;
+
+            if (inputDirection == "" || inputDistance == "") {
+                alert("Por favor, preencha todos os campos obrigatórios antes de continuar.");
+                return;
+            }
+
+            
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const fieldIds = [];
     
@@ -106,8 +111,8 @@ export default class SprayLineControlPanel extends React.Component {
     
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
-            const distance = parseFloat(this.distanceRef.current.value);
-            const direction = parseFloat(this.directionRef.current.value);
+            const distance = parseFloat(inputDistance);
+            const direction = parseFloat(inputDirection);
             const csrfToken = getCsrfToken();
 
             const URL = `/api/projects/${project_id}/tasks/${task_id}/process/spraylines`;
@@ -131,7 +136,11 @@ export default class SprayLineControlPanel extends React.Component {
                     body: JSON.stringify(payload),
                 });
                 if (response.ok) {
-                    
+                    this.setState({isProcessing: true});
+                    this.setState({enableExport: false});
+                    this.setState({processingCompleted: false});
+                    this.setState({exportingCompleted: false});
+
                     const data = await response.json();
                     console.log('Processamento bem-sucedido:', data);
                     // Aqui vai a função que chama o endpoint para ver se já foi terminado de processar o talhão e criado o geojson dele
