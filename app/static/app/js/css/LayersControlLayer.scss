@@ -1,4 +1,17 @@
 .leaflet-touch .leaflet-control-layers-control, .leaflet-control-layers-control{
+    .fixFlexDirection .export-asset-panel{
+        display: flex;
+        align-content: center !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+       
+        div{
+            display: flex;
+            margin: 2px
+        }
+
+    }
     .layers-control-layer{
         clear: both;
 
