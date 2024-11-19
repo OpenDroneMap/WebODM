@@ -12,6 +12,10 @@
         }
 
     }
+    .fixFlexDirection .export-asset-panel{
+        display:flex;
+        flex-direction: column;
+    }
     .layers-control-layer{
         clear: both;
 

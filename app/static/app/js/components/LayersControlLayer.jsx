@@ -360,6 +360,12 @@ export default class LayersControlLayer extends React.Component {
                                 exportParams={this.getLayerParams} 
                                 dropUp />
             </div>
+            <div className="fixFlexDirection">
+                <ExportAssetPanel task={meta.task} 
+                                asset={this.asset} 
+                                exportParams={this.getLayerParams} 
+                                dropUp />
+            </div>
         </div> : ""}
     </div>);
 
