@@ -245,6 +245,78 @@ O weed_type podem ser ("soy", "corn", "cane").
   }
   ```
 
+## API Spray Lines
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/process/spraylines`
+- **Método:** POST
+- **Query Parameters:**
+  - `project_pk` (integer, required): ID do projeto.
+  - `pk` (string, required): ID da tarefa.
+- **Headers:**
+  - `Content-Type: application/json`
+- **Descrição:** Envia um `processing_requests` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`.
+
+- **Body Schema:**
+  ```json
+  "processing_requests": {
+    "type": "object",
+    "properties": {
+      "distancia": { "type": "number" },
+      "angulo": { "type": "number" },
+      "fields_to_process": {
+        "type": "array",
+        "items": { "type": "number" }
+      },
+    },
+    "required": ["distancia", "angulo", "fields_to_process"]
+  }
+  ```
+
+- **Example Body:**
+```json
+  {
+   "processing_requests": {
+     "distancia":10,
+     "angulo":45,
+     "fields_to_process":[1, 3]
+   }
+  }
+```
+
+## API Export Spray Lines
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/export/spraylines`
+- **Método:** POST
+- **Query Parameters:**
+  - `project_pk` (integer, required): ID do projeto.
+  - `pk` (string, required): ID da tarefa.
+- **Headers:**
+  - `Content-Type: application/json`
+- **Descrição:** Envia um `processing_requests` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`.
+
+- **Body Schema:**
+  ```json
+  {
+    "type": "object",
+    "properties": {
+        "field_id": { "type": "number" },
+        "export_format": { "type": "string" }
+    },
+    "required": ["field_id", "export_format"]
+  }
+  ```
+
+- **Example Body:**
+```json
+  {
+    "processing_requests": {
+      "field_id": 1,
+  	  "export_format": "xml"
+    }
+  }
+```
+
+
 ## Exibição do Mapa
 
 Ele é divido em dois componentes, o primeiro componente a `MapView` é responsável por exibir algumas informações adicionais além do mapa. Onde a magia realmente acontece é no componente chamado `Map`.
