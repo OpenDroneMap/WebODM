@@ -106,7 +106,7 @@ export default class LayersControlPanel extends React.Component {
         const task_id = this.props.task_id;
         const project_id = this.props.project_id;
         const geojsonData = this.drawnItems.toGeoJSON();
-        const url = "http://localhost:8000/api/projects/"+ project_id + "/tasks/"+ task_id +"/save/field";
+        const url = "/api/projects/"+ project_id + "/tasks/"+ task_id +"/save/field";
         const csrfToken = getCsrfToken(); 
 
         const body = {
