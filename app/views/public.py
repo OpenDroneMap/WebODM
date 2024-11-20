@@ -53,7 +53,8 @@ def handle_model_display(request, template, task_pk=None):
                 'task': json.dumps(task.get_model_display_params()),
                 'public': 'true',
                 'public-edit': str(task.public_edit).lower(),
-                'share-buttons': 'false' if settings.DESKTOP_MODE else 'true'
+                'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
+                'model-type': request.GET.get('t', 'cloud'),
             }.items()
         })
 
