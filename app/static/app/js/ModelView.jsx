@@ -70,14 +70,19 @@ class SetCameraView extends React.Component{
 
 class TexturedModelMenu extends React.Component{
     static propTypes = {
-        toggleTexturedModel: PropTypes.func.isRequired
+        toggleTexturedModel: PropTypes.func.isRequired,
+        selected: PropTypes.bool
+    }
+
+    static defaultProps = {
+        selected: false
     }
 
     constructor(props){
         super(props);
 
         this.state = {
-            showTexturedModel: false
+            showTexturedModel: props.selected
         }
         
         // Translation for sidebar.html
@@ -129,13 +134,15 @@ class ModelView extends React.Component {
   static defaultProps = {
     task: null,
     public: false,
-    shareButtons: true
+    shareButtons: true,
+    modelType: "cloud"
   };
 
   static propTypes = {
       task: PropTypes.object.isRequired, // The object should contain two keys: {id: <taskId>, project: <projectId>}
       public: PropTypes.bool, // Is the view being displayed via a shared link?
-      shareButtons: PropTypes.bool
+      shareButtons: PropTypes.bool,
+      modelType: PropTypes.oneOf(['cloud', 'mesh'])
   };
 
   constructor(props){
@@ -143,7 +150,7 @@ class ModelView extends React.Component {
 
     this.state = {
       error: "",
-      showTexturedModel: false,
+      showingTexturedModel: false,
       initializingModel: false,
       selectedCamera: null,
       modalOpen: false
@@ -323,7 +330,7 @@ class ModelView extends React.Component {
       viewer.toggleSidebar();
 
       if (this.hasTexturedModel()){
-          window.ReactDOM.render(<TexturedModelMenu toggleTexturedModel={this.toggleTexturedModel}/>, $("#textured_model_button").get(0));
+          window.ReactDOM.render(<TexturedModelMenu selected={this.props.modelType === 'mesh'} toggleTexturedModel={this.toggleTexturedModel}/>, $("#textured_model_button").get(0));
       }else{
           $("#textured_model").hide();
           $("#textured_model_container").hide();
@@ -355,6 +362,11 @@ class ModelView extends React.Component {
           if (e.type == "loading_failed"){
             this.setState({error: "Could not load point cloud. This task doesn't seem to have one. Try processing the task again."});
             return;
+          }
+
+          // Automatically load 3D model if required
+          if (this.hasTexturedModel() && this.props.modelType === "mesh"){
+            this.toggleTexturedModel({ target: { checked: true }});
           }
     
           let scene = viewer.scene;
@@ -655,6 +667,7 @@ class ModelView extends React.Component {
 
             this.setState({
                 initializingModel: false,
+                showingTexturedModel: true
             });
         }
 
@@ -699,17 +712,23 @@ class ModelView extends React.Component {
         // Already initialized
         this.modelReference.visible = true;
         this.setPointCloudsVisible(false);
+        this.setState({showingTexturedModel: true});
       }
     }else{
       this.modelReference.visible = false;
       this.setPointCloudsVisible(true);
+      this.setState({showingTexturedModel: false});
     }
   }
 
   // React render
   render(){
-    const { selectedCamera } = this.state;
+    const { selectedCamera, showingTexturedModel } = this.state;
     const { task } = this.props;
+    const queryParams = {};
+    if (showingTexturedModel){
+        queryParams.t = "mesh";
+    }
 
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
@@ -735,6 +754,7 @@ class ModelView extends React.Component {
                 task={this.props.task} 
                 popupPlacement="top"
                 linksTarget="3d"
+                queryParams={queryParams}
             />
             : ""}
             <SwitchModeButton 
