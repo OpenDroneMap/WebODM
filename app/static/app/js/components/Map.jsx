@@ -69,11 +69,20 @@ class Map extends React.Component {
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
+    this.taskCount = 1;
     this.addedCameraShots = {};
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
+  }
+
+  countTasks = () => {
+    let tasks = {};
+    this.props.tiles.forEach(tile => {
+        tasks[tile.meta.task.id] = true;
+    });
+    return Object.keys(tasks).length;
   }
 
   updateOpacity = (evt) => {
@@ -130,6 +139,8 @@ class Map extends React.Component {
         this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
         this.tileJsonRequests = [];
     }
+
+    this.taskCount = this.countTasks();
 
     const { tiles } = this.props,
           layerId = layer => {
@@ -243,7 +254,7 @@ class Map extends React.Component {
             meta.metaUrl = metaUrl;
             meta.unitForward = unitForward;
             meta.unitBackward = unitBackward;
-            if (this.props.tiles.length > 1){
+            if (this.taskCount > 1){
               // Assign to a group
               meta.group = {id: meta.task.id, name: meta.task.name};
             }
@@ -251,11 +262,13 @@ class Map extends React.Component {
             layer[Symbol.for("tile-meta")] = mres;
 
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
-              layer.addTo(this.map);
+              if (type === this.props.mapType){
+                layer.addTo(this.map);
+              }
             }
 
             // Show 3D switch button only if we have a single orthophoto
-            if (tiles.length === 1){
+            if (this.taskCount === 1){
               this.setState({singleTask: meta.task});
             }
 
@@ -343,7 +356,7 @@ class Map extends React.Component {
                     }
                   });
                 shotsLayer[Symbol.for("meta")] = {name: _("Cameras"), icon: "fa fa-camera fa-fw"};
-                if (this.props.tiles.length > 1){
+                if (this.taskCount > 1){
                   // Assign to a group
                   shotsLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
                 }
@@ -397,7 +410,7 @@ class Map extends React.Component {
                     }
                   });
                 gcpLayer[Symbol.for("meta")] = {name: _("Ground Control Points"), icon: "far fa-dot-circle fa-fw"};
-                if (this.props.tiles.length > 1){
+                if (this.taskCount > 1){
                   // Assign to a group
                   gcpLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
                 }
@@ -585,8 +598,9 @@ _('Example:'),
         this.map.on('click', e => {
           if (PluginsAPI.Map.handleClick(e)) return;
           
-          // Find first tile layer at the selected coordinates 
+          // Find first visible tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
+            // TODO: visible?
             if (layer._map && layer.options.bounds.contains(e.latlng)){
               this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
@@ -657,7 +671,7 @@ _('Example:'),
         name: name || "", 
         icon: "fa fa-sticky-note fa-fw"
       };
-      if (this.props.tiles.length > 1 && task){
+      if (this.taskCount > 1 && task){
         meta.group = {id: task.id, name: task.name};
       }
       layer[Symbol.for("meta")] = meta;

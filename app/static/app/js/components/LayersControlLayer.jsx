@@ -28,7 +28,7 @@ export default class LayersControlLayer extends React.Component {
     super(props);
 
     this.map = props.map;
-    
+
     const url = this.getLayerUrl();
     const params = Utils.queryParams({search: url.slice(url.indexOf("?"))});
 

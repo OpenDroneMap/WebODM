@@ -65,7 +65,7 @@ export default class LayersControlPanel extends React.Component {
       this.props.overlays.forEach(scanGroup('overlays'));
       this.props.layers.forEach(scanGroup('layers'));
       this.props.annotations.forEach(scanGroup('annotations'));
-      
+      console.log(main);
       const getGroupContent = group => {
         return (<div>
 
