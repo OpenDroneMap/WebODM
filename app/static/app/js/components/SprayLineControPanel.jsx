@@ -169,10 +169,13 @@ export default class SprayLineControlPanel extends React.Component {
                 } else {
                     console.error('Erro no processamento');
                     this.setState({error: true});
+                    this.setState({isProcessing: false});
+
                 }
             } catch (error) {
                 console.error('Erro na requisição:', error);
                 this.setState({error: true});
+                this.setState({isProcessing: false});
             }
 
             
