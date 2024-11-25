@@ -23,6 +23,7 @@ export default class SprayLineControlPanel extends React.Component {
             isExporting: false,
             exportingCompleted: false,
             enableExport: false,
+            error: false
         };
 
         this.distanceRef = React.createRef();
@@ -77,7 +78,7 @@ export default class SprayLineControlPanel extends React.Component {
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
     
-        if (overlays[1] && filteredSelectedLayers.length > 0) {
+        if (overlays[1] && filteredSelectedLayers.length > 0 && this.state.isProcessing == false) {
 
             const inputDirection = this.directionRef.current.value;
             const inputDistance = this.distanceRef.current.value;
@@ -87,7 +88,12 @@ export default class SprayLineControlPanel extends React.Component {
                 return;
             }
 
-            
+            this.setState({isProcessing: true});
+            this.setState({enableExport: false});
+            this.setState({processingCompleted: false});
+            this.setState({exportingCompleted: false});
+            this.setState({error: false});
+
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const fieldIds = [];
     
@@ -136,35 +142,40 @@ export default class SprayLineControlPanel extends React.Component {
                     body: JSON.stringify(payload),
                 });
                 if (response.ok) {
-                    this.setState({isProcessing: true});
-                    this.setState({enableExport: false});
-                    this.setState({processingCompleted: false});
-                    this.setState({exportingCompleted: false});
 
                     const data = await response.json();
                     console.log('Processamento bem-sucedido:', data);
-                    // Aqui vai a função que chama o endpoint para ver se já foi terminado de processar o talhão e criado o geojson dele
-                    // setTimeout(() => {
-                    //     // this.getProcess(project_id, task_id); // Vai verificar se tem algo processando ESPERAR OARA IMPLEMENTAR
-
-                    // IMPLEMENTAR RESTANTE DO CÓDIGO
-
-                    // }, 5000);
                     
-                    // SIMULANDO O TEMPO DE PROCESSAMENTO DO TALHÃO
-                    setTimeout(() => {
-                        this.setState({processingCompleted:true});
-                        this.setState({isProcessing: false});
-                        this.setState({enableExport: true});
-                    }, 20000)
+                    const intervalId = setInterval(async () => {
+                        try {
+                            const processing = await this.getProcess(project_id, task_id); 
 
+                            if (processing[0].finishedOn !== null) {
+                                console.log('Processamento concluído!');
 
+                                setTimeout(() => {
+                                    clearInterval(intervalId);
+                                    this.setState({processingCompleted:true});
+                                    this.setState({isProcessing: false});
+                                    this.setState({enableExport: true});
+                                }, 2000);
+                            }
+
+                        } catch (error) {
+                            console.error('Erro ao chamar getProcess:', error);
+                            
+                        }
+                    }, 1000);
                 } else {
                     console.error('Erro no processamento');
+                    this.setState({error: true});
                 }
             } catch (error) {
                 console.error('Erro na requisição:', error);
+                this.setState({error: true});
             }
+
+            
         }
     };
 
@@ -174,9 +185,11 @@ export default class SprayLineControlPanel extends React.Component {
         const { overlays } = this.props;
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
+
+        this.setState({processingCompleted: false});
     
         if (overlays[1] && filteredSelectedLayers.length > 0) {
-            this.setState({processingCompleted: false});
+
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const fieldIds = [];
     
@@ -257,7 +270,7 @@ export default class SprayLineControlPanel extends React.Component {
                     } else {
                         console.error(`Erro no processamento da exportação para o field_id ${field_id}:`, response.statusText);
                     }
-
+                    this.setState({processingCompleted:false})
                     this.setState({exportingCompleted: true});
                     this.setState({isExporting: false});
                     this.setState({enableExport: true});
@@ -268,27 +281,25 @@ export default class SprayLineControlPanel extends React.Component {
         }
     }
 
-    getProcess = (project_id, task_id) => {
-        const url = '/api/projects/' + project_id + '/tasks/'+ task_id +'/getProcess';
-        fetch(url, {
-          method: "GET",
-          headers: {
-            "content-type": "application/json",
-          }
+    getProcess = async (project_id, task_id) => {
+        const url = `/api/projects/${project_id}/tasks/${task_id}/getProcess`;
+        return fetch(url, {
+            method: "GET",
+            headers: {
+                "content-type": "application/json",
+            },
         })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error("Erro na requisição");
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log(data);
-          })
-          .catch(error => {
-            console.error("Erro:", error);
-          });
-      }
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erro na requisição");
+                }
+                return response.json(); 
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                throw error; 
+            });
+    };
 
 
     render() {
@@ -315,7 +326,7 @@ export default class SprayLineControlPanel extends React.Component {
                             <input type="number" id="distance" name="distance" min="0" step="0.1" ref={this.distanceRef} required />
                             <br />
 
-                            <label htmlFor="direction">Angulo:</label>
+                            <label htmlFor="direction">Ângulo:</label>
                             <input type="number" id="direction" name="direction" min="0" max="360" step="1" ref={this.directionRef} required />
                             <br />
                         </form>
@@ -352,10 +363,17 @@ export default class SprayLineControlPanel extends React.Component {
                 </ul>
 
                 <div>
-                    {this.state.isProcessing ? 'Processando Talhões, aguarde...' : '' }
-                    {this.state.processingCompleted && !this.state.isExporting ? 'Processamento concluido!' : ''}
-                    {this.state.isExporting ? 'Exportando Arquivos, aguarde...' : ''}
-                    {this.state.exportingCompleted ? 'Arquivos exportados!' : ''}
+                    {this.state.error
+                    ? 'Erro ao processar o talhão'
+                    : this.state.isProcessing
+                    ? 'Processando Talhões, aguarde...'
+                    : this.state.processingCompleted && !this.state.isExporting
+                    ? 'Processamento concluído!'
+                    : this.state.isExporting
+                    ? 'Exportando Arquivos, aguarde...'
+                    : this.state.exportingCompleted
+                    ? 'Arquivos exportados!'
+                    : ''}
                 </div>
 
             </div>
