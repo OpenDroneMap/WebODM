@@ -158,7 +158,7 @@ export default class SprayLineControlPanel extends React.Component {
                                     this.setState({processingCompleted:true});
                                     this.setState({isProcessing: false});
                                     this.setState({enableExport: true});
-                                }, 4000);
+                                }, 2000);
                             }
 
                         } catch (error) {
