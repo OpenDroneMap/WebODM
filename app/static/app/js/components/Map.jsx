@@ -163,7 +163,8 @@ class Map extends React.Component {
       this.tileJsonRequests = [];
 
       async.each(tiles, (tile, done) => {
-        const { url, meta, type } = tile;
+        const { url, type } = tile;
+        const meta = Utils.clone(tile.meta);
         
         let metaUrl = url + "metadata";
         let unitForward = value => value;
