@@ -58,7 +58,7 @@ export default L.Control.extend({
     },
 
     update: function(layers, overlays, annotations){
-        ReactDOM.render(<LayersControlButton map={this.map} layers={layers} overlays={overlays} annotations={annotations} />, this.container);
+        ReactDOM.render(<LayersControlButton ref={r => this.layersControlButton = r} map={this.map} layers={layers} overlays={overlays} annotations={annotations} />, this.container);
     }
 });
 

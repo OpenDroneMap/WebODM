@@ -7,6 +7,7 @@ import Utils from '../classes/Utils';
 import Workers from '../classes/Workers';
 import ErrorMessage from './ErrorMessage';
 import ExportAssetPanel from './ExportAssetPanel';
+import PluginsAPI from '../classes/plugins/API';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
 
@@ -72,6 +73,18 @@ export default class LayersControlLayer extends React.Component {
       return this.props.layer._url || "";
   }
 
+  componentDidMount(){
+    PluginsAPI.Map.onMapTypeChanged(this.handleMapTypeChange);
+  }
+
+  handleMapTypeChange = (type, autoExpand) => {
+    if (this.meta.type !== undefined){
+        const visible = this.meta.type === type;
+        const expanded = visible && autoExpand;
+        this.setState({visible, expanded});
+    }
+  }
+
   componentDidUpdate(prevProps, prevState){
     const { layer } = this.props;
 
@@ -109,6 +122,8 @@ export default class LayersControlLayer extends React.Component {
         this.exportReq.abort();
         this.exportReq = null;
     }
+
+    PluginsAPI.Map.offMapTypeChanged(this.handleMapTypeChange);
   }
 
   handleZoomToClick = () => {

@@ -103,9 +103,9 @@ class Map extends React.Component {
           case "plant":
               return this.props.thermal ? _("Thermal") : _("Plant Health");
           case "dsm":
-              return _("DSM");
+              return _("Surface Model");
           case "dtm":
-              return _("DTM");
+              return _("Terrain Model");
       }
       return "";
   }
@@ -121,6 +121,10 @@ class Map extends React.Component {
             return "fa fa-chart-area fa-fw";
     }
     return "";
+  }
+
+  typeZIndex = (type) => {
+    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1;
   }
 
   hasBands = (bands, orthophoto_bands) => {
@@ -165,7 +169,7 @@ class Map extends React.Component {
       async.each(tiles, (tile, done) => {
         const { url, type } = tile;
         const meta = Utils.clone(tile.meta);
-        
+
         let metaUrl = url + "metadata";
         let unitForward = value => value;
         let unitBackward = value => value;
@@ -246,7 +250,8 @@ class Map extends React.Component {
                   tileSize: TILESIZE,
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
-                  detectRetina: true
+                  detectRetina: true,
+                  zIndex: this.typeZIndex(type),
                 });
             
             // Associate metadata with this layer
@@ -285,7 +290,7 @@ class Map extends React.Component {
               return latlng;
             };
 
-            // Show/hide methods
+            // Additional layer methods
             layer.show = function(){
               if (!self.map.hasLayer(this)) self.map.addLayer(this);
               else this.getContainer().style.display = '';
@@ -296,6 +301,10 @@ class Map extends React.Component {
             layer.isHidden = function(){
               if (!this.getContainer()) return false;
               return this.getContainer().style.display === 'none';
+            }
+            layer.setZIndex = function(z){
+              this.options.zIndex = z;
+              this._updateZIndex();
             }
 
             var popup = L.DomUtil.create('div', 'infoWindow');
@@ -620,8 +629,7 @@ _('Example:'),
           
           // Find first visible tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
-            // TODO: visible?
-            if (layer._map && layer.options.bounds.contains(e.latlng)){
+            if (layer._map && !layer.isHidden() && layer.options.bounds.contains(e.latlng)){
               this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
               layer.openPopup();
@@ -718,8 +726,8 @@ _('Example:'),
       this.updatePopupFor(imageryLayer);
     });
 
-    if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers(true);
+    if (this.layersControl && prevProps.mapType !== this.props.mapType){
+      PluginsAPI.Map.mapTypeChanged(this.props.mapType, this.taskCount === 1);
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||

@@ -84,12 +84,7 @@ export default class LayersControlPanel extends React.Component {
               const m_a = a[Symbol.for("meta")] || {};
               const m_b = b[Symbol.for("meta")] || {};
               return m_a.type > m_b.type ? -1 : 1;
-          }).map(layer => {
-            return {
-              layer,
-              autoExpand: (layer[Symbol.for("meta")] || {}).autoExpand || false
-            };
-          }).map(({layer, autoExpand}, i) => <LayersControlLayer map={this.props.map} expanded={autoExpand} overlay={false} layer={layer} key={i} />)}
+          }).map((layer, i) => <LayersControlLayer map={this.props.map} expanded={(layer[Symbol.for("meta")] || {}).autoExpand || false} overlay={false} layer={layer} key={`${i}-${(layer[Symbol.for("meta")] || {}).type}`} />)}
         </div>);
       };
 
