@@ -77,9 +77,11 @@ export default class LayersControlLayer extends React.Component {
 
     if (prevState.visible !== this.state.visible){
         if (this.state.visible){
-            layer.addTo(this.map);
+            if (layer.show) layer.show(); 
+            else if (!this.map.hasLayer(layer)) layer.addTo(this.map);
         }else{
-            this.map.removeLayer(layer);
+            if (layer.hide) layer.hide();
+            else this.map.removeLayer(layer);
         }
     }
 
@@ -93,7 +95,7 @@ export default class LayersControlLayer extends React.Component {
     }
 
     if (prevProps.expanded !== this.props.expanded){
-        this.state.expanded = this.props.expanded;
+        this.setState({expanded: this.props.expanded});
     }
   }
 

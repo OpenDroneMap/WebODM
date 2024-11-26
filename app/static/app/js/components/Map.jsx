@@ -252,6 +252,8 @@ class Map extends React.Component {
             // Associate metadata with this layer
             meta.name = this.typeToHuman(type);
             meta.icon = this.typeToIcon(type);
+            meta.type = type;
+            meta.autoExpand = this.taskCount === 1 && type === this.props.mapType;
             meta.metaUrl = metaUrl;
             meta.unitForward = unitForward;
             meta.unitBackward = unitBackward;
@@ -275,13 +277,26 @@ class Map extends React.Component {
 
             // For some reason, getLatLng is not defined for tileLayer?
             // We need this function if other code calls layer.openPopup()
-            let self = this;
+            const self = this;
             layer.getLatLng = function(){
               let latlng = self.lastClickedLatLng ? 
                             self.lastClickedLatLng : 
                             this.options.bounds.getCenter();
               return latlng;
             };
+
+            // Show/hide methods
+            layer.show = function(){
+              if (!self.map.hasLayer(this)) self.map.addLayer(this);
+              else this.getContainer().style.display = '';
+            };
+            layer.hide = function(){
+              this.getContainer().style.display = 'none';
+            };
+            layer.isHidden = function(){
+              if (!this.getContainer()) return false;
+              return this.getContainer().style.display === 'none';
+            }
 
             var popup = L.DomUtil.create('div', 'infoWindow');
 
@@ -448,6 +463,10 @@ class Map extends React.Component {
       minZoom: 0,
       maxZoom: 24
     });
+
+    this.map.on('viewreset', this.layerVisibilityCheck);
+    this.map.on('zoomstart', this.layerVisibilityCheck);
+    this.map.on('movestart', this.layerVisibilityCheck);
 
     // For some reason, in production this class is not added (but we need it)
     // leaflet bug?
@@ -686,6 +705,13 @@ _('Example:'),
     this.setState({annotations: this.state.annotations.filter(l => l !== layer)});
   }
 
+  layerVisibilityCheck = () => {
+    // Check if imageryLayers are invisible and remove them to prevent tiles from loading
+    this.state.imageryLayers.forEach(layer => {
+      if (layer.isHidden()) this.map.removeLayer(layer);
+    }); 
+  }
+
   componentDidUpdate(prevProps, prevState) {
     this.state.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.state.opacity / 100);
@@ -705,6 +731,9 @@ _('Example:'),
 
   componentWillUnmount() {
     this.map.remove();
+    this.map.off('viewreset', this.layerVisibilityCheck);
+    this.map.off('zoomstart', this.layerVisibilityCheck);
+    this.map.off('movestart', this.layerVisibilityCheck);
 
     if (this.tileJsonRequests) {
       this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
