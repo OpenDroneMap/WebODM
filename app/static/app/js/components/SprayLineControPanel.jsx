@@ -110,7 +110,13 @@ export default class SprayLineControlPanel extends React.Component {
                     );
     
                     if (isBoundsEqual) {
-                        fieldIds.push(leafletLayer.feature.properties.Field_id);
+                        const featureProps = leafletLayer.feature.properties;
+
+                        if ('field_id' in featureProps) {
+                            fieldIds.push(featureProps.field_id);
+                        } else if ('Field_id' in featureProps) {
+                            fieldIds.push(featureProps.Field_id);
+                        }
                     }
                 });
             });
@@ -209,7 +215,13 @@ export default class SprayLineControlPanel extends React.Component {
                     );
     
                     if (isBoundsEqual) {
-                        fieldIds.push(leafletLayer.feature.properties.Field_id);
+                        const featureProps = leafletLayer.feature.properties;
+
+                        if ('field_id' in featureProps) {
+                            fieldIds.push(featureProps.field_id);
+                        } else if ('Field_id' in featureProps) {
+                            fieldIds.push(featureProps.Field_id);
+                        }
                     }
                 });
             });
