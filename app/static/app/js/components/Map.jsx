@@ -26,7 +26,7 @@ import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
-import '../vendor/leaflet/leaflet-side-by-side';
+import '../vendor/leaflet/Leaflet.SideBySide/leaflet-side-by-side';
 import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
 import { unitSystem, toMetric } from '../classes/Units';
@@ -64,7 +64,8 @@ class Map extends React.Component {
       opacity: 100,
       imageryLayers: [],
       overlays: [],
-      annotations: []
+      annotations: [],
+      rightLayers: []
     };
 
     this.basemaps = {};
@@ -161,7 +162,7 @@ class Map extends React.Component {
       if (this.map.hasLayer(layer)) prevSelectedLayers.push(layerId(layer));
       layer.remove();
     });
-    this.setState({imageryLayers: []});
+    this.setState({imageryLayers: [], rightLayers: []});
 
     // Request new tiles
     return new Promise((resolve, reject) => {
@@ -314,7 +315,7 @@ class Map extends React.Component {
             popup.innerHTML = `<div class="title">
                                     ${name}
                                 </div>
-                                <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
+                                <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" class="opacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
                                 <ul class="asset-links loading">
                                     <li><i class="fa fa-spin fa-sync fa-spin fa-fw"></i></li>
@@ -485,6 +486,7 @@ class Map extends React.Component {
 
     PluginsAPI.Map.onAddAnnotation(this.handleAddAnnotation);
     PluginsAPI.Map.onAnnotationDeleted(this.handleDeleteAnnotation);
+    PluginsAPI.Map.onSideBySideChanged(this.handleSideBySideChange);
 
     PluginsAPI.Map.triggerWillAddControls({
         map: this.map,
@@ -628,6 +630,7 @@ _('Example:'),
 
         this.map.on('click', e => {
           if (PluginsAPI.Map.handleClick(e)) return;
+          if (this.sideBySideCtrl) return;
           
           // Find first visible tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
@@ -715,6 +718,30 @@ _('Example:'),
     this.setState({annotations: this.state.annotations.filter(l => l !== layer)});
   }
 
+  handleSideBySideChange = (layer, side) => {
+    let { rightLayers } = this.state;
+    rightLayers = rightLayers.filter(l => l !== layer);
+    
+    if (side){
+      rightLayers.push(layer);
+    }
+
+    this.setState({rightLayers});
+
+    if (rightLayers.length > 0){
+      if (!this.sideBySideCtrl){
+        this.sideBySideCtrl = L.control.sideBySide([], rightLayers).addTo(this.map);
+      }else{
+        this.sideBySideCtrl.setRightLayers(rightLayers);
+      }
+    }else{
+      if (this.sideBySideCtrl){
+        this.sideBySideCtrl.remove();
+        this.sideBySideCtrl = null;
+      }
+    }
+  }
+
   layerVisibilityCheck = () => {
     // Check if imageryLayers are invisible and remove them to prevent tiles from loading
     this.state.imageryLayers.forEach(layer => {
@@ -752,7 +779,7 @@ _('Example:'),
 
     PluginsAPI.Map.offAddAnnotation(this.handleAddAnnotation);
     PluginsAPI.Map.offAnnotationDeleted(this.handleAddAnnotation);
-    
+    PluginsAPI.Map.offSideBySideChanged(this.handleSideBySideChange);
   }
 
   handleMapMouseDown(e){
@@ -765,7 +792,7 @@ _('Example:'),
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" className="opacity" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 

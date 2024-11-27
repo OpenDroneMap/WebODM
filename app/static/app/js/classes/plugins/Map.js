@@ -31,6 +31,7 @@ export default {
     "annotationDeleted",
     "downloadAnnotations",
     "mapTypeChanged",
+    "sideBySideChanged",
   ]
 };
 
