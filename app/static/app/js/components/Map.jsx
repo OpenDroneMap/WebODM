@@ -790,11 +790,15 @@ class Map extends React.Component {
     if (this.shareButton) this.shareButton.hidePopup();
   }
 
+  handleEndProcess(){
+    location.reload(true);
+  }
+
   render() {
     
     return (
       <div style={{ height: "100%" }} className="map">
-        <ProcessingCard task_id = {this.props.tiles[0].meta.task.id} project_id = {this.props.tiles[0].meta.task.project}/>
+        <ProcessingCard task_id = {this.props.tiles[0].meta.task.id} project_id = {this.props.tiles[0].meta.task.project} endProcess ={this.handleEndProcess}/>
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider hidden-xs">
             {_("Opacidade:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
