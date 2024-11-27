@@ -59,7 +59,7 @@ urlpatterns = [
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/cameraview$', CameraView.as_view()),
 
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/cattle$', TaskAiDetectionCattle.as_view()),
-    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn)$', TaskAiDetectionWeed.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn|cane)$', TaskAiDetectionWeed.as_view()),
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/field$', TaskAiDetectionField.as_view()),
 
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process/spraylines$', SprayLinesProcessing.as_view()),

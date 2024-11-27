@@ -43,7 +43,7 @@ class FieldLayerControlPopup extends React.Component {
       },
       {
         checkboxLabel: "Cana",
-        type: 'sugarcane',
+        type: 'cane',
         fieldColor: '#596F62',
       },
     ];
