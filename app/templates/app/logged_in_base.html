@@ -76,24 +76,8 @@
 
             {# Verifica se o menu não é "Diagnóstico" ou se o usuário é Administrador (is_staff True).  Se qualquer uma das condições for verdadeira, o item do menu será exibido na lista. Se o menu for Diagnóstico e o usuário não for administrador o item não será exibido. #}
             {% if menu.label != "Diagnóstico" or user.is_staff != False %}
+                {% if menu.label != "Rede Lightning" and menu.label != "Interface de Ponto de Controle" %}
         
-            <li>
-                <a href="{{menu.link}}">
-                    <div>
-                        <i class="{{menu.css_icon}} plugin-icon"></i>
-                        <span data-sidebar="link-text">
-                            {{menu.label}}
-                        </span>
-                    </div>
-                    {% if menu.has_submenu %}
-                    <span class="fa arrow"></span>
-                    {% endif %}
-                </a>
-                <span class="horizontal-bar-sidebar"></span>
-
-                {% if menu.has_submenu %}
-                <ul class="nav nav-second-level" data-sidebar="dropdown">
-                    {% for menu in menu.submenu %}
                     <li>
                         <a href="{{menu.link}}">
                             <div>
@@ -107,15 +91,34 @@
                             {% endif %}
                         </a>
                         <span class="horizontal-bar-sidebar"></span>
+
+                        {% if menu.has_submenu %}
+                        <ul class="nav nav-second-level" data-sidebar="dropdown">
+                            {% for menu in menu.submenu %}
+                            <li>
+                                <a href="{{menu.link}}">
+                                    <div>
+                                        <i class="{{menu.css_icon}} plugin-icon"></i>
+                                        <span data-sidebar="link-text">
+                                            {{menu.label}}
+                                        </span>
+                                    </div>
+                                    {% if menu.has_submenu %}
+                                    <span class="fa arrow"></span>
+                                    {% endif %}
+                                </a>
+                                <span class="horizontal-bar-sidebar"></span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                     </li>
-                    {% endfor %}
-                </ul>
                 {% endif %}
-            </li>
             {% endif %}
             {% endfor %}
 
             {% if view_nodes %}
+            {% if user.is_staff %}
             <li>
                 <a href="#" class="itens-collapse">
                     <div>
@@ -158,6 +161,7 @@
                 </ul>
                 <!-- /.nav-second-level -->
             </li>
+            {% endif %}
             {% endif %}
 
             {% if user.is_staff %}
