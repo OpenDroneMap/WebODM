@@ -26,6 +26,7 @@ import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
+import '../vendor/leaflet/leaflet-side-by-side';
 import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
 import { unitSystem, toMetric } from '../classes/Units';
@@ -258,6 +259,7 @@ class Map extends React.Component {
             meta.name = this.typeToHuman(type);
             meta.icon = this.typeToIcon(type);
             meta.type = type;
+            meta.raster = true;
             meta.autoExpand = this.taskCount === 1 && type === this.props.mapType;
             meta.metaUrl = metaUrl;
             meta.unitForward = unitForward;
