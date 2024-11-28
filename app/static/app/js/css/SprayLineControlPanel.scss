@@ -1,0 +1,103 @@
+.leaflet-control-sprayline-control .sprayline-control-panel{
+    padding: 6px 10px 6px 6px;
+    background: #fff;
+    width: 300px;
+    min-height: 74px;
+    max-height: 300px;
+    overflow-y: auto;
+  
+    .close-button{
+      display: inline-block;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQAAAD8x0bcAAAAkUlEQVR4AZWRxQGDUBAFJ9pMflNIP/iVSkIb2wgccXd7g7O+3JXCQUgqBAfFSl8CMooJGQHfuUlEwZpoahZQ7ODTSXWJQkxyioock7BL2tXmdF4moJNX6IDZfbUBQNrX7qfeXfPuqwBAQjEz60w64htGJ+luFH48gt+NYe6v5b/cnr9asM+HlRQ2Qlwh2CjuqQQ9vKsKTwhQ1wAAAABJRU5ErkJggg==);
+      height: 18px;
+      width: 18px;
+      margin-right: 0;
+      float: right;
+      vertical-align: middle;
+      text-align: right;
+      margin-top: 0px;
+      margin-left: 16px;
+      position: relative;
+      left: 2px;
+  
+      &:hover{
+        opacity: 0.7;
+        cursor: pointer;
+      }
+    }
+  
+    .title{
+      font-size: 120%;
+      margin-right: 60px;
+    }
+  
+    hr{
+      clear: both;
+      margin: 6px 0px;
+      border-color: #ddd;
+    }
+  
+    *{
+        font-size: 12px;
+    }
+    .list-sprayline{
+      padding: 0;
+    }
+
+    .layer-item {
+      margin-bottom: 10px;
+      list-style: none;
+    }
+
+    .list-layer-items.collapsed {
+      display: none;
+    }
+
+    .collapsed-infos-btn {
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      border-radius: 4px;
+      margin-right: 5px;
+      padding: 0px 4px;
+    }
+
+    a.link-item {
+      display: inline;
+      background-color: transparent !important;
+      border: none;
+    }
+
+    a.link-item:hover {
+      opacity: 0.6;
+    }
+
+    .form-container label {
+      width: 180px;
+    }
+
+    .form-container input {
+      width: 80px;
+    }
+
+    .dropdown-menu.pull-right {
+      right: 136px !important;
+    }
+
+    .dropdown-menu a {
+      width: 100%;
+      text-align: left;
+      display: block;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .export-disable {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+  }
+  

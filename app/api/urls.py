@@ -17,6 +17,9 @@ from .users import UsersList
 from .externalauth import ExternalTokenAuth
 from .ai import AiProcessing
 from .geojson import SaveGeoJson
+from .process_status import GetProcess
+from .spray_lines import SprayLinesProcessing
+from .spray_lines_export import SprayLinesExport
 from webodm import settings
 
 router = routers.DefaultRouter()
@@ -56,12 +59,17 @@ urlpatterns = [
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/3d/cameraview$', CameraView.as_view()),
 
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/cattle$', TaskAiDetectionCattle.as_view()),
-    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn)$', TaskAiDetectionWeed.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/(?P<detection_type>soy|corn|cane)$', TaskAiDetectionWeed.as_view()),
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/ai/detections/field$', TaskAiDetectionField.as_view()),
 
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process/spraylines$', SprayLinesProcessing.as_view()),
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/process$', AiProcessing.as_view()),
 
     re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/save/field$', SaveGeoJson.as_view()),
+
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/getProcess$', GetProcess.as_view()),
+    re_path(r'projects/(?P<project_pk>[^/.]+)/tasks/(?P<pk>[^/.]+)/export/spraylines$', SprayLinesExport.as_view()),
+    
 
     re_path(r'workers/check/(?P<celery_task_id>.+)', CheckTask.as_view()),
     re_path(r'workers/get/(?P<celery_task_id>.+)', GetTaskResult.as_view()),
