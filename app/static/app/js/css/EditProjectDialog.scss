@@ -72,3 +72,8 @@
         opacity: 0.65 !important;
         background-color: #a0a0a0 !important;
     }
+     .modal-dialog .modal-content{
+        display: flex;
+        flex-direction: column;
+        
+    }

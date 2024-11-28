@@ -158,6 +158,7 @@ class EditProjectDialog extends React.Component {
         }
 
         return (
+          
             <FormDialog {...this.props}
                 getFormData={this.getFormData}
                 reset={this.reset}
