@@ -56,7 +56,7 @@ class ProcessingCard extends React.Component{
       "spray_lines" : "Linhas de Pulverização"
     }
 
-   
+    // Verifica se existe algum item processando, caso um item tenha terminado de processar ele chama a função endProcess (função do Map.jsx) que da reload na pagina.
     if(items.length === 0){
       if(this.state.loading == true){
         this.state.loading = false;

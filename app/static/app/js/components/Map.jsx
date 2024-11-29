@@ -791,6 +791,7 @@ class Map extends React.Component {
   }
 
   handleEndProcess(){
+    // Faz reload da pagina.
     location.reload(true);
   }
 
