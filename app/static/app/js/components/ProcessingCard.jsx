@@ -53,7 +53,8 @@ class ProcessingCard extends React.Component{
     const { items } = this.state;
     const translateTypes = {
       "weeds" : "Daninha",
-      "spray_lines" : "Linhas de Pulverização"
+      "spray_lines" : "Linhas de Pulverização",
+      "spray_lines_export" : "Linhas de Pulverização"
     }
 
     // Verifica se existe algum item processando, caso um item tenha terminado de processar ele chama a função endProcess (função do Map.jsx) que da reload na pagina.
@@ -63,7 +64,7 @@ class ProcessingCard extends React.Component{
         this.props.endProcess();
       }
       return null;
-    }else if(items[0].task_type != "spray_lines"){
+    }else if(items[0].task_type != "spray_lines" && items[0].task_type != "spray_lines_export"){
       this.state.loading = true;
     }
 
