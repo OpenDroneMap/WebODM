@@ -183,7 +183,7 @@ class TaskViewSet(viewsets.ViewSet):
         task.images_count = len(task.scan_images())
 
         if task.images_count < 1:
-            raise exceptions.ValidationError(detail=_("You need to upload at least 1 file before commit"))
+            raise exceptions.ValidationError(detail=_("Você precisa fazer upload de pelo menos 1 arquivo antes de commit"))
 
         task.update_size()
         task.save()
@@ -206,7 +206,7 @@ class TaskViewSet(viewsets.ViewSet):
         files = flatten_files(request.FILES)
 
         if len(files) == 0:
-            raise exceptions.ValidationError(detail=_("No files uploaded"))
+            raise exceptions.ValidationError(detail=_("Nenhum arquivo carregado"))
 
         task.handle_images_upload(files)
         task.images_count = len(task.scan_images())
@@ -232,7 +232,7 @@ class TaskViewSet(viewsets.ViewSet):
         if new_task:
             return Response({'success': True, 'task': TaskSerializer(new_task).data}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': _("Cannot duplicate task")}, status=status.HTTP_200_OK)
+            return Response({'error': _("Não é possível duplicar a tarefa")}, status=status.HTTP_200_OK)
 
     def create(self, request, project_pk=None):
         project = get_and_check_project(request, project_pk, ('change_project', ))
@@ -249,7 +249,7 @@ class TaskViewSet(viewsets.ViewSet):
             files = flatten_files(request.FILES)
 
             if len(files) <= 1:
-                raise exceptions.ValidationError(detail=_("Cannot create task, you need at least 2 images"))
+                raise exceptions.ValidationError(detail=_("Não é possível criar tarefa, você precisa de pelo menos 2 imagens"))
 
             with transaction.atomic():
                 task = models.Task.objects.create(project=project,
@@ -368,10 +368,10 @@ class TaskDownloads(TaskNestedView):
         try:
             asset_fs, is_zipstream = task.get_asset_file_or_zipstream(asset)
         except FileNotFoundError:
-            raise exceptions.NotFound(_("Asset does not exist"))
+            raise exceptions.NotFound(_("Asset não existe"))
 
         if not is_zipstream and not os.path.isfile(asset_fs):
-            raise exceptions.NotFound(_("Asset does not exist"))
+            raise exceptions.NotFound(_("Asset não existe"))
         
         download_filename = request.GET.get('filename', get_asset_download_filename(task, asset))
 
@@ -395,10 +395,10 @@ class TaskAssets(TaskNestedView):
         try:
             asset_path = path_traversal_check(task.assets_path(unsafe_asset_path), task.assets_path(""))
         except SuspiciousFileOperation:
-            raise exceptions.NotFound(_("Asset does not exist"))
+            raise exceptions.NotFound(_("Asset não existe"))
 
         if (not os.path.exists(asset_path)) or os.path.isdir(asset_path):
-            raise exceptions.NotFound(_("Asset does not exist"))
+            raise exceptions.NotFound(_("Asset não existe"))
 
         return download_file_response(request, asset_path, 'inline')
 
@@ -417,10 +417,10 @@ class TaskAssetsImport(APIView):
         task_name = request.data.get('name', _('Imported Task'))
 
         if not import_url and len(files) != 1:
-            raise exceptions.ValidationError(detail=_("Cannot create task, you need to upload 1 file"))
+            raise exceptions.ValidationError(detail=_("Não é possível criar tarefa, você precisa fazer upload de 1 arquivo"))
 
         if import_url and len(files) > 0:
-            raise exceptions.ValidationError(detail=_("Cannot create task, either specify a URL or upload 1 file."))
+            raise exceptions.ValidationError(detail=_("Não é possível criar tarefa, especifique um URL ou faça upload de 1 arquivo."))
 
         chunk_index = request.data.get('dzchunkindex')
         uuid = request.data.get('dzuuid') 
