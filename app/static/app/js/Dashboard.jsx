@@ -24,7 +24,7 @@ class Dashboard extends React.Component {
   }
 
   addNewProject(project){
-    if (!project.name) return (new $.Deferred()).reject(_("Name field is required"));
+    if (!project.name) return (new $.Deferred()).reject(_("O campo Nome é obrigatório"));
 
     return $.ajax({
           url: `/api/projects/`,
@@ -106,7 +106,7 @@ $(function(){
                 // Do nothing
             }
         });
-        return found ? _("Your changes will be lost. Are you sure you want to leave?") : undefined; 
+        return found ? _("Suas alterações serão perdidas. Tem certeza de que deseja sair?") : undefined; 
     };
 
     const btn_add_default = 'btn';
