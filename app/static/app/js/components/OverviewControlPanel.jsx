@@ -204,7 +204,7 @@ export default class OverviewControlPanel extends React.Component {
   render() {
     return (
       <div className="overview-control-panel">
-        <span className="close-button" onClick={this.props.onClose} />
+        <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
         <div className="title">Overview</div>
         <hr />
         {this.state.filteredSelectedLayers.length > 0 ? (

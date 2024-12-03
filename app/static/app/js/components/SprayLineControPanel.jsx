@@ -320,7 +320,7 @@ export default class SprayLineControlPanel extends React.Component {
     render() {
         return (
             <div className="sprayline-control-panel">
-                <span className="close-button" onClick={this.props.onClose} />
+                <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
                 <div className="title">Pulverizar</div>
                 <hr />
 

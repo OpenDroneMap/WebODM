@@ -150,11 +150,13 @@ L.Control.AutoLayers = L.Control.extend({
 		//base layers are made here
 		var baseLayersDiv = this._baseLayersDiv = L.DomUtil.create('div', 'leaflet-control-layers-tab',
 			form);
+		this._baseLayersClose = L.DomUtil.create('span', 'leaflet-control-autolayers-close',
+			baseLayersDiv);
+		this._baseLayersClose.classList.add('fas', 'fa-times');
 		this._baseLayersTitle = L.DomUtil.create('div', 'leaflet-control-autolayers-title',
 			baseLayersDiv);
 		this._baseLayersTitle.innerHTML = 'Base Maps';
-		this._baseLayersClose = L.DomUtil.create('span', 'leaflet-control-autolayers-close',
-			baseLayersDiv);
+		
 		var baseLayersBox = this._baseLayersBox = L.DomUtil.create('div', 'map-filter', baseLayersDiv);
 		var baseLayersFilter = this._baseLayersFilter = L.DomUtil.create('input',
 			'map-filter-box-base', baseLayersBox);

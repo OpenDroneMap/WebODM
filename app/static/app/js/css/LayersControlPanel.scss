@@ -12,13 +12,14 @@
 
 .leaflet-control-layers-control .layers-control-panel{
   padding: 15px 20px 15px 25px;
+  margin: 10px 12px 0 0;
   background: #fff;
-  min-width: 250px; 
-  max-width: 300px;
-  overflow-y: auto; 
-  padding-right: 15px;
-  z-index: 99999;
-  max-height: 320px; 
+  width: 300px;
+  min-height: 74px;
+  max-height: 418px;
+  overflow-y: auto;
+  border-radius: 12px;
+  overflow-x: hidden;
   
 
   .loading{
@@ -28,11 +29,9 @@
 
   .close-button{
     display: inline-block;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAUklEQVQ4jWNgGAXYgC4DA4M5FnFzqBxBYM7AwPCKgYHBAUnMASqGzWCswIaBgeElAwODExqbJOAA1fgSzTUogIlUU4kFtgwUeIHiQKQ4GkcaAAC8Jw8GjeNLuQAAAABJRU5ErkJggg==);
-    background-repeat: no-repeat;
-    background-size: contain;
-    height: 25px;
-    width: 25px;
+    font-size:17px;
+    height: 30px;
+    width: 30px;
     margin-right: 0;
     float: right;
     vertical-align: middle;
@@ -40,8 +39,7 @@
     margin-top: 0px;
     margin-left: 16px;
     position: relative;
-    left: 7px;
-    top: -7px;
+    left: 2px;
 
     &:hover{
       opacity: 0.7;
