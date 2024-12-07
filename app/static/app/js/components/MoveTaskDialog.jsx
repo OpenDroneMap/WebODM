@@ -51,7 +51,7 @@ class MoveTaskDialog extends React.Component {
       })
       .fail((jqXHR, textStatus, errorThrown) => {
           this.dialog.setState({ 
-              error: interpolate(_("Could not load projects list: %(error)s"), {error: textStatus})
+              error: interpolate(_("Não foi possível carregar a lista de projetos: %(error)s"), {error: textStatus})
           });
       })
       .always(() => {
@@ -85,7 +85,7 @@ class MoveTaskDialog extends React.Component {
               <div style={{minHeight: '50px'}}>
                 {!this.state.loading ? 
                 <div className="form-group">
-                    <label className="col-sm-2 control-label">{_("Project")}</label>
+                    <label className="col-sm-2 control-label">{_("Projeto")}</label>
                     <div className="col-sm-10">
                         <select className="form-control" 
                                 value={this.state.projectId}

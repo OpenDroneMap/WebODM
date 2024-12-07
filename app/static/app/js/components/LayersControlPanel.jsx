@@ -27,7 +27,7 @@ export default class LayersControlPanel extends React.Component {
         content = (
             <span>
                 <i className="loading fa fa-circle-notch fa-spin"></i> 
-                {_("Loading…")}
+                {_("Carregando…")}
             </span>
         );
     } else {

@@ -7,11 +7,11 @@ import { _ } from '../classes/gettext';
 
 class FormDialog extends React.Component {
     static defaultProps = {
-        title: _("Title"),
-        saveLabel: _("Save"),
-        savingLabel: _("Saving…"),
+        title: _("Título"),
+        saveLabel: _("Salvar"),
+        savingLabel: _("Salvando..."),
         saveIcon: "glyphicon glyphicon-plus",
-        deleteWarning: _("Are you sure?"),
+        deleteWarning: _("Tem certeza?"),
         show: false
     };
 
@@ -127,7 +127,7 @@ class FormDialog extends React.Component {
             this.serverRequest = this.props.saveAction(formData);
             if (this.serverRequest){
                 this.serverRequest.fail(e => {
-                    this.setState({error: e.message || (e.responseJSON || {}).detail || (e.responseJSON || {}).error || e.responseText || _("Could not apply changes")});
+                    this.setState({error: e.message || (e.responseJSON || {}).detail || (e.responseJSON || {}).error || e.responseText || _("Não foi possível aplicar as alterações")});
                 }).always(() => {
                     this.setState({saving: false});
                     this.serverRequest = null;
@@ -148,7 +148,7 @@ class FormDialog extends React.Component {
                 this.setState({deleting: true});
                 this.props.deleteAction()
                     .fail(e => {
-                        if (this._mounted) this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Could not delete item")});
+                        if (this._mounted) this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Não foi possível excluir o item")});
                     }).always(() => {
                         if (this._mounted) this.setState({deleting: false});
                     });

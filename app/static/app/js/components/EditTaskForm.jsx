@@ -678,7 +678,7 @@ class EditTaskForm extends React.Component {
         </div >);
     } else {
       taskOptions = (<div className="form-group">
-        <div className="col-sm-offset-2 col-sm-10">{_("Loading processing nodes and presets...")} <i className="fa fa-sync fa-spin fa-fw"></i></div>
+        <div className="col-sm-offset-2 col-sm-10">{_("Carregando nós de processamento e predefinições...")} <i className="fa fa-sync fa-spin fa-fw"></i></div>
       </div>);
     }
 

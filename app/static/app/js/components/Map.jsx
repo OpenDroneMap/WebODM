@@ -579,7 +579,7 @@ class Map extends React.Component {
             this.container = Leaflet.DomUtil.create('div', 'leaflet-control-add-overlay leaflet-bar leaflet-control');
             Leaflet.DomEvent.disableClickPropagation(this.container);
             const btn = Leaflet.DomUtil.create('a', 'leaflet-control-add-overlay-button');
-            btn.setAttribute("title", _("Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay"));
+            btn.setAttribute("title", _("Adicione uma sobreposição temporária de GeoJSON (.json) ou ShapeFile (.zip)"));
             
             this.container.append(btn);
             addDnDZone(btn, {url: "/", clickable: true});
@@ -647,7 +647,7 @@ class Map extends React.Component {
                             $assetLinks.append($(linksHtml));
                         })
                         .fail(() => {
-                            $assetLinks.append($("<li>" + _("Error: cannot load assets list.") + "</li>"));
+                            $assetLinks.append($("<li>" + _("Erro: não é possível carregar a lista de ativos.") + "</li>"));
                         })
                         .always(() => {
                             $assetLinks.removeClass('loading');

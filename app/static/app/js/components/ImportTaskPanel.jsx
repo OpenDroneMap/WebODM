@@ -61,7 +61,7 @@ class ImportTaskPanel extends React.Component {
       });
 
       this.dz.on("error", (file) => {
-          if (this.state.uploading) this.setState({error: _("Cannot upload file. Check your internet connection and try again.")});
+          if (this.state.uploading) this.setState({error: _("Não é possível fazer upload do arquivo. Verifique sua conexão com a Internet e tente novamente.")});
         })
         .on("sending", () => {
           this.setState({typeUrl: false, uploading: true, totalCount: 1});
@@ -93,7 +93,7 @@ class ImportTaskPanel extends React.Component {
               this.setState({error: interpolate(_('Invalid response from server: %(error)s'), { error: e.message})});
             }
           }else if (this.state.uploading){
-            this.setState({uploading: false, error: _("An error occured while uploading the file. Please try again.")});
+            this.setState({uploading: false, error: _("Ocorreu um erro ao carregar o arquivo. Por favor, tente novamente.")});
           }
         });
     }
@@ -137,11 +137,11 @@ class ImportTaskPanel extends React.Component {
       if (json.id){
         this.props.onImported();
       }else{
-        this.setState({error: json.error || interpolate(_("Invalid JSON response: %(error)s"), {error: JSON.stringify(json)})});
+        this.setState({error: json.error || interpolate(_("Resposta JSON inválida: %(error)s"), {error: JSON.stringify(json)})});
       }
     })
     .fail(() => {
-        this.setState({importingFromUrl: false, error: _("Cannot import from URL. Check your internet connection.")});
+        this.setState({importingFromUrl: false, error: _("Não é possível importar do URL. Verifique sua conexão com a Internet.")});
     });
   }
 
@@ -158,15 +158,15 @@ class ImportTaskPanel extends React.Component {
           <ErrorMessage bind={[this, 'error']} />
 
           <button type="button" className="close theme-color-primary" title="Close" onClick={this.cancel}><span aria-hidden="true">&times;</span></button>
-          <h4>{_("Import Existing Assets")}</h4>
-          <p><Trans params={{arrow: '<i class="glyphicon glyphicon-arrow-right"></i>'}}>{_("You can import .zip files that have been exported from existing tasks via Download Assets %(arrow)s All Assets.")}</Trans></p>
+          <h4>{_("Importar ativos existentes")}</h4>
+          <p><Trans params={{arrow: '<i class="glyphicon glyphicon-arrow-right"></i>'}}>{_("Você pode importar arquivos .zip que foram exportados de tarefas existentes por meio de Baixar ativos %(arrow)s Todos os ativos.")}</Trans></p>
           
           <button disabled={this.state.uploading}
                   type="button" 
                   className="btn btn-primary"
                   ref={this.setRef("uploadButton")}>
             <i className="glyphicon glyphicon-upload"></i>
-            {_("Upload a File")}
+            {_("Carregar um arquivo")}
           </button>
           <button disabled={this.state.uploading}
                   type="button" 
@@ -174,7 +174,7 @@ class ImportTaskPanel extends React.Component {
                   onClick={this.handleImportFromUrl}
                   ref={this.setRef("importFromUrlButton")}>
             <i className="glyphicon glyphicon-cloud-download"></i>
-            {_("Import From URL")}
+            {_("Importar do URL")}
           </button>
 
           {this.state.typeUrl ? 
@@ -183,7 +183,7 @@ class ImportTaskPanel extends React.Component {
                 <input disabled={this.state.importingFromUrl} onChange={this.handleChangeImportUrl} size="45" type="text" className="form-control" placeholder="http://" value={this.state.importUrl} />
                 <button onClick={this.handleConfirmImportUrl}
                         disabled={this.state.importUrl.length < 4 || this.state.importingFromUrl} 
-                        className="btn-import btn btn-primary"><i className="glyphicon glyphicon-cloud-download"></i> {_("Import")}</button>
+                        className="btn-import btn btn-primary"><i className="glyphicon glyphicon-cloud-download"></i> {_("Importar")}</button>
               </div>
             </div> : ""}
 
@@ -193,7 +193,7 @@ class ImportTaskPanel extends React.Component {
                     className="btn btn-danger btn-sm" 
                     onClick={this.cancelUpload}>
               <i className="glyphicon glyphicon-remove-circle"></i>
-              {_("Cancel Upload")}
+              {_("Cancelar upload")}
             </button> 
           </div> : ""}
         </div>

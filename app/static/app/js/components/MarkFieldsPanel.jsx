@@ -74,7 +74,7 @@ export default class LayersControlPanel extends React.Component {
         fetch('/api/projects/' + this.props.project_id + '/tasks/'+ this.props.task_id +'/ai/detections/field').then((value) => {
             if (value.status == 404) {
               let err = {};
-              err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
+              err.message = interpolate(_("Detecção em %(url)s não encontrada!"), { url: api });
               cb(err);
               return;
             }

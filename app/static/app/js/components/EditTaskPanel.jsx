@@ -53,7 +53,7 @@ class EditTaskPanel extends React.Component {
           this.setState({saving: false});
           this.props.onSave(json);
         }).fail(() => {
-          this.setState({saving: false, error: _("Could not update task information. Please try again.")});
+          this.setState({saving: false, error: _("Não foi possível atualizar as informações da tarefa. Por favor, tente novamente.")});
         });     
     }
 
@@ -76,7 +76,7 @@ class EditTaskPanel extends React.Component {
                     <button type="button" className="btn btn-sm btn-primary save" onClick={this.handleSave} disabled={this.state.saving || !this.state.editTaskFormLoaded}>
                         {this.state.saving ? 
                             <span>
-                                <i className="fa fa-circle-notch fa-spin"></i> {_("Saving...")}
+                                <i className="fa fa-circle-notch fa-spin"></i> {_("Salvando...")}
                             </span>
                         :   <span>
                                 <i className="fa fa-edit"></i> {_("Save")}
