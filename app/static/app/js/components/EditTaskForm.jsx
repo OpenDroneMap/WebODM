@@ -124,8 +124,8 @@ class EditTaskForm extends React.Component {
         if (Array.isArray(json)) {
           // No nodes with options?
           const noProcessingNodesError = (nodes) => {
-            var extra = nodes ? _("We tried to reach:") + "<ul>" + nodes.map(n => Utils.html`<li><a href="${n.url}">${n.label}</a></li>`).join("") + "</ul>" : "";
-            this.setState({ error: _("There are no usable processing nodes.") + extra + _("Make sure that at least one processing node is reachable and that you have granted the current user sufficient permissions to view the processing node (by going to Administration -- Processing Nodes -- Select Node -- Object Permissions -- Add User/Group and check CAN VIEW PROCESSING NODE). If you are bringing a node back online, it will take about 30 seconds for WebODM to recognize it.") });
+            var extra = nodes ? _("Tentamos alcançar:") + "<ul>" + nodes.map(n => Utils.html`<li><a href="${n.url}">${n.label}</a></li>`).join("") + "</ul>" : "";
+            this.setState({ error: _("Não há nós de processamento utilizáveis.") + extra + _("Certifique-se de que pelo menos um nó de processamento esteja acessível e que você tenha concedido ao usuário atual permissões suficientes para visualizar o nó de processamento (indo para Administração - Nós de Processamento - Selecionar Nó - Permissões de Objeto - Adicionar Usuário/Grupo e verificar PODE VISUALIZAR NÓ DE PROCESSAMENTO). Se você estiver colocando um nó online novamente, levará cerca de 30 segundos para que o WebODM o reconheça.") });
           };
 
           if (json.length === 0) {
@@ -224,7 +224,7 @@ class EditTaskForm extends React.Component {
 
   loadPresets() {
     const failed = () => {
-      this.setState({ error: _("Could not load list of presets. Are you connected to the internet?") });
+      this.setState({ error: _("Não foi possível carregar a lista de predefinições. Você está conectado à internet?") });
     }
 
     this.presetsRequest =
@@ -449,7 +449,7 @@ class EditTaskForm extends React.Component {
     this.setState({ presetActionPerforming: true });
 
     const isCustom = selectedPreset.id === -1,
-      name = isCustom ? _("My Preset") : interpolate(_("Copy of %(preset)s"), { preset: selectedPreset.name });
+      name = isCustom ? _("Minha predefinição") : interpolate(_("Cópia de %(preset)s"), { preset: selectedPreset.name });
 
     $.ajax({
       url: `/api/presets/`,
@@ -472,7 +472,7 @@ class EditTaskForm extends React.Component {
       this.setState({ presets, selectedPreset: preset });
       this.handleEditPreset();
     }).fail(() => {
-      this.setState({ presetError: _("Could not duplicate the preset. Please try to refresh the page.") });
+      this.setState({ presetError: _("Não foi possível duplicar a predefinição. Por favor, tente atualizar a página.") });
     }).always(() => {
       this.setState({ presetActionPerforming: false });
     });
@@ -481,7 +481,7 @@ class EditTaskForm extends React.Component {
   handleDeletePreset() {
     const { selectedPreset, presets } = this.state;
     if (selectedPreset.system) {
-      this.setState({ presetError: _("System presets can only be removed by a staff member from the Administration panel.") });
+      this.setState({ presetError: _("As predefinições do sistema só podem ser removidas por um membro da equipe no painel de Administração.") });
       return;
     }
 
@@ -498,7 +498,7 @@ class EditTaskForm extends React.Component {
         // Select first by default
         this.setState({ presets, selectedPreset: presets[0], editingPreset: false });
       }).fail(() => {
-        this.setState({ presetError: _("Could not delete the preset. Please try to refresh the page.") });
+        this.setState({ presetError: _("Não foi possível excluir a predefinição. Por favor, tente atualizar a página.") });
       }).always(() => {
         this.setState({ presetActionPerforming: false });
       });
@@ -554,7 +554,7 @@ class EditTaskForm extends React.Component {
         <div className="alert alert-warning">
           <div dangerouslySetInnerHTML={{ __html: this.state.error }}></div>
           <button className="btn btn-sm btn-primary" onClick={this.retryLoad}>
-            <i className="fa fa-rotate-left"></i> {_("Retry")}
+            <i className="fa fa-rotate-left"></i> {_("Tentar novamente")}
           </button>
         </div>
       </div>);
@@ -641,7 +641,7 @@ class EditTaskForm extends React.Component {
                 className="remove-style name-input"
                 placeholder={this.state.namePlaceholder}
                 value={this.state.name} />
-              <button type="button" title={_("Add tags")} onClick={this.toggleTagsField} className="remove-style">
+              <button type="button" title={_("Adicionar tags")} onClick={this.toggleTagsField} className="remove-style">
                 <i className="fa fa-tag"></i>
               </button>
             </div>
