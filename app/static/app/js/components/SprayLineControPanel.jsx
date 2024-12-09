@@ -30,9 +30,9 @@ export default class SprayLineControlPanel extends React.Component {
         this.directionRef = React.createRef();
         this.flightHeightRef = React.createRef();
 
-
     }
 
+    // Atualiza state selectedLayers quando um novo talhão é marcado para pulverizar 
     componentDidUpdate = (prevProps) => {
         if (prevProps.selectedLayers !== this.props.selectedLayers) {
             const filteredLayers = this.props.selectedLayers
@@ -43,9 +43,13 @@ export default class SprayLineControlPanel extends React.Component {
         }
     }
 
+    // Função para abrir popup do talhão ao clicar nele
     handlePopUp = (e) => {
+
+        const clickedId = e.currentTarget.id;
+    
         const { overlays } = this.props;
-        const layerSelected = this.state.filteredSelectedLayers.filter(layer => layer.index == e.target.id);
+        const layerSelected = this.state.filteredSelectedLayers.filter(layer => layer.index == clickedId);
         if (overlays[1]) {
             const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
             const reflayerLeafLeat = leafleatLayers.filter(layer => {
@@ -71,6 +75,8 @@ export default class SprayLineControlPanel extends React.Component {
         }
     }
 
+
+    // Função para processamento de talhões selecionados
 
     handleProcess = async () => {
 
@@ -175,19 +181,22 @@ export default class SprayLineControlPanel extends React.Component {
                 } else {
                     console.error('Erro no processamento');
                     this.setState({error: true});
-                    this.setState({isProcessing: false});
+                    this.setState({isProcessing: false});3
+                    alert('Não foi possivel processar os talhões selecionados.');
 
                 }
             } catch (error) {
                 console.error('Erro na requisição:', error);
                 this.setState({error: true});
                 this.setState({isProcessing: false});
+                alert('Não foi possivel processar os talhões selecionados.');
             }
 
             
         }
     };
 
+    // Função para exportar resultados do processamento de talhões
 
     handleExport = async (format) => {
 
@@ -296,6 +305,8 @@ export default class SprayLineControlPanel extends React.Component {
         }
     }
 
+    // Função para identificar se tem algum talhão sendo processado
+
     getProcess = async (project_id, task_id) => {
         const url = `/api/projects/${project_id}/tasks/${task_id}/getProcess`;
         return fetch(url, {
@@ -316,13 +327,26 @@ export default class SprayLineControlPanel extends React.Component {
             });
     };
 
+    // Função de incremento para icons personalizados nos inputs
+    incrementValue = (ref, step = 1, max = Infinity) => {
+        const currentValue = parseFloat(ref.current.value) || 0;
+        const newValue = Math.min(currentValue + step, max); 
+        ref.current.value = newValue;
+    };
+
+    // Função de decremento para icons personalizados nos inputs
+    decrementValue = (ref, step = 1, min = 0) => {
+        const currentValue = parseFloat(ref.current.value) || 0;
+        const newValue = Math.max(currentValue - step, min); 
+        ref.current.value = newValue;
+    };
+
 
     render() {
         return (
             <div className="sprayline-control-panel">
-                <span className="close-button" onClick={this.props.onClose} />
-                <div className="title">Pulverizar</div>
-                <hr />
+                <span className="close-button fas fa-times" onClick={this.props.onClose} />
+                <div className="title">PULVERIZAR</div>
 
                 {this.state.filteredSelectedLayers.length > 0 ? (
                     <div>
@@ -330,32 +354,81 @@ export default class SprayLineControlPanel extends React.Component {
                             {this.state.filteredSelectedLayers.map(({ layer, index }) => (
                                 <li key={index} className='layer-item'>
                                     <a href="javascript:void(0)" id={index} onClick={this.handlePopUp} className='link-item'>
-                                        {names[index] + ` - Layer ${index}` || `Layer ${index}`}
+                                        
+                                        {names[index] ? 
+                                        <div className='layer-container'>
+                                            <span className='NameField'> {names[index]} </span> 
+                                            <span className='vertical-bar'></span>
+                                            <span className='layer-id'> Layer {index} </span>
+                                        </div> :
+                                            <span className='layer-id'> Layer {index} </span>}
                                     </a>
                                 </li>
                             ))}
                         </ul>
 
                         <form className='form-container'>
-                            <label htmlFor="distance">Distância entre linhas:</label>
-                            <input type="number" id="distance" name="distance" min="0" step="0.1" ref={this.distanceRef} required />
-                            <br />
-
-                            <label htmlFor="direction">Ângulo:</label>
-                            <input type="number" id="direction" name="direction" min="0" max="360" step="1" ref={this.directionRef} required />
-                            <br />
+                            <hr />
+                            <div>
+                                <label htmlFor="distance">Distância entre linhas</label>
+                                <div className="custom-number-input">
+                                    <input
+                                    type="number"
+                                    id="distance"
+                                    name="distance"
+                                    min="0"
+                                    step="1"
+                                    ref={this.distanceRef}
+                                    required
+                                    />
+                                    <div className="icon-incre-decre">
+                                        <i className="fas fa-chevron-up"
+                                            onClick={() => this.incrementValue(this.distanceRef, 1)}/>
+                                        <i className="fas fa-chevron-down"
+                                            onClick={() => this.decrementValue(this.distanceRef, 1)}/>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div>
+                                <label htmlFor="direction">Ângulo</label>
+                                <div className="custom-number-input">
+                                    <input
+                                    type="number"
+                                    id="direction"
+                                    name="direction"
+                                    min="0"
+                                    max="360"
+                                    step="1"
+                                    ref={this.directionRef}
+                                    required
+                                    />
+                                    <div className="icon-incre-decre">
+                                    <i className="fas fa-chevron-up"
+                                        onClick={() => this.incrementValue(this.directionRef, 1, 360)}/>
+                                    <i className="fas fa-chevron-down"
+                                        onClick={() => this.decrementValue(this.directionRef, 1, 0)}/>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 ) : (
                     "Nenhum talhão selecionado"
                 )}
-                <hr />
-                <button onClick={this.handleProcess}>Processar</button>
-                <button disabled={!this.state.enableExport} 
-                        className={this.state.enableExport ? 'btn-export' : 'btn-export export-disable'}  
-                        data-toggle="dropdown">
-                    Exportar
-                </button>
+                <div className='btn-container'>
+                    <button onClick={this.handleProcess} 
+                            className='btn btn-sm btn-primary btn-process'>
+                            {this.state.isProcessing ? <i class="iconSize fas fa-spinner fa-spin"></i> : <i class="iconSize far fa-circle"></i> }
+                        Processar
+                    </button>
+                    <button disabled={!this.state.enableExport} 
+                            className={this.state.enableExport ? 'btn btn-sm btn-primary btn-export' : 'btn btn-sm btn-primary btn-export export-disable'}  
+                            data-toggle="dropdown">
+                        <i class="iconSize far fa-arrow-alt-circle-down"></i>
+                        Exportar
+                    </button>
+                </div>
                 <ul className="dropdown-menu  pull-right">
                     <li>
                         <a href="javascript:void(0);" onClick={() => this.handleExport("geojson")}>
@@ -377,7 +450,7 @@ export default class SprayLineControlPanel extends React.Component {
                     </li>
                 </ul>
 
-                <div>
+                {/* <div>
                     {this.state.error
                     ? 'Erro ao processar o talhão'
                     : this.state.isProcessing
@@ -389,13 +462,15 @@ export default class SprayLineControlPanel extends React.Component {
                     : this.state.exportingCompleted
                     ? 'Arquivos exportados!'
                     : ''}
-                </div>
+                </div> */}
 
             </div>
         );
     }
 }
 
+
+// Função para obter csrfToken e passar nas requisições
 const getCsrfToken = () => {
     const cookies = document.cookie.split(';');
     for (let cookie of cookies) {
