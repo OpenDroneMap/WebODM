@@ -22,7 +22,7 @@ export default class SprayLineControlPanel extends React.Component {
             processingCompleted: false,
             isExporting: false,
             exportingCompleted: false,
-            enableExport: true,
+            enableExport: false,
             error: false
         };
 
@@ -416,17 +416,19 @@ export default class SprayLineControlPanel extends React.Component {
                 ) : (
                     "Nenhum talhão selecionado"
                 )}
-                <button onClick={this.handleProcess} 
-                        className='btn btn-sm btn-primary btn-process'>
-                        {this.state.isProcessing ? <i className="iconSize fa fa-spin fa-circle-notch"/> : <i class="iconSize far fa-circle"></i> }
-                    Processar
-                </button>
-                <button disabled={!this.state.enableExport} 
-                        className={this.state.enableExport ? 'btn btn-sm btn-primary btn-export' : 'btn btn-sm btn-primary btn-export export-disable'}  
-                        data-toggle="dropdown">
-                    <i className='iconSize glyphicon glyphicon-download'></i>
-                    Exportar
-                </button>
+                <div className='btn-container'>
+                    <button onClick={this.handleProcess} 
+                            className='btn btn-sm btn-primary btn-process'>
+                            {this.state.isProcessing ? <i class="iconSize fas fa-spinner fa-spin"></i> : <i class="iconSize far fa-circle"></i> }
+                        Processar
+                    </button>
+                    <button disabled={!this.state.enableExport} 
+                            className={this.state.enableExport ? 'btn btn-sm btn-primary btn-export' : 'btn btn-sm btn-primary btn-export export-disable'}  
+                            data-toggle="dropdown">
+                        <i class="iconSize far fa-arrow-alt-circle-down"></i>
+                        Exportar
+                    </button>
+                </div>
                 <ul className="dropdown-menu  pull-right">
                     <li>
                         <a href="javascript:void(0);" onClick={() => this.handleExport("geojson")}>

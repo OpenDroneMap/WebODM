@@ -194,45 +194,54 @@
     opacity: 0.5;
   }
 
+  .btn-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+
+  }
+
   .btn-process {
     background-color: #aeaeae;
     border-color: #aeaeae;
     border-radius: 25px !important;
-    font-size: 14px;
+    font-size: 15px;
     color: #FFF;
     min-width: 115px !important;
     outline: none !important;
-    display: inline-block;
-    margin-right: 10px;
-    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    
+    
 
     &:hover {
       opacity: 0.8;
     }
 
-    i {
-      margin-right: 5px;
-    }
+    
   }
 
   .btn-export {
     background-color: #469c42;
     border-color: #469c42;
     border-radius: 25px !important;
-    background-size: 25px 25px;
     font-size: 14px;
+    color: #FFF;
     min-width: 115px !important;
     outline: none !important;
-    display: inline-block;
-    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    
+    
 
     &:hover {
       opacity: 0.8;
     }
 
-    i {
-      margin-right: 5px;
-    }
+    
   }
 
   .export-disable:hover {
