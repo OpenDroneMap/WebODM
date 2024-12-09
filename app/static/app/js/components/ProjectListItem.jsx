@@ -146,13 +146,32 @@ class ProjectListItem extends React.Component {
     e.persist();
     const files = e.target.files; 
     const fileArray = Array.from(files); 
-    console.log(fileArray);
 
-    fileArray.forEach((file) => {
-        this.dz.addFile(file);
+    // console.log(fileArray);
+
+    const allowedExtensions = ['.png', '.jpg', '.jpeg'];
+
+    // Filtrar arquivos válidos
+    const validFiles = fileArray.filter((file) => {
+      const fileName = file.name.toLowerCase();
+      return allowedExtensions.some((ext) => fileName.endsWith(ext));
+    });
+
+
+    const rejectedFiles = fileArray.filter((file) => !validFiles.includes(file));
+
+    if (rejectedFiles.length > 0) {
+      const rejectedFileNames = rejectedFiles.map((file) => file.name).join(', ');
+      alert(`Os seguintes arquivos não foram aceitos: ${rejectedFileNames}`);
+    }
+
+    // console.log("Arquivos válidos:", validFiles);
+
+    validFiles.forEach((file) => {
+      this.dz.addFile(file);
     });
     
-    this.dz.emit('addedfiles', files);
+    this.dz.emit('addedfiles', validFiles);
     e.target.value = "";
   }
 
@@ -163,11 +182,26 @@ class ProjectListItem extends React.Component {
     const filesArray = Array.from(files);
 
     let FilesToDrozoneArray = [];
+    let rejectedFiles = [];
+
+    const allowedExtensions = ['.png', '.jpg', '.jpeg'];
 
     for (const file of filesArray) {
         if (file.name.endsWith(".zip")) {
-            const unzipFiles = await this.unzipZipFile(file);
-            FilesToDrozoneArray = [...FilesToDrozoneArray, ...unzipFiles];
+          const unzipFiles = await this.unzipZipFile(file);
+
+          // console.log(unzipFiles)
+
+          const validUnzipFiles = unzipFiles.filter((f) => 
+            allowedExtensions.some((ext) => f.name.toLowerCase().endsWith(ext))
+          );
+          const rejectedUnzipFiles = unzipFiles.filter((f) => 
+            !allowedExtensions.some((ext) => f.name.toLowerCase().endsWith(ext))
+          );
+
+          // Adicionar arquivos válidos e rejeitados às respectivas listas
+          FilesToDrozoneArray = [...FilesToDrozoneArray, ...validUnzipFiles];
+          rejectedFiles = [...rejectedFiles, ...rejectedUnzipFiles];
         } 
         
         else if (file.name.endsWith(".rar")) {
@@ -175,9 +209,16 @@ class ProjectListItem extends React.Component {
         }
         
         else {
-            FilesToDrozoneArray = [...FilesToDrozoneArray, file];
+          FilesToDrozoneArray = [...FilesToDrozoneArray, file];
         }
     }
+
+    // Exibir alerta se houver arquivos rejeitados
+    if (rejectedFiles.length > 0) {
+      const rejectedFileNames = rejectedFiles.map((file) => file.name).join(', ');
+      alert(`Os seguintes arquivos não foram aceitos do zip: ${rejectedFileNames}`);
+    }
+
     FilesToDrozoneArray.forEach((file) => {
         this.dz.addFile(file);
     })
@@ -226,7 +267,7 @@ class ProjectListItem extends React.Component {
           url : 'TO_BE_CHANGED',
           parallelUploads: 6,
           uploadMultiple: false,
-          acceptedFiles: "image/*,text/*,.las,.laz,video/*,.srt,.zip",
+          acceptedFiles: "image/*,.zip",
           autoProcessQueue: false,
           createImageThumbnails: false,
           clickable: false,
@@ -731,7 +772,7 @@ class ProjectListItem extends React.Component {
                           this.handleUpload();
                           }}>
                           <i className="content-upload-glyphicon" aria-hidden="true"></i>
-                          Upload Folder
+                          Selecionar Pasta
                         <input 
                           type="file" 
                           id="folderpicker" 
@@ -753,7 +794,7 @@ class ProjectListItem extends React.Component {
                         type="file" 
                         id="filepicker" 
                         name="fileList" 
-                        accept="image/*,text/*,.las,.laz,video/*,.srt,.rar,.zip"
+                        accept="image/*,.zip"
                         multiple 
                         style={{display:'none'}} 
                         onChange={this.handleUploadFiles}/>
