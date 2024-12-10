@@ -1,0 +1,256 @@
+.leaflet-control-sprayline-control .sprayline-control-panel{
+  padding: 15px 20px 15px 25px;
+  background: #fff;
+  width: 300px;
+  min-height: 74px;
+  max-height: 418px;
+  overflow-y: auto;
+  border-radius: 12px;
+  overflow-x: hidden;
+
+  .close-button{
+    display: inline-block;
+    font-size:17px;
+    height: 30px;
+    width: 30px;
+    margin-right: 0;
+    float: right;
+    vertical-align: middle;
+    text-align: right;
+    margin-top: 0px;
+    margin-left: 16px;
+    position: relative;
+    left: 2px;
+
+    &:hover{
+      opacity: 0.7;
+      cursor: pointer;
+    }
+  }
+
+  .title{
+    font-size: 14.4px;
+    color:#14a5a2;
+    margin-right: 60px;
+    margin-bottom: 15px;
+    width: 100%;
+    padding-top: 15px;
+  }
+
+  .layer-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    .vertical-bar {
+      height: 16px;
+      width: 1.5px;
+      background-color: #2c3e50;
+      display: inline-block;
+      border: none;
+    }
+
+    .NameField {
+      color: #4ca2a1;
+      display: flex;
+      justify-content: flex-start;
+      
+    }
+
+    .layer-id {
+      color:#2c3e50;
+    }
+
+  }
+
+
+  *{
+      font-size: 12px;
+  }
+  .list-sprayline{
+    padding: 0;
+    margin: 0;
+
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  .list-sprayline::-webkit-scrollbar {
+    width: 13px; 
+  }
+  
+
+  .list-sprayline::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 10px;
+  }
+  
+  .list-sprayline::-webkit-scrollbar-thumb {
+    background-color: #888; 
+    border-radius: 10px; 
+  }
+  
+
+  .list-sprayline::-webkit-scrollbar-thumb:hover {
+    background-color: #555; 
+  }
+
+  .layer-item {
+    margin-bottom: 10px;
+    list-style: none;
+  }
+
+  .list-layer-items.collapsed {
+    display: none;
+  }
+
+  .collapsed-infos-btn {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    border-radius: 4px;
+    margin-right: 5px;
+    padding: 0px 4px;
+  }
+
+  a.link-item {
+    display: inline;
+    background-color: transparent !important;
+    border: none;
+  }
+
+  a.link-item:hover {
+    opacity: 0.6;
+  }
+
+  .form-container {
+
+    label {
+      width: 150px;
+    }
+
+    input {
+      width: 80px;
+      background-color: rgba(226, 226, 226, .6);
+      appearance: none;
+      border: none;
+      border-radius: 20px;
+      outline: none;
+      padding-left: 5px;
+    }
+
+    div {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #74b06f;
+      margin-top: 5px;
+      margin-bottom: 7px;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield; 
+    }
+
+    .icon-incre-decre {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      right: 5px;
+      color: #4ca2a1;
+    }
+
+
+  }
+
+
+  .dropdown-menu.pull-right {
+    right: 136px !important;
+  }
+
+  .dropdown-menu a {
+    width: 100%;
+    text-align: left;
+    display: block;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .export-disable {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .btn-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+
+  }
+
+  .btn-process {
+    background-color: #aeaeae;
+    border-color: #aeaeae;
+    border-radius: 25px !important;
+    font-size: 15px;
+    color: #FFF;
+    min-width: 115px !important;
+    outline: none !important;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    
+    
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    
+  }
+
+  .btn-export {
+    background-color: #469c42;
+    border-color: #469c42;
+    border-radius: 25px !important;
+    font-size: 14px;
+    color: #FFF;
+    min-width: 115px !important;
+    outline: none !important;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    
+    
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    
+  }
+
+  .export-disable:hover {
+    opacity: 0.5 !important;
+  }
+
+  .iconSize {
+    font-size: 15px;
+    
+  }
+
+}

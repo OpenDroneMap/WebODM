@@ -13,9 +13,11 @@ export default class LayersControlPanel extends React.Component {
 
     static propTypes = {
         onClose: PropTypes.func.isRequired,
+        onOpen: PropTypes.func.isRequired,
         map: PropTypes.object.isRequired,
         task_id: PropTypes.string.isRequired,
-        project_id: PropTypes.number.isRequired
+        project_id: PropTypes.number.isRequired,
+        showPanel: PropTypes.bool.isRequired
     }
 
     constructor(props) {
@@ -24,7 +26,8 @@ export default class LayersControlPanel extends React.Component {
         this.drawnItems = new L.FeatureGroup();
         this.polygonIdCounter = 1;
         this.state = {
-          isDrawing: false
+          isDrawing: false,
+          showPanel: false
         };
     }
 
@@ -67,6 +70,31 @@ export default class LayersControlPanel extends React.Component {
         document.querySelector('.leaflet-draw-toolbar').style.display = 'none';
         document.querySelector('.leaflet-draw-toolbar a.leaflet-draw-edit-edit').style.display = 'none';
         document.querySelector('.leaflet-draw-toolbar a.leaflet-draw-edit-remove').style.display = 'none';
+
+        fetch('/api/projects/' + this.props.project_id + '/tasks/'+ this.props.task_id +'/ai/detections/field').then((value) => {
+            if (value.status == 404) {
+              let err = {};
+              err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
+              cb(err);
+              return;
+            }
+            value.json().then((geojson) =>{
+                L.geoJSON(geojson, {
+                    onEachFeature: (feature, layer) => {
+                        feature.properties.field_id = this.polygonIdCounter++;
+                        this.drawnItems.addLayer(layer);
+                    }
+                });
+
+            })
+        })
+        const getReload = localStorage.getItem('reloadMarkField');
+        if(getReload == "false"){
+            map.removeLayer(this.drawnItems);
+        }else{
+            this.props.onOpen();
+            localStorage.setItem('reloadMarkField', false);
+        }
     }
 
     componentWillUnmount() {
@@ -75,6 +103,14 @@ export default class LayersControlPanel extends React.Component {
             map.removeControl(this.drawControl);
         }
         map.removeLayer(this.drawnItems);
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        if(this.props.showPanel === true){
+            this.props.map.addLayer(this.drawnItems);
+        }else {
+            this.props.map.removeLayer(this.drawnItems);
+        }
     }
 
     editPolygon = () => {
@@ -106,7 +142,7 @@ export default class LayersControlPanel extends React.Component {
         const task_id = this.props.task_id;
         const project_id = this.props.project_id;
         const geojsonData = this.drawnItems.toGeoJSON();
-        const url = "http://localhost:8000/api/projects/"+ project_id + "/tasks/"+ task_id +"/save/field";
+        const url = "/api/projects/"+ project_id + "/tasks/"+ task_id +"/save/field";
         const csrfToken = getCsrfToken(); 
 
         const body = {
@@ -121,24 +157,28 @@ export default class LayersControlPanel extends React.Component {
                 'X-CSRFToken': csrfToken,
             },
             body: JSON.stringify(body,null,2)
-        });   
-
-        location.reload(true);
-    }
+        }).then(() => {
+            localStorage.setItem('reloadMarkField', true);
+            location.reload(true);
+        });
+        
+    };
 
     render() {
         return (
             <div className="markFields-control-panel">
-                <span className="close-button" onClick={this.props.onClose}/>
-                <div className="title">{_("Mark Fields")}</div>
-                <hr/>
-                algum conteudo ?
-                <hr/>
-                <button id="draw-polygon" onClick={this.drawPolygon}>Marcar Talhões</button>
-                <button id="edit-polygon" onClick={this.editPolygon}>Editar Talhões</button>
-                <button id="delete-polygon" onClick={this.deletePolygon}>Deletar Talhões</button>
-                <button id="export-polygon" onClick={this.exportPolygons}>Exportar</button>
-                <button id="save-polygon" onClick={this.savePolygon}>Salvar</button>
+                <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
+                <div className="title">{_("MARCAR TALHÕES")}</div>
+                <span className="panel-button" onClick={this.drawPolygon}> <i className="corIcons fas fa-thumbtack"></i> Marcar Talhões</span>
+                <hr />
+                <span className="panel-button" onClick={this.editPolygon}><i className="corIcons fas fa-edit"></i> Editar Talhões</span>
+                <hr />
+                <span className="panel-button" onClick={this.savePolygon}><i className="corIcons fas fa-save"></i> Salvar</span>
+                <hr />
+                <span className="panel-button" onClick={this.exportPolygons}><i className="corIcons fas fa-download"></i> Exportar</span>
+                <hr />
+                <span className="panel-button" onClick={this.deletePolygon}><i className="corIconDelete fas fa-trash-alt"></i> Deletar Talhões</span>
+                <hr />
             </div>
         );
     } 

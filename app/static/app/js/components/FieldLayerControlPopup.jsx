@@ -43,7 +43,7 @@ class FieldLayerControlPopup extends React.Component {
       },
       {
         checkboxLabel: "Cana",
-        type: 'sugarcane',
+        type: 'cane',
         fieldColor: '#596F62',
       },
     ];
@@ -56,6 +56,7 @@ class FieldLayerControlPopup extends React.Component {
     this.state = {
       cropType: null,
       isChecked: false,
+      isPulverize: false, 
     };
 
     this.getSelectedLayers = this.props.stateSelectedLayers[0];
@@ -66,8 +67,21 @@ class FieldLayerControlPopup extends React.Component {
       bounds: this.boundLayer.getBounds(),
       cropType: null,
       aiOptions: new Set(),
+      pulverize: false, 
     });
+    
   }
+
+  handleOnChangePulverize() {
+    const newPulverizeState = !this.state.isPulverize;
+    this.setState({ isPulverize: newPulverizeState });
+  
+
+    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {
+      $merge: { pulverize: newPulverizeState }
+    }));
+  }
+  
 
   handleCheck(category) {
 
@@ -128,7 +142,6 @@ class FieldLayerControlPopup extends React.Component {
         {
           this.cropType.map((typ, index ) => {
               const lastTyp = this.cropType.length - 1 !== index
-              console.log(lastTyp);
               return (
                 <div className="croType-container" key={typ.type}>
                   <div onClick={() => this.handleOnChangeRadio(typ.type)} style={{ cursor: "pointer" }}>
@@ -147,7 +160,6 @@ class FieldLayerControlPopup extends React.Component {
       <p className='IAprocess-info'>IAs para processar</p>
       {
           this.aiOptions.map(option => {
-            {console.log(option.category)}
             return (
               <div className='IAprocess-container' key={option.category} onClick={() => this.handleCheck(option.category)}> 
                 <i className={this.state.isChecked ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
@@ -157,6 +169,14 @@ class FieldLayerControlPopup extends React.Component {
             )
           })
         }
+
+        <p className='IAprocess-info'>Pulverizar</p>
+
+        <div className='IAprocess-container' onClick={() => this.handleOnChangePulverize()}>
+          <i className={this.state.isPulverize ? "fas fa-check-square" : "far fa-square"}></i>
+          <label htmlFor="pulverize" style={{ cursor: "pointer" }}> Pulverizar</label>
+        </div>
+
     </div>)
   }
 }

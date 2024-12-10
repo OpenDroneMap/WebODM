@@ -25,12 +25,16 @@ import Standby from './Standby';
 import LayersControl from './LayersControl';
 import OverviewControl from './OverviewControl';
 import MarkFieldsControl from './MarkFieldsControl';
+import SprayLineControl from './SprayLineControl';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _ } from '../classes/gettext';
+import ProcessingCard from './ProcessingCard';
+
+
 
 class Map extends React.Component {
   static defaultProps = {
@@ -107,7 +111,6 @@ class Map extends React.Component {
     return this.state.selectedLayers;
   }
 
-  // types_to_be_loaded is a Set.
   loadGeoJsonDetections(types_to_be_loaded) {
     const { tiles } = this.props;
     const task_id = tiles[0].meta.task.id;
@@ -131,6 +134,7 @@ class Map extends React.Component {
       });
     });
   }
+
 
   // types_to_be_removed is a Set.
   removeGeoJsonDetections(types_to_be_removed) {
@@ -686,6 +690,14 @@ class Map extends React.Component {
       removeGeoJsonDetections: this.removeGeoJsonDetections,
     }).addTo(this.map);
 
+    this.sprayLineControl = new SprayLineControl({
+      tiles: tiles,
+      selectedLayers: this.state.selectedLayers,
+      overlays: this.state.overlays,
+      loadGeoJsonDetections: this.loadGeoJsonDetections,
+      removeGeoJsonDetections: this.removeGeoJsonDetections,
+    }).addTo(this.map);
+
 
     window.addEventListener("sidebarToggle", () => {
       setTimeout(() => {
@@ -731,6 +743,22 @@ class Map extends React.Component {
       this.overviewControl.updateOverlays(this.state.overlays, this.state.selectedLayers);
     }
 
+    if (this.sprayLineControl &&
+          (prevState.selectedLayers.length == this.state.selectedLayers.length ||
+          this.state.selectedLayers.length == 0) &&
+          prevState.selectedLayers !== this.state.selectedLayers) {
+      this.sprayLineControl.update(this.state.selectedLayers);
+    }
+
+     // Atualizando o sprayLineControl
+     if (this.sprayLineControl && prevState.selectedLayers !== this.state.selectedLayers) {
+      this.sprayLineControl.updateSelectedLayers(this.state.selectedLayers, this.state.overlays);
+    }
+
+    if (this.sprayLineControl && prevState.overlays !== this.state.overlays) {
+      this.sprayLineControl.updateOverlays(this.state.overlays, this.state.selectedLayers);
+    }
+
     if (this.props.tiles != null){
       // Gives the new types to be loaded.
       // props.aiSelected -prevProps.aiSelected
@@ -762,9 +790,16 @@ class Map extends React.Component {
     if (this.shareButton) this.shareButton.hidePopup();
   }
 
+  handleEndProcess(){
+    // Faz reload da pagina.
+    location.reload(true);
+  }
+
   render() {
+    
     return (
       <div style={{ height: "100%" }} className="map">
+        <ProcessingCard task_id = {this.props.tiles[0].meta.task.id} project_id = {this.props.tiles[0].meta.task.project} endProcess ={this.handleEndProcess}/>
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider hidden-xs">
             {_("Opacidade:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
