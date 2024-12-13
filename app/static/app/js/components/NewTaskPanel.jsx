@@ -75,7 +75,7 @@ class NewTaskPanel extends React.Component {
 
   cancel = (e) => {
     if (this.props.onCancel) {
-      if (window.confirm(_("Are you sure you want to cancel?"))) {
+      if (window.confirm(_("Tem certeza de que deseja cancelar?"))) {
         this.props.onCancel();
       }
     }
@@ -137,13 +137,13 @@ class NewTaskPanel extends React.Component {
       <div className="new-task-panel theme-background-highlight">
         <div className="form-horizontal">
           <div>
-            <p className='files-text'>{interpolate(_("%(count)s files selected. Please check these additional options:"), { count: this.props.filesCount })}</p>
+            <p className='files-text'>{interpolate(_("%(count)s arquivos selecionados. Por favor, verifique estas opções adicionais:"), { count: this.props.filesCount })}</p>
 
             {!filesCountOk ?
               <div className="alert alert-warning">
-                {interpolate(_("Number of files selected exceeds the maximum of %(count)s allowed on this processing node."), { count: this.taskForm.selectedNodeMaxImages() })}
+                {interpolate(_("O número de arquivos selecionados excede o máximo de %(count)s permitido neste nó de processamento."), { count: this.taskForm.selectedNodeMaxImages() })}
                 <button onClick={this.props.onCancel} type="button" className="btn btn-xs btn-primary redo">
-                  <span><i className="glyphicon glyphicon-remove-circle"></i> {_("Cancel")}</span>
+                  <span><i className="glyphicon glyphicon-remove-circle"></i> {_("Cancelar")}</span>
                 </button>
               </div>
               : ""}
@@ -194,7 +194,7 @@ class NewTaskPanel extends React.Component {
                 <div className=" textMoveRight">
                   {this.props.onCancel !== undefined && <button type="submit" className="btn btn-danger" onClick={this.cancel} style={{ marginRight: 4 }}>{("Cancelar")}</button>}
                   {this.state.loading ?
-                    <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Loading…")}</button>
+                    <button type="submit" className="btn btn-primary" disabled={true}><i className="fa fa-circle-notch fa-spin fa-fw"></i>{_("Carregando....")}</button>
                     :
                     <button type="submit" className="btn btn-confirm" onClick={this.save} disabled={this.props.filesCount < 1 || !filesCountOk}>{("Iniciar o processamento")}</button>
                   }

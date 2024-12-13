@@ -69,14 +69,14 @@ class ProjectList extends Paginated {
                     this.updatePagination(this.PROJECTS_PER_PAGE, json.count);
                 }else{
                     this.setState({ 
-                        error: interpolate(_("Invalid JSON response: %(error)s"), {error: JSON.stringify(json)}),
+                        error: interpolate(_("Resposta JSON inválida: %(error)s"), {error: JSON.stringify(json)}),
                         loading: false
                     });
                 }
             })
             .fail((jqXHR, textStatus, errorThrown) => {
                 this.setState({ 
-                    error: interpolate(_("Could not load projects list: %(error)s"), {error: textStatus}),
+                    error: interpolate(_("Não foi possível carregar a lista de projetos: %(error)s"), {error: textStatus}),
                     loading: false
                 });
             })

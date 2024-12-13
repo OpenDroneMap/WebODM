@@ -68,7 +68,7 @@ class TaskList extends React.Component {
         })
         .fail((jqXHR, textStatus, errorThrown) => {
           this.setState({ 
-              error: interpolate(_("Could not load task list: %(error)s"), { error: textStatus} ),
+              error: interpolate(_("Não foi possível carregar a lista de tarefas: %(error)s"), { error: textStatus} ),
           });
         })
         .always(() => {
@@ -140,9 +140,9 @@ class TaskList extends React.Component {
   render() {
     let message = "";
     if (this.state.loading){
-      message = (<span>{_("Loading...")} <i className="fa fa-sync fa-spin fa-fw"></i></span>);
+      message = (<span>{_("Carregando...")} <i className="fa fa-sync fa-spin fa-fw"></i></span>);
     }else if (this.state.error){
-      message = (<span>{interpolate(_("Error: %(error)s"), {error: this.state.error})} <a href="javascript:void(0);" onClick={this.retry}>{_("Try again")}</a></span>);
+      message = (<span>{interpolate(_("Erro: %(error)s"), {error: this.state.error})} <a href="javascript:void(0);" onClick={this.retry}>{_("Tente novamente")}</a></span>);
     }else if (this.state.tasks.length === 0){
       message = (<span></span>);
     }
@@ -150,7 +150,7 @@ class TaskList extends React.Component {
     return (
       <div className="task-list">
         {this.state.tasks.filter(t => {
-          const name = t.name !== null ? t.name : interpolate(_("Task #%(number)s"), { number: t.id });
+          const name = t.name !== null ? t.name : interpolate(_("Tarefa #%(number)s"), { number: t.id });
           return name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) !== -1 &&
                   this.arrayContainsAll(t.tags, this.state.filterTags);
         }).map(task => (

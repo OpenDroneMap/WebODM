@@ -364,17 +364,17 @@ class ProjectListItem extends React.Component {
                     if (task && task.id){
                         this.newTaskAdded();
                     }else{
-                        this.setUploadState({error: interpolate(_('Cannot create new task. Invalid response from server: %(error)s'), { error: JSON.stringify(task) }) });
+                        this.setUploadState({error: interpolate(_('Não é possível criar uma nova tarefa. Resposta inválida do servidor: %(error)s'), { error: JSON.stringify(task) }) });
                     }
                   }).fail(() => {
-                    this.setUploadState({error: _("Cannot create new task. Please try again later.")});
+                    this.setUploadState({error: _("Não é possível criar uma nova tarefa. Por favor, tente novamente mais tarde.")});
                   });
             }else if (this.dz.getQueuedFiles() === 0){
                 // Done but didn't upload all?
                 this.setUploadState({
                     totalCount: this.state.upload.totalCount - remainingFilesCount,
                     uploading: false,
-                    error: interpolate(_('%(count)s files cannot be uploaded. As a reminder, only images (.jpg, .tif, .png) and GCP files (.txt) can be uploaded. Try again.'), { count: remainingFilesCount })
+                    error: interpolate(_('%(count)s arquivos não podem ser carregados. Lembrando que apenas imagens (.jpg, .tif, .png) e arquivos GCP (.txt) podem ser carregados. Tente novamente.'), { count: remainingFilesCount })
                 });
             }
         })
@@ -497,11 +497,11 @@ class ProjectListItem extends React.Component {
             this.dz.options.url = `/api/projects/${this.state.data.id}/tasks/${task.id}/upload/`;
             this.dz.processQueue();
         }else{
-            this.setState({error: interpolate(_('Cannot create new task. Invalid response from server: %(error)s'), { error: JSON.stringify(task) }) });
+            this.setState({error: interpolate(_('Não é possível criar uma nova tarefa. Resposta inválida do servidor: %(error)s'), { error: JSON.stringify(task) }) });
             this.handleTaskCanceled();
         }
       }).fail(() => {
-        this.setState({error: _("Cannot create new task. Please try again later.")});
+        this.setState({error: _("Não é possível criar uma nova tarefa. Por favor, tente novamente mais tarde.")});
         this.handleTaskCanceled();
       });
   }
@@ -528,7 +528,7 @@ class ProjectListItem extends React.Component {
         this.setState({error: "", refreshing: true});
         deleteAction()
           .fail(e => {
-            this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Could not delete item")});
+            this.setState({error: e.message || (e.responseJSON || {}).detail || e.responseText || _("Não foi possível excluir o item")});
           }).always(() => {
             this.setState({refreshing: false});
           });
@@ -690,8 +690,8 @@ class ProjectListItem extends React.Component {
     const numTasks = data.tasks.length;
     const canEdit = this.hasPermission("change");
     const userTags = Tags.userTags(data.tags);
-    let deleteWarning = _("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?");
-    if (!data.owned) deleteWarning = _("This project was shared with you. It will not be deleted, but simply hidden from your dashboard. Continue?")
+    let deleteWarning = _("Todas as tarefas, imagens e modelos associados a este projeto serão excluídos permanentemente. Tem certeza de que deseja continuar?");
+    if (!data.owned) deleteWarning = _("Este projeto foi compartilhado com você. Ele não será excluído, mas simplesmente ocultado do seu painel. Continuar?")
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
@@ -702,9 +702,9 @@ class ProjectListItem extends React.Component {
         {canEdit ? 
             <EditProjectDialog 
             ref={(domNode) => { this.editProjectDialog = domNode; }}
-            title={_("Edit Project")}
-            saveLabel={_("Save Changes")}
-            savingLabel={_("Saving changes...")}
+            title={_("Editar Projeto")}
+            saveLabel={_("Salvar alterações")}
+            savingLabel={_("Salvando alterações...")}
             saveIcon="far fa-edit"
             showDuplicate={true}
             onDuplicated={this.props.onProjectDuplicated}
@@ -832,7 +832,7 @@ class ProjectListItem extends React.Component {
                 <div className="btn-group">
                   <i className='fa fa-sort-alpha-down'></i>
                   <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {_("Sort")}
+                    {_("Organizar")}
                   </a>
                   <SortPanel selected="-created_at" items={this.sortItems} onChange={this.sortChanged} />
                 </div>
