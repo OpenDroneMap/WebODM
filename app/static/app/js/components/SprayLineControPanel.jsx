@@ -428,28 +428,29 @@ export default class SprayLineControlPanel extends React.Component {
                         <i class="iconSize far fa-arrow-alt-circle-down"></i>
                         Exportar
                     </button>
-                </div>
-                <ul className="dropdown-menu  pull-right">
-                    <li>
-                        <a href="javascript:void(0);" onClick={() => this.handleExport("geojson")}>
-                            <i className="fa fa-code fa-fw"></i> 
-                            GeoJSON (.JSON)
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);" onClick={() => this.handleExport("shp")}>
-                            <i className="far fa-file-archive fa-fw"></i> 
-                            ShapeFile (.SHP)
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);" onClick={() => this.handleExport("xml")}>
-                            <i className="fa fa-file-code fa-fw"></i> 
-                            XML (.XML)
-                        </a>
-                    </li>
-                </ul>
+                        <ul className="dropdown-menu  pull-right">
+                        <li>
+                            <a href="javascript:void(0);" onClick={() => this.handleExport("geojson")}>
+                                <i className="fa fa-code fa-fw"></i> 
+                                GeoJSON (.JSON)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onClick={() => this.handleExport("shp")}>
+                                <i className="far fa-file-archive fa-fw"></i> 
+                                ShapeFile (.SHP)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onClick={() => this.handleExport("xml")}>
+                                <i className="fa fa-file-code fa-fw"></i> 
+                                XML (.XML)
+                            </a>
+                        </li>
+                    </ul>
 
+                </div>
+                
                 {/* <div>
                     {this.state.error
                     ? 'Erro ao processar o talhão'
