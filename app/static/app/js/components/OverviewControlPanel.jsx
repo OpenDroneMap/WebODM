@@ -16,6 +16,7 @@ export default class OverviewControlPanel extends React.Component {
     super(props);
 
     this.state = {
+      groupedLayers: {},
       collapsedLayers: {},
       filteredSelectedLayers: [],
     };
@@ -25,105 +26,42 @@ export default class OverviewControlPanel extends React.Component {
     this.tiles = this.props.tiles;
   }
 
-  componentDidUpdate = (prevProps) => {
+
+  componentDidUpdate(prevProps, prevState) {
     if (prevProps.selectedLayers !== this.props.selectedLayers) {
-      const filteredLayers = this.props.selectedLayers
-        .map((layer, index) => ({ layer, index }))
-        .filter(
-          ({ layer }) =>
-            layer.cropType !== null &&
-            layer.aiOptions &&
-            layer.aiOptions.size > 0
-        );
+        const filteredLayers = this.props.selectedLayers
+            .map((layer, index) => ({ layer, index }))
+            .filter(
+                ({ layer }) =>
+                    layer.cropType !== null &&
+                    layer.aiOptions &&
+                    layer.aiOptions.size > 0
+            );
 
-      this.setState({ filteredSelectedLayers: filteredLayers });
+        this.setState({ filteredSelectedLayers: filteredLayers });
     }
-  };
 
-  handleCollapsedlistLayerItems = (index) => {
-    this.setState((prevState) => ({
-      collapsedLayers: {
-        ...prevState.collapsedLayers,
-        [index]: !prevState.collapsedLayers[index], // Toggle o estado de colapsado para esse índice
-      },
-    }));
-  };
+    if (prevState.filteredSelectedLayers !== this.state.filteredSelectedLayers) {
+        this.AddFieldsIdOnSelectedLayers();
+        this.groupLayersByCropType();
+    }
 
-  handleClearOverviewLayers = () => {
-    const fieldSet = new Set(["field"]);
-
-    this.setState({ filteredSelectedLayers: [] });
-    this.removeGeoJsonDetections(fieldSet);
-    this.loadGeoJsonDetections(fieldSet);
-  };
-
-    handleSendData = async () => {
-        const { filteredSelectedLayers } = this.state;
-
-        if (filteredSelectedLayers.length == 0 ){
-            alert("Nenhum talhão selecionado.");
-            return;
-        } 
-
-        const task_id = this.tiles[0].meta.task.id;
-        const project_id = this.tiles[0].meta.task.project;
-        const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
-        const csrfToken = getCsrfToken(); 
-    
-        const requests = filteredSelectedLayers.map(({ layer }) => {
-            const payload = {
-                type: layer.cropType,
-                payload: { processing_requests: { fields_to_process: [] } } // Adicionar IDs aqui
-            };
-            return fetch(url, {
-                method: 'POST',
-                headers: { 
-                    'content-type': 'application/json',
-                    'X-CSRFToken': csrfToken, // Adicionando o CSRF token ao cabeçalho
-                },
-                body: JSON.stringify(payload)
-            });
-        });
-    
-        try {
-            const responses = await Promise.all(requests);
-            const results = await Promise.all(responses.map(res => res.json()));
-            console.log('sucess: ', results);
-            alert("Talhões enviados para o processamento com sucesso.");
-
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    
-
-    this.removeGeoJsonDetections = this.props.removeGeoJsonDetections;
-    this.loadGeoJsonDetections = this.props.loadGeoJsonDetections;
-    this.tiles = this.props.tiles;
+    if (prevProps.overlays !== this.props.overlays) {
+      this.AddFieldsIdOnSelectedLayers();
+      this.groupLayersByCropType();
+    }
   }
 
-  componentDidUpdate = (prevProps) => {
-    if (prevProps.selectedLayers !== this.props.selectedLayers) {
-      const filteredLayers = this.props.selectedLayers
-        .map((layer, index) => ({ layer, index }))
-        .filter(
-          ({ layer }) =>
-            layer.cropType !== null &&
-            layer.aiOptions &&
-            layer.aiOptions.size > 0
-        );
-
-      this.setState({ filteredSelectedLayers: filteredLayers });
-    }
-  };
 
   handleCollapsedlistLayerItems = (index) => {
     this.setState((prevState) => ({
       collapsedLayers: {
         ...prevState.collapsedLayers,
-        [index]: !prevState.collapsedLayers[index], // Toggle o estado de colapsado para esse índice
+        [index]: !prevState.collapsedLayers[index], 
       },
     }));
   };
+
 
   handleClearOverviewLayers = () => {
     const fieldSet = new Set(["field"]);
@@ -133,35 +71,105 @@ export default class OverviewControlPanel extends React.Component {
     this.loadGeoJsonDetections(fieldSet);
   };
 
-  handleSendData = async () => {
+
+  AddFieldsIdOnSelectedLayers = () => {
+
     const { filteredSelectedLayers } = this.state;
+    const { overlays } = this.props;
+
+    if(overlays[1]) {
+
+    const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+
+    filteredSelectedLayers.forEach(selectedLayer => {
+        const bounds2 = selectedLayer.layer.bounds;
+
+        leafleatLayers.forEach(leafletLayer => {
+            const bounds1 = leafletLayer._bounds;
+
+            const isBoundsEqual = (
+                bounds1._northEast.lat === bounds2._northEast.lat &&
+                bounds1._northEast.lng === bounds2._northEast.lng &&
+                bounds1._southWest.lat === bounds2._southWest.lat &&
+                bounds1._southWest.lng === bounds2._southWest.lng
+            );
+
+            if (isBoundsEqual) {
+                const featureProps = leafletLayer.feature.properties;
+
+                if ('field_id' in featureProps) {
+                    selectedLayer.field_id = featureProps.field_id; 
+                } else if ('Field_id' in featureProps) {
+                    selectedLayer.field_id = featureProps.Field_id; 
+                }
+            }
+        });
+      });
+    }
+  }
+
+  groupLayersByCropType = () => {
+    const { filteredSelectedLayers } = this.state;
+
+    const groupedLayers = filteredSelectedLayers.reduce((groups, current) => {
+        const cropType = current.layer.cropType;
+
+        if (!groups[cropType]) {
+            groups[cropType] = []; // Inicializa o array se não existir
+        }
+
+        groups[cropType].push(current);
+        return groups;
+    }, {});
+
+    this.setState({ groupedLayers });
+  };
+
+
+  handleSendData = async () => {
+    const { groupedLayers } = this.state;
+    const { filteredSelectedLayers } = this.state;
+
+    if (!groupedLayers || Object.keys(groupedLayers).length === 0 || !filteredSelectedLayers) {
+        alert("Nenhum talhão selecionado.");
+        return;
+    }
+
     const task_id = this.tiles[0].meta.task.id;
     const project_id = this.tiles[0].meta.task.project;
     const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
     const csrfToken = getCsrfToken();
 
-    const requests = filteredSelectedLayers.map(({ layer }) => {
-      const payload = {
-        type: layer.cropType,
-        payload: { processing_requests: { fields_to_process: [] } }, // Adicionar IDs aqui
-      };
-      return fetch(url, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "X-CSRFToken": csrfToken, // Adicionando o CSRF token ao cabeçalho
-        },
-        body: JSON.stringify(payload),
-      });
+    const requests = Object.entries(groupedLayers).map(([cropType, layers]) => {
+        
+        
+        const fieldsToProcessID = layers.map(layer => layer.field_id);
+
+        
+        const payload = {
+            type: cropType,
+            payload: { processing_requests: { fields_to_process: fieldsToProcessID } }
+        };
+
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                'X-CSRFToken': csrfToken, // Adiciona o CSRF token ao cabeçalho
+            },
+            body: JSON.stringify(payload),
+        });
     });
 
     try {
-      const responses = await Promise.all(requests);
-      const results = await Promise.all(responses.map((res) => res.json()));
-      console.log("sucess: ", results);
-      alert("Talhões enviados para o processamento com sucesso.");
+        // Aguarda todas as requisições serem completadas
+        const responses = await Promise.all(requests);
+        const results = await Promise.all(responses.map(res => res.json()));
+        console.log('Sucesso:', results);
+        alert("Talhões enviados para o processamento com sucesso.");
     } catch (error) {
-      console.error("Error:", error);
+        console.error('Erro:', error);
+        alert("Ocorreu um erro ao enviar os talhões para processamento.");
     }
   };
 
@@ -222,7 +230,7 @@ export default class OverviewControlPanel extends React.Component {
                     width="24px"
                     fill="#FFFFFF"
                     stroke="#FFFFFF"
-                    stroke-width="20"
+                    strokeWidth="20"
                     style={{
                       transform: this.state.collapsedLayers[index]
                         ? "rotate(90deg)"
@@ -247,25 +255,6 @@ export default class OverviewControlPanel extends React.Component {
                   }`}
                   onClick={this.handlePopUp}
                 >
-                  {/* <li>
-                                        Coordenadas:
-                                        <ul>
-                                            <li>
-                                                Nordeste
-                                                <ul>
-                                                    <li>lat: {layer.bounds._northEast.lat} </li>
-                                                    <li>lng: {layer.bounds._northEast.lng} </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                Sudoeste
-                                                <ul>
-                                                    <li>lat: {layer.bounds._southWest.lat} </li>
-                                                    <li>lng: {layer.bounds._southWest.lng} </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li> */}
                   <li>
                     Tipo de colheita: {translate(layer.cropType, "cropType")}
                   </li>
