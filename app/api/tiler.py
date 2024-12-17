@@ -304,7 +304,7 @@ class Tiles(TaskNestedView):
             try:
                 boundaries_feature = json.loads(boundaries_feature)
             except json.JSONDecodeError:
-                raise exceptions.ValidationError(_("Invalid boundaries parameter"))
+                raise exceptions.ValidationError(_("Parâmetro limites inválidos"))
 
         if formula == '': formula = None
         if bands == '': bands = None
@@ -323,7 +323,7 @@ class Tiles(TaskNestedView):
             if tilesize == 512:
                 z -= 1
         except ValueError:
-            raise exceptions.ValidationError(_("Invalid tile size parameter"))
+            raise exceptions.ValidationError(_("Parâmetro de tamanho de telha inválido"))
 
         try:
             expr, _discard_ = lookup_formula(formula, bands)
@@ -353,7 +353,7 @@ class Tiles(TaskNestedView):
 
         with COGReader(url) as src:
             if not src.tile_exists(z, x, y):
-                raise exceptions.NotFound(_("Outside of bounds"))
+                raise exceptions.NotFound(_("Fora dos limites"))
 
             minzoom, maxzoom = get_zoom_safe(src)
             has_alpha = has_alpha_band(src.dataset)
@@ -363,7 +363,7 @@ class Tiles(TaskNestedView):
                 try:
                     boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                 except:
-                    raise exceptions.ValidationError(_("Invalid boundaries"))
+                    raise exceptions.ValidationError(_("Limites inválidos"))
             else:
                 boundaries_cutline = None
             # Handle N-bands datasets for orthophotos (not plant health)
@@ -425,19 +425,19 @@ class Tiles(TaskNestedView):
                                         tile_buffer=tile_buffer,
                                         resampling_method=resampling)
             except TileOutsideBounds:
-                raise exceptions.NotFound(_("Outside of bounds"))
+                raise exceptions.NotFound(_("Fora do limites"))
             
             if color_map:
                 try:
                     colormap.get(color_map)
                 except InvalidColorMapName:
-                    raise exceptions.ValidationError(_("Not a valid color_map value"))
+                    raise exceptions.ValidationError(_("Fora dos limites"))
             
             intensity = None
             try:
                 rescale_arr = list(map(float, rescale.split(",")))
             except ValueError:
-                raise exceptions.ValidationError(_("Invalid rescale value"))
+                raise exceptions.ValidationError(_("Valor de revenda inválido"))
 
             # Auto?
             if ext is None:
@@ -459,10 +459,10 @@ class Tiles(TaskNestedView):
                     if hillshade <= 0:
                         hillshade = 1.0
                 except ValueError:
-                    raise exceptions.ValidationError(_("Invalid hillshade value"))
+                    raise exceptions.ValidationError(_("Valor de hillshade inválido"))
                 if tile.data.shape[0] != 1:
                     raise exceptions.ValidationError(
-                        _("Cannot compute hillshade of non-elevation raster (multiple bands found)"))
+                        _("Não é possível calcular hillshade de raster não-elevação (várias bandas encontradas)"))
                 delta_scale = (maxzoom + ZOOM_EXTRA_LEVELS + 1 - z) * 4
                 dx = src.dataset.meta["transform"][0] * delta_scale
                 dy = -src.dataset.meta["transform"][4] * delta_scale
@@ -486,7 +486,7 @@ class Tiles(TaskNestedView):
                     rgb, _discard_ = apply_cmap(rgb_data, colormap.get(color_map))
                 if rgb.data.shape[0] != 3:
                     raise exceptions.ValidationError(
-                        _("Cannot process tile: intensity image provided, but no RGB data was computed."))
+                        _("Não é possível processar tile: imagem de intensidade fornecida, mas nenhum dado RGB foi computado."))
                 intensity = intensity * 255.0
                 rgb = hsv_blend(rgb, intensity)
                 if rgb is not None:
@@ -535,9 +535,9 @@ class Export(TaskNestedView):
         expr = None
 
         if asset_type in ['orthophoto', 'dsm', 'dtm'] and not export_format in ['gtiff', 'gtiff-rgb', 'jpg', 'png', 'kmz']:
-            raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
+            raise exceptions.ValidationError(_("Formato não suportado: %(value)s") % {'value': export_format})
         if asset_type == 'georeferenced_model' and not export_format in ['laz', 'las', 'ply', 'csv']:
-            raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
+            raise exceptions.ValidationError(_("Formato não suportado: %(value)s") % {'value': export_format})
         
         # Default color map, hillshade
         if asset_type in ['dsm', 'dtm'] and export_format != 'gtiff':
@@ -550,16 +550,16 @@ class Export(TaskNestedView):
             try:
                 colormap.get(color_map)
             except InvalidColorMapName:
-                raise exceptions.ValidationError(_("Not a valid color_map value"))
+                raise exceptions.ValidationError(_("Não é um valor color_map válido"))
 
         if epsg is not None:
             try:
                 epsg = int(epsg)
             except ValueError:
-                raise exceptions.ValidationError(_("Invalid EPSG code: %(value)s") % {'value': epsg})
+                raise exceptions.ValidationError(_("Código EPSG inválido: %(value)s") % {'value': epsg})
         
         if (formula and not bands) or (not formula and bands):
-            raise exceptions.ValidationError(_("Both formula and bands parameters are required"))
+            raise exceptions.ValidationError(_("Ambos os parâmetros de fórmula e bandas são necessários"))
 
         if formula and bands:
             if bands == 'auto':
@@ -582,7 +582,7 @@ class Export(TaskNestedView):
             try:
                 rescale = list(map(float, rescale.split(",")))
             except ValueError:
-                raise exceptions.ValidationError(_("Invalid rescale value: %(value)s") % {'value': rescale})
+                raise exceptions.ValidationError(_("Valor de revenda inválido: %(value)s") % {'value': rescale})
         
         if hillshade is not None:
             try:
@@ -590,7 +590,7 @@ class Export(TaskNestedView):
                 if hillshade < 0:
                     raise Exception("Hillshade must be > 0")
             except:
-                raise exceptions.ValidationError(_("Invalid hillshade value: %(value)s") % {'value': hillshade})
+                raise exceptions.ValidationError(_("Valor de hillshade inválido: %(value)s") % {'value': hillshade})
         
         if asset_type == 'georeferenced_model':
             url = get_pointcloud_path(task)
@@ -601,7 +601,7 @@ class Export(TaskNestedView):
             raise exceptions.NotFound()
 
         if epsg is not None and task.epsg is None:
-            raise exceptions.ValidationError(_("Cannot use epsg on non-georeferenced dataset"))
+            raise exceptions.ValidationError(_("Não é possível usar EPSG em conjunto de dados não georreferenciados"))
         
         # Strip unsafe chars, append suffix
         extension = extension_for_export_format(export_format)

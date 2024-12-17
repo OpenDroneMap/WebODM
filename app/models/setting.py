@@ -17,8 +17,8 @@ logger = logging.getLogger('app.logger')
 
 
 class Setting(models.Model):
-    app_name = models.CharField(max_length=255, blank=False, null=False, help_text=_("The name of your application"), verbose_name=_("App name"))
-    app_logo = models.ImageField(upload_to="settings/", blank=False, null=False, help_text=_("A 512x512 logo of your application (.png or .jpeg)"), verbose_name=_("App logo"))
+    app_name = models.CharField(max_length=255, blank=False, null=False, help_text=_("O nome do seu aplicativo"), verbose_name=_("App name"))
+    app_logo = models.ImageField(upload_to="settings/", blank=False, null=False, help_text=_("Um logotipo de 512x512 do seu aplicativo (.png ou .jpeg)"), verbose_name=_("App logo"))
     app_logo_36 = ImageSpecField(source='app_logo',
                                       processors=[ResizeToFit(79, 36)],
                                       format='PNG',
@@ -28,8 +28,8 @@ class Setting(models.Model):
                                       format='PNG',
                                       options={'quality': 90})
 
-    organization_name = models.CharField(default='Global Drones', max_length=255, blank=True, null=True, help_text=_("The name of your organization"), verbose_name=_("Organization name"))
-    organization_website = models.URLField(default='/', max_length=255, blank=True, null=True, help_text=_("The website URL of your organization"), verbose_name=_("Organization website"))
+    organization_name = models.CharField(default='Global Drones', max_length=255, blank=True, null=True, help_text=_("O nome da sua organização"), verbose_name=_("Organization name"))
+    organization_website = models.URLField(default='/', max_length=255, blank=True, null=True, help_text=_("O URL do site da sua organização"), verbose_name=_("Organization website"))
     theme = models.ForeignKey(Theme, blank=False, null=False, on_delete=models.DO_NOTHING, verbose_name=_("Theme"),
                               help_text=_("Active theme"))
 

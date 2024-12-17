@@ -122,7 +122,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if new_project:
             return Response({'success': True, 'project': ProjectSerializer(new_project).data}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': _("Cannot duplicate project")}, status=status.HTTP_200_OK)
+            return Response({'error': _("Não é possível duplicar o projeto")}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def permissions(self, request, pk=None):
@@ -190,9 +190,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 assign_perm(perm, user, project)
 
         except User.DoesNotExist as e:
-            return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': _("Usuário inválido na lista de permissões")}, status=status.HTTP_400_BAD_REQUEST)
         except AttributeError as e:
-            return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': _("Permissões inválidas")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)
 

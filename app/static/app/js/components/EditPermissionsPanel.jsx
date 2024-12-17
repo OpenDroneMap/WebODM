@@ -46,7 +46,7 @@ class EditPermissionsPanel extends React.Component {
         this.setState({validUsernames, permissions: json});
       })
       .fail(() => {
-        this.setState({error: _("Cannot load permissions.")});
+        this.setState({error: _("Não é possível carregar permissões.")});
       })
       .always(() => {
           this.setState({loading: false});
@@ -251,7 +251,7 @@ class EditPermissionsPanel extends React.Component {
           <div className="permissions-user-container">
             <ErrorMessage bind={[this, 'error']} />
               <div className='add-new-btn' key="add-new">
-                    <label  className="control-label">{_("Permissions")}</label>
+                    <label  className="control-label">{_("Permissões")}</label>
 
                     <button onClick={this.addNewPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-user-plus"></i></button>
               </div>

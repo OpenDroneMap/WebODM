@@ -501,3 +501,30 @@
         margin-right: 4px;
     }
 }
+.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+     border-bottom-right-radius: 20px;
+     border-top-right-radius: 20px;
+     border: none;
+}
+.btn-group > .btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+.btn-group > .btn:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+.task-list-item .expanded-panel .action-buttons .edit-button:focus, 
+.task-list-item .expanded-panel .action-buttons .edit-button:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+.task-list-item .expanded-panel .action-buttons .btn.Vier_Map:focus, 
+.task-list-item .expanded-panel .action-buttons .btn.Vier_Map:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+.arrow-dropdown {
+    font-size: 16px !important;
+    margin: 5px !important;
+}

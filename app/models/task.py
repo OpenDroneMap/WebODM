@@ -248,48 +248,48 @@ class Task(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False, verbose_name=_("Id"))
 
-    uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text=_("Identifier of the task (as returned by NodeODM API)"), verbose_name=_("UUID"))
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=_("Project that this task belongs to"), verbose_name=_("Project"))
-    name = models.CharField(max_length=255, null=True, blank=True, help_text=_("A label for the task"), verbose_name=_("Name"))
-    processing_time = models.IntegerField(default=-1, help_text=_("Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)"), verbose_name=_("Processing Time"))
-    processing_node = models.ForeignKey(ProcessingNode, on_delete=models.SET_NULL, null=True, blank=True, help_text=_("Processing node assigned to this task (or null if this task has not been associated yet)"), verbose_name=_("Processing Node"))
-    auto_processing_node = models.BooleanField(default=True, help_text=_("A flag indicating whether this task should be automatically assigned a processing node"), verbose_name=_("Auto Processing Node"))
-    status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text=_("Current status of the task"), verbose_name=_("Status"))
-    last_error = models.TextField(null=True, blank=True, help_text=_("The last processing error received"), verbose_name=_("Last Error"))
-    options = models.JSONField(default=dict, blank=True, help_text=_("Options that are being used to process this task"), validators=[validate_task_options], verbose_name=_("Options"))
+    uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text=_("Identificador da tarefa (conforme retornado pela API NodeODM)"), verbose_name=_("UUID"))
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=_("Projeto ao qual esta tarefa pertence"), verbose_name=_("Project"))
+    name = models.CharField(max_length=255, null=True, blank=True, help_text=_("Um rótulo para a tarefa"), verbose_name=_("Name"))
+    processing_time = models.IntegerField(default=-1, help_text=_("Número de milissegundos decorridos desde o início desta tarefa (-1 indica que nenhuma informação está disponível)"), verbose_name=_("Processing Time"))
+    processing_node = models.ForeignKey(ProcessingNode, on_delete=models.SET_NULL, null=True, blank=True, help_text=_("Nó de processamento atribuído a esta tarefa (ou nulo se esta tarefa ainda não tiver sido associada)"), verbose_name=_("Processing Node"))
+    auto_processing_node = models.BooleanField(default=True, help_text=_("Um sinalizador indicando se esta tarefa deve ser atribuída automaticamente a um nó de processamento"), verbose_name=_("Auto Processing Node"))
+    status = models.IntegerField(choices=STATUS_CODES, db_index=True, null=True, blank=True, help_text=_("Status atual da tarefa"), verbose_name=_("Status"))
+    last_error = models.TextField(null=True, blank=True, help_text=_("O último erro de processamento recebido"), verbose_name=_("Last Error"))
+    options = models.JSONField(default=dict, blank=True, help_text=_("Opções que estão sendo usadas para processar esta tarefa"), validators=[validate_task_options], verbose_name=_("Options"))
     available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text=_("List of available assets to download"), verbose_name=_("Available Assets"))
 
-    orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text=_("Extent of the orthophoto"), verbose_name=_("Orthophoto Extent"))
-    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM", verbose_name=_("DSM Extent"))
-    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DTM", verbose_name=_("DTM Extent"))
+    orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text=_("Extensão da ortofoto"), verbose_name=_("Orthophoto Extent"))
+    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extensão do DSM", verbose_name=_("DSM Extent"))
+    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extensão do DTM", verbose_name=_("DTM Extent"))
 
     # mission
-    created_at = models.DateTimeField(default=timezone.now, help_text=_("Creation date"), verbose_name=_("Created at"))
+    created_at = models.DateTimeField(default=timezone.now, help_text=_("Data de criação"), verbose_name=_("Created at"))
     pending_action = models.IntegerField(choices=PENDING_ACTIONS, db_index=True, null=True, blank=True, help_text=_("A requested action to be performed on the task. The selected action will be performed by the worker at the next iteration."), verbose_name=_("Pending Action"))
 
-    public = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is available to the public"), verbose_name=_("Public"))
-    resize_to = models.IntegerField(default=-1, help_text=_("When set to a value different than -1, indicates that the images for this task have been / will be resized to the size specified here before processing."), verbose_name=_("Resize To"))
+    public = models.BooleanField(default=False, help_text=_("Um sinalizador que indica se esta tarefa está disponível ao público"), verbose_name=_("Public"))
+    resize_to = models.IntegerField(default=-1, help_text=_("Quando definido com um valor diferente de -1, indica que as imagens para esta tarefa foram/serão redimensionadas para o tamanho especificado aqui antes do processamento."), verbose_name=_("Resize To"))
 
     upload_progress = models.FloatField(default=0.0,
-                                        help_text=_("Value between 0 and 1 indicating the upload progress of this task's files to the processing node"),
+                                        help_text=_("Valor entre 0 e 1 indicando o andamento do upload dos arquivos desta tarefa para o nó de processamento"),
                                         verbose_name=_("Upload Progress"),
                                         blank=True)
     resize_progress = models.FloatField(default=0.0,
-                                        help_text=_("Value between 0 and 1 indicating the resize progress of this task's images"),
+                                        help_text=_("Valor entre 0 e 1 indicando o andamento do redimensionamento das imagens desta tarefa"),
                                         verbose_name=_("Resize Progress"),
                                         blank=True)
     running_progress = models.FloatField(default=0.0,
-                                        help_text=_("Value between 0 and 1 indicating the running progress (estimated) of this task"),
+                                        help_text=_("Valor entre 0 e 1 indicando o andamento da execução (estimado) desta tarefa"),
                                         verbose_name=_("Running Progress"),
                                         blank=True)
-    import_url = models.TextField(null=False, default="", blank=True, help_text=_("URL this task is imported from (only for imported tasks)"), verbose_name=_("Import URL"))
-    images_count = models.IntegerField(null=False, blank=True, default=0, help_text=_("Number of images associated with this task"), verbose_name=_("Images Count"))
-    partial = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing."), verbose_name=_("Partial"))
-    potree_scene = models.JSONField(default=dict, blank=True, help_text=_("Serialized potree scene information used to save/load measurements and camera view angle"), verbose_name=_("Potree Scene"))
-    epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("EPSG code of the dataset (if georeferenced)"), verbose_name="EPSG")
-    tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Task tags"), verbose_name=_("Tags"))
-    orthophoto_bands = models.JSONField(default=list, blank=True, help_text=_("List of orthophoto bands"), verbose_name=_("Orthophoto Bands"))
-    size = models.FloatField(default=0.0, blank=True, help_text=_("Size of the task on disk in megabytes"), verbose_name=_("Size"))
+    import_url = models.TextField(null=False, default="", blank=True, help_text=_("URL do qual esta tarefa é importada (somente para tarefas importadas)"), verbose_name=_("Import URL"))
+    images_count = models.IntegerField(null=False, blank=True, default=0, help_text=_("Número de imagens associadas a esta tarefa"), verbose_name=_("Images Count"))
+    partial = models.BooleanField(default=False, help_text=_("Um sinalizador que indica se esta tarefa está aguardando o upload de informações ou arquivos antes de ser considerada para processamento."), verbose_name=_("Partial"))
+    potree_scene = models.JSONField(default=dict, blank=True, help_text=_("Informações serializadas da cena Potree usadas para salvar/carregar medições e ângulo de visão da câmera"), verbose_name=_("Potree Scene"))
+    epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("Código EPSG do conjunto de dados (se georreferenciado)"), verbose_name="EPSG")
+    tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Tags de tarefa"), verbose_name=_("Tags"))
+    orthophoto_bands = models.JSONField(default=list, blank=True, help_text=_("Lista de bandas ortofoto"), verbose_name=_("Orthophoto Bands"))
+    size = models.FloatField(default=0.0, blank=True, help_text=_("Tamanho da tarefa no disco em megabytes"), verbose_name=_("Size"))
     
     class Meta:
         verbose_name = _("Task")
