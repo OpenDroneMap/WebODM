@@ -46,8 +46,6 @@ export default class OverviewControlPanel extends React.Component {
     if (prevState.filteredSelectedLayers !== this.state.filteredSelectedLayers) {
         this.AddFieldsIdOnSelectedLayers();
         this.groupLayersByCropType();
-        console.log("filteredSelectedLayers: ", this.state.filteredSelectedLayers);
-        console.log("")
     }
   }
 
@@ -140,8 +138,6 @@ export default class OverviewControlPanel extends React.Component {
         return;
     }
 
-    console.log("groupedLayers: ", groupedLayers);
-
     const task_id = this.tiles[0].meta.task.id;
     const project_id = this.tiles[0].meta.task.project;
     const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
@@ -155,8 +151,6 @@ export default class OverviewControlPanel extends React.Component {
             type: cropType,
             payload: { processing_requests: { fields_to_process: fieldsToProcessID } }
         };
-
-        console.log("payload: ", payload);
 
         return fetch(url, {
             method: 'POST',
