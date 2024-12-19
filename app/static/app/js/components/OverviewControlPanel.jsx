@@ -26,7 +26,9 @@ export default class OverviewControlPanel extends React.Component {
     this.tiles = this.props.tiles;
   }
 
-
+  // Atualiza o estado do componente quando as propriedades ou o estado mudam
+  // Verifica se `selectedLayers` mudou e filtra talhões válidos com base em condições específicas atualizando o state filteredSelectedLayers
+  // Chama funções auxiliares para adicionar IDs de cada talhão e agrupa-los por tipo de cultura
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.selectedLayers !== this.props.selectedLayers) {
         const filteredLayers = this.props.selectedLayers
@@ -44,15 +46,13 @@ export default class OverviewControlPanel extends React.Component {
     if (prevState.filteredSelectedLayers !== this.state.filteredSelectedLayers) {
         this.AddFieldsIdOnSelectedLayers();
         this.groupLayersByCropType();
-    }
-
-    if (prevProps.overlays !== this.props.overlays) {
-      this.AddFieldsIdOnSelectedLayers();
-      this.groupLayersByCropType();
+        console.log("filteredSelectedLayers: ", this.state.filteredSelectedLayers);
+        console.log("")
     }
   }
 
 
+  // Função para alternar o estado colapsado de um talhão selecionado listado no popup
   handleCollapsedlistLayerItems = (index) => {
     this.setState((prevState) => ({
       collapsedLayers: {
@@ -62,7 +62,7 @@ export default class OverviewControlPanel extends React.Component {
     }));
   };
 
-
+  // Reseta os talhões marcados no mapa
   handleClearOverviewLayers = () => {
     const fieldSet = new Set(["field"]);
 
@@ -71,43 +71,45 @@ export default class OverviewControlPanel extends React.Component {
     this.loadGeoJsonDetections(fieldSet);
   };
 
-
+   // Adiciona o campo `field_id` aos talhões selecionadas 
   AddFieldsIdOnSelectedLayers = () => {
-
     const { filteredSelectedLayers } = this.state;
     const { overlays } = this.props;
 
-    if(overlays[1]) {
+    const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
 
-    const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+    if (overlayWithLayers) {
 
-    filteredSelectedLayers.forEach(selectedLayer => {
-        const bounds2 = selectedLayer.layer.bounds;
+        const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
 
-        leafleatLayers.forEach(leafletLayer => {
-            const bounds1 = leafletLayer._bounds;
+        filteredSelectedLayers.forEach(selectedLayer => {
+            const bounds2 = selectedLayer.layer.bounds;
 
-            const isBoundsEqual = (
-                bounds1._northEast.lat === bounds2._northEast.lat &&
-                bounds1._northEast.lng === bounds2._northEast.lng &&
-                bounds1._southWest.lat === bounds2._southWest.lat &&
-                bounds1._southWest.lng === bounds2._southWest.lng
-            );
+            leafleatLayers.forEach(leafletLayer => {
+                const bounds1 = leafletLayer._bounds;
 
-            if (isBoundsEqual) {
-                const featureProps = leafletLayer.feature.properties;
+                const isBoundsEqual = (
+                    bounds1._northEast.lat === bounds2._northEast.lat &&
+                    bounds1._northEast.lng === bounds2._northEast.lng &&
+                    bounds1._southWest.lat === bounds2._southWest.lat &&
+                    bounds1._southWest.lng === bounds2._southWest.lng
+                );
 
-                if ('field_id' in featureProps) {
-                    selectedLayer.field_id = featureProps.field_id; 
-                } else if ('Field_id' in featureProps) {
-                    selectedLayer.field_id = featureProps.Field_id; 
+                if (isBoundsEqual) {
+                    const featureProps = leafletLayer.feature.properties;
+
+                    if ('field_id' in featureProps) {
+                        selectedLayer.field_id = featureProps.field_id; 
+                    } else if ('Field_id' in featureProps) {
+                        selectedLayer.field_id = featureProps.Field_id; 
+                    }
                 }
-            }
+            });
         });
-      });
     }
-  }
+};
 
+  // Agrupa os talhões selecionados com base no tipo de cultivo
   groupLayersByCropType = () => {
     const { filteredSelectedLayers } = this.state;
 
@@ -115,7 +117,7 @@ export default class OverviewControlPanel extends React.Component {
         const cropType = current.layer.cropType;
 
         if (!groups[cropType]) {
-            groups[cropType] = []; // Inicializa o array se não existir
+            groups[cropType] = []; 
         }
 
         groups[cropType].push(current);
@@ -125,15 +127,20 @@ export default class OverviewControlPanel extends React.Component {
     this.setState({ groupedLayers });
   };
 
-
+  // Envia os talhões selecionados para um endpoint de processamento
   handleSendData = async () => {
     const { groupedLayers } = this.state;
     const { filteredSelectedLayers } = this.state;
+
+    this.AddFieldsIdOnSelectedLayers();
+    this.groupLayersByCropType();
 
     if (!groupedLayers || Object.keys(groupedLayers).length === 0 || !filteredSelectedLayers) {
         alert("Nenhum talhão selecionado.");
         return;
     }
+
+    console.log("groupedLayers: ", groupedLayers);
 
     const task_id = this.tiles[0].meta.task.id;
     const project_id = this.tiles[0].meta.task.project;
@@ -141,15 +148,15 @@ export default class OverviewControlPanel extends React.Component {
     const csrfToken = getCsrfToken();
 
     const requests = Object.entries(groupedLayers).map(([cropType, layers]) => {
-        
-        
+      
         const fieldsToProcessID = layers.map(layer => layer.field_id);
-
         
         const payload = {
             type: cropType,
             payload: { processing_requests: { fields_to_process: fieldsToProcessID } }
         };
+
+        console.log("payload: ", payload);
 
         return fetch(url, {
             method: 'POST',
@@ -162,7 +169,6 @@ export default class OverviewControlPanel extends React.Component {
     });
 
     try {
-        // Aguarda todas as requisições serem completadas
         const responses = await Promise.all(requests);
         const results = await Promise.all(responses.map(res => res.json()));
         console.log('Sucesso:', results);
@@ -173,41 +179,46 @@ export default class OverviewControlPanel extends React.Component {
     }
   };
 
+  // Abre o popup do talhão correspondente
   handlePopUp = (e) => {
     const { overlays } = this.props;
     const layerSelected = this.state.filteredSelectedLayers.filter(
       (layer) => layer.index == e.target.id
     );
 
-    if (overlays[1]) {
-      const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
-      const reflayerLeafLeat = leafleatLayers.filter((layer) => {
-        return (
-          layer._bounds &&
-          layerSelected[0] &&
-          layerSelected[0].layer &&
-          layerSelected[0].layer.bounds &&
-          layer._bounds._northEast.lat ===
-            layerSelected[0].layer.bounds._northEast.lat &&
-          layer._bounds._northEast.lng ===
-            layerSelected[0].layer.bounds._northEast.lng &&
-          layer._bounds._southWest.lat ===
-            layerSelected[0].layer.bounds._southWest.lat &&
-          layer._bounds._southWest.lng ===
-            layerSelected[0].layer.bounds._southWest.lng
-        );
-      });
+    const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
 
-      if (reflayerLeafLeat.length > 0) {
-        const layer = reflayerLeafLeat[0];
-        if (layer.getPopup()) {
-          if (!layer.isPopupOpen()) {
-            layer.openPopup();
-          }
+    if (overlayWithLayers) {
+        const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
+        
+        const reflayerLeafLeat = leafleatLayers.filter((layer) => {
+            return (
+                layer._bounds &&
+                layerSelected[0] &&
+                layerSelected[0].layer &&
+                layerSelected[0].layer.bounds &&
+                layer._bounds._northEast.lat ===
+                    layerSelected[0].layer.bounds._northEast.lat &&
+                layer._bounds._northEast.lng ===
+                    layerSelected[0].layer.bounds._northEast.lng &&
+                layer._bounds._southWest.lat ===
+                    layerSelected[0].layer.bounds._southWest.lat &&
+                layer._bounds._southWest.lng ===
+                    layerSelected[0].layer.bounds._southWest.lng
+            );
+        });
+
+        if (reflayerLeafLeat.length > 0) {
+            const layer = reflayerLeafLeat[0];
+            if (layer.getPopup()) {
+                if (!layer.isPopupOpen()) {
+                    layer.openPopup();
+                }
+            }
         }
-      }
     }
   };
+
 
   render() {
     return (
@@ -221,9 +232,9 @@ export default class OverviewControlPanel extends React.Component {
               <li
                 key={index}
                 className="layer-item"
-                onClick={() => this.handleCollapsedlistLayerItems(index)}
+                
               >
-                <button className="collapsed-infos-btn">
+                <button className="collapsed-infos-btn" onClick={() => this.handleCollapsedlistLayerItems(index)}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 -960 960 960"
@@ -235,7 +246,7 @@ export default class OverviewControlPanel extends React.Component {
                       transform: this.state.collapsedLayers[index]
                         ? "rotate(90deg)"
                         : "rotate(0deg)",
-                      transition: "transform 0.3s ease", // Adiciona uma transição suave
+                      transition: "transform 0.3s ease", 
                     }}
                   >
                     <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z" />
@@ -288,6 +299,7 @@ export default class OverviewControlPanel extends React.Component {
   }
 }
 
+// Função para obter o token CSRF armazenado nos cookies do navegador
 const getCsrfToken = () => {
   const cookies = document.cookie.split(";");
   for (let cookie of cookies) {
@@ -397,6 +409,7 @@ const names = [
   "Helena",
 ];
 
+// Objeto contendo traduções para diferentes tipos de dados
 const translations = {
   cropType: {
     sugarcane: "Cana-de-açúcar",
@@ -408,6 +421,7 @@ const translations = {
   },
 };
 
+// Função para traduzir um valor com base no tipo fornecido
 const translate = (value, type) => {
   return translations[type] && translations[type][value]
     ? translations[type][value]
