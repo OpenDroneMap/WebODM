@@ -215,7 +215,7 @@
     font-size: 16px;
 }
 
-.horizontal-bar {
+.leaflet-control-layers-base .horizontal-bar {
     display: block;
     opacity: 1;
     height: 1px;
