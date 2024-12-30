@@ -35,7 +35,8 @@ class NewTaskPanel extends React.Component {
       taskInfo: {},
       inReview: false,
       loading: false,
-      showMapPreview: false
+      showMapPreview: false,
+      dismissImageCountWarning: false,
     };
 
     this.save = this.save.bind(this);
@@ -156,6 +157,12 @@ class NewTaskPanel extends React.Component {
         <div className="form-horizontal">
           <div className={this.state.inReview ? "disabled" : ""}>
             <p>{interpolate(_("%(count)s files selected. Please check these additional options:"), { count: this.props.filesCount})}</p>
+            {this.props.filesCount === 999 && !this.state.dismissImageCountWarning ? 
+            <div className="alert alert-warning alert-dismissible alert-images">
+              <button type="button" className="close" title={_("Close")} onClick={() => this.setState({dismissImageCountWarning: true})}><span aria-hidden="true">&times;</span></button>
+              <i className="fa fa-hand-point-right"></i> {_("Did you forget any images? When images exceed 1000, they are often stored inside multiple folders on the SD card.")}
+            </div>
+            : ""}
 
             {!filesCountOk ? 
             <div className="alert alert-warning">
