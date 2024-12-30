@@ -12,6 +12,12 @@
     	button{
     		margin-top: 10px;
     	}
+
+        &.alert-images{
+            button{
+                margin-top: 0;
+            }
+        }
     }
 
     p.header{
