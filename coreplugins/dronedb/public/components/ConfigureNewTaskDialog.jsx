@@ -7,14 +7,20 @@ import "./ConfigureNewTaskDialog.scss";
 
 export default class ConfigureNewTaskDialog extends Component {
 	static defaultProps = {
-		
+
 	};
 	static propTypes = {
 		onHide: PropTypes.func.isRequired,
 		onSaveTask: PropTypes.func.isRequired,
-		ddbRes: PropTypes.object,		
+		ddbRes: PropTypes.object,
   	}
-	
+
+	handleTaskName = () => {
+		return new Promise((resolve) => {
+			resolve(ddbRes ? ddbRes.name : null);
+		});
+	}
+
 	render() {
 		const {
 			onHide,
@@ -36,7 +42,7 @@ export default class ConfigureNewTaskDialog extends Component {
 						 filesCount={ddbRes ? ddbRes.images_count : 0}
 						 getFiles={() => []}
 						 showResize={false}
-						 suggestedTaskName={ddbRes ? ddbRes.name : null}
+						 suggestedTaskName={this.handleTaskName}
 					 />
 				</Modal.Body>
 			</Modal>
