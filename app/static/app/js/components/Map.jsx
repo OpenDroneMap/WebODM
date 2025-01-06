@@ -95,7 +95,16 @@ class Map extends React.Component {
   }
 
   setSelectedLayers(idx, el) {
-    el.name = names[idx];
+    //Verifica se todos os nomes ja foram utilizados e, caso todos tenham sido utilizados, reutiliza os nomes anteriores com um valor do lado
+    let counter = "";
+    const value = Math.floor(idx/names.length);
+    let nameIdx = idx;
+    if(value >= 1){
+      counter = " " + (value + 1);
+      nameIdx = nameIdx - (names.length*value);
+    }
+    el.name = names[nameIdx] + counter; 
+
     if (idx >= this.state.selectedLayers.length) {
       this.setState(update(this.state, 
         {selectedLayers: {$push: [el]}}
