@@ -53,7 +53,9 @@ class ImportTaskPanel extends React.Component {
           clickable: this.uploadButton,
           timeout: 2147483647,
           chunking: true,
-          chunkSize: 16000000, // 16MB
+          chunkSize: 16000000, // 16MB,
+          retryChunks: true,
+          retryChunksLimit: 20,
           headers: {
             [csrf.header]: csrf.token
           }
@@ -91,7 +93,7 @@ class ImportTaskPanel extends React.Component {
             }catch(e){
               this.setState({error: interpolate(_('Invalid response from server: %(error)s'), { error: e.message})});
             }
-          }else if (this.state.uploading){
+          }else{
             this.setState({uploading: false, error: _("An error occured while uploading the file. Please try again.")});
           }
         });
