@@ -355,9 +355,9 @@ export default class SprayLineControlPanel extends React.Component {
                                 <li key={index} className='layer-item'>
                                     <a href="javascript:void(0)" id={index} onClick={this.handlePopUp} className='link-item'>
                                         
-                                        {names[index] ? 
+                                        {layer.name ? 
                                         <div className='layer-container'>
-                                            <span className='NameField'> {names[index]} </span> 
+                                            <span className='NameField'> {layer.name} </span> 
                                             <span className='vertical-bar'></span>
                                             <span className='layer-id'> Layer {index} </span>
                                         </div> :
@@ -481,26 +481,3 @@ const getCsrfToken = () => {
     }
     return null;
 }
-
-
-const names = [
-    "Ana", "Beatriz", "Carlos", "Daniela", "Eduardo",
-    "Fernanda", "Gabriel", "Helena", "Igor", "Juliana",
-    "Kleber", "Luana", "Marcos", "Natalia", "Otávio",
-    "Priscila", "Roberto", "Samantha", "Thiago", "Vanessa",
-    "Wesley", "Yasmin", "Zé", "Amanda", "Bruno",
-    "Camila", "Diego", "Eliane", "Flávio", "Gustavo",
-    "Heloísa", "Isabela", "João", "Karine", "Leonardo",
-    "Maria", "Nicolas", "Olga", "Pedro", "Queila",
-    "Raul", "Sabrina", "Tiago", "Vânia", "William",
-    "Zilda", "André", "Barbara", "Célia", "David",
-    "Emanuelle", "Felipe", "Giovana", "Henrique", "Irene",
-    "Júlio", "Larissa", "Marcelo", "Nayara", "Olavo",
-    "Paula", "Ricardo", "Silvia", "Tânia", "Vinícius",
-    "Wagner", "Yara", "Zeca", "Adriana", "Bernardo",
-    "Cristiane", "Douglas", "Elena", "Flávia", "Gisele",
-    "Hugo", "Jéssica", "Lucas", "Márcia", "Nando",
-    "Patrícia", "Rafael", "Silvia", "Tatiane", "Valter",
-    "Wellington", "Zuleica", "Aline", "Bruna", "César",
-    "Daniel", "Evelyn", "Fábio", "Gisele", "Helena"
-];
