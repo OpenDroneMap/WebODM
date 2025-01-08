@@ -79,7 +79,7 @@ class EditTaskPanel extends React.Component {
                                 <i className="fa fa-circle-notch fa-spin"></i> {_("Salvando...")}
                             </span>
                         :   <span>
-                                <i className="fa fa-edit"></i> {_("Save")}
+                                <i className="fa fa-edit"></i> {_("Salvar")}
                             </span>}
                     </button>
                 </div>

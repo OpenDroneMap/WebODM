@@ -39,7 +39,7 @@ class OverviewControl extends React.Component {
         return (
             <div className={showPanel ? "open" : ""}>
                 <a href="javascript:void(0);" 
-                title="Overview"
+                title="Visão geral"
                 onClick={this.handleOpen} 
                 className="leaflet-control-overview-control-button leaflet-bar-part theme-secondary"></a>
                 <OverviewControlPanel 

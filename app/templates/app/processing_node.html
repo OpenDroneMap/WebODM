@@ -8,43 +8,43 @@
 
 <table class="table table-bordered table-striped table-first-col-bold processing-node-info">
 	<tr>
-		<td>{% trans "Hostname" %}</td>
+		<td>Nome do Host</td>
 		<td>{{ processing_node.hostname }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "Port" %}</td>
+		<td>Porta</td>
 		<td>{{ processing_node.port }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "API Version" %}</td>
+		<td>Versão da API</td>
 		<td>{{ processing_node.api_version }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "Engine" %}</td>
+		<td>Engine</td>
 		<td>{{ processing_node.engine }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "Engine Version" %}</td>
+		<td>Versão da engine</td>
 		<td>{{ processing_node.engine_version }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "Queue Count" %}</td>
+		<td>Contagem da fila</td>
 		<td>{{ processing_node.queue_count }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "Max Images Limit" %}</td>
+		<td>Limite maximo de imagens</td>
 		<td>{{ processing_node.max_images }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "Label" %}</td>
-		<td>{{ processing_node.label|default:"None" }}</td>
+		<td>Rótulo</td>
+		<td>{{ processing_node.label|default:"Vazio" }}</td>
 	</tr>
 	<tr>
-		<td>{% trans "Last Refreshed" %}</td>
-		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'ago' context '5 minutes ago' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
+		<td>Última atualização</td>
+		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'Atrás' context '5 minutos atrás' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
 	</tr>
 	<tr>
-		<td>{% trans "Options (JSON)" %}</td>
+		<td>Opções (JSON)</td>
 		<td><div data-console data-console-lang="js" data-console-height="300">{{ available_options_json}}</div></td>
 	</tr>
 </table>

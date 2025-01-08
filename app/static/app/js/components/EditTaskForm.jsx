@@ -577,8 +577,8 @@ class EditTaskForm extends React.Component {
 
           {!this.state.presetActionPerforming ?
             <div className="btn-group presets-dropdown littleScreen">
-              <button type="button" className="btn btn-sm btn-default" title={_("Edit Task Options")} onClick={this.handleEditPreset}>
-                <i className="fa fa-sliders-h"></i> {_("Edit")}
+              <button type="button" className="btn btn-sm btn-default" title={_("Editar opções de tarefa")} onClick={this.handleEditPreset}>
+                <i className="fa fa-sliders-h"></i> {_("Editar")}
               </button>
               <button type="button" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
                 <span className="caret"></span>
@@ -591,15 +591,15 @@ class EditTaskForm extends React.Component {
 
                 {this.state.selectedPreset.id !== -1 ?
                   <li>
-                    <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-copy"></i> {_("Duplicate")}</a>
+                    <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-copy"></i> {_("Dublicar")}</a>
                   </li>
                   :
                   <li>
-                    <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-save"></i> {_("Save")}</a>
+                    <a href="javascript:void(0);" onClick={this.handleDuplicateSavePreset}><i className="fa fa-save"></i> {_("Salvar")}</a>
                   </li>
                 }
                 <li className={this.state.selectedPreset.system ? "disabled" : ""}>
-                  <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash"></i> {_("Delete")}</a>
+                  <a href="javascript:void(0);" onClick={this.handleDeletePreset}><i className="fa fa-trash"></i> {_("Deletar")}</a>
                 </li>
               </ul>
             </div>
@@ -631,7 +631,7 @@ class EditTaskForm extends React.Component {
               </div>
           </div> */}
           <div className="form-group col-sm-10">
-            <label className="col-sm-2 control-label newPad">{_("Name")}</label>
+            <label className="col-sm-2 control-label newPad">{_("Nome")}</label>
             <div className="col-sm-10 name-fields input-field">
               {this.state.loadingTaskName ?
                 <i className="fa fa-circle-notch fa-spin fa-fw name-loading"></i>
@@ -647,7 +647,7 @@ class EditTaskForm extends React.Component {
             </div>
           </div>
           <div className='form-group col-sm-10'>
-              <label className="col-sm-2 control-label newPad">{_("Options")}</label>
+              <label className="col-sm-2 control-label newPad">{_("Opções")}</label>
               <div className="col-sm-10 option-container">
                 {!this.props.inReview ? optionsSelector :
                   <div className="review-options">

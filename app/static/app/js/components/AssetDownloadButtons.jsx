@@ -63,7 +63,7 @@ class AssetDownloadButtons extends React.Component {
                     <i className="glyphicon glyphicon-download-alt" style={{ fontSize: "1em" }}></i>
                     {this.props.showLabel ? (
                         <>
-                        {" " + _("Download Assets")}
+                        {" " + _("Baixar recursos")}
                         {/* Divisor vertical */}
                         <span
                             style={{

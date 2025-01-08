@@ -205,7 +205,7 @@ export default class OverviewControlPanel extends React.Component {
     return (
       <div className="overview-control-panel">
         <span className="close-button" onClick={this.props.onClose} />
-        <div className="title">Overview</div>
+        <div className="title">Visão geral</div>
         <hr />
         {this.state.filteredSelectedLayers.length > 0 ? (
           <ul className="list-overview">
@@ -239,7 +239,7 @@ export default class OverviewControlPanel extends React.Component {
                   onClick={this.handlePopUp}
                   className="link-item"
                 >
-                  {names[index] + ` - Layer ${index}` || `Layer ${index}`}
+                  {names[index] + ` - Camada ${index}` || `Camada ${index}`}
                 </a>
                 <ul
                   className={`list-layer-items ${

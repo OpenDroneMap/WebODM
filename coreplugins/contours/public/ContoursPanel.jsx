@@ -240,7 +240,7 @@ export default class ContoursPanel extends React.Component {
                       (simplify === "custom" && !customSimplify);
 
     let content = "";
-    if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> {_("Loading…")}</span>);
+    if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> {_("Carregando ...")}</span>);
     else if (permanentError) content = (<div className="alert alert-warning">{permanentError}</div>);
     else{
       content = (<div>
@@ -276,14 +276,14 @@ export default class ContoursPanel extends React.Component {
           <label className="col-sm-3 control-label">{_("Simplificar:")}</label>
           <div className="col-sm-9 ">
             <select className="form-control" value={simplify} onChange={this.handleSelectSimplify}>
-              {simplifyValues.map(sv => <option value={sv.value}>{sv.label} ({sv.value} {_("meter")})</option>)}
-              <option value="custom">{_("Custom")}</option>
+              {simplifyValues.map(sv => <option value={sv.value}>{sv.label} ({sv.value} {_("metros")})</option>)}
+              <option value="custom">{_("Personalizar")}</option>
             </select>
           </div>
         </div>
         {simplify === "custom" ? 
           <div className="row form-group form-inline">
-            <label className="col-sm-3 control-label">{_("Value:")}</label>
+            <label className="col-sm-3 control-label">{_("Valor:")}</label>
             <div className="col-sm-9 ">
               <input type="number" className="form-control custom-interval" value={customSimplify} onChange={this.handleChangeCustomSimplify} /><span> {_("meter")}</span>
             </div>

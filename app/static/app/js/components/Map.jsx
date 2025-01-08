@@ -801,7 +801,7 @@ class Map extends React.Component {
         </div>
 
         <Standby 
-            message={_("Loading...")}
+            message={_("Carregando...")}
             show={this.state.showLoading}
             />
             

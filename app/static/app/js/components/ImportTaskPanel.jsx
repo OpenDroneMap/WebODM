@@ -193,7 +193,7 @@ class ImportTaskPanel extends React.Component {
                     className="btn btn-danger btn-sm" 
                     onClick={this.cancelUpload}>
               <i className="glyphicon glyphicon-remove-circle"></i>
-              {_("Cancelar upload")}
+              {_("Cancelar")}
             </button> 
           </div> : ""}
         </div>

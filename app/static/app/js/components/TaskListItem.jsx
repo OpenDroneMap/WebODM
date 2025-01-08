@@ -485,7 +485,7 @@ class TaskListItem extends React.Component {
           task.can_rerun_from[1] :
           null;
 
-        addActionButton(_("Restart"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
+        addActionButton(_("Reiniciar"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
           subItems: this.getRestartSubmenuItems()
         });
       }

@@ -731,7 +731,7 @@ class ProjectListItem extends React.Component {
                           this.handleUpload();
                           }}>
                           <i className="content-upload-glyphicon" aria-hidden="true"></i>
-                          Upload Folder
+                          Subir arquivos
                         <input 
                           type="file" 
                           id="folderpicker" 
@@ -826,7 +826,7 @@ class ProjectListItem extends React.Component {
                         onChange={this.toggleTag(t)} /> <label className="filter-checkbox-label" htmlFor={"filter-tag-" + data.id + "-" + t}>{t}</label>
                   </li>)}
 
-                  <li className="clear-container"><input type="button" onClick={this.clearFilter} className="btn btn-default btn-xs" value={_("Clear")}/></li>
+                  <li className="clear-container"><input type="button" onClick={this.clearFilter} className="btn btn-default btn-xs" value={_("Limpar")}/></li>
                   </ul>
                 </div>
                 <div className="btn-group">

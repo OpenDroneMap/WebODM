@@ -22,16 +22,16 @@ class Paginator extends React.Component {
 
         this.sortItems = [{
             key: "created_at",
-            label: _("Created on")
+            label: _("Criada em")
           },{
             key: "name",
-            label: _("Name")
+            label: _("Nome")
           },{
             key: "tags",
             label: _("Tags")
           },{
             key: "owner",
-            label: _("Owner")
+            label: _("Proprietário")
           }];
     }
 
