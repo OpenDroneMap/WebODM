@@ -50,8 +50,11 @@ export default class SprayLineControlPanel extends React.Component {
     
         const { overlays } = this.props;
         const layerSelected = this.state.filteredSelectedLayers.filter(layer => layer.index == clickedId);
-        if (overlays[1]) {
-            const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+
+        const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
+
+        if (overlayWithLayers) {
+            const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
             const reflayerLeafLeat = leafleatLayers.filter(layer => {
                 return (
                     layer._bounds &&
@@ -83,8 +86,11 @@ export default class SprayLineControlPanel extends React.Component {
         const { overlays } = this.props;
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
-    
-        if (overlays[1] && filteredSelectedLayers.length > 0 && this.state.isProcessing == false) {
+
+        
+        const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
+
+        if (overlayWithLayers && filteredSelectedLayers.length > 0 && this.state.isProcessing == false) {
 
             const inputDirection = this.directionRef.current.value;
             const inputDistance = this.distanceRef.current.value;
@@ -100,7 +106,7 @@ export default class SprayLineControlPanel extends React.Component {
             this.setState({exportingCompleted: false});
             this.setState({error: false});
 
-            const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+            const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
             const fieldIds = [];
     
             leafleatLayers.forEach(leafletLayer => {
@@ -205,10 +211,13 @@ export default class SprayLineControlPanel extends React.Component {
         const { filteredSelectedLayers } = this.state;
 
         this.setState({processingCompleted: false});
-    
-        if (overlays[1] && filteredSelectedLayers.length > 0) {
 
-            const leafleatLayers = Array.from(Object.values(overlays[1]._layers));
+
+        const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
+    
+        if (overlayWithLayers && filteredSelectedLayers.length > 0) {
+
+            const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
             const fieldIds = [];
     
             leafleatLayers.forEach(leafletLayer => {
@@ -419,13 +428,13 @@ export default class SprayLineControlPanel extends React.Component {
                 <div className='btn-container'>
                     <button onClick={this.handleProcess} 
                             className='btn btn-sm btn-primary btn-process'>
-                            {this.state.isProcessing ? <i class="iconSize fas fa-spinner fa-spin"></i> : <i class="iconSize far fa-circle"></i> }
+                            {this.state.isProcessing ? <i className="iconSize fas fa-spinner fa-spin"></i> : <i className="iconSize far fa-circle"></i> }
                         Processar
                     </button>
                     <button disabled={!this.state.enableExport} 
                             className={this.state.enableExport ? 'btn btn-sm btn-primary btn-export' : 'btn btn-sm btn-primary btn-export export-disable'}  
                             data-toggle="dropdown">
-                        <i class="iconSize far fa-arrow-alt-circle-down"></i>
+                        <i className="iconSize far fa-arrow-alt-circle-down"></i>
                         Exportar
                     </button>
                         <ul className="dropdown-menu  pull-right">
