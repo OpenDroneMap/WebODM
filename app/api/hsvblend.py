@@ -1,6 +1,6 @@
 import numpy as np
 
-# Originally based on work by Frank and Evan
+# Originally based on work by Frank and Even
 # Modified by Piero Toffanin for speed and lower memory usage
 # The code here is re-licensed under AGPLv3, but is based on MIT
 
