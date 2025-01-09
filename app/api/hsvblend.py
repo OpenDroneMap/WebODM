@@ -80,6 +80,7 @@ def hsv_to_rgb( h, s, v ):
 
 def hsv_blend(rgb, intensity):
     h, s = rgb_to_hs(rgb[0], rgb[1], rgb[2])
+
     #replace v with hillshade
     #convert back to RGB
     return hsv_to_rgb(h, s, intensity)

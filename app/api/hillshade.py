@@ -79,15 +79,15 @@ class LightSource:
 
         # compute the normal vectors from the partial derivatives
         e_dy, e_dx = np.gradient(vert_exag * elevation, dy, dx)
-
-        # .view is to keep subclasses
-        normal = np.empty(elevation.shape + (3,)).view(type(elevation))
+        
+        normal = np.empty(elevation.shape + (3,), dtype=np.float32)
         normal[..., 0] = -e_dx
         normal[..., 1] = -e_dy
         normal[..., 2] = 1
-        normal /= _vector_magnitude(normal)
+        np.divide(normal, _vector_magnitude(normal), out=normal)
 
-        return self.shade_normals(normal, fraction).astype(np.float32)
+        return self.shade_normals(normal, fraction)
+
 
     def shade_normals(self, normals, fraction=1.):
         """
@@ -112,7 +112,7 @@ class LightSource:
             completely in shadow and 1 is completely illuminated.
         """
 
-        intensity = normals.dot(self.direction)
+        intensity = normals.dot(self.direction.astype(np.float32))
 
         # Apply contrast stretch
         imin, imax = intensity.min(), intensity.max()
