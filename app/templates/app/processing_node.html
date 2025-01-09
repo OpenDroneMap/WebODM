@@ -41,7 +41,7 @@
 	</tr>
 	<tr>
 		<td>Última atualização</td>
-		<td>{{ processing_node.last_refreshed|timesince }} {% trans 'Atrás' context '5 minutos atrás' %} ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
+		<td>{{ processing_node.last_refreshed|timesince }} Atrás' context '5 minutos atrás ({{ processing_node.last_refreshed|localtime }})</td> <!-- TODO: timezone? -->
 	</tr>
 	<tr>
 		<td>Opções (JSON)</td>
@@ -50,8 +50,8 @@
 </table>
 {% if user.is_superuser %} 
 <div class="text-center">
-	<button class="btn btn-default" onclick="location.href='{% url "admin:nodeodm_processingnode_change" processing_node.id %}';"><i class="glyphicon glyphicon-pencil"></i> {% trans "Edit" %}</button>
-	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><i class="glyphicon glyphicon-trash"></i> {% trans "Delete" %}</button>
+	<button class="btn btn-default" onclick="location.href='{% url "admin:nodeodm_processingnode_change" processing_node.id %}';"><i class="glyphicon glyphicon-pencil"></i> Editar</button>
+	<button class="btn btn-danger" onclick="location.href='{% url "admin:nodeodm_processingnode_delete" processing_node.id  %}';"><i class="glyphicon glyphicon-trash"></i> Deletar</button>
 </div>
 {% endif %}
 

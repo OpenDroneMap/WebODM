@@ -2,8 +2,8 @@
 {% load i18n %}
 
 {% block content %}
-<h2>{% trans 'Tasks Notification' %}</h2>
-<p>Get notified when a task has finished processing, has been removed or has failed</p>
+<h2>Notificação de tarefas</h2>
+<p>Ser notificado quando uma tarefa tiver concluído o processamento, tiver sido removida ou tiver falhado</p>
 <hr>
 <form action="/plugins/tasknotification/" method="post" class="mt-5">
   {% csrf_token %}

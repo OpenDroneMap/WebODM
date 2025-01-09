@@ -731,7 +731,7 @@ class ProjectListItem extends React.Component {
                           this.handleUpload();
                           }}>
                           <i className="content-upload-glyphicon" aria-hidden="true"></i>
-                          Subir arquivos
+                          Selecionar pastas
                         <input 
                           type="file" 
                           id="folderpicker" 
