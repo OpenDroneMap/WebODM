@@ -608,6 +608,13 @@ class Map extends React.Component {
     this.map.on('draw:editstop', () => {
       this.state.isDrawing = false;
     });
+    this.map.on('draw:deletestart', () => {
+      this.state.isDrawing = true;
+    });
+    this.map.on('draw:deletestop', () => {
+      this.state.isDrawing = false;
+    });
+    
 
     this.setState({showLoading: true});
     this.loadImageryLayers(true).then(() => {
