@@ -87,7 +87,7 @@ class LightSource:
         normal[..., 2] = 1
         normal /= _vector_magnitude(normal)
 
-        return self.shade_normals(normal, fraction)
+        return self.shade_normals(normal, fraction).astype(np.float32)
 
     def shade_normals(self, normals, fraction=1.):
         """
