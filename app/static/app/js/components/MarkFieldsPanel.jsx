@@ -29,7 +29,7 @@ export default class LayersControlPanel extends React.Component {
           isDrawing: false,
           showPanel: false,
           isObstacle: false,
-          polygonStyle: [{color: '#3388ff', fillColor: '#3388ff', fillOpacity: 0.2, },{ color: 'red', fillColor: 'red', fillOpacity: 0.2 }]
+          polygonStyle: [{color: '#3388ff', fillColor: '#3388ff', fillOpacity: 0.2, },{ color: 'red', fillColor: 'red', fillOpacity: 0.2, weight: 3, opacity: 1 }]
         };
     }
 
@@ -66,6 +66,7 @@ export default class LayersControlPanel extends React.Component {
           layer.feature.properties.field_id = this.polygonIdCounter++; // Assign unique field_id
           layer.feature.properties.obstacle = type;
 
+          console.log("quando marca");
           console.log(layer.options);
 
           const style = type === false 
@@ -76,7 +77,6 @@ export default class LayersControlPanel extends React.Component {
           layer.setStyle(style);
         }
         this.drawnItems.addLayer(layer);
-        console.log(this.drawnItems.toGeoJSON());
       });
       
 
@@ -100,7 +100,8 @@ export default class LayersControlPanel extends React.Component {
                             layer.options.color = "red";
                             layer.options.fillColor = "red";
                         }
-                        
+                        console.log("veio do fetch");
+                        console.log(layer.options);
                         this.drawnItems.addLayer(layer);
                     }
                 });
