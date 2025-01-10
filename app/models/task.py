@@ -969,6 +969,7 @@ class Task(models.Model):
 
         if is_backup:
             self.read_backup_file()
+            self.import_url = ""
         else:
             self.console += gettext("Done!") + "\n"
         

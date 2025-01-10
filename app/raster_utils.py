@@ -243,6 +243,7 @@ def export_raster(input, output, **opts):
                 # Apply colormap?
                 if rgb and cmap is not None:
                     rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
+                    arr = None
 
                     if intensity is not None:
                         rgb_data = hsv_blend(rgb_data, intensity)
