@@ -87,6 +87,14 @@ class Map extends React.Component {
     $('#layerOpacity', popup.getContent()).val(layer.options.opacity);
   }
 
+  tdPopupButtonUrl = (task) => {
+    if (this.props.public){
+      return `/public/task/${task.id}/3d/`;
+    }else{
+      return `/3d/project/${task.project}/task/${task.id}/`;
+    }
+  }
+
   typeToHuman = (type) => {
       switch(type){
           case "orthophoto":
@@ -281,7 +289,7 @@ class Map extends React.Component {
                                 </ul>
 
                                 <button
-                                    onclick="location.href='/3d/project/${meta.task.project}/task/${meta.task.id}/';"
+                                    onclick="location.href='${this.tdPopupButtonUrl(meta.task)}';"
                                     type="button"
                                     class="switchModeButton btn btn-sm btn-secondary">
                                     <i class="fa fa-cube"></i> 3D
