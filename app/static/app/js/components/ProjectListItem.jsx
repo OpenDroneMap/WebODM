@@ -155,6 +155,35 @@ class ProjectListItem extends React.Component {
 
       this.dz.on("addedfiles", files => {
           let totalBytes = 0;
+
+          // Append a suffix to duplicate filenames
+          if (this.state.upload.files.length > 0){
+            const fileMap = {};
+            for (let i = 0; i < this.state.upload.files.length; i++){
+              const f = this.state.upload.files[i];
+              const filename = f.upload.filename;
+              if (!fileMap[filename]) fileMap[filename] = 1;
+              else fileMap[filename]++;
+            }
+            
+            for (let i = 0; i < files.length; i++){
+              const f = files[i];
+              const filename = f.upload.filename;
+
+              if (fileMap[filename] > 0){
+                const idx = filename.lastIndexOf(".");
+                if (idx !== -1){
+                  const name = filename.substring(0, idx);
+                  const ext = filename.substring(idx);
+                  f.upload.filename = `${name}_${fileMap[filename]}${ext}`;
+                  fileMap[filename]++;
+                }else{
+                  console.warn(`Duplicate ${filename} filename`);
+                }
+              }
+            }
+          }
+
           for (let i = 0; i < files.length; i++){
               totalBytes += files[i].size;
               files[i].deltaBytesSent = 0;
@@ -231,7 +260,7 @@ class ProjectListItem extends React.Component {
                 }else{
                     // Check response
                     let response = JSON.parse(file.xhr.response);
-                    if (response.success && response.uploaded && response.uploaded[file.name] === file.size){
+                    if (response.success && response.uploaded && response.uploaded[file.upload.filename] === file.size){
                         // Update progress by removing the tracked progress and 
                         // use the file size as the true number of bytes
                         let totalBytesSent = this.state.upload.totalBytesSent + file.size;
