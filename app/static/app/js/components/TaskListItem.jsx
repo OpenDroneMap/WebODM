@@ -433,7 +433,7 @@ class TaskListItem extends React.Component {
     let status = statusCodes.description(task.status);
     if (status === "") status = _("Sending images to processing node");
 
-    if (!task.processing_node && !imported) status = _("Waiting for a node...");
+    if (!task.processing_node && !imported && task.status !== statusCodes.COMPLETED) status = _("Waiting for a node...");
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
     const disabled = this.state.actionButtonsDisabled || 
@@ -675,7 +675,7 @@ class TaskListItem extends React.Component {
 
     if (task.last_error){
       statusLabel = getStatusLabel(task.last_error, 'error');
-    }else if (!task.processing_node && !imported && this.props.hasPermission("change")){
+    }else if (!task.processing_node && !imported && this.props.hasPermission("change") && task.status !== statusCodes.COMPLETED){
       statusLabel = getStatusLabel(_("Set a processing node"));
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;
