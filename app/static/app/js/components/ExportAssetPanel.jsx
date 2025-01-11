@@ -118,6 +118,8 @@ export default class ExportAssetPanel extends React.Component {
     if (!format) format = this.state.format;
 
     return (cb) => {
+        if (typeof cb !== 'function') cb = undefined;
+        
         const { task } = this.props;
         this.setState({exporting: true, error: ""});
         const data = this.getExportParams(format);
