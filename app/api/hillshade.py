@@ -109,19 +109,19 @@ class LightSource:
         intensity = normals.dot(self.direction.astype(np.float32))
 
         # Apply contrast stretch
-        imin, imax = intensity.min(), intensity.max()
+        # imin, imax = np.nanmin(intensity), np.nanmax(intensity)
         intensity *= fraction
 
         # Rescale to 0-1, keeping range before contrast stretch
         # If constant slope, keep relative scaling (i.e. flat should be 0.5,
         # fully occluded 0, etc.)
-        if (imax - imin) > 1e-6:
+        # if (imax - imin) > 1e-6:
             # Strictly speaking, this is incorrect. Negative values should be
             # clipped to 0 because they're fully occluded. However, rescaling
             # in this manner is consistent with the previous implementation and
             # visually appears better than a "hard" clip.
-            intensity -= imin
-            intensity /= (imax - imin)
+            # intensity -= imin
+            # intensity /= (imax - imin)
         intensity = np.clip(intensity, 0, 1)
 
         return intensity
