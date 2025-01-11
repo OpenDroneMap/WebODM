@@ -235,7 +235,7 @@ def export_raster(input, output, **opts):
                 if hillshade is not None and hillshade > 0:
                     delta_scale = ZOOM_EXTRA_LEVELS ** 2
                     dx = src.meta["transform"][0] * delta_scale
-                    dy = -src.meta["transform"][4] * delta_scale
+                    dy = src.meta["transform"][4] * delta_scale
                     ls = LightSource(azdeg=315, altdeg=45)
                     intensity = ls.hillshade(arr[0], dx=dx, dy=dy, vert_exag=hillshade)
                     intensity = intensity * 255.0

@@ -71,12 +71,6 @@ class LightSource:
             A 2d array of illumination values between 0-1, where 0 is
             completely in shadow and 1 is completely illuminated.
         """
-
-        # Because most image and raster GIS data has the first row in the array
-        # as the "top" of the image, dy is implicitly negative.  This is
-        # consistent to what `imshow` assumes, as well.
-        dy = -dy
-
         # compute the normal vectors from the partial derivatives
         e_dy, e_dx = np.gradient(vert_exag * elevation, dy, dx)
         

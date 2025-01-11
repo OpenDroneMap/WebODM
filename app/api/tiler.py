@@ -465,7 +465,7 @@ class Tiles(TaskNestedView):
                         _("Cannot compute hillshade of non-elevation raster (multiple bands found)"))
                 delta_scale = (maxzoom + ZOOM_EXTRA_LEVELS + 1 - z) ** 2
                 dx = src.dataset.meta["transform"][0] * delta_scale
-                dy = -src.dataset.meta["transform"][4] * delta_scale
+                dy = src.dataset.meta["transform"][4] * delta_scale
                 ls = LightSource(azdeg=315, altdeg=45)
                 
                 # Remove elevation data from edge buffer tiles
