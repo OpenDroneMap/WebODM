@@ -1,14 +1,14 @@
 {% extends "app/logged_in_base.html" %}
-{% load i18n %}
 
 {% block content %}
-	{% load render_bundle from webpack_loader %}
-	{% render_bundle 'MapView' attrs='async' %}
-
-	<div data-mapview 
+	<div data-mapview
 		{% for key, value in params %}
 			data-{{key}}="{{value}}"
 		{% endfor %}
-	></div>
+	>
+		{% include "map_placeholder.html" %}
+	</div>
 
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'MapView' attrs='async' %}
 {% endblock %}

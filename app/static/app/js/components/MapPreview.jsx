@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'ReactDOM';
 import '../css/MapPreview.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';

@@ -140,7 +140,7 @@ class TaskList extends React.Component {
   render() {
     let message = "";
     if (this.state.loading){
-      message = (<span>{_("Loading...")} <i className="fa fa-sync fa-spin fa-fw"></i></span>);
+      message = (<span>{_("Loading...")} <i className="fa fa-circle-notch fa-spin fa-fw"></i></span>);
     }else if (this.state.error){
       message = (<span>{interpolate(_("Error: %(error)s"), {error: this.state.error})} <a href="javascript:void(0);" onClick={this.retry}>{_("Try again")}</a></span>);
     }else if (this.state.tasks.length === 0){

@@ -51,7 +51,7 @@
 {% endblock %}
 {% block navbar-sidebar %}
     <div class="navbar-default sidebar" role="navigation">
-        <div class="sidebar-nav navbar-collapse">
+        <div class="sidebar-nav navbar-collapse collapse">
             <ul class="nav" id="side-menu">
                 <li>
                     <a href="/dashboard/"><i class="fa fa-tachometer-alt fa-fw"></i> {% trans 'Dashboard' %}</a>
@@ -139,6 +139,8 @@
                 </li>
             </ul>
         </div>
+        <script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
+        <script>$('#side-menu').metisMenu();</script>
         <!-- /.sidebar-collapse -->
     </div>
     <!-- /.navbar-static-side -->
