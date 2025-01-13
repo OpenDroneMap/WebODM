@@ -12,7 +12,7 @@ from webodm import settings
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    quota = models.FloatField(default=-1, blank=True, help_text=_("Maximum disk quota in megabytes"), verbose_name=_("Quota"))
+    quota = models.FloatField(default=-1, blank=True, help_text=_("Cota máxima de disco em megabytes"), verbose_name=_("Quota"))
 
     def has_quota(self):
         return self.quota != -1

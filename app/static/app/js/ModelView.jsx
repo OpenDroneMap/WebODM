@@ -34,7 +34,7 @@ class SetCameraView extends React.Component{
     handleClick = () => {
         const { view } = Potree.saveProject(this.props.viewer);
         const showError = () => {
-            this.setState({error: _("Cannot set initial camera view")});
+            this.setState({error: _("Não é possível definir a visualização inicial da câmera")});
             setTimeout(() => this.setState({error: ""}), 3000);
         };
         const showOk = () => {
@@ -59,7 +59,7 @@ class SetCameraView extends React.Component{
     render(){
         return ([<input key="btn" type="button" onClick={this.handleClick} 
                     style={{marginBottom: 12, display: 'inline-block'}} name="set_camera_view" 
-                    value={_("set initial camera view")} />,
+                    value={_("definir a visualização inicial da câmera")} />,
                 this.state.showOk ? (<div key="ok" style={{color: 'lightgreen', display: 'inline-block', marginLeft: 12}}>✓</div>) : "",
                 this.state.error ? (<div key="error" style={{color: 'red'}}>{this.state.error}</div>) : ""
                 ]
@@ -93,7 +93,7 @@ class TexturedModelMenu extends React.Component{
                             type="checkbox" 
                             checked={this.state.showTexturedModel}
                             onChange={this.handleClick}
-                        /> {_("Show Model")}</label>);
+                        /> {_("Mostrar modelo")}</label>);
     }
 }
 
@@ -120,7 +120,7 @@ class CamerasMenu extends React.Component{
                             type="checkbox" 
                             checked={this.state.showCameras}
                             onChange={this.handleClick}
-                        /> {_("Show Cameras")}</label>);
+                        /> {_("Mostrar Cameras")}</label>);
     }
 }
 
@@ -728,7 +728,7 @@ class ModelView extends React.Component {
         </div> : ""}
 
           <Standby 
-            message={_("Loading textured model...")}
+            message={_("Carregando modelo texturizado...")}
             show={this.state.initializingModel}
             />
       </div>);

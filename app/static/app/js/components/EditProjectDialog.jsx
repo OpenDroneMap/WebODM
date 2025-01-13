@@ -122,13 +122,13 @@ class EditProjectDialog extends React.Component {
                     this.props.onDuplicated(json.project);
                 }else{
                     this.setState({
-                        error: json.error || _("Cannot complete operation.")
+                        error: json.error || _("Não é possível concluir a operação.")
                     });
                 }
             })
             .fail(() => {
                 this.setState({
-                    error: _("Cannot complete operation."),
+                    error: _("Não é possível concluir a operação."),
                 });
             })
             .always(() => {

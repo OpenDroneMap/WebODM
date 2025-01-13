@@ -12,7 +12,7 @@ export function addTempLayer(file, cb) {
 
   if (file && file.size > maxSize) {
     let err = {};
-    err.message = interpolate(_("%(file)s is bigger than 5 MB."), { file: file.name });
+    err.message = interpolate(_("%(file)s é maior que 5 MB."), { file: file.name });
     cb(err);
   } else {
     //get just the first file
@@ -28,7 +28,7 @@ export function addTempLayer(file, cb) {
           shp(reader.result).then(function (geojson) {
             addLayer(geojson);
           }).catch(function (err) {
-            err.message = interpolate(_("Not a proper zipped shapefile: %(file)s"), { file: file.name });
+            err.message = interpolate(_("Não é um shapefile compactado adequado: %(file)s"), { file: file.name });
             cb(err);
           })
         }
@@ -41,7 +41,7 @@ export function addTempLayer(file, cb) {
           let geojson = JSON.parse(reader.result);
           addLayer(geojson);
         } catch (err) {
-          err.message = interpolate(_("Not a proper JSON file: %(file)s"), { file: file.name });
+          err.message = interpolate(_("Não é um arquivo JSON adequado: %(file)s"), { file: file.name });
           cb(err);
         }
       }
@@ -91,7 +91,7 @@ export function addTempLayerUsingRequest(api, apiType, aiTypes, stateSelectedLay
     fetch(api).then((value) => {
       if (value.status == 404) {
         let err = {};
-        err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
+        err.message = interpolate(_("Detecção em %(url)s não encontrada!"), { url: api });
         cb(err);
         return;
       }
@@ -112,7 +112,7 @@ export function addTempLayerUsingRequest(api, apiType, aiTypes, stateSelectedLay
         addLayer(geojson);
       }).catch((err) => {
         console.error(err)
-        err.message = interpolate(_("Not a proper JSON file at: %(url)s!"), { url: api });
+        err.message = interpolate(_("Não é um arquivo JSON adequado em: %(url)s!"), { url: api });
         cb(err);
       });
     });

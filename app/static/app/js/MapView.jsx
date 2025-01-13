@@ -139,27 +139,27 @@ class MapView extends React.Component {
   render() {
     let mapTypeButtons = [
       {
-        label: _("Orthophoto"),
+        label: _("Ortofoto"),
         type: "orthophoto",
         icon: "far fa-image"
       },
       {
-        label: _("Plant Health"),
+        label: _("Saúde Vegetal"),
         type: "plant",
         icon: "fa fa-seedling"
       },
       {
-        label: _("Surface Model"),
+        label: _("Modelo de superfície"),
         type: "dsm",
         icon: "fa fa-chart-area"
       },
       {
-        label: _("Terrain Model"),
+        label: _("Modelo de terreno"),
         type: "dtm",
         icon: "fa fa-chart-area"
       },
       {
-        label: _("Polynomial Health"),
+        label: _("Saúde Polinomial"),
         type: "polyhealth",
         icon: "fa fa-image"
       }
@@ -242,7 +242,7 @@ class MapView extends React.Component {
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                IA Types
+                Talhões Processados
                 <span class="glyphicon glyphicon-chevron-down"></span>
               </button>
               

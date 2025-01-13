@@ -20,12 +20,12 @@ logger = logging.getLogger('app.logger')
 
 
 class Project(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, help_text=_("The person who created the project"), verbose_name=_("Owner"))
-    name = models.CharField(max_length=255, help_text=_("A label used to describe the project"), verbose_name=_("Name"))
-    description = models.TextField(default="", blank=True, help_text=_("More in-depth description of the project"), verbose_name=_("Description"))
-    created_at = models.DateTimeField(default=timezone.now, help_text=_("Creation date"), verbose_name=_("Created at"))
-    deleting = models.BooleanField(db_index=True, default=False, help_text=_("Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted."), verbose_name=_("Deleting"))
-    tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Project tags"), verbose_name=_("Tags"))
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, help_text=_("A pessoa que criou o projeto"), verbose_name=_("Owner"))
+    name = models.CharField(max_length=255, help_text=_("Um rótulo usado para descrever o projeto"), verbose_name=_("Name"))
+    description = models.TextField(default="", blank=True, help_text=_("Descrição mais detalhada do projeto"), verbose_name=_("Description"))
+    created_at = models.DateTimeField(default=timezone.now, help_text=_("Data de criação"), verbose_name=_("Created at"))
+    deleting = models.BooleanField(db_index=True, default=False, help_text=_("Se este projeto foi marcado para exclusão. Os projetos que possuem tarefas em execução precisam aguardar que as tarefas sejam devidamente limpas antes de serem excluídas."), verbose_name=_("Deleting"))
+    tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Tags do projeto"), verbose_name=_("Tags"))
     
     def delete(self, *args):
         # No tasks?

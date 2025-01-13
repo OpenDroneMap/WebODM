@@ -158,10 +158,10 @@ class PluginAdmin(admin.ModelAdmin):
         try:
             p = enable_plugin(plugin_name)
             if p.requires_restart():
-                messages.warning(request, _("Restart required. Please restart WebODM to enable %(plugin)s") % {
+                messages.warning(request, _("Reinicie necessário. Reinicie o WebODM para ativar %(plugin)s") % {
                     'plugin': plugin_name})
         except Exception as e:
-            messages.warning(request, _("Cannot enable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
+            messages.warning(request, _("Não é possível ativar o plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
                                                                                            'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
@@ -170,10 +170,10 @@ class PluginAdmin(admin.ModelAdmin):
         try:
             p = disable_plugin(plugin_name)
             if p.requires_restart():
-                messages.warning(request, _("Restart required. Please restart WebODM to fully disable %(plugin)s") % {
+                messages.warning(request, _("Reinicie necessário. Por favor, reinicie o WebODM para desativar totalmente %(plugin)s") % {
                     'plugin': plugin_name})
         except Exception as e:
-            messages.warning(request, _("Cannot disable plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
+            messages.warning(request, _("Não é possível desabilitar o plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
                                                                                             'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
@@ -182,7 +182,7 @@ class PluginAdmin(admin.ModelAdmin):
         try:
             delete_plugin(plugin_name)
         except Exception as e:
-            messages.warning(request, _("Cannot delete plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
+            messages.warning(request, _("Não é possível excluir o plugin %(plugin)s: %(message)s") % {'plugin': plugin_name,
                                                                                             'message': str(e)})
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
@@ -230,15 +230,15 @@ class PluginAdmin(admin.ModelAdmin):
                 clear_plugins_cache()
                 init_plugins()
 
-                messages.info(request, _("Plugin added successfully"))
+                messages.info(request, _("Plugin adicionado com sucesso"))
             except Exception as e:
-                messages.warning(request, _("Cannot load plugin: %(message)s") % {'message': str(e)})
+                messages.warning(request, _("Não é possível carregar o plugin: %(message)s") % {'message': str(e)})
                 if os.path.exists(tmp_zip_path):
                     os.remove(tmp_zip_path)
                 if os.path.exists(tmp_extract_path):
                     shutil.rmtree(tmp_extract_path)
         else:
-            messages.error(request, _("You need to upload a zip file"))
+            messages.error(request, _("Você precisa fazer upload de um arquivo zip"))
 
         return HttpResponseRedirect(reverse('admin:app_plugin_changelist'))
 
