@@ -147,17 +147,17 @@ class NewTaskPanel extends React.Component {
                 </button>
               </div>
               : ""}
-
-            <EditTaskForm
-              selectedNode={Storage.getItem("last_processing_node") || "auto"}
-              onFormLoaded={this.handleFormTaskLoaded}
-              onFormChanged={this.handleFormChanged}
-              inReview={this.state.inReview}
-              currentStep={this.state.currentStep}
-              suggestedTaskName={this.props.suggestedTaskName}
-              ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
-            />
-
+            <div className='fixEditar'>
+              <EditTaskForm
+                selectedNode={Storage.getItem("last_processing_node") || "auto"}
+                onFormLoaded={this.handleFormTaskLoaded}
+                onFormChanged={this.handleFormChanged}
+                inReview={this.state.inReview}
+                currentStep={this.state.currentStep}
+                suggestedTaskName={this.props.suggestedTaskName}
+                ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
+              />
+            </div>
             {this.state.editTaskFormLoaded && this.props.showResize && this.state.currentStep !== "aiStep" ?
               <div>
                 <div className="form-group col-sm-10">
