@@ -95,6 +95,16 @@ class Map extends React.Component {
   }
 
   setSelectedLayers(idx, el) {
+    //Verifica se todos os nomes ja foram utilizados e, caso todos tenham sido utilizados, reutiliza os nomes anteriores com um valor do lado
+    let counter = "";
+    const value = Math.floor(idx/names.length);
+    let nameIdx = idx;
+    if(value >= 1){
+      counter = " " + (value + 1);
+      nameIdx = nameIdx - (names.length*value);
+    }
+    el.name = names[nameIdx] + counter; 
+
     if (idx >= this.state.selectedLayers.length) {
       this.setState(update(this.state, 
         {selectedLayers: {$push: [el]}}
@@ -835,5 +845,27 @@ class Map extends React.Component {
     );
   }
 }
+
+const names = [
+  "Ana", "Beatriz", "Carlos", "Daniela", "Eduardo",
+  "Fernanda", "Gabriel", "Helena", "Igor", "Juliana",
+  "Kleber", "Luana", "Marcos", "Natalia", "Otávio",
+  "Priscila", "Roberto", "Samantha", "Thiago", "Vanessa",
+  "Wesley", "Yasmin", "Zé", "Amanda", "Bruno",
+  "Camila", "Diego", "Eliane", "Flávio", "Gustavo",
+  "Heloísa", "Isabela", "João", "Karine", "Leonardo",
+  "Maria", "Nicolas", "Olga", "Pedro", "Queila",
+  "Raul", "Sabrina", "Tiago", "Vânia", "William",
+  "Zilda", "André", "Barbara", "Célia", "David",
+  "Emanuelle", "Felipe", "Giovana", "Henrique", "Irene",
+  "Júlio", "Larissa", "Marcelo", "Nayara", "Olavo",
+  "Paula", "Ricardo", "Silvia", "Tânia", "Vinícius",
+  "Wagner", "Yara", "Zeca", "Adriana", "Bernardo",
+  "Cristiane", "Douglas", "Elena", "Flávia", "Gisele",
+  "Hugo", "Jéssica", "Lucas", "Márcia", "Nando",
+  "Patrícia", "Rafael", "Silvia", "Tatiane", "Valter",
+  "Wellington", "Zuleica", "Aline", "Bruna", "César",
+  "Daniel", "Evelyn", "Fábio", "Gisele", "Helena"
+];
 
 export default Map;
