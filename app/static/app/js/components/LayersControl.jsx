@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'ReactDOM';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
 import '../css/LayersControl.scss';
