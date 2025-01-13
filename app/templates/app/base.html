@@ -119,14 +119,12 @@
     {% endautoescape %}
 {% endblock %}
 </body>
-<script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
+
 <script>
 {% task_options_docs_link as to_link %}
 window.__taskOptionsDocsLink = "{{ to_link|safe }}";
 
 $(function(){
-    $('#side-menu').metisMenu();
-
     $(window).bind("load resize", function() {
         {% if desktop_mode %}
         var topOffset = 0;
