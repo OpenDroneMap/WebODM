@@ -111,6 +111,14 @@ class Map extends React.Component {
     return this.state.selectedLayers;
   }
 
+  setPolygonColor(polygon){
+    polygon.eachLayer((layer)=>{
+      if(layer.feature.properties.obstacle === true){
+        layer.setStyle({color: 'red', fillOpacity: 0.5});
+      }
+    });
+  }
+
   loadGeoJsonDetections(types_to_be_loaded) {
     const { tiles } = this.props;
     const task_id = tiles[0].meta.task.id;
@@ -122,6 +130,7 @@ class Map extends React.Component {
       addTempLayerUsingRequest(base_url + typ, typ, this.props.aiTypes, [this.getSelectedLayers, this.setSelectedLayers], (error, tempLayer, api_url) => {
         if (!error) {
           this.setOpacityForLayer(tempLayer, 1);
+          this.setPolygonColor(tempLayer);
           tempLayer.addTo(this.map);
           tempLayer[Symbol.for("meta")] = {  name: typ  };
           this.setState(update(this.state, {

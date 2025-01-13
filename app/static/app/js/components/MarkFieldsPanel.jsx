@@ -66,9 +66,6 @@ export default class LayersControlPanel extends React.Component {
           layer.feature.properties.field_id = this.polygonIdCounter++; // Assign unique field_id
           layer.feature.properties.obstacle = type;
 
-          console.log("quando marca");
-          console.log(layer.options);
-
           const style = type === false 
         ? this.state.polygonStyle[0]
         : this.state.polygonStyle[1]
@@ -100,8 +97,6 @@ export default class LayersControlPanel extends React.Component {
                             layer.options.color = "red";
                             layer.options.fillColor = "red";
                         }
-                        console.log("veio do fetch");
-                        console.log(layer.options);
                         this.drawnItems.addLayer(layer);
                     }
                 });
