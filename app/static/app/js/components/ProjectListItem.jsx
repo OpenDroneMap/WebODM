@@ -2,6 +2,7 @@ import '../css/ProjectListItem.scss';
 import React from 'react';
 import update from 'immutability-helper';
 import TaskList from './TaskList';
+import statusCodes from '../classes/StatusCodes';
 import NewTaskPanel from './NewTaskPanel';
 import ImportTaskPanel from './ImportTaskPanel';
 import UploadProgressBar from './UploadProgressBar';
@@ -53,7 +54,8 @@ class ProjectListItem extends React.Component {
       sortKey: "-created_at",
       filterTags: [],
       selectedTags: [],
-      filterText: ""
+      filterText: "",
+      showMap: false,
     };
 
     this.sortItems = [{
@@ -66,7 +68,7 @@ class ProjectListItem extends React.Component {
         key: "tags",
         label: _("Tags")
       }];
-
+  
     this.toggleTaskList = this.toggleTaskList.bind(this);
     this.closeUploadError = this.closeUploadError.bind(this);
     this.cancelUpload = this.cancelUpload.bind(this);
@@ -96,17 +98,140 @@ class ProjectListItem extends React.Component {
         .always(() => {
           this.setState({refreshing: false});
         });
+    
+    // Lida com a exibição do mapa sempre que há uma atualização nas tasks
+    this.handleShowMapProject();
   }
 
   componentWillUnmount(){
     if (this.deleteProjectRequest) this.deleteProjectRequest.abort();
     if (this.refreshRequest) this.refreshRequest.abort();
+    if (this.taskInterval) clearInterval(this.taskInterval);
   }
 
   componentDidUpdate(prevProps, prevState){
     if (prevState.filterText !== this.state.filterText ||
         prevState.selectedTags.length !== this.state.selectedTags.length){
       if (this.taskList) this.taskList.applyFilter(this.state.filterText, this.state.selectedTags);
+    }
+  }
+
+
+  /**
+ * Obtém a lista de tarefas de um projeto específico a partir da API.
+ * 
+ * Esta função realiza uma requisição para o endpoint da API, utilizando o ID do projeto
+ * e o critério de ordenação fornecido. 
+ * 
+ * @returns {Promise<Array>} Uma promessa que resolve para um array de objetos de tarefas.
+ *                           Retorna um array vazio se houver algum erro durante a requisição.
+ */
+  async getTasksForAPI() {
+
+    try {
+        // Faz uma requisição GET para a API para obter a lista de tarefas.
+        const response = await $.getJSON(`/api/projects/${this.state.data.id}/tasks/?ordering=${this.state.sortKey}`);
+        
+        // Retorna os dados das tarefas obtidas.
+        return response; 
+    } catch (error) {
+        // Loga o erro no console em caso de falha na requisição.
+        console.error("Erro ao carregar tasks:", error);
+        
+        // Retorna um array vazio para garantir que o chamador não quebre.
+        return []; 
+    }
+  }
+
+
+/**
+ * Verifica se existe alguma tarefa com os status especificados.
+ * 
+ * @param {Array<string>} statusList - Lista de status a serem verificados.
+ * @returns {Promise<boolean>} Uma promessa que resolve para `true` se alguma tarefa possui o status desejado.
+ */
+  async checkTaskStatus(statusList) {
+    try {
+      // Obtém a lista de tarefas da API
+      const tasks = await this.getTasksForAPI();
+
+      // Verifica se alguma tarefa possui um status presente na lista statusList
+      return tasks.some(task => statusList.includes(task.status));
+
+    } catch (error) {
+      // Em caso de erro, loga o erro no console e retorna false
+      console.error("Erro ao verificar status das tarefas:", error);
+      return false;
+    }
+  }
+
+
+  /**
+ * Inicia um monitoramento periódico do status das tarefas.
+ * 
+ * Esta função verifica a cada 1 segundo se há tarefas em execução ou com status nulo (Estado nulo sinaliza task recem adicionada).
+ * Quando não há mais tarefas em execução, o monitoramento é interrompido e o estado
+ * do componente é atualizado para exibir o mapa.
+  */
+  monitorTaskStatus() {
+
+    // Verifica se já existe um intervalo ativo e o limpa para evitar duplicação.
+    if (this.taskInterval) clearInterval(this.taskInterval);
+
+    // Configura um intervalo para monitorar o status das tarefas.
+    this.taskInterval = setInterval(async () => {
+      try {
+        // Verifica se há alguma tarefa com status RUNNING ou null.
+        const isTaskRunning = await this.checkTaskStatus([statusCodes.RUNNING, null]);
+
+        // Se nenhuma tarefa estiver em execução, interrompe o monitoramento
+        if (!isTaskRunning) {
+          clearInterval(this.taskInterval);
+          this.handleShowMapProject();
+        }
+      } catch (error) {
+          // Loga o erro caso ocorra um problema na verificação de status e garante que o intervalo seja interrompido em caso de erro.
+        console.error("Erro durante o monitoramento de tarefas:", error);
+        clearInterval(this.taskInterval);
+      }
+    }, 1000); 
+  }
+
+  /**
+ * Controla a exibição do mapa com base no status das tarefas.
+ * 
+ * Esta função verifica o status das tarefas relacionadas ao projeto e decide
+ * se o mapa deve ser exibido ou ocultado. Caso existam tarefas em execução, 
+ * inicia um monitoramento periódico para acompanhar mudanças de status.
+ */
+  async handleShowMapProject() {
+    try {
+      // Verifica se há tarefas COMPLETED.
+      const hasCompletedTask = await this.checkTaskStatus([statusCodes.COMPLETED]);
+
+      if (hasCompletedTask) {
+        // Exibe o mapa caso uma tarefa tenha sido concluída
+        this.setState({ showMap: true });
+        return;
+      }
+
+      // Verifica se há tarefas RUNNING ou com status nulo (novas tarefas).
+      const hasRunningTasks = await this.checkTaskStatus([statusCodes.RUNNING, null]);
+      
+      if (hasRunningTasks) {
+        // Oculta o mapa enquanto as tarefas estão sendo processadas.
+        this.setState({ showMap: false });
+
+        // Inicia o monitoramento periódico para acompanhar o status das tarefas.
+        this.monitorTaskStatus(); 
+      } else {
+
+        //Oculta o mapa se nenhuma tarefa está em execução ou concluída.
+        this.setState({ showMap: false }); 
+      }
+    } catch (error) {
+      // Loga qualquer erro que ocorra durante a execução.
+      console.error("Erro em handleShowMapProject:", error);
     }
   }
 
@@ -259,6 +384,9 @@ class ProjectListItem extends React.Component {
 
 
   componentDidMount(){
+
+    this.handleShowMapProject();
+
     Dropzone.autoDiscover = false;
 
     if (this.hasPermission("add")){
@@ -440,7 +568,7 @@ class ProjectListItem extends React.Component {
 
   newTaskAdded = () => {
     this.setState({importing: false});
-    
+
     if (this.state.showTaskList){
       this.taskList.refresh();
     }else{
@@ -879,7 +1007,7 @@ class ProjectListItem extends React.Component {
                 </div>
               </div> : ""}
 
-              {numTasks > 0 ?
+              {numTasks > 0 && this.state.showMap ?
                 <span>
                   <i key="edit-icon" className='fa fa-globe'></i>
                   <a key="edit-text" href="javascript:void(0);" onClick={this.viewMap}>
