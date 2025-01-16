@@ -457,7 +457,7 @@ class TaskListItem extends React.Component {
 
       if (task.status === statusCodes.COMPLETED) {
         if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1) {
-          addActionButton(" " + _("View Mapa"), "Vier_Map", "fa fa-globe", () => {
+          addActionButton(" " + _("Ver Mapa"), "Vier_Map", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         } else {
