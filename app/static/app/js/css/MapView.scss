@@ -79,25 +79,32 @@
 
     .map-header-wrapper {
         display: flex;
-        flex-direction: column-reverse;
-        align-items: center;
+        flex-direction: row-reverse;
+        align-items: flex-start;
         justify-content: space-between;
         width: 100%;
         margin-bottom: $bottom-spacing;
         margin-top: $top-spacing;
 
-        @media (min-width: 1300px) {
-            flex-direction: row-reverse;
+
+        @media (max-width: 767px) {
+            align-items: center !important;
+            margin-top: 5px;
+            flex-direction: column-reverse;
         }
 
         .map-type-selector {
             flex: 1;
             height: 100%;
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             flex-wrap: wrap;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            gap: 5px;
+
+            .btn-map {
+                min-width: 170px;
+                height: 40px;
+            }
 
             @media (min-width: 1300px) {
                 justify-content: flex-end;
@@ -105,7 +112,6 @@
 
             button {
                 font-size: 10px;
-                margin-left: 7px;
                 color: #fff;
                 margin-bottom: 5px;
 
@@ -132,9 +138,6 @@
                 font-size: 10px;
                 background-color: #74b06f;
                 border-radius: 25px;
-                margin-left:7px;
-                
-                
                 &:hover,
                 &:focus,
                 &:active,
@@ -207,22 +210,32 @@
             display: flex;
             flex-grow: 0;
             align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+
+            @media (max-width: 767px) {
+                margin-bottom: 5px !important;
+            }
 
             h3 {
                 font-size: 15px;
                 margin: 0;
+                padding: 0;
                 width: 80%;
 
                 overflow-wrap: break-word;
                 word-wrap: break-word;
                 overflow: hidden;
                 text-overflow: ellipsis;
+
+                @media (max-width: 767px) {
+                    width: 100% !important;
+                }
                 
             }
 
             i.fa-globe {
                 color: #14a5a2;
-                margin-right: 10px;
                 font-size: 20px;
             }
         }
