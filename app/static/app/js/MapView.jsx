@@ -233,8 +233,6 @@ class MapView extends React.Component {
               </button>
             )}
 
-            <button className='btn btn-map rounded-corners default-button'>Saúde Polinomial</button>
-            
             <div className="btn-group btn-map">
               <button
                 type="button"
