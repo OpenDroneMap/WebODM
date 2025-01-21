@@ -89,10 +89,40 @@
 
   .action-buttons{
     margin-top: 12px;
-    
-    
-    
   }
+
+  .action-buttons a {
+    position: relative;
+    left: 27%;
+    transform: translateX(-12.5%);
+  }
+
+  .delete-visualization-btn {
+    display: inline-flex;
+    align-items: center;
+    color: #e57373;
+    font-size: 14px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 5px;
+    border-radius: 5px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  
+    i {
+      margin-right: 8px;
+      font-size: 20px; 
+    }
+  
+    span {
+      color: #e57373;
+    }
+  }
+  
+  
+  
   
   .btn-group {
     display: flex;

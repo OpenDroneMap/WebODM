@@ -310,9 +310,9 @@ export default class ContoursPanel extends React.Component {
         : ""}
 
         <div className="row action-buttons">
-            {previewLayer ? <a title="Delete Preview" href="javascript:void(0);" onClick={this.handleRemovePreview}>
-              <i className="fa fa-trash"></i>
-            </a> : ""}
+            {previewLayer ? <a title="Delete Preview" href="javascript:void(0);" onClick={this.handleRemovePreview} className="delete-visualization-btn">
+              <i className="fa fa-trash"></i> <span>{_("Deletar Visualização")}</span>
+            </a>: ""}
           <div className="col-sm-12 text-right">
            <div className="btn-group">
             <button onClick={this.handleShowPreview}
