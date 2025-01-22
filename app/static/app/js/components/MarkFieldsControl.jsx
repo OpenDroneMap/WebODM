@@ -32,7 +32,6 @@ class MarkFieldslButton extends React.Component {
 
   render(){
     const { showPanel } = this.state;
-    console.log(this.props.task_id);
 
     return (<div className={showPanel ? "open" : ""}>
               <a href="javascript:void(0);" 

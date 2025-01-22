@@ -142,6 +142,10 @@
 
     .form-group {
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1rem;
         
         .select-container {
             display: flex;
@@ -185,6 +189,9 @@
     }
 
     @media (max-width: 600px) {
+        .form-group{
+            display: block;
+        }
         .resize-images-container {
             display: flex;
             justify-content: center;
@@ -220,19 +227,45 @@
         }
     }
     .noPadding{
+        max-width: 120px;
         padding-top: 0px;
+        padding: 0px;
+        margin-top: 0px;
+        text-align: left;
         @media(max-width:800px){
             padding-left: 10px;
             padding-right: 10px;
         }
     }
+    .newPad{
+        padding:0px;
+        max-width: 70px;
+        text-align: left;
+        margin-top: 0;
+    }
+    input,
+    select,
+    textarea {
+        flex: 1; /* Faz com que os inputs ocupem o restante do espaço */
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
     .textMoveRight{
         text-align: right;
+        margin-left: 2%;
         @media(max-width:580px){
             margin-right:5px;
+            text-align: center;
         }
     }
     .buttonHover:hover{
         filter:brightness(0.9);
+    }
+    .fixEditar .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle){
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+        border: none;
+        height: 35.5px;
     }
 }

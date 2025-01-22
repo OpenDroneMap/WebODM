@@ -89,9 +89,7 @@ export default class LayersControlPanel extends React.Component {
             })
         })
         const getReload = localStorage.getItem('reloadMarkField');
-        console.log(getReload);
         if(getReload == "false"){
-            console.log('teste2')
             map.removeLayer(this.drawnItems);
         }else{
             this.props.onOpen();

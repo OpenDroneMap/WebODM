@@ -523,7 +523,9 @@ class TaskListItem extends React.Component {
             // The button expands sub items
             buttonHtml = (<button type="button" className={"btn btn-sm  btn-drop-label " + button.className} data-toggle="dropdown" disabled={disabled}>
               <i className={button.icon}></i>
-              {button.label}
+              {button.label} 
+              
+              <span class="glyphicon glyphicon-chevron-down arrow-dropdown" ></span>
             </button>);
           }
 
@@ -533,11 +535,12 @@ class TaskListItem extends React.Component {
               className}>
               {buttonHtml}
               {subItems.length > 0 &&
-                [<button key="dropdown-button"
-                  disabled={disabled}
-                  type="button"
-                  className={"btn btn-sm dropdown-toggle " + button.className}
-                  data-toggle="dropdown"><span className="caret"></span></button>,
+                [
+                // <button key="dropdown-button"
+                //   disabled={disabled}
+                //   type="button"
+                //   className={"btn btn-sm dropdown-toggle " + button.className}
+                //   data-toggle="dropdown"></button>,
                 <ul key="dropdown-menu" className="dropdown-menu">
                   {subItems.map(subItem => <li key={subItem.label}>
                     <a href="javascript:void(0);" onClick={subItem.onClick}><i className={subItem.icon + ' fa-fw '}></i>{subItem.label}</a>

@@ -242,7 +242,7 @@ class MapView extends React.Component {
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                IA Types
+                Talhões Processados
                 <span class="glyphicon glyphicon-chevron-down"></span>
               </button>
               
