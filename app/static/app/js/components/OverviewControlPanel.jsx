@@ -30,6 +30,10 @@ export default class OverviewControlPanel extends React.Component {
   // Verifica se `selectedLayers` mudou e filtra talhões válidos com base em condições específicas atualizando o state filteredSelectedLayers
   // Chama funções auxiliares para adicionar IDs de cada talhão e agrupa-los por tipo de cultura
   componentDidUpdate(prevProps, prevState) {
+
+    console.log(this.props.selectedLayers);
+
+
     if (prevProps.selectedLayers !== this.props.selectedLayers) {
         const filteredLayers = this.props.selectedLayers
             .map((layer, index) => ({ layer, index }))
@@ -37,10 +41,14 @@ export default class OverviewControlPanel extends React.Component {
                 ({ layer }) =>
                     layer.cropType !== null &&
                     layer.aiOptions &&
-                    layer.aiOptions.size > 0
+                    layer.aiOptions.size > 0 ||
+                    layer.polynomialHealth
+                    
             );
 
         this.setState({ filteredSelectedLayers: filteredLayers });
+
+        console.log("filteredLayers: " + this.state.filteredSelectedLayers);
     }
 
     if (prevState.filteredSelectedLayers !== this.state.filteredSelectedLayers) {
@@ -124,6 +132,48 @@ export default class OverviewControlPanel extends React.Component {
 
     this.setState({ groupedLayers });
   };
+
+
+  heandlePolinomialHealth = async (taskID, projectID) => {
+
+    console.log("heandlePolinomialHealth");
+
+
+    const url = `/api/projects/${projectID}/tasks/${taskID}/process/polinomialHealth`;
+
+    const csrfToken = getCsrfToken(); // Certifique-se de implementar essa função para obter o CSRF Token.
+
+    // Payload no formato especificado
+    const payload = {
+        processing_requests: {
+            fields_to_process: [1], // Ajuste os valores conforme necessário
+            polynomial_degree: 3,
+            points: [] // Pode ser preenchido dinamicamente se necessário
+        }
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken // Inclua o token CSRF, se necessário
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Response Data:", data);
+        alert("Request succeeded!");
+    } catch (error) {
+        console.error("Error occurred:", error);
+        alert(`Request failed: ${error.message}`);
+    }
+};
 
   // Envia os talhões selecionados para um endpoint de processamento
   handleSendData = async () => {
@@ -261,13 +311,18 @@ export default class OverviewControlPanel extends React.Component {
                   onClick={this.handlePopUp}
                 >
                   <li>
-                    Tipo de colheita: {translate(layer.cropType, "cropType")}
+                    {/* Tipo de colheita: {translate(layer.cropType, "cropType")} */}
+                    {layer.cropType ? "Colheita: " + translate(layer.cropType, "cropType") : " "}
                   </li>
                   <li>
-                    Opções de IA:{" "}
+                    {layer.aiOptions.size > 0 ? "IA: " + translate(layer.aiOptions[1], "aiOptions") : " "}
+                    {/* Opções de IA:{" "}
                     {Array.from(layer.aiOptions)
                       .map((option) => translate(option, "aiOptions"))
-                      .join(", ")}
+                      } */}
+                  </li>
+                  <li>
+                    {layer.polynomialHealth ? "Gerar Saúde Polinomial: Sim" : "Gerar Saúde Polinomial: Não"}
                   </li>
                 </ul>
               </li>

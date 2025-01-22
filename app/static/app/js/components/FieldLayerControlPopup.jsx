@@ -57,6 +57,7 @@ class FieldLayerControlPopup extends React.Component {
       cropType: null,
       isChecked: false,
       isPulverize: false, 
+      isPolinomialHealth: false,
     };
 
     this.getSelectedLayers = this.props.stateSelectedLayers[0];
@@ -68,6 +69,7 @@ class FieldLayerControlPopup extends React.Component {
       cropType: null,
       aiOptions: new Set(),
       pulverize: false, 
+      polynomialHealth: false
     });
     
   }
@@ -80,6 +82,17 @@ class FieldLayerControlPopup extends React.Component {
     this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {
       $merge: { pulverize: newPulverizeState }
     }));
+  }
+
+
+  handleOnChangePolinomialHealth () {
+    
+    const newPolinomiaHealthState = !this.state.isPolinomialHealth;
+    this.setState({ isPolinomialHealth: newPolinomiaHealthState });
+
+    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {
+      $merge: { polynomialHealth: newPolinomiaHealthState }
+    }))
   }
   
 
@@ -175,6 +188,14 @@ class FieldLayerControlPopup extends React.Component {
         <div className='IAprocess-container' onClick={() => this.handleOnChangePulverize()}>
           <i className={this.state.isPulverize ? "fas fa-check-square" : "far fa-square"}></i>
           <label htmlFor="pulverize" style={{ cursor: "pointer" }}> Pulverizar</label>
+        </div>
+
+
+        <p className='IAprocess-info'>Saúde Polinomial </p>
+
+        <div className='IAprocess-container'onClick={() => this.handleOnChangePolinomialHealth()}>
+          <i className={this.state.isPolinomialHealth ? "fas fa-check-square" : "far fa-square"}></i>
+          <label style={{ cursor: "pointer" }}> Saúde polinomial</label>
         </div>
 
     </div>)
