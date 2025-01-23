@@ -1,0 +1,24 @@
+.leaflet-control-objdetect{
+  z-index: 999 !important;
+
+  a.leaflet-control-objdetect-button{
+    background: url(icon.svg) no-repeat 0 0;
+    background-size: 26px 26px;
+    border-radius: 2px;
+  }
+
+  div.objdetect-panel{ display: none; }
+  
+  .open{
+    a.leaflet-control-objdetect-button{
+      display: none;
+    }
+
+    div.objdetect-panel{
+      display: block;
+    }
+  }
+}
+.leaflet-touch .leaflet-control-objdetect a {
+  background-position: 2px 2px;
+}
