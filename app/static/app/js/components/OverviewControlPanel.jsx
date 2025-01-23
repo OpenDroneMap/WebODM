@@ -23,12 +23,11 @@ export default class OverviewControlPanel extends React.Component {
 
     this.removeGeoJsonDetections = this.props.removeGeoJsonDetections;
     this.loadGeoJsonDetections = this.props.loadGeoJsonDetections;
-    this.tiles = this.props.tiles;
+
   }
 
   // Atualiza o estado do componente quando as propriedades ou o estado mudam
   // Verifica se `selectedLayers` mudou e filtra talhões válidos com base em condições específicas atualizando o state filteredSelectedLayers
-  // Chama funções auxiliares para adicionar IDs de cada talhão e agrupa-los por tipo de cultura
   componentDidUpdate(prevProps, prevState) {
 
 
@@ -46,11 +45,6 @@ export default class OverviewControlPanel extends React.Component {
         );
 
       this.setState({ filteredSelectedLayers: filteredLayers });
-    }
-
-    if (prevState.filteredSelectedLayers !== this.state.filteredSelectedLayers) {
-      this.AddFieldsIdOnSelectedLayers();
-      this.groupLayersByCropType();
     }
   }
 
@@ -112,11 +106,142 @@ export default class OverviewControlPanel extends React.Component {
     }
   };
 
-  // Agrupa os talhões selecionados com base no tipo de cultivo
-  groupLayersByCropType = () => {
+  // Função que gerencia os processamentos
+  handleSendData = async () => {
     const { filteredSelectedLayers } = this.state;
 
-    const groupedLayers = filteredSelectedLayers.reduce((groups, current) => {
+    // Verifica se tem algum talhão selecionado para processamento de Ia ou gerar saúde polinomial, caso não tenha manda um alerta
+    if (!filteredSelectedLayers || filteredSelectedLayers.length === 0) {
+      alert("Nenhum talhão selecionado.");
+      return;
+    }
+
+    // adiciona os fieldsIds correspondentes a cada talhão
+    this.AddFieldsIdOnSelectedLayers();
+
+    // Filtra os talhões com processamento de saúde polinomial e Ia
+    const polinomialHealthProcess = filteredSelectedLayers.filter(layer => layer.layer.polynomialHealth);
+    const aiProcessingFields = filteredSelectedLayers.filter(layer => layer.layer.aiOptions.size > 0);
+
+
+    // Executa os processos de Ia e saúde polinomial, caso haja algum talhão com Ia ou saúde polinomial
+    try {
+      
+      // Array para guardar resostas das duas funções assincronas e fazer elas serem executadas simultaneâmente 
+      const processingTasks = [];
+
+      if (polinomialHealthProcess.length > 0) {
+        processingTasks.push(this.heandlePolinomialHealthProcess(polinomialHealthProcess));
+      }
+
+      if (aiProcessingFields.length > 0) {
+        processingTasks.push(this.handleIaProcess(aiProcessingFields));
+      }
+
+      // Executa ambos os processamentos simultaneamente
+      await Promise.all(processingTasks);
+
+    } catch (error) {
+
+      console.error("Erro ao processar os dados: ", error);
+      alert("Erro no processamento");
+    }
+  };
+
+
+  // Função para lidar com processamento de IA
+  handleIaProcess = async (fields) => {
+
+    const { tiles } = this.props;
+    
+    // Pega informações necessárias para  a requisição
+    const task_id = tiles[0].meta.task.id;
+    const project_id = tiles[0].meta.task.project;
+    const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
+    const csrfToken = getCsrfToken();
+
+    // Agrupa os talhões por tipo de cultivo
+    const groupedFields = this.groupFieldsByCropType(fields);
+
+
+    // Mapeia os campos agrupados por tipo de cultivo, criando um array de chamadas assíncronas
+    // Para cada tipo de cultivo (cropType), monta o payload com os IDs dos talhões a serem processados 
+    // e utiliza a função `makeRequest` para enviar a requisição ao endpoint especificado
+    const requests = Object.entries(groupedFields).map(([cropType, layers]) => {
+      const fields_to_process_ids = layers.map(layer => layer.field_id);
+      const payload = {
+        type: cropType,
+        payload: { processing_requests: { fields_to_process: fields_to_process_ids } },
+      };
+      return this.makeRequest(url, payload, csrfToken);
+    });
+
+    // Executa as chamadas assíncronas e trata os resultados, caso haja algum erro, rejeita a promise
+    try {
+      const results = await Promise.all(requests);
+      console.log("Sucesso na requisição da IA:", results);
+    } catch (error) {
+      console.error("Erro na requisição da IA:", error);
+      throw error;
+    }
+  };
+
+
+  // Função para lidar com processamento de Saúde polinomial
+  heandlePolinomialHealthProcess = async (fields) => {
+
+    const { tiles } = this.props;
+
+    // Pegar informações necessárias para  a requisição
+    const task_id = tiles[0].meta.task.id;
+    const project_id = tiles[0].meta.task.project;
+    const url = `/api/projects/${project_id}/tasks/${task_id}/process/polinomialHealth`;
+    const csrfToken = getCsrfToken();
+
+    // Agrupa os ids dos talhões
+    const fields_to_process_ids = fields.map(field => field.field_id);
+
+    // Monta o payload com os IDs dos talhões a serem processados
+    const payload = {
+      processing_requests: {
+        fields_to_process: fields_to_process_ids,
+        polynomial_degree: 3,
+        points: [],
+      },
+    };
+
+    // Executa a chamadas assíncrona e trata o resultado, caso haja algum erro, rejeita a promise
+    try {
+      const data = await this.makeRequest(url, payload, csrfToken);
+      console.log("Sucesso no Polynomial Health:", data);
+    } catch (error) {
+      console.error("Erro no Polynomial Health:", error);
+      throw error;
+    }
+  };
+
+
+  makeRequest = async (url, payload, csrfToken) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.status}`);
+    }
+
+    return response.json();
+  };
+
+
+  groupFieldsByCropType = (fields) => {
+
+    const groupedLayers = fields.reduce((groups, current) => {
       const cropType = current.layer.cropType;
 
       if (!groups[cropType]) {
@@ -127,113 +252,7 @@ export default class OverviewControlPanel extends React.Component {
       return groups;
     }, {});
 
-    this.setState({ groupedLayers });
-  };
-
-
-  heandlePolinomialHealth = async (taskID, projectID) => {
-
-    console.log("heandlePolinomialHealth");
-
-
-    const url = `/api/projects/${projectID}/tasks/${taskID}/process/polinomialHealth`;
-
-    const csrfToken = getCsrfToken(); // Certifique-se de implementar essa função para obter o CSRF Token.
-
-    // Payload no formato especificado
-    const payload = {
-      processing_requests: {
-        fields_to_process: [1], // Ajuste os valores conforme necessário
-        polynomial_degree: 3,
-        points: [] // Pode ser preenchido dinamicamente se necessário
-      }
-    };
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken // Inclua o token CSRF, se necessário
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Response Data:", data);
-      alert("Request succeeded!");
-    } catch (error) {
-      console.error("Error occurred:", error);
-      alert(`Request failed: ${error.message}`);
-    }
-  };
-
-  // Envia os talhões selecionados para um endpoint de processamento
-  handleSendData = async () => {
-    
-    const { filteredSelectedLayers } = this.state;
-
-    // Verifica se tem algum talhão selecionado 
-    if (!filteredSelectedLayers) {
-      alert("Nenhum talhão selecionado.");
-      return;
-    }
-
-    // Adiciona os filedsIDs correspondente aos talhões selecionados
-    this.AddFieldsIdOnSelectedLayers();
-
-    // Verifica os talhões marcados para geração da saude polinomial
-    const polinomialHealthProcess = filteredSelectedLayers.filter(layer => layer.layer.polynomialHealth === true);
-
-    // Verifica os talhões marcados para processamento de IA
-    const IaProcess = filteredSelectedLayers.filter(layer => layer.layer.aiOptions.length !== 0);
-
-    console.log("polinomialHealth: ", polinomialHealthProcess);
-
-    this.groupLayersByCropType();
-
-    console.log("groupedLayers: ", groupedLayers);
-    console.log("filteresSelectedLayers: ", filteredSelectedLayers);
-
-    
-
-    // const task_id = this.tiles[0].meta.task.id;
-    // const project_id = this.tiles[0].meta.task.project;
-    // const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
-    // const csrfToken = getCsrfToken();
-
-    // const requests = Object.entries(groupedLayers).map(([cropType, layers]) => {
-
-    //   const fieldsToProcessID = layers.map(layer => layer.field_id);
-
-    //   const payload = {
-    //     type: cropType,
-    //     payload: { processing_requests: { fields_to_process: fieldsToProcessID } }
-    //   };
-
-    //   return fetch(url, {
-    //     method: 'POST',
-    //     headers: {
-    //       'content-type': 'application/json',
-    //       'X-CSRFToken': csrfToken, // Adiciona o CSRF token ao cabeçalho
-    //     },
-    //     body: JSON.stringify(payload),
-    //   });
-    // });
-
-    // try {
-    //   const responses = await Promise.all(requests);
-    //   const results = await Promise.all(responses.map(res => res.json()));
-    //   console.log('Sucesso:', results);
-    //   alert("Talhões enviados para o processamento com sucesso.");
-    // } catch (error) {
-    //   console.error('Erro:', error);
-    //   alert("Ocorreu um erro ao enviar os talhões para processamento.");
-    // }
+    return groupedLayers;
   };
 
   // Abre o popup do talhão correspondente
