@@ -30,7 +30,6 @@ export default class OverviewControlPanel extends React.Component {
   // Verifica se `selectedLayers` mudou e filtra talhões válidos com base em condições específicas atualizando o state filteredSelectedLayers
   componentDidUpdate(prevProps, prevState) {
 
-
     if (prevProps.selectedLayers !== this.props.selectedLayers) {
       const filteredLayers = this.props.selectedLayers
         .map((layer, index) => ({ layer, index }))
@@ -49,7 +48,13 @@ export default class OverviewControlPanel extends React.Component {
   }
 
 
-  // Função para alternar o estado colapsado de um talhão selecionado listado no popup
+  /**
+ * Alterna o estado colapsado de um talhão listado no popup.
+ *
+ * @param {number} index - O índice do item na lista de camadas cujo estado de colapso será alternado.
+ * @returns {void}
+ *
+ */
   handleCollapsedlistLayerItems = (index) => {
     this.setState((prevState) => ({
       collapsedLayers: {
@@ -59,7 +64,12 @@ export default class OverviewControlPanel extends React.Component {
     }));
   };
 
-  // Reseta os talhões marcados no mapa
+  /**
+ * Reseta os talhões marcados no mapa.
+ *
+ * @returns {void}
+ *
+ */
   handleClearOverviewLayers = () => {
     const fieldSet = new Set(["field"]);
 
@@ -68,23 +78,42 @@ export default class OverviewControlPanel extends React.Component {
     this.loadGeoJsonDetections(fieldSet);
   };
 
-  // Adiciona o campo `field_id` aos talhões selecionadas 
+  /**
+ * Adiciona o campo `field_id` aos talhões selecionados.
+ *
+ * @returns {void} Não retorna um valor, mas atualiza os objetos das camadas selecionadas adicionando o campo `field_id` quando identificado.
+ *
+ * @description
+ * A função busca o campo `field_id` (ou `Field_id`, dependendo do caso) nas propriedades das camadas presentes em `overlays` 
+ * e o adiciona às camadas selecionadas em `filteredSelectedLayers`, com base na comparação das coordenadas dos limites (`bounds`).
+ * Somente camadas cujos limites coincidam serão atualizadas.
+ */
   AddFieldsIdOnSelectedLayers = () => {
     const { filteredSelectedLayers } = this.state;
     const { overlays } = this.props;
 
+    // Filtra o local onde os layers estão armazenados dentro da props overlays
     const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
 
+    // Veridica se os layers foram encontrados corretamente
     if (overlayWithLayers) {
 
+      // Extrai os layers do mapa e converte para um array para facilitar a iteração
       const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
 
+      // Itera sobre cada talhão selecionado
       filteredSelectedLayers.forEach(selectedLayer => {
+
+        // Obtem os limites do talhão selecionado
         const bounds2 = selectedLayer.layer.bounds;
 
+        // Itera sobre os layers do mapa que comtém os IDs buscados
         leafleatLayers.forEach(leafletLayer => {
+
+          // Obtem os limites dos layers do mapa
           const bounds1 = leafletLayer._bounds;
 
+          // Verifica a correspondência entre os limites dos talhões para identificar os layers no overview que correspondem aos talhões selecionados
           const isBoundsEqual = (
             bounds1._northEast.lat === bounds2._northEast.lat &&
             bounds1._northEast.lng === bounds2._northEast.lng &&
@@ -92,13 +121,17 @@ export default class OverviewControlPanel extends React.Component {
             bounds1._southWest.lng === bounds2._southWest.lng
           );
 
+          // Verifica se existe um layer correspondente ao talhão marcado
           if (isBoundsEqual) {
+
+            // Obtem as propriedades do layer corresponde
             const featureProps = leafletLayer.feature.properties;
 
+            // Verifica se existe o campo field_id no layer corresponde
             if ('field_id' in featureProps) {
+
+              // Adiciona o field_id ao talhão selecionado
               selectedLayer.field_id = featureProps.field_id;
-            } else if ('Field_id' in featureProps) {
-              selectedLayer.field_id = featureProps.Field_id;
             }
           }
         });
@@ -106,11 +139,22 @@ export default class OverviewControlPanel extends React.Component {
     }
   };
 
-  // Função que gerencia os processamentos
+  /**
+ * Gerencia o envio e processamento dos dados selecionados.
+ *
+ * @returns {void} Não retorna um valor, mas executa os processos de IA e saúde polinomial para os talhões selecionados.
+ *
+ * @description
+ * - Verifica se há talhões selecionados para processamento. Se não houver, exibe um alerta ao usuário.
+ * - Adiciona os `fieldIds` correspondentes aos talhões selecionados usando a função `AddFieldsIdOnSelectedLayers`.
+ * - Filtra os talhões que possuem opções de saúde polinomial e IA.
+ * - Executa os processos de saúde polinomial e IA de forma assíncrona e simultânea, caso aplicável.
+ * - Trata possíveis erros durante o processamento e exibe um alerta caso ocorra algum problema.
+ */
   handleSendData = async () => {
     const { filteredSelectedLayers } = this.state;
 
-    // Verifica se tem algum talhão selecionado para processamento de Ia ou gerar saúde polinomial, caso não tenha manda um alerta
+    // Verifica se tem algum talhão selecionado para processamento de IA ou gerar saúde polinomial, caso não tenha manda um alerta
     if (!filteredSelectedLayers || filteredSelectedLayers.length === 0) {
       alert("Nenhum talhão selecionado.");
       return;
@@ -119,21 +163,22 @@ export default class OverviewControlPanel extends React.Component {
     // adiciona os fieldsIds correspondentes a cada talhão
     this.AddFieldsIdOnSelectedLayers();
 
-    // Filtra os talhões com processamento de saúde polinomial e Ia
+    // Filtra os talhões com processamento de saúde polinomial e IA
     const polinomialHealthProcess = filteredSelectedLayers.filter(layer => layer.layer.polynomialHealth);
     const aiProcessingFields = filteredSelectedLayers.filter(layer => layer.layer.aiOptions.size > 0);
 
-
-    // Executa os processos de Ia e saúde polinomial, caso haja algum talhão com Ia ou saúde polinomial
+    // Tenta lidar com os processamentos, caso não consiga exibe um alerta de erro
     try {
-      
+
       // Array para guardar resostas das duas funções assincronas e fazer elas serem executadas simultaneâmente 
       const processingTasks = [];
 
+      // Caso haja algum talhão com saúde polinomial, executa a função de processamento de saúde polinomial
       if (polinomialHealthProcess.length > 0) {
         processingTasks.push(this.heandlePolinomialHealthProcess(polinomialHealthProcess));
       }
 
+      // Caso haja algum talhão com IA, executa a função de processamento de IA
       if (aiProcessingFields.length > 0) {
         processingTasks.push(this.handleIaProcess(aiProcessingFields));
       }
@@ -149,11 +194,23 @@ export default class OverviewControlPanel extends React.Component {
   };
 
 
-  // Função para lidar com processamento de IA
+  /**
+ * Lida com o processamento de IA para os talhões selecionados.
+ *
+ * @param {Array} fields - Lista de talhões selecionados para processamento de IA.
+ * @returns {Promise<void>} Retorna uma Promise que resolve após todas as requisições de processamento serem concluídas.
+ *
+ * @description
+ * - Obtém as informações necessárias para construir a requisição, como `task_id`, `project_id` e a URL do endpoint.
+ * - Agrupa os talhões por tipo de cultivo utilizando a função `groupFieldsByCropType`.
+ * - Para cada tipo de cultivo, monta um payload contendo os IDs dos talhões a serem processados.
+ * - Envia as requisições de forma assíncrona utilizando a função `makeRequest`.
+ * - Trata os resultados das requisições, exibindo sucesso no console ou lançando um erro em caso de falha.
+ */
   handleIaProcess = async (fields) => {
 
     const { tiles } = this.props;
-    
+
     // Pega informações necessárias para  a requisição
     const task_id = tiles[0].meta.task.id;
     const project_id = tiles[0].meta.task.project;
@@ -187,7 +244,20 @@ export default class OverviewControlPanel extends React.Component {
   };
 
 
-  // Função para lidar com processamento de Saúde polinomial
+  /**
+ * Lida com o processamento de Saúde Polinomial para os talhões selecionados.
+ *
+ * @param {Array} fields - Lista de talhões selecionados para processamento de Saúde Polinomial.
+ * @returns {Promise<void>} Retorna uma Promise que resolve após a requisição de processamento ser concluída.
+ *
+ * @description
+ * - Obtém as informações necessárias para construir a requisição, como `task_id`, `project_id` e a URL do endpoint.
+ * - Agrupa os IDs dos talhões que serão processados.
+ * - Monta um payload contendo os IDs dos talhões, o grau do polinômio (3 por default) e os pontos do talhão.
+ * - Envia a requisição de forma assíncrona utilizando a função `makeRequest`.
+ * - Trata o resultado da requisição, exibindo sucesso no console ou lançando um erro em caso de falha.
+ */
+
   heandlePolinomialHealthProcess = async (fields) => {
 
     const { tiles } = this.props;
@@ -205,7 +275,7 @@ export default class OverviewControlPanel extends React.Component {
     const payload = {
       processing_requests: {
         fields_to_process: fields_to_process_ids,
-        polynomial_degree: 3,
+        polynomial_degree: 3, // DEFAULT
         points: [],
       },
     };
@@ -221,7 +291,17 @@ export default class OverviewControlPanel extends React.Component {
   };
 
 
+  /**
+   * Realiza uma requisição POST assíncrona para o endpoint especificado.
+   *
+   * @param {string} url - URL do endpoint para onde a requisição será enviada.
+   * @param {Object} payload - Dados que serão enviados no corpo da requisição.
+   * @param {string} csrfToken - Token CSRF utilizado para autenticação da requisição.
+   * @returns {Promise<Object>} Retorna uma Promise que resolve com o corpo da resposta em formato JSON.
+   *
+   */
   makeRequest = async (url, payload, csrfToken) => {
+    // Realiza a requisição com o método POST e as opções configuradas
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -231,49 +311,83 @@ export default class OverviewControlPanel extends React.Component {
       body: JSON.stringify(payload),
     });
 
+    // Verifica se a resposta da requisição é bem-sucedida 
     if (!response.ok) {
+      // Lança um erro se o status HTTP não for bem-sucedido
       throw new Error(`Erro na requisição: ${response.status}`);
     }
 
+    // Retorna o corpo da resposta convertido para JSON
     return response.json();
   };
 
 
+  /**
+ * Agrupa os talhões com base no tipo de cultivo.
+ *
+ * @param {Array<Object>} fields - Lista de objetos representando os talhões selecionados.
+ * @returns {Object} Objeto onde as chaves são os tipos de cultivo (`cropType`) 
+ *                   e os valores são arrays de talhões correspondentes.
+ * 
+ */
   groupFieldsByCropType = (fields) => {
-
+    // Reduz o array de talhões (`fields`) para um objeto agrupado por tipo de cultivo (`cropType`)
     const groupedLayers = fields.reduce((groups, current) => {
-      const cropType = current.layer.cropType;
+      const cropType = current.layer.cropType; // Obtém o tipo de cultivo do talhão atual
 
+      // Verifica se o tipo de cultivo já existe no grupo; caso contrário, inicializa como um array vazio
       if (!groups[cropType]) {
         groups[cropType] = [];
       }
 
+      // Adiciona o talhão atual ao grupo correspondente ao seu tipo de cultivo
       groups[cropType].push(current);
-      return groups;
-    }, {});
 
+      return groups; // Retorna o objeto acumulador atualizado
+    }, {}); // Inicializa o objeto acumulador como um objeto vazio
+
+    // Retorna o objeto contendo os talhões agrupados por tipo de cultivo
     return groupedLayers;
   };
 
-  // Abre o popup do talhão correspondente
+
+
+  /**
+ * Abre o popup do talhão correspondente quando um evento é disparado.
+ *
+ * @param {Object} e - O evento disparado (por exemplo, um clique em um talhão).
+ * @returns {void}
+ *
+ * @description
+ * - Filtra o talhão correspondente ao evento com base no `id` do alvo.
+ * - Procura o overlay que contém as camadas correspondentes.
+ * - Compara as coordenadas de limites de cada camada para identificar a camada correspondente ao talhão selecionado.
+ * - Se o talhão correspondente for encontrado, abre o popup da camada, caso ainda não esteja aberto.
+ */
   handlePopUp = (e) => {
+    // Obtém as camadas de sobreposição (overlays) da props
     const { overlays } = this.props;
+
+    // Filtra o talhão selecionado com base no `id` do alvo do evento
     const layerSelected = this.state.filteredSelectedLayers.filter(
-      (layer) => layer.index == e.target.id
+      (layer) => layer.index == e.target.id // Compara o índice do talhão com o id do alvo
     );
 
+    // Encontra o overlay que contém as camadas (layers)
     const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
 
     if (overlayWithLayers) {
+      // Converte as camadas em um array para facilitar o processamento
       const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
 
+      // Filtra as camadas para encontrar a que corresponde aos limites do talhão selecionado
       const reflayerLeafLeat = leafleatLayers.filter((layer) => {
         return (
-          layer._bounds &&
-          layerSelected[0] &&
-          layerSelected[0].layer &&
-          layerSelected[0].layer.bounds &&
-          layer._bounds._northEast.lat ===
+          layer._bounds && // Verifica se a camada tem limites (bounds)
+          layerSelected[0] && // Verifica se um talhão foi selecionado
+          layerSelected[0].layer && // Verifica se o talhão tem camada associada
+          layerSelected[0].layer.bounds && // Verifica se o talhão tem limites
+          layer._bounds._northEast.lat === // Verifica se os limites da camada correspondem aos limites do talhão
           layerSelected[0].layer.bounds._northEast.lat &&
           layer._bounds._northEast.lng ===
           layerSelected[0].layer.bounds._northEast.lng &&
@@ -284,9 +398,13 @@ export default class OverviewControlPanel extends React.Component {
         );
       });
 
+      // Se a camada correspondente for encontrada
       if (reflayerLeafLeat.length > 0) {
         const layer = reflayerLeafLeat[0];
+
+        // Verifica se a camada tem um popup associado
         if (layer.getPopup()) {
+          // Se o popup não estiver aberto, abre o popup
           if (!layer.isPopupOpen()) {
             layer.openPopup();
           }
@@ -294,6 +412,7 @@ export default class OverviewControlPanel extends React.Component {
       }
     }
   };
+
 
 
   render() {
