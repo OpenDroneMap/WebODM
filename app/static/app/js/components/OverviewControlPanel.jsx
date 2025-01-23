@@ -31,29 +31,26 @@ export default class OverviewControlPanel extends React.Component {
   // Chama funções auxiliares para adicionar IDs de cada talhão e agrupa-los por tipo de cultura
   componentDidUpdate(prevProps, prevState) {
 
-    console.log(this.props.selectedLayers);
-
 
     if (prevProps.selectedLayers !== this.props.selectedLayers) {
-        const filteredLayers = this.props.selectedLayers
-            .map((layer, index) => ({ layer, index }))
-            .filter(
-                ({ layer }) =>
-                    layer.cropType !== null &&
-                    layer.aiOptions &&
-                    layer.aiOptions.size > 0 ||
-                    layer.polynomialHealth
-                    
-            );
+      const filteredLayers = this.props.selectedLayers
+        .map((layer, index) => ({ layer, index }))
+        .filter(
+          ({ layer }) =>
+            layer.cropType !== null &&
+            layer.aiOptions &&
+            layer.aiOptions.size > 0 ||
+            layer.cropType !== null &&
+            layer.polynomialHealth
 
-        this.setState({ filteredSelectedLayers: filteredLayers });
+        );
 
-        console.log("filteredLayers: " + this.state.filteredSelectedLayers);
+      this.setState({ filteredSelectedLayers: filteredLayers });
     }
 
     if (prevState.filteredSelectedLayers !== this.state.filteredSelectedLayers) {
-        this.AddFieldsIdOnSelectedLayers();
-        this.groupLayersByCropType();
+      this.AddFieldsIdOnSelectedLayers();
+      this.groupLayersByCropType();
     }
   }
 
@@ -63,7 +60,7 @@ export default class OverviewControlPanel extends React.Component {
     this.setState((prevState) => ({
       collapsedLayers: {
         ...prevState.collapsedLayers,
-        [index]: !prevState.collapsedLayers[index], 
+        [index]: !prevState.collapsedLayers[index],
       },
     }));
   };
@@ -77,7 +74,7 @@ export default class OverviewControlPanel extends React.Component {
     this.loadGeoJsonDetections(fieldSet);
   };
 
-   // Adiciona o campo `field_id` aos talhões selecionadas 
+  // Adiciona o campo `field_id` aos talhões selecionadas 
   AddFieldsIdOnSelectedLayers = () => {
     const { filteredSelectedLayers } = this.state;
     const { overlays } = this.props;
@@ -86,48 +83,48 @@ export default class OverviewControlPanel extends React.Component {
 
     if (overlayWithLayers) {
 
-        const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
+      const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
 
-        filteredSelectedLayers.forEach(selectedLayer => {
-            const bounds2 = selectedLayer.layer.bounds;
+      filteredSelectedLayers.forEach(selectedLayer => {
+        const bounds2 = selectedLayer.layer.bounds;
 
-            leafleatLayers.forEach(leafletLayer => {
-                const bounds1 = leafletLayer._bounds;
+        leafleatLayers.forEach(leafletLayer => {
+          const bounds1 = leafletLayer._bounds;
 
-                const isBoundsEqual = (
-                    bounds1._northEast.lat === bounds2._northEast.lat &&
-                    bounds1._northEast.lng === bounds2._northEast.lng &&
-                    bounds1._southWest.lat === bounds2._southWest.lat &&
-                    bounds1._southWest.lng === bounds2._southWest.lng
-                );
+          const isBoundsEqual = (
+            bounds1._northEast.lat === bounds2._northEast.lat &&
+            bounds1._northEast.lng === bounds2._northEast.lng &&
+            bounds1._southWest.lat === bounds2._southWest.lat &&
+            bounds1._southWest.lng === bounds2._southWest.lng
+          );
 
-                if (isBoundsEqual) {
-                    const featureProps = leafletLayer.feature.properties;
+          if (isBoundsEqual) {
+            const featureProps = leafletLayer.feature.properties;
 
-                    if ('field_id' in featureProps) {
-                        selectedLayer.field_id = featureProps.field_id; 
-                    } else if ('Field_id' in featureProps) {
-                        selectedLayer.field_id = featureProps.Field_id; 
-                    }
-                }
-            });
+            if ('field_id' in featureProps) {
+              selectedLayer.field_id = featureProps.field_id;
+            } else if ('Field_id' in featureProps) {
+              selectedLayer.field_id = featureProps.Field_id;
+            }
+          }
         });
+      });
     }
-};
+  };
 
   // Agrupa os talhões selecionados com base no tipo de cultivo
   groupLayersByCropType = () => {
     const { filteredSelectedLayers } = this.state;
 
     const groupedLayers = filteredSelectedLayers.reduce((groups, current) => {
-        const cropType = current.layer.cropType;
+      const cropType = current.layer.cropType;
 
-        if (!groups[cropType]) {
-            groups[cropType] = []; 
-        }
+      if (!groups[cropType]) {
+        groups[cropType] = [];
+      }
 
-        groups[cropType].push(current);
-        return groups;
+      groups[cropType].push(current);
+      return groups;
     }, {});
 
     this.setState({ groupedLayers });
@@ -145,82 +142,98 @@ export default class OverviewControlPanel extends React.Component {
 
     // Payload no formato especificado
     const payload = {
-        processing_requests: {
-            fields_to_process: [1], // Ajuste os valores conforme necessário
-            polynomial_degree: 3,
-            points: [] // Pode ser preenchido dinamicamente se necessário
-        }
+      processing_requests: {
+        fields_to_process: [1], // Ajuste os valores conforme necessário
+        polynomial_degree: 3,
+        points: [] // Pode ser preenchido dinamicamente se necessário
+      }
     };
 
     try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken // Inclua o token CSRF, se necessário
-            },
-            body: JSON.stringify(payload)
-        });
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken // Inclua o token CSRF, se necessário
+        },
+        body: JSON.stringify(payload)
+      });
 
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
 
-        const data = await response.json();
-        console.log("Response Data:", data);
-        alert("Request succeeded!");
+      const data = await response.json();
+      console.log("Response Data:", data);
+      alert("Request succeeded!");
     } catch (error) {
-        console.error("Error occurred:", error);
-        alert(`Request failed: ${error.message}`);
+      console.error("Error occurred:", error);
+      alert(`Request failed: ${error.message}`);
     }
-};
+  };
 
   // Envia os talhões selecionados para um endpoint de processamento
   handleSendData = async () => {
-    const { groupedLayers } = this.state;
+    
     const { filteredSelectedLayers } = this.state;
 
+    // Verifica se tem algum talhão selecionado 
+    if (!filteredSelectedLayers) {
+      alert("Nenhum talhão selecionado.");
+      return;
+    }
+
+    // Adiciona os filedsIDs correspondente aos talhões selecionados
     this.AddFieldsIdOnSelectedLayers();
+
+    // Verifica os talhões marcados para geração da saude polinomial
+    const polinomialHealthProcess = filteredSelectedLayers.filter(layer => layer.layer.polynomialHealth === true);
+
+    // Verifica os talhões marcados para processamento de IA
+    const IaProcess = filteredSelectedLayers.filter(layer => layer.layer.aiOptions.length !== 0);
+
+    console.log("polinomialHealth: ", polinomialHealthProcess);
+
     this.groupLayersByCropType();
 
-    if (!groupedLayers || Object.keys(groupedLayers).length === 0 || !filteredSelectedLayers) {
-        alert("Nenhum talhão selecionado.");
-        return;
-    }
+    console.log("groupedLayers: ", groupedLayers);
+    console.log("filteresSelectedLayers: ", filteredSelectedLayers);
 
-    const task_id = this.tiles[0].meta.task.id;
-    const project_id = this.tiles[0].meta.task.project;
-    const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
-    const csrfToken = getCsrfToken();
+    
 
-    const requests = Object.entries(groupedLayers).map(([cropType, layers]) => {
-      
-        const fieldsToProcessID = layers.map(layer => layer.field_id);
-        
-        const payload = {
-            type: cropType,
-            payload: { processing_requests: { fields_to_process: fieldsToProcessID } }
-        };
+    // const task_id = this.tiles[0].meta.task.id;
+    // const project_id = this.tiles[0].meta.task.project;
+    // const url = `/api/projects/${project_id}/tasks/${task_id}/process`;
+    // const csrfToken = getCsrfToken();
 
-        return fetch(url, {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'X-CSRFToken': csrfToken, // Adiciona o CSRF token ao cabeçalho
-            },
-            body: JSON.stringify(payload),
-        });
-    });
+    // const requests = Object.entries(groupedLayers).map(([cropType, layers]) => {
 
-    try {
-        const responses = await Promise.all(requests);
-        const results = await Promise.all(responses.map(res => res.json()));
-        console.log('Sucesso:', results);
-        alert("Talhões enviados para o processamento com sucesso.");
-    } catch (error) {
-        console.error('Erro:', error);
-        alert("Ocorreu um erro ao enviar os talhões para processamento.");
-    }
+    //   const fieldsToProcessID = layers.map(layer => layer.field_id);
+
+    //   const payload = {
+    //     type: cropType,
+    //     payload: { processing_requests: { fields_to_process: fieldsToProcessID } }
+    //   };
+
+    //   return fetch(url, {
+    //     method: 'POST',
+    //     headers: {
+    //       'content-type': 'application/json',
+    //       'X-CSRFToken': csrfToken, // Adiciona o CSRF token ao cabeçalho
+    //     },
+    //     body: JSON.stringify(payload),
+    //   });
+    // });
+
+    // try {
+    //   const responses = await Promise.all(requests);
+    //   const results = await Promise.all(responses.map(res => res.json()));
+    //   console.log('Sucesso:', results);
+    //   alert("Talhões enviados para o processamento com sucesso.");
+    // } catch (error) {
+    //   console.error('Erro:', error);
+    //   alert("Ocorreu um erro ao enviar os talhões para processamento.");
+    // }
   };
 
   // Abre o popup do talhão correspondente
@@ -233,33 +246,33 @@ export default class OverviewControlPanel extends React.Component {
     const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
 
     if (overlayWithLayers) {
-        const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
-        
-        const reflayerLeafLeat = leafleatLayers.filter((layer) => {
-            return (
-                layer._bounds &&
-                layerSelected[0] &&
-                layerSelected[0].layer &&
-                layerSelected[0].layer.bounds &&
-                layer._bounds._northEast.lat ===
-                    layerSelected[0].layer.bounds._northEast.lat &&
-                layer._bounds._northEast.lng ===
-                    layerSelected[0].layer.bounds._northEast.lng &&
-                layer._bounds._southWest.lat ===
-                    layerSelected[0].layer.bounds._southWest.lat &&
-                layer._bounds._southWest.lng ===
-                    layerSelected[0].layer.bounds._southWest.lng
-            );
-        });
+      const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
 
-        if (reflayerLeafLeat.length > 0) {
-            const layer = reflayerLeafLeat[0];
-            if (layer.getPopup()) {
-                if (!layer.isPopupOpen()) {
-                    layer.openPopup();
-                }
-            }
+      const reflayerLeafLeat = leafleatLayers.filter((layer) => {
+        return (
+          layer._bounds &&
+          layerSelected[0] &&
+          layerSelected[0].layer &&
+          layerSelected[0].layer.bounds &&
+          layer._bounds._northEast.lat ===
+          layerSelected[0].layer.bounds._northEast.lat &&
+          layer._bounds._northEast.lng ===
+          layerSelected[0].layer.bounds._northEast.lng &&
+          layer._bounds._southWest.lat ===
+          layerSelected[0].layer.bounds._southWest.lat &&
+          layer._bounds._southWest.lng ===
+          layerSelected[0].layer.bounds._southWest.lng
+        );
+      });
+
+      if (reflayerLeafLeat.length > 0) {
+        const layer = reflayerLeafLeat[0];
+        if (layer.getPopup()) {
+          if (!layer.isPopupOpen()) {
+            layer.openPopup();
+          }
         }
+      }
     }
   };
 
@@ -276,7 +289,7 @@ export default class OverviewControlPanel extends React.Component {
               <li
                 key={index}
                 className="layer-item"
-                
+
               >
                 <button className="collapsed-infos-btn" onClick={() => this.handleCollapsedlistLayerItems(index)}>
                   <svg
@@ -290,7 +303,7 @@ export default class OverviewControlPanel extends React.Component {
                       transform: this.state.collapsedLayers[index]
                         ? "rotate(90deg)"
                         : "rotate(0deg)",
-                      transition: "transform 0.3s ease", 
+                      transition: "transform 0.3s ease",
                     }}
                   >
                     <path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z" />
@@ -305,26 +318,27 @@ export default class OverviewControlPanel extends React.Component {
                   {layer.name + ` - Layer ${index}` || `Layer ${index}`}
                 </a>
                 <ul
-                  className={`list-layer-items ${
-                    !this.state.collapsedLayers[index] ? "collapsed" : ""
-                  }`}
+                  className={`list-layer-items ${!this.state.collapsedLayers[index] ? "collapsed" : ""
+                    }`}
                   onClick={this.handlePopUp}
                 >
-                  <li>
-                    {/* Tipo de colheita: {translate(layer.cropType, "cropType")} */}
-                    {layer.cropType ? "Colheita: " + translate(layer.cropType, "cropType") : " "}
-                  </li>
-                  <li>
-                    {layer.aiOptions.size > 0 ? "IA: " + translate(layer.aiOptions[1], "aiOptions") : " "}
-                    {/* Opções de IA:{" "}
-                    {Array.from(layer.aiOptions)
-                      .map((option) => translate(option, "aiOptions"))
-                      } */}
-                  </li>
-                  <li>
-                    {layer.polynomialHealth ? "Gerar Saúde Polinomial: Sim" : "Gerar Saúde Polinomial: Não"}
-                  </li>
+                  {layer.cropType && (
+                    <li>
+                      Colheita: {translate(layer.cropType, "cropType")}
+                    </li>
+                  )}
+                  {layer.aiOptions.size > 0 && (
+                    <li>
+                      IA: {translate([...layer.aiOptions][0], "aiOptions")}
+                    </li>
+                  )}
+                  {layer.polynomialHealth && (
+                    <li>
+                      Gerar Saúde Polinomial: Sim
+                    </li>
+                  )}
                 </ul>
+
               </li>
             ))}
           </ul>
