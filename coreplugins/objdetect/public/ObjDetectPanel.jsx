@@ -174,11 +174,13 @@ export default class ObjDetectPanel extends React.Component {
       {label: _('Cars'), value: 'cars'}, 
       {label: _('Trees'), value: 'trees'}, 
     ]
-
+    
     let content = "";
     if (loading) content = (<span><i className="fa fa-circle-notch fa-spin"></i> {_("Loading…")}</span>);
     else if (permanentError) content = (<div className="alert alert-warning">{permanentError}</div>);
     else{
+      const featCount = objLayer ? objLayer.getLayers().length : 0;
+
       content = (<div>
         <ErrorMessage bind={[this, "error"]} />
         <div className="row model-selector">
@@ -192,12 +194,12 @@ export default class ObjDetectPanel extends React.Component {
         </div>
         
         {objLayer ? <div className="detect-action-buttons">
-            <span><strong>{_("Count:")}</strong> {objLayer.getLayers().length}</span>
+            <span><strong>{_("Count:")}</strong> {featCount}</span>
             <div>
-              <button onClick={this.handleDownload}
+              {featCount > 0 ? <button onClick={this.handleDownload}
                     type="button" className="btn btn-sm btn-primary btn-download">
                 <i className="fa fa-download fa-fw"/> {_("Download")}
-              </button>
+              </button> : ""}
               <button onClick={this.handleRemoveObjLayer}
                       type="button" className="btn btn-sm btn-default">
                 <i className="fa fa-trash fa-fw"/>
