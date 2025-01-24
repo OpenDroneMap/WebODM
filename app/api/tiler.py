@@ -524,6 +524,7 @@ class Export(TaskNestedView):
         epsg = request.data.get('epsg')
         color_map = request.data.get('color_map')
         hillshade = request.data.get('hillshade')
+        resample = request.data.get('resample')
 
         if formula == '': formula = None
         if bands == '': bands = None
@@ -531,6 +532,7 @@ class Export(TaskNestedView):
         if epsg == '': epsg = None
         if color_map == '': color_map = None
         if hillshade == '': hillshade = None
+        if resample == '': resample = None
 
         expr = None
 
@@ -551,6 +553,12 @@ class Export(TaskNestedView):
                 colormap.get(color_map)
             except InvalidColorMapName:
                 raise exceptions.ValidationError(_("Not a valid color_map value"))
+
+        if resample is not None:
+            try:
+                resample = float(resample)
+            except ValueError:
+                raise exceptions.ValidationError(_("Invalid resample value: %(value)s") % {'value': resample})
 
         if epsg is not None:
             try:
@@ -627,9 +635,10 @@ class Export(TaskNestedView):
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})
         elif asset_type == 'georeferenced_model':
             # Shortcut the process if no processing is required
-            if export_format == 'laz' and (epsg == task.epsg or epsg is None):
+            if export_format == 'laz' and (epsg == task.epsg or epsg is None) and (resample is None or resample == 0):
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.laz'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
                 celery_task_id = export_pointcloud.delay(url, epsg=epsg, 
-                                                            format=export_format).task_id
+                                                            format=export_format,
+                                                            resample=resample).task_id
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})
