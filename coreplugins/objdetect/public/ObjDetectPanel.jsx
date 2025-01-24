@@ -5,6 +5,7 @@ import L from 'leaflet';
 import './ObjDetectPanel.scss';
 import ErrorMessage from 'webodm/components/ErrorMessage';
 import Workers from 'webodm/classes/Workers';
+import Utils from 'webodm/classes/Utils';
 import { _ } from 'webodm/classes/gettext';
 
 export default class ObjDetectPanel extends React.Component {
@@ -86,10 +87,10 @@ export default class ObjDetectPanel extends React.Component {
 
       this.setState({objLayer: L.geoJSON(geojson, {
         onEachFeature: (feature, layer) => {
-            if (feature.properties && feature.properties.level !== undefined) {
+            if (feature.properties && feature.properties['class'] !== undefined) {
                 layer.bindPopup(`<div style="margin-right: 32px;">
-                    <b>${_("Class:")}</b> ${feature.properties.class}<br/>
-                    <b>${_("Score:")}</b> ${feature.properties.score}<br/>
+                    <b>${_("Label:")}</b> ${feature.properties['class']}<br/>
+                    <b>${_("Confidence:")}</b> ${feature.properties.score.toFixed(3)}<br/>
                   </div>
                   `);
             }
@@ -100,6 +101,7 @@ export default class ObjDetectPanel extends React.Component {
         }
       })});
       this.state.objLayer.addTo(map);
+      this.state.objLayer.label = this.state.model;
 
       cb();
     }catch(e){
@@ -162,6 +164,10 @@ export default class ObjDetectPanel extends React.Component {
     });
   }
 
+  handleDownload = () => {
+    Utils.saveAs(JSON.stringify(this.state.objLayer.toGeoJSON(14), null, 4), `${this.state.objLayer.label || "objects"}.geojson`);
+  }
+
   render(){
     const { loading, permanentError, objLayer, detecting, model } = this.state;
     const models = [
@@ -175,28 +181,29 @@ export default class ObjDetectPanel extends React.Component {
     else{
       content = (<div>
         <ErrorMessage bind={[this, "error"]} />
-        <div className="row form-group form-inline">
-          <label className="col-sm-2 control-label">{_("Model:")}</label>
-          <div className="col-sm-10 ">
+        <div className="row model-selector">
             <select className="form-control" value={model} onChange={this.handleSelectModel}>
               {models.map(m => <option value={m.value}>{m.label}</option>)}
             </select>
-          </div>
-        </div>
-
-        <div className="row action-buttons">
-          <div className="col-sm-3">
-            {objLayer ? <a title="Delete Layer" href="javascript:void(0);" onClick={this.handleRemoveObjLayer}>
-              <i className="fa fa-trash"></i>
-            </a> : ""}
-          </div>
-          <div className="col-sm-9 text-right">
             <button onClick={this.handleDetect}
                     disabled={detecting} type="button" className="btn btn-sm btn-primary btn-detect">
               {detecting ? <i className="fa fa-spin fa-circle-notch"/> : <i className="fa fa-search fa-fw"/>} {_("Detect")}
             </button>
-          </div>
         </div>
+        
+        {objLayer ? <div className="detect-action-buttons">
+            <span><strong>{_("Count:")}</strong> {objLayer.getLayers().length}</span>
+            <div>
+              <button onClick={this.handleDownload}
+                    type="button" className="btn btn-sm btn-primary btn-download">
+                <i className="fa fa-download fa-fw"/> {_("Download")}
+              </button>
+              <button onClick={this.handleRemoveObjLayer}
+                      type="button" className="btn btn-sm btn-default">
+                <i className="fa fa-trash fa-fw"/>
+              </button>
+            </div>
+        </div> : ""}
       </div>);
     }
 

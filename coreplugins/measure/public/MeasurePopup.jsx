@@ -68,7 +68,7 @@ export default class MeasurePopup extends React.Component {
   }
 
   getGeoJSON(){
-    const geoJSON = this.props.resultFeature.toGeoJSON();
+    const geoJSON = this.props.resultFeature.toGeoJSON(14);
     geoJSON.properties = this.getProperties();
     return geoJSON;
   }
@@ -125,7 +125,7 @@ export default class MeasurePopup extends React.Component {
         type: 'POST',
         url: `/api/plugins/measure/task/${task.id}/volume`,
         data: JSON.stringify({
-          area: this.props.resultFeature.toGeoJSON(),
+          area: this.props.resultFeature.toGeoJSON(14),
           method: baseMethod
         }),
         contentType: "application/json"

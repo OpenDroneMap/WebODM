@@ -37,6 +37,9 @@
 
   label{
     padding-top: 5px;
+    &.no-pad{
+      padding-top: 0;
+    }
   }
 
   select, input{
@@ -50,6 +53,25 @@
 
   .row.form-group.form-inline{
     margin-bottom: 8px;
+  }
+
+  .model-selector{
+    display: flex;
+    padding-left: 15px;
+    padding-right: 15px;
+    select{
+      margin-right: 8px;
+    }
+  }
+
+  .detect-action-buttons{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    .btn-download{
+      margin-right: 6px;
+    }
   }
 
   .dropdown-menu{
