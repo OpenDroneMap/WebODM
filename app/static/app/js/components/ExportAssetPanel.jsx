@@ -99,7 +99,7 @@ export default class ExportAssetPanel extends React.Component {
   }
 
   handleChangeResample = e => {
-    this.setState({resample: parseFloat(e.target.value) || 0});
+    this.setState({resample: e.target.value});
   }
 
   getExportParams = (format) => {
