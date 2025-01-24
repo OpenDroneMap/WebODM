@@ -1,6 +1,6 @@
 {
 	"name": "Object Detect",
-	"webodmMinVersion": "2.5.8",
+	"webodmMinVersion": "2.6.0",
 	"description": "Detect objects using AI in orthophotos",
 	"version": "1.0.0",
 	"author": "Piero Toffanin",
