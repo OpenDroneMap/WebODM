@@ -2,7 +2,7 @@ import os
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
-from app.api.workers import GetTaskResult, TaskResultOutputError, CheckTask
+from app.api.workers import GetTaskResult, TaskResultOutputError
 from app.models import Task
 from app.plugins.views import TaskView
 from django.utils.translation import gettext_lazy as _
@@ -33,9 +33,6 @@ class TaskVolume(TaskView):
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
-
-class TaskVolumeCheck(CheckTask):
-    pass
 
 class TaskVolumeResult(GetTaskResult):
     def get(self, request, pk=None, celery_task_id=None):

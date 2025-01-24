@@ -17,7 +17,14 @@ class CheckTask(APIView):
         res = TestSafeAsyncResult(celery_task_id)
 
         if not res.ready():
-            return Response({'ready': False}, status=status.HTTP_200_OK)
+            out = {'ready': False}
+            
+            # Copy progress meta
+            if res.state == "PROGRESS" and res.info is not None:
+                for k in res.info:
+                    out[k] = res.info[k]
+            
+            return Response(out, status=status.HTTP_200_OK)
         else:
             result = res.get()
 
@@ -28,6 +35,9 @@ class CheckTask(APIView):
             if self.error_check(result) is not None:
                 msg = self.on_error(result)
                 return Response({'ready': True, 'error': msg})
+
+            if isinstance(result.get('file'), str) and not os.path.isfile(result.get('file')):
+                return Response({'ready': True, 'error': "Cannot generate file"})
 
             return Response({'ready': True})
 
