@@ -75,6 +75,7 @@ export default class ExportAssetPanel extends React.Component {
         format: props.exportFormats[0],
         epsg: this.props.task.epsg || null,
         customEpsg: Storage.getItem("last_export_custom_epsg") || "4326",
+        resample: 0,
         exporting: false
     }
   }
@@ -97,6 +98,10 @@ export default class ExportAssetPanel extends React.Component {
     this.setState({customEpsg: e.target.value});
   }
 
+  handleChangeResample = e => {
+    this.setState({resample: parseFloat(e.target.value) || 0});
+  }
+
   getExportParams = (format) => {
       let params = {};
 
@@ -111,7 +116,13 @@ export default class ExportAssetPanel extends React.Component {
       const epsg = this.getEpsg();
       if (epsg) params.epsg = this.getEpsg();
 
+      if (this.state.resample > 0) params.resample = this.state.resample;
+
       return params;
+  }
+
+  isPointCloud = () => {
+    return this.props.asset == "georeferenced_model";
   }
 
   handleExport = (format) => {
@@ -171,7 +182,7 @@ export default class ExportAssetPanel extends React.Component {
   }
 
   render(){
-    const {epsg, customEpsg, exporting, format } = this.state;
+    const {epsg, customEpsg, exporting, format, resample } = this.state;
     const { exportFormats } = this.props;
     const utmEPSG = this.props.task.epsg;
 
@@ -200,14 +211,21 @@ export default class ExportAssetPanel extends React.Component {
 
   let exportSelector = null;
   if (this.props.selectorOnly){
-    exportSelector = (<div className="row form-group form-inline">
+    exportSelector = [<div key={1} className="row form-group form-inline">
         <label className="col-sm-3 control-label">{_("Format:")}</label>
         <div className="col-sm-9 ">
         <select className="form-control" value={format} onChange={this.handleSelectFormat}>
             {exportFormats.map(ef => <option key={ef} value={ef}>{this.efInfo[ef].label}</option>)}
         </select>
         </div>
-    </div>);
+    </div>,
+    this.isPointCloud() ? <div key={2} className="row form-group form-inline">
+        <label className="col-sm-3 control-label">{_("Resample (meters):")}</label>
+        <div className="col-sm-9 ">
+          <input type="number" min="0" className="form-control custom-interval" value={resample} onChange={this.handleChangeResample} />
+        </div>
+      </div>
+    : ""];
   }else{
     exportSelector = (<div className="row form-group form-inline">
         <label className="col-sm-3 control-label">{_("Export:")}</label>
