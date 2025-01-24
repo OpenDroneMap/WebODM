@@ -1,122 +1,48 @@
 import os
-
+import json
 from rest_framework import status
 from rest_framework.response import Response
-from app.plugins.views import TaskView, CheckTask, GetTaskResult
+from app.plugins.views import TaskView, CheckTask, GetTaskResult, TaskResultOutputError
 from app.plugins.worker import run_function_async
 from django.utils.translation import gettext_lazy as _
 
-class ContoursException(Exception):
-    pass
-
-def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1):
+def detect(orthophoto, model):
     import os
-    import subprocess
-    import tempfile
-    import shutil
-    import glob
     from webodm import settings
 
-    ext = ""
-    if output_format == "GeoJSON":
-        ext = "json"
-    elif output_format == "GPKG":
-        ext = "gpkg"
-    elif output_format == "DXF":
-        ext = "dxf"
-    elif output_format == "ESRI Shapefile":
-        ext = "shp"
-    MIN_CONTOUR_LENGTH = 10
+    try:
+        from geodeep import detect as gdetect, models
+        models.cache_dir = os.path.join(settings.MEDIA_ROOT, "CACHE", "detection_models")
+    except ImportError:
+        return {'error': "GeoDeep library is missing"}
 
-    tmpdir = os.path.join(settings.MEDIA_TMP, os.path.basename(tempfile.mkdtemp('_contours', dir=settings.MEDIA_TMP)))
-    gdal_contour_bin = shutil.which("gdal_contour")
-    ogr2ogr_bin = shutil.which("ogr2ogr")
-
-    if gdal_contour_bin is None:
-        return {'error': 'Cannot find gdal_contour'}
-    if ogr2ogr_bin is None:
-        return {'error': 'Cannot find ogr2ogr'}
-    
-    contours_file = f"contours.gpkg"
-    p = subprocess.Popen([gdal_contour_bin, "-q", "-a", "level", "-3d", "-f", "GPKG", "-i", str(interval), dem, contours_file], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p.communicate()
-
-    out = out.decode('utf-8').strip()
-    err = err.decode('utf-8').strip()
-    success = p.returncode == 0
-
-    if not success:
-        return {'error', f'Error calling gdal_contour: {str(err)}'}
-    
-    outfile = os.path.join(tmpdir, f"output.{ext}")
-    p = subprocess.Popen([ogr2ogr_bin, outfile, contours_file, "-simplify", str(simplify), "-f", output_format, "-t_srs", f"EPSG:{epsg}", "-nln", "contours",
-                            "-dialect", "sqlite", "-sql", f"SELECT ID, ROUND(level * {zfactor}, 5) AS level, GeomFromGML(AsGML(ATM_Transform(GEOM, ATM_Scale(ATM_Create(), 1, 1, {zfactor})), 10)) as GEOM FROM contour WHERE ST_Length(GEOM) >= {MIN_CONTOUR_LENGTH}"], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p.communicate()
-
-    out = out.decode('utf-8').strip()
-    err = err.decode('utf-8').strip()
-    success = p.returncode == 0
-
-    if not success:
-        return {'error', f'Error calling ogr2ogr: {str(err)}'}
-    
-    if not os.path.isfile(outfile):
-        return {'error': f'Cannot find output file: {outfile}'}
-    
-    if output_format == "ESRI Shapefile":
-        ext="zip"
-        shp_dir = os.path.join(tmpdir, "contours")
-        os.makedirs(shp_dir)
-        contour_files = glob.glob(os.path.join(tmpdir, "output.*"))
-        for cf in contour_files:
-            shutil.move(cf, shp_dir)
-
-        shutil.make_archive(os.path.join(tmpdir, 'output'), 'zip', shp_dir)
-        outfile = os.path.join(tmpdir, f"output.{ext}")
-
-    return {'file': outfile}
-
-
-class TaskContoursGenerate(TaskView):
+    try:
+         return {'output': gdetect(orthophoto, model, output_type='geojson')}
+    except Exception as e:
+        return {'error': str(e)}
+     
+class TaskObjDetect(TaskView):
     def post(self, request, pk=None):
         task = self.get_and_check_task(request, pk)
 
-        layer = request.data.get('layer', None)
-        if layer == 'DSM' and task.dsm_extent is None:
-            return Response({'error': _('No DSM layer is available.')})
-        elif layer == 'DTM' and task.dtm_extent is None:
-            return Response({'error': _('No DTM layer is available.')})
+        if task.orthophoto_extent is None:
+            return Response({'error': _('No orthophoto is available.')})
 
-        try:
-            if layer == 'DSM':
-                dem = os.path.abspath(task.get_asset_download_path("dsm.tif"))
-            elif layer == 'DTM':
-                dem = os.path.abspath(task.get_asset_download_path("dtm.tif"))
-            else:
-                raise ContoursException('{} is not a valid layer.'.format(layer))
+        orthophoto = os.path.abspath(task.get_asset_download_path("orthophoto.tif"))
+        model = request.data.get('model', 'cars')
 
-            epsg = int(request.data.get('epsg', '3857'))
-            interval = float(request.data.get('interval', 1))
-            format = request.data.get('format', 'GPKG')
-            supported_formats = ['GPKG', 'ESRI Shapefile', 'DXF', 'GeoJSON']
-            if not format in supported_formats:
-                raise ContoursException("Invalid format {} (must be one of: {})".format(format, ",".join(supported_formats)))
-            simplify = float(request.data.get('simplify', 0.01))
-            zfactor = float(request.data.get('zfactor', 1))
+        if not model in ['cars', 'trees']:
+            return Response({'error': 'Invalid model'}, status=status.HTTP_200_OK)
 
-            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify, zfactor).task_id
-            return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
-        except ContoursException as e:
-            return Response({'error': str(e)}, status=status.HTTP_200_OK)
+        celery_task_id = run_function_async(detect, orthophoto, model).task_id
+        return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
 
-class TaskContoursCheck(CheckTask):
-    def on_error(self, result):
-        pass
-
-    def error_check(self, result):
-        contours_file = result.get('file')
-        if not contours_file or not os.path.exists(contours_file):
-            return _('Could not generate contour file. This might be a bug.')
-
-class TaskContoursDownload(GetTaskResult):
+class TaskObjCheck(CheckTask):
     pass
+
+class TaskObjDownload(GetTaskResult):
+    def handle_output(self, output, result, **kwargs):
+        try:
+            return json.loads(output)
+        except:
+            raise TaskResultOutputError("Invalid GeoJSON")

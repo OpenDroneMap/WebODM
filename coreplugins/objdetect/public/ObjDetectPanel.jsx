@@ -78,37 +78,33 @@ export default class ObjDetectPanel extends React.Component {
     };
   }
 
-  addGeoJSONFromURL = (url, cb) => {
+  addGeoJSON = (geojson, cb) => {
     const { map } = this.props;
 
-    $.getJSON(url)
-     .done((geojson) => {
-      try{
-        this.handleRemoveObjLayer();
+    try{
+      this.handleRemoveObjLayer();
 
-        this.setState({objLayer: L.geoJSON(geojson, {
-          onEachFeature: (feature, layer) => {
-              if (feature.properties && feature.properties.level !== undefined) {
-                  layer.bindPopup(`<div style="margin-right: 32px;">
-                      <b>${_("Class:")}</b> ${feature.properties.class}<br/>
-                      <b>${_("Score:")}</b> ${feature.properties.score}<br/>
-                    </div>
-                    `);
-              }
-          },
-          style: feature => {
-              // TODO: different colors for different elevations?
-              return {color: "yellow"};
-          }
-        })});
-        this.state.objLayer.addTo(map);
+      this.setState({objLayer: L.geoJSON(geojson, {
+        onEachFeature: (feature, layer) => {
+            if (feature.properties && feature.properties.level !== undefined) {
+                layer.bindPopup(`<div style="margin-right: 32px;">
+                    <b>${_("Class:")}</b> ${feature.properties.class}<br/>
+                    <b>${_("Score:")}</b> ${feature.properties.score}<br/>
+                  </div>
+                  `);
+            }
+        },
+        style: feature => {
+            // TODO: different colors for different elevations?
+            return {color: "red"};
+        }
+      })});
+      this.state.objLayer.addTo(map);
 
-        cb();
-      }catch(e){
-        cb(e.message);
-      }
-     })
-     .fail(cb);
+      cb();
+    }catch(e){
+      cb(e.message);
+    }
   }
 
   handleRemoveObjLayer = () => {
@@ -139,11 +135,20 @@ export default class ObjDetectPanel extends React.Component {
           Workers.waitForCompletion(result.celery_task_id, error => {
             if (error) this.setState({detecting: false, error});
             else{
-              const fileUrl = `/api/plugins/objdetect/task/${taskId}/download/${result.celery_task_id}`;
+              Workers.getOutput(result.celery_task_id, (error, geojson) => {
+                try{
+                  geojson = JSON.parse(geojson);
+                }catch(e){
+                  error = "Invalid GeoJSON";
+                }
 
-              this.addGeoJSONFromURL(fileUrl, e => {
-                if (e) this.setState({error: JSON.stringify(e)});
-                this.setState({detecting: false});
+                if (error) this.setState({detecting: false, error});
+                else{
+                  this.addGeoJSON(geojson, e => {
+                    if (e) this.setState({error: JSON.stringify(e)});
+                    this.setState({detecting: false});
+                  });
+                }
               });
             }
           }, `/api/plugins/objdetect/task/${taskId}/check/`);
