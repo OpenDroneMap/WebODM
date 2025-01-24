@@ -66,6 +66,8 @@ app.conf.beat_schedule = {
 class MockAsyncResult:
     def __init__(self, celery_task_id, result = None):
         self.celery_task_id = celery_task_id
+        self.state = "PENDING"
+
         if result is None:
             if celery_task_id == 'bogus':
                 self.result = None
