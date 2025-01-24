@@ -20,7 +20,7 @@ class CheckTask(APIView):
             out = {'ready': False}
             
             # Copy progress meta
-            if res.state == "PROGRESS":
+            if res.state == "PROGRESS" and res.info is not None:
                 for k in res.info:
                     out[k] = res.info[k]
             
