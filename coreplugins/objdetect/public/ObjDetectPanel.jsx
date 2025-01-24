@@ -28,6 +28,7 @@ export default class ObjDetectPanel extends React.Component {
         loading: true,
         task: props.tasks[0] || null,
         detecting: false,
+        progress: null,
         objLayer: null,
     };
   }
@@ -124,7 +125,7 @@ export default class ObjDetectPanel extends React.Component {
   }
 
   handleDetect = () => {
-    this.setState({detecting: true, error: ""});
+    this.setState({detecting: true, error: "", progress: null});
     const taskId = this.state.task.id;
     this.saveInputValues();
 
@@ -153,7 +154,9 @@ export default class ObjDetectPanel extends React.Component {
                 }
               });
             }
-          }, `/api/plugins/objdetect/task/${taskId}/check/`);
+          }, (_, progress) => {
+            this.setState({progress});
+          });
         }else if (result.error){
             this.setState({detecting: false, error: result.error});
         }else{
@@ -169,7 +172,7 @@ export default class ObjDetectPanel extends React.Component {
   }
 
   render(){
-    const { loading, permanentError, objLayer, detecting, model } = this.state;
+    const { loading, permanentError, objLayer, detecting, model, progress } = this.state;
     const models = [
       {label: _('Cars'), value: 'cars'}, 
       {label: _('Trees'), value: 'trees'}, 
@@ -189,7 +192,7 @@ export default class ObjDetectPanel extends React.Component {
             </select>
             <button onClick={this.handleDetect}
                     disabled={detecting} type="button" className="btn btn-sm btn-primary btn-detect">
-              {detecting ? <i className="fa fa-spin fa-circle-notch"/> : <i className="fa fa-search fa-fw"/>} {_("Detect")}
+              {detecting ? <i className="fa fa-spin fa-circle-notch"/> : <i className="fa fa-search fa-fw"/>} {_("Detect")} {detecting && progress !== null ? ` (${progress.toFixed(0)}%)` : ""}
             </button>
         </div>
         

@@ -1,7 +1,8 @@
 import $ from 'jquery';
 
 export default {
-    waitForCompletion: (celery_task_id, cb, checkUrl = "/api/workers/check/") => {
+    waitForCompletion: (celery_task_id, cb, progress_cb) => {
+        const checkUrl = "/api/workers/check/";
         let errorCount = 0;
         let url = checkUrl + celery_task_id;
 
@@ -15,6 +16,9 @@ export default {
               }else if (result.ready){
                 cb();
               }else{
+                if (typeof progress_cb === "function" && result.progress !== undefined && result.status !== undefined){
+                    progress_cb(result.status, result.progress);
+                }
                 // Retry
                 setTimeout(() => check(), 2000);
               }

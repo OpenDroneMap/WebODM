@@ -1,7 +1,6 @@
 from app.plugins import PluginBase
 from app.plugins import MountPoint
 from .api import TaskObjDetect
-from .api import TaskObjCheck
 from .api import TaskObjDownload
 
 
@@ -15,6 +14,5 @@ class Plugin(PluginBase):
     def api_mount_points(self):
         return [
             MountPoint('task/(?P<pk>[^/.]+)/detect', TaskObjDetect.as_view()),
-            MountPoint('task/[^/.]+/check/(?P<celery_task_id>.+)', TaskObjCheck.as_view()),
             MountPoint('task/[^/.]+/download/(?P<celery_task_id>.+)', TaskObjDownload.as_view()),
         ]

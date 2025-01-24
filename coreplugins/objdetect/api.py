@@ -2,11 +2,11 @@ import os
 import json
 from rest_framework import status
 from rest_framework.response import Response
-from app.plugins.views import TaskView, CheckTask, GetTaskResult, TaskResultOutputError
+from app.plugins.views import TaskView, GetTaskResult, TaskResultOutputError
 from app.plugins.worker import run_function_async
 from django.utils.translation import gettext_lazy as _
 
-def detect(orthophoto, model):
+def detect(orthophoto, model, progress_callback=None):
     import os
     from webodm import settings
 
@@ -17,7 +17,7 @@ def detect(orthophoto, model):
         return {'error': "GeoDeep library is missing"}
 
     try:
-         return {'output': gdetect(orthophoto, model, output_type='geojson')}
+         return {'output': gdetect(orthophoto, model, output_type='geojson', progress_callback=progress_callback)}
     except Exception as e:
         return {'error': str(e)}
      
@@ -34,11 +34,9 @@ class TaskObjDetect(TaskView):
         if not model in ['cars', 'trees']:
             return Response({'error': 'Invalid model'}, status=status.HTTP_200_OK)
 
-        celery_task_id = run_function_async(detect, orthophoto, model).task_id
-        return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
+        celery_task_id = run_function_async(detect, orthophoto, model, with_progress=True).task_id
 
-class TaskObjCheck(CheckTask):
-    pass
+        return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
 
 class TaskObjDownload(GetTaskResult):
     def handle_output(self, output, result, **kwargs):

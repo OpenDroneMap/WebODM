@@ -139,7 +139,7 @@ export default class MeasurePopup extends React.Component {
                       else this.setState({volume: parseFloat(volume)});
                   }, `/api/plugins/measure/task/${task.id}/volume/get/`);
               }
-            }, `/api/plugins/measure/task/${task.id}/volume/check/`);
+            });
         }else if (result.error){
             this.setState({error: result.error});
         }else{
