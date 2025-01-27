@@ -384,6 +384,9 @@ UI_MAX_PROCESSING_NODES = None
 # are removed (or None to disable)
 CLEANUP_PARTIAL_TASKS = 72
 
+# Maximum number of threads that a worker should use for processing
+WORKERS_MAX_THREADS = 1
+
 # Link to GCP docs
 GCP_DOCS_LINK = "https://docs.opendronemap.org/gcp/#gcp-file-format"
 
