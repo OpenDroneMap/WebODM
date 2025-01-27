@@ -9,25 +9,21 @@
 }
 
 .leaflet-control-autolayers-close {
-    display: inline-block;
-    font-size:17px;
-    height: 30px;
-    width: 30px;
-    margin-right: 0;
-    float: right;
-    vertical-align: middle;
-    text-align: right;
-    margin-top: 0px;
-    margin-left: 16px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #707070
+    position: absolute !important;
+    top: 17px !important;
+    right: 15px !important;
+    font-size: 17px;
+    color: #707070;
+    cursor: pointer;
+    z-index: 1000; /* Certifique-se de que ele esteja acima dos outros elementos */
 }
 
-.leaflet-control-autolayers-close:hover{
+.leaflet-control-autolayers-close:hover {
     opacity: 0.7;
-    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .leaflet-control-autolayers-title {
@@ -200,7 +196,7 @@
 
 .leaflet-control-layers-expanded {
     padding: 15px 20px 15px 25px;
-    margin: 10px 12px 0 0;
+    margin: 1000px 12px 0 0;
     background: #fff;
     width: 300px;
     min-height: 74px;
@@ -208,6 +204,8 @@
     overflow-y: auto;
     border-radius: 12px;
     overflow-x: hidden;
+    position: relative; /* Ou 'absolute' se necessário */
+    left: -13px; /* Ajuste conforme necessário */
 }
 
 .map-filter-box-base {
@@ -252,7 +250,6 @@
         max-height: 200px;
         overflow-y: auto;
         overflow-x: auto;
-        
     }
 
     .leaflet-control-autolayers-title {

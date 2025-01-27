@@ -1,5 +1,6 @@
 .leaflet-control-sprayline-control .sprayline-control-panel{
   padding: 15px 20px 15px 25px;
+  margin: 10px 12px 0 0;
   background: #fff;
   width: 300px;
   min-height: 74px;
@@ -29,12 +30,10 @@
   }
 
   .title{
-    font-size: 14.4px;
-    color:#14a5a2;
+    padding: 7px 0px;
+    font-size: 120%;
     margin-right: 60px;
-    margin-bottom: 15px;
-    width: 100%;
-    padding-top: 15px;
+    color: #14a5a2;
   }
 
   .layer-container {
@@ -45,7 +44,7 @@
     .vertical-bar {
       height: 16px;
       width: 1.5px;
-      background-color: #2c3e50;
+      background-color: #14a5a2;
       display: inline-block;
       border: none;
     }
@@ -58,7 +57,7 @@
     }
 
     .layer-id {
-      color:#2c3e50;
+      color:#14a5a2;
     }
 
   }
@@ -150,7 +149,7 @@
 
     hr {
       border: none;
-      border-top: 1px solid #74b06f;
+      border-top: 1px solid #74b16f;
       margin-top: 5px;
       margin-bottom: 7px;
     }
@@ -202,9 +201,10 @@
   }
 
   .btn-process {
-    background-color: #aeaeae;
-    border-color: #aeaeae;
-    border-radius: 25px !important;
+    background-color: #74b16f;
+    border-color: #74b16f;
+    border-radius: 20px;
+    height: 27.6px;
     font-size: 15px;
     color: #FFF;
     min-width: 115px !important;
@@ -212,6 +212,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    transition: background-color 0.3s ease;
     
     
 
@@ -223,9 +224,10 @@
   }
 
   .btn-export {
-    background-color: #469c42;
-    border-color: #469c42;
-    border-radius: 25px !important;
+    background-color: #74b16f;
+    border-color: #74b16f;
+    border-radius: 20px;
+    height: 27.6px;
     font-size: 14px;
     color: #FFF;
     min-width: 115px !important;
@@ -233,6 +235,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    transition: background-color 0.3s ease;
 
     
     

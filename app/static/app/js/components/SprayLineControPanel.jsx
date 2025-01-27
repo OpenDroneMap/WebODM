@@ -367,7 +367,7 @@ export default class SprayLineControlPanel extends React.Component {
                                         {layer.name ? 
                                         <div className='layer-container'>
                                             <span className='NameField'> {layer.name} </span> 
-                                            <span className='vertical-bar'></span>
+                                            <span> | </span>
                                             <span className='layer-id'> Layer {index} </span>
                                         </div> :
                                             <span className='layer-id'> Layer {index} </span>}

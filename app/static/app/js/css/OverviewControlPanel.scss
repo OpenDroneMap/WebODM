@@ -1,12 +1,13 @@
 .leaflet-control-overview-control .overview-control-panel {
-  padding: 6px 10px 6px 6px;
+  padding: 15px 20px 15px 25px;
+  margin: 10px 12px 0 0;
   background: #fff;
   width: 300px;
   min-height: 74px;
   max-height: 418px;
   overflow-y: auto;
   border-radius: 12px;
-  border: none;
+  overflow-x: hidden;
 
   .close-button{
     display: inline-block;
@@ -28,9 +29,11 @@
     }
   }
 
-  .title {
+  .title{
+    padding: 7px 0px;
     font-size: 120%;
-    margin-right: 120px;
+    margin-right: 60px;
+    color: #14a5a2;
   }
 
   hr {
@@ -74,6 +77,7 @@
 
   .list-layer-items.collapsed {
     display: none;
+
   }
 
   .collapsed-infos-btn {
@@ -87,7 +91,7 @@
     width: 18px;
     color: #fff;
     border: none;
-    background-color: #4b8b45;
+    background-color: #74b16f;
   }
   .collapsed-infos-btn:hover{
     background-color: #319c41;
@@ -110,19 +114,21 @@
   }
   .send,
   .clear {
-    background-color: #319c41;
+    background-color: #74b16f;
     border-radius: 20px;
+    height: 27.6px;
+    font-size: 14px;
     margin: 5px;
     padding: 4px;
     color: #fff;
     border: none;
-    width: 23%;
+    width: 27%;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
 
   .send:hover {
-    background-color: #4b8b45;
+    background-color: #319c41;
   }
 
   .clear {

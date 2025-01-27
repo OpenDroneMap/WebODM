@@ -113,8 +113,12 @@
   }
 
   .btn-group.dropup .btn-export, .btn-group.dropup .dropdown-toggle {
-    background-color: #319c41;
+    background-color: #74b06f;
     border: none;
+
+    &:hover{
+      background-color: #319c41;
+    }
   }
 
 
@@ -146,6 +150,8 @@
         background-size: 100%; 
         background-position: center;
     }
+
+    
     
   }
 
