@@ -21,7 +21,7 @@ drf-nested-routers==0.11.1
 funcsigs==1.0.2
 futures==3.1.1
 gunicorn==19.8.0
-geodeep==0.9.4
+geodeep==0.9.7
 itypes==1.1.0
 kombu==4.6.7
 Markdown==3.3.4

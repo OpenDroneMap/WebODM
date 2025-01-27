@@ -17,7 +17,7 @@ def detect(orthophoto, model, progress_callback=None):
         return {'error': "GeoDeep library is missing"}
 
     try:
-         return {'output': gdetect(orthophoto, model, output_type='geojson', progress_callback=progress_callback)}
+        return {'output': gdetect(orthophoto, model, output_type='geojson', max_threads=settings.WORKERS_MAX_THREADS, progress_callback=progress_callback)}
     except Exception as e:
         return {'error': str(e)}
      
