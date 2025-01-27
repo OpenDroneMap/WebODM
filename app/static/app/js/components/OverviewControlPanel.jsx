@@ -414,7 +414,6 @@ export default class OverviewControlPanel extends React.Component {
   };
 
 
-
   render() {
     return (
       <div className="overview-control-panel">
@@ -467,7 +466,7 @@ export default class OverviewControlPanel extends React.Component {
                   )}
                   {layer.aiOptions.size > 0 && (
                     <li>
-                      IA: {translate([...layer.aiOptions][0], "aiOptions")}
+                      IA: {[...layer.aiOptions].map((option) => translate(option, "aiOptions")).join(", ")}
                     </li>
                   )}
                   {layer.polynomialHealth && (
@@ -521,6 +520,7 @@ const translations = {
   },
   aiOptions: {
     weed: "Daninha",
+    segmentation: "Segmentação"
   },
 };
 

@@ -26,6 +26,10 @@ class FieldLayerControlPopup extends React.Component {
         checkboxLabel: "Daninha",
         category: 'weed',
       },
+      {
+        checkboxLabel: "Segmentação",
+        category: 'segmentation',
+      },
     ];
 
     // checkboxLabel: the label that appears with the checkbox when the detections popup is opened. (Optional)
@@ -56,6 +60,7 @@ class FieldLayerControlPopup extends React.Component {
     this.state = {
       cropType: null,
       isChecked: false,
+      optionIsChecked: {},
       isPulverize: false,
       isPolinomialHealth: false,
     };
@@ -98,7 +103,13 @@ class FieldLayerControlPopup extends React.Component {
 
   handleCheck(category) {
 
-    this.setState({ isChecked: !this.state.isChecked });
+    this.setState((prevState) => ({
+      optionIsChecked: {
+        ...prevState.optionIsChecked,
+        [category]: !prevState.optionIsChecked[category], // Alterna o estado da opção clicada
+      },
+    }));
+    console.log(this.state.optionIsChecked);
     this.handleOnChangeAi(category);
   }
 
@@ -175,10 +186,9 @@ class FieldLayerControlPopup extends React.Component {
           this.aiOptions.map(option => {
             return (
               <div className='IAprocess-container' key={option.category} onClick={() => this.handleCheck(option.category)}>
-                <i className={this.state.isChecked ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
+                <i className={this.state.optionIsChecked[option.category] ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
                 <label htmlFor={option.category} style={{ cursor: "pointer" }} > {option.checkboxLabel}</label>
               </div>
-
             )
           })
         }
