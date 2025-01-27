@@ -254,7 +254,7 @@ export default class LayersControlLayer extends React.Component {
                 }else if (result.error){
                     this.setState({exportLoading: false, error: result.error});
                 }else{
-                    this.setState({exportLoading: false, error: interpolate(_("Invalid JSON response: %(error)s"), {error: JSON.stringify(result)})});
+                    this.setState({exportLoading: false, error: interpolate(_("Resposta JSON inválida: %(error)s"), {error: JSON.stringify(result)})});
                 }
             }).fail(error => {
                 this.setState({exportLoading: false, error: JSON.stringify(error)});
@@ -321,11 +321,11 @@ export default class LayersControlLayer extends React.Component {
                     {histogramLoading ? 
                     <i className="fa fa-circle-notch fa-spin fa-fw" /> :
                     [<select key="sel" className="form-control" value={bands} onChange={this.handleSelectBands} title={auto_bands.filter !== "" && bands == "auto" ? auto_bands.filter : ""}>
-                        <option key="auto" value="auto">{_("Automatic")}</option>
+                        <option key="auto" value="auto">{_("Automático")}</option>
                         {algo.filters.map(f => <option key={f} value={f}>{f}</option>)}
                     </select>,
                     bands == "auto" && !auto_bands.match ? 
-                    <i key="ico" style={{marginLeft: '4px'}} title={interpolate(_("Not every band for %(name)s could be automatically identified."), {name: algo.id}) + "\n" + _("Your sensor might not have the proper bands for using this algorithm.")} className="fa fa-exclamation-circle info-button"></i>
+                    <i key="ico" style={{marginLeft: '4px'}} title={interpolate(_("Nem todas as bandas de %(name)s puderam ser identificadas automaticamente."), {name: algo.id}) + "\n" + _("Seu sensor pode não ter as bandas adequadas para usar este algoritmo.")} className="fa fa-exclamation-circle info-button"></i>
                     : ""]}
                 </div>
             </div> : ""}
@@ -347,9 +347,9 @@ export default class LayersControlLayer extends React.Component {
                 <label className="col-sm-3 control-label">{_("Sombra:")}</label>
                 <div className="col-sm-9 ">
                     <select className="form-control" value={hillshade} onChange={this.handleSelectHillshade}>
-                        <option value="0">{_("None")}</option>
+                        <option value="0">{_("Vazio")}</option>
                         <option value="6">{_("Normal")}</option>
-                        <option value="18">{_("Extruded")}</option>
+                        <option value="18">{_("Extrudado")}</option>
                     </select>
                 </div>
             </div> : ""}

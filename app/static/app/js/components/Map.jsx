@@ -95,6 +95,16 @@ class Map extends React.Component {
   }
 
   setSelectedLayers(idx, el) {
+    //Verifica se todos os nomes ja foram utilizados e, caso todos tenham sido utilizados, reutiliza os nomes anteriores com um valor do lado
+    let counter = "";
+    const value = Math.floor(idx/names.length);
+    let nameIdx = idx;
+    if(value >= 1){
+      counter = " " + (value + 1);
+      nameIdx = nameIdx - (names.length*value);
+    }
+    el.name = names[nameIdx] + counter; 
+
     if (idx >= this.state.selectedLayers.length) {
       this.setState(update(this.state, 
         {selectedLayers: {$push: [el]}}
@@ -111,6 +121,14 @@ class Map extends React.Component {
     return this.state.selectedLayers;
   }
 
+  setPolygonColor(polygon){
+    polygon.eachLayer((layer)=>{
+      if(layer.feature.properties.obstacle === true){
+        layer.setStyle({color: 'red', fillOpacity: 0.5});
+      }
+    });
+  }
+
   loadGeoJsonDetections(types_to_be_loaded) {
     const { tiles } = this.props;
     const task_id = tiles[0].meta.task.id;
@@ -122,6 +140,7 @@ class Map extends React.Component {
       addTempLayerUsingRequest(base_url + typ, typ, this.props.aiTypes, [this.getSelectedLayers, this.setSelectedLayers], (error, tempLayer, api_url) => {
         if (!error) {
           this.setOpacityForLayer(tempLayer, 1);
+          this.setPolygonColor(tempLayer);
           tempLayer.addTo(this.map);
           tempLayer[Symbol.for("meta")] = {  name: typ  };
           this.setState(update(this.state, {
@@ -579,7 +598,7 @@ class Map extends React.Component {
             this.container = Leaflet.DomUtil.create('div', 'leaflet-control-add-overlay leaflet-bar leaflet-control');
             Leaflet.DomEvent.disableClickPropagation(this.container);
             const btn = Leaflet.DomUtil.create('a', 'leaflet-control-add-overlay-button');
-            btn.setAttribute("title", _("Add a temporary GeoJSON (.json) or ShapeFile (.zip) overlay"));
+            btn.setAttribute("title", _("Adicione uma sobreposição temporária de GeoJSON (.json) ou ShapeFile (.zip)"));
             
             this.container.append(btn);
             addDnDZone(btn, {url: "/", clickable: true});
@@ -608,6 +627,13 @@ class Map extends React.Component {
     this.map.on('draw:editstop', () => {
       this.state.isDrawing = false;
     });
+    this.map.on('draw:deletestart', () => {
+      this.state.isDrawing = true;
+    });
+    this.map.on('draw:deletestop', () => {
+      this.state.isDrawing = false;
+    });
+    
 
     this.setState({showLoading: true});
     this.loadImageryLayers(true).then(() => {
@@ -647,7 +673,7 @@ class Map extends React.Component {
                             $assetLinks.append($(linksHtml));
                         })
                         .fail(() => {
-                            $assetLinks.append($("<li>" + _("Error: cannot load assets list.") + "</li>"));
+                            $assetLinks.append($("<li>" + _("Erro: não é possível carregar a lista de ativos.") + "</li>"));
                         })
                         .always(() => {
                             $assetLinks.removeClass('loading');
@@ -806,7 +832,7 @@ class Map extends React.Component {
         </div>
 
         <Standby 
-            message={_("Loading...")}
+            message={_("Carregando...")}
             show={this.state.showLoading}
             />
             
@@ -835,5 +861,27 @@ class Map extends React.Component {
     );
   }
 }
+
+const names = [
+  "Ana", "Beatriz", "Carlos", "Daniela", "Eduardo",
+  "Fernanda", "Gabriel", "Helena", "Igor", "Juliana",
+  "Kleber", "Luana", "Marcos", "Natalia", "Otávio",
+  "Priscila", "Roberto", "Samantha", "Thiago", "Vanessa",
+  "Wesley", "Yasmin", "Zé", "Amanda", "Bruno",
+  "Camila", "Diego", "Eliane", "Flávio", "Gustavo",
+  "Heloísa", "Isabela", "João", "Karine", "Leonardo",
+  "Maria", "Nicolas", "Olga", "Pedro", "Queila",
+  "Raul", "Sabrina", "Tiago", "Vânia", "William",
+  "Zilda", "André", "Barbara", "Célia", "David",
+  "Emanuelle", "Felipe", "Giovana", "Henrique", "Irene",
+  "Júlio", "Larissa", "Marcelo", "Nayara", "Olavo",
+  "Paula", "Ricardo", "Silvia", "Tânia", "Vinícius",
+  "Wagner", "Yara", "Zeca", "Adriana", "Bernardo",
+  "Cristiane", "Douglas", "Elena", "Flávia", "Gisele",
+  "Hugo", "Jéssica", "Lucas", "Márcia", "Nando",
+  "Patrícia", "Rafael", "Silvia", "Tatiane", "Valter",
+  "Wellington", "Zuleica", "Aline", "Bruna", "César",
+  "Daniel", "Evelyn", "Fábio", "Gisele", "Helena"
+];
 
 export default Map;

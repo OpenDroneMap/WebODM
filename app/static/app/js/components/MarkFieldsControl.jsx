@@ -35,7 +35,7 @@ class MarkFieldslButton extends React.Component {
 
     return (<div className={showPanel ? "open" : ""}>
               <a href="javascript:void(0);" 
-                  title="Mark Fields"
+                  title="Marcar talhões"
                   onClick={this.handleOpen} 
                   className="leaflet-control-markFields-control-button leaflet-bar-part theme-secondary">
                   <i class="fas fa-draw-polygon fixIcon" ></i>

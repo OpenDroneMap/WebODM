@@ -78,7 +78,7 @@ class GCPPopup extends React.Component {
     }
 
     imageOnError = () => {
-        this.setState({error: _("Image missing"), loading: false});
+        this.setState({error: _("Imagem ausente"), loading: false});
     }
 
     imageOnLoad = () => {
@@ -172,10 +172,10 @@ class GCPPopup extends React.Component {
             </div>
 
             <div>
-                <strong>{_("Horizontal error:")}</strong> {Math.abs(Math.max(feature.properties.error[0], feature.properties.error[1])).toFixed(3)} {_("(meters)")}
+                <strong>{_("Erro horizontal:")}</strong> {Math.abs(Math.max(feature.properties.error[0], feature.properties.error[1])).toFixed(3)} {_("(metros)")}
             </div>
             <div>
-                <strong>{_("Vertical error:")}</strong> {Math.abs(feature.properties.error[2]).toFixed(3)} {_("(meters)")}
+                <strong>{_("Erro vertical:")}</strong> {Math.abs(feature.properties.error[2]).toFixed(3)} {_("(metros)")}
             </div>
             <div>
                 <a href={downloadGCPLink}><i className={assetDownload.icon}></i> {assetDownload.label} </a>

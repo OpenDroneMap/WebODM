@@ -128,7 +128,7 @@ L.Control.AutoLayers = L.Control.extend({
 
 			var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
 			link.href = '#';
-			link.title = 'Base Maps';
+			link.title = 'Base do mapa';
 
 			if (L.Browser.touch) {
 				L.DomEvent
@@ -155,12 +155,13 @@ L.Control.AutoLayers = L.Control.extend({
 		this._baseLayersClose.classList.add('fas', 'fa-times');
 		this._baseLayersTitle = L.DomUtil.create('div', 'leaflet-control-autolayers-title',
 			baseLayersDiv);
-		this._baseLayersTitle.innerHTML = 'Base Maps';
-		
+		this._baseLayersTitle.innerHTML = 'Base do mapa';
+		this._baseLayersClose = L.DomUtil.create('span', 'leaflet-control-autolayers-close',
+			baseLayersDiv);
 		var baseLayersBox = this._baseLayersBox = L.DomUtil.create('div', 'map-filter', baseLayersDiv);
 		var baseLayersFilter = this._baseLayersFilter = L.DomUtil.create('input',
 			'map-filter-box-base', baseLayersBox);
-		baseLayersFilter.setAttribute('placeholder', 'Filter Base Layer List');
+		baseLayersFilter.setAttribute('placeholder', 'Filtrar lista de camada base');
 		baseLayersFilter.setAttribute('autocomplete', 'off');
 		this._baseLayersList = L.DomUtil.create('div', className + '-base', baseLayersDiv);
 		this._separator = L.DomUtil.create('div', className + '-separator', form);
@@ -254,7 +255,7 @@ L.Control.AutoLayers = L.Control.extend({
 			if (e.currentTarget.innerText === 'Overlays') {
 				overlayOrBase = 'overlays';
 			}
-			if (e.currentTarget.innerText === 'Base Maps') {
+			if (e.currentTarget.innerText === 'Base do mapa') {
 				overlayOrBase = 'base';
 			}
 
@@ -284,7 +285,7 @@ L.Control.AutoLayers = L.Control.extend({
 			}
 
 			if (e.currentTarget.innerText === 'Overlays' || e.currentTarget
-				.innerText === 'Base Maps') {
+				.innerText === 'Base do mapa') {
 				var filterBoxValue = this.parentNode.getElementsByClassName('map-filter')[0].children[0].value
 					.toLowerCase();
 				var displayLayers = this.parentNode.getElementsByClassName('leaflet-control-layers-' +

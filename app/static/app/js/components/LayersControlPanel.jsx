@@ -26,8 +26,8 @@ render() {
     if (!this.props.layers.length) {
         content = (
             <span>
-                <i className="loading fa fa-circle-notch fa-spin"></i>
-                {_("Loading…")}
+                <i className="loading fa fa-circle-notch fa-spin"></i> 
+                {_("Carregando…")}
             </span>
         );
     } else {

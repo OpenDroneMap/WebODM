@@ -217,8 +217,8 @@ export default class OverviewControlPanel extends React.Component {
   render() {
     return (
       <div className="overview-control-panel">
-        <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
-        <div className="title">Overview</div>
+        <span className="close-button" onClick={this.props.onClose} />
+        <div className="title">Visão geral</div>
         <hr />
         {this.state.filteredSelectedLayers.length > 0 ? (
           <ul className="list-overview">
@@ -252,7 +252,7 @@ export default class OverviewControlPanel extends React.Component {
                   onClick={this.handlePopUp}
                   className="link-item"
                 >
-                  {names[index] + ` - Layer ${index}` || `Layer ${index}`}
+                  {layer.name + ` - Layer ${index}` || `Layer ${index}`}
                 </a>
                 <ul
                   className={`list-layer-items ${
@@ -304,104 +304,6 @@ const getCsrfToken = () => {
   }
   return null;
 };
-
-const names = [
-  "Ana",
-  "Beatriz",
-  "Carlos",
-  "Daniela",
-  "Eduardo",
-  "Fernanda",
-  "Gabriel",
-  "Helena",
-  "Igor",
-  "Juliana",
-  "Kleber",
-  "Luana",
-  "Marcos",
-  "Natalia",
-  "Otávio",
-  "Priscila",
-  "Roberto",
-  "Samantha",
-  "Thiago",
-  "Vanessa",
-  "Wesley",
-  "Yasmin",
-  "Zé",
-  "Amanda",
-  "Bruno",
-  "Camila",
-  "Diego",
-  "Eliane",
-  "Flávio",
-  "Gustavo",
-  "Heloísa",
-  "Isabela",
-  "João",
-  "Karine",
-  "Leonardo",
-  "Maria",
-  "Nicolas",
-  "Olga",
-  "Pedro",
-  "Queila",
-  "Raul",
-  "Sabrina",
-  "Tiago",
-  "Vânia",
-  "William",
-  "Zilda",
-  "André",
-  "Barbara",
-  "Célia",
-  "David",
-  "Emanuelle",
-  "Felipe",
-  "Giovana",
-  "Henrique",
-  "Irene",
-  "Júlio",
-  "Larissa",
-  "Marcelo",
-  "Nayara",
-  "Olavo",
-  "Paula",
-  "Ricardo",
-  "Silvia",
-  "Tânia",
-  "Vinícius",
-  "Wagner",
-  "Yara",
-  "Zeca",
-  "Adriana",
-  "Bernardo",
-  "Cristiane",
-  "Douglas",
-  "Elena",
-  "Flávia",
-  "Gisele",
-  "Hugo",
-  "Jéssica",
-  "Lucas",
-  "Márcia",
-  "Nando",
-  "Patrícia",
-  "Rafael",
-  "Silvia",
-  "Tatiane",
-  "Valter",
-  "Wellington",
-  "Zuleica",
-  "Aline",
-  "Bruna",
-  "César",
-  "Daniel",
-  "Evelyn",
-  "Fábio",
-  "Gisele",
-  "Helena",
-];
 
 // Objeto contendo traduções para diferentes tipos de dados
 const translations = {

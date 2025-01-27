@@ -215,7 +215,7 @@ export default class ExportAssetPanel extends React.Component {
             <div className={"btn-group " + (this.props.dropUp ?  "dropup" : "")}>
                 <button onClick={this.handleExport(exportFormats[0])}
                     disabled={disabled} type="button" className="btn btn-sm btn-primary btn-export">
-                    {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exporting...") : this.efInfo[exportFormats[0]].label}
+                    {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exportando...") : this.efInfo[exportFormats[0]].label}
                 </button>
                 <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className=""></span></button>
                 <ul className="dropdown-menu pull-right">

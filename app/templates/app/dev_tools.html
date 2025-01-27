@@ -3,34 +3,34 @@
 
 {% block content %}
 
-<h2>{% trans 'Developer Tools' %}</h2>
+<h2>Ferramenta do desenvolvedor</h2>
 
 <div id="errorDialog" class="alert alert-warning alert-dismissible" style="display: none;">
-    <button type="button" class="close" title="{% trans 'Close' %}" onClick="javascript:hideError()"><span aria-hidden="true">&times;</span></button>
+    <button type="button" class="close" title="Fechar" onClick="javascript:hideError()"><span aria-hidden="true">&times;</span></button>
     <div id="errorMessage"></div>
 </div>
 
 <form class="form-inline" style="margin-top: 32px;">
-    <strong>{% trans 'Current Locale:' %}</strong> {{ current_locale }}<br/>
-    <small>{% trans "To change locale, modify your browser's locale settings, then refresh the page, or use the set locale button below." %}</small>
+    <strong>Local atual:</strong> {{ current_locale }}<br/>
+    <small>"Para alterar a localidade, modifique as configurações de localidade do seu navegador e atualize a página ou use o botão definir localidade abaixo."</small>
     <br/><br/>
     <div class="form-group margin-bottom">
-      <label for="transFiles">{% trans 'Translation Files (.zip):' %}</label>
+      <label for="transFiles">Arquivos de tradução (.zip):</label>
       <input id='transFiles' type="text" class="form-control" size="50" value="https://hosted.weblate.org/download/webodm/?format=zip">
     </div>
     <div style="margin-top: 16px;">
-        <button type="button" class="btn btn-danger" onClick="javascript:execute(this, 'reloadTranslation', document.getElementById('transFiles').value)"><i class="fa fa-language"></i> {% trans 'Download and Replace Translation Files' %}</button>
+        <button type="button" class="btn btn-danger" onClick="javascript:execute(this, 'reloadTranslation', document.getElementById('transFiles').value)"><i class="fa fa-language"></i> Baixar e substituir arquivos de tradução</button>
     </div>
 </form>
 <form class="form-inline" style="margin-top: 32px;" onsubmit="return false;">
     <div class="form-group margin-bottom">
-        <label for="targetLocale">{% trans 'Set locale:' %}</label>
+        <label for="targetLocale">Definir local</label>
         <input id='targetLocale' type="text" class="form-control" size="6" value="it-IT">
-        <button class="btn btn-primary" onclick="window.setLocale(document.getElementById('targetLocale').value);"><i class="fa fa-globe"></i> {% trans 'Apply' %}</button>
+        <button class="btn btn-primary" onclick="window.setLocale(document.getElementById('targetLocale').value);"><i class="fa fa-globe"></i> Aplicar</button>
     </div>
 </form>
 <div id="action-loading" style="display: none; margin-top: 12px">
-    <i class="fa fa-circle-notch fa-spin fa-fw"></i> {% trans 'Executing… do not refresh the page! This could take a while.' %}
+    <i class="fa fa-circle-notch fa-spin fa-fw"></i> Execução... Não atualize a página! Isso pode demorar um pouco.
 </div>
 
 <script>

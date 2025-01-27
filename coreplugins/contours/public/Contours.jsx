@@ -34,7 +34,7 @@ class ContoursButton extends React.Component {
         <a href="javascript:void(0);" 
             onClick={this.handleOpen} 
             className="leaflet-control-contours-button leaflet-bar-part theme-secondary"
-            title="Contours"></a>
+            title="Contornos"></a>
         <ContoursPanel map={this.props.map} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
     </div>);
   }
