@@ -209,7 +209,7 @@ class TagsField extends React.Component {
                 onDrop={this.handleDrop}
                 onDragOver={this.handleDragOver}
                 onDragEnter={this.handleDragEnter}
-                className="form-control tags-field rounded-corners">{this.state.userTags.map((tag, i) => 
+                className="">{this.state.userTags.map((tag, i) => 
                   <div draggable="true" className="tag-badge" key={i} ref={domNode => this.domTags[i] = domNode} 
                       onClick={this.stop} 
                       onDragStart={this.handleDragStart(tag)} 

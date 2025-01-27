@@ -609,9 +609,9 @@ class EditTaskForm extends React.Component {
 
       let tagsField = "";
       if (this.state.showTagsField) {
-        tagsField = (<div className="form-group">
-          <label className="col-sm-2 control-label">{_("Tags")}</label>
-          <div className="col-sm-10">
+        tagsField = (<div className="form-group col-sm-10">
+          <label title="Marcações" className="col-sm-2 control-label newPad">Tags</label>
+          <div className='col-sm-10 name-fields input-field tag-field'>
             <TagsField onUpdate={(tags) => this.state.tags = tags} tags={this.state.tags} ref={domNode => this.tagsField = domNode} />
           </div>
         </div>);
