@@ -896,14 +896,15 @@ class ProjectListItem extends React.Component {
                 <button type='button'
                         className='btn btn-sm rounded-corners upload-file upload-folder bg-success'
                         onClick={() => {
-                          document.querySelector('#folderpicker').click();
+                          const btnTarget = "folderpicker_" + this.props.data.id 
+                          document.querySelector(`#${btnTarget}`).click();
                           this.handleUpload();
                           }}>
                           <i className="content-upload-glyphicon" aria-hidden="true"></i>
                           Selecionar pastas
-                        <input 
+                        <input
                           type="file" 
-                          id="folderpicker" 
+                          id={"folderpicker_" + this.props.data.id }
                           name="fileList" 
                           webkitdirectory='true' 
                           multiple 
@@ -913,14 +914,15 @@ class ProjectListItem extends React.Component {
                 <button type="button" 
                     className="btn btn-sm rounded-corners upload-file"
                     onClick={() => {
-                      document.querySelector('#filepicker').click();
+                      const btnTarget = "filerpicker_" + this.props.data.id 
+                      document.querySelector(`#${btnTarget}`).click();
                       this.handleUpload();
                     }}>
                     <i className="content-upload-glyphicon" aria-hidden="true"></i>
                     {_("Selecionar imagens e Ponto de Controle")}
                     <input 
                         type="file" 
-                        id="filepicker" 
+                        id={"filerpicker_" + this.props.data.id }
                         name="fileList" 
                         accept="image/*,.zip"
                         multiple 
