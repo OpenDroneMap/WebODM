@@ -68,6 +68,7 @@ class Map extends React.Component {
       overlays: [],
       selectedLayers: [],
       isDrawing: false,
+      openPopup: null
     };
 
     this.basemaps = {};
@@ -82,6 +83,7 @@ class Map extends React.Component {
     this.removeGeoJsonDetections = this.removeGeoJsonDetections.bind(this);
     this.setSelectedLayers = this.setSelectedLayers.bind(this);
     this.getSelectedLayers = this.getSelectedLayers.bind(this);
+    this.togglePopup = this.togglePopup.bind(this);
   }
 
   setOpacityForLayer(layer, opacity) {
@@ -476,6 +478,25 @@ class Map extends React.Component {
     });
   }
 
+  togglePopup(popup) {
+    this.setState({
+      openPopup: popup,
+    })
+  }
+
+
+  updateControlPlugin() {
+    if (PluginsAPI.Map.contoursControl) {
+      PluginsAPI.Map.contoursControl.update(this.state.openPopup, this.togglePopup);
+    }
+  }
+
+  updateMeasurePlugin() {
+    if (PluginsAPI.Map.measureControl) {
+      PluginsAPI.Map.measureControl.update(this.state.openPopup);
+    }
+  }
+
   componentDidMount() {
     const { showBackground, tiles } = this.props;
 
@@ -491,7 +512,7 @@ class Map extends React.Component {
     // leaflet bug?
     $(this.container).addClass("leaflet-touch");
 
-    
+
 
     let scaleControl = Leaflet.control.scale({
       maxWidth: 250,
@@ -679,46 +700,29 @@ class Map extends React.Component {
     // POPUP MEDIDAS E CONTORNO
     PluginsAPI.Map.triggerWillAddControls({
       map: this.map,
-      tiles
+      tiles,
+      openPopup: this.state.openPopup,
+      onTogglePopup: this.togglePopup,
     });
 
     // POPUP CAMADAS
     this.layersControl = new LayersControl({
       layers: this.state.imageryLayers,
-      overlays: this.state.overlays
+      overlays: this.state.overlays,
+      openPopup: this.state.openPopup,
+      onTogglePopup: this.togglePopup,
     }).addTo(this.map);
 
     // POPUP BASEMAPS
     this.autolayers = Leaflet.control.autolayers({
       overlays: {},
       selectedOverlays: [],
-      baseLayers: this.basemaps
+      baseLayers: this.basemaps,
+      openPopup: this.state.openPopup,
+      onTogglePopup: this.togglePopup,
     }).addTo(this.map);
 
-    // POPUP OVERVIEW
-    this.overviewControl = new OverviewControl({
-      tiles: tiles,
-      selectedLayers: this.state.selectedLayers,
-      overlays: this.state.overlays,
-      loadGeoJsonDetections: this.loadGeoJsonDetections,
-      removeGeoJsonDetections: this.removeGeoJsonDetections,
-    }).addTo(this.map);
-
-    // POPUP SPRAYLINE
-    this.sprayLineControl = new SprayLineControl({
-      tiles: tiles,
-      selectedLayers: this.state.selectedLayers,
-      overlays: this.state.overlays,
-      loadGeoJsonDetections: this.loadGeoJsonDetections,
-      removeGeoJsonDetections: this.removeGeoJsonDetections,
-    }).addTo(this.map);
-
-
-    // POPUP MARCAR TALHÕES
-    this.MarkFieldsControl = new MarkFieldsControl({
-      task_id: this.props.tiles?.[0]?.meta?.task?.id || "ID padrão",
-      project_id: this.props.tiles[0].meta.task.project
-    }).addTo(this.map);
+    this.autolayers.addEventPopup(this.togglePopup);
 
     // POPUP MAIS
     const AddOverlayCtrl = Leaflet.Control.extend({
@@ -740,6 +744,38 @@ class Map extends React.Component {
     });
     new AddOverlayCtrl().addTo(this.map);
 
+    // POPUP OVERVIEW
+    this.overviewControl = new OverviewControl({
+      tiles: tiles,
+      selectedLayers: this.state.selectedLayers,
+      overlays: this.state.overlays,
+      loadGeoJsonDetections: this.loadGeoJsonDetections,
+      removeGeoJsonDetections: this.removeGeoJsonDetections,
+      openPopup: this.state.openPopup,
+      onTogglePopup: this.togglePopup,
+    }).addTo(this.map);
+
+    // POPUP SPRAYLINE
+    this.sprayLineControl = new SprayLineControl({
+      tiles: tiles,
+      selectedLayers: this.state.selectedLayers,
+      overlays: this.state.overlays,
+      loadGeoJsonDetections: this.loadGeoJsonDetections,
+      removeGeoJsonDetections: this.removeGeoJsonDetections,
+      openPopup: this.state.openPopup,
+      onTogglePopup: this.togglePopup,
+
+    }).addTo(this.map);
+
+
+    // POPUP MARCAR TALHÕES
+    this.MarkFieldsControl = new MarkFieldsControl({
+      task_id: this.props.tiles?.[0]?.meta?.task?.id || "ID padrão",
+      project_id: this.props.tiles[0].meta.task.project,
+      openPopup: this.state.openPopup,
+      onTogglePopup: this.togglePopup,
+    }).addTo(this.map);
+
 
     window.addEventListener("sidebarToggle", () => {
       setTimeout(() => {
@@ -755,13 +791,28 @@ class Map extends React.Component {
       this.updatePopupFor(imageryLayer);
     });
 
+    if (prevState.openPopup !== this.state.openPopup) {
+
+      if (this.state.openPopup) {
+
+        this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.openPopup, this.togglePopup)
+        this.MarkFieldsControl.update(this.state.openPopup)
+        this.overviewControl.updateOpenPopup(this.state.openPopup, this.togglePopup);
+        this.sprayLineControl.updateOpenPopup(this.state.openPopup, this.togglePopup);
+        this.updateControlPlugin();
+        this.updateMeasurePlugin();
+        this.autolayers.updateOpenPopup(this.state.openPopup, this.togglePopup);
+      }
+    }
+
+
     if (prevProps.tiles !== this.props.tiles) {
       this.loadImageryLayers(true);
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
       prevState.overlays !== this.state.overlays)) {
-      this.layersControl.update(this.state.imageryLayers, this.state.overlays);
+      this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.openPopup, this.togglePopup);
     }
 
     if (this.selectionOverviewControl &&

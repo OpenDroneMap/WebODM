@@ -12,52 +12,68 @@ class LayersControlButton extends React.Component {
     map: PropTypes.object.isRequired
   }
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
-        showPanel: false
+      showPanel: false
     };
+
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+
+    this.onTogglePopup = this.props.onTogglePopup;
   }
 
   handleOpen = () => {
-    this.setState({showPanel: true});
+
+    this.setState({ showPanel: true });
+    this.onTogglePopup("layers");
   }
 
   handleClose = () => {
-    this.setState({showPanel: false});
+    this.setState({ showPanel: false });
   }
 
-  render(){
+  componentDidUpdate = (prevProps) => {
+
+    if (prevProps.openPopup !== this.props.openPopup) {
+
+      if (this.props.openPopup !== "layers") {
+        this.handleClose();
+      }
+    }
+  }
+
+  render() {
     const { showPanel } = this.state;
 
-    return (<div className=  {showPanel ? "open layer-container" : "layer-container"}>
-        <LayersControlPanel map={this.props.map} layers={this.props.layers} overlays={this.props.overlays} onClose={this.handleClose} />
-        <a href="javascript:void(0);" 
-            title="Camadas"
-            onClick={this.handleOpen} 
-            className="leaflet-control-layers-control-button leaflet-bar-part theme-secondary"></a>
+    return (<div className={showPanel ? "open layer-container" : "layer-container"}>
+      <LayersControlPanel map={this.props.map} layers={this.props.layers} overlays={this.props.overlays} onClose={this.handleClose} />
+      <a href="javascript:void(0);"
+        title="Camadas"
+        onClick={this.handleOpen}
+        className="leaflet-control-layers-control-button leaflet-bar-part theme-secondary"></a>
     </div>);
   }
 }
-
 export default L.Control.extend({
-    options: {
-        position: 'topright'
-    },
+  options: {
+    position: 'topright'
+  },
 
-    onAdd: function (map) {
-        this.container = L.DomUtil.create('div', 'leaflet-control-layers-control leaflet-bar leaflet-control');
-        this.map = map;
+  onAdd: function (map) {
+    this.container = L.DomUtil.create('div', 'leaflet-control-layers-control leaflet-bar leaflet-control');
+    this.map = map;
 
-        L.DomEvent.disableClickPropagation(this.container);
-        this.update(this.options.layers, []);
+    L.DomEvent.disableClickPropagation(this.container);
+    this.update(this.options.layers, [], this.options.openPopup, this.options.onTogglePopup);
 
-        return this.container;
-    },
+    return this.container;
+  },
 
-    update: function(layers, overlays){
-        ReactDOM.render(<LayersControlButton map={this.map} layers={layers} overlays={overlays}/>, this.container);
-    }
+  update: function (layers, overlays, openPopup, onTogglePopup ) {
+    ReactDOM.render(<LayersControlButton map={this.map} layers={layers} overlays={overlays} openPopup={openPopup} onTogglePopup={onTogglePopup} />, this.container);
+  }
 });
 
