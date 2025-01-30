@@ -486,13 +486,13 @@ class Map extends React.Component {
 
 
   updateControlPlugin() {
-    if (PluginsAPI.Map.contoursControl) {
+    if (PluginsAPI.Map.contoursControl?.update) {
       PluginsAPI.Map.contoursControl.update(this.state.openPopup, this.togglePopup);
     }
   }
 
   updateMeasurePlugin() {
-    if (PluginsAPI.Map.measureControl) {
+    if (PluginsAPI.Map.measureControl?.update) {
       PluginsAPI.Map.measureControl.update(this.state.openPopup);
     }
   }
