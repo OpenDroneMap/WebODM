@@ -425,8 +425,8 @@ export default class OverviewControlPanel extends React.Component {
   render() {
     return (
       <div className="overview-control-panel">
-        <span className="close-button" onClick={this.props.onClose} />
-        <div className="title">Visão geral</div>
+        <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
+        <div className="title">VISÃO GERAL</div>
         <hr />
         {this.state.filteredSelectedLayers.length > 0 ? (
           <ul className="list-overview">
@@ -460,7 +460,7 @@ export default class OverviewControlPanel extends React.Component {
                   onClick={this.handlePopUp}
                   className="link-item"
                 >
-                  {layer.name + ` - Layer ${index}` || `Layer ${index}`}
+                  {layer.name + ` | Layer ${index}` || `Layer ${index}`}
                 </a>
                 <ul
                   className={`list-layer-items ${!this.state.collapsedLayers[index] ? "collapsed" : ""
@@ -492,14 +492,15 @@ export default class OverviewControlPanel extends React.Component {
         )}
         <hr />
         <div className="conteiner-button">
-          <button className="send" onClick={() => this.handleSendData()}>
-            Enviar
-          </button>
+          
           <button
             className="clear"
             onClick={() => this.handleClearOverviewLayers()}
           >
             Limpar
+          </button>
+          <button className="send" onClick={() => this.handleSendData()}>
+            Enviar
           </button>
         </div>
       </div>

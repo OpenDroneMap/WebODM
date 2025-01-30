@@ -355,7 +355,7 @@ export default class ContoursPanel extends React.Component {
     }
 
     return (<div className="contours-panel">
-      <span className="close-button" onClick={this.props.onClose}/>
+      <span className="close-button fas fa-times" onClick={this.props.onClose}/>
       <div className="title">{_("CONTORNOS")}</div>
       
       {content}

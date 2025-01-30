@@ -348,13 +348,13 @@ export default class SprayLineControlPanel extends React.Component {
                             {this.state.filteredSelectedLayers.map(({ layer, index }) => (
                                 <li key={index} className='layer-item'>
                                     <a href="javascript:void(0)" id={index} onClick={this.handlePopUp} className='link-item'>
-
-                                        {layer.name ?
-                                            <div className='layer-container'>
-                                                <span className='NameField'> {layer.name} </span>
-                                                <span className='vertical-bar'></span>
-                                                <span className='layer-id'> Layer {index} </span>
-                                            </div> :
+                                        
+                                        {layer.name ? 
+                                        <div className='layer-container'>
+                                            <span className='NameField'> {layer.name} </span> 
+                                            <span> | </span>
+                                            <span className='layer-id'> Layer {index} </span>
+                                        </div> :
                                             <span className='layer-id'> Layer {index} </span>}
                                     </a>
                                 </li>

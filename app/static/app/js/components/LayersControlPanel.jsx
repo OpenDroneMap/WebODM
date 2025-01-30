@@ -20,7 +20,7 @@ export default class LayersControlPanel extends React.Component {
     super(props);
   }
 
-  render(){
+render() {
     let content = "";
 
     if (!this.props.layers.length) {
@@ -38,7 +38,7 @@ export default class LayersControlPanel extends React.Component {
                         {this.props.overlays.map((layer, i) => (
                             <div key={i}>
                                 <LayersControlLayer map={this.props.map} expanded={false} overlay={true} layer={layer} />
-                                {i < this.props.overlays.length && <span className='horizontal-bar'></span>} 
+                                {i < this.props.overlays.length && <span className="horizontal-bar"></span>}
                             </div>
                         ))}
                     </div>
@@ -50,21 +50,19 @@ export default class LayersControlPanel extends React.Component {
                 }).map((layer, i) => (
                     <div key={(layer[Symbol.for("meta")] || {}).name || i}>
                         <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} />
-                        {/* {i < this.props.layers.length && <span className='horizontal-bar'></span>}  */}
                     </div>
                 ))}
             </div>
         );
     }
 
+    return (
+        <div className="layers-control-panel">
+            <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
+            <div className="title">{_("CAMADAS")}</div>
+            {content}
+        </div>
+    );
+}
 
-
-    return (<div className="layers-control-panel">
-      <span className="close-button" onClick={this.props.onClose}/>
-      <div className="title">{_("CAMADAS")}</div>
-      
-      {content}
-     
-    </div>);
-  }
 }
