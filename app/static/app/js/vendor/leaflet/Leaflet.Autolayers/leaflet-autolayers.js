@@ -39,7 +39,7 @@ L.Control.AutoLayers = L.Control.extend({
 	selectedBasemap: null,
 	layersToAdd: {},
 
-
+	
 	countZIndexBase: function(layers) {
 		for (var i = 0; i < layers.length; i++) {
 			var layer = layers[i];
@@ -74,6 +74,23 @@ L.Control.AutoLayers = L.Control.extend({
 
 		this.fetchMapData();
 	},
+
+	updateOpenPopup: function(openPopup) {
+
+		if(openPopup !== "basemaps") {
+			document.querySelector(".leaflet-control-autolayers-close")?.click()
+		}
+	},
+
+
+	addEventPopup: function(onTogglePopup) {
+
+		document.querySelector(".leaflet-control-layers-toggle").addEventListener("click", () => {
+			onTogglePopup("basemaps");
+		})
+	},
+
+	
 
 	onAdd: function(map) {
 		this._initEvents();

@@ -12,10 +12,10 @@ class OverviewControl extends React.Component {
         removeGeoJsonDetections: PropTypes.func,
         loadGeoJsonDetections: PropTypes.func,
         overlays: PropTypes.array.isRequired,
-        tiles:PropTypes.array
+        tiles: PropTypes.array
     }
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -24,33 +24,43 @@ class OverviewControl extends React.Component {
     }
 
     handleOpen = () => {
-        this.setState({showPanel: true});
+        this.setState({ showPanel: true });
+        this.props.onTogglePopup("overview");
     }
-    
+
     handleClose = () => {
-        this.setState({showPanel: false});
+        this.setState({ showPanel: false });
+    }
+
+    componentDidUpdate = (prevProps) => {
+        if (prevProps.openPopup !== this.props.openPopup) {
+
+            if (this.props.openPopup !== "overview") {
+                this.handleClose();
+            }
+        }
     }
 
 
     render() {
-        
+
         const { showPanel } = this.state;
-        
+
         return (
             <div className={showPanel ? "open" : ""}>
-                <a href="javascript:void(0);" 
-                title="Visão geral"
-                onClick={this.handleOpen} 
-                className="leaflet-control-overview-control-button leaflet-bar-part theme-secondary"></a>
-                <OverviewControlPanel 
+                <a href="javascript:void(0);"
+                    title="Visão geral"
+                    onClick={this.handleOpen}
+                    className="leaflet-control-overview-control-button leaflet-bar-part theme-secondary"></a>
+                <OverviewControlPanel
                     tiles={this.props.tiles}
-                    onClose={this.handleClose} 
-                    selectedLayers={this.props.selectedLayers} 
+                    onClose={this.handleClose}
+                    selectedLayers={this.props.selectedLayers}
                     removeGeoJsonDetections={this.props.removeGeoJsonDetections}
                     loadGeoJsonDetections={this.props.loadGeoJsonDetections}
-                    overlays={this.props.overlays}/>
+                    overlays={this.props.overlays} />
             </div>);
-        
+
     }
 }
 
@@ -66,39 +76,58 @@ export default L.Control.extend({
 
         L.DomEvent.disableClickPropagation(this.container);
 
-        this.update(this.options.selectedLayers, 
-                    this.options.removeGeoJsonDetections, 
-                    this.options.loadGeoJsonDetections,
-                    this.options.tiles,
-                    this.options.overlays);
+        this.update(this.options.selectedLayers,
+            this.options.removeGeoJsonDetections,
+            this.options.loadGeoJsonDetections,
+            this.options.tiles,
+            this.options.overlays,
+            this.options.openPopup,
+            this.options.onTogglePopup);
 
         return this.container;
     },
 
-    update: function(selectedLayers, removeGeoJsonDetections, loadGeoJsonDetections, tiles, overlays){
-        ReactDOM.render(<OverviewControl 
-                            map={this.map} 
-                            selectedLayers={selectedLayers} 
-                            removeGeoJsonDetections={removeGeoJsonDetections}
-                            loadGeoJsonDetections={loadGeoJsonDetections}
-                            tiles={tiles}
-                            overlays={overlays}/>, 
-                            this.container);
+    update: function (selectedLayers, removeGeoJsonDetections, loadGeoJsonDetections, tiles, overlays, openPopup, onTogglePopup) {
+        ReactDOM.render(<OverviewControl
+            map={this.map}
+            selectedLayers={selectedLayers}
+            removeGeoJsonDetections={removeGeoJsonDetections}
+            loadGeoJsonDetections={loadGeoJsonDetections}
+            tiles={tiles}
+            overlays={overlays} 
+            openPopup={openPopup}
+            onTogglePopup={onTogglePopup}/>,
+            this.container);
     },
 
-    updateSelectedLayers: function(selectedLayers, overlays) {
+    updateSelectedLayers: function (selectedLayers, overlays) {
         this.update(selectedLayers,
-                    this.options.removeGeoJsonDetections, 
-                    this.options.loadGeoJsonDetections,
-                    this.options.tiles,
-                    overlays)
+            this.options.removeGeoJsonDetections,
+            this.options.loadGeoJsonDetections,
+            this.options.tiles,
+            overlays,
+            this.options.openPopup,
+            this.options.onTogglePopup);
     },
 
-    updateOverlays: function(overlays, selectedLayers) {
+    updateOverlays: function (overlays, selectedLayers) {
         this.update(selectedLayers,
-                    this.options.removeGeoJsonDetections, 
-                    this.options.loadGeoJsonDetections,
-                    this.options.tiles,
-                    overlays)
+            this.options.removeGeoJsonDetections,
+            this.options.loadGeoJsonDetections,
+            this.options.tiles,
+            overlays,
+            this.options.openPopup,
+            this.options.onTogglePopup);
+    },
+
+    updateOpenPopup: function (openPopup, onTogglePopup) {
+        this.update(this.options.selectedLayers,
+            this.options.removeGeoJsonDetections,
+            this.options.loadGeoJsonDetections,
+            this.options.tiles,
+            this.options.overlays,
+            openPopup,
+            onTogglePopup
+        )
     }
 });
