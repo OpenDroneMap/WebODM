@@ -20,7 +20,6 @@ Ele também pode ser feito por outra classe que ainda não foi identificada mas 
 
 Essa api é usada no front-end com uma biblioteca chamada de leaflet que é utilizada para desenhar o mapa. Para mais informações: [Leaflet](https://leafletjs.com/reference.html "Leaflet")
 
-
 ### API para salvar field_detection.geojson para processamentos AI
 
 - **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/save/field`
@@ -71,7 +70,6 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
 
 ## API para iniciar processamento dos ortomosaicos
 
-
 - **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/process`
 - **Método:** POST
 - **Query Parameters:**
@@ -79,7 +77,7 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
   - `pk` (string, required): ID da tarefa.
 - **Headers:**
   - `Content-Type: application/json`
-- **Descrição:** Envia um `payload` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`. O `type` e `subtype` indentificam qual subrota será chamada. 
+- **Descrição:** Envia um `payload` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`. O `type` e `subtype` indentificam qual subrota será chamada.
 
 - **Body Schema:**
   ```json
@@ -97,6 +95,7 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
 ### Tipo: cattle
 
 - **Body Schema:**
+
   ```json
   {
     "type": "cattle",
@@ -127,38 +126,35 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
 ### Tipo: polynomial-health
 
 - **Body Schema:**
+
   ```json
   {
     "type": "polynomial-health",
     "payload": {
-        "processing_requests": {
-          "fields_to_process": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "field_id": { "type": "number" },
-                "polynomial_degree": {
-                  "type": "number"
-                },
-                "points": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "x": { "type": "number" },
-                      "y": { "type": "number" }
-                    },
-                    "required": ["x", "y"]
-                  }
-                }
+      "processing_requests": {
+        "fields_to_process": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field_id": { "type": "number" },
+              "polynomial_degree": {
+                "type": "number"
               },
-              "required": [
-                "field_id",
-                "polynomial_degree",
-                "points"
-              ]
-            }
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "x": { "type": "number" },
+                    "y": { "type": "number" }
+                  },
+                  "required": ["x", "y"]
+                }
+              }
+            },
+            "required": ["field_id", "polynomial_degree", "points"]
+          }
         }
       },
       "required": ["fields_to_process"]
@@ -193,15 +189,16 @@ Substitua `<webapp_ip>` e `<webapp_port>` pelos valores corretos do seu ambiente
 O weed_type podem ser ("soy", "corn", "cane").
 
 - **Body Schema:**
+
   ```json
   {
     "type": "{weed_type}",
     "payload": {
       "processing_requests": {
         "fields_to_process": {
-         "type": "array",
-         "items": { "type": "number" }
-       }
+          "type": "array",
+          "items": { "type": "number" }
+        }
       },
       "required": ["fields_to_process"]
     },
@@ -210,11 +207,12 @@ O weed_type podem ser ("soy", "corn", "cane").
   ```
 
 - **Example Body:**
+
   ```json
   {
     "type": "soy",
     "payload": {
-        "processing_requests": {
+      "processing_requests": {
         "fields_to_process": [3, 4, 5]
       }
     }
@@ -222,11 +220,12 @@ O weed_type podem ser ("soy", "corn", "cane").
   ```
 
 - **Example Body:**
+
   ```json
   {
     "type": "corn",
     "payload": {
-        "processing_requests": {
+      "processing_requests": {
         "fields_to_process": [3, 4, 5]
       }
     }
@@ -234,11 +233,12 @@ O weed_type podem ser ("soy", "corn", "cane").
   ```
 
   - **Example Body:**
+
   ```json
   {
     "type": "cane",
     "payload": {
-        "processing_requests": {
+      "processing_requests": {
         "fields_to_process": [3, 4, 5]
       }
     }
@@ -257,6 +257,7 @@ O weed_type podem ser ("soy", "corn", "cane").
 - **Descrição:** Envia um `processing_requests` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`.
 
 - **Body Schema:**
+
   ```json
   "processing_requests": {
     "type": "object",
@@ -273,14 +274,15 @@ O weed_type podem ser ("soy", "corn", "cane").
   ```
 
 - **Example Body:**
+
 ```json
-  {
-   "processing_requests": {
-     "distancia":10,
-     "angulo":45,
-     "fields_to_process":[1, 3]
-   }
+{
+  "processing_requests": {
+    "distancia": 10,
+    "angulo": 45,
+    "fields_to_process": [1, 3]
   }
+}
 ```
 
 ## API Export Spray Lines
@@ -295,27 +297,86 @@ O weed_type podem ser ("soy", "corn", "cane").
 - **Descrição:** Envia um `processing_requests` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`.
 
 - **Body Schema:**
+
   ```json
   {
     "type": "object",
     "properties": {
-        "field_id": { "type": "number" },
-        "export_format": { "type": "string" }
+      "field_id": { "type": "number" },
+      "export_format": { "type": "string" }
     },
     "required": ["field_id", "export_format"]
   }
   ```
 
 - **Example Body:**
+
+```json
+{
+  "processing_requests": {
+    "field_id": 1,
+    "export_format": "xml"
+  }
+}
+```
+
+## API Polinomial Health
+
+- **Endpoint:**`http://<webapp_ip>:<webapp_port>/api/projects/<project_id>/tasks/<task_id>/process/polinomialHealth`
+- **Método:** POST
+- **Query Parameters:**
+  - `project_pk` (integer, required): ID do projeto.
+  - `pk` (string, required): ID da tarefa.
+- **Headers:**
+  - `Content-Type: application/json`
+- **Descrição:** Envia um `processing_requests` para um endpoint especificado pela variavel de ambiente `WO_AGROSMART_API_ADDRESS`.
+
+- **Body Schema:**
+
 ```json
   {
-    "processing_requests": {
-      "field_id": 1,
-  	  "export_format": "xml"
-    }
+    "type": "object",
+    "properties": {
+      "processing_requests": {
+        "type": "object",
+        "properties": {
+          "fields_to_process": {
+            "type": "array",
+            "items": { "type": "number" }
+          },
+          "polynomial_degree": {
+            "type": "number"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" }
+              },
+              "required": ["x", "y"]
+            }
+          }
+        },
+        "required": ["fields_to_process", "polynomial_degree", "points"]
+      }
+    },
+    "required": ["processing_requests"]
   }
 ```
 
+- **Example Body:**
+
+```json
+  {
+    "processing_requests": {
+      "fields_to_process": [1, 2],
+      "polynomial_degree": 3, // DEFAULT
+      "points": [],
+    },
+  };
+```
 
 ## Exibição do Mapa
 
@@ -335,41 +396,43 @@ Ele é divido em dois componentes, o primeiro componente a `MapView` é respons�
 ## Botões de IA
 
 Os botões de IA que ficam na parte superior do mapa são controlados em um único lugar: [MapView.jsx](https://github.com/LSIIM/WebODM/blob/master/app/static/app/js/MapView.jsx "MapView.jsx"). O código de controle das rotas de acesso e labels estão todas a seguir:
-  ```javascript
-    // label: what's written on the button
-    // type: corresponds to the internal representation of that type.
-    // name: the trailing name for the route.
-    // icon: the icon.
-    let aiTypes = [
-      {
-        label: _("IA Gado"),
-        type: "ai_cattle",
-        name: "cattle", //route
-        icon: "glyphicon glyphicon-screenshot",
-      },
-      {
-        label: _("IA Talhão"),
-        type: "ai_field",
-        name: "field", //route
-        icon: "glyphicon glyphicon-screenshot",
-      },
-      {
-        label: _("IA Daninha (soja)"),
-        type: "ai_soy",
-        name: "soy", //route
-        icon: "glyphicon glyphicon-screenshot",
-      },
-      {
-        label: _("IA Daninha (milho)"),
-        type: "ai_corn",
-        name: "corn", //route
-        icon: "glyphicon glyphicon-screenshot",
-      }
-    ]
+
+```javascript
+// label: what's written on the button
+// type: corresponds to the internal representation of that type.
+// name: the trailing name for the route.
+// icon: the icon.
+let aiTypes = [
+  {
+    label: _("IA Gado"),
+    type: "ai_cattle",
+    name: "cattle", //route
+    icon: "glyphicon glyphicon-screenshot",
+  },
+  {
+    label: _("IA Talhão"),
+    type: "ai_field",
+    name: "field", //route
+    icon: "glyphicon glyphicon-screenshot",
+  },
+  {
+    label: _("IA Daninha (soja)"),
+    type: "ai_soy",
+    name: "soy", //route
+    icon: "glyphicon glyphicon-screenshot",
+  },
+  {
+    label: _("IA Daninha (milho)"),
+    type: "ai_corn",
+    name: "corn", //route
+    icon: "glyphicon glyphicon-screenshot",
+  },
+];
 ```
 
 Apenas adicionar um novo tipo não fará com que um novo botão apareça apesar de fazer uma nova checkbox aparecer. Para adicionar um novo botão é preciso adicionar um novo caminho de asset e adicionar seus respectivos tipos em outros lugares.
-- No [Task.py](https://github.com/LSIIM/WebODM/blob/dev/app/models/task.py "Task.py"): Adicione um novo caminho de um asset em `ASSETS_MAP` e adicione um tipo a `types` em `get_map_items`. Exemplo: 
+
+- No [Task.py](https://github.com/LSIIM/WebODM/blob/dev/app/models/task.py "Task.py"): Adicione um novo caminho de um asset em `ASSETS_MAP` e adicione um tipo a `types` em `get_map_items`. Exemplo:
 
 ```python
 ASSETS_MAP = {
@@ -382,9 +445,10 @@ class Task (models.Models):
 
     def get_map_items(self):
 		types = []
-		
+
 		if 'cattle_detection.geojson' in self.available_assets: types.append('ai_cattle')
 ```
+
 - No [Map.jsx](https://github.com/LSIIM/WebODM/blob/master/app/static/app/js/components/Map.jsx "Map.jsx"): Adicione o novo tipo a `let availableAISelections = ['ai_cattle', 'ai_corn', 'ai_field', 'ai_soy']`
 
 ## Primeira build
