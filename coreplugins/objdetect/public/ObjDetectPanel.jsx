@@ -125,6 +125,7 @@ export default class ObjDetectPanel extends React.Component {
   }
 
   handleDetect = () => {
+    this.handleRemoveObjLayer();
     this.setState({detecting: true, error: "", progress: null});
     const taskId = this.state.task.id;
     this.saveInputValues();
