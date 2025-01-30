@@ -201,8 +201,8 @@
   }
 
   .btn-process {
-    background-color: #74b16f;
-    border-color: #74b16f;
+    background-color: #afafaf;
+    border-color: #afafaf;
     border-radius: 20px;
     height: 27.6px;
     font-size: 15px;
@@ -213,11 +213,13 @@
     align-items: center;
     gap: 5px;
     transition: background-color 0.3s ease;
+    transition: border-color 0.3s ease;
     
     
 
     &:hover {
-      opacity: 0.8;
+      background-color: #888888;
+      border-color: #888888;
     }
 
     

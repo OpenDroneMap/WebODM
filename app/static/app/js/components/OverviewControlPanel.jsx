@@ -278,14 +278,15 @@ export default class OverviewControlPanel extends React.Component {
         )}
         <hr />
         <div className="conteiner-button">
-          <button className="send" onClick={() => this.handleSendData()}>
-            Enviar
-          </button>
+          
           <button
             className="clear"
             onClick={() => this.handleClearOverviewLayers()}
           >
             Limpar
+          </button>
+          <button className="send" onClick={() => this.handleSendData()}>
+            Enviar
           </button>
         </div>
       </div>
