@@ -138,7 +138,7 @@ export function addTempLayerUsingRequest(api, apiType, aiTypes, stateSelectedLay
           },
           //
           onEachFeature: function (feature, layer) {
-            if (feature.properties && apiType == 'field') {
+            if (feature.properties.obstacle == false && feature.properties && apiType == 'field') {
                 layer.bindPopup(createFieldLayerControlPopup(aiTypes, layer, stateSelectedLayers), {
                     maxHeight: 200
               });
