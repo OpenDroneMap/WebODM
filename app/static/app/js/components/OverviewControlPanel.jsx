@@ -220,15 +220,23 @@ export default class OverviewControlPanel extends React.Component {
     // Agrupa os talhões por tipo de cultivo
     const groupedFields = this.groupFieldsByCropType(fields);
 
-
     // Mapeia os campos agrupados por tipo de cultivo, criando um array de chamadas assíncronas
     // Para cada tipo de cultivo (cropType), monta o payload com os IDs dos talhões a serem processados 
     // e utiliza a função `makeRequest` para enviar a requisição ao endpoint especificado
     const requests = Object.entries(groupedFields).map(([cropType, layers]) => {
+
+      // Checa se é segmentação ou não
+      let isSegmentation = false;
+      if(layers[0].layer.aiOptions.values().next().value === "weed"){
+        isSegmentation = false;
+      }else{
+        isSegmentation = true;
+      }
+
       const fields_to_process_ids = layers.map(layer => layer.field_id);
       const payload = {
         type: cropType,
-        payload: { processing_requests: { fields_to_process: fields_to_process_ids } },
+        payload: { processing_requests: { segmentation: isSegmentation, fields_to_process: fields_to_process_ids } },
       };
       return this.makeRequest(url, payload, csrfToken);
     });
@@ -414,7 +422,6 @@ export default class OverviewControlPanel extends React.Component {
   };
 
 
-
   render() {
     return (
       <div className="overview-control-panel">
@@ -467,7 +474,7 @@ export default class OverviewControlPanel extends React.Component {
                   )}
                   {layer.aiOptions.size > 0 && (
                     <li>
-                      IA: {translate([...layer.aiOptions][0], "aiOptions")}
+                      IA: {[...layer.aiOptions].map((option) => translate(option, "aiOptions")).join(", ")}
                     </li>
                   )}
                   {layer.polynomialHealth && (
@@ -521,6 +528,7 @@ const translations = {
   },
   aiOptions: {
     weed: "Daninha",
+    segmentation: "Segmentação"
   },
 };
 

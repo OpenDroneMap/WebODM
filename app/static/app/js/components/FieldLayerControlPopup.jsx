@@ -26,6 +26,10 @@ class FieldLayerControlPopup extends React.Component {
         checkboxLabel: "Daninha",
         category: 'weed',
       },
+      {
+        checkboxLabel: "Segmentação",
+        category: 'segmentation',
+      },
     ];
 
     // checkboxLabel: the label that appears with the checkbox when the detections popup is opened. (Optional)
@@ -56,6 +60,7 @@ class FieldLayerControlPopup extends React.Component {
     this.state = {
       cropType: null,
       isChecked: false,
+      optionIsChecked: {},
       isPulverize: false,
       isPolinomialHealth: false,
     };
@@ -98,8 +103,8 @@ class FieldLayerControlPopup extends React.Component {
 
   handleCheck(category) {
 
-    this.setState({ isChecked: !this.state.isChecked });
-    this.handleOnChangeAi(category);
+    this.setState({ optionIsChecked: category });
+  this.handleOnChangeAi(category);
   }
 
   changeLayerColor(color) {
@@ -107,14 +112,25 @@ class FieldLayerControlPopup extends React.Component {
   }
 
   handleOnChangeAi(id) {
-    this.checked[id] = !this.checked[id];
+    // Dessa forma somente 1 IA pode ser selecionada por vez. Da forma comentada mais de 1 IA pode ser selecionada
 
-    if (this.checked[id]) {
-      this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $add: [id] } }));
-    }
-    else {
-      this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $remove: [id] } }));
-    }
+    // Atualiza a seleção global
+    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $set: new Set([id]) } }));
+
+    // Propaga a seleção para todos os outros popups
+    this.getSelectedLayers().forEach((layer, index) => {
+      if (index !== this.selectedIndex) {
+        this.setSelectedLayers(index, update(layer, { aiOptions: { $set: new Set([id]) } }));
+      }
+    });
+
+    //this.checked[id] = !this.checked[id];
+    //if (this.checked[id]) {
+    //  this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $add: [id] } }));
+    //}
+    //else {
+    //  this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $remove: [id] } }));
+    //}
   }
 
   handleOnChangeRadio(id) {
@@ -175,12 +191,11 @@ class FieldLayerControlPopup extends React.Component {
           this.aiOptions.map(option => {
             return (
               <div className='IAprocess-container' key={option.category} onClick={() => this.handleCheck(option.category)}>
-                <i className={this.state.isChecked ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
+                <i className={this.state.optionIsChecked === option.category ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
                 <label htmlFor={option.category} style={{ cursor: "pointer" }} > {option.checkboxLabel}</label>
               </div>
-
             )
-          })
+          })  
         }
 
         <p className='IAprocess-info'>Saúde Polinomial </p>
