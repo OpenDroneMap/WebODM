@@ -227,17 +227,16 @@ class MapView extends React.Component {
               <button
                 key={mapType.type}
                 onClick={this.handleMapTypeButton(mapType.type)}
-                className={"btn rounded-corners " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}
+                className={"btn rounded-corners btn-map " + (mapType.type === this.state.selectedMapType ? "selected-button" : "default-button")}
               >
                 <i className={mapType.icon}></i> {mapType.label}
               </button>
             )}
-            
-            
-            <div className="btn-group">
+
+            <div className="btn-group btn-map">
               <button
                 type="button"
-                className="btn btn-secondary dropdown-toggle"
+                className="btn btn-map btn-secondary dropdown-toggle"
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
