@@ -19,11 +19,7 @@ export default class SprayLineControlPanel extends React.Component {
         this.state = {
             filteredSelectedLayers: [],
             isProcessing: false,
-            processingCompleted: false,
-            isExporting: false,
-            exportingCompleted: false,
             enableExport: false,
-            error: false
         };
 
         this.distanceRef = React.createRef();
@@ -47,7 +43,7 @@ export default class SprayLineControlPanel extends React.Component {
     handlePopUp = (e) => {
 
         const clickedId = e.currentTarget.id;
-    
+
         const { overlays } = this.props;
         const layerSelected = this.state.filteredSelectedLayers.filter(layer => layer.index == clickedId);
 
@@ -87,7 +83,7 @@ export default class SprayLineControlPanel extends React.Component {
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
 
-        
+
         const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
 
         if (overlayWithLayers && filteredSelectedLayers.length > 0 && this.state.isProcessing == false) {
@@ -100,27 +96,24 @@ export default class SprayLineControlPanel extends React.Component {
                 return;
             }
 
-            this.setState({isProcessing: true});
-            this.setState({enableExport: false});
-            this.setState({processingCompleted: false});
-            this.setState({exportingCompleted: false});
-            this.setState({error: false});
+            this.setState({ isProcessing: true });
+            this.setState({ enableExport: false });
 
             const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
             const fieldIds = [];
-    
+
             leafleatLayers.forEach(leafletLayer => {
                 filteredSelectedLayers.forEach(selectedLayer => {
                     const bounds1 = leafletLayer._bounds;
                     const bounds2 = selectedLayer.layer.bounds;
-    
+
                     const isBoundsEqual = (
                         bounds1._northEast.lat === bounds2._northEast.lat &&
                         bounds1._northEast.lng === bounds2._northEast.lng &&
                         bounds1._southWest.lat === bounds2._southWest.lat &&
                         bounds1._southWest.lng === bounds2._southWest.lng
                     );
-    
+
                     if (isBoundsEqual) {
                         const featureProps = leafletLayer.feature.properties;
 
@@ -132,7 +125,7 @@ export default class SprayLineControlPanel extends React.Component {
                     }
                 });
             });
-    
+
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
             const distance = parseFloat(inputDistance);
@@ -148,7 +141,7 @@ export default class SprayLineControlPanel extends React.Component {
                     fields_to_process: fieldIds
                 }
             };
-    
+
             try {
                 const response = await fetch(URL, {
                     method: 'POST',
@@ -163,42 +156,39 @@ export default class SprayLineControlPanel extends React.Component {
 
                     const data = await response.json();
                     console.log('Processamento bem-sucedido:', data);
-                    
+
                     const intervalId = setInterval(async () => {
                         try {
-                            const processing = await this.getProcess(project_id, task_id); 
+                            const processing = await this.getProcess(project_id, task_id);
 
                             if (processing[0].finishedOn !== null) {
                                 console.log('Processamento concluído!');
 
                                 setTimeout(() => {
                                     clearInterval(intervalId);
-                                    this.setState({processingCompleted:true});
-                                    this.setState({isProcessing: false});
-                                    this.setState({enableExport: true});
+                                    this.setState({ isProcessing: false });
+                                    this.setState({ enableExport: true });
                                 }, 2000);
                             }
 
                         } catch (error) {
                             console.error('Erro ao chamar getProcess:', error);
-                            
+
                         }
                     }, 1000);
                 } else {
                     console.error('Erro no processamento');
-                    this.setState({error: true});
-                    this.setState({isProcessing: false});3
+                    this.setState({ isProcessing: false }); 3
                     alert('Não foi possivel processar os talhões selecionados.');
 
                 }
             } catch (error) {
                 console.error('Erro na requisição:', error);
-                this.setState({error: true});
-                this.setState({isProcessing: false});
+                this.setState({ isProcessing: false });
                 alert('Não foi possivel processar os talhões selecionados.');
             }
 
-            
+
         }
     };
 
@@ -210,28 +200,28 @@ export default class SprayLineControlPanel extends React.Component {
         const { tiles } = this.props;
         const { filteredSelectedLayers } = this.state;
 
-        this.setState({processingCompleted: false});
+        
 
 
         const overlayWithLayers = overlays.find(overlay => overlay && overlay._layers);
-    
+
         if (overlayWithLayers && filteredSelectedLayers.length > 0) {
 
             const leafleatLayers = Array.from(Object.values(overlayWithLayers._layers));
             const fieldIds = [];
-    
+
             leafleatLayers.forEach(leafletLayer => {
                 filteredSelectedLayers.forEach(selectedLayer => {
                     const bounds1 = leafletLayer._bounds;
                     const bounds2 = selectedLayer.layer.bounds;
-    
+
                     const isBoundsEqual = (
                         bounds1._northEast.lat === bounds2._northEast.lat &&
                         bounds1._northEast.lng === bounds2._northEast.lng &&
                         bounds1._southWest.lat === bounds2._southWest.lat &&
                         bounds1._southWest.lng === bounds2._southWest.lng
                     );
-    
+
                     if (isBoundsEqual) {
                         const featureProps = leafletLayer.feature.properties;
 
@@ -243,7 +233,7 @@ export default class SprayLineControlPanel extends React.Component {
                     }
                 });
             });
-    
+
             const task_id = tiles[0].meta.task.id;
             const project_id = tiles[0].meta.task.project;
 
@@ -253,9 +243,7 @@ export default class SprayLineControlPanel extends React.Component {
 
             try {
                 for (let field_id of fieldIds) {
-                    this.setState({isExporting: true});
-                    this.setState({exportingCompleted:false});
-                    this.setState({enableExport:false});
+                    this.setState({ enableExport: false });
                     const payload = {
                         processing_requests: {
                             field_id: field_id,
@@ -280,12 +268,12 @@ export default class SprayLineControlPanel extends React.Component {
                             const downloadUrl = window.URL.createObjectURL(blob);
                             const link = document.createElement('a');
                             link.href = downloadUrl;
-                            link.download = `pulverizacao_${field_id}.zip`; 
+                            link.download = `pulverizacao_${field_id}.zip`;
                             document.body.appendChild(link);
                             link.click();
                             link.remove();
                             console.log(`Arquivo ZIP exportado com sucesso para o field_id: ${field_id}`);
-                
+
                         } else if (contentType.includes('application/json')) {
                             const geoJsonResponse = await response.json();
                             if (geoJsonResponse && geoJsonResponse.type === 'FeatureCollection') {
@@ -298,15 +286,12 @@ export default class SprayLineControlPanel extends React.Component {
                                 link.click();
                                 link.remove();
                                 console.log(`GeoJSON exportado com sucesso para o field_id: ${field_id}`);
-                            } 
+                            }
                         }
                     } else {
                         console.error(`Erro no processamento da exportação para o field_id ${field_id}:`, response.statusText);
                     }
-                    this.setState({processingCompleted:false})
-                    this.setState({exportingCompleted: true});
-                    this.setState({isExporting: false});
-                    this.setState({enableExport: true});
+                    this.setState({ enableExport: true });
                 }
             } catch (error) {
                 console.error('Erro na requisição:', error);
@@ -328,25 +313,25 @@ export default class SprayLineControlPanel extends React.Component {
                 if (!response.ok) {
                     throw new Error("Erro na requisição");
                 }
-                return response.json(); 
+                return response.json();
             })
             .catch(error => {
                 console.error("Erro:", error);
-                throw error; 
+                throw error;
             });
     };
 
     // Função de incremento para icons personalizados nos inputs
     incrementValue = (ref, step = 1, max = Infinity) => {
         const currentValue = parseFloat(ref.current.value) || 0;
-        const newValue = Math.min(currentValue + step, max); 
+        const newValue = Math.min(currentValue + step, max);
         ref.current.value = newValue;
     };
 
     // Função de decremento para icons personalizados nos inputs
     decrementValue = (ref, step = 1, min = 0) => {
         const currentValue = parseFloat(ref.current.value) || 0;
-        const newValue = Math.max(currentValue - step, min); 
+        const newValue = Math.max(currentValue - step, min);
         ref.current.value = newValue;
     };
 
@@ -363,13 +348,13 @@ export default class SprayLineControlPanel extends React.Component {
                             {this.state.filteredSelectedLayers.map(({ layer, index }) => (
                                 <li key={index} className='layer-item'>
                                     <a href="javascript:void(0)" id={index} onClick={this.handlePopUp} className='link-item'>
-                                        
-                                        {layer.name ? 
-                                        <div className='layer-container'>
-                                            <span className='NameField'> {layer.name} </span> 
-                                            <span className='vertical-bar'></span>
-                                            <span className='layer-id'> Layer {index} </span>
-                                        </div> :
+
+                                        {layer.name ?
+                                            <div className='layer-container'>
+                                                <span className='NameField'> {layer.name} </span>
+                                                <span className='vertical-bar'></span>
+                                                <span className='layer-id'> Layer {index} </span>
+                                            </div> :
                                             <span className='layer-id'> Layer {index} </span>}
                                     </a>
                                 </li>
@@ -382,19 +367,19 @@ export default class SprayLineControlPanel extends React.Component {
                                 <label htmlFor="distance">Distância entre linhas</label>
                                 <div className="custom-number-input">
                                     <input
-                                    type="number"
-                                    id="distance"
-                                    name="distance"
-                                    min="0"
-                                    step="1"
-                                    ref={this.distanceRef}
-                                    required
+                                        type="number"
+                                        id="distance"
+                                        name="distance"
+                                        min="0"
+                                        step="1"
+                                        ref={this.distanceRef}
+                                        required
                                     />
                                     <div className="icon-incre-decre">
                                         <i className="fas fa-chevron-up"
-                                            onClick={() => this.incrementValue(this.distanceRef, 1)}/>
+                                            onClick={() => this.incrementValue(this.distanceRef, 1)} />
                                         <i className="fas fa-chevron-down"
-                                            onClick={() => this.decrementValue(this.distanceRef, 1)}/>
+                                            onClick={() => this.decrementValue(this.distanceRef, 1)} />
                                     </div>
                                 </div>
                             </div>
@@ -403,20 +388,20 @@ export default class SprayLineControlPanel extends React.Component {
                                 <label htmlFor="direction">Ângulo</label>
                                 <div className="custom-number-input">
                                     <input
-                                    type="number"
-                                    id="direction"
-                                    name="direction"
-                                    min="0"
-                                    max="360"
-                                    step="1"
-                                    ref={this.directionRef}
-                                    required
+                                        type="number"
+                                        id="direction"
+                                        name="direction"
+                                        min="0"
+                                        max="360"
+                                        step="1"
+                                        ref={this.directionRef}
+                                        required
                                     />
                                     <div className="icon-incre-decre">
-                                    <i className="fas fa-chevron-up"
-                                        onClick={() => this.incrementValue(this.directionRef, 1, 360)}/>
-                                    <i className="fas fa-chevron-down"
-                                        onClick={() => this.decrementValue(this.directionRef, 1, 0)}/>
+                                        <i className="fas fa-chevron-up"
+                                            onClick={() => this.incrementValue(this.directionRef, 1, 360)} />
+                                        <i className="fas fa-chevron-down"
+                                            onClick={() => this.decrementValue(this.directionRef, 1, 0)} />
                                     </div>
                                 </div>
                             </div>
@@ -426,53 +411,45 @@ export default class SprayLineControlPanel extends React.Component {
                     "Nenhum talhão selecionado"
                 )}
                 <div className='btn-container'>
-                    <button onClick={this.handleProcess} 
-                            className='btn btn-sm btn-primary btn-process'>
-                            {this.state.isProcessing ? <i className="iconSize fas fa-spinner fa-spin"></i> : <i className="iconSize far fa-circle"></i> }
+                    <button onClick={this.handleProcess}
+                        className='btn btn-sm btn-primary btn-process'>
+                        {this.state.isProcessing ? <i className="iconSize fas fa-spinner fa-spin"></i> : <i className="iconSize far fa-circle"></i>}
                         Processar
                     </button>
-                    <button disabled={!this.state.enableExport} 
-                            className={this.state.enableExport ? 'btn btn-sm btn-primary btn-export' : 'btn btn-sm btn-primary btn-export export-disable'}  
-                            data-toggle="dropdown">
+                    <button disabled={!this.state.enableExport}
+                        className={this.state.enableExport ? 'btn btn-sm btn-primary btn-export' : 'btn btn-sm btn-primary btn-export export-disable'}
+                        data-toggle="dropdown">
                         <i className="iconSize far fa-arrow-alt-circle-down"></i>
                         Exportar
                     </button>
-                        <ul className="dropdown-menu  pull-right">
+                    <ul className="dropdown-menu  pull-right">
                         <li>
                             <a href="javascript:void(0);" onClick={() => this.handleExport("geojson")}>
-                                <i className="fa fa-code fa-fw"></i> 
+                                <i className="fa fa-code fa-fw"></i>
                                 GeoJSON (.JSON)
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0);" onClick={() => this.handleExport("shp")}>
-                                <i className="far fa-file-archive fa-fw"></i> 
+                                <i className="far fa-file-archive fa-fw"></i>
                                 ShapeFile (.SHP)
                             </a>
                         </li>
                         <li>
                             <a href="javascript:void(0);" onClick={() => this.handleExport("xml")}>
-                                <i className="fa fa-file-code fa-fw"></i> 
+                                <i className="fa fa-file-code fa-fw"></i>
                                 XML (.XML)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onClick={() => this.handleExport("kml")}>
+                                <i className="fa fa-map fa-fw"></i>
+                                KML (.KML)
                             </a>
                         </li>
                     </ul>
 
                 </div>
-                
-                {/* <div>
-                    {this.state.error
-                    ? 'Erro ao processar o talhão'
-                    : this.state.isProcessing
-                    ? 'Processando Talhões, aguarde...'
-                    : this.state.processingCompleted && !this.state.isExporting
-                    ? 'Processamento concluído!'
-                    : this.state.isExporting
-                    ? 'Exportando Arquivos, aguarde...'
-                    : this.state.exportingCompleted
-                    ? 'Arquivos exportados!'
-                    : ''}
-                </div> */}
 
             </div>
         );
