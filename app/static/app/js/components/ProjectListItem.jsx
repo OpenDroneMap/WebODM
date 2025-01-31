@@ -274,7 +274,7 @@ class ProjectListItem extends React.Component {
 
     // console.log(fileArray);
 
-    const allowedExtensions = ['.png', '.jpg', '.jpeg'];
+    const allowedExtensions = ['.png', '.jpg', '.jpeg', '.tif'];
 
     // Filtrar arquivos válidos
     const validFiles = fileArray.filter((file) => {
@@ -309,7 +309,7 @@ class ProjectListItem extends React.Component {
     let FilesToDrozoneArray = [];
     let rejectedFiles = [];
 
-    const allowedExtensions = ['.png', '.jpg', '.jpeg'];
+    const allowedExtensions = ['.png', '.jpg', '.jpeg', '.tif'];
 
     for (const file of filesArray) {
       if (file.name.endsWith(".zip")) {
@@ -395,7 +395,7 @@ class ProjectListItem extends React.Component {
         url: 'TO_BE_CHANGED',
         parallelUploads: 6,
         uploadMultiple: false,
-        acceptedFiles: ".png,.jpg,.jpeg,.zip",
+        acceptedFiles: ".png,.jpg,.jpeg,.zip,.tif",
         autoProcessQueue: false,
         createImageThumbnails: false,
         clickable: false,
@@ -924,7 +924,7 @@ class ProjectListItem extends React.Component {
                         type="file" 
                         id={"filerpicker_" + this.props.data.id }
                         name="fileList" 
-                        accept=".png,.jpg,.jpeg,.zip"
+                        accept=".png,.jpg,.jpeg,.zip,.tif"
                         multiple 
                         style={{display:'none'}} 
                         onChange={this.handleUploadFiles}/>
