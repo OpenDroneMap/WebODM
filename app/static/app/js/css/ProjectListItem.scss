@@ -104,6 +104,23 @@
                 width: 100%;
             }
         }
+        .btn-danger {
+            background-color: #d80101;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            border-bottom-left-radius: 20px !important;
+            border-top-left-radius: 20px !important;
+            padding: 10px 20px;
+
+            i {
+                margin-right: 5px;
+            }
+
+            &:hover {
+                opacity: 0.65;
+            }
+        }
     }
 
     .task-filters{
