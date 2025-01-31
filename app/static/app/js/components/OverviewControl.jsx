@@ -120,12 +120,12 @@ export default L.Control.extend({
             this.options.onTogglePopup);
     },
 
-    updateOpenPopup: function (openPopup, onTogglePopup) {
-        this.update(this.options.selectedLayers,
+    updateOpenPopup: function (openPopup, onTogglePopup, overlays, selectedLayers) {
+        this.update(selectedLayers,
             this.options.removeGeoJsonDetections,
             this.options.loadGeoJsonDetections,
             this.options.tiles,
-            this.options.overlays,
+            overlays,
             openPopup,
             onTogglePopup
         )

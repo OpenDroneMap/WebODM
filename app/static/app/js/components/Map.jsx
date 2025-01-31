@@ -797,8 +797,8 @@ class Map extends React.Component {
 
         this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.openPopup, this.togglePopup)
         this.MarkFieldsControl.update(this.state.openPopup)
-        this.overviewControl.updateOpenPopup(this.state.openPopup, this.togglePopup);
-        this.sprayLineControl.updateOpenPopup(this.state.openPopup, this.togglePopup);
+        this.overviewControl.updateOpenPopup(this.state.openPopup, this.togglePopup, this.state.overlays, this.state.selectedLayers);
+        this.sprayLineControl.updateOpenPopup(this.state.openPopup, this.togglePopup, this.state.overlays, this.state.selectedLayers);
         this.updateControlPlugin();
         this.updateMeasurePlugin();
         this.autolayers.updateOpenPopup(this.state.openPopup, this.togglePopup);
