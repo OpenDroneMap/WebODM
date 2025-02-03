@@ -736,218 +736,221 @@ class ProjectListItem extends React.Component {
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
-         href="javascript:void(0);"
-         ref={this.setRef("dropzone")}
-         >
-        
-        {canEdit ? 
-            <EditProjectDialog 
-            ref={(domNode) => { this.editProjectDialog = domNode; }}
-            title={_("Edit Project")}
-            saveLabel={_("Save Changes")}
-            savingLabel={_("Saving changes...")}
-            saveIcon="far fa-edit"
-            showDuplicate={true}
-            onDuplicated={this.props.onProjectDuplicated}
-            projectName={data.name}
-            projectDescr={data.description}
-            projectId={data.id}
-            projectTags={data.tags}
-            deleteWarning={deleteWarning}
-            saveAction={this.updateProject}
-            showPermissions={this.hasPermission("change")}
-            deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
-            />
+       href="javascript:void(0);"
+       ref={this.setRef("dropzone")}
+       >
+      
+      {canEdit ? 
+        <EditProjectDialog 
+        ref={(domNode) => { this.editProjectDialog = domNode; }}
+        title={_("Edit Project")}
+        saveLabel={_("Save Changes")}
+        savingLabel={_("Saving changes...")}
+        saveIcon="far fa-edit"
+        showDuplicate={true}
+        onDuplicated={this.props.onProjectDuplicated}
+        projectName={data.name}
+        projectDescr={data.description}
+        projectId={data.id}
+        projectTags={data.tags}
+        deleteWarning={deleteWarning}
+        saveAction={this.updateProject}
+        showPermissions={this.hasPermission("change")}
+        deleteAction={this.hasPermission("delete") ? this.handleDelete : undefined}
+        />
+      : ""}
+
+      <div className="row no-margin">
+        <ErrorMessage bind={[this, 'error']} />
+        <div className="btn-group project-buttons">
+        {this.hasPermission("add") ? 
+          <div className={"asset-download-buttons " + (this.state.upload.uploading ? "hide" : "")}>
+          <button type='button'
+              className='btn btn-sm rounded-corners upload-file upload-folder bg-success'
+              onClick={() => {
+                document.querySelector('#folderpicker').click();
+                this.handleUpload();
+                }}>
+                <i className="content-upload-glyphicon" aria-hidden="true"></i>
+                Selecionar Pasta
+              <input 
+                type="file" 
+                id="folderpicker" 
+                name="fileList" 
+                webkitdirectory='true' 
+                multiple 
+                style={{display:'none'}} 
+                onChange={this.handleUploadfolders}/>
+          </button>
+          <button type="button" 
+            className="btn btn-sm rounded-corners upload-file"
+            onClick={() => {
+              document.querySelector('#filepicker').click();
+              this.handleUpload();
+            }}>
+            <i className="content-upload-glyphicon" aria-hidden="true"></i>
+            {_("Selecionar imagens e Ponto de Controle")}
+            <input 
+              type="file" 
+              id="filepicker" 
+              name="fileList" 
+              accept="image/*,.zip"
+              multiple 
+              style={{display:'none'}} 
+              onChange={this.handleUploadFiles}/>
+          </button>
+          <button type="button" 
+              className="btn btn-sm rounded-corners import-file"
+              onClick={this.handleImportTask}>
+            <i className="content-import-glyphicon"></i> {_("Importar")}
+          </button>
+          {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
+          </div>
         : ""}
 
-        <div className="row no-margin">
-          <ErrorMessage bind={[this, 'error']} />
-          <div className="btn-group project-buttons">
-            {this.hasPermission("add") ? 
-              <div className={"asset-download-buttons " + (this.state.upload.uploading ? "hide" : "")}>
-                <button type='button'
-                        className='btn btn-sm rounded-corners upload-file upload-folder bg-success'
-                        onClick={() => {
-                          document.querySelector('#folderpicker').click();
-                          this.handleUpload();
-                          }}>
-                          <i className="content-upload-glyphicon" aria-hidden="true"></i>
-                          Selecionar Pasta
-                        <input 
-                          type="file" 
-                          id="folderpicker" 
-                          name="fileList" 
-                          webkitdirectory='true' 
-                          multiple 
-                          style={{display:'none'}} 
-                          onChange={this.handleUploadfolders}/>
-                </button>
-                <button type="button" 
-                    className="btn btn-sm rounded-corners upload-file"
-                    onClick={() => {
-                      document.querySelector('#filepicker').click();
-                      this.handleUpload();
-                    }}>
-                    <i className="content-upload-glyphicon" aria-hidden="true"></i>
-                    {_("Selecionar imagens e Ponto de Controle")}
-                    <input 
-                        type="file" 
-                        id="filepicker" 
-                        name="fileList" 
-                        accept="image/*,.zip"
-                        multiple 
-                        style={{display:'none'}} 
-                        onChange={this.handleUploadFiles}/>
-                </button>
-                <button type="button" 
-                      className="btn btn-sm rounded-corners import-file"
-                      onClick={this.handleImportTask}>
-                  <i className="content-import-glyphicon"></i> {_("Importar")}
-                </button>
-                {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
-              </div>
-            : ""}
-
-            <button disabled={this.state.upload.error !== ""} 
-                    type="button"
-                    className={"btn btn-danger btn-sm " + (!this.state.upload.uploading ? "hide" : "")} 
-                    onClick={this.handleCancel}>
-              <i className="glyphicon glyphicon-remove-circle"></i>
-              Cancel Upload
-            </button> 
-          </div>
-
-          <div className="project-name">
-            {data.name}
-            {userTags.length > 0 ? 
-              userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
-              : ""}
-          </div>
-          <div className="project-description">
-            {data.description}
-          </div>
-          <div className="row project-links">
-            {numTasks > 0 ? 
-              <span className='task-container'>
-                <i className='fa fa-tasks'></i>
-                <a href="javascript:void(0);" onClick={this.toggleTaskList}>
-                  <span>
-                    <p>{interpolate(_("%(count)s Tarefas"), { count: numTasks})}</p>
-                    <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
-                  </span>
-                </a>
-              </span>
-              : ""}
-            
-            {this.state.showTaskList && numTasks > 1 ? 
-              <div className="task-filters">
-                <div className="btn-group">
-                  {this.state.selectedTags.length || this.state.filterText !== "" ? 
-                    <a className="quick-clear-filter" href="javascript:void(0)" onClick={this.clearFilter}>×</a>
-                  : ""}
-                  <i className='fa fa-filter'></i>
-                  <a href="javascript:void(0);" onClick={this.onOpenFilter} className="dropdown-toggle" data-toggle-outside data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {_("Filtrar")}
-                  </a>
-                  <ul className="dropdown-menu dropdown-menu-right filter-dropdown">
-                  <li className="filter-text-container">
-                    <input type="text" className="form-control filter-text theme-border-secondary-07" 
-                          value={this.state.filterText}
-                          ref={domNode => {this.filterTextInput = domNode}}
-                          placeholder=""
-                          spellCheck="false"
-                          autoComplete="false"
-                          onChange={this.handleFilterTextChange} />
-                  </li>
-                  {filterTags.map(t => <li key={t} className="tag-selection">
-                    <input type="checkbox"
-                        className="filter-checkbox"
-                        id={"filter-tag-" + data.id + "-" + t}
-                        checked={this.state.selectedTags.indexOf(t) !== -1}
-                        onChange={this.toggleTag(t)} /> <label className="filter-checkbox-label" htmlFor={"filter-tag-" + data.id + "-" + t}>{t}</label>
-                  </li>)}
-
-                  <li className="clear-container"><input type="button" onClick={this.clearFilter} className="btn btn-default btn-xs" value={_("Clear")}/></li>
-                  </ul>
-                </div>
-                <div className="btn-group">
-                  <i className='fa fa-sort-alpha-down'></i>
-                  <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {_("Sort")}
-                  </a>
-                  <SortPanel selected="-created_at" items={this.sortItems} onChange={this.sortChanged} />
-                </div>
-              </div> : ""}
-
-              {numTasks > 0 ?
-                <span>
-                  <i key="edit-icon" className='fa fa-globe'></i>
-                  <a key="edit-text" href="javascript:void(0);" onClick={this.viewMap}>
-                    {_("Ver mapa")}
-                  </a>
-                </span>
-                : ""}
-              
-            {canEdit ? 
-              <span>
-                <i key="edit-icon" className='far fa-edit'></i>
-                <a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> 
-                  {_("Editar")}
-                </a>
-              </span>
-              : ""}
-
-            {!canEdit && !data.owned ? 
-              [<i key="edit-icon" className='far fa-eye-slash'></i>
-              ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleHideProject(deleteWarning, this.handleDelete)}> {_("Delete")}
-              </a>]
-            : ""}
-
-          </div>
         </div>
-        <i className="drag-drop-icon fa fa-inbox"></i>
-        <div className="row">
-          {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload}/> : ""}
+
+        <div className="project-name">
+        {data.name}
+        {userTags.length > 0 ? 
+          userTags.map((t, i) => <div key={i} className="tag-badge small-badge" onClick={this.handleTagClick(t)}>{t}</div>)
+          : ""}
+        </div>
+        <div className="project-description">
+        {data.description}
+        </div>
+        <div className="row project-links">
+        {numTasks > 0 ? 
+          <span className='task-container'>
+          <i className='fa fa-tasks'></i>
+          <a href="javascript:void(0);" onClick={this.toggleTaskList}>
+            <span>
+            <p>{interpolate(_("%(count)s Tarefas"), { count: numTasks})}</p>
+            <i className={'fa fa-caret-' + (this.state.showTaskList ? 'down' : 'right')}></i>
+            </span>
+          </a>
+          </span>
+          : ""}
+        
+        {this.state.showTaskList && numTasks > 1 ? 
+          <div className="task-filters">
+          <div className="btn-group">
+            {this.state.selectedTags.length || this.state.filterText !== "" ? 
+            <a className="quick-clear-filter" href="javascript:void(0)" onClick={this.clearFilter}>×</a>
+            : ""}
+            <i className='fa fa-filter'></i>
+            <a href="javascript:void(0);" onClick={this.onOpenFilter} className="dropdown-toggle" data-toggle-outside data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {_("Filtrar")}
+            </a>
+            <ul className="dropdown-menu dropdown-menu-right filter-dropdown">
+            <li className="filter-text-container">
+            <input type="text" className="form-control filter-text theme-border-secondary-07" 
+                value={this.state.filterText}
+                ref={domNode => {this.filterTextInput = domNode}}
+                placeholder=""
+                spellCheck="false"
+                autoComplete="false"
+                onChange={this.handleFilterTextChange} />
+            </li>
+            {filterTags.map(t => <li key={t} className="tag-selection">
+            <input type="checkbox"
+              className="filter-checkbox"
+              id={"filter-tag-" + data.id + "-" + t}
+              checked={this.state.selectedTags.indexOf(t) !== -1}
+              onChange={this.toggleTag(t)} /> <label className="filter-checkbox-label" htmlFor={"filter-tag-" + data.id + "-" + t}>{t}</label>
+            </li>)}
+
+            <li className="clear-container"><input type="button" onClick={this.clearFilter} className="btn btn-default btn-xs" value={_("Clear")}/></li>
+            </ul>
+          </div>
+          <div className="btn-group">
+            <i className='fa fa-sort-alpha-down'></i>
+            <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {_("Sort")}
+            </a>
+            <SortPanel selected="-created_at" items={this.sortItems} onChange={this.sortChanged} />
+          </div>
+          </div> : ""}
+
+          {numTasks > 0 ?
+          <span>
+            <i key="edit-icon" className='fa fa-globe'></i>
+            <a key="edit-text" href="javascript:void(0);" onClick={this.viewMap}>
+            {_("Ver mapa")}
+            </a>
+          </span>
+          : ""}
           
-          {this.state.upload.error !== "" ? 
-            <div className="alert alert-warning alert-dismissible">
-                <button type="button" className="close" title={_("Close")} onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
-                {this.state.upload.error}
-            </div>
-            : ""}
-
-          {this.state.upload.editing ? 
-            <NewTaskPanel
-              onSave={this.handleTaskSaved}
-              onCancel={this.handleTaskCanceled}
-              suggestedTaskName={this.handleTaskTitleHint}
-              filesCount={this.state.upload.totalCount}
-              showResize={true}
-              getFiles={() => this.state.upload.files }
-            />
+        {canEdit ? 
+          <span>
+          <i key="edit-icon" className='far fa-edit'></i>
+          <a key="edit-text" href="javascript:void(0);" onClick={this.handleEditProject}> 
+            {_("Editar")}
+          </a>
+          </span>
           : ""}
 
-          {this.state.importing ? 
-            <ImportTaskPanel
-              onImported={this.newTaskAdded}
-              onCancel={this.handleCancelImportTask}
-              projectId={this.state.data.id}
-            />
-          : ""}
-
-          {this.state.showTaskList ? 
-            <TaskList 
-                ref={this.setRef("taskList")} 
-                source={`/api/projects/${data.id}/tasks/?ordering=${this.state.sortKey}`}
-                onDelete={this.taskDeleted}
-                onTaskMoved={this.taskMoved}
-                hasPermission={this.hasPermission}
-                onTagsChanged={this.tagsChanged}
-                onTagClicked={this.selectTag}
-                history={this.props.history}
-            /> : ""}
+        {!canEdit && !data.owned ? 
+          [<i key="edit-icon" className='far fa-eye-slash'></i>
+          ,<a key="edit-text" href="javascript:void(0);" onClick={this.handleHideProject(deleteWarning, this.handleDelete)}> {_("Delete")}
+          </a>]
+        : ""}
 
         </div>
+      </div>
+      <i className="drag-drop-icon fa fa-inbox"></i>
+      <div className="row">
+        {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload}/> : ""}
+        
+        {this.state.upload.error !== "" ? 
+        <div className="alert alert-warning alert-dismissible">
+          <button type="button" className="close" title={_("Close")} onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
+          {this.state.upload.error}
+        </div>
+        : ""}
+
+        {this.state.upload.uploading ? 
+        <button disabled={this.state.upload.error !== ""} 
+            type="button"
+            className={"btn btn-danger btn-sm upload-cancel"} 
+            onClick={this.handleCancel}>
+          <i className="glyphicon glyphicon-remove-circle"></i>
+          Cancel Upload
+        </button> 
+        : ""}
+
+        {this.state.upload.editing ? 
+        <NewTaskPanel
+          onSave={this.handleTaskSaved}
+          onCancel={this.handleTaskCanceled}
+          suggestedTaskName={this.handleTaskTitleHint}
+          filesCount={this.state.upload.totalCount}
+          showResize={true}
+          getFiles={() => this.state.upload.files }
+        />
+        : ""}
+
+        {this.state.importing ? 
+        <ImportTaskPanel
+          onImported={this.newTaskAdded}
+          onCancel={this.handleCancelImportTask}
+          projectId={this.state.data.id}
+        />
+        : ""}
+
+        {this.state.showTaskList ? 
+        <TaskList 
+          ref={this.setRef("taskList")} 
+          source={`/api/projects/${data.id}/tasks/?ordering=${this.state.sortKey}`}
+          onDelete={this.taskDeleted}
+          onTaskMoved={this.taskMoved}
+          hasPermission={this.hasPermission}
+          onTagsChanged={this.tagsChanged}
+          onTagClicked={this.selectTag}
+          history={this.props.history}
+        /> : ""}
+
+      </div>
       </li>
     );
   }
