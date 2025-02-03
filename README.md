@@ -67,9 +67,6 @@ To install WebODM manually on your machine with docker:
 ### Requirements
   - [Git](https://git-scm.com/downloads)
   - [Docker](https://www.docker.com/)
-  - [Docker-compose](https://docs.docker.com/compose/install/)
-  - Python
-  - Pip
 
 * Windows users should install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-windows) and :
     1. make sure Linux containers are enabled (Switch to Linux Containers...)
