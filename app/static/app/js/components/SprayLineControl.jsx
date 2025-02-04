@@ -45,17 +45,22 @@ class SprayLineControl extends React.Component {
         const { showPanel } = this.state;
 
         return (
-            <div className={showPanel ? "open" : ""}>
-                <a href="javascript:void(0);"
+            <>  
+            <a href="javascript:void(0);"
                     title="Pulverizar"
                     onClick={this.handleOpen}
                     className="leaflet-control-sprayline-control-button leaflet-bar-part theme-secondary"></a>
+             <div className={showPanel ? "open popright" : ""}>
+              
                 <SprayLineControlPanel
                     onClose={this.handleClose}
                     selectedLayers={this.props.selectedLayers}
                     overlays={this.props.overlays}
                     tiles={this.props.tiles} />
-            </div>);
+            </div>
+            
+            </>
+           );
 
     }
 }

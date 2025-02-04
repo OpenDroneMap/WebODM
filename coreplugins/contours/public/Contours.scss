@@ -8,7 +8,12 @@
   }
 
   div.contours-panel{ display: none; }
-  
+  .popright{
+    position: absolute;
+   top: 10%;
+   left: -10%;
+   transform: translate(-100%, 0%) !important;
+ }
   .open{
     a.leaflet-control-contours-button{
       display: none;

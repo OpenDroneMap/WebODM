@@ -969,11 +969,23 @@ L.Control.AutoLayers = L.Control.extend({
 	_expand: function() {
 		L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
 		L.DomUtil.removeClass(this._baseLayersClose, 'hidden'); // Garante que o botão fique visível
+		this._container.style.position = 'absolute';
+   		this._container.style.top = '10%';
+		this._container.style.left = '-10%';
+		this._container.style.transform = 'translate(-100%, 0%)';
+		this._container.style.setProperty('transform', 'translate(-100%, 0%)', 'important');
+
+		
 	},
 
 	_collapse: function() {
 		L.DomUtil.removeClass(this._container, 'leaflet-control-layers-expanded');
 		L.DomUtil.addClass(this._baseLayersClose, 'hidden'); // Esconde o botão
+		this._container.style.removeProperty('position');
+		this._container.style.removeProperty('top');
+		this._container.style.removeProperty('left');
+		this._container.style.removeProperty('transform');
+
 	}
 });
 
