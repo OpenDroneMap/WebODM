@@ -12,16 +12,10 @@
     z-index: 99999;
     border-radius: 20px !important;
     position: absolute;
-    // //left: -22px !important;
-    // left: -35em !important;
-    
-        position: absolute !important;
-       top: 10% !important;
-       left: -10% !important;
-       transform: translate(-100%, 0%) !important;
-     
-    
-    
+    //left: -22px !important;
+    left: -26em !important;
+    top: 8px;
+    max-width: 300px;
 }
 
 .leaflet-control-measure,
@@ -122,4 +116,5 @@
     background-repeat: no-repeat;
     background-size: 50px 50px !important;
     background-position-y: -8px;
+    display: block !important;
 }   
