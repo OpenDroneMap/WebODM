@@ -80,7 +80,7 @@ class SharePopup extends React.Component{
         this.setState({task});
         this.props.taskChanged(task);
       })
-      .fail(() => this.setState({error: _("An error occurred. Check your connection and permissions.")}))
+      .fail(() => this.setState({error: _("Ocorreu um erro. Verifique sua conexão e permissões.")}))
       .always(() => {
         this.setState({togglingShare: false});
       });
@@ -98,7 +98,7 @@ class SharePopup extends React.Component{
     return (<div onMouseDown={e => { e.stopPropagation(); }} className={"sharePopup " + this.props.placement}>
       <div className={"sharePopupContainer popover in " + this.props.placement}>
         <div className="arrow"></div>
-        <h3 className="popover-title theme-background-highlight">{_("Share This Task")}</h3>
+        <h3 className="popover-title theme-background-highlight">{_("Compartilhe esta tarefa")}</h3>
         <div className="popover-content theme-secondary">
           <ErrorMessage bind={[this, 'error']} />
           <div className="checkbox">
@@ -120,7 +120,7 @@ class SharePopup extends React.Component{
                 type="checkbox" 
                 checked={this.state.task.public}
                 onChange={() => {}}
-                 /> {_("Enabled")}
+                 /> {_("Habilitar")}
             </label>
           </div>
           <div className={"share-links " + (this.state.task.public ? "show" : "")}>

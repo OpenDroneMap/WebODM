@@ -39,7 +39,7 @@ L.Control.AutoLayers = L.Control.extend({
 	selectedBasemap: null,
 	layersToAdd: {},
 
-
+	
 	countZIndexBase: function(layers) {
 		for (var i = 0; i < layers.length; i++) {
 			var layer = layers[i];
@@ -74,6 +74,23 @@ L.Control.AutoLayers = L.Control.extend({
 
 		this.fetchMapData();
 	},
+
+	updateOpenPopup: function(openPopup) {
+
+		if(openPopup !== "basemaps") {
+			document.querySelector(".leaflet-control-autolayers-close")?.click()
+		}
+	},
+
+
+	addEventPopup: function(onTogglePopup) {
+
+		document.querySelector(".leaflet-control-layers-toggle").addEventListener("click", () => {
+			onTogglePopup("basemaps");
+		})
+	},
+
+	
 
 	onAdd: function(map) {
 		this._initEvents();
@@ -128,7 +145,7 @@ L.Control.AutoLayers = L.Control.extend({
 
 			var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
 			link.href = '#';
-			link.title = 'Base Maps';
+			link.title = 'Base do mapa';
 
 			if (L.Browser.touch) {
 				L.DomEvent
@@ -146,22 +163,31 @@ L.Control.AutoLayers = L.Control.extend({
 		} else {
 			this._expand();
 		}
+		
+
 
 		//base layers are made here
 		var baseLayersDiv = this._baseLayersDiv = L.DomUtil.create('div', 'leaflet-control-layers-tab',
 			form);
+		
+		this._baseLayersClose = L.DomUtil.create('span', 'leaflet-control-autolayers-close hidden', container); // Classe 'hidden' para esconder
+		this._baseLayersClose.className += ' fas fa-times';
+		this._baseLayersClose.style.position = 'absolute';
+		this._baseLayersClose.style.top = '10px'; // Posição no topo direito
+		this._baseLayersClose.style.right = '10px';
+		this._baseLayersClose.style.cursor = 'pointer';
 		this._baseLayersTitle = L.DomUtil.create('div', 'leaflet-control-autolayers-title',
 			baseLayersDiv);
-		this._baseLayersTitle.innerHTML = 'Base Maps';
-		this._baseLayersClose = L.DomUtil.create('span', 'leaflet-control-autolayers-close',
-			baseLayersDiv);
+		this._baseLayersTitle.innerHTML = 'Base do mapa';
 		var baseLayersBox = this._baseLayersBox = L.DomUtil.create('div', 'map-filter', baseLayersDiv);
 		var baseLayersFilter = this._baseLayersFilter = L.DomUtil.create('input',
 			'map-filter-box-base', baseLayersBox);
-		baseLayersFilter.setAttribute('placeholder', 'Filter Base Layer List');
+		baseLayersFilter.setAttribute('placeholder', 'Filtrar lista de camada base');
 		baseLayersFilter.setAttribute('autocomplete', 'off');
 		this._baseLayersList = L.DomUtil.create('div', className + '-base', baseLayersDiv);
 		this._separator = L.DomUtil.create('div', className + '-separator', form);
+		
+
 
 		//overlays are done here
 		var overlaysLayersDiv = this._overlaysDiv = L.DomUtil.create('div',
@@ -182,6 +208,8 @@ L.Control.AutoLayers = L.Control.extend({
 		overlaysLayersFilter.setAttribute('autocomplete', 'off');
 		this._overlaysList = L.DomUtil.create('div', className + '-overlays', overlaysLayersDiv);
 
+			
+		
 		container.appendChild(form);
 
 		//check to see if we have any preadded 
@@ -224,6 +252,12 @@ L.Control.AutoLayers = L.Control.extend({
 			}
 		});
 
+		this._map.on('click', function() {
+			L.DomUtil.addClass(this._baseLayersClose, 'hidden'); // Garante que o botão permaneça escondido
+		}.bind(this));
+
+		this._baseLayersClose.addEventListener('click', this._collapse.bind(this));
+
 		//now the baselayers filter box
 		L.DomEvent.addListener(baseFilterBox, 'keyup', function(e) {
 			var filterBoxValue = this.value.toLowerCase();
@@ -252,7 +286,7 @@ L.Control.AutoLayers = L.Control.extend({
 			if (e.currentTarget.innerText === 'Overlays') {
 				overlayOrBase = 'overlays';
 			}
-			if (e.currentTarget.innerText === 'Base Maps') {
+			if (e.currentTarget.innerText === 'Base do mapa') {
 				overlayOrBase = 'base';
 			}
 
@@ -282,7 +316,7 @@ L.Control.AutoLayers = L.Control.extend({
 			}
 
 			if (e.currentTarget.innerText === 'Overlays' || e.currentTarget
-				.innerText === 'Base Maps') {
+				.innerText === 'Base do mapa') {
 				var filterBoxValue = this.parentNode.getElementsByClassName('map-filter')[0].children[0].value
 					.toLowerCase();
 				var displayLayers = this.parentNode.getElementsByClassName('leaflet-control-layers-' +
@@ -312,9 +346,8 @@ L.Control.AutoLayers = L.Control.extend({
 		//x in the corner to close
 		var closeControl = this._baseLayersClose;
 		L.DomEvent.addListener(closeControl, 'click', function(e) {
-			this.parentNode.parentNode.parentNode.className = this.parentNode.parentNode.parentNode.className
-				.replace(
-					'leaflet-control-layers-expanded', '');
+			L.DomEvent.stop(e); // Evitar propagação
+			this.parentNode.classList.remove('leaflet-control-layers-expanded'); // Fecha o painel
 		});
 
 		//fix pesky zooming, have to dynamically measure the hidden div too! Make sure you do that!
@@ -935,11 +968,12 @@ L.Control.AutoLayers = L.Control.extend({
 	
 	_expand: function() {
 		L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
+		L.DomUtil.removeClass(this._baseLayersClose, 'hidden'); // Garante que o botão fique visível
 	},
 
 	_collapse: function() {
-		this._container.className = this._container.className.replace(
-			' leaflet-control-layers-expanded', '');
+		L.DomUtil.removeClass(this._container, 'leaflet-control-layers-expanded');
+		L.DomUtil.addClass(this._baseLayersClose, 'hidden'); // Esconde o botão
 	}
 });
 

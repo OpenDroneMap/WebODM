@@ -4,11 +4,11 @@
 
     <div class="row text-center">
         <div class="col-md-12 col-sm-12">
-            <h4>{% trans 'Projects' %}</h4>
+            <h4>Projetos</h4>
             <form action="/plugins/projects-charts/" method="get" class="mt-6">
                 <div class="row">
                     <div class="col-sm-4">
-                        <label for="year">{% trans 'Year' %}</label>
+                        <label for="year">Anos</label>
                     </div>
                     {% for field in form %}
                         <div class="col-sm-4">
@@ -20,7 +20,7 @@
 
                     <div class="col-sm-4">
                         {{ form.non_field_errors }}
-                        <input type="submit" value="{% trans 'Next' %}" class="btn btn-primary"/>
+                        <input type="submit" value="Proximo" class="btn btn-primary"/>
                     </div>
                 </div>
             </form>
@@ -61,12 +61,12 @@
                 data: {
                     labels: [
                         {% for month in months %}
-                            "{{ month }}",
+                            "{{ mês }}",
                         {% endfor %}
                     ],
                     datasets: [
                         {
-                            label: "{% trans 'Projects by month' %}",
+                            label: "Projetos por mês",
                             data: [{{ projects_by_month|join:", "  }}],
                             backgroundColor: [
                                 {% for _ in projects_by_month %}
@@ -108,7 +108,7 @@
                     ],
                     datasets: [
                         {
-                            label: "{% trans 'Tasks by month' %}",
+                            label: "Tarefas por mês",
                             data: [{{ tasks_by_month|join:", "  }}],
                             backgroundColor: [
                                 {% for _ in tasks_by_month %}

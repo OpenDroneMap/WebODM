@@ -1,17 +1,19 @@
 .leaflet-control-overview-control .overview-control-panel {
-  padding: 6px 10px 6px 6px;
+  padding: 15px 20px 15px 25px;
+  margin: 10px 12px 0 0;
   background: #fff;
   width: 300px;
   min-height: 74px;
   max-height: 418px;
   overflow-y: auto;
   border-radius: 12px;
-  border: none;
-  .close-button {
+  overflow-x: hidden;
+
+  .close-button{
     display: inline-block;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQAAAD8x0bcAAAAkUlEQVR4AZWRxQGDUBAFJ9pMflNIP/iVSkIb2wgccXd7g7O+3JXCQUgqBAfFSl8CMooJGQHfuUlEwZpoahZQ7ODTSXWJQkxyioock7BL2tXmdF4moJNX6IDZfbUBQNrX7qfeXfPuqwBAQjEz60w64htGJ+luFH48gt+NYe6v5b/cnr9asM+HlRQ2Qlwh2CjuqQQ9vKsKTwhQ1wAAAABJRU5ErkJggg==);
-    height: 18px;
-    width: 18px;
+    font-size:17px;
+    height: 30px;
+    width: 30px;
     margin-right: 0;
     float: right;
     vertical-align: middle;
@@ -21,15 +23,17 @@
     position: relative;
     left: 2px;
 
-    &:hover {
+    &:hover{
       opacity: 0.7;
       cursor: pointer;
     }
   }
 
-  .title {
+  .title{
+    padding: 7px 0px;
     font-size: 120%;
-    margin-right: 120px;
+    margin-right: 60px;
+    color: #14a5a2;
   }
 
   hr {
@@ -73,6 +77,7 @@
 
   .list-layer-items.collapsed {
     display: none;
+
   }
 
   .collapsed-infos-btn {
@@ -86,7 +91,7 @@
     width: 18px;
     color: #fff;
     border: none;
-    background-color: #4b8b45;
+    background-color: #74b16f;
   }
   .collapsed-infos-btn:hover{
     background-color: #319c41;
@@ -109,19 +114,21 @@
   }
   .send,
   .clear {
-    background-color: #319c41;
+    background-color: #74b16f;
     border-radius: 20px;
+    height: 27.6px;
+    font-size: 14px;
     margin: 5px;
     padding: 4px;
     color: #fff;
     border: none;
-    width: 23%;
+    width: 27%;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
 
   .send:hover {
-    background-color: #4b8b45;
+    background-color: #319c41;
   }
 
   .clear {

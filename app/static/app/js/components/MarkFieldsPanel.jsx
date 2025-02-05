@@ -27,7 +27,9 @@ export default class LayersControlPanel extends React.Component {
         this.polygonIdCounter = 1;
         this.state = {
           isDrawing: false,
-          showPanel: false
+          showPanel: false,
+          isObstacle: false,
+          polygonStyle: [{color: '#3388ff', fillColor: '#3388ff', fillOpacity: 0.2, },{ color: 'red', fillColor: 'red', fillOpacity: 0.2, weight: 3, opacity: 1 }]
         };
     }
 
@@ -57,12 +59,21 @@ export default class LayersControlPanel extends React.Component {
         // Assign a unique "Field_id" property to each created polygon
         map.on(L.Draw.Event.CREATED, (e) => {
           const layer = e.layer;
+          const type = this.state.isObstacle;
           layer.feature = layer.feature || {}; // Ensure feature object exists
           layer.feature.type = "Feature"; // Set type to Feature for GeoJSON
           layer.feature.properties = layer.feature.properties || {}; // Ensure properties object exists
           layer.feature.properties.field_id = this.polygonIdCounter++; // Assign unique field_id
-          this.drawnItems.addLayer(layer);
-          
+          layer.feature.properties.obstacle = type;
+
+          const style = type === false 
+        ? this.state.polygonStyle[0]
+        : this.state.polygonStyle[1]
+
+        if (layer.setStyle) {
+          layer.setStyle(style);
+        }
+        this.drawnItems.addLayer(layer);
       });
       
 
@@ -74,7 +85,7 @@ export default class LayersControlPanel extends React.Component {
         fetch('/api/projects/' + this.props.project_id + '/tasks/'+ this.props.task_id +'/ai/detections/field').then((value) => {
             if (value.status == 404) {
               let err = {};
-              err.message = interpolate(_("Detection at %(url)s not found!"), { url: api });
+              err.message = interpolate(_("Detecção em %(url)s não encontrada!"), { url: api });
               cb(err);
               return;
             }
@@ -82,6 +93,10 @@ export default class LayersControlPanel extends React.Component {
                 L.geoJSON(geojson, {
                     onEachFeature: (feature, layer) => {
                         feature.properties.field_id = this.polygonIdCounter++;
+                        if(feature.properties.obstacle === true){
+                            layer.options.color = "red";
+                            layer.options.fillColor = "red";
+                        }
                         this.drawnItems.addLayer(layer);
                     }
                 });
@@ -122,7 +137,13 @@ export default class LayersControlPanel extends React.Component {
     };
 
     drawPolygon = () => {
-        this.props.map.fire('draw:drawstart', { layerType: 'polygon' });
+        this.state.isObstacle = false;   
+        this.props.map.fire('draw:drawstart', { layerType: 'polygon'});
+        this.drawControl._toolbars.draw._modes.polygon.handler.enable(); 
+    };
+    drawObstacle = () => {
+        this.state.isObstacle = true;   
+        this.props.map.fire('draw:drawstart', { layerType: 'polygon'});
         this.drawControl._toolbars.draw._modes.polygon.handler.enable();    
     };
 
@@ -170,6 +191,8 @@ export default class LayersControlPanel extends React.Component {
                 <span className="close-button fas fa-times" onClick={this.props.onClose}></span>
                 <div className="title">{_("MARCAR TALHÕES")}</div>
                 <span className="panel-button" onClick={this.drawPolygon}> <i className="corIcons fas fa-thumbtack"></i> Marcar Talhões</span>
+                <hr />
+                <span className="panel-button" onClick={this.drawObstacle}> <i className="corIcons fas fa-mountain"></i> Marcar Obstáculos</span>
                 <hr />
                 <span className="panel-button" onClick={this.editPolygon}><i className="corIcons fas fa-edit"></i> Editar Talhões</span>
                 <hr />

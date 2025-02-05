@@ -28,7 +28,7 @@
 {% if not is_popup %}
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+<a href="{% url 'admin:index' %}">Home</a>
 <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
 {{ cl.opts.verbose_name_plural|capfirst }}
 </div>
@@ -66,7 +66,7 @@
       {% block filters %}
         {% if cl.has_filters %}
           <div id="changelist-filter">
-            <h2>{% trans 'Filter' %}</h2>
+            <h2>Filtro</h2>
             {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
           </div>
         {% endif %}

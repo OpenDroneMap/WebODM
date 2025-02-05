@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { _ } from '../classes/gettext';
 
 const warnings = {
-    'ignore-gsd': _("You might run out of memory if you use this option.")
+    'ignore-gsd': _("Você pode ficar sem memória se usar esta opção.")
 };
 
 class ProcessingNodeOption extends React.Component {
@@ -150,7 +150,7 @@ class ProcessingNodeOption extends React.Component {
             <label>
               <input type="checkbox"
                     checked={this.state.value !== ""}
-                    onChange={this.handleCheckboxChange} /> {_("Enable")}
+                    onChange={this.handleCheckboxChange} /> {_("Habilitar")}
             </label>
           </div>
         );
@@ -159,7 +159,7 @@ class ProcessingNodeOption extends React.Component {
     let loadFileControl = "";
     if (this.supportsFileAPI() && this.props.domain === 'json'){
         loadFileControl = ([
-            <button key="btn" type="file" className="btn glyphicon glyphicon-import btn-primary" data-toggle="tooltip" data-placement="left" title={_("Click to import a JSON file")} onClick={() => this.loadFile()}></button>,
+            <button key="btn" type="file" className="btn glyphicon glyphicon-import btn-primary" data-toggle="tooltip" data-placement="left" title={_("Clique para importar um arquivo JSON")} onClick={() => this.loadFile()}></button>,
             <input key="file-ctrl" className="file-control" type="file" 
                 accept="text/plain,application/json,application/geo+json,.geojson"
                 onChange={this.handleFileSelect}
@@ -180,7 +180,7 @@ class ProcessingNodeOption extends React.Component {
         {loadFileControl}
         
         {this.state.value !== "" ? 
-        <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title={_("Reset to default")} onClick={this.resetToDefault}></button> :
+        <button type="submit" className="btn glyphicon glyphicon glyphicon-repeat btn-default" data-toggle="tooltip" data-placement="top" title={_("Redefinir para o padrão")} onClick={this.resetToDefault}></button> :
         ""}
 
         {warningMsg}

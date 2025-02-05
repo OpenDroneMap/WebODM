@@ -22,16 +22,16 @@ class Paginator extends React.Component {
 
         this.sortItems = [{
             key: "created_at",
-            label: _("Created on")
+            label: _("Criada em")
           },{
             key: "name",
-            label: _("Name")
+            label: _("Nome")
           },{
             key: "tags",
             label: _("Tags")
           },{
             key: "owner",
-            label: _("Owner")
+            label: _("Proprietário")
           }];
     }
 
@@ -118,13 +118,13 @@ class Paginator extends React.Component {
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false"
                         onClick={this.toggleSearch}
-                        title={_("Search")}><i className="fa fa-search"></i></a>
+                        title={_("Buscar")}><i className="fa fa-search"></i></a>
                 <ul className="dropdown-menu dropdown-menu-right search-popup">
                     <li>
                         <input type="text" 
                             ref={(domNode) => { this.searchInput = domNode}}
                             className="form-control search theme-border-secondary-07" 
-                            placeholder={_("Search names or #tags")}
+                            placeholder={_("Buscar nome ou #tags")}
                             spellCheck="false"
                             autoComplete="false"
                             value={searchText}
@@ -135,14 +135,14 @@ class Paginator extends React.Component {
                 </ul>
             </li>
             <li className="btn-group">
-                <a href="javascript:void(0);" className="dropdown-toggle force-rounded btn-sort" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Sort")}></i></a>
+                <a href="javascript:void(0);" className="dropdown-toggle force-rounded btn-sort" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i className="fa fa-sort-alpha-down" title={_("Organizar")}></i></a>
                 <SortPanel selected={this.state.sortKey} items={this.sortItems} onChange={this.sortChanged} />
             </li>
         </ul>);
 
         if (this.props.currentSearch){
             let currentSearch = decodeSearch(this.props.currentSearch);
-            clearSearch = (<span className="clear-search">{_("Search results for:")} <span className="query">{currentSearch}</span> <a href="javascript:void(0);" onClick={this.clearSearch}>×</a></span>);
+            clearSearch = (<span className="clear-search">{_("Resultados da pesquisa para:")} <span className="query">{currentSearch}</span> <a href="javascript:void(0);" onClick={this.clearSearch}>×</a></span>);
         }
 
         if (itemsPerPage && itemsPerPage && totalItems > itemsPerPage){

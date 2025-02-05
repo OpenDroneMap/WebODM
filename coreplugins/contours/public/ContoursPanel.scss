@@ -1,5 +1,6 @@
 .leaflet-control-contours .contours-panel{
   padding: 10px 10px 6px 6px;
+  margin: 10px 10px 0 0;
   background: #fff;
   min-width: 250px; 
   max-width: 300px;
@@ -8,18 +9,17 @@
   
   .close-button{
     display: inline-block;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAUklEQVQ4jWNgGAXYgC4DA4M5FnFzqBxBYM7AwPCKgYHBAUnMASqGzWCswIaBgeElAwODExqbJOAA1fgSzTUogIlUU4kFtgwUeIHiQKQ4GkcaAAC8Jw8GjeNLuQAAAABJRU5ErkJggg==);
-    height: 25px;
-    width: 25px;
+    font-size:17px;
+    height: 30px;
+    width: 30px;
     margin-right: 0;
     float: right;
     vertical-align: middle;
     text-align: right;
-    margin-top: 0px;
+    margin-top: 4px;
     margin-left: 16px;
     position: relative;
-    left: 2px;
-    background-size: contain;
+    left: -10px;
 
     &:hover{
       opacity: 0.7;
@@ -89,10 +89,40 @@
 
   .action-buttons{
     margin-top: 12px;
-    
-    
-    
   }
+
+  .action-buttons a {
+    position: relative;
+    left: 27%;
+    transform: translateX(-12.5%);
+  }
+
+  .delete-visualization-btn {
+    display: inline-flex;
+    align-items: center;
+    color: #e57373;
+    font-size: 14px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 5px;
+    border-radius: 5px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  
+    i {
+      margin-right: 8px;
+      font-size: 20px; 
+    }
+  
+    span {
+      color: #e57373;
+    }
+  }
+  
+  
+  
   
   .btn-group {
     display: flex;
@@ -122,12 +152,17 @@
 
 
 .btn.btn-sm.btn-primary.btn-export{
-  background-color: #469c42;
-  border-color: #469c42;
+  background-color: #74b16f;
+  border-color: #74b16f;
   border-radius: 25px;
   background-size: 25px 25px;
   
   font-size: 14px;
+
+  &:hover{
+    background-color: #319c41;
+    border-color: #319c41;
+  }
 }
 .glyphicon{
   font-size: 14px;

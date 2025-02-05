@@ -12,7 +12,7 @@ class FieldLayerControlPopup extends React.Component {
     stateSelectedLayers: PropTypes.array.isRequired,
   }
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.boundLayer = this.props.boundLayer;
@@ -25,6 +25,10 @@ class FieldLayerControlPopup extends React.Component {
       {
         checkboxLabel: "Daninha",
         category: 'weed',
+      },
+      {
+        checkboxLabel: "Segmentação",
+        category: 'segmentation',
       },
     ];
 
@@ -56,7 +60,9 @@ class FieldLayerControlPopup extends React.Component {
     this.state = {
       cropType: null,
       isChecked: false,
-      isPulverize: false, 
+      optionIsChecked: {},
+      isPulverize: false,
+      isPolinomialHealth: false,
     };
 
     this.getSelectedLayers = this.props.stateSelectedLayers[0];
@@ -67,46 +73,69 @@ class FieldLayerControlPopup extends React.Component {
       bounds: this.boundLayer.getBounds(),
       cropType: null,
       aiOptions: new Set(),
-      pulverize: false, 
+      pulverize: false,
+      polynomialHealth: false
     });
-    
+
   }
 
   handleOnChangePulverize() {
     const newPulverizeState = !this.state.isPulverize;
     this.setState({ isPulverize: newPulverizeState });
-  
+
 
     this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {
       $merge: { pulverize: newPulverizeState }
     }));
   }
-  
+
+
+  handleOnChangePolinomialHealth() {
+
+    const newPolinomiaHealthState = !this.state.isPolinomialHealth;
+    this.setState({ isPolinomialHealth: newPolinomiaHealthState });
+
+    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {
+      $merge: { polynomialHealth: newPolinomiaHealthState }
+    }))
+  }
+
 
   handleCheck(category) {
 
-    this.setState({isChecked: !this.state.isChecked});
-    this.handleOnChangeAi(category);
+    this.setState({ optionIsChecked: category });
+  this.handleOnChangeAi(category);
   }
 
   changeLayerColor(color) {
-    this.boundLayer.setStyle({color: color});
+    this.boundLayer.setStyle({ color: color });
   }
 
   handleOnChangeAi(id) {
-    this.checked[id] = !this.checked[id];
+    // Dessa forma somente 1 IA pode ser selecionada por vez. Da forma comentada mais de 1 IA pode ser selecionada
 
-    if (this.checked[id]) {
-      this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {aiOptions: {$add: [id]}}));
-    }
-    else {
-      this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {aiOptions: {$remove: [id]}}));
-    }
+    // Atualiza a seleção global
+    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $set: new Set([id]) } }));
+
+    // Propaga a seleção para todos os outros popups
+    this.getSelectedLayers().forEach((layer, index) => {
+      if (index !== this.selectedIndex) {
+        this.setSelectedLayers(index, update(layer, { aiOptions: { $set: new Set([id]) } }));
+      }
+    });
+
+    //this.checked[id] = !this.checked[id];
+    //if (this.checked[id]) {
+    //  this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $add: [id] } }));
+    //}
+    //else {
+    //  this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { aiOptions: { $remove: [id] } }));
+    //}
   }
 
   handleOnChangeRadio(id) {
-    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], {$merge: {cropType: id}}));
-    this.setState({cropType: id});
+    this.setSelectedLayers(this.selectedIndex, update(this.getSelectedLayers()[this.selectedIndex], { $merge: { cropType: id } }));
+    this.setState({ cropType: id });
     let color;
 
     for (let i = 0; i < this.cropType.length; i++) {
@@ -121,26 +150,26 @@ class FieldLayerControlPopup extends React.Component {
 
   render() {
     return (
-    <div className='field-layer'>
-      {/* <h1>{names[this.selectedIndex] + ` - Layer ${this.selectedIndex}` || `Layer ${this.selectedIndex}`}</h1> */}
-      <h1>
-        {names[this.selectedIndex] 
-        ?
-          <div>
-            <span className='NameField'> {names[this.selectedIndex]} </span> 
-            <span className='vertical-bar'></span>
-            <span> Layer {this.selectedIndex} </span>
-          </div> 
-        : 
-          <span> 
-            Layer {this.selectedIndex} 
-          </span>}
-      </h1>
+      <div className='field-layer'>
+        {/* <h1>{names[this.selectedIndex] + ` - Layer ${this.selectedIndex}` || `Layer ${this.selectedIndex}`}</h1> */}
+        <h1>
+          {this.getSelectedLayers()[this.selectedIndex].name
+            ?
+            <div>
+              <span className='NameField'> {this.getSelectedLayers()[this.selectedIndex].name} </span>
+              <span className='vertical-bar'></span>
+              <span> Layer {this.selectedIndex} </span>
+            </div>
+            :
+            <span>
+              Layer {this.selectedIndex}
+            </span>}
+        </h1>
 
-      <fieldset>
-        <legend>TIPO DE CULTIVO</legend>
-        {
-          this.cropType.map((typ, index ) => {
+        <fieldset>
+          <legend>TIPO DE CULTIVO</legend>
+          {
+            this.cropType.map((typ, index) => {
               const lastTyp = this.cropType.length - 1 !== index
               return (
                 <div className="croType-container" key={typ.type}>
@@ -151,62 +180,45 @@ class FieldLayerControlPopup extends React.Component {
                     </label>
                   </div>
                   {lastTyp ? <span className='horizontal-bar'></span> : ""}
-              </div>
+                </div>
               )
-          })
-        }
-      </fieldset>
+            })
+          }
+        </fieldset>
 
-      <p className='IAprocess-info'>IAs para processar</p>
-      {
+        <p className='IAprocess-info'>IAs para processar</p>
+        {
           this.aiOptions.map(option => {
             return (
-              <div className='IAprocess-container' key={option.category} onClick={() => this.handleCheck(option.category)}> 
-                <i className={this.state.isChecked ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
+              <div className='IAprocess-container' key={option.category} onClick={() => this.handleCheck(option.category)}>
+                <i className={this.state.optionIsChecked === option.category ? "fas fa-check-square" : "far fa-square"} id={option.category}></i>
                 <label htmlFor={option.category} style={{ cursor: "pointer" }} > {option.checkboxLabel}</label>
               </div>
-              
             )
-          })
+          })  
         }
 
-        <p className='IAprocess-info'>Pulverizar</p>
+        <p className='IAprocess-info'>Saúde Polinomial </p>
+
+        <div className='IAprocess-container' onClick={() => this.handleOnChangePolinomialHealth()}>
+          <i className={this.state.isPolinomialHealth ? "fas fa-check-square" : "far fa-square"}></i>
+          <label style={{ cursor: "pointer" }}>Saúde polinomial</label>
+        </div>
+
+        <p className='IAprocess-info'>Pulverização</p>
 
         <div className='IAprocess-container' onClick={() => this.handleOnChangePulverize()}>
           <i className={this.state.isPulverize ? "fas fa-check-square" : "far fa-square"}></i>
           <label htmlFor="pulverize" style={{ cursor: "pointer" }}> Pulverizar</label>
         </div>
 
-    </div>)
+
+      </div>)
   }
 }
 
-export default function createFieldLayerControlPopup(aiTypes, boundLayer, stateSelectedLayers)
-{
+export default function createFieldLayerControlPopup(aiTypes, boundLayer, stateSelectedLayers) {
   let container = L.DomUtil.create('div');
-  ReactDOM.render(<FieldLayerControlPopup aiTypes={aiTypes} boundLayer={boundLayer} stateSelectedLayers={stateSelectedLayers}/>, container);
+  ReactDOM.render(<FieldLayerControlPopup aiTypes={aiTypes} boundLayer={boundLayer} stateSelectedLayers={stateSelectedLayers} />, container);
   return container;
 }
-
-
-const names = [
-  "Ana", "Beatriz", "Carlos", "Daniela", "Eduardo",
-  "Fernanda", "Gabriel", "Helena", "Igor", "Juliana",
-  "Kleber", "Luana", "Marcos", "Natalia", "Otávio",
-  "Priscila", "Roberto", "Samantha", "Thiago", "Vanessa",
-  "Wesley", "Yasmin", "Zé", "Amanda", "Bruno",
-  "Camila", "Diego", "Eliane", "Flávio", "Gustavo",
-  "Heloísa", "Isabela", "João", "Karine", "Leonardo",
-  "Maria", "Nicolas", "Olga", "Pedro", "Queila",
-  "Raul", "Sabrina", "Tiago", "Vânia", "William",
-  "Zilda", "André", "Barbara", "Célia", "David",
-  "Emanuelle", "Felipe", "Giovana", "Henrique", "Irene",
-  "Júlio", "Larissa", "Marcelo", "Nayara", "Olavo",
-  "Paula", "Ricardo", "Silvia", "Tânia", "Vinícius",
-  "Wagner", "Yara", "Zeca", "Adriana", "Bernardo",
-  "Cristiane", "Douglas", "Elena", "Flávia", "Gisele",
-  "Hugo", "Jéssica", "Lucas", "Márcia", "Nando",
-  "Patrícia", "Rafael", "Silvia", "Tatiane", "Valter",
-  "Wellington", "Zuleica", "Aline", "Bruna", "César",
-  "Daniel", "Evelyn", "Fábio", "Gisele", "Helena"
-];

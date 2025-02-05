@@ -207,7 +207,7 @@ class TaskListItem extends React.Component {
             if (options.success !== undefined) options.success(json);
           } else {
             this.setState({
-              actionError: json.error || options.defaultError || _("Cannot complete operation."),
+              actionError: json.error || options.defaultError || _("Não é possível concluir a operação."),
               actionButtonsDisabled: false,
               expanded: true
             });
@@ -215,7 +215,7 @@ class TaskListItem extends React.Component {
         })
           .fail(() => {
             this.setState({
-              actionError: options.defaultError || _("Cannot complete operation."),
+              actionError: options.defaultError || _("Não é possível concluir a operação."),
               actionButtonsDisabled: false
             });
           })
@@ -262,20 +262,20 @@ class TaskListItem extends React.Component {
       } else if (line.indexOf("SVD did not converge") !== -1 ||
         line.indexOf("0 partial reconstructions in total") !== -1) {
         this.setState({
-          friendlyTaskError: interpolate(_("It looks like there might be one of the following problems: %(problems)s You can read more about best practices for capturing good images %(link)s."), {
+          friendlyTaskError: interpolate(_("Parece que pode haver um dos seguintes problemas: %(problems)s Você pode ler mais sobre as melhores práticas para capturar boas imagens %(link)s."), {
             problems: `<ul>
-          <li>${_("Not enough images")}</li>
-          <li>${_("Not enough overlap between images")}</li>
-          <li>${_("Images might be too blurry (common with phone cameras)")}</li>
-          <li>${_("The min-num-features task option is set too low, try increasing it by 25%")}</li>
-        </ul>`, link: `<a href='https://docs.webodm.net/references/create-successful-maps' target='_blank'>${_("here")}</a>`
+          <li>${_("Imagens insuficientes")}</li>
+          <li>${_("Sobreposição insuficiente entre as imagens")}</li>
+          <li>${_("As imagens podem ficar muito desfocadas (comum em câmeras de telefone)")}</li>
+          <li>${_("A opção de tarefa min-num-features está definida muito baixa, tente aumentá-la em 25%")}</li>
+        </ul>`, link: `<a href='https://docs.webodm.net/references/create-successful-maps' target='_blank'>${_("Aqui")}</a>`
           })
         });
       } else if (line.indexOf("Illegal instruction") !== -1 ||
         line.indexOf("Child returned 132") !== -1) {
-        this.setState({ friendlyTaskError: interpolate(_("It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See %(link)s for more information."), { link: `<a href='https://github.com/OpenDroneMap/WebODM#common-troubleshooting'>${_("this page")}</a>` }) });
+        this.setState({ friendlyTaskError: interpolate(_("Parece que este computador pode ser muito antigo. WebODM requer um computador com CPU de 64 bits com suporte para conjunto de instruções MMX, SSE, SSE2, SSE3 e SSSE3 ou superior. Você ainda pode executar o WebODM se compilar suas próprias imagens do Docker. Consulte %(link)s para obter mais informações."), { link: `<a href='https://github.com/OpenDroneMap/WebODM#common-troubleshooting'>${_("Esta página")}</a>` }) });
       } else if (line.indexOf("Child returned 127") !== -1) {
-        this.setState({ friendlyTaskError: _("The processing node is missing a program necessary to complete the task. This might indicate a corrupted installation. If you built OpenDroneMap, please check that all programs built without errors.") });
+        this.setState({ friendlyTaskError: _("O nó de processamento está faltando um programa necessário para concluir a tarefa. Isso pode indicar uma instalação corrompida. Se você construiu o OpenDroneMap, verifique se todos os programas foram construídos sem erros.") });
       }
     }
   }
@@ -317,7 +317,7 @@ class TaskListItem extends React.Component {
 
     // Create onClick handlers
     for (let rfParam in rfMap) {
-      rfMap[rfParam].label = interpolate(_("From %(stage)s"), { stage: rfMap[rfParam].label });
+      rfMap[rfParam].label = interpolate(_("Para %(stage)s"), { stage: rfMap[rfParam].label });
       rfMap[rfParam].onClick = this.genRestartAction(rfParam);
     }
 
@@ -329,7 +329,7 @@ class TaskListItem extends React.Component {
       // Add resume "pseudo button" to help users understand
       // how to resume a task that failed for memory/disk issues.
       items.unshift({
-        label: _("Resume Processing"),
+        label: _("Retomar processamento"),
         icon: "fa fa-bolt",
         onClick: this.genRestartAction(task.can_rerun_from[task.can_rerun_from.length - 1])
       });
@@ -345,7 +345,7 @@ class TaskListItem extends React.Component {
       success: () => {
         this.setState({ time: -1 });
       },
-      defaultError: _("Cannot restart task.")
+      defaultError: _("Não é possível reiniciar a tarefa.")
     }
     );
 
@@ -387,7 +387,7 @@ class TaskListItem extends React.Component {
       })
         .fail(() => {
           this.setState({
-            actionError: interpolate(_("Cannot restart task from (stage)s."), { stage: value || "the start" }),
+            actionError: interpolate(_("Não é possível reiniciar a tarefa de (stage)s."), { stage: value || "the start" }),
             actionButtonsDisabled: false
           });
         });
@@ -421,13 +421,13 @@ class TaskListItem extends React.Component {
 
   render() {
     const task = this.state.task;
-    const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
+    const name = task.name !== null ? task.name : interpolate(_("Tarefa #%(number)s"), { number: task.id });
     const imported = task.import_url !== "";
 
     let status = statusCodes.description(task.status);
-    if (status === "") status = _("Sending images to processing node");
+    if (status === "") status = _("Enviando imagens para o nó de processamento");
 
-    if (!task.processing_node && !imported) status = _("Waiting for a node...");
+    if (!task.processing_node && !imported) status = _("Esperando por um nó...");
     if (task.pending_action !== null) status = pendingActions.description(task.pending_action);
 
     const disabled = this.state.actionButtonsDisabled ||
@@ -457,7 +457,7 @@ class TaskListItem extends React.Component {
 
       if (task.status === statusCodes.COMPLETED) {
         if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1) {
-          addActionButton(" " + _("View Mapa"), "Vier_Map", "fa fa-globe", () => {
+          addActionButton(" " + _("Ver mapa"), "Vier_Map", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         } else {
@@ -472,7 +472,7 @@ class TaskListItem extends React.Component {
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
         (task.processing_node || imported) && this.props.hasPermission("change")) {
-        addActionButton(_("Cancelar"), "btn-primary", "fa fa-times", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
+        addActionButton(_("Cancelar"), "btn-primary", "fa fa-times", this.genActionApiCall("cancel", { defaultError: _("Não é possível cancelar a tarefa.") }));
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
@@ -485,14 +485,14 @@ class TaskListItem extends React.Component {
           task.can_rerun_from[1] :
           null;
 
-        addActionButton(_("Restart"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
+        addActionButton(_("Reiniciar"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom), {
           subItems: this.getRestartSubmenuItems()
         });
       }
 
       if (this.props.hasPermission("delete")) {
         addActionButton(_("Excluir"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
-          confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
+          confirm: _("Todas as informações relacionadas a esta tarefa, incluindo imagens, mapas e modelos serão excluídas. Continuar?"),
           defaultError: _("Cannot delete task.")
         }));
       }
@@ -634,17 +634,17 @@ class TaskListItem extends React.Component {
                 /> : ""}
 
               {showOrthophotoMissingWarning ?
-                <div className="task-warning"><i className="fa fa-warning"></i> <span>{_("An orthophoto could not be generated. To generate one, make sure GPS information is embedded in the EXIF tags of your images, or use a Ground Control Points (GCP) file.")}</span></div> : ""}
+                <div className="task-warning"><i className="fa fa-warning"></i> <span>{_("Não foi possível gerar uma ortofoto. Para gerar um, certifique-se de que as informações de GPS estejam incorporadas nas tags EXIF ​​de suas imagens ou use um arquivo Ground Control Points (GCP).")}</span></div> : ""}
 
               {showMemoryErrorWarning ?
-                <div className="task-warning"><i className="fa fa-support"></i> <Trans params={{ memlink: `<a href="${memoryErrorLink}" target='_blank'>${_("enough RAM allocated")}</a>`, cloudlink: `<a href='https://webodm.net' target='_blank'>${_("cloud processing node")}</a>` }}>{_("It looks like your processing node ran out of memory. If you are using docker, make sure that your docker environment has %(memlink)s. Alternatively, make sure you have enough physical RAM, reduce the number of images, make your images smaller, or reduce the max-concurrency parameter from the task's options. You can also try to use a %(cloudlink)s.")}</Trans></div> : ""}
+                <div className="task-warning"><i className="fa fa-support"></i> <Trans params={{ memlink: `<a href="${memoryErrorLink}" target='_blank'>${_("RAM suficiente alocada")}</a>`, cloudlink: `<a href='https://webodm.net' target='_blank'>${_("nó de processamento em nuvem")}</a>` }}>{_("Parece que seu nó de processamento ficou sem memória. Se você estiver usando o docker, certifique-se de que seu ambiente docker tenha %(memlink)s. Como alternativa, certifique-se de ter RAM física suficiente, reduza o número de imagens, diminua o tamanho das imagens ou reduza o parâmetro max-concurrency nas opções da tarefa. Você também pode tentar usar um %(cloudlink)s.")}</Trans></div> : ""}
 
               {showTaskWarning ?
                 <div className="task-warning"><i className="fa fa-support"></i> <span dangerouslySetInnerHTML={{ __html: this.state.friendlyTaskError }} /></div> : ""}
 
               {showExitedWithCodeOneHints ?
                 <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
-                  <Trans params={{ link: `<a href="${window.__taskOptionsDocsLink}" target="_blank">${window.__taskOptionsDocsLink.replace("https://", "")}</a>` }}>{_("\"Process exited with code 1\" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the Task Options. Check the documentation at %(link)s")}</Trans>
+                  <Trans params={{ link: `<a href="${window.__taskOptionsDocsLink}" target="_blank">${window.__taskOptionsDocsLink.replace("https://", "")}</a>` }}>{_("\"Processo encerrado com código 1\" significa que parte do processamento falhou. Às vezes é um problema com o conjunto de dados, às vezes pode ser resolvido ajustando as opções de tarefa. Verifique a documentação em %(link)s")}</Trans>
                 </div>
                 </div>
                 : ""}
@@ -768,12 +768,12 @@ class TaskListItem extends React.Component {
     if (task.last_error) {
       statusLabel = getStatusLabel(task.last_error, 'error');
     } else if (!task.processing_node && !imported && this.props.hasPermission("change")) {
-      statusLabel = getStatusLabel(_("Set a processing node"));
+      statusLabel = getStatusLabel(_("Definir um nó de processamento"));
       statusIcon = "fa fa-hourglass-3";
       showEditLink = true;
     } else if (task.partial && !task.pending_action) {
       statusIcon = "fa fa-hourglass-3";
-      statusLabel = getStatusLabel(_("Waiting for image upload..."));
+      statusLabel = getStatusLabel(_("Aguardando upload da imagem..."));
     } else {
       let progress = 100;
       let type = 'done';
@@ -802,7 +802,7 @@ class TaskListItem extends React.Component {
 
     if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
       (task.processing_node || imported) && this.props.hasPermission("change")) {
-      addTaskAction(_("Cancelar"), "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Cannot cancel task.") }));
+      addTaskAction(_("Cancelar"), "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", { defaultError: _("Não é possível cancelar a tarefa.") }));
     }
 
     // Ability to change options
@@ -824,8 +824,8 @@ class TaskListItem extends React.Component {
       );
 
       addTaskAction(_("Deletar"), "fa fa-trash", this.genActionApiCall("remove", {
-        confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
-        defaultError: _("Cannot delete task.")
+        confirm: _("Todas as informações relacionadas a esta tarefa, incluindo imagens, mapas e modelos serão excluídas. Continuar?"),
+        defaultError: _("Não é possível excluir a tarefa.")
       }));
     }
 

@@ -45,13 +45,13 @@ class SortPanel extends React.Component {
 
   render() {
     return (<ul className="dropdown-menu dropdown-menu-right sort-items">
-      <li className="sort-order-label">{_("Descending")}</li>
+      <li className="sort-order-label">{_("Descendente")}</li>
       {this.state.items.map(i => 
         <li key={i.key}><a onClick={this.handleClick(i.key, "desc")} className="sort-item">
           { i.label } {i.selected === "desc" ? <i className="fa fa-check"></i> : ""}
         </a></li>
       )}
-      <li className="sort-order-label">{_("Ascending")}</li>
+      <li className="sort-order-label">{_("Ascendente")}</li>
       {this.state.items.map(i => 
         <li key={i.key}><a onClick={this.handleClick(i.key, "asc")} className="sort-item">
           { i.label } {i.selected === "asc" ? <i className="fa fa-check"></i> : ""}
