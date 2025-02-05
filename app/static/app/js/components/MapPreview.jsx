@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'ReactDOM';
 import '../css/MapPreview.scss';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from 'leaflet';
@@ -14,6 +13,8 @@ import Standby from './Standby';
 import exifr from '../vendor/exifr';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _, interpolate } from '../classes/gettext';
+import 'leaflet-fullscreen/dist/Leaflet.fullscreen';
+import 'leaflet-fullscreen/dist/leaflet.fullscreen.css';
 
 const Colors = {
   fill: '#fff',
@@ -115,6 +116,34 @@ _('Example:'),
       selectedOverlays: [],
       baseLayers: this.basemaps
     }).addTo(this.map);
+
+    this.map.addControl(new L.Control.Fullscreen({
+        position: 'bottomleft'
+    }));
+
+    var fullscreenchange;
+
+    if ('onfullscreenchange' in document) {
+        fullscreenchange = 'fullscreenchange';
+    } else if ('onmozfullscreenchange' in document) {
+        fullscreenchange = 'mozfullscreenchange';
+    } else if ('onwebkitfullscreenchange' in document) {
+        fullscreenchange = 'webkitfullscreenchange';
+    } else if ('onmsfullscreenchange' in document) {
+        fullscreenchange = 'MSFullscreenChange';
+    }
+
+    if (fullscreenchange) {
+        var onFullscreenChange = L.bind(this.map._onFullscreenChange, this.map);
+
+        this.map.whenReady(function () {
+            L.DomEvent.on(document, fullscreenchange, onFullscreenChange);
+        });
+
+        this.map.on('unload', function () {
+            L.DomEvent.off(document, fullscreenchange, onFullscreenChange);
+        });
+    }
 
     this.map.fitBounds([
      [13.772919746115805,

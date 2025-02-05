@@ -294,7 +294,7 @@ class TestApiTask(BootTransactionTestCase):
                 c += 1
                 time.sleep(1)
 
-            self.assertEqual(file_import_task.import_url, "file://all.zip")
+            self.assertEqual(file_import_task.import_url, "")
             self.assertEqual(file_import_task.images_count, 1)
             self.assertEqual(file_import_task.processing_node, None)
             self.assertEqual(file_import_task.auto_processing_node, False)

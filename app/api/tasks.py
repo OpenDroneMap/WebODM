@@ -471,6 +471,7 @@ class TaskAssetsImport(APIView):
                 os.unlink(tmp_upload_file)
             
             with open(tmp_upload_file, 'ab') as fd:
+                fd.truncate(byte_offset)
                 fd.seek(byte_offset)
                 if isinstance(files[0], InMemoryUploadedFile):
                     for chunk in files[0].chunks():

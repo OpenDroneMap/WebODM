@@ -317,3 +317,41 @@ pre.prettyprint:focus,
 .tag-badge a, .tag-badge a:hover{
 	color: {{ theme_secondary }};
 }
+
+
+@keyframes placeHolderShimmer {
+	0%{ background-position: 100% 0; }
+	100%{ background-position: -100% 0; }
+}
+@keyframes placeHolderPulse {
+	0%{ opacity: 0.2; }
+	50%{ opacity: 0.4; }
+	100%{ opacity: 0.2; }
+}
+
+.placeholder-item{
+	border-radius: 4px;
+	background: {{ theme_highlight }};
+}
+.placeholder-item.shimmer{
+	animation-duration: 1.5s;
+	animation-fill-mode: forwards;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-name: placeHolderShimmer;
+	background: {{ theme_highlight }};
+	background: linear-gradient(to right, {% scalebyiv theme_highlight 1.1 %} 8%, {% scalebyiv theme_highlight 0.9 %} 18%, {% scalebyiv theme_highlight 1.1 %} 33%);
+	background-size: 200% 100%;
+}
+.placeholder-item.border{
+	border: 1px solid {{ theme_border }};
+}
+.placeholder-item i{
+	color: {% scalebyiv theme_highlight 0.7 %};
+	font-size: 800%;
+	opacity: 0.2;
+	animation-duration: 0.75s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-name: placeHolderPulse;
+}

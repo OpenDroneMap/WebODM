@@ -29,6 +29,9 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'app/css/bootstrap.min.css' %}" />
 
+    <link rel="preload" href="{% static 'app/webfonts/fa-regular-400.woff2' %}" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="{% static 'app/webfonts/fa-solid-900.woff2' %}" as="font" type="font/woff2" crossorigin="anonymous">
+    
     <link href="{% static 'app/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'app/css/metisMenu.min.css' %}" rel="stylesheet">
     <link href="{% static 'app/css/sb-admin-2.css' %}" rel="stylesheet">
@@ -116,14 +119,12 @@
     {% endautoescape %}
 {% endblock %}
 </body>
-<script src="{% static 'app/js/vendor/metisMenu.min.js' %}"></script>
+
 <script>
 {% task_options_docs_link as to_link %}
 window.__taskOptionsDocsLink = "{{ to_link|safe }}";
 
 $(function(){
-    $('#side-menu').metisMenu();
-
     $(window).bind("load resize", function() {
         {% if desktop_mode %}
         var topOffset = 0;

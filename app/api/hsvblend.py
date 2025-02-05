@@ -1,5 +1,9 @@
 import numpy as np
 
+# Originally based on work by Frank and Even
+# Modified by Piero Toffanin for speed and lower memory usage
+# The code here is re-licensed under AGPLv3, but is based on MIT
+
 #******************************************************************************
 #  Copyright (c) 2009, Frank Warmerdam
 #  Copyright (c) 2010, Even Rouault <even dot rouault at mines-paris dot org>
@@ -25,44 +29,37 @@ import numpy as np
 
 
 # =============================================================================
-# rgb_to_hsv()
+# rgb_to_hs()
 #
 # rgb comes in as [r,g,b] with values in the range [0,255].  The returned
-# hsv values will be with hue and saturation in the range [0,1] and value
-# in the range [0,255]
+# hsv values will be with hue and saturation in the range [0,1]
 #
-def rgb_to_hsv( r,g,b ):
 
+def rgb_to_hs( r, g, b ):
+    
     maxc = np.maximum(r,np.maximum(g,b))
     minc = np.minimum(r,np.minimum(g,b))
 
-    v = maxc
-
-    minc_eq_maxc = np.equal(minc,maxc)
-
     # compute the difference, but reset zeros to ones to avoid divide by zeros later.
-    ones = np.ones((r.shape[0],r.shape[1]))
-    maxc_minus_minc = np.choose( minc_eq_maxc, (maxc-minc,ones) )
+    maxc_minus_minc = maxc-minc
+    s = np.divide(maxc_minus_minc, np.maximum(maxc, 1), dtype=np.float32)
+    maxc_minus_minc[minc==maxc] = 1
 
-    s = (maxc-minc) / np.maximum(ones,maxc)
-    rc = (maxc-r) / maxc_minus_minc
-    gc = (maxc-g) / maxc_minus_minc
-    bc = (maxc-b) / maxc_minus_minc
+    rc = np.divide((maxc-r), maxc_minus_minc, dtype=np.float32)
+    gc = np.divide((maxc-g), maxc_minus_minc, dtype=np.float32)
+    bc = np.divide((maxc-b), maxc_minus_minc, dtype=np.float32)
+    maxc_minus_minc = None
 
-    maxc_is_r = np.equal(maxc,r)
-    maxc_is_g = np.equal(maxc,g)
-    maxc_is_b = np.equal(maxc,b)
+    h = np.zeros((r.shape[0],r.shape[1]), dtype=np.float32)
+    np.copyto(h, 4.0+gc-rc, where=(maxc == b))
+    np.copyto(h, 2.0+rc-bc, where=(maxc==g))
+    rc = None
+    np.copyto(h, bc-gc, where=(maxc==r))
+    
+    np.divide(h, 6.0, out=h)
+    np.mod(h, 1.0, out=h)
 
-    h = np.zeros((r.shape[0],r.shape[1]))
-    h = np.choose( maxc_is_b, (h,4.0+gc-rc) )
-    h = np.choose( maxc_is_g, (h,2.0+rc-bc) )
-    h = np.choose( maxc_is_r, (h,bc-gc) )
-
-    h = np.mod(h/6.0,1.0)
-
-    hsv = np.asarray([h,s,v])
-
-    return hsv
+    return h, s
 
 # =============================================================================
 # hsv_to_rgb()
@@ -70,33 +67,57 @@ def rgb_to_hsv( r,g,b ):
 # hsv comes in as [h,s,v] with hue and saturation in the range [0,1],
 # but value in the range [0,255].
 
-def hsv_to_rgb( hsv ):
+def hsv_to_rgb( h, s, v ):
 
-    h = hsv[0]
-    s = hsv[1]
-    v = hsv[2]
+    np.multiply(h, 6.0, out=h)
+    i = h.astype(np.uint8)
+    np.subtract(h, i, out=h)
+    q = v*(1.0 - s*h)
+    t = v*(1.0 - s*(1.0-h))
+    h = None
 
-    #if s == 0.0: return v, v, v
-    i = (h*6.0).astype(int)
-    f = (h*6.0) - i
     p = v*(1.0 - s)
-    q = v*(1.0 - s*f)
-    t = v*(1.0 - s*(1.0-f))
 
-    r = i.choose( v, q, p, p, t, v )
-    g = i.choose( t, v, v, q, p, p )
-    b = i.choose( p, p, t, v, v, q )
+    r = np.zeros_like(v, dtype=np.uint8)
+    g = np.zeros_like(v, dtype=np.uint8)
+    b = np.zeros_like(v, dtype=np.uint8)
+    
+    idx = i==0
+    np.copyto(r, v, where=idx, casting='unsafe')
+    np.copyto(g, t, where=idx, casting='unsafe')
+    np.copyto(b, p, where=idx, casting='unsafe')
+    
+    idx = i==1
+    np.copyto(r, q, where=idx, casting='unsafe')
+    np.copyto(g, v, where=idx, casting='unsafe')
+    np.copyto(b, p, where=idx, casting='unsafe')
+    
+    idx = i==2
+    np.copyto(r, p, where=idx, casting='unsafe')
+    np.copyto(g, v, where=idx, casting='unsafe')
+    np.copyto(b, t, where=idx, casting='unsafe')
 
-    rgb = np.asarray([r,g,b]).astype(np.uint8)
+    idx = i==3
+    np.copyto(r, p, where=idx, casting='unsafe')
+    np.copyto(g, q, where=idx, casting='unsafe')
+    np.copyto(b, v, where=idx, casting='unsafe')
 
-    return rgb
+    idx = i==4
+    np.copyto(r, t, where=idx, casting='unsafe')
+    np.copyto(g, p, where=idx, casting='unsafe')
+    np.copyto(b, v, where=idx, casting='unsafe')
+
+    idx = i==5
+    np.copyto(r, v, where=idx, casting='unsafe')
+    np.copyto(g, p, where=idx, casting='unsafe')
+    np.copyto(b, q, where=idx, casting='unsafe')
+
+    return np.asarray([r,g,b])
 
 
 def hsv_blend(rgb, intensity):
-    hsv = rgb_to_hsv(rgb[0], rgb[1], rgb[2])
+    h, s = rgb_to_hs(rgb[0], rgb[1], rgb[2])
 
     #replace v with hillshade
-    hsv_adjusted = np.asarray( [hsv[0], hsv[1], intensity] )
-
     #convert back to RGB
-    return hsv_to_rgb( hsv_adjusted )
+    return hsv_to_rgb(h, s, intensity)

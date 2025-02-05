@@ -1,12 +1,16 @@
 {% extends "app/public/base.html" %}
 
 {% block content %}
-	{% load render_bundle from webpack_loader %}
-	{% render_bundle 'MapView' attrs='async' %}
+	<style type="text/css">#map-placeholder-header{margin-top: 20px !important}</style>
 
-	<div data-mapview 
+	<div data-mapview
 		{% for key, value in params %}
 			data-{{key}}="{{value}}"
 		{% endfor %}
-	></div>
+	>
+		{% include "map_placeholder.html" %}
+	</div>
+
+	{% load render_bundle from webpack_loader %}
+	{% render_bundle 'MapView' attrs='async' %}
 {% endblock %}
