@@ -938,13 +938,7 @@ class ProjectListItem extends React.Component {
               </div>
               : ""}
 
-            <button disabled={this.state.upload.error !== ""}
-              type="button"
-              className={"btn btn-danger btn-sm " + (!this.state.upload.uploading ? "hide" : "")}
-              onClick={this.handleCancel}>
-              <i className="glyphicon glyphicon-remove-circle"></i>
-              Cancel Upload
-            </button>
+        
           </div>
 
           <div className="project-name">
@@ -1038,7 +1032,15 @@ class ProjectListItem extends React.Component {
         <i className="drag-drop-icon fa fa-inbox"></i>
         <div className="row">
           {this.state.upload.uploading ? <UploadProgressBar {...this.state.upload} /> : ""}
-
+            {this.state.upload.uploading ? 
+            <button disabled={this.state.upload.error !== ""}
+              type="button"
+              className="btn btn-danger btn-sm upload-cancel"
+              onClick={this.handleCancel}>
+              <i className="glyphicon glyphicon-remove-circle"></i>
+              Cancel Upload
+            </button>
+            : ""}
           {this.state.upload.error !== "" ?
             <div className="alert alert-warning alert-dismissible">
               <button type="button" className="close" title={_("Close")} onClick={this.closeUploadError}><span aria-hidden="true">&times;</span></button>
