@@ -971,7 +971,7 @@ L.Control.AutoLayers = L.Control.extend({
 		L.DomUtil.removeClass(this._baseLayersClose, 'hidden'); // Garante que o botão fique visível
 		this._container.style.position = 'absolute';
    		this._container.style.top = '10%';
-		this._container.style.left = '-10%';
+		this._container.style.left = '-30%';
 		this._container.style.transform = 'translate(-100%, 0%)';
 		this._container.style.setProperty('transform', 'translate(-100%, 0%)', 'important');
 
