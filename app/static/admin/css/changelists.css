@@ -5,6 +5,28 @@
 /* DATE DRILLDOWN */
 /* PAGINATOR */
 /* ACTIONS */
+.content{
+  margin-left: 70px;
+}
+h1{
+  margin-left: 0px !important;
+}
+#h1Border{
+  width: 100%;
+  border-bottom: 2px solid #14A5A2;
+  margin-bottom: 20px;
+}
+#listBorder{
+  width: 100%;
+  border-bottom: 2px solid #14A5A2;
+  margin-bottom: 20px;
+}
+#breadcrumbs{
+  margin: 0px;
+}
+#action-toggle{
+  display: none;
+}
 #changelist {
   position: relative;
   width: 100%;
@@ -48,7 +70,6 @@
   display: none;
 }
 #changelist #toolbar {
-  margin-left: 20px;
   margin-bottom: 20px;
   background-color: #edeeef;
 }
@@ -92,11 +113,10 @@
 }
 
 .actions {
-  margin-left: 20px;
   display: flex;
   align-items: center;
   background-color: #edeeef;
-  margin-bottom: 40px !important;
+  margin-bottom: 20px !important;
 }
 .actions span.all {
   font-size: 13px;
