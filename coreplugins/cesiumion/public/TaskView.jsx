@@ -10,7 +10,7 @@ import {
 	ImplicitTaskFetcher as TaskFetcher,
 	APIFetcher
 } from "./components/Fetcher";
-import {AssetConfig, AssetStyles} from "./defaults";
+import {AssetConfig} from "./defaults";
 import { fetchCancelable, getCookie } from "./utils";
 
 export default class TaskView extends Component {
