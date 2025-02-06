@@ -35,14 +35,16 @@ class Toggle extends React.Component {
 class Checkbox extends Toggle{
     static defaultProps = {
         trueIcon: "far fa-check-square",
-        falseIcon: "far fa-square"
+        falseIcon: "far fa-square",
+        className: ""
     }
 }
 
 class ExpandButton extends Toggle{
     static defaultProps = {
         trueIcon: "fa fa-caret-down",
-        falseIcon: "fa fa-caret-right"
+        falseIcon: "fa fa-caret-right",
+        className: ""
     }
 }
 

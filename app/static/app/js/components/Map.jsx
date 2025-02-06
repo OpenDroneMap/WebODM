@@ -687,7 +687,7 @@ _('Example:'),
     }).catch(e => {
         this.setState({showLoading: false, error: e.message});
     });
-
+    
     PluginsAPI.Map.triggerDidAddControls({
       map: this.map,
       tiles: tiles,

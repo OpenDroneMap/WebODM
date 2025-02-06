@@ -115,8 +115,10 @@ export default class LayersControlAnnotations extends React.Component {
   componentDidUpdate(prevProps, prevState){
     if (prevState.visible !== this.state.visible){
       this.annRefs.forEach(ann => {
-        let visible = this.state.visible ? ann.state.visible : false;
-        PluginsAPI.Map.toggleAnnotation(ann.props.layer, visible);
+        if (ann){
+          let visible = this.state.visible ? ann.state.visible : false;
+          PluginsAPI.Map.toggleAnnotation(ann.props.layer, visible);
+        }
       });
     }
   }

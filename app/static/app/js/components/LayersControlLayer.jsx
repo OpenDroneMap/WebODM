@@ -16,13 +16,15 @@ export default class LayersControlLayer extends React.Component {
       layer: null,
       expanded: false,
       map: null,
-      overlay: false
+      overlay: false,
+      separator: false,
   };
   static propTypes = {
     layer: PropTypes.object.isRequired,
     expanded: PropTypes.bool,
     map: PropTypes.object.isRequired,
-    overlay: PropTypes.bool
+    overlay: PropTypes.bool,
+    separator: PropTypes.bool
   };
 
   constructor(props){
@@ -340,7 +342,7 @@ export default class LayersControlLayer extends React.Component {
 
     return (<div className="layers-control-layer">
         <div className="layer-control-title">
-            {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="paddingSpace"></div>}<Checkbox bind={[this, 'visible']}/>
+            {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} className="expand-layer" /> : <div className="paddingSpace"></div>}<Checkbox bind={[this, 'visible']}/>
             <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}><i className={"layer-icon " + (meta.icon || "fa fa-vector-square fa-fw")}></i><div className="layer-title">{meta.name}</div></a> {meta.raster ? <a className="layer-action" href="javascript:void(0)" onClick={this.handleSideClick}><i title={_("Side By Side")} className={"fa fa-fw " + this.sideIcon()}></i></a> : ""}<a className="layer-action" href="javascript:void(0)" onClick={this.handleZoomToClick}><i title={_("Zoom To")} className="fa fa-expand"></i></a>
         </div>
 
@@ -414,6 +416,8 @@ export default class LayersControlLayer extends React.Component {
                             asset={this.asset} 
                             exportParams={this.getLayerParams} 
                             dropUp />
+            
+            {this.props.separator ? <hr className="layer-separator" /> : ""}
         </div> : ""}
     </div>);
 
