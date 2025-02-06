@@ -312,11 +312,20 @@ class Map extends React.Component {
             layer.isHidden = function(){
               if (!this.getContainer()) return false;
               return this.getContainer().style.display === 'none';
-            }
+            };
             layer.setZIndex = function(z){
+              if (this._originalZ === undefined) this._originalZ = this.options.zIndex;
               this.options.zIndex = z;
               this._updateZIndex();
-            }
+            };
+            layer.restoreZIndex = function(){
+              if (this._originalZ !== undefined){
+                this.setZIndex(this._originalZ);
+              }
+            };
+            layer.bringToFront = function(){
+              this.setZIndex(this.options.zIndex + 10000);
+            };
 
             var popup = L.DomUtil.create('div', 'infoWindow');
 
@@ -727,23 +736,33 @@ _('Example:'),
   }
 
   handleSideBySideChange = (layer, side) => {
-    let { rightLayers } = this.state;
+    let { rightLayers, imageryLayers } = this.state;
+    let leftLayers = [];
+
+    imageryLayers.forEach(l => l.restoreZIndex());
+
     rightLayers = rightLayers.filter(l => l !== layer);
-    
     if (side){
       rightLayers.push(layer);
     }
+    rightLayers.forEach(l => l.bringToFront());
 
     this.setState({rightLayers});
 
     if (rightLayers.length > 0){
       if (!this.sideBySideCtrl){
-        this.sideBySideCtrl = L.control.sideBySide([], rightLayers).addTo(this.map);
+        this.sideBySideCtrl = L.control.sideBySide(leftLayers, rightLayers).addTo(this.map);
       }else{
         this.sideBySideCtrl.setRightLayers(rightLayers);
+        this.sideBySideCtrl.setLeftLayers(leftLayers);
       }
     }else{
       if (this.sideBySideCtrl){
+        // Make sure clipping is removed
+        imageryLayers.forEach(l => {
+          let container = l.getContainer();
+          if (container) container.style.clip = '';
+        });
         this.sideBySideCtrl.remove();
         this.sideBySideCtrl = null;
       }
