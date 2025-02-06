@@ -241,7 +241,7 @@ export default class ContoursPanel extends React.Component {
                 this.setState({[loadingProp]: false});
               }
             }
-          }, `/api/plugins/contours/task/${taskId}/contours/check/`);
+          });
         }else if (result.error){
             this.setState({[loadingProp]: false, error: result.error});
         }else{

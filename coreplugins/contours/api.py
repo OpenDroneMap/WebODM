@@ -109,14 +109,6 @@ class TaskContoursGenerate(TaskView):
         except ContoursException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
 
-class TaskContoursCheck(CheckTask):
-    def on_error(self, result):
-        pass
-
-    def error_check(self, result):
-        contours_file = result.get('file')
-        if not contours_file or not os.path.exists(contours_file):
-            return _('Could not generate contour file. This might be a bug.')
 
 class TaskContoursDownload(GetTaskResult):
     pass

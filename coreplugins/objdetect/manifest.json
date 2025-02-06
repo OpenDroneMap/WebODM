@@ -1,0 +1,13 @@
+{
+	"name": "Object Detect",
+	"webodmMinVersion": "2.6.0",
+	"description": "Detect objects using AI in orthophotos",
+	"version": "1.0.0",
+	"author": "Piero Toffanin",
+	"email": "pt@uav4geo.com",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["object", "detect", "ai"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

@@ -82,7 +82,8 @@ class TestApiTask(BootTransactionTestCase):
                 ('orthophoto', {'formula': 'NDVI', 'bands': 'RGN'}, status.HTTP_200_OK),
                 ('dsm', {'epsg': 4326}, status.HTTP_200_OK),
                 ('dtm', {'epsg': 4326}, status.HTTP_200_OK),
-                ('georeferenced_model', {'epsg': 4326}, status.HTTP_200_OK)
+                ('georeferenced_model', {'epsg': 4326}, status.HTTP_200_OK),
+                ('georeferenced_model', {'epsg': 4326, 'resample': 2.5}, status.HTTP_200_OK)
             ]
 
             # Cannot export stuff
