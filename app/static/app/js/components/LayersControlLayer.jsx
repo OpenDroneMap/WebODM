@@ -78,6 +78,7 @@ export default class LayersControlLayer extends React.Component {
 
   componentDidMount(){
     PluginsAPI.Map.onMapTypeChanged(this.handleMapTypeChange);
+    PluginsAPI.Map.onSideBySideChanged(this.handleSideBySideChange);
   }
 
   handleMapTypeChange = (type, autoExpand) => {
@@ -85,6 +86,23 @@ export default class LayersControlLayer extends React.Component {
         const visible = this.meta.type === type;
         const expanded = visible && autoExpand;
         this.setState({visible, expanded});
+    }
+  }
+
+  handleSideBySideChange = (layer, side) => {
+    // Toggle this layer's side off if it was previously sided
+    // when another layer is set to side
+    if (this.props.layer !== layer && this.state.side && side){
+        setTimeout(() => {
+            let visible = this.state.visible;
+            if (this.wasInvisibleOnSideClick){
+                visible = false;
+                this.wasInvisibleOnSideClick = false;
+            }
+    
+            this.setState({ side: false, visible });
+            PluginsAPI.Map.sideBySideChanged(this.props.layer, false);
+        }, 0);
     }
   }
 
@@ -126,6 +144,7 @@ export default class LayersControlLayer extends React.Component {
         this.exportReq = null;
     }
 
+    PluginsAPI.Map.offSideBySideChanged(this.handleSideBySideChange);
     PluginsAPI.Map.offMapTypeChanged(this.handleMapTypeChange);
   }
 

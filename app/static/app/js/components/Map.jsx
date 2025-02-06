@@ -737,7 +737,6 @@ _('Example:'),
 
   handleSideBySideChange = (layer, side) => {
     let { rightLayers, imageryLayers } = this.state;
-    let leftLayers = [];
 
     imageryLayers.forEach(l => l.restoreZIndex());
 
@@ -749,20 +748,20 @@ _('Example:'),
 
     this.setState({rightLayers});
 
+    // Make to reset clipping
+    imageryLayers.forEach(l => {
+      let container = l.getContainer();
+      if (container) container.style.clip = '';
+    });
+
     if (rightLayers.length > 0){
       if (!this.sideBySideCtrl){
-        this.sideBySideCtrl = L.control.sideBySide(leftLayers, rightLayers).addTo(this.map);
+        this.sideBySideCtrl = L.control.sideBySide([], rightLayers).addTo(this.map);
       }else{
         this.sideBySideCtrl.setRightLayers(rightLayers);
-        this.sideBySideCtrl.setLeftLayers(leftLayers);
       }
     }else{
       if (this.sideBySideCtrl){
-        // Make sure clipping is removed
-        imageryLayers.forEach(l => {
-          let container = l.getContainer();
-          if (container) container.style.clip = '';
-        });
         this.sideBySideCtrl.remove();
         this.sideBySideCtrl = null;
       }
