@@ -65,7 +65,7 @@ export default class LayersControlPanel extends React.Component {
       this.props.overlays.forEach(scanGroup('overlays'));
       this.props.layers.forEach(scanGroup('layers'));
       this.props.annotations.forEach(scanGroup('annotations'));
-      
+
       const getGroupContent = group => {
         return (<div>
 
@@ -83,8 +83,14 @@ export default class LayersControlPanel extends React.Component {
           {group.layers.sort((a, b) => {
               const m_a = a[Symbol.for("meta")] || {};
               const m_b = b[Symbol.for("meta")] || {};
-              return m_a.name > m_b.name ? -1 : 1;
-          }).map((layer, i) => <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} key={i} />)}
+              return m_a.type > m_b.type ? -1 : 1;
+          }).map((layer, i) => <LayersControlLayer map={this.props.map} 
+                                                  expanded={(layer[Symbol.for("meta")] || {}).autoExpand || false} 
+                                                  overlay={false} 
+                                                  layer={layer} 
+                                                  key={`${i}-${(layer[Symbol.for("meta")] || {}).type}`} 
+                                                  separator={i < group.layers.length - 1} 
+                                                />)}
         </div>);
       };
 

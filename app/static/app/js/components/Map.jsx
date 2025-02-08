@@ -26,6 +26,7 @@ import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
 import 'rbush';
 import '../vendor/leaflet/leaflet-markers-canvas';
+import '../vendor/leaflet/Leaflet.SideBySide/leaflet-side-by-side';
 import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
 import { unitSystem, toMetric } from '../classes/Units';
@@ -63,17 +64,27 @@ class Map extends React.Component {
       opacity: 100,
       imageryLayers: [],
       overlays: [],
-      annotations: []
+      annotations: [],
+      rightLayers: []
     };
 
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
+    this.taskCount = 1;
     this.addedCameraShots = {};
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
+  }
+
+  countTasks = () => {
+    let tasks = {};
+    this.props.tiles.forEach(tile => {
+        tasks[tile.meta.task.id] = true;
+    });
+    return Object.keys(tasks).length;
   }
 
   updateOpacity = (evt) => {
@@ -102,9 +113,9 @@ class Map extends React.Component {
           case "plant":
               return this.props.thermal ? _("Thermal") : _("Plant Health");
           case "dsm":
-              return _("DSM");
+              return _("Surface Model");
           case "dtm":
-              return _("DTM");
+              return _("Terrain Model");
       }
       return "";
   }
@@ -120,6 +131,10 @@ class Map extends React.Component {
             return "fa fa-chart-area fa-fw";
     }
     return "";
+  }
+
+  typeZIndex = (type) => {
+    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1;
   }
 
   hasBands = (bands, orthophoto_bands) => {
@@ -139,6 +154,8 @@ class Map extends React.Component {
         this.tileJsonRequests = [];
     }
 
+    this.taskCount = this.countTasks();
+
     const { tiles } = this.props,
           layerId = layer => {
             const meta = layer[Symbol.for("meta")];
@@ -153,15 +170,16 @@ class Map extends React.Component {
       if (this.map.hasLayer(layer)) prevSelectedLayers.push(layerId(layer));
       layer.remove();
     });
-    this.setState({imageryLayers: []});
+    this.setState({imageryLayers: [], rightLayers: []});
 
     // Request new tiles
     return new Promise((resolve, reject) => {
       this.tileJsonRequests = [];
 
       async.each(tiles, (tile, done) => {
-        const { url, meta, type } = tile;
-        
+        const { url, type } = tile;
+        const meta = Utils.clone(tile.meta);
+
         let metaUrl = url + "metadata";
         let unitForward = value => value;
         let unitBackward = value => value;
@@ -242,16 +260,20 @@ class Map extends React.Component {
                   tileSize: TILESIZE,
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
-                  detectRetina: true
+                  detectRetina: true,
+                  zIndex: this.typeZIndex(type),
                 });
             
             // Associate metadata with this layer
             meta.name = this.typeToHuman(type);
             meta.icon = this.typeToIcon(type);
+            meta.type = type;
+            meta.raster = true;
+            meta.autoExpand = this.taskCount === 1 && type === this.props.mapType;
             meta.metaUrl = metaUrl;
             meta.unitForward = unitForward;
             meta.unitBackward = unitBackward;
-            if (this.props.tiles.length > 1){
+            if (this.taskCount > 1){
               // Assign to a group
               meta.group = {id: meta.task.id, name: meta.task.name};
             }
@@ -259,17 +281,19 @@ class Map extends React.Component {
             layer[Symbol.for("tile-meta")] = mres;
 
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
-              layer.addTo(this.map);
+              if (type === this.props.mapType){
+                layer.addTo(this.map);
+              }
             }
 
             // Show 3D switch button only if we have a single orthophoto
-            if (tiles.length === 1){
+            if (this.taskCount === 1){
               this.setState({singleTask: meta.task});
             }
 
             // For some reason, getLatLng is not defined for tileLayer?
             // We need this function if other code calls layer.openPopup()
-            let self = this;
+            const self = this;
             layer.getLatLng = function(){
               let latlng = self.lastClickedLatLng ? 
                             self.lastClickedLatLng : 
@@ -277,12 +301,38 @@ class Map extends React.Component {
               return latlng;
             };
 
+            // Additional layer methods
+            layer.show = function(){
+              if (!self.map.hasLayer(this)) self.map.addLayer(this);
+              else this.getContainer().style.display = '';
+            };
+            layer.hide = function(){
+              this.getContainer().style.display = 'none';
+            };
+            layer.isHidden = function(){
+              if (!this.getContainer()) return false;
+              return this.getContainer().style.display === 'none';
+            };
+            layer.setZIndex = function(z){
+              if (this._originalZ === undefined) this._originalZ = this.options.zIndex;
+              this.options.zIndex = z;
+              this._updateZIndex();
+            };
+            layer.restoreZIndex = function(){
+              if (this._originalZ !== undefined){
+                this.setZIndex(this._originalZ);
+              }
+            };
+            layer.bringToFront = function(){
+              this.setZIndex(this.options.zIndex + 10000);
+            };
+
             var popup = L.DomUtil.create('div', 'infoWindow');
 
             popup.innerHTML = `<div class="title">
                                     ${name}
                                 </div>
-                                <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
+                                <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" class="opacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
                                 <ul class="asset-links loading">
                                     <li><i class="fa fa-spin fa-sync fa-spin fa-fw"></i></li>
@@ -351,7 +401,7 @@ class Map extends React.Component {
                     }
                   });
                 shotsLayer[Symbol.for("meta")] = {name: _("Cameras"), icon: "fa fa-camera fa-fw"};
-                if (this.props.tiles.length > 1){
+                if (this.taskCount > 1){
                   // Assign to a group
                   shotsLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
                 }
@@ -405,7 +455,7 @@ class Map extends React.Component {
                     }
                   });
                 gcpLayer[Symbol.for("meta")] = {name: _("Ground Control Points"), icon: "far fa-dot-circle fa-fw"};
-                if (this.props.tiles.length > 1){
+                if (this.taskCount > 1){
                   // Assign to a group
                   gcpLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
                 }
@@ -443,12 +493,17 @@ class Map extends React.Component {
       maxZoom: 24
     });
 
+    this.map.on('viewreset', this.layerVisibilityCheck);
+    this.map.on('zoomstart', this.layerVisibilityCheck);
+    this.map.on('movestart', this.layerVisibilityCheck);
+
     // For some reason, in production this class is not added (but we need it)
     // leaflet bug?
     $(this.container).addClass("leaflet-touch");
 
     PluginsAPI.Map.onAddAnnotation(this.handleAddAnnotation);
     PluginsAPI.Map.onAnnotationDeleted(this.handleDeleteAnnotation);
+    PluginsAPI.Map.onSideBySideChanged(this.handleSideBySideChange);
 
     PluginsAPI.Map.triggerWillAddControls({
         map: this.map,
@@ -592,10 +647,11 @@ _('Example:'),
 
         this.map.on('click', e => {
           if (PluginsAPI.Map.handleClick(e)) return;
+          if (this.sideBySideCtrl) return;
           
-          // Find first tile layer at the selected coordinates 
+          // Find first visible tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
-            if (layer._map && layer.options.bounds.contains(e.latlng)){
+            if (layer._map && !layer.isHidden() && layer.options.bounds.contains(e.latlng)){
               this.lastClickedLatLng = this.map.mouseEventToLatLng(e.originalEvent);
               this.updatePopupFor(layer);
               layer.openPopup();
@@ -640,7 +696,7 @@ _('Example:'),
     }).catch(e => {
         this.setState({showLoading: false, error: e.message});
     });
-
+    
     PluginsAPI.Map.triggerDidAddControls({
       map: this.map,
       tiles: tiles,
@@ -665,7 +721,7 @@ _('Example:'),
         name: name || "", 
         icon: "fa fa-sticky-note fa-fw"
       };
-      if (this.props.tiles.length > 1 && task){
+      if (this.taskCount > 1 && task){
         meta.group = {id: task.id, name: task.name};
       }
       layer[Symbol.for("meta")] = meta;
@@ -679,14 +735,54 @@ _('Example:'),
     this.setState({annotations: this.state.annotations.filter(l => l !== layer)});
   }
 
+  handleSideBySideChange = (layer, side) => {
+    let { rightLayers, imageryLayers } = this.state;
+
+    imageryLayers.forEach(l => l.restoreZIndex());
+
+    rightLayers = rightLayers.filter(l => l !== layer);
+    if (side){
+      rightLayers.push(layer);
+    }
+    rightLayers.forEach(l => l.bringToFront());
+
+    this.setState({rightLayers});
+
+    // Make sure to reset clipping
+    imageryLayers.forEach(l => {
+      let container = l.getContainer();
+      if (container) container.style.clip = '';
+    });
+
+    if (rightLayers.length > 0){
+      if (!this.sideBySideCtrl){
+        this.sideBySideCtrl = L.control.sideBySide([], rightLayers).addTo(this.map);
+      }else{
+        this.sideBySideCtrl.setRightLayers(rightLayers);
+      }
+    }else{
+      if (this.sideBySideCtrl){
+        this.sideBySideCtrl.remove();
+        this.sideBySideCtrl = null;
+      }
+    }
+  }
+
+  layerVisibilityCheck = () => {
+    // Check if imageryLayers are invisible and remove them to prevent tiles from loading
+    this.state.imageryLayers.forEach(layer => {
+      if (layer.isHidden()) this.map.removeLayer(layer);
+    }); 
+  }
+
   componentDidUpdate(prevProps, prevState) {
     this.state.imageryLayers.forEach(imageryLayer => {
       imageryLayer.setOpacity(this.state.opacity / 100);
       this.updatePopupFor(imageryLayer);
     });
 
-    if (prevProps.tiles !== this.props.tiles){
-      this.loadImageryLayers(true);
+    if (this.layersControl && prevProps.mapType !== this.props.mapType){
+      PluginsAPI.Map.mapTypeChanged(this.props.mapType, this.taskCount === 1);
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
@@ -698,6 +794,9 @@ _('Example:'),
 
   componentWillUnmount() {
     this.map.remove();
+    this.map.off('viewreset', this.layerVisibilityCheck);
+    this.map.off('zoomstart', this.layerVisibilityCheck);
+    this.map.off('movestart', this.layerVisibilityCheck);
 
     if (this.tileJsonRequests) {
       this.tileJsonRequests.forEach(tileJsonRequest => tileJsonRequest.abort());
@@ -706,7 +805,7 @@ _('Example:'),
 
     PluginsAPI.Map.offAddAnnotation(this.handleAddAnnotation);
     PluginsAPI.Map.offAnnotationDeleted(this.handleAddAnnotation);
-    
+    PluginsAPI.Map.offSideBySideChanged(this.handleSideBySideChange);
   }
 
   handleMapMouseDown(e){
@@ -719,7 +818,7 @@ _('Example:'),
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" className="opacity" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 

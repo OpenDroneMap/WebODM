@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from "react";
 import IonAssetLabel from "./IonAssetLabel";
-import { AssetStyles } from "../defaults";
+import { AssetConfig } from "../defaults";
 
 import "./IonAssetButton.scss";
 
@@ -22,7 +22,7 @@ export default class IonAssetButton extends PureComponent {
 		} = this.props;
 	
 		const menuItems = assets
-			.sort((a, b) => AssetStyles[a].name.localeCompare(AssetStyles[b].name))
+			.sort((a, b) => AssetConfig[a].name.localeCompare(AssetConfig[b].name))
 			.map(asset => (
 				<li>
 					<a key={asset} style={{cursor:'pointer'}} onClick={this.handleClick(asset)}>

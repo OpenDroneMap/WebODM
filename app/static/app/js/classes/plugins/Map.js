@@ -29,7 +29,9 @@ export default {
     "deleteAnnotation",
     "toggleAnnotation",
     "annotationDeleted",
-    "downloadAnnotations"
+    "downloadAnnotations",
+    "mapTypeChanged",
+    "sideBySideChanged",
   ]
 };
 

@@ -1,11 +1,11 @@
 import React, { PureComponent, Fragment } from "react";
-import { AssetStyles } from "../defaults";
+import { AssetConfig } from "../defaults";
 
 const IonAssetLabel = ({ asset, showIcon = false, ...options }) => (
 	<Fragment>
-		{showIcon && <i className={`${AssetStyles[asset].icon}`} />}
+		{showIcon && <i className={`${AssetConfig[asset].icon}`} />}
 		{"  "}
-		{AssetStyles[asset].name}
+		{AssetConfig[asset].name}
 	</Fragment>
 );
 
