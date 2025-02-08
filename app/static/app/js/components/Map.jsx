@@ -748,7 +748,7 @@ _('Example:'),
 
     this.setState({rightLayers});
 
-    // Make to reset clipping
+    // Make sure to reset clipping
     imageryLayers.forEach(l => {
       let container = l.getContainer();
       if (container) container.style.clip = '';
