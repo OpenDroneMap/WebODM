@@ -499,8 +499,26 @@
   #preset_form .submit-row .continue{
     background-color: #74B16F;
   }
-  #preset_form {
-    width: 70%;
+  
+  #preset_form .help{
+    margin-left: 200px !important;
   }
 
+  #preset_form .form-row.field-owner,
+  #preset_form .form-row.field-name,
+  #preset_form .form-row.field-options {
+    border-top: 2px solid #14A5A2;
+    padding: 10px;
+  }
+  
+  #preset_form .form-row.field-created_at {
+    border-top: 2px solid #14A5A2;
+    border-bottom: 2px solid #14A5A2;
+    padding: 10px;
+  }
+  
+  #preset_form .submit-row {
+    margin-right: 100px;
+  }
+  
 /*# sourceMappingURL=forms.css.map */
