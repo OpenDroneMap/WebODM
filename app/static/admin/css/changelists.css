@@ -346,5 +346,29 @@
   font-size: 13px;
   vertical-align: top;
 }
+#changelist .actions{
+  border-top: 2px solid #14A5A2; 
+  border-bottom: 2px solid #14A5A2; 
+  margin: 20px 0; /* Espaçamento em cima e embaixo */
+  padding: 15px; /* Espaçamento interno após a linha */
+}
+#content-main{
+  margin: 50px;
+}
+#changelist #result_list tr{
+  margin: 10px;
+}
 
+
+#changelist #result_list tbody tr {
+  height: 40px; 
+}
+#changelist #result_list input[type="checkbox"] {
+  transform: scale(1.5); 
+  margin-right: 10px; 
+}
+
+#changelist #result_list .action-checkbox {
+  padding: 10px; 
+}
 /*# sourceMappingURL=changelists.css.map */
