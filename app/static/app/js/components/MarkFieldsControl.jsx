@@ -43,15 +43,19 @@ class MarkFieldslButton extends React.Component {
   render() {
     const { showPanel } = this.state;
 
-    return (<div className={showPanel ? "open" : ""}>
-      <a href="javascript:void(0);"
-        title="Marcar talhões"
-        onClick={this.handleOpen}
-        className="leaflet-control-markFields-control-button leaflet-bar-part theme-secondary">
-        <i class="fas fa-draw-polygon fixIcon" ></i>
-      </a>
-      <MarkFieldsPanel map={this.props.map} task_id={this.props.task_id} showPanel={this.state.showPanel} project_id={this.props.project_id} onOpen={this.handleOpen} onClose={this.handleClose} />
-    </div>);
+    return (
+      <><a href="javascript:void(0);"
+          title="Marcar talhões"
+          onClick={this.handleOpen}
+          className="leaflet-control-markFields-control-button leaflet-bar-part theme-secondary">
+          <i class="fas fa-draw-polygon fixIcon" ></i>
+        </a>
+        <div className={showPanel ? "open popright" : ""}>
+        
+        <MarkFieldsPanel map={this.props.map} task_id={this.props.task_id} showPanel={this.state.showPanel} project_id={this.props.project_id} onOpen={this.handleOpen} onClose={this.handleClose} />
+      </div>
+      </>
+    );
   }
 }
 

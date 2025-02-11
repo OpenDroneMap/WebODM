@@ -47,19 +47,23 @@ class OverviewControl extends React.Component {
         const { showPanel } = this.state;
 
         return (
-            <div className={showPanel ? "open" : ""}>
-                <a href="javascript:void(0);"
+            <>
+            <a href="javascript:void(0);"
                     title="Visão geral"
                     onClick={this.handleOpen}
                     className="leaflet-control-overview-control-button leaflet-bar-part theme-secondary"></a>
-                <OverviewControlPanel
+           
+            <div className={showPanel ? "open popright" : ""}>
+                     <OverviewControlPanel
                     tiles={this.props.tiles}
                     onClose={this.handleClose}
                     selectedLayers={this.props.selectedLayers}
                     removeGeoJsonDetections={this.props.removeGeoJsonDetections}
                     loadGeoJsonDetections={this.props.loadGeoJsonDetections}
                     overlays={this.props.overlays} />
-            </div>);
+            </div>
+            </>
+ );
 
     }
 }

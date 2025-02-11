@@ -6,6 +6,12 @@
       background-size: 25px 25px;
       //background-position-y: 0px;
     }
+    .popright{
+      position: absolute;
+     top: 10%;
+     left: -10%;
+     transform: translate(-100%, 0%) !important;
+   }
   
     div.overview-control-panel{ display: none; }
     

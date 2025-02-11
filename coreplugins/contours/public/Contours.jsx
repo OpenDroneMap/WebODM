@@ -41,13 +41,18 @@ class ContoursButton extends React.Component {
   render(){
     const { showPanel } = this.state;
 
-    return (<div className={showPanel ? "open" : ""}>
-        <a href="javascript:void(0);" 
-            onClick={this.handleOpen} 
-            className="leaflet-control-contours-button leaflet-bar-part theme-secondary"
-            title="Contornos"></a>
-        <ContoursPanel map={this.props.map} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
-    </div>);
+    return (
+    <>
+    <a href="javascript:void(0);" 
+              onClick={this.handleOpen} 
+              className="leaflet-control-contours-button leaflet-bar-part theme-secondary"
+              title="Contornos"></a>
+      <div className={showPanel ? "open popright" : ""}>
+          
+          <ContoursPanel map={this.props.map} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
+      </div>
+    </>
+    );
   }
 }
 
