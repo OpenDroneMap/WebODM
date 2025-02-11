@@ -200,7 +200,7 @@
   overflow: auto;
 }
 .admin-area .submit-row input.default {
-  margin-left: 5px;
+  margin-left:5px;
 }
 .admin-area .submit-row input.default:hover {
   opacity: 0.9;
@@ -413,4 +413,112 @@
   margin-top: 0;
 }
 
+  /* custom preset */
+  #preset_form #id_owner {
+    width: 25rem;
+    background-color: #E3E3E3;
+    border-radius: 50px;
+  }
+  
+  #preset_form #id_name {
+    width: 25rem;
+    background-color: #E3E3E3;
+    border-radius: 50px;
+  }
+  
+  #preset_form #id_options {
+    background-color: #E3E3E3;
+    border-radius: 25px;
+    min-height: 184px;
+    min-width: 245px;
+  }
+  
+  #preset_form #id_created_at_0 {
+    width: 10rem;
+    background-color: #E3E3E3;
+    border-radius: 50px;
+  }
+  
+  #preset_form #id_created_at_1 {
+    width: 10rem;
+    background-color: #E3E3E3;
+    border-radius: 50px;
+  }
+  
+  #preset_form .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  #preset_form .datetime {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #preset_form .datetime input {
+    width: 200px;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    background-color: #f4f4f4;
+  }
+  
+  #preset_form .datetimeshortcuts {
+    display: inline-block;
+    margin-left: 10px;
+  }
+  
+  #preset_form .date-icon, #preset_form .clock-icon {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+  
+  #preset_form .timezonewarning {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: 5px;
+  }
+  
+  #preset_form .help {
+    color: #777;
+    font-size: 0.9em;
+    margin-top: 5px;
+  }
+  #preset_form .submit-row input {
+    border-radius: 50px;
+  }
+  #preset_form .submit-row .default{
+    background-color: #319c41;
+  }
+  #preset_form .submit-row .addanother{
+    background-color: #74B16F;
+  }
+
+  #preset_form .submit-row .continue{
+    background-color: #74B16F;
+  }
+  
+  #preset_form .help{
+    margin-left: 200px !important;
+  }
+
+  #preset_form .form-row.field-owner,
+  #preset_form .form-row.field-name,
+  #preset_form .form-row.field-options {
+    border-top: 2px solid #14A5A2;
+    padding: 10px;
+  }
+  
+  #preset_form .form-row.field-created_at {
+    border-top: 2px solid #14A5A2;
+    border-bottom: 2px solid #14A5A2;
+    padding: 10px;
+  }
+  
+  #preset_form .submit-row {
+    margin-right: 100px;
+  }
+  
 /*# sourceMappingURL=forms.css.map */
