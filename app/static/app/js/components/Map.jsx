@@ -724,7 +724,7 @@ class Map extends React.Component {
 
     this.autolayers.addEventPopup(this.togglePopup);
 
-    // POPUP MAIS
+    // POPUP ADICONAR LAYER
     const AddOverlayCtrl = Leaflet.Control.extend({
       options: {
         position: 'topright'
@@ -776,7 +776,7 @@ class Map extends React.Component {
       onTogglePopup: this.togglePopup,
     }).addTo(this.map);
 
-
+    // Está ouvindo o evento "sidebarToggle" quando esse evento é disparado ele recarrega o mapa para ficar do tamanho adequado
     window.addEventListener("sidebarToggle", () => {
       setTimeout(() => {
         this.map.invalidateSize();

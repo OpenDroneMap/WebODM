@@ -244,7 +244,7 @@ class MapView extends React.Component {
                 Talhões Processados
                 <span class="glyphicon glyphicon-chevron-down"></span>
               </button>
-              
+
               <div className="dropdown-menu dropdown-menu-right">
                 {aiDropdownItems}
               </div>
@@ -286,6 +286,12 @@ $(function () {
   });
   window.addEventListener("resize", () => {
     $(".map-container").get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
+  });
+  //Redefine a altura do mapa sempre que a sidebar é collapsada ou expandida
+  window.addEventListener("sidebarToggle", () => {
+    setTimeout(() => {
+      $(".map-container").get(0).style.height = 'calc(100% - ' + $(".map-header-wrapper").get(0).offsetHeight.toString() + "px)";
+    }, 200)
   });
 });
 

@@ -26,7 +26,7 @@ export default class OverviewControlPanel extends React.Component {
 
   }
 
-  // Atualiza o estado do componente quando as propriedades ou o estado mudam
+  // Atualiza o estado do componente quando as propriedades ou os estados mudam
   // Verifica se `selectedLayers` mudou e filtra talhões válidos com base em condições específicas atualizando o state filteredSelectedLayers
   componentDidUpdate(prevProps, prevState) {
 
