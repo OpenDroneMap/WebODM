@@ -605,7 +605,9 @@ class Task(models.Model):
             self.extract_assets_and_complete()
         except zipfile.BadZipFile:
             raise NodeServerError(gettext("Invalid zip file"))
-
+        except NotImplementedError:
+            raise NodeServerError(gettext("Unsupported compression method"))
+        
         images_json = self.assets_path("images.json")
         if os.path.exists(images_json):
             try:
