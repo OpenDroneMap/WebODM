@@ -596,7 +596,7 @@ class Task(models.Model):
 
                             fd.write(chunk)
 
-                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError) as e:
+                except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, ReadTimeoutError, requests.exceptions.MissingSchema) as e:
                     raise NodeServerError(e)
 
         self.refresh_from_db()
