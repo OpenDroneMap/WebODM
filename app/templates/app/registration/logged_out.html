@@ -1,7 +1,34 @@
 {% extends 'registration/login.html' %}
 {% load i18n %}
-
+{% load settings %}
 {% block registration_content %}
+    <div class="container-fluid full-height">
+        <div class="row" style="height: 100%; margin: 0;">
+            <div class="col-md-6" style="padding: 0; background-color: #000; color: #fff;">
+                <div style="display: table; height: 100vh; width: 100%;">
+                    <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                        <img src="{% settings_image_url 'app_logo' %}" alt="Logo"
+                             style="width: 512px; display: block; margin: 0 auto;"/>
+                        <h3>{{ SETTINGS.slogan }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" style="padding: 0; background-color: #fff;">
+                <div style="display: table; height: 100%; width: 100%;">
+                    <div style="display: table-cell; vertical-align: middle;">
+                        <h3 style="max-width: 300px; margin: 0 auto; text-align: left; margin-bottom: 20px;">
+                            {% trans "You have been logged out." %}
+                        </h3>
+                        <div style="text-align: center;">
+                            <a href="{% url 'login' %}">{% trans 'Log in' %}</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h3>{% trans "You have been logged out." %}</h3>
     <p><a href="{% url 'login' %}">{% trans 'Log In' %}</a></p>
 {% endblock %}

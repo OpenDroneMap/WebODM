@@ -1,11 +1,13 @@
-{% extends 'registration/registration_base.html' %}
+{% extends 'registration/registration_base_login.html' %}
 {% load i18n %}
 {% load settings %}
 
 {% block registration_content %}
     {% if form.errors %}
         <div class="alert alert-warning">
-            <p><strong>{% trans "Invalid credentials." %}</strong> {% trans "Note that both fields are case-sensitive." %}</p>
+            <p>
+                <strong>{% trans "Invalid credentials." %}</strong> {% trans "Note that both fields are case-sensitive." %}
+            </p>
         </div>
     {% endif %}
 
@@ -14,83 +16,122 @@
     {% reset_password_link as reset_pwd_link %}
 
     {% if autologin %}
-        <script>location.href='/';</script>
+        <script>location.href = '/';</script>
     {% else %}
-    <form id="loginForm" {% if ext_auth %} style="display: none" {% endif %} action="{% url 'login' %}" method="post" class="form-horizontal" role="form">{% csrf_token %}
-        {% for field in form %}
-            {% include 'registration/form_field.html' %}
-        {% endfor %}
-        <input type="hidden" name="next" value="" id="loginNext" />
-        <script>
-            var loginNext = document.getElementById("loginNext");
-            var value = new URLSearchParams(new URL(window.location.href).search).get('next');
-            if (value) loginNext.value = value;
-        </script>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default">{% trans 'Log in' %}</button>
-            </div>
-            <div class="top-buffer col-sm-offset-2 col-sm-10">
-                {% if reset_pwd_link != '' %}
-                <p><a href="{{ reset_pwd_link }}">{% trans "Forgot your password?" %}</a></p>
-                {% else %}
-                <p><a href="javascript:toggleForgotPasswordHint();">{% trans "Forgot your password?" %}</a></p>
-                <script>function toggleForgotPasswordHint(){ $("#forgotPasswordHint").toggle(); }</script>
-                <div id="forgotPasswordHint" style="display: none; font-size: 90%; padding: 4px;" class="theme-secondary">
-                    You can reset the administrator password by running the following command:
-                    <span class="theme-background-highlight" style="padding: 4px; margin: 8px 0; display: inline-block;">./webodm.sh resetadminpassword yournewpass</span><br/>
-                    If you used WebODM Manager to launch WebODM, find the "Reset Password" button within the maintenance panel or within one of WebODM Manager menus.
+
+        <div class="container-fluid full-height">
+            <div class="row" style="height: 100%; margin: 0;">
+                <div class="col-md-6" style="padding: 0; background-color: #000; color: #fff;">
+                    <div style="display: table; height: 100vh; width: 100%;">
+                        <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                            <img src="{% settings_image_url 'app_logo' %}" alt="Logo"
+                                 style="width: 512px; display: block; margin: 0 auto;"/>
+                            <h3>{{ SETTINGS.slogan }}</h3>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
+                <div class="col-md-6" style="padding: 0; background-color: #fff;">
+                    <div style="display: table; height: 100%; width: 100%;">
+                        <div style="display: table-cell; vertical-align: middle;">
+                            <h3 style="max-width: 300px; margin: 0 auto; text-align: left; margin-bottom: 20px;">
+                                {% trans "Log in" %}
+                            </h3>
+
+                            <form id="loginForm" {% if ext_auth %} style="display: none" {% endif %}
+                                  style="max-width: 300px; margin: 0 auto;"
+                                  action="{% url 'login' %}"
+                                  method="post" role="form">{% csrf_token %}
+
+                                {% for field in form %}
+                                    {% include 'registration/form_field.html' %}
+                                {% endfor %}
+                                <input type="hidden" name="next" value="" id="loginNext"/>
+                                <script>
+                                    var loginNext = document.getElementById("loginNext");
+                                    var value = new URLSearchParams(new URL(window.location.href).search).get('next');
+                                    if (value) loginNext.value = value;
+                                </script>
+                                <div style="text-align: right;">
+                                    <button type="submit" class="btn btn-default">{% trans 'Log in' %}</button>
+                                    <div class="top-buffer col-sm-offset-2 col-sm-10">
+                                        {% if reset_pwd_link != '' %}
+                                            <p>
+                                                <a href="{{ reset_pwd_link }}">{% trans "Forgot your password?" %}</a>
+                                            </p>
+                                        {% else %}
+                                            <p>
+                                                <a href="javascript:toggleForgotPasswordHint();">{% trans "Forgot your password?" %}</a>
+                                            </p>
+                                            <script>function toggleForgotPasswordHint() {
+                                                $("#forgotPasswordHint").toggle();
+                                            }</script>
+                                            <div id="forgotPasswordHint"
+                                                 style="display: none; font-size: 90%; padding: 4px;"
+                                                 class="theme-secondary">
+                                                {% trans "You can reset the administrator password by running the following command:" %}
+
+                                                <span class="theme-background-highlight"
+                                                      style="padding: 4px; margin: 8px 0; display: inline-block;">./webodm.sh resetadminpassword yournewpass</span><br/>
+                                                {% trans "If you used WebODM Manager to launch WebODM, find the 'Reset Password' button within the maintenance panel or within one of WebODM Manager menus." %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </form>
 
-    {% if ext_auth %}
-    <div class="text-center" id="authLoading">
-        <i class="fa fa-spin fa-circle-notch fa-spin fa-fw fa-2x"></i>
-    </div>
-    <script>
-    function getAutoLoginCookie() {
-        var value = "; " + document.cookie;
-        var parts = value.split("; autologin=");
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-    function delAutoLoginCookie() {
-        var domain = getAutoLoginCookie();
-        document.cookie = 'autologin=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Domain=' + domain + ';';
-    }
-    function showLoginForm(){
-        $("#authLoading").hide();
-        $("#loginForm").show();
-    }
-    $(function(){
-        if (getAutoLoginCookie() !== undefined){
-            $.ajax({
-                url: "/api/external-token-auth/",
-                type: "POST",
-                xhrFields: {
-                    withCredentials: true
-                },
-            }).done(function(res){
-                delAutoLoginCookie();
-                if (res.redirect){
-                    location.href = res.redirect;
-                }else{
-                    if (res.error) console.error(res.error);
-                    showLoginForm();
+        {% if ext_auth %}
+            <div class="text-center" id="authLoading">
+                <i class="fa fa-spin fa-circle-notch fa-spin fa-fw fa-2x"></i>
+            </div>
+            <script>
+                function getAutoLoginCookie() {
+                    var value = "; " + document.cookie;
+                    var parts = value.split("; autologin=");
+                    if (parts.length === 2) return parts.pop().split(';').shift();
                 }
-            }).fail(function(){
-                delAutoLoginCookie();
-                showLoginForm();
-                console.error("Auto login failed");
-            });
-        }else{
-            showLoginForm();
-        }
-    });
-    </script>
-    {% endif %}
+
+                function delAutoLoginCookie() {
+                    var domain = getAutoLoginCookie();
+                    document.cookie = 'autologin=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Domain=' + domain + ';';
+                }
+
+                function showLoginForm() {
+                    $("#authLoading").hide();
+                    $("#loginForm").show();
+                }
+
+                $(function () {
+                    if (getAutoLoginCookie() !== undefined) {
+                        $.ajax({
+                            url: "/api/external-token-auth/",
+                            type: "POST",
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                        }).done(function (res) {
+                            delAutoLoginCookie();
+                            if (res.redirect) {
+                                location.href = res.redirect;
+                            } else {
+                                if (res.error) console.error(res.error);
+                                showLoginForm();
+                            }
+                        }).fail(function () {
+                            delAutoLoginCookie();
+                            showLoginForm();
+                            console.error("Auto login failed");
+                        });
+                    } else {
+                        showLoginForm();
+                    }
+                });
+            </script>
+        {% endif %}
 
     {% endif %}
 {% endblock %}
