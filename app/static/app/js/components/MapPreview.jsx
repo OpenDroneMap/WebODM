@@ -575,9 +575,9 @@ _('Example:'),
           </button>
           <ul className="dropdown-menu">
             <li>
-              <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> GeoJSON</a>
-              <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> CSV</a>
-              <a href="javascript:void(0);" onClick={() => this.download('geo')}><i className="fas fa-file-alt fa-fw"></i> Geolocation File</a>
+              <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> {_("GeoJSON")}</a>
+              <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> {_("CSV")}</a>
+              <a href="javascript:void(0);" onClick={() => this.download('geo')}><i className="fas fa-file-alt fa-fw"></i> {_("Geolocation File")}</a>
             </li>
           </ul>
         </div> : ""}
