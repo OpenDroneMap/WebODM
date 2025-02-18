@@ -511,6 +511,10 @@ _('Example:'),
   download = format => {
     let output = "";
     let filename = `images.${format}`;
+    if (format === "geo"){
+      filename = "geo.txt";
+    }
+
     const feats = {
       type: "FeatureCollection",
       features: this.exifData.map(ed => {
@@ -537,6 +541,10 @@ _('Example:'),
     }else if (format === 'csv'){
       output = `Filename,Timestamp,Latitude,Longitude,Altitude\r\n${feats.features.map(feat => {
         return `${feat.properties.Filename},${feat.properties.Timestamp},${feat.geometry.coordinates[1]},${feat.geometry.coordinates[0]},${feat.geometry.coordinates[2]}`
+      }).join("\r\n")}`;
+    }else if (format === 'geo'){
+      output = `EPSG:4326\r\n${feats.features.map(feat => {
+        return `${feat.properties.Filename} ${feat.geometry.coordinates[0]} ${feat.geometry.coordinates[1]} ${feat.geometry.coordinates[2]}`
       }).join("\r\n")}`;
     }else{
       console.error("Invalid format");
@@ -569,6 +577,7 @@ _('Example:'),
             <li>
               <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> GeoJSON</a>
               <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> CSV</a>
+              <a href="javascript:void(0);" onClick={() => this.download('geo')}><i className="fas fa-file-alt fa-fw"></i> Geolocation File</a>
             </li>
           </ul>
         </div> : ""}
