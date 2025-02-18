@@ -4,6 +4,10 @@ import shutil
 from wsgiref.util import FileWrapper
 
 import mimetypes
+import rasterio
+from rasterio.enums import ColorInterp
+from PIL import Image
+import io
 
 from shutil import copyfileobj, move
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
@@ -235,7 +239,7 @@ class TaskViewSet(viewsets.ViewSet):
             return Response({'success': True, 'task': TaskSerializer(new_task).data}, status=status.HTTP_200_OK)
         else:
             return Response({'error': _("Cannot duplicate task")}, status=status.HTTP_200_OK)
-
+    
     def create(self, request, project_pk=None):
         project = get_and_check_project(request, project_pk, ('change_project', ))
 
@@ -402,6 +406,65 @@ class TaskDownloads(TaskNestedView):
             return download_file_stream(request, asset_fs, 'attachment', download_filename=download_filename)
         else:
             return download_file_response(request, asset_fs, 'attachment', download_filename=download_filename)
+
+
+class TaskThumbnail(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Generate a thumbnail on the fly for a particular task
+        """
+        task = self.get_and_check_task(request, pk)
+        orthophoto_path = task.get_check_file_asset_path("orthophoto.tif")
+        if orthophoto_path is None:
+            raise exceptions.NotFound()
+
+        try:
+            thumb_size = int(self.request.query_params.get('size', 512))
+            if thumb_size < 1 or thumb_size > 2048:
+                raise ValueError()
+
+            quality = int(self.request.query_params.get('quality', 75))
+            if quality < 0 or quality > 100:
+                raise ValueError()
+        except ValueError:
+            raise exceptions.ValidationError("Invalid query parameters")            
+
+        with rasterio.open(orthophoto_path, "r") as raster:
+            ci = raster.colorinterp
+            indexes = (1, 2, 3,)
+
+            # More than 4 bands?
+            if len(ci) > 4:
+                # Try to find RGBA band order
+                if ColorInterp.red in ci and \
+                        ColorInterp.green in ci and \
+                        ColorInterp.blue in ci:
+                    indexes = (ci.index(ColorInterp.red) + 1,
+                                ci.index(ColorInterp.green) + 1,
+                                ci.index(ColorInterp.blue) + 1,)
+            elif len(ci) < 3:
+                 raise exceptions.NotFound()
+            
+            if ColorInterp.alpha in ci:
+                indexes += (ci.index(ColorInterp.alpha) + 1, )
+
+            img = raster.read(indexes=indexes, boundless=True, fill_value=255, out_shape=(
+                len(indexes),
+                thumb_size,
+                thumb_size,
+            ), resampling=rasterio.enums.Resampling.nearest).transpose((1, 2, 0))
+            
+        img = Image.fromarray(img)
+        output = io.BytesIO()
+        img.save(output, format='PNG', quality=quality)
+
+        res = HttpResponse(content_type="image/png")
+        res['Content-Disposition'] = 'inline'
+        res.write(output.getvalue())
+        output.close()
+
+        return res
+
 
 """
 Raw access to the task's asset folder resources

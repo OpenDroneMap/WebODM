@@ -1260,6 +1260,11 @@ class Task(models.Model):
                 shutil.copy(alignment_file, dst_file)
         else:
             logger.warn("Cannot set alignment file for {}, {} does not exist".format(self, alignment_file))
+    
+    def get_check_file_asset_path(self, asset):
+        file = self.assets_path(self.ASSETS_MAP[asset])
+        if isinstance(file, str) and os.path.isfile(file):
+            return file
 
     def handle_images_upload(self, files):
         uploaded = {}

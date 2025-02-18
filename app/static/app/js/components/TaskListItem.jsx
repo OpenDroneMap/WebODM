@@ -171,6 +171,10 @@ class TaskListItem extends React.Component {
     return `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/output/?line=${line}`;
   }
 
+  thumbnailUrl = () => {
+    return `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/thumbnail?size=192`;  
+  }
+
   hoursMinutesSecs(t){
     if (t === 0 || t === -1) return "-- : -- : --";
 
@@ -556,54 +560,62 @@ class TaskListItem extends React.Component {
         <div className="expanded-panel">
           <div className="row">
             <div className="col-md-12 no-padding">
-              <table className="table table-condensed info-table">
-                <tbody>
-                  <tr>
-                    <td><strong>{_("Created on:")}</strong></td>
-                    <td>{(new Date(task.created_at)).toLocaleString()}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>{_("Processing Node:")}</strong></td>
-                    <td>{task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})</td>
-                  </tr>
-                  {Array.isArray(task.options) &&
-                  <tr>
-                    <td><strong>{_("Options:")}</strong></td>
-                    <td>{this.optionsToList(task.options)}</td>
-                  </tr>}
-                  {stats && stats.gsd && 
-                  <tr>
-                    <td><strong>{_("Average GSD:")}</strong></td>
-                    <td>{parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm</td>
-                  </tr>}
-                  {stats && stats.area &&
-                  <tr>
-                    <td><strong>{_("Area:")}</strong></td>
-                    <td>{parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;</td>
-                  </tr>}
-                  {stats && stats.pointcloud && stats.pointcloud.points &&
-                  <tr>
-                    <td><strong>{_("Reconstructed Points:")}</strong></td>
-                    <td>{stats.pointcloud.points.toLocaleString()}</td>
-                  </tr>}
-                  {task.size > 0 && 
-                  <tr>
-                    <td><strong>{_("Disk Usage:")}</strong></td>
-                    <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
-                  </tr>}
-                  <tr>
-                    <td><strong>{_("Task ID:")}</strong></td>
-                    <td>{task.id}</td>
-                  </tr>
-                  <tr>
-                      <td><strong>{_("Task Output:")}</strong></td>
-                      <td><div className="btn-group btn-toggle"> 
-                        <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
-                        <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>{_("Off")}</button>
-                      </div></td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="col-md-9 col-sm-10 no-padding">
+                <table className="table table-condensed info-table">
+                  <tbody>
+                    <tr>
+                      <td><strong>{_("Created on:")}</strong></td>
+                      <td>{(new Date(task.created_at)).toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>{_("Processing Node:")}</strong></td>
+                      <td>{task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})</td>
+                    </tr>
+                    {Array.isArray(task.options) &&
+                    <tr>
+                      <td><strong>{_("Options:")}</strong></td>
+                      <td>{this.optionsToList(task.options)}</td>
+                    </tr>}
+                    {stats && stats.gsd && 
+                    <tr>
+                      <td><strong>{_("Average GSD:")}</strong></td>
+                      <td>{parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm</td>
+                    </tr>}
+                    {stats && stats.area &&
+                    <tr>
+                      <td><strong>{_("Area:")}</strong></td>
+                      <td>{parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;</td>
+                    </tr>}
+                    {stats && stats.pointcloud && stats.pointcloud.points &&
+                    <tr>
+                      <td><strong>{_("Reconstructed Points:")}</strong></td>
+                      <td>{stats.pointcloud.points.toLocaleString()}</td>
+                    </tr>}
+                    {task.size > 0 && 
+                    <tr>
+                      <td><strong>{_("Disk Usage:")}</strong></td>
+                      <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
+                    </tr>}
+                    <tr>
+                      <td><strong>{_("Task ID:")}</strong></td>
+                      <td>{task.id}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>{_("Task Output:")}</strong></td>
+                        <td><div className="btn-group btn-toggle"> 
+                          <button onClick={this.setView("console")} className={"btn btn-xs " + (this.state.view === "basic" ? "btn-default" : "btn-primary")}>{_("On")}</button>
+                          <button onClick={this.setView("basic")} className={"btn btn-xs " + (this.state.view === "console" ? "btn-default" : "btn-primary")}>{_("Off")}</button>
+                        </div></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {task.status === statusCodes.COMPLETED ? 
+              <div className="col-md-3 col-sm-2 text-center">
+                <a href={`/map/project/${task.project}/task/${task.id}/`}>
+                  <img className="task-thumbnail" src={this.thumbnailUrl()} alt={_("Thumbnail")}/>
+                </a>
+              </div> : ""}
               
               {this.state.view === 'console' ?
                 <Console
