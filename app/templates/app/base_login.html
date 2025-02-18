@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load i18n cache static settings plugins %}
+    <!--
+    WebODM - User-friendly, commercial grade software for processing aerial imagery.
+    Copyright (C) 2020  WebODM Authors
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    -->
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="author" content="WebODM Contributors">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="{% settings_image_url 'app_logo_favicon' %}" sizes="32x32">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'app/css/bootstrap.min.css' %}"/>
+
+    <link rel="preload" href="{% static 'app/webfonts/fa-regular-400.woff2' %}" as="font" type="font/woff2"
+          crossorigin="anonymous">
+    <link rel="preload" href="{% static 'app/webfonts/fa-solid-900.woff2' %}" as="font" type="font/woff2"
+          crossorigin="anonymous">
+
+    <link href="{% static 'app/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app/css/metisMenu.min.css' %}" rel="stylesheet">
+    <link href="{% static 'app/css/sb-admin-2.css' %}" rel="stylesheet">
+    {% block extra-headers %}{% endblock %}
+
+    <script src="{% static 'app/js/vendor/modernizr-2.8.3.min.js' %}"></script>
+    <script src="{% static 'app/js/vendor/es6-shim.min.js' %}"></script>
+    <script src="{% static 'app/js/vendor/jquery-1.11.2.min.js' %}"></script>
+    <script src="{% static 'app/js/vendor/system.js' %}"></script>
+    <script src="{% url 'javascript-catalog' %}"></script>
+
+    {% block headers-before-bundle %}{% endblock %}
+
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle 'main' %}
+
+    {% autoescape off %}
+        {% get_plugins_js_includes %}
+        {% get_plugins_css_includes %}
+    {% endautoescape %}
+
+    <title>{{ title|default:"Login" }} - {{ SETTINGS.app_name }}</title>
+
+    {% cache 3600 theme_css %}
+        <style type="text/css">
+            {% include "theme.css" %}
+        </style>
+    {% endcache %}
+
+    {% is_desktop_mode as desktop_mode %}
+
+    <style type="text/css">
+        {{ SETTINGS.theme.css|safe }}
+    </style>
+</head>
+<body data-admin-utc-offset="{% now "Z" %}">
+{% if desktop_mode %}
+    <div class='topLine' style="background: #e7e7e7; position: absolute; left: 0; right: 0; height: 1px;"></div>
+{% endif %}
+
+{% block body %}
+    <!--[if lt IE 8]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
+            href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <div id="wrapper">
+        {{ SETTINGS.theme.html_before_header|safe }}
+        {% block page-wrapper %}{{ SETTINGS.theme.html_after_header|safe }}{% endblock %}
+    </div>
+
+{% endblock %}
+</body>
+
+<script src="{% static 'app/js/vendor/bootstrap.min.js' %}"></script>
+{{ SETTINGS.theme.html_after_body|safe }}
+</html>
