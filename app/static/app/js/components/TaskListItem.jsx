@@ -48,6 +48,7 @@ class TaskListItem extends React.Component {
       view: "basic",
       showMoveDialog: false,
       actionLoading: false,
+      thumbLoadFailed: false
     }
 
     for (let k in props.data){
@@ -429,6 +430,10 @@ class TaskListItem extends React.Component {
     }
   }
 
+  handleThumbError = e => {
+    this.setState({thumbLoadFailed: true});
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -610,10 +615,10 @@ class TaskListItem extends React.Component {
                   </tbody>
                 </table>
               </div>
-              {task.status === statusCodes.COMPLETED ? 
+              {!this.state.thumbLoadFailed && task.status === statusCodes.COMPLETED ? 
               <div className="col-md-3 col-sm-2 text-center">
                 <a href={`/map/project/${task.project}/task/${task.id}/`}>
-                  <img className="task-thumbnail" src={this.thumbnailUrl()} alt={_("Thumbnail")}/>
+                  <img onError={this.handleThumbError} className="task-thumbnail" src={this.thumbnailUrl()} alt={_("Thumbnail")}/>
                 </a>
               </div> : ""}
               

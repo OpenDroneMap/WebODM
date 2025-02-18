@@ -8,6 +8,7 @@ import rasterio
 from rasterio.enums import ColorInterp
 from PIL import Image
 import io
+import numpy as np
 
 from shutil import copyfileobj, move
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
@@ -453,7 +454,20 @@ class TaskThumbnail(TaskNestedView):
                 thumb_size,
                 thumb_size,
             ), resampling=rasterio.enums.Resampling.nearest).transpose((1, 2, 0))
+        
+        if img.dtype != np.uint8:
+            img = img.astype(np.float32)
             
+            # Ignore alpha values
+            minval = img[:,:,:3].min()
+            maxval = img[:,:,:3].max()
+
+            if minval != maxval:
+                img[:,:,:3] -= minval
+                img[:,:,:3] *= (255.0/(maxval-minval))
+            
+            img = img.astype(np.uint8)
+
         img = Image.fromarray(img)
         output = io.BytesIO()
         img.save(output, format='PNG', quality=quality)
