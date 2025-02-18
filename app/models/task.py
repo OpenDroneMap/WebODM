@@ -1241,7 +1241,26 @@ class Task(models.Model):
     def get_image_path(self, filename):
         p = self.task_path(filename)
         return path_traversal_check(p, self.task_path())
-    
+
+    def set_alignment_file_from(self, align_task):
+        tp = self.task_path()
+        if not os.path.exists(tp):
+            os.makedirs(tp, exist_ok=True)
+
+        alignment_file = align_task.assets_path(self.ASSETS_MAP['georeferenced_model.laz'])
+        dst_file = self.task_path("align.laz")
+
+        if os.path.exists(dst_file):
+            os.unlink(dst_file)
+
+        if os.path.exists(alignment_file):
+            try:
+                os.link(alignment_file, dst_file)
+            except:
+                shutil.copy(alignment_file, dst_file)
+        else:
+            logger.warn("Cannot set alignment file for {}, {} does not exist".format(self, alignment_file))
+
     def handle_images_upload(self, files):
         uploaded = {}
         for file in files:

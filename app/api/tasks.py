@@ -91,6 +91,7 @@ class TaskViewSet(viewsets.ViewSet):
     
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
+    filter_fields = ('status', ) # TODO: add filter fields
 
     def get_permissions(self):
         """
@@ -238,11 +239,25 @@ class TaskViewSet(viewsets.ViewSet):
     def create(self, request, project_pk=None):
         project = get_and_check_project(request, project_pk, ('change_project', ))
 
+        # Check if an alignment field is set to a valid task
+        # this means a user wants to align this task with another
+        align_to = request.data.get('align_to')
+        align_task = None
+        if align_to is not None and align_to != "auto" and align_to != "":
+            try:
+                align_task = models.Task.objects.get(pk=align_to)
+                get_and_check_project(request, align_task.project.id, ('view_project', ))
+            except ObjectDoesNotExist:
+                raise exceptions.ValidationError(detail=_("Cannot create task, alignment task is not valid"))
+        
         # If this is a partial task, we're going to upload images later
         # for now we just create a placeholder task.
         if request.data.get('partial'):
             task = models.Task.objects.create(project=project,
                                               pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
+            if align_task is not None:
+                task.set_alignment_file_from(align_task)
+            
             serializer = TaskSerializer(task, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -255,7 +270,8 @@ class TaskViewSet(viewsets.ViewSet):
             with transaction.atomic():
                 task = models.Task.objects.create(project=project,
                                                   pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
-
+                if align_task is not None:
+                    task.set_alignment_file_from(align_task)
                 task.handle_images_upload(files)
                 task.images_count = len(task.scan_images())
 

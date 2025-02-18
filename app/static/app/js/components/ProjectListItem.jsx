@@ -418,7 +418,8 @@ class ProjectListItem extends React.Component {
         options: taskInfo.options,
         processing_node:  taskInfo.selectedNode.id,
         auto_processing_node: taskInfo.selectedNode.key == "auto",
-        partial: true
+        partial: true,
+        align_to: taskInfo.alignTo
     };
 
     if (taskInfo.resizeMode === ResizeModes.YES){
@@ -780,6 +781,8 @@ class ProjectListItem extends React.Component {
               suggestedTaskName={this.handleTaskTitleHint}
               filesCount={this.state.upload.totalCount}
               showResize={true}
+              showAlign={numTasks > 0}
+              projectId={this.state.data.id}
               getFiles={() => this.state.upload.files }
             />
           : ""}

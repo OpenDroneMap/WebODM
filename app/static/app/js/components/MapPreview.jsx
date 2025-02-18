@@ -24,12 +24,14 @@ const Colors = {
 class MapPreview extends React.Component {
   static defaultProps = {
     getFiles: null,
-    onPolygonChange: () => {}
+    onPolygonChange: () => {},
+    onImagesBboxChanged: () => {}
   };
     
   static propTypes = {
     getFiles: PropTypes.func.isRequired,
-    onPolygonChange: PropTypes.func
+    onPolygonChange: PropTypes.func,
+    onImagesBboxChanged: PropTypes.func
   };
 
   constructor(props) {
@@ -214,11 +216,27 @@ _('Example:'),
         this.map.fitBounds(this.imagesGroup.getBounds());
       }
 
+      this.props.onImagesBboxChanged(this.computeBbox(this.exifData));
+
       this.setState({showLoading: false});
 
     }).catch(e => {
       this.setState({showLoading: false, error: e.message});
     });
+  }
+
+  computeBbox = exifData => {
+    // minx, maxx, miny, maxy
+    let bbox = [Infinity, -Infinity, Infinity, -Infinity];
+    exifData.forEach(ed => {
+      if (ed.gps){
+        bbox[0] = Math.min(bbox[0], ed.gps.longitude);
+        bbox[1] = Math.max(bbox[1], ed.gps.longitude);
+        bbox[2] = Math.min(bbox[2], ed.gps.latitude);
+        bbox[3] = Math.max(bbox[3], ed.gps.latitude);
+      }
+    });
+    return bbox;
   }
 
   readExifData = () => {
