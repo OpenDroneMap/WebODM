@@ -192,6 +192,12 @@ a, a:hover, a:focus{
 #navbar-top{
 	background-color: {{ theme_header_background }};
 }
+#column-left{
+	background-color: {{ theme_header_background }};
+}
+#slogan-text{
+    color: {{ theme_header_primary }};
+}
 
 /* Header primary */
 .navbar-default .navbar-link,
