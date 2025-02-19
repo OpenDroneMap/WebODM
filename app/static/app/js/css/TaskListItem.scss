@@ -158,7 +158,11 @@
     }
 
     .task-thumbnail{
+        width: 156px;
+        height: 156px;
         max-width: 100%;
+        max-height: 156px;
+        overflow: hidden;
         &:hover{
             opacity: 0.9;
         }

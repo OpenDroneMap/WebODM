@@ -125,7 +125,7 @@ class Thumbnail(TaskNestedView):
             
             img.thumbnail((thumb_size, thumb_size))
             output = io.BytesIO()
-            img.save(output, format='JPEG', quality=quality)
+            img.save(output, format='JPEG', quality=quality, progressive=True)
 
             res = HttpResponse(content_type="image/jpeg")
             res['Content-Disposition'] = 'inline'

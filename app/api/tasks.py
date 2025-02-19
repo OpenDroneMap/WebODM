@@ -437,15 +437,8 @@ class TaskThumbnail(TaskNestedView):
         if orthophoto_path is None:
             raise exceptions.NotFound()
 
-        try:
-            thumb_size = int(self.request.query_params.get('size', 512))
-            if thumb_size < 1 or thumb_size > 2048:
-                raise ValueError()
-
-            quality = int(self.request.query_params.get('quality', 75))
-            if quality < 0 or quality > 100:
-                raise ValueError()
-        except ValueError:
+        thumb_size = int(self.request.query_params.get('size', 512))
+        if thumb_size < 1 or thumb_size > 2048:
             raise exceptions.ValidationError("Invalid query parameters")            
 
         with rasterio.open(orthophoto_path, "r") as raster:
@@ -495,9 +488,14 @@ class TaskThumbnail(TaskNestedView):
 
         img = Image.fromarray(img)
         output = io.BytesIO()
-        img.save(output, format='PNG', quality=quality)
 
-        res = HttpResponse(content_type="image/png")
+        if 'image/webp' in request.META.get('HTTP_ACCEPT', ''):
+            img.save(output, format='WEBP')
+            res = HttpResponse(content_type="image/webp")
+        else:
+            img.save(output, format='PNG')
+            res = HttpResponse(content_type="image/png")
+
         res['Content-Disposition'] = 'inline'
         res.write(output.getvalue())
         output.close()
