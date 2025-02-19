@@ -60,7 +60,6 @@ WebODM runs best on Linux, but works well on Windows and Mac too. If you are tec
 
 WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
 
-
 ## Manual installation (Docker)
 To install WebODM manually on your machine with docker:
 
@@ -127,6 +126,18 @@ If you don't need the default "node-odm-1" node, simply pass `--default-nodes 0`
 `./webodm.sh restart --default-nodes 0`.
 
 Then from the web interface simply manually remove the "node-odm-1" node.
+
+## Distributed Installation Using NAS (Qnap)
+If you use lightning or another processor node the requirements for WebODM are low enough for it to run on a fairly low power device such as a NAS. Testing has been done on a Qnap-TS264 with 32Gb of RAM (Celeron  N5095 processor)
+To install WebODM on a Qnap NAS:-
+1) Enable ssh access to the NAS in control panel
+2) Install git. This might be easily achieved using the [qgit qkpg](https://www.myqnap.org/product/qgit/)
+3) Now follow the “Installation with Docker” instructions above.
+4) A new "webodm" application should appear in container station along with four individual containers for the app.
+5) Webodm should be available at port 8000 of the NAS.
+6) Setup a lightning account online and configure it within "processing nodes". It's also possible to setup a more powerful computer to run processing tasks instead of lightning.
+   
+This method of working may be useful if using the WebODM Lightning PAYG model as it offers somewhere to host your models outwith the three day window offered as part of PAYG
 
 ### Enable MicMac
 
