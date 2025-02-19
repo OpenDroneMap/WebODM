@@ -33,7 +33,7 @@ class Setting(models.Model):
     theme = models.ForeignKey(Theme, blank=False, null=False, on_delete=models.DO_NOTHING, verbose_name=_("Theme"),
                               help_text=_("Active theme"))
     slogan = models.CharField(max_length=255, blank=True, null=True, help_text=_("A slogan for your application to show on the login page"),
-                              verbose_name=_("Slogan"))
+                              verbose_name=_("Slogan"), default="A user-friendly, commercial grade software for drone image processing.")
 
     def __init__(self, *args, **kwargs):
         super(Setting, self).__init__(*args, **kwargs)
