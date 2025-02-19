@@ -173,7 +173,7 @@ class TaskListItem extends React.Component {
   }
 
   thumbnailUrl = () => {
-    return `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/thumbnail?size=192`;  
+    return `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/thumbnail?size=156`;  
   }
 
   hoursMinutesSecs(t){
@@ -434,6 +434,10 @@ class TaskListItem extends React.Component {
     this.setState({thumbLoadFailed: true});
   }
 
+  handleThumbLoad = e => {
+    console.log("LOADED")
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -618,7 +622,7 @@ class TaskListItem extends React.Component {
               {!this.state.thumbLoadFailed && task.status === statusCodes.COMPLETED ? 
               <div className="col-md-3 col-sm-2 text-center">
                 <a href={`/map/project/${task.project}/task/${task.id}/`}>
-                  <img onError={this.handleThumbError} className="task-thumbnail" src={this.thumbnailUrl()} alt={_("Thumbnail")}/>
+                  <img onLoad={this.handleThumbLoad} onError={this.handleThumbError} className="task-thumbnail" src={this.thumbnailUrl()} alt={_("Thumbnail")}/>
                 </a>
               </div> : ""}
               

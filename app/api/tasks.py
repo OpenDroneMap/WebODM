@@ -466,8 +466,15 @@ class TaskThumbnail(TaskNestedView):
             
             if ColorInterp.alpha in ci:
                 indexes += (ci.index(ColorInterp.alpha) + 1, )
+            
+            w = raster.width
+            h = raster.height
+            d = max(w, h)
+            dw = (d - w) // 2
+            dh = (d - h) // 2
+            win = rasterio.windows.Window(-dw, -dh, d, d)
 
-            img = raster.read(indexes=indexes, boundless=True, fill_value=255, out_shape=(
+            img = raster.read(indexes=indexes, window=win, boundless=True, fill_value=0, out_shape=(
                 len(indexes),
                 thumb_size,
                 thumb_size,
