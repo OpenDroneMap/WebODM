@@ -76,11 +76,10 @@ class NewTaskPanel extends React.Component {
   }
 
   loadAlignTasks = (bbox) => {
-    // TODO: filter by bbox
     this.setState({alignTasks: [], alignTo: "auto", loadingAlignTasks: true});
 
     this.alignTasksRequest = 
-      $.getJSON(`/api/projects/${this.props.projectId}/tasks/?ordering=-created_at&status=${statusCodes.COMPLETED}&available_assets=georeferenced_model.laz`, tasks => {
+      $.getJSON(`/api/projects/${this.props.projectId}/tasks/?ordering=-created_at&status=${statusCodes.COMPLETED}&available_assets=georeferenced_model.laz&bbox=${bbox.join(",")}`, tasks => {
         if (Array.isArray(tasks)){
           this.setState({loadingAlignTasks: false, alignTasks: tasks});
         }else{
@@ -179,7 +178,6 @@ class NewTaskPanel extends React.Component {
 
   handleImagesBboxChange = (bbox) => {
     if (this.props.showAlign){
-      console.log("TODO! Load alignment tasks that fit within", bbox);
       this.loadAlignTasks(bbox);
     }
   }

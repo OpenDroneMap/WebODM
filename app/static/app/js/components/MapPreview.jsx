@@ -226,13 +226,13 @@ _('Example:'),
   }
 
   computeBbox = exifData => {
-    // minx, maxx, miny, maxy
-    let bbox = [Infinity, -Infinity, Infinity, -Infinity];
+    // minx, miny, maxx, maxy
+    let bbox = [Infinity, Infinity, -Infinity, -Infinity];
     exifData.forEach(ed => {
       if (ed.gps){
         bbox[0] = Math.min(bbox[0], ed.gps.longitude);
-        bbox[1] = Math.max(bbox[1], ed.gps.longitude);
-        bbox[2] = Math.min(bbox[2], ed.gps.latitude);
+        bbox[1] = Math.min(bbox[1], ed.gps.latitude);
+        bbox[2] = Math.max(bbox[2], ed.gps.longitude);
         bbox[3] = Math.max(bbox[3], ed.gps.latitude);
       }
     });

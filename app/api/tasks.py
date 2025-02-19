@@ -17,6 +17,7 @@ from django.db import transaction
 from django.http import FileResponse
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
+from django.contrib.gis.geos import Polygon
 from app.vendor import zipfly
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.decorators import action
@@ -175,7 +176,15 @@ class TaskViewSet(viewsets.ViewSet):
             for a in assets:
                 query['available_assets__contains'] = "{" + a + "}"
 
-        # TODO  bounding box filtering
+        bbox = request.query_params.get('bbox')
+        if bbox is not None:
+            try:
+                xmin, ymin, xmax, ymax = [float(v) for v in bbox.split(",")]
+            except:
+                raise exceptions.ValidationError("Invalid bbox parameter")   
+
+            geom = Polygon.from_bbox((xmin, ymin, xmax, ymax))
+            query['orthophoto_extent__intersects'] = geom
 
         tasks = self.queryset.filter(**query)
         tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
