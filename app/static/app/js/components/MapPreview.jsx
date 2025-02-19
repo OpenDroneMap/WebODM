@@ -527,7 +527,35 @@ _('Example:'),
   }
 
   setAlignmentPolygon = (task) => {
-    console.log(task.extent)
+    if (this.alignPoly){
+      this.map.removeLayer(this.alignPoly);
+      this.alignPoly = null;
+    }
+
+    if (!task || !task.extent){
+      if (this.imagesGroup) this.map.fitBounds(this.imagesGroup.getBounds());
+      return;
+    }
+
+    const [xmin, ymin, xmax, ymax] = task.extent;
+    
+    this.alignPoly = L.polygon([
+      [ymin, xmin],
+      [ymax, xmin],
+      [ymax, xmax],
+      [ymin, xmax],
+      [ymin, xmin]
+    ], {
+      clickable: true,
+      weight: 3,
+      opacity: 0.9,
+      color: "#808f9b",
+      fillColor: "#808f9b",
+      fillOpacity: 0.2
+    }).bindPopup(task.name).addTo(this.map);
+
+    this.alignPoly.bringToBack();
+    this.map.fitBounds(this.alignPoly.getBounds());
   }
 
   download = format => {
