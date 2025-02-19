@@ -96,8 +96,7 @@ class TaskViewSet(viewsets.ViewSet):
     
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
-    filter_fields = ('status', ) # TODO: add filter fields
-
+    
     def get_permissions(self):
         """
         Instantiates and returns the list of permissions that this view requires.
@@ -159,7 +158,26 @@ class TaskViewSet(viewsets.ViewSet):
 
     def list(self, request, project_pk=None):
         get_and_check_project(request, project_pk)
-        tasks = self.queryset.filter(project=project_pk)
+        query = {
+            'project': project_pk
+        }
+
+        status = request.query_params.get('status')
+        if status is not None:
+            try:
+                query['status'] = int(status)
+            except ValueError:
+                raise exceptions.ValidationError("Invalid status parameter")   
+
+        available_assets = request.query_params.get('available_assets')
+        if available_assets is not None:
+            assets = [a.strip() for a in available_assets.split(",") if a.strip() != ""]
+            for a in assets:
+                query['available_assets__contains'] = "{" + a + "}"
+
+        # TODO  bounding box filtering
+
+        tasks = self.queryset.filter(**query)
         tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)

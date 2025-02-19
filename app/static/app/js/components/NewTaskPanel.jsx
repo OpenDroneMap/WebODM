@@ -76,13 +76,13 @@ class NewTaskPanel extends React.Component {
   }
 
   loadAlignTasks = (bbox) => {
-    // TODO: filter by status on server
+    // TODO: filter by bbox
     this.setState({alignTasks: [], alignTo: "auto", loadingAlignTasks: true});
 
     this.alignTasksRequest = 
-      $.getJSON(`/api/projects/${this.props.projectId}/tasks/?ordering=-created_at`, tasks => {
+      $.getJSON(`/api/projects/${this.props.projectId}/tasks/?ordering=-created_at&status=${statusCodes.COMPLETED}&available_assets=georeferenced_model.laz`, tasks => {
         if (Array.isArray(tasks)){
-          this.setState({loadingAlignTasks: false, alignTasks: tasks.filter(t => t.status === statusCodes.COMPLETED && t.available_assets.indexOf("georeferenced_model.laz") !== -1)});
+          this.setState({loadingAlignTasks: false, alignTasks: tasks});
         }else{
           this.setState({loadingAlignTasks: false});
         }
