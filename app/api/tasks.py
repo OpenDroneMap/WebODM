@@ -52,6 +52,7 @@ class TaskSerializer(serializers.ModelSerializer):
     processing_node_name = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
     statistics = serializers.SerializerMethodField()
+    extent = serializers.SerializerMethodField()
     tags = TagsField(required=False)
 
     def get_processing_node_name(self, obj):
@@ -82,6 +83,16 @@ class TaskSerializer(serializers.ModelSerializer):
 
         return []
 
+    def get_extent(self, obj):
+        if obj.orthophoto_extent is not None:
+            return obj.orthophoto_extent.extent
+        elif obj.dsm_extent is not None:
+            return obj.dsm_extent.extent
+        elif obj.dtm_extent is not None:
+            return obj.dsm_extent.extent
+        else:
+            return None
+
     class Meta:
         model = models.Task
         exclude = ('orthophoto_extent', 'dsm_extent', 'dtm_extent', )
@@ -93,7 +104,7 @@ class TaskViewSet(viewsets.ViewSet):
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dsm_extent', 'dtm_extent', )
+    queryset = models.Task.objects.all().defer('dsm_extent', 'dtm_extent', )
     
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'

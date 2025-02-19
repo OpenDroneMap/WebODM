@@ -184,6 +184,13 @@ class NewTaskPanel extends React.Component {
 
   handleAlignToChanged = e => {
     this.setState({alignTo: e.target.value});
+    if (this.mapPreview){
+      if (e.target.value !== "auto"){
+        this.mapPreview.setAlignmentPolygon(this.state.alignTasks.find(t => t.id === e.target.value));
+      }else{
+        this.mapPreview.setAlignmentPolygon(null);
+      }
+    }
 
     setTimeout(() => {
         this.handleFormChanged();

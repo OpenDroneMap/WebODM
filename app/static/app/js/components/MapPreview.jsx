@@ -526,6 +526,10 @@ _('Example:'),
       }));
   }
 
+  setAlignmentPolygon = (task) => {
+    console.log(task.extent)
+  }
+
   download = format => {
     let output = "";
     let filename = `images.${format}`;
