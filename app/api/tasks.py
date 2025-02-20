@@ -24,6 +24,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Q
 
 from app import models, pending_actions
 from nodeodm import status_codes
@@ -104,7 +105,7 @@ class TaskViewSet(viewsets.ViewSet):
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all().defer('dsm_extent', 'dtm_extent', )
+    queryset = models.Task.objects.all()
     
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
@@ -170,14 +171,12 @@ class TaskViewSet(viewsets.ViewSet):
 
     def list(self, request, project_pk=None):
         get_and_check_project(request, project_pk)
-        query = {
-            'project': project_pk
-        }
+        query = Q(project=project_pk)
 
         status = request.query_params.get('status')
         if status is not None:
             try:
-                query['status'] = int(status)
+                query &= Q(status=int(status))
             except ValueError:
                 raise exceptions.ValidationError("Invalid status parameter")   
 
@@ -185,7 +184,7 @@ class TaskViewSet(viewsets.ViewSet):
         if available_assets is not None:
             assets = [a.strip() for a in available_assets.split(",") if a.strip() != ""]
             for a in assets:
-                query['available_assets__contains'] = "{" + a + "}"
+                query &= Q(available_assets__contains="{" + a + "}")
 
         bbox = request.query_params.get('bbox')
         if bbox is not None:
@@ -195,9 +194,11 @@ class TaskViewSet(viewsets.ViewSet):
                 raise exceptions.ValidationError("Invalid bbox parameter")   
 
             geom = Polygon.from_bbox((xmin, ymin, xmax, ymax))
-            query['orthophoto_extent__intersects'] = geom
+            query &= Q(orthophoto_extent__intersects=geom) | \
+                     Q(dsm_extent__intersects=geom) | \
+                     Q(dtm_extent__intersects=geom)
 
-        tasks = self.queryset.filter(**query)
+        tasks = self.queryset.filter(query)
         tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
@@ -457,9 +458,11 @@ class TaskThumbnail(TaskNestedView):
         if orthophoto_path is None:
             raise exceptions.NotFound()
 
-        thumb_size = int(self.request.query_params.get('size', 512))
-        if thumb_size < 1 or thumb_size > 2048:
-            raise exceptions.ValidationError("Invalid query parameters")            
+        thumb_size = 256
+        try:
+            thumb_size = max(1, min(1024, int(request.query_params.get('size', 256))))
+        except ValueError:
+            pass
 
         with rasterio.open(orthophoto_path, "r") as raster:
             ci = raster.colorinterp

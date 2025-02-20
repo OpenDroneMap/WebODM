@@ -173,7 +173,7 @@ class TaskListItem extends React.Component {
   }
 
   thumbnailUrl = () => {
-    return `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/thumbnail?size=156`;  
+    return `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/thumbnail?size=164`;  
   }
 
   hoursMinutesSecs(t){
