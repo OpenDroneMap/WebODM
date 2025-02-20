@@ -1,48 +1,39 @@
-{% extends 'registration/registration_base_login.html' %}
+{% extends 'registration/registration_base.html' %}
 {% load i18n %}
 {% load settings %}
 
-{% block registration_content %}
-    {% if form.errors %}
-        <div class="alert alert-warning">
-            <p>
-                <strong>{% trans "Invalid credentials." %}</strong> {% trans "Note that both fields are case-sensitive." %}
-            </p>
-        </div>
-    {% endif %}
+{% block body %}
+    {% block registration_content %}
+        {% is_single_user_mode as autologin %}
+        {% has_external_auth as ext_auth %}
+        {% reset_password_link as reset_pwd_link %}
 
-    {% is_single_user_mode as autologin %}
-    {% has_external_auth as ext_auth %}
-    {% reset_password_link as reset_pwd_link %}
+        {% if autologin %}
+            <script>location.href = '/';</script>
+        {% else %}
 
-    {% if autologin %}
-        <script>location.href = '/';</script>
-    {% else %}
-
-        <div class="container-fluid full-height">
-            <div class="row" style="height: 100%; margin: 0;">
-                <div id="column-left" class="col-md-6 col-sm-6" style="padding: 0">
-                    <div style="display: table; height: 100vh; width: 100%;">
-                        <div style="display: table-cell; vertical-align: middle; text-align: center;">
-                            <img src="{% settings_image_url 'app_logo' %}" alt="Logo"
-                                 style="max-width: {{ SETTINGS.app_logo_size }}px; display: block; margin: 0 auto;"/>
-                            <h1 id="slogan-text" style="">{{ SETTINGS.app_name }}</h1>
-                            <h3 id="slogan-text" style="">{{ SETTINGS.slogan }}</h3>
-                        </div>
+            <div class="container-fluid">
+                <div class="row text-center">
+                    <div class="col-sm-6 login-column-left">
+                        <img src="{% settings_image_url 'app_logo' %}" class="img-responsive" alt="Image">
+                        <h1>{{ SETTINGS.app_name }}</h1>
+                        {% if SETTINGS.slogan %}
+                            <h3>{{ SETTINGS.slogan }}</h3>
+                        {% endif %}
                     </div>
-                </div>
-                <div class="col-md-6 col-sm-6" style="padding: 0; background-color: #fff;">
-                    <div style="display: table; height: 100%; width: 100%;">
-                        <div style="display: table-cell; vertical-align: middle;">
-                            <h3 style="max-width: 300px; margin: 0 auto; text-align: left; margin-bottom: 20px;">
-                                {% trans "Log in" %}
-                            </h3>
-
+                    <div class="col-sm-6 login-column-right">
+                        <div class="login-form-container">
+                            <h2>{% trans "Log in" %}</h2>
+                            {% if form.errors %}
+                                <div class="alert alert-warning">
+                                    <p>
+                                        <strong>{% trans "Invalid credentials." %}</strong> {% trans "Note that both fields are case-sensitive." %}
+                                    </p>
+                                </div>
+                            {% endif %}
                             <form id="loginForm" {% if ext_auth %} style="display: none" {% endif %}
-                                  style="max-width: 300px; margin: 0 auto;"
                                   action="{% url 'login' %}"
-                                  method="post" role="form">{% csrf_token %}
-
+                                  method="post" class="form-horizontal" role="form">{% csrf_token %}
                                 {% for field in form %}
                                     {% include 'registration/form_field.html' %}
                                 {% endfor %}
@@ -52,12 +43,13 @@
                                     var value = new URLSearchParams(new URL(window.location.href).search).get('next');
                                     if (value) loginNext.value = value;
                                 </script>
-                                <div style="text-align: right;">
-                                    <button type="submit" class="btn btn-default">{% trans 'Log in' %}</button>
+                                <div class="form-group text-right">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <button type="submit" class="btn btn-default">{% trans 'Log in' %}</button>
+                                    </div>
                                     <div class="top-buffer col-sm-offset-2 col-sm-10">
                                         {% if reset_pwd_link != '' %}
-                                            <p>
-                                                <a href="{{ reset_pwd_link }}">{% trans "Forgot your password?" %}</a>
+                                            <p><a href="{{ reset_pwd_link }}">{% trans "Forgot your password?" %}</a>
                                             </p>
                                         {% else %}
                                             <p>
@@ -83,56 +75,55 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        {% if ext_auth %}
-            <div class="text-center" id="authLoading">
-                <i class="fa fa-spin fa-circle-notch fa-spin fa-fw fa-2x"></i>
-            </div>
-            <script>
-                function getAutoLoginCookie() {
-                    var value = "; " + document.cookie;
-                    var parts = value.split("; autologin=");
-                    if (parts.length === 2) return parts.pop().split(';').shift();
-                }
-
-                function delAutoLoginCookie() {
-                    var domain = getAutoLoginCookie();
-                    document.cookie = 'autologin=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Domain=' + domain + ';';
-                }
-
-                function showLoginForm() {
-                    $("#authLoading").hide();
-                    $("#loginForm").show();
-                }
-
-                $(function () {
-                    if (getAutoLoginCookie() !== undefined) {
-                        $.ajax({
-                            url: "/api/external-token-auth/",
-                            type: "POST",
-                            xhrFields: {
-                                withCredentials: true
-                            },
-                        }).done(function (res) {
-                            delAutoLoginCookie();
-                            if (res.redirect) {
-                                location.href = res.redirect;
-                            } else {
-                                if (res.error) console.error(res.error);
-                                showLoginForm();
-                            }
-                        }).fail(function () {
-                            delAutoLoginCookie();
-                            showLoginForm();
-                            console.error("Auto login failed");
-                        });
-                    } else {
-                        showLoginForm();
+            {% if ext_auth %}
+                <div class="text-center" id="authLoading">
+                    <i class="fa fa-spin fa-circle-notch fa-spin fa-fw fa-2x"></i>
+                </div>
+                <script>
+                    function getAutoLoginCookie() {
+                        var value = "; " + document.cookie;
+                        var parts = value.split("; autologin=");
+                        if (parts.length === 2) return parts.pop().split(';').shift();
                     }
-                });
-            </script>
-        {% endif %}
 
-    {% endif %}
+                    function delAutoLoginCookie() {
+                        var domain = getAutoLoginCookie();
+                        document.cookie = 'autologin=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Domain=' + domain + ';';
+                    }
+
+                    function showLoginForm() {
+                        $("#authLoading").hide();
+                        $("#loginForm").show();
+                    }
+
+                    $(function () {
+                        if (getAutoLoginCookie() !== undefined) {
+                            $.ajax({
+                                url: "/api/external-token-auth/",
+                                type: "POST",
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                            }).done(function (res) {
+                                delAutoLoginCookie();
+                                if (res.redirect) {
+                                    location.href = res.redirect;
+                                } else {
+                                    if (res.error) console.error(res.error);
+                                    showLoginForm();
+                                }
+                            }).fail(function () {
+                                delAutoLoginCookie();
+                                showLoginForm();
+                                console.error("Auto login failed");
+                            });
+                        } else {
+                            showLoginForm();
+                        }
+                    });
+                </script>
+            {% endif %}
+        {% endif %}
+    {% endblock %}
 {% endblock %}

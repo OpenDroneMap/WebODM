@@ -35,8 +35,6 @@ class Setting(models.Model):
     slogan = models.CharField(max_length=255, blank=True, null=True, help_text=_("A slogan for your application to show on the login page"),
                               verbose_name=_("Slogan"), default="A user-friendly, commercial grade software for drone image processing.")
 
-    app_logo_size = models.IntegerField(default=307, blank=False, null=False, help_text=_("The size of the logo in pixels"), verbose_name=_("App logo size"))
-
     def __init__(self, *args, **kwargs):
         super(Setting, self).__init__(*args, **kwargs)
 

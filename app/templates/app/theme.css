@@ -192,12 +192,6 @@ a, a:hover, a:focus{
 #navbar-top{
 	background-color: {{ theme_header_background }};
 }
-#column-left{
-	background-color: {{ theme_header_background }};
-}
-#slogan-text{
-    color: {{ theme_header_primary }};
-}
 
 /* Header primary */
 .navbar-default .navbar-link,
@@ -360,4 +354,58 @@ pre.prettyprint:focus,
 	animation-iteration-count: infinite;
 	animation-timing-function: linear;
 	animation-name: placeHolderPulse;
+}
+
+/* Login page */
+.login-column-left {
+            background-color: {{ theme_header_background }};
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+			justify-content: center;
+        }
+
+.login-column-left h3,h1 {
+            color: {{theme_header_primary }};
+        }
+
+ .login-column-right {
+            height: 100vh;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+ }
+
+ .login-column-left img {
+            width: 60% !important;
+            align-self: center;
+ }
+
+ .login-form-container {
+            width: 50%;
+            margin: 0 auto;
+}
+
+.login-form-container h2 {
+            margin-bottom: 20px;
+}
+
+
+@media (max-width: 768px) {
+    .col-sm-6.login-column-left {
+                height: 30%;
+    }
+
+.login-column-right {
+    height: 70%;
+}
+
+.login-column-left img {
+    width: 45% !important;
+}
+
+.login-form-container {
+    width: 85%;
+    }
 }

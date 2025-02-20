@@ -1,26 +1,22 @@
 {% extends 'registration/login.html' %}
 {% load i18n %}
 {% load settings %}
-{% block registration_content %}
-    <div class="container-fluid full-height">
-        <div class="row" style="height: 100%; margin: 0;">
-            <div id="column-left" class="col-md-6 col-sm-6" style="padding: 0">
-                    <div style="display: table; height: 100vh; width: 100%;">
-                        <div style="display: table-cell; vertical-align: middle; text-align: center;">
-                            <img src="{% settings_image_url 'app_logo' %}" alt="Logo"
-                                 style="max-width: {{ SETTINGS.app_logo_size }}px; display: block; margin: 0 auto;"/>
-                            <h1 id="slogan-text" style="">{{ SETTINGS.app_name }}</h1>
-                            <h3 id="slogan-text" style="">{{ SETTINGS.slogan }}</h3>
-                        </div>
-                    </div>
+
+{% block body %}
+    {% block registration_content %}
+        <div class="container-fluid">
+            <div class="row text-center">
+                <div class="col-sm-6 login-column-left">
+                    <img src="{% settings_image_url 'app_logo' %}" class="img-responsive" alt="Image">
+                    <h1>{{ SETTINGS.app_name }}</h1>
+                    {% if SETTINGS.slogan %}
+                        <h3>{{ SETTINGS.slogan }}</h3>
+                    {% endif %}
                 </div>
-            <div class="col-md-6" style="padding: 0; background-color: #fff;">
-                <div style="display: table; height: 100%; width: 100%;">
-                    <div style="display: table-cell; vertical-align: middle;">
-                        <h3 style="max-width: 300px; margin: 0 auto; text-align: left; margin-bottom: 20px;">
-                            {% trans "You have been logged out." %}
-                        </h3>
-                        <div style="text-align: center;">
+                <div class="col-sm-6 login-column-right">
+                    <div class="form-container">
+                        <h2>{% trans "You have been logged out." %}</h2>
+                        <div class="form-group text-center">
                             <a href="{% url 'login' %}">{% trans 'Log in' %}</a>
                         </div>
 
@@ -28,5 +24,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    {% endblock %}
 {% endblock %}
