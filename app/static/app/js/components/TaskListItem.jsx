@@ -434,6 +434,20 @@ class TaskListItem extends React.Component {
     this.setState({thumbLoadFailed: true});
   }
 
+  spatialRefsToHuman = (refs) => {
+    if (refs.indexOf("alignment") !== -1) return _("Alignment");
+
+    let out = [];
+    if (refs.indexOf("gps") !== -1){
+      out.push(_("GPS"));
+    }
+    if (refs.indexOf("gcp") !== -1){
+      out.push(_("GCP"));
+    }
+
+    return out.join("/");
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -595,6 +609,11 @@ class TaskListItem extends React.Component {
                     <tr>
                       <td><strong>{_("Reconstructed Points:")}</strong></td>
                       <td>{stats.pointcloud.points.toLocaleString()}</td>
+                    </tr>}
+                    {stats && stats.spatial_refs && stats.spatial_refs.length &&
+                    <tr>
+                      <td><strong>{_("Spatial Reference:")}</strong></td>
+                      <td>{this.spatialRefsToHuman(stats.spatial_refs)}</td>
                     </tr>}
                     {task.size > 0 && 
                     <tr>

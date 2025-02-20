@@ -411,7 +411,15 @@ class Task(models.Model):
                 points = j.get('point_cloud_statistics', {}).get('stats', {}).get('statistic', [{}])[0].get('count')
             else:
                 points = j.get('reconstruction_statistics', {}).get('reconstructed_points_count')
-                        
+
+            spatial_refs = []
+            if j.get('reconstruction_statistics', {}).get('has_gps'):
+                spatial_refs.append("gps")
+            if j.get('reconstruction_statistics', {}).get('has_gcp') and 'average_error' in j.get('gcp_errors', {}):
+                spatial_refs.append("gcp")
+            if 'align' in j:
+                spatial_refs.append("alignment")
+
             return {
                 'pointcloud':{
                     'points': points,
@@ -420,6 +428,7 @@ class Task(models.Model):
                 'area': j.get('processing_statistics', {}).get('area'),
                 'start_date': j.get('processing_statistics', {}).get('start_date'),
                 'end_date': j.get('processing_statistics', {}).get('end_date'),
+                'spatial_refs': spatial_refs,
             }
         else:
             return {}
