@@ -66,7 +66,7 @@ export default class ExportAssetPanel extends React.Component {
         },
         'csv': {
             label: "CSV",
-            icon: "fa fa-file-text"
+            icon: "fas fa-file-alt"
         }        
     };
 

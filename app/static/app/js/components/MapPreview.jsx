@@ -24,12 +24,14 @@ const Colors = {
 class MapPreview extends React.Component {
   static defaultProps = {
     getFiles: null,
-    onPolygonChange: () => {}
+    onPolygonChange: () => {},
+    onImagesBboxChanged: () => {}
   };
     
   static propTypes = {
     getFiles: PropTypes.func.isRequired,
-    onPolygonChange: PropTypes.func
+    onPolygonChange: PropTypes.func,
+    onImagesBboxChanged: PropTypes.func
   };
 
   constructor(props) {
@@ -214,11 +216,27 @@ _('Example:'),
         this.map.fitBounds(this.imagesGroup.getBounds());
       }
 
+      this.props.onImagesBboxChanged(this.computeBbox(this.exifData));
+
       this.setState({showLoading: false});
 
     }).catch(e => {
       this.setState({showLoading: false, error: e.message});
     });
+  }
+
+  computeBbox = exifData => {
+    // minx, miny, maxx, maxy
+    let bbox = [Infinity, Infinity, -Infinity, -Infinity];
+    exifData.forEach(ed => {
+      if (ed.gps){
+        bbox[0] = Math.min(bbox[0], ed.gps.longitude);
+        bbox[1] = Math.min(bbox[1], ed.gps.latitude);
+        bbox[2] = Math.max(bbox[2], ed.gps.longitude);
+        bbox[3] = Math.max(bbox[3], ed.gps.latitude);
+      }
+    });
+    return bbox;
   }
 
   readExifData = () => {
@@ -508,9 +526,45 @@ _('Example:'),
       }));
   }
 
+  setAlignmentPolygon = (task) => {
+    if (this.alignPoly){
+      this.map.removeLayer(this.alignPoly);
+      this.alignPoly = null;
+    }
+
+    if (!task || !task.extent){
+      if (this.imagesGroup) this.map.fitBounds(this.imagesGroup.getBounds());
+      return;
+    }
+
+    const [xmin, ymin, xmax, ymax] = task.extent;
+    
+    this.alignPoly = L.polygon([
+      [ymin, xmin],
+      [ymax, xmin],
+      [ymax, xmax],
+      [ymin, xmax],
+      [ymin, xmin]
+    ], {
+      clickable: true,
+      weight: 3,
+      opacity: 0.9,
+      color: "#808f9b",
+      fillColor: "#808f9b",
+      fillOpacity: 0.2
+    }).bindPopup(task.name).addTo(this.map);
+
+    this.alignPoly.bringToBack();
+    this.map.fitBounds(this.alignPoly.getBounds());
+  }
+
   download = format => {
     let output = "";
     let filename = `images.${format}`;
+    if (format === "geo"){
+      filename = "geo.txt";
+    }
+
     const feats = {
       type: "FeatureCollection",
       features: this.exifData.map(ed => {
@@ -537,6 +591,10 @@ _('Example:'),
     }else if (format === 'csv'){
       output = `Filename,Timestamp,Latitude,Longitude,Altitude\r\n${feats.features.map(feat => {
         return `${feat.properties.Filename},${feat.properties.Timestamp},${feat.geometry.coordinates[1]},${feat.geometry.coordinates[0]},${feat.geometry.coordinates[2]}`
+      }).join("\r\n")}`;
+    }else if (format === 'geo'){
+      output = `EPSG:4326\r\n${feats.features.map(feat => {
+        return `${feat.properties.Filename} ${feat.geometry.coordinates[0]} ${feat.geometry.coordinates[1]} ${feat.geometry.coordinates[2]}`
       }).join("\r\n")}`;
     }else{
       console.error("Invalid format");
@@ -567,8 +625,9 @@ _('Example:'),
           </button>
           <ul className="dropdown-menu">
             <li>
-              <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> GeoJSON</a>
-              <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> CSV</a>
+              <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> {_("GeoJSON")}</a>
+              <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> {_("CSV")}</a>
+              <a href="javascript:void(0);" onClick={() => this.download('geo')}><i className="fas fa-file-alt fa-fw"></i> {_("Geolocation File")}</a>
             </li>
           </ul>
         </div> : ""}

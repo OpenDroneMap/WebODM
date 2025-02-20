@@ -4,6 +4,11 @@ import shutil
 from wsgiref.util import FileWrapper
 
 import mimetypes
+import rasterio
+from rasterio.enums import ColorInterp
+from PIL import Image
+import io
+import numpy as np
 
 from shutil import copyfileobj, move
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
@@ -12,12 +17,14 @@ from django.db import transaction
 from django.http import FileResponse
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
+from django.contrib.gis.geos import Polygon
 from app.vendor import zipfly
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Q
 
 from app import models, pending_actions
 from nodeodm import status_codes
@@ -46,6 +53,7 @@ class TaskSerializer(serializers.ModelSerializer):
     processing_node_name = serializers.SerializerMethodField()
     can_rerun_from = serializers.SerializerMethodField()
     statistics = serializers.SerializerMethodField()
+    extent = serializers.SerializerMethodField()
     tags = TagsField(required=False)
 
     def get_processing_node_name(self, obj):
@@ -76,6 +84,16 @@ class TaskSerializer(serializers.ModelSerializer):
 
         return []
 
+    def get_extent(self, obj):
+        if obj.orthophoto_extent is not None:
+            return obj.orthophoto_extent.extent
+        elif obj.dsm_extent is not None:
+            return obj.dsm_extent.extent
+        elif obj.dtm_extent is not None:
+            return obj.dsm_extent.extent
+        else:
+            return None
+
     class Meta:
         model = models.Task
         exclude = ('orthophoto_extent', 'dsm_extent', 'dtm_extent', )
@@ -87,11 +105,11 @@ class TaskViewSet(viewsets.ViewSet):
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dsm_extent', 'dtm_extent', )
+    queryset = models.Task.objects.all()
     
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
-
+    
     def get_permissions(self):
         """
         Instantiates and returns the list of permissions that this view requires.
@@ -153,7 +171,34 @@ class TaskViewSet(viewsets.ViewSet):
 
     def list(self, request, project_pk=None):
         get_and_check_project(request, project_pk)
-        tasks = self.queryset.filter(project=project_pk)
+        query = Q(project=project_pk)
+
+        status = request.query_params.get('status')
+        if status is not None:
+            try:
+                query &= Q(status=int(status))
+            except ValueError:
+                raise exceptions.ValidationError("Invalid status parameter")   
+
+        available_assets = request.query_params.get('available_assets')
+        if available_assets is not None:
+            assets = [a.strip() for a in available_assets.split(",") if a.strip() != ""]
+            for a in assets:
+                query &= Q(available_assets__contains="{" + a + "}")
+
+        bbox = request.query_params.get('bbox')
+        if bbox is not None:
+            try:
+                xmin, ymin, xmax, ymax = [float(v) for v in bbox.split(",")]
+            except:
+                raise exceptions.ValidationError("Invalid bbox parameter")   
+
+            geom = Polygon.from_bbox((xmin, ymin, xmax, ymax))
+            query &= Q(orthophoto_extent__intersects=geom) | \
+                     Q(dsm_extent__intersects=geom) | \
+                     Q(dtm_extent__intersects=geom)
+
+        tasks = self.queryset.filter(query)
         tasks = filters.OrderingFilter().filter_queryset(self.request, tasks, self)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
@@ -234,15 +279,29 @@ class TaskViewSet(viewsets.ViewSet):
             return Response({'success': True, 'task': TaskSerializer(new_task).data}, status=status.HTTP_200_OK)
         else:
             return Response({'error': _("Cannot duplicate task")}, status=status.HTTP_200_OK)
-
+    
     def create(self, request, project_pk=None):
         project = get_and_check_project(request, project_pk, ('change_project', ))
 
+        # Check if an alignment field is set to a valid task
+        # this means a user wants to align this task with another
+        align_to = request.data.get('align_to')
+        align_task = None
+        if align_to is not None and align_to != "auto" and align_to != "":
+            try:
+                align_task = models.Task.objects.get(pk=align_to)
+                get_and_check_project(request, align_task.project.id, ('view_project', ))
+            except ObjectDoesNotExist:
+                raise exceptions.ValidationError(detail=_("Cannot create task, alignment task is not valid"))
+        
         # If this is a partial task, we're going to upload images later
         # for now we just create a placeholder task.
         if request.data.get('partial'):
             task = models.Task.objects.create(project=project,
                                               pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
+            if align_task is not None:
+                task.set_alignment_file_from(align_task)
+            
             serializer = TaskSerializer(task, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -255,7 +314,8 @@ class TaskViewSet(viewsets.ViewSet):
             with transaction.atomic():
                 task = models.Task.objects.create(project=project,
                                                   pending_action=pending_actions.RESIZE if 'resize_to' in request.data else None)
-
+                if align_task is not None:
+                    task.set_alignment_file_from(align_task)
                 task.handle_images_upload(files)
                 task.images_count = len(task.scan_images())
 
@@ -386,6 +446,85 @@ class TaskDownloads(TaskNestedView):
             return download_file_stream(request, asset_fs, 'attachment', download_filename=download_filename)
         else:
             return download_file_response(request, asset_fs, 'attachment', download_filename=download_filename)
+
+
+class TaskThumbnail(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Generate a thumbnail on the fly for a particular task
+        """
+        task = self.get_and_check_task(request, pk)
+        orthophoto_path = task.get_check_file_asset_path("orthophoto.tif")
+        if orthophoto_path is None:
+            raise exceptions.NotFound()
+
+        thumb_size = 256
+        try:
+            thumb_size = max(1, min(1024, int(request.query_params.get('size', 256))))
+        except ValueError:
+            pass
+
+        with rasterio.open(orthophoto_path, "r") as raster:
+            ci = raster.colorinterp
+            indexes = (1, 2, 3,)
+
+            # More than 4 bands?
+            if len(ci) > 4:
+                # Try to find RGBA band order
+                if ColorInterp.red in ci and \
+                        ColorInterp.green in ci and \
+                        ColorInterp.blue in ci:
+                    indexes = (ci.index(ColorInterp.red) + 1,
+                                ci.index(ColorInterp.green) + 1,
+                                ci.index(ColorInterp.blue) + 1,)
+            elif len(ci) < 3:
+                 raise exceptions.NotFound()
+            
+            if ColorInterp.alpha in ci:
+                indexes += (ci.index(ColorInterp.alpha) + 1, )
+            
+            w = raster.width
+            h = raster.height
+            d = max(w, h)
+            dw = (d - w) // 2
+            dh = (d - h) // 2
+            win = rasterio.windows.Window(-dw, -dh, d, d)
+
+            img = raster.read(indexes=indexes, window=win, boundless=True, fill_value=0, out_shape=(
+                len(indexes),
+                thumb_size,
+                thumb_size,
+            ), resampling=rasterio.enums.Resampling.nearest).transpose((1, 2, 0))
+        
+        if img.dtype != np.uint8:
+            img = img.astype(np.float32)
+            
+            # Ignore alpha values
+            minval = img[:,:,:3].min()
+            maxval = img[:,:,:3].max()
+
+            if minval != maxval:
+                img[:,:,:3] -= minval
+                img[:,:,:3] *= (255.0/(maxval-minval))
+            
+            img = img.astype(np.uint8)
+
+        img = Image.fromarray(img)
+        output = io.BytesIO()
+
+        if 'image/webp' in request.META.get('HTTP_ACCEPT', ''):
+            img.save(output, format='WEBP')
+            res = HttpResponse(content_type="image/webp")
+        else:
+            img.save(output, format='PNG')
+            res = HttpResponse(content_type="image/png")
+
+        res['Content-Disposition'] = 'inline'
+        res.write(output.getvalue())
+        output.close()
+
+        return res
+
 
 """
 Raw access to the task's asset folder resources
