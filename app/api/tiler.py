@@ -524,7 +524,7 @@ class Export(TaskNestedView):
         epsg = request.data.get('epsg')
         color_map = request.data.get('color_map')
         hillshade = request.data.get('hillshade')
-        resample = request.data.get('resample')
+        resample = request.data.get('resample', 0)
 
         if formula == '': formula = None
         if bands == '': bands = None
@@ -532,7 +532,7 @@ class Export(TaskNestedView):
         if epsg == '': epsg = None
         if color_map == '': color_map = None
         if hillshade == '': hillshade = None
-        if resample == '': resample = None
+        if resample == '': resample = 0
 
         expr = None
 
