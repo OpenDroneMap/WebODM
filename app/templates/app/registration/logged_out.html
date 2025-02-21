@@ -1,7 +1,28 @@
 {% extends 'registration/login.html' %}
 {% load i18n %}
+{% load settings %}
 
-{% block registration_content %}
-    <h3>{% trans "You have been logged out." %}</h3>
-    <p><a href="{% url 'login' %}">{% trans 'Log In' %}</a></p>
+{% block body %}
+    {% block registration_content %}
+        <div class="container-fluid">
+            <div class="row text-center">
+                <div class="col-sm-6 login-column-left">
+                    <img src="{% settings_image_url 'app_logo' %}" class="img-responsive" alt="Image">
+                    <h1>{{ SETTINGS.app_name }}</h1>
+                    {% if SETTINGS.slogan %}
+                        <h3>{{ SETTINGS.slogan }}</h3>
+                    {% endif %}
+                </div>
+                <div class="col-sm-6 login-column-right">
+                    <div class="form-container">
+                        <h2>{% trans "You have been logged out." %}</h2>
+                        <div class="form-group text-center">
+                            <a href="{% url 'login' %}">{% trans 'Log in' %}</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
 {% endblock %}
