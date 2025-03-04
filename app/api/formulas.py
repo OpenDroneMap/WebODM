@@ -119,6 +119,11 @@ algos = {
         'expr': 'L * 100 + 27315',
         'help': _('Temperature in Centikelvin degrees.')
     },
+    'VDMI': {
+        'expr': '(N - R + ((N - G) / (N + G)) - ((N - Re) / (N + Re)) - (G + Re)) / (N + R + Re)',
+        'help': _('VDMI – Vine Disease Monitoring Index'),
+        'range': (-1, 1)
+    },
 
     # more?
 
