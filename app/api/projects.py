@@ -66,6 +66,9 @@ class ProjectFilter(filters.FilterSet):
 
         names = re.sub("\s+", " ", re.sub(user_pattern, "", re.sub(tag_pattern, "", value))).strip()
 
+        if len(users) > 0:
+            qs = qs.filter(owner__username__iexact=users[0][1:])
+        
         if len(names) > 0:
             project_name_vec = SearchVector("name")
             task_name_vec = SearchVector(StringAgg("task__name", delimiter=' '))
@@ -85,9 +88,6 @@ class ProjectFilter(filters.FilterSet):
             for t in project_tags[1:]:
                 tags_query = tags_query & SearchQuery(t)
             qs = qs.annotate(pt_search=project_tags_vec).filter(pt_search=tags_query)
-
-        if len(users) > 0:
-            qs = qs.filter(owner__username__iexact=users[0][1:])
 
         return qs.distinct()
 
