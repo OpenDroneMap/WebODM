@@ -97,11 +97,12 @@ class TestApiTags(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(3, len(res.data))
 
-        # Can search by username
+        # Can search by username and task name
         res = client.get("/api/projects/?search=@tEstUsEr%20TestTask2")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(1, len(res.data))
 
+        # Bad username
         res = client.get("/api/projects/?search=@TestTask2")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(0, len(res.data))
