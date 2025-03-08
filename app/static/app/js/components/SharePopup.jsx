@@ -120,13 +120,14 @@ class SharePopup extends React.Component{
   }
 
   showLocalLinkAlert = () => {
-    const link = Utils.absoluteUrl("/");
+    const link = new URL(Utils.absoluteUrl("/")).hostname;
     return !this.state.localLinkAlertDismissed && 
-                      (link.indexOf("localhost") !== -1 || 
-                       link.indexOf("192.168.") !== -1 || 
-                       link.indexOf("0.0.0.0") !== -1 || 
-                       link.indexOf("127.0.0.1") !== -1 || 
-                       link.indexOf("::1") !== -1);
+                      (link.indexOf("localhost") === 0 || 
+                       link.indexOf("192.168.") === 0 || 
+                       link.indexOf("0.0.0.0") === 0 || 
+                       link.indexOf("127.0.0.1") === 0 || 
+                       link.indexOf("10.") === 0 || 
+                       link.indexOf("::1") === 0);
   }
 
   hideLocalLinkAlert = () => {
