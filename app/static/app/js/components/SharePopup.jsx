@@ -189,7 +189,7 @@ class SharePopup extends React.Component{
               <div className="alert alert-warning alert-dismissable link-alert">
                 <button type="button" className="close" title={_("Dismiss")} onClick={this.hideLocalLinkAlert}><span aria-hidden="true">&times;</span></button>
                 <i className="fa fa-exclamation-triangle"></i>
-                <span dangerouslySetInnerHTML={{__html: interpolate(_("The link below is accessible only within your local network. To share it with others online, use a %(link)s"), {link: `<a href="https://github.com/OpenDroneMap/WebODM/blob/master/HOSTED.md" target="_blank">${_("hosted instance")}</a>`})}}></span>
+                <span dangerouslySetInnerHTML={{__html: interpolate(_("The link below is accessible only within your local network. To share a link with others online, use a %(service)s"), {service: `<a href="https://github.com/OpenDroneMap/WebODM/blob/master/HOSTED.md" target="_blank">${_("hosted instance")}</a>`})}}></span>
               </div>
             : ""}
             
