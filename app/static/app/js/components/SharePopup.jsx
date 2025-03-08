@@ -8,7 +8,8 @@ import QRCode from 'qrcode.react';
 import update from 'immutability-helper';
 import $ from 'jquery';
 import PluginsAPI from '../classes/plugins/API';
-import { _ } from '../classes/gettext';
+import { _, interpolate } from '../classes/gettext';
+import Storage from '../classes/Storage';
 
 class SharePopup extends React.Component{
   static propTypes = {
@@ -33,7 +34,8 @@ class SharePopup extends React.Component{
       error: "",
       showQR: false,
       linkControls: [], // coming from plugins,
-      relShareLink: this.getRelShareLink()
+      relShareLink: this.getRelShareLink(),
+      localLinkAlertDismissed: !!Storage.getItem("local_link_alert_dismissed")
     };
 
     this.handleEnableSharing = this.handleEnableSharing.bind(this);
@@ -117,6 +119,21 @@ class SharePopup extends React.Component{
     this.setState({showQR: !this.state.showQR});
   }
 
+  showLocalLinkAlert = () => {
+    const link = Utils.absoluteUrl("/");
+    return !this.state.localLinkAlertDismissed && 
+                      (link.indexOf("localhost") !== -1 || 
+                       link.indexOf("192.168.") !== -1 || 
+                       link.indexOf("0.0.0.0") !== -1 || 
+                       link.indexOf("127.0.0.1") !== -1 || 
+                       link.indexOf("::1") !== -1);
+  }
+
+  hideLocalLinkAlert = () => {
+    Storage.setItem("local_link_alert_dismissed", "1");
+    this.setState({localLinkAlertDismissed: true});
+  }
+
   render(){
     const shareLink = Utils.absoluteUrl(this.getRelShareLink());
     const iframeUrl = Utils.absoluteUrl(`public/task/${this.state.task.id}/iframe/${this.props.linksTarget}/${Utils.toSearchQuery(this.props.queryParams)}`);
@@ -168,6 +185,14 @@ class SharePopup extends React.Component{
             </div> : ""}
           </div>
           <div className={"share-links " + (this.state.task.public ? "show" : "")}>
+            {this.showLocalLinkAlert() ? 
+              <div className="alert alert-warning alert-dismissable link-alert">
+                <button type="button" className="close" title={_("Dismiss")} onClick={this.hideLocalLinkAlert}><span aria-hidden="true">&times;</span></button>
+                <i className="fa fa-exclamation-triangle"></i>
+                <span dangerouslySetInnerHTML={{__html: interpolate(_("The link below is accessible only within your local network. To share it with others online, use a %(link)s"), {link: `<a href="https://github.com/OpenDroneMap/WebODM/blob/master/HOSTED.md" target="_blank">${_("hosted instance")}</a>`})}}></span>
+              </div>
+            : ""}
+            
             <div className={"form-group " + (this.state.showQR ? "hide" : "")}>
               <label>
                 {_("Link:")}
