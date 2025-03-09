@@ -9,7 +9,7 @@ In order to share public links (accessible from anybody on the internet) you nee
 | [WebODM Lightning](https://webodm.net) | [Guide](https://docs.webodm.net/how-to/import-existing-tasks) | [Sign Up](https://webodm.net/register) | :heavy_check_mark: |
 
 
-> **Note for Commercial Service Providers:_**  To get your service listed here, please open a pull request.
+> **Note for Commercial Service Providers:**  To get your service listed here, please open a pull request.
  
 ## Self-Host
 
