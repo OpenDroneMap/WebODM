@@ -4,12 +4,12 @@ In order to share public links (accessible from anybody on the internet) you nee
 
 ## Commercial Services
 
-| Service                                | How To                                                        | Sign Up Link                           | Free To Try        |
+| Service                                | How To                                                        | Sign Up                                | Free To Try        |
 | -------------------------------------- | ------------------------------------------------------------- | -------------------------------------- | ------------------ |
 | [WebODM Lightning](https://webodm.net) | [Guide](https://docs.webodm.net/how-to/import-existing-tasks) | [Sign Up](https://webodm.net/register) | :heavy_check_mark: |
-|                                        |                                                               |                                        |                    |
 
-> **Commercial Service Providers:_**  To get your service listed here, please open a pull request.
+
+> **Note for Commercial Service Providers:_**  To get your service listed here, please open a pull request.
  
 ## Self-Host
 
