@@ -106,12 +106,12 @@ class Map extends React.Component {
     }
   }
 
-  typeToHuman = (type) => {
+  typeToHuman = (type, thermal = false) => {
       switch(type){
           case "orthophoto":
               return _("Orthophoto");
           case "plant":
-              return this.props.thermal ? _("Thermal") : _("Plant Health");
+              return thermal ? _("Thermal") : _("Plant Health");
           case "dsm":
               return _("Surface Model");
           case "dtm":
@@ -120,12 +120,12 @@ class Map extends React.Component {
       return "";
   }
 
-  typeToIcon = (type) => {
+  typeToIcon = (type, thermal = false) => {
     switch(type){
         case "orthophoto":
             return "far fa-image fa-fw"
         case "plant":
-            return this.props.thermal ? "fa fa-thermometer-half fa-fw" : "fa fa-seedling fa-fw";
+            return thermal ? "fa fa-thermometer-half fa-fw" : "fa fa-seedling fa-fw";
         case "dsm":
         case "dtm":
             return "fa fa-chart-area fa-fw";
@@ -265,8 +265,12 @@ class Map extends React.Component {
                 });
             
             // Associate metadata with this layer
-            meta.name = this.typeToHuman(type);
-            meta.icon = this.typeToIcon(type);
+            let thermal = typeof(mres) === 'object' && mres.band_descriptions && 
+                          Array.isArray(mres.band_descriptions) && mres.band_descriptions.length > 0 &&
+                          mres.band_descriptions[0].indexOf("lwir") !== -1;
+
+            meta.name = this.typeToHuman(type, this.props.thermal || thermal);
+            meta.icon = this.typeToIcon(type, this.props.thermal || thermal);
             meta.type = type;
             meta.raster = true;
             meta.autoExpand = this.taskCount === 1 && type === this.props.mapType;
