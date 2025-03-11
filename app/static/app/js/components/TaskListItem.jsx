@@ -516,7 +516,8 @@ class TaskListItem extends React.Component {
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
             task.processing_node &&
             this.props.hasPermission("change") &&
-            !imported){
+            !imported &&
+            !task.compacted){
           // By default restart reruns every pipeline
           // step from the beginning
           const rerunFrom = task.can_rerun_from.length > 1 ?
@@ -771,8 +772,8 @@ class TaskListItem extends React.Component {
         taskActions.push(
             <li key="sep" role="separator" className="divider"></li>
         );
-        
-        if (task.status === statusCodes.COMPLETED){
+
+        if (task.status === statusCodes.COMPLETED && !task.compacted){
           addTaskAction(_("Compact"), "fa fa-database", this.genActionApiCall("compact", {
               confirm: _("Compacting will free disk space by permanently deleting the original images used for processing. It will no longer be possible to restart the task. Maps and models will remain in place. Continue?"),
               defaultError: _("Cannot compact task.")

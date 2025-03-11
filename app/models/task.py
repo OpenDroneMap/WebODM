@@ -286,6 +286,8 @@ class Task(models.Model):
     tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Task tags"), verbose_name=_("Tags"))
     orthophoto_bands = fields.JSONField(default=list, blank=True, help_text=_("List of orthophoto bands"), verbose_name=_("Orthophoto Bands"))
     size = models.FloatField(default=0.0, blank=True, help_text=_("Size of the task on disk in megabytes"), verbose_name=_("Size"))
+    compacted = models.BooleanField(default=False, help_text=_("A flag indicating whether this task was compacted"), verbose_name=_("Compact"))
+    
     
     class Meta:
         verbose_name = _("Task")
@@ -1130,7 +1132,6 @@ class Task(models.Model):
         self.orthophoto_bands = bands
         if commit: self.save()
 
-
     def delete(self, using=None, keep_parents=False):
         task_id = self.id
         from app.plugins import signals as plugin_signals
@@ -1161,6 +1162,7 @@ class Task(models.Model):
             except Exception as e:
                 logger.warning(e)
 
+        self.compacted = True
         self.update_size(commit=True)
 
     def set_failure(self, error_message):
