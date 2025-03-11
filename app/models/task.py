@@ -235,6 +235,7 @@ class Task(models.Model):
         (pending_actions.RESTART, 'RESTART'),
         (pending_actions.RESIZE, 'RESIZE'),
         (pending_actions.IMPORT, 'IMPORT'),
+        (pending_actions.COMPACT, 'COMPACT'),
     )
 
     TASK_PROGRESS_LAST_VALUE = 0.85
@@ -807,6 +808,14 @@ class Task(models.Model):
 
                     # Stop right here!
                     return
+                
+                elif self.pending_action == pending_actions.COMPACT:
+                    logger.info("Compacting {}".format(self))
+                    time.sleep(2) # Purely to make sure the user sees the "compacting..." message in the UI since this is so fast
+                    self.compact()
+                    self.pending_action = None
+                    self.save()
+                    return
 
             if self.processing_node:
                 # Need to update status (first time, queued or running?)
@@ -1142,6 +1151,18 @@ class Task(models.Model):
 
         plugin_signals.task_removed.send_robust(sender=self.__class__, task_id=task_id)
 
+    def compact(self):
+        # Remove all images
+        images_path = self.task_path()
+        images = [os.path.join(images_path, i) for i in self.scan_images()]
+        for im in images:
+            try:
+                os.unlink(im)
+            except Exception as e:
+                logger.warning(e)
+
+        self.update_size(commit=True)
+
     def set_failure(self, error_message):
         logger.error("FAILURE FOR {}: {}".format(self, error_message))
         self.last_error = error_message
@@ -1157,7 +1178,8 @@ class Task(models.Model):
     def check_if_canceled(self):
         # Check if task has been canceled/removed
         if Task.objects.only("pending_action").get(pk=self.id).pending_action in [pending_actions.CANCEL,
-                                                                                  pending_actions.REMOVE]:
+                                                                                  pending_actions.REMOVE,
+                                                                                  pending_actions.COMPACT]:
             raise TaskInterruptedException()
 
     def resize_images(self):

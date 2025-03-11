@@ -461,11 +461,13 @@ class TaskListItem extends React.Component {
 
     const disabled = this.state.actionButtonsDisabled || 
                     ([pendingActions.CANCEL,
-                      pendingActions.REMOVE, 
+                      pendingActions.REMOVE,
+                      pendingActions.COMPACT,
                       pendingActions.RESTART].indexOf(task.pending_action) !== -1);
     const editable = this.props.hasPermission("change") && [statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1;
     const actionLoading = this.state.actionLoading;
-
+    const showAssetButtons = task.status === statusCodes.COMPLETED;
+    
     let expanded = "";
     if (this.state.expanded){
       let showOrthophotoMissingWarning = false,
@@ -484,7 +486,7 @@ class TaskListItem extends React.Component {
         });
       };
 
-      if (task.status === statusCodes.COMPLETED){
+      if (showAssetButtons){
         if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1){
           addActionButton(" " + _("View Map"), "btn-primary", "fa fa-globe", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
@@ -534,7 +536,7 @@ class TaskListItem extends React.Component {
       }
 
       actionButtons = (<div className="action-buttons">
-            {task.status === statusCodes.COMPLETED ?
+            {showAssetButtons ?
               <AssetDownloadButtons task={this.state.task} disabled={disabled} />
             : ""}
             {actionButtons.map(button => {
@@ -672,7 +674,6 @@ class TaskListItem extends React.Component {
             </div>
           </div>
           <div className="row clearfix">
-            <ErrorMessage bind={[this, 'actionError']} />
             {actionButtons}
           </div>
           <TaskPluginActionButtons task={task} disabled={disabled} />
@@ -734,6 +735,10 @@ class TaskListItem extends React.Component {
           type = 'neutral';
       }
 
+      if (task.pending_action === pendingActions.COMPACT){
+        statusIcon = 'fa fa-cog fa-spin fa-fw';
+      }
+
       statusLabel = getStatusLabel(status, type, progress);
     }
 
@@ -764,8 +769,15 @@ class TaskListItem extends React.Component {
 
     if (this.props.hasPermission("delete")){
         taskActions.push(
-            <li key="sep" role="separator" className="divider"></li>,
+            <li key="sep" role="separator" className="divider"></li>
         );
+        
+        if (task.status === statusCodes.COMPLETED){
+          addTaskAction(_("Compact"), "fa fa-database", this.genActionApiCall("compact", {
+              confirm: _("Compacting will free disk space by permanently deleting the original images used for processing. It will no longer be possible to restart the task. Maps and models will remain in place. Continue?"),
+              defaultError: _("Cannot compact task.")
+          }));
+        }
     
         addTaskAction(_("Delete"), "fa fa-trash", this.genActionApiCall("remove", {
             confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
@@ -816,6 +828,7 @@ class TaskListItem extends React.Component {
             : ""}
           </div>
         </div>
+        <ErrorMessage bind={[this, 'actionError']} />
         {expanded}
       </div>
     );
