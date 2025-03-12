@@ -101,6 +101,15 @@ class TestApp(BootTestCase):
         self.assertEqual(res.content.decode("utf-8").count('href="/processingnode/'), 3)
         self.assertTemplateUsed(res, 'app/dashboard.html')
 
+        # There should be an onboarding message
+        self.assertTrue('To create a map, press the' in res.content.decode("utf-8"))
+
+        # But not if we disable it
+        settings.DASHBOARD_ONBOARDING = False
+        res = c.get('/dashboard/', follow=True)
+        self.assertFalse('To create a map, press the' in res.content.decode("utf-8"))
+        settings.DASHBOARD_ONBOARDING  = True        
+
         # The API should return 3 nodes
         res = c.get('/api/processingnodes/')
         self.assertEqual(len(res.data), 3)
