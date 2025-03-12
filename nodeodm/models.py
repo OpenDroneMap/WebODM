@@ -71,7 +71,11 @@ class ProcessingNode(models.Model):
 
             self.api_version = info.version
             self.queue_count = info.task_queue_count
-            self.max_images = info.max_images
+
+            if isinstance(info.max_images, (int, float)):
+                self.max_images = max(0, info.max_images)
+            else:
+                self.max_images = None
             self.engine_version = info.engine_version
             self.engine = info.engine
 

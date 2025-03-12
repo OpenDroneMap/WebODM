@@ -963,7 +963,6 @@ class TestApiTask(BootTransactionTestCase):
             task.refresh_from_db()
             self.assertTrue(task.last_error is None)
 
-
             # Reassigning the task to another project should move its assets
             self.assertTrue(os.path.exists(full_task_directory_path(task.id, project.id)))
             self.assertTrue(len(task.scan_images()) == 2)
@@ -973,6 +972,23 @@ class TestApiTask(BootTransactionTestCase):
             task.refresh_from_db()
             self.assertFalse(os.path.exists(full_task_directory_path(task.id, project.id)))
             self.assertTrue(os.path.exists(full_task_directory_path(task.id, other_project.id)))
+
+            # Move back
+            task.project = project
+            task.save()
+            task.refresh_from_db()
+
+            # Compacting the task should remove the images
+            # but not the assets
+            self.assertTrue(len(os.listdir(task.assets_path())) > 0)
+            self.assertEqual(len(task.scan_images()), 2)
+
+            res = client.post("/api/projects/{}/tasks/{}/compact/".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            task.refresh_from_db()
+
+            self.assertTrue(len(os.listdir(task.assets_path())) > 0)
+            self.assertEqual(len(task.scan_images()), 0)            
 
         # Restart node-odm as to not generate orthophotos
         testWatch.clear()

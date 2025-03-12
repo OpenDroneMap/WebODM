@@ -24,7 +24,7 @@
 	{% else %}
 		{% include "quota.html" %}
 
-		{% if no_tasks %}
+		{% if no_tasks and onboarding %}
 			<h3>{% trans 'Welcome!' %} ☺</h3>
 			{% trans 'Select Images and GCP' as upload_images %}
 			<p>

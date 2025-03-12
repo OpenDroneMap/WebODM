@@ -396,6 +396,10 @@ DOCS_LINK = "https://docs.opendronemap.org"
 # Link to task options docs
 TASK_OPTIONS_DOCS_LINK = "https://docs.opendronemap.org/arguments/"
 
+# Whether to display onboarding instructions and 
+# automatically create a first project on first login
+DASHBOARD_ONBOARDING = True
+
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True
     EXTERNAL_AUTH_ENDPOINT = 'http://0.0.0.0:5555/auth'

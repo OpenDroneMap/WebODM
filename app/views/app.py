@@ -46,12 +46,13 @@ def dashboard(request):
         permissions.append('add_project')
     
     # Create first project automatically
-    if no_projects and 'add_project' in permissions:
+    if settings.DASHBOARD_ONBOARDING and no_projects and 'add_project' in permissions:
         Project.objects.create(owner=request.user, name=_("First Project"))
 
     return render(request, 'app/dashboard.html', {'title': _('Dashboard'),
         'no_processingnodes': no_processingnodes,
         'no_tasks': no_tasks,
+        'onboarding': settings.DASHBOARD_ONBOARDING,
         'params': {
             'permissions': json.dumps(permissions)
         }.items()

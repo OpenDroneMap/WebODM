@@ -239,7 +239,7 @@ class NewTaskPanel extends React.Component {
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
 
-            {this.state.editTaskFormLoaded && this.props.showAlign && this.state.showMapPreview ?
+            {this.state.editTaskFormLoaded && this.props.showAlign && this.state.showMapPreview && this.state.alignTasks.length > 0 ?
               <div>
                 <div className="form-group">
                   <label className="col-sm-2 control-label">{_("Alignment")}</label>

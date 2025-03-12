@@ -153,6 +153,10 @@ class TaskViewSet(viewsets.ViewSet):
     def remove(self, *args, **kwargs):
         return self.set_pending_action(pending_actions.REMOVE, *args, perms=('delete_project', ), **kwargs)
 
+    @action(detail=True, methods=['post'])
+    def compact(self, *args, **kwargs):
+        return self.set_pending_action(pending_actions.COMPACT, *args, perms=('delete_project', ), **kwargs)
+
     @action(detail=True, methods=['get'])
     def output(self, request, pk=None, project_pk=None):
         """
