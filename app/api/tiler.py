@@ -37,6 +37,12 @@ warnings.filterwarnings("ignore", category=NotGeoreferencedWarning)
 # Disable: Alpha band was removed from the output data array
 warnings.filterwarnings("ignore", category=AlphaBandWarning)
 
+# Disable: UserWarning: Warning: 'partition' will ignore the 'mask' of the MaskedArray.
+warnings.filterwarnings("ignore", category=UserWarning)
+
+# Disable: RuntimeWarning: overflow encountered in reduce
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
 for custom_colormap in custom_colormaps:
     colormap = colormap.register(custom_colormap)
 
