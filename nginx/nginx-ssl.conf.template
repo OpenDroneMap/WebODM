@@ -75,9 +75,6 @@ http {
       # redirects, we set the Host: header above already.
       proxy_redirect off;
 
-      # for streaming requests
-      proxy_buffering off;
-      
       proxy_pass http://app_server;
     }
 
