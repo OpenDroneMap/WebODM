@@ -29,6 +29,7 @@ from app.plugins.signals import task_completed, task_removed, task_removing
 from app.tests.classes import BootTransactionTestCase
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
+from guardian.shortcuts import assign_perm
 from app.testwatch import testWatch
 from .utils import start_processing_node, clear_test_media_root, catch_signal
 
@@ -71,7 +72,9 @@ class TestApiTask(BootTransactionTestCase):
 
             # Create processing node
             pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
-
+            assign_perm('view_processingnode', user, pnode)
+            assign_perm('view_processingnode', other_user, pnode)
+            
             # Verify that it's working
             self.assertTrue(pnode.api_version is not None)
 
@@ -1094,6 +1097,8 @@ class TestApiTask(BootTransactionTestCase):
         task = Task.objects.create(project=project, name="Test")
         pnode = ProcessingNode.objects.create(hostname="invalid-host", port=11223)
         another_pnode = ProcessingNode.objects.create(hostname="invalid-host-2", port=11223)
+        assign_perm('view_processingnode', project.owner, pnode)
+        assign_perm('view_processingnode', project.owner, another_pnode)
 
         # By default
         self.assertTrue(task.auto_processing_node)
@@ -1178,6 +1183,8 @@ class TestApiTask(BootTransactionTestCase):
 
         # Bring a processing node online
         pnode = ProcessingNode.objects.create(hostname="invalid-host", port=11223)
+        assign_perm('view_processingnode', user, pnode)
+
         pnode.last_refreshed = timezone.now()
         pnode.save()
         self.assertTrue(pnode.is_online())
@@ -1202,7 +1209,8 @@ class TestApiTask(BootTransactionTestCase):
             )
 
             pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
-
+            assign_perm('view_processingnode', user, pnode)
+            
             # task creation via chunked upload
             image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
             image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
