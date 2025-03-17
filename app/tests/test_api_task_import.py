@@ -40,6 +40,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Create processing node
             pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+            assign_perm('view_processingnode', user, pnode)
             client.login(username="testuser", password="test1234")
 
             # Create task
@@ -233,6 +234,8 @@ class TestApiTask(BootTransactionTestCase):
 
             # Create processing node
             pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+            assign_perm('view_processingnode', user, pnode)
+
             client.login(username="testuser", password="test1234")
 
             # Create task
