@@ -6,6 +6,11 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
     padding-bottom: 8px;
 }
 
+[data-mapview]{
+    height: calc(100vh - 100px);
+    height: calc(100dvh - 100px);
+}
+
 #public-wrapper{
     margin-left: 12px;
     margin-right: 12px;

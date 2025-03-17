@@ -53,6 +53,7 @@ http {
     }
 
     location / {
+      proxy_http_version 1.1;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
       # enable this if and only if you use HTTPS
@@ -62,6 +63,29 @@ http {
       # we don't want nginx trying to do something clever with
       # redirects, we set the Host: header above already.
       proxy_redirect off;
+
+      # for streaming requests
+      proxy_buffering off;
+      
+      proxy_pass http://app_server;
+    }
+
+    # Same as above, but adds proxy_buffering off
+    location ~* (download/.*\.zip|backup)$ {
+      proxy_http_version 1.1;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+      # enable this if and only if you use HTTPS
+      # proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header Host $http_host;
+
+      # we don't want nginx trying to do something clever with
+      # redirects, we set the Host: header above already.
+      proxy_redirect off;
+
+      # For streaming requests
+      proxy_buffering off;
+
       proxy_pass http://app_server;
     }
   }
