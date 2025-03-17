@@ -53,9 +53,11 @@ class ProcessingNode(models.Model):
             nodes = get_objects_for_user(user, 'view_processingnode', ProcessingNode, accept_global_perms=False)
         else:
             nodes = ProcessingNode.objects.all()
+
+        if not settings.NODE_OPTIMISTIC_MODE:
+            nodes = nodes.filter(last_refreshed__gte=timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES))
         
-        return nodes.filter(last_refreshed__gte=timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES)) \
-                                     .order_by('queue_count').first()
+        return nodes.order_by('queue_count').first()
 
     def is_online(self):
         if settings.NODE_OPTIMISTIC_MODE:
