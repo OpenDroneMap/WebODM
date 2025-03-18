@@ -18,7 +18,7 @@ from django.http import FileResponse
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.contrib.gis.geos import Polygon
-from app.vendor import zipfly
+from zipstream.ng import ZipStream
 from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -406,16 +406,15 @@ def download_file_response(request, filePath, content_disposition, download_file
 
 
 def download_file_stream(request, stream, content_disposition, download_filename=None):
-    if isinstance(stream, zipfly.ZipStream):
-        f = stream.generator()
-    else:
+    if not isinstance(stream, ZipStream):
         # This should never happen, but just in case..
         raise exceptions.ValidationError("stream not a zipstream instance")
     
-    response = StreamingHttpResponse(f, content_type=(mimetypes.guess_type(download_filename)[0] or "application/zip"))
+    response = StreamingHttpResponse(stream, content_type=(mimetypes.guess_type(download_filename)[0] or "application/zip"))
 
     response['Content-Type'] = mimetypes.guess_type(download_filename)[0] or "application/zip"
     response['Content-Disposition'] = "{}; filename={}".format(content_disposition, download_filename)
+    response['Content-Length'] = len(stream)
 
     # For testing
     response['_stream'] = 'yes'
