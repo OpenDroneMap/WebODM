@@ -50,7 +50,8 @@ class Map extends React.Component {
     publicEdit: PropTypes.bool,
     shareButtons: PropTypes.bool,
     permissions: PropTypes.array,
-    thermal: PropTypes.bool
+    thermal: PropTypes.bool,
+    project: PropTypes.object
   };
 
   constructor(props) {
@@ -837,15 +838,18 @@ _('Example:'),
         />
 
         <div className="actionButtons">
+          
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
-          {(this.props.shareButtons && !this.props.public && this.state.singleTask !== null) ? 
+          {((this.state.singleTask || this.props.project) && this.props.shareButtons && !this.props.public) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
-              task={this.state.singleTask} 
+              task={this.state.singleTask}
+              project={this.props.project}
               linksTarget="map"
               queryParams={{t: this.props.mapType}}
             />
           : ""}
+          
           <SwitchModeButton 
             task={this.state.singleTask}
             type="mapToModel" 
