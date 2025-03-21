@@ -208,15 +208,17 @@ class TestApp(BootTestCase):
         # There should be a public_id
         self.assertTrue(project.public_id is not None)
 
-        # Can access project URLs even as anonymous user
+        # Can access project/task URLs even as anonymous user
         test_public_project_views(ac, status.HTTP_200_OK)
+        test_public_task_views(ac, status.HTTP_200_OK)
 
         # Unshare a task
         task.public = False
         task.save()
 
-        # We can still access project URLs
+        # We can still access project/task URLs
         test_public_project_views(ac, status.HTTP_200_OK)
+        test_public_task_views(ac, status.HTTP_200_OK)
 
     def test_admin_views(self):
         c = Client()

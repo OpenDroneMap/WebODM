@@ -16,7 +16,7 @@ def get_public_task(task_pk):
     Get a task and raise a 404 if it's not public
     """
     task = get_object_or_404(Task, pk=task_pk)
-    if not task.public:
+    if not (task.public or task.project.public):
        raise Http404()
     return task
 
