@@ -65,10 +65,8 @@ class SharePopup extends React.Component{
   }
 
   componentDidMount(){
-    if (this.state.task && !this.state.task.public){
-      this.handleEnableSharing();
-    }
-    if (this.state.project && !this.state.project.public){
+    if ((this.state.task && !this.state.task.public) ||
+        (this.state.project && !this.state.project.public)){
       this.handleEnableSharing();
     }
 
