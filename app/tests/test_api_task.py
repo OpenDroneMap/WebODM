@@ -847,7 +847,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
             
             # Share entire project
-            res = client.patch("/api/projects/{}/".format(project.id, task.id), {
+            res = client.patch("/api/projects/{}/".format(project.id), {
                 'public': True,
                 'public_edit': True
             })
