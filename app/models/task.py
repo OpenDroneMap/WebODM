@@ -1173,6 +1173,16 @@ class Task(models.Model):
         self.compacted = True
         self.update_size(commit=True)
 
+    def check_public_edit(self):
+        """
+        Returns whether we need to check change permissions on this task
+        during an API call that needs to make edits
+        """
+        public = self.public or self.project.public
+        public_edit = self.public_edit or self.project.public_edit
+
+        return (not public) or (public and not public_edit)
+
     def set_failure(self, error_message):
         logger.error("FAILURE FOR {}: {}".format(self, error_message))
         self.last_error = error_message

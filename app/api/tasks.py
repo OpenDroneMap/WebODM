@@ -213,7 +213,7 @@ class TaskViewSet(viewsets.ViewSet):
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
-        if not task.public:
+        if not (task.public or task.project.public):
             get_and_check_project(request, task.project.id)
 
         serializer = TaskSerializer(task)
@@ -372,7 +372,7 @@ class TaskNestedView(APIView):
             raise exceptions.NotFound()
 
         # Check for permissions, unless the task is public
-        if not task.public:
+        if not (task.public or task.project.public):
             get_and_check_project(request, task.project.id)
 
         return task
