@@ -832,6 +832,36 @@ class TestApiTask(BootTransactionTestCase):
             res = other_client.post("/api/projects/{}/tasks/{}/3d/scene".format(project.id, task.id), json.dumps({ "type": "Potree", "modified": True }), content_type="application/json")
             self.assertEqual(res.status_code, status.HTTP_200_OK)
 
+            # Revert edit
+            res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+                'public': False,
+                'public_edit': False
+            })
+            
+            # Cannot save again
+            res = other_client.post("/api/projects/{}/tasks/{}/3d/cameraview".format(project.id, task.id), json.dumps({ "position": [0,0,0], "target": [0,0,0] }), content_type="application/json")
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+            
+            # Cannot access project information via project id (which could be enumerated)
+            res = other_client.get("/api/projects/{}/".format(project.id))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+            
+            # Share entire project
+            res = client.patch("/api/projects/{}/".format(project.id), {
+                'public': True,
+                'public_edit': True
+            })
+
+            # Still cannot access project information via project id (which could be enumerated)
+            res = other_client.get("/api/projects/{}/".format(project.id))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+            
+            # Can now save since it's shared/editable project-wise
+            res = other_client.post("/api/projects/{}/tasks/{}/3d/cameraview".format(project.id, task.id), json.dumps({ "position": [0,0,0], "target": [0,0,0] }), content_type="application/json")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            res = other_client.post("/api/projects/{}/tasks/{}/3d/scene".format(project.id, task.id), json.dumps({ "type": "Potree", "modified": True }), content_type="application/json")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
             # User logs out
             other_client.logout()
 

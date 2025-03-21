@@ -163,7 +163,7 @@ class TestApp(BootTestCase):
         self.assertTrue(res.status_code == status.HTTP_200_OK)
 
         # Cannot access public URLs unless a task is shared
-        def test_public_views(client, expectedStatus):
+        def test_public_task_views(client, expectedStatus):
             res = client.get('/public/task/{}/map/'.format(task.id))
             self.assertTrue(res.status_code == expectedStatus)
             res = client.get('/public/task/{}/3d/'.format(task.id))
@@ -174,16 +174,51 @@ class TestApp(BootTestCase):
             self.assertTrue(res.status_code == expectedStatus)
             res = client.get('/public/task/{}/json/'.format(task.id))
             self.assertTrue(res.status_code == expectedStatus)
+        
+        # Cannot access certain public URLs unless a project is shared
+        def test_public_project_views(client, expectedStatus):
+            if project.public_id is not None:
+                res = client.get('/public/project/{}/map/'.format(project.public_id))
+                self.assertTrue(res.status_code == expectedStatus)
+                res = client.get('/public/project/{}/iframe/map/'.format(project.public_id))
+                self.assertTrue(res.status_code == expectedStatus)
+                res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
+                self.assertTrue(res.status_code == expectedStatus)
 
-        test_public_views(c, status.HTTP_404_NOT_FOUND)
+            
+        test_public_task_views(c, status.HTTP_404_NOT_FOUND)
+        test_public_project_views(c, status.HTTP_404_NOT_FOUND)
+
+        # Project should not have a public_id
+        self.assertTrue(project.public_id is None)
 
         # Share task
         task.public = True
         task.save()
 
-        # Can now access URLs even as anonymous user
+        # Can now access task URLs even as anonymous user
         ac = Client()
-        test_public_views(ac, status.HTTP_200_OK)
+        test_public_task_views(ac, status.HTTP_200_OK)
+
+        # Set project to public
+        project.public = True
+        project.save()
+        project.refresh_from_db()
+
+        # There should be a public_id
+        self.assertTrue(project.public_id is not None)
+
+        # Can access project/task URLs even as anonymous user
+        test_public_project_views(ac, status.HTTP_200_OK)
+        test_public_task_views(ac, status.HTTP_200_OK)
+
+        # Unshare a task
+        task.public = False
+        task.save()
+
+        # We can still access project/task URLs
+        test_public_project_views(ac, status.HTTP_200_OK)
+        test_public_task_views(ac, status.HTTP_200_OK)
 
     def test_admin_views(self):
         c = Client()
