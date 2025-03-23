@@ -467,7 +467,18 @@ start(){
 		command+=" --scale node-odm=$WO_DEFAULT_NODES"
 	fi
 
-	run "$command"
+	command_no_start="$command --no-start"
+
+	echo "Creating containers without starting them..."
+    run "$command_no_start"
+
+    # Call the script rename_containers.sh and rename the containers if needed
+    echo "Renaming containers if needed..."
+    ./rename_containers.sh
+
+    # Start the containers
+    echo "Starting containers..."
+    run "$command"
 }
 
 down(){
