@@ -21,6 +21,7 @@ import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
+import CropButton from './CropButton';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
@@ -637,6 +638,14 @@ _('Example:'),
         }
     });
     new AddOverlayCtrl().addTo(this.map);
+
+    this.cropButton = new CropButton({
+      position:'topright',
+      onPolygonChange: geojson => {
+        console.log(geojson);
+      }
+    });
+    this.map.addControl(this.cropButton);
 
     this.map.fitBounds([
      [13.772919746115805,

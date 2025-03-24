@@ -164,7 +164,7 @@ class CropButton extends React.Component {
         if (this.polygon){
             this.group.removeLayer(this.polygon);
             this.polygon = null;
-            this.props.onPolygonChange();
+            this.props.onPolygonChange(null);
         }
     }
 
@@ -177,10 +177,10 @@ class CropButton extends React.Component {
                 color: "#ffa716",
                 fillColor: "#ffa716",
                 fillOpacity: 0.2
-            }).addTo(this.group);
+        }).addTo(this.group);
 
             this.props.onPolygonCreated(this.polygon);
-            this.props.onPolygonChange();
+            this.props.onPolygonChange(this.getCropPolygon());
         }
 
         this.toggleCrop();
