@@ -106,4 +106,12 @@
     & > .leaflet-container{
         width: 100%;
     }
+
+    & > .alert-warning{
+        position: absolute;
+        z-index: 10000;
+        top: 8px;
+        left: 8px;
+        right: 8px;
+    }
 }

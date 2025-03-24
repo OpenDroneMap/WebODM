@@ -178,7 +178,6 @@ class CropButton extends React.Component {
                 fillColor: "#ffa716",
                 fillOpacity: 0.2
         }).addTo(this.group);
-
             this.props.onPolygonCreated(this.polygon);
             this.props.onPolygonChange(this.getCropPolygon());
         }

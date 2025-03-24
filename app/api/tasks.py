@@ -34,6 +34,7 @@ from .common import get_and_check_project, get_asset_download_filename
 from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
+from .fields import PolygonGeometryField
 from webodm import settings
 
 def flatten_files(request_files):
@@ -55,6 +56,7 @@ class TaskSerializer(serializers.ModelSerializer):
     statistics = serializers.SerializerMethodField()
     extent = serializers.SerializerMethodField()
     tags = TagsField(required=False)
+    crop = PolygonGeometryField(required=False, allow_null=True)
 
     def get_processing_node_name(self, obj):
         if obj.processing_node is not None:

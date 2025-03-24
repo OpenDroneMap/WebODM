@@ -643,7 +643,39 @@ _('Example:'),
       this.cropButton = new CropButton({
         position:'topright',
         onPolygonChange: geojson => {
-          console.log(geojson);
+
+          // Find tasks IDs
+          const taskIDs = {};
+          const requests = [];
+          
+          // Crop affects all tasks in the map
+          for (let layer of this.state.imageryLayers){
+            if (layer._map && !layer.isHidden()){
+              const meta = layer[Symbol.for("meta")];
+              const task = meta.task;
+              if (!taskIDs[task.id]){
+                requests.push($.ajax({
+                  url: `/api/projects/${task.project}/tasks/${task.id}/`,
+                  contentType: 'application/json',
+                  data: JSON.stringify({
+                    crop: geojson
+                  }),
+                  dataType: 'json',
+                  type: 'PATCH'
+                }));
+                taskIDs[task.id] = true;
+              }
+            }
+          }
+
+          $.when(...requests)
+            .done(responses => {
+              console.log(responses)
+            })
+            .fail(e => {
+              this.setState({error: _("Cannot set cropping area. Check your internet connection.")});
+              console.error(e);
+            });
         }
       });
       this.map.addControl(this.cropButton);
