@@ -639,13 +639,15 @@ _('Example:'),
     });
     new AddOverlayCtrl().addTo(this.map);
 
-    this.cropButton = new CropButton({
-      position:'topright',
-      onPolygonChange: geojson => {
-        console.log(geojson);
-      }
-    });
-    this.map.addControl(this.cropButton);
+    if (this.props.permissions.indexOf("change") !== -1){
+      this.cropButton = new CropButton({
+        position:'topright',
+        onPolygonChange: geojson => {
+          console.log(geojson);
+        }
+      });
+      this.map.addControl(this.cropButton);
+    }
 
     this.map.fitBounds([
      [13.772919746115805,
