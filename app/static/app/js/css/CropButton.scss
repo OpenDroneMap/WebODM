@@ -1,0 +1,15 @@
+.crop-control:active, .crop-control:focus{
+    outline: none;
+}
+
+.crop-button-marker-layer{
+    &:hover{
+        cursor: crosshair;
+    }
+}
+
+.crop-button-accept-button{
+    &:hover{
+        cursor: pointer;
+    }
+}
