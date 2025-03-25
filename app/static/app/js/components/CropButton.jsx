@@ -228,6 +228,8 @@ class CropButton extends React.Component {
             const latlng = this.map.mouseEventToLatLng(e.originalEvent);
             this.uniqueLatLonPush(latlng);
             this.confirmPolygon();
+        }else if (this.state.cropping){
+            this.toggleCrop();
         }
 
         return false;
