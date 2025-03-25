@@ -370,7 +370,7 @@ class Tiles(TaskNestedView):
                 raise exceptions.NotFound()
 
             if task.crop is not None:
-                boundaries_cutline, _ = geom_transform_wkt_bbox(task.crop, src.dataset)
+                boundaries_cutline, boundaries_bbox = geom_transform_wkt_bbox(task.crop, src.dataset)
             elif boundaries_feature is not None:
                 try:
                     boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
