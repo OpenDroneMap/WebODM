@@ -25,6 +25,7 @@ from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list, get_auto_bands
 from .tasks import TaskNestedView
+from .geoutils import geom_transform_wkt_bbox
 from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster, export_pointcloud
@@ -172,7 +173,9 @@ class Metadata(TaskNestedView):
         try:
             with COGReader(raster_path) as src:
                 band_count = src.dataset.meta['count']
-                if boundaries_feature is not None:
+                if task.crop is not None:
+                    boundaries_cutline, boundaries_bbox = geom_transform_wkt_bbox(task.crop, src.dataset)
+                elif boundaries_feature is not None:
                     boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                     boundaries_bbox = featureBounds(boundaries_feature)
                 else:
@@ -365,7 +368,10 @@ class Tiles(TaskNestedView):
             has_alpha = has_alpha_band(src.dataset)
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
-            if boundaries_feature is not None:
+
+            if task.crop is not None:
+                boundaries_cutline, _ = geom_transform_wkt_bbox(task.crop, src.dataset)
+            elif boundaries_feature is not None:
                 try:
                     boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                 except:
