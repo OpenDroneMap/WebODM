@@ -14,6 +14,8 @@ class CropButton extends React.Component {
   static defaultProps = {
     group: null,
     title: _("Crop"),
+    color: "#ffa716",
+    pulse: false,
     onPolygonCreated: () => {},
     onPolygonChange: () => {}
   };
@@ -22,6 +24,8 @@ class CropButton extends React.Component {
     map: PropTypes.object.isRequired,
     group: PropTypes.object,
     title: PropTypes.string,
+    color: PropTypes.string,
+    pulse: PropTypes.boolean,
     onPolygonCreated: PropTypes.func,
     onPolygonChange: PropTypes.func
   };
@@ -174,9 +178,10 @@ class CropButton extends React.Component {
                 clickable: true,
                 weight: 3,
                 opacity: 0.9,
-                color: "#ffa716",
-                fillColor: "#ffa716",
-                fillOpacity: 0.2
+                color: this.props.color,
+                fillColor: this.props.color,
+                fillOpacity: 0.2,
+                className: "crop" + (this.props.pulse ? " pulse" : "")
         }).addTo(this.group);
             this.props.onPolygonCreated(this.polygon);
             this.props.onPolygonChange(this.getCropPolygon());
@@ -261,6 +266,8 @@ export default L.Control.extend({
         ReactDOM.render(<CropButton ref={(domNode) => this._btn = domNode} map={map} 
                                     group={this.options.group}
                                     title={this.options.title}
+                                    color={this.options.color}
+                                    pulse={this.options.pulse}
                                     onPolygonCreated={this.options.onPolygonCreated}
                                     onPolygonChange={this.options.onPolygonChange} />, container);
 

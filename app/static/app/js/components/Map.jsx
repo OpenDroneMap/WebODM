@@ -642,6 +642,8 @@ _('Example:'),
     if (this.props.permissions.indexOf("change") !== -1){
       this.cropButton = new CropButton({
         position:'topright',
+        color:'#fff',
+        pulse: true,
         onPolygonChange: geojson => {
 
           // Find tasks IDs
