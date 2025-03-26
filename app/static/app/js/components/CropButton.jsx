@@ -167,11 +167,20 @@ class CropButton extends React.Component {
         }
     }
 
-    deletePolygon = () => {
+    deletePolygon = (opts = {}) => {
         if (this.polygon){
-            this.group.removeLayer(this.polygon);
-            this.polygon = null;
-            this.props.onPolygonChange(null);
+            const remove = () => {
+                this.group.removeLayer(this.polygon);
+                this.polygon = null;
+                if (opts.triggerEvents) this.props.onPolygonChange(null);
+            };
+
+            if (opts.fade){
+                this.polygon._path.classList.add("fade");
+                setTimeout(remove, 1500);
+            }else{
+                remove();
+            }
         }
     }
 
@@ -280,8 +289,8 @@ export default L.Control.extend({
         return container;
     },
 
-    deletePolygon: function(){
-        return this._btn.deletePolygon();
+    deletePolygon: function(opts = {}){
+        return this._btn.deletePolygon(opts);
     },
 
     getCropPolygon: function(){

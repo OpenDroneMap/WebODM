@@ -276,7 +276,7 @@ class Map extends React.Component {
                 if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
-
+            
             const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,
                   minZoom: 0,
@@ -665,16 +665,16 @@ _('Example:'),
     if (this.props.permissions.indexOf("change") !== -1){
       const updateCropArea = geojson => {
         // Find tasks IDs
-        const taskMetas = {};
+        const taskMap = {};
         const requests = [];
         if (!geojson) geojson = '';
 
         // Crop affects all tasks in the map
         for (let layer of this.state.imageryLayers){
-          if (layer._map && !layer.isHidden()){
+          if (layer._map){
             const meta = layer[Symbol.for("meta")];
             const task = meta.task;
-            if (!taskMetas[task.id]){
+            if (!taskMap[task.id]){
               requests.push($.ajax({
                 url: `/api/projects/${task.project}/tasks/${task.id}/`,
                 contentType: 'application/json',
@@ -684,7 +684,7 @@ _('Example:'),
                 dataType: 'json',
                 type: 'PATCH'
               }));
-              taskMetas[task.id] = meta;
+              taskMap[task.id] = meta;
             }
           }
         }
@@ -697,14 +697,30 @@ _('Example:'),
               responses = [responses];
             }
 
-            // Update task info
+            // Update task in meta and tiles objects
             responses.forEach(task => {
-              taskMetas[task.id].task = task;
+              if (!task) return;
+
+              const meta = taskMap[task.id];
+              meta.task = task;
+
+              for (let i = 0; i < this.props.tiles.length; i++){
+                const tile = this.props.tiles[i];
+                if (tile.meta && tile.meta.task.id === task.id){
+                  tile.meta.task = task;                  
+                }
+              }
             });
+            
+            this.loadImageryLayers();
           })
           .fail(e => {
             this.setState({error: _("Cannot set cropping area. Check your internet connection.")});
             console.error(e);
+          }).always(() => {
+            setTimeout(() => {
+              this.cropButton.deletePolygon({triggerEvents: false, fade: true});
+            }, 1000);
           });
       };
 
@@ -719,7 +735,8 @@ _('Example:'),
               if (window.confirm(_('Are you sure you want to set a new crop area?'))){
                 updateCropArea(null);
               }else{
-                return true; // Stop crop button from toggling
+                // Stop crop button from toggling
+                return true;
               }
             }
 

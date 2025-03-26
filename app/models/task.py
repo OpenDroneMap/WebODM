@@ -358,10 +358,12 @@ class Task(models.Model):
         # must be enclosed within all raster extents
         # and have a positive area
         if self.crop is not None:
+            has_extents = False
             for extent in [self.orthophoto_extent, self.dsm_extent, self.dtm_extent]:
                 if extent is not None:
+                    has_extents = True
                     self.crop = extent.intersection(self.crop)
-            if self.crop.area <= 0:
+            if not has_extents or self.crop.area <= 0:
                 self.crop = None
 
         self.clean()
@@ -1007,6 +1009,7 @@ class Task(models.Model):
         self.update_size()
         self.potree_scene = {}
         self.running_progress = 1.0
+        self.crop = None
         self.status = status_codes.COMPLETED
 
         if is_backup:

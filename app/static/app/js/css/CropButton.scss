@@ -22,6 +22,10 @@
 .leaflet-interactive.crop.pulse {
     animation: cropPulseFill 1s infinite ease-in-out;
 }
+.leaflet-interactive.crop.fade{
+    -webkit-transition-duration: 1s;
+    transition-duration: 1s;
+}
 
 @keyframes cropPulseFill {
     0% {
