@@ -729,6 +729,8 @@ _('Example:'),
         color:'#fff',
         pulse: true,
         willCrop: () => {
+          this.removeSideBySideCtrl();
+          
           for (let layer of this.state.imageryLayers){
             const meta = layer[Symbol.for("meta")];
             if (meta.task.crop){
@@ -876,10 +878,14 @@ _('Example:'),
         this.sideBySideCtrl.setRightLayers(rightLayers);
       }
     }else{
-      if (this.sideBySideCtrl){
-        this.sideBySideCtrl.remove();
-        this.sideBySideCtrl = null;
-      }
+      this.removeSideBySideCtrl();
+    }
+  }
+
+  removeSideBySideCtrl = () => {
+    if (this.sideBySideCtrl){
+      this.sideBySideCtrl.remove();
+      this.sideBySideCtrl = null;
     }
   }
 
