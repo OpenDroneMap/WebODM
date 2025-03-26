@@ -354,6 +354,16 @@ class Task(models.Model):
         if errors:
             raise ValidationError(errors)
 
+        # Validate crop area
+        # must be enclosed within all raster extents
+        # and have a positive area
+        if self.crop is not None:
+            for extent in [self.orthophoto_extent, self.dsm_extent, self.dtm_extent]:
+                if extent is not None:
+                    self.crop = extent.intersection(self.crop)
+            if self.crop.area <= 0:
+                self.crop = None
+
         self.clean()
         self.validate_unique()
 

@@ -26,7 +26,6 @@ def geom_transform_wkt_bbox(geom, dataset):
 
         tx, ty = rasterio.warp.transform(CRS.from_epsg(geom.srid), dataset.crs, xs, ys)
         raster_coords = [dataset.index(x, y) for x, y in zip(tx, ty)]
-
         out = ", ".join(f"{x} {y}" for y, x in raster_coords)
         wkt = f"POLYGON (({out}))"
         return wkt, (minx, miny, maxx, maxy)

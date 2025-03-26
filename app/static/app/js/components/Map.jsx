@@ -277,8 +277,6 @@ class Map extends React.Component {
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
 
-            console.log(tileUrl, meta.task);
-
             const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,
                   minZoom: 0,
@@ -665,45 +663,70 @@ _('Example:'),
     new AddOverlayCtrl().addTo(this.map);
 
     if (this.props.permissions.indexOf("change") !== -1){
+      const updateCropArea = geojson => {
+        // Find tasks IDs
+        const taskMetas = {};
+        const requests = [];
+        if (!geojson) geojson = '';
+
+        // Crop affects all tasks in the map
+        for (let layer of this.state.imageryLayers){
+          if (layer._map && !layer.isHidden()){
+            const meta = layer[Symbol.for("meta")];
+            const task = meta.task;
+            if (!taskMetas[task.id]){
+              requests.push($.ajax({
+                url: `/api/projects/${task.project}/tasks/${task.id}/`,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                  crop: geojson
+                }),
+                dataType: 'json',
+                type: 'PATCH'
+              }));
+              taskMetas[task.id] = meta;
+            }
+          }
+        }
+
+        $.when(...requests)
+          .done(responses => {
+            if (Array.isArray(responses)){
+              responses = responses[0];
+            }else{
+              responses = [responses];
+            }
+
+            // Update task info
+            responses.forEach(task => {
+              taskMetas[task.id].task = task;
+            });
+          })
+          .fail(e => {
+            this.setState({error: _("Cannot set cropping area. Check your internet connection.")});
+            console.error(e);
+          });
+      };
+
       this.cropButton = new CropButton({
         position:'topright',
         color:'#fff',
         pulse: true,
-        onPolygonChange: geojson => {
-
-          // Find tasks IDs
-          const taskIDs = {};
-          const requests = [];
-          
-          // Crop affects all tasks in the map
+        willCrop: () => {
           for (let layer of this.state.imageryLayers){
-            if (layer._map && !layer.isHidden()){
-              const meta = layer[Symbol.for("meta")];
-              const task = meta.task;
-              if (!taskIDs[task.id]){
-                requests.push($.ajax({
-                  url: `/api/projects/${task.project}/tasks/${task.id}/`,
-                  contentType: 'application/json',
-                  data: JSON.stringify({
-                    crop: geojson
-                  }),
-                  dataType: 'json',
-                  type: 'PATCH'
-                }));
-                taskIDs[task.id] = true;
+            const meta = layer[Symbol.for("meta")];
+            if (meta.task.crop){
+              if (window.confirm(_('Are you sure you want to set a new crop area?'))){
+                updateCropArea(null);
+              }else{
+                return true; // Stop crop button from toggling
               }
             }
-          }
 
-          $.when(...requests)
-            .done(responses => {
-              console.log(responses)
-            })
-            .fail(e => {
-              this.setState({error: _("Cannot set cropping area. Check your internet connection.")});
-              console.error(e);
-            });
-        }
+            break;
+          }
+        },
+        onPolygonChange: updateCropArea
       });
       this.map.addControl(this.cropButton);
     }

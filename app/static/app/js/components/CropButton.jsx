@@ -17,7 +17,8 @@ class CropButton extends React.Component {
     color: "#ffa716",
     pulse: false,
     onPolygonCreated: () => {},
-    onPolygonChange: () => {}
+    onPolygonChange: () => {},
+    willCrop: () => {}
   };
 
   static propTypes = {
@@ -45,7 +46,7 @@ class CropButton extends React.Component {
     }
   }
 
-  toggleCrop = () => {
+  toggleCrop = (e) => {
         const { cropping } = this.state;
 
         let crop = !cropping;
@@ -76,6 +77,8 @@ class CropButton extends React.Component {
                 this.measureArea = null;
             }
         }else{
+            if (e && this.props.willCrop()) return;
+
             if (!this.captureMarker) {
                 this.captureMarker = L.marker(this.map.getCenter(), {
                     clickable: true,
@@ -270,6 +273,7 @@ export default L.Control.extend({
                                     title={this.options.title}
                                     color={this.options.color}
                                     pulse={this.options.pulse}
+                                    willCrop={this.options.willCrop}
                                     onPolygonCreated={this.options.onPolygonCreated}
                                     onPolygonChange={this.options.onPolygonChange} />, container);
 
