@@ -25,7 +25,7 @@ class CropButton extends React.Component {
     group: PropTypes.object,
     title: PropTypes.string,
     color: PropTypes.string,
-    pulse: PropTypes.boolean,
+    pulse: PropTypes.bool,
     onPolygonCreated: PropTypes.func,
     onPolygonChange: PropTypes.func
   };

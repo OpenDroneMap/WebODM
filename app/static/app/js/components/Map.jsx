@@ -185,21 +185,37 @@ class Map extends React.Component {
         let metaUrl = url + "metadata";
         let unitForward = value => value;
         let unitBackward = value => value;
+        let queryParams = {};
 
         if (type == "plant"){
           if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
             // Single band, probably thermal dataset, in any case we can't render NDVI
             // because it requires 3 bands
-            metaUrl += "?formula=Celsius&bands=L&color_map=magma";
+            queryParams = {
+              formula: 'Celsius',
+              bands: 'L',
+              color_map: 'magma'
+            };
           }else if (meta.task && meta.task.orthophoto_bands){
             let formula = this.hasBands(["red", "green", "nir"], meta.task.orthophoto_bands) ? "NDVI" : "VARI";
-            metaUrl += `?formula=${formula}&bands=auto&color_map=rdylgn`;
+            queryParams = {
+              formula,
+              bands: 'auto',
+              color_map: 'rdylgn'
+            };
           }else{
             // This should never happen?
-            metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
+            queryParams = {
+              formula: 'NDVI',
+              bands: 'RGN',
+              color_map: 'rdylgn'
+            };
           }
         }else if (type == "dsm" || type == "dtm"){
-          metaUrl += "?hillshade=6&color_map=viridis";
+          queryParams = {
+            hillshade: 6,
+            color_map: 'viridis'
+          };
           unitForward = value => {
             return unitSystem().elevation(value).value;
           };
@@ -209,6 +225,10 @@ class Map extends React.Component {
             return toMetric(unitValue).value;
           };
         }
+
+        if (meta.task.crop) queryParams.crop = 1;
+
+        metaUrl += Utils.toSearchQuery(queryParams);
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
@@ -242,17 +262,22 @@ class Map extends React.Component {
                         max = Math.max(statistics[b]["max"]);
                       }
                     }
-                    params["rescale"] = encodeURIComponent(`${min},${max}`);              
+                    params.rescale = encodeURIComponent(`${min},${max}`);              
                 }else{
                     console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
-                    params["rescale"] = encodeURIComponent("-1,1");
+                    params.rescale = encodeURIComponent("-1,1");
                 }
                 
-                params["size"] = TILESIZE;
+                params.size = TILESIZE;
+                if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }else{
-                tileUrl = Utils.buildUrlWithQuery(tileUrl, { size: TILESIZE });
+                let params = { size: TILESIZE };
+                if (meta.task.crop) params.crop = 1;
+                tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
+
+            console.log(tileUrl, meta.task);
 
             const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,
@@ -838,8 +863,12 @@ _('Example:'),
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
                             prevState.overlays !== this.state.overlays ||
                             prevState.annotations !== this.state.annotations)){
-        this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
+      this.updateLayersControl();
     }
+  }
+
+  updateLayersControl = () => {
+    this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
   }
 
   componentWillUnmount() {

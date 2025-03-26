@@ -1047,6 +1047,7 @@ class Task(models.Model):
                     'ground_control_points': ground_control_points,
                     'epsg': self.epsg,
                     'orthophoto_bands': self.orthophoto_bands,
+                    'crop': self.crop is not None
                 }
             }
         }

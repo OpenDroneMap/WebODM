@@ -141,6 +141,7 @@ class Metadata(TaskNestedView):
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
         defined_range = self.request.query_params.get('range')
+        crop = self.request.query_params.get('crop') == '1'
         boundaries_feature = self.request.query_params.get('boundaries')
         if formula == '': formula = None
         if bands == '': bands = None
@@ -173,14 +174,20 @@ class Metadata(TaskNestedView):
         try:
             with COGReader(raster_path) as src:
                 band_count = src.dataset.meta['count']
-                if task.crop is not None:
-                    boundaries_cutline, boundaries_bbox = geom_transform_wkt_bbox(task.crop, src.dataset)
+                if crop and task.crop is not None:
+                    cutline, bounds = geom_transform_wkt_bbox(task.crop, src.dataset)
                 elif boundaries_feature is not None:
-                    boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
-                    boundaries_bbox = featureBounds(boundaries_feature)
+                    cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
+                    bounds = featureBounds(boundaries_feature)
                 else:
-                    boundaries_cutline = None
-                    boundaries_bbox = None
+                    cutline = None
+                    bounds = None
+                
+                if cutline is not None:
+                    vrt_options = {'cutline': cutline}
+                else:
+                    vrt_options = None
+
                 if has_alpha_band(src.dataset):
                     band_count -= 1
                 nodata = None
@@ -189,10 +196,7 @@ class Metadata(TaskNestedView):
                     nodata = 0
                 histogram_options = {"bins": 255, "range": hrange}
                 if expr is not None:
-                    if boundaries_cutline is not None:
-                        data, mask = src.preview(expression=expr, vrt_options={'cutline': boundaries_cutline})
-                    else:
-                        data, mask = src.preview(expression=expr)
+                    data, mask = src.preview(expression=expr, vrt_options=vrt_options)
                     data = np.ma.array(data)
                     data.mask = mask == 0
                     stats = {
@@ -202,11 +206,8 @@ class Metadata(TaskNestedView):
                     stats = {b: ImageStatistics(**s) for b, s in stats.items()}
                     metadata = RioMetadata(statistics=stats, **src.info().dict())
                 else:
-                    if (boundaries_cutline is not None) and (boundaries_bbox is not None):
-                        metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata
-                                                , bounds=boundaries_bbox, vrt_options={'cutline': boundaries_cutline})
-                    else:
-                        metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata)
+                    metadata = src.metadata(pmin=pmin, pmax=pmax, hist_options=histogram_options, nodata=nodata,
+                                            bounds=bounds, vrt_options=vrt_options)
                 info = json.loads(metadata.json())
         except IndexError as e:
             # Caught when trying to get an invalid raster metadata
@@ -277,7 +278,7 @@ class Metadata(TaskNestedView):
             info['maxzoom'] = info['minzoom']
         info['maxzoom'] += ZOOM_EXTRA_LEVELS
         info['minzoom'] -= ZOOM_EXTRA_LEVELS
-        info['bounds'] = {'value': src.bounds, 'crs': src.dataset.crs}
+        info['bounds'] = {'value': bounds if bounds is not None else src.bounds, 'crs': src.dataset.crs}
 
         return Response(info)
 
@@ -305,6 +306,7 @@ class Tiles(TaskNestedView):
         color_map = self.request.query_params.get('color_map')
         hillshade = self.request.query_params.get('hillshade')
         tilesize = self.request.query_params.get('size')
+        crop = self.request.query_params.get('crop') == '1'
 
         boundaries_feature = self.request.query_params.get('boundaries')
         if boundaries_feature == '':
@@ -369,15 +371,21 @@ class Tiles(TaskNestedView):
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
 
-            if task.crop is not None:
-                boundaries_cutline, boundaries_bbox = geom_transform_wkt_bbox(task.crop, src.dataset)
+            if crop and task.crop is not None:
+                cutline, bounds = geom_transform_wkt_bbox(task.crop, src.dataset)
             elif boundaries_feature is not None:
                 try:
-                    boundaries_cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
+                    cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                 except:
                     raise exceptions.ValidationError(_("Invalid boundaries"))
             else:
-                boundaries_cutline = None
+                cutline = None
+            
+            if cutline is not None:
+                    vrt_options = {'cutline': cutline}
+            else:
+                vrt_options = None
+
             # Handle N-bands datasets for orthophotos (not plant health)
             if tile_type == 'orthophoto' and expr is None:
                 ci = src.dataset.colorinterp
@@ -415,27 +423,15 @@ class Tiles(TaskNestedView):
 
             try:
                 if expr is not None:
-                    if boundaries_cutline is not None:
-                        tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
-                                        padding=padding,
-                                        tile_buffer=tile_buffer,
-                                        resampling_method=resampling, vrt_options={'cutline': boundaries_cutline})
-                    else:
-                        tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
-                                        padding=padding,
-                                        tile_buffer=tile_buffer,
-                                        resampling_method=resampling)
+                    tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
+                                    padding=padding,
+                                    tile_buffer=tile_buffer,
+                                    resampling_method=resampling, vrt_options=vrt_options)
                 else:
-                    if boundaries_cutline is not None:
-                        tile = src.tile(x, y, z, tilesize=tilesize, nodata=nodata,
-                                        padding=padding,
-                                        tile_buffer=tile_buffer,
-                                        resampling_method=resampling, vrt_options={'cutline': boundaries_cutline})
-                    else:
-                        tile = src.tile(x, y, z, indexes=indexes, tilesize=tilesize, nodata=nodata,
-                                        padding=padding, 
-                                        tile_buffer=tile_buffer,
-                                        resampling_method=resampling)
+                    tile = src.tile(x, y, z, tilesize=tilesize, nodata=nodata,
+                                    padding=padding,
+                                    tile_buffer=tile_buffer,
+                                    resampling_method=resampling, vrt_options=vrt_options)
             except TileOutsideBounds:
                 raise exceptions.NotFound(_("Outside of bounds"))
             
