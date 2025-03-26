@@ -497,7 +497,8 @@ class Task(models.Model):
                 'public': self.public,
                 'resize_to': self.resize_to,
                 'potree_scene': self.potree_scene,
-                'tags': self.tags
+                'tags': self.tags,
+                'crop': json.loads(self.crop.geojson) if self.crop is not None else None,
             }))
     
     def read_backup_file(self):
@@ -516,6 +517,10 @@ class Task(models.Model):
                     self.resize_to = backup.get('resize_to', self.resize_to)
                     self.potree_scene = backup.get('potree_scene', self.potree_scene)
                     self.tags = backup.get('tags', self.tags)
+
+                    crop = backup.get('crop')
+                    if crop is not None:
+                        self.crop = json.dumps(crop)
 
             except Exception as e:
                 logger.warning("Cannot read backup file: %s" % str(e))
@@ -1002,6 +1007,13 @@ class Task(models.Model):
                 setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
 
                 logger.info("Populated extent field with {} for {}".format(raster_path, self))
+        
+        # Flushes the changes to the *_extent fields
+        # and immediately reads them back into Python
+        # This is required because GEOS screws up the X/Y conversion
+        # from the raster CRS to 4326, whereas PostGIS seems to do it correctly :/
+        self.save()
+        self.refresh_from_db()
 
         self.update_available_assets_field()
         self.update_epsg_field()
