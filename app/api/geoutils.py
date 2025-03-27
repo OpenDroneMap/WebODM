@@ -57,4 +57,3 @@ def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic", wkt_crs="raste
         return wkt, (minx, miny, maxx, maxy)
     else:
         raise ValueError("Cannot transform complex geometries to WKT")
-
