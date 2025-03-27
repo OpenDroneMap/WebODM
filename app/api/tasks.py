@@ -5,6 +5,7 @@ from wsgiref.util import FileWrapper
 
 import mimetypes
 import rasterio
+from rasterio.vrt import WarpedVRT
 from rasterio.enums import ColorInterp
 from PIL import Image
 import io
@@ -35,6 +36,7 @@ from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 from .fields import PolygonGeometryField
+from .geoutils import geom_transform_wkt_bbox
 from webodm import settings
 
 def flatten_files(request_files):
@@ -488,19 +490,50 @@ class TaskThumbnail(TaskNestedView):
             if ColorInterp.alpha in ci:
                 indexes += (ci.index(ColorInterp.alpha) + 1, )
             
-            w = raster.width
-            h = raster.height
-            d = max(w, h)
-            dw = (d - w) // 2
-            dh = (d - h) // 2
-            win = rasterio.windows.Window(-dw, -dh, d, d)
+            if task.crop is not None:
+                cutline, (minx, miny, maxx, maxy) = geom_transform_wkt_bbox(task.crop, raster, 'raster')
 
-            img = raster.read(indexes=indexes, window=win, boundless=True, fill_value=0, out_shape=(
-                len(indexes),
-                thumb_size,
-                thumb_size,
-            ), resampling=rasterio.enums.Resampling.nearest).transpose((1, 2, 0))
-        
+                w = maxx - minx
+                h = maxy - miny
+                win = rasterio.windows.Window(minx, miny, w, h)
+                ratio = w / h
+                if ratio > 1:
+                    out_width = thumb_size
+                    out_height = int(thumb_size / ratio)
+                else:
+                    out_height = thumb_size
+                    out_width = int(thumb_size * ratio)
+
+
+                with WarpedVRT(raster, cutline=cutline) as vrt:
+                    rgb = vrt.read(indexes=indexes, window=win, fill_value=0, out_shape=(
+                        len(indexes),
+                        out_height,
+                        out_width,
+                    ), resampling=rasterio.enums.Resampling.nearest)
+                
+                img = np.zeros((len(indexes), thumb_size, thumb_size), dtype=rgb.dtype)
+                y_offset = (thumb_size - out_height) // 2
+                x_offset = (thumb_size - out_width) // 2
+
+                # Place the output image in the center
+                img[:, y_offset:y_offset + out_height, x_offset:x_offset + out_width] = rgb
+            else:
+                w = raster.width
+                h = raster.height
+                d = max(w, h)
+                dw = (d - w) // 2
+                dh = (d - h) // 2
+                win = rasterio.windows.Window(-dw, -dh, d, d)
+
+                img = raster.read(indexes=indexes, window=win, boundless=True, fill_value=0, out_shape=(
+                    len(indexes),
+                    thumb_size,
+                    thumb_size,
+                ), resampling=rasterio.enums.Resampling.nearest)
+            
+            img = img.transpose((1, 2, 0))
+
         if img.dtype != np.uint8:
             img = img.astype(np.float32)
             

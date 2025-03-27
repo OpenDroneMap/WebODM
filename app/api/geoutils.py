@@ -1,14 +1,16 @@
 import rasterio.warp
+import numpy as np
 from rasterio.crs import CRS
 
 # GEOS has some weird bug where
 # we can't simply call geom.tranform(srid)
 # so we write our own
 
-def geom_transform_wkt_bbox(geom, dataset):
+def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic"):
     """
     :param geom GEOSGeometry
     :param dataset rasterio dataset
+    :param bbox_crs CRS of bbox (geographic --> lat/lon | raster --> pixels)
     :return (WKT, bbox)
     """
     if not geom.srid:
@@ -19,15 +21,26 @@ def geom_transform_wkt_bbox(geom, dataset):
     coords = geom.tuple
     if len(coords) == 1:
         xs, ys = zip(*coords[0])
-        minx = min(xs)
-        maxx = max(xs)
-        miny = min(ys)
-        maxy = max(ys)
-
         tx, ty = rasterio.warp.transform(CRS.from_epsg(geom.srid), dataset.crs, xs, ys)
         raster_coords = [dataset.index(x, y) for x, y in zip(tx, ty)]
+
+        if bbox_crs == 'geographic':
+            minx = min(xs)
+            maxx = max(xs)
+            miny = min(ys)
+            maxy = max(ys)
+        elif bbox_crs == 'raster':
+            coords = np.array(raster_coords)
+            px = coords[:, 1]
+            py = coords[:, 0]
+            minx = px.min()
+            maxx = px.max()
+            miny = py.min()
+            maxy = py.max()
+
         out = ", ".join(f"{x} {y}" for y, x in raster_coords)
         wkt = f"POLYGON (({out}))"
         return wkt, (minx, miny, maxx, maxy)
     else:
         raise ValueError("Cannot transform complex geometries to WKT")
+
