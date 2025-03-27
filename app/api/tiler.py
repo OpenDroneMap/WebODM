@@ -644,10 +644,12 @@ class Export(TaskNestedView):
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})
         elif asset_type == 'georeferenced_model':
             # Shortcut the process if no processing is required
-            if export_format == 'laz' and (epsg == task.epsg or epsg is None) and (resample is None or resample == 0):
+            if export_format == 'laz' and (epsg == task.epsg or epsg is None) and (resample is None or resample == 0) and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.laz'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
                 celery_task_id = export_pointcloud.delay(url, epsg=epsg, 
                                                             format=export_format,
-                                                            resample=resample).task_id
+                                                            resample=resample,
+                                                            crop=task.crop.wkt if task.crop is not None else None,
+                                                            crop_reference=task.get_reference_raster() if task.crop is not None else None).task_id
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})

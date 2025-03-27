@@ -977,14 +977,7 @@ class Task(models.Model):
                 raise NodeServerError("Cannot restore from backup")
 
         # Populate *_extent fields
-        extent_fields = [
-            (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
-             'orthophoto_extent'),
-            (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
-             'dsm_extent'),
-            (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
-             'dtm_extent'),
-        ]
+        extent_fields = self.get_extent_fields()
 
         for raster_path, field in extent_fields:
             if os.path.exists(raster_path):
@@ -1037,6 +1030,22 @@ class Task(models.Model):
 
         from app.plugins import signals as plugin_signals
         plugin_signals.task_completed.send_robust(sender=self.__class__, task_id=self.id)
+
+    def get_extent_fields(self):
+        return [
+            (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
+             'orthophoto_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
+             'dsm_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
+             'dtm_extent'),
+        ]
+
+    def get_reference_raster(self):
+        extent_fields = self.get_extent_fields()
+        for file, field in extent_fields:
+            if getattr(self, field) is not None:
+                return file 
 
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))

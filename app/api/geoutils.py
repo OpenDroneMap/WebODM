@@ -6,11 +6,12 @@ from rasterio.crs import CRS
 # we can't simply call geom.tranform(srid)
 # so we write our own
 
-def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic"):
+def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic", wkt_crs="raster"):
     """
     :param geom GEOSGeometry
     :param dataset rasterio dataset
     :param bbox_crs CRS of bbox (geographic --> lat/lon | projected --> north/east | raster --> pixels)
+    :param wkt_crs CRS of WKT (raster --> pixels | projected --> north/east)
     :return (WKT, bbox)
     """
     if not geom.srid:
@@ -42,8 +43,16 @@ def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic"):
             maxx = px.max()
             miny = py.min()
             maxy = py.max()
+        else:
+            raise ValueError("Invalid bbox_crs")
 
-        out = ", ".join(f"{x} {y}" for y, x in raster_coords)
+        if wkt_crs == "raster":
+            out = ", ".join(f"{x} {y}" for y, x in raster_coords)
+        elif wkt_crs == "projected":
+            out = ", ".join(f"{x} {y}" for x, y in zip(tx, ty))
+        else:
+            raise ValueError("Invalid wkt_crs")
+        
         wkt = f"POLYGON (({out}))"
         return wkt, (minx, miny, maxx, maxy)
     else:
