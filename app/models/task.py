@@ -358,12 +358,15 @@ class Task(models.Model):
         # must be enclosed within all raster extents
         # and have a positive area
         if self.crop is not None:
-            has_extents = False
-            for extent in [self.orthophoto_extent, self.dsm_extent, self.dtm_extent]:
-                if extent is not None:
-                    has_extents = True
-                    self.crop = extent.intersection(self.crop)
-            if not has_extents or self.crop.area <= 0:
+            if self.crop.valid:
+                has_extents = False
+                for extent in [self.orthophoto_extent, self.dsm_extent, self.dtm_extent]:
+                    if extent is not None:
+                        has_extents = True
+                        self.crop = extent.intersection(self.crop)
+                if not has_extents or self.crop.area <= 0:
+                    self.crop = None
+            else:
                 self.crop = None
 
         self.clean()
