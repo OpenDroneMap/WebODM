@@ -10,7 +10,7 @@ def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic"):
     """
     :param geom GEOSGeometry
     :param dataset rasterio dataset
-    :param bbox_crs CRS of bbox (geographic --> lat/lon | raster --> pixels)
+    :param bbox_crs CRS of bbox (geographic --> lat/lon | projected --> north/east | raster --> pixels)
     :return (WKT, bbox)
     """
     if not geom.srid:
@@ -22,13 +22,18 @@ def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic"):
     if len(coords) == 1:
         xs, ys = zip(*coords[0])
         tx, ty = rasterio.warp.transform(CRS.from_epsg(geom.srid), dataset.crs, xs, ys)
-        raster_coords = [dataset.index(x, y) for x, y in zip(tx, ty)]
+        raster_coords = [dataset.index(x, y, op=np.round) for x, y in zip(tx, ty)]
 
         if bbox_crs == 'geographic':
             minx = min(xs)
             maxx = max(xs)
             miny = min(ys)
             maxy = max(ys)
+        elif bbox_crs == 'projected':
+            minx = min(tx)
+            maxx = max(tx)
+            miny = min(ty)
+            maxy = max(ty)
         elif bbox_crs == 'raster':
             coords = np.array(raster_coords)
             px = coords[:, 1]

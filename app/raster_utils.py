@@ -5,12 +5,16 @@ import os
 import subprocess
 import numpy as np
 import numexpr as ne
+from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
+from rasterio.vrt import WarpedVRT
+from rasterio.windows import Window, bounds as window_bounds
 from rio_tiler.utils import has_alpha_band, linear_rescale
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
+from app.api.geoutils import geom_transform_wkt_bbox
 from rio_tiler.io import COGReader
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 
@@ -34,13 +38,53 @@ def export_raster(input, output, **opts):
     hillshade = opts.get('hillshade')
     asset_type = opts.get('asset_type')
     name = opts.get('name', 'raster') # KMZ specific
+    crop_wkt = opts.get('crop')
 
     dem = asset_type in ['dsm', 'dtm']
+
+    if crop_wkt is not None:
+        with rasterio.open(input) as ds:
+            crop = GEOSGeometry(crop_wkt)
+            crop.srid = 4326
+            cutline, bounds = geom_transform_wkt_bbox(crop, ds, 'raster')
+            vrt_options = {'cutline': cutline}
+    else:
+        vrt_options = None
     
-    with COGReader(input) as ds_src:
+    with COGReader(input, vrt_options=vrt_options) as ds_src:
         src = ds_src.dataset
         profile = src.meta.copy()
+        win_bounds = None
+        win_transform = None
+        dst_width = src.width
+        dst_height = src.height
 
+        if vrt_options is None:
+            reader = src
+            win = Window(0, 0, dst_width, dst_height)
+            win_transform = src.transform
+        else:
+            reader = WarpedVRT(src, **vrt_options)
+            dst_width = bounds[2] - bounds[0]
+            dst_height = bounds[3] - bounds[1]
+            win = Window(bounds[0], bounds[1], dst_width, dst_height)
+            win_bounds = window_bounds(win, profile['transform'])
+
+            win_transform, width, height = calculate_default_transform(
+                src.crs, src.crs, src.width, src.height,
+                left=win_bounds[0],
+                bottom=win_bounds[1],
+                right=win_bounds[2],
+                top=win_bounds[3],
+                dst_width=dst_width,
+                dst_height=dst_height)
+
+            profile.update(
+                transform=win_transform,
+                width=width,
+                height=height
+            )
+            
         # Output format
         driver = "GTiff"
         compress = None
@@ -89,7 +133,7 @@ def export_raster(input, output, **opts):
             nodata = None
             if asset_type == 'orthophoto':
                 nodata = 0
-            md = ds_src.metadata(pmin=2.0, pmax=98.0, hist_options={"bins": 255}, nodata=nodata)
+            md = ds_src.metadata(pmin=2.0, pmax=98.0, hist_options={"bins": 255}, nodata=nodata, vrt_options=vrt_options)
             rescale = [md['statistics']['1']['min'], md['statistics']['1']['max']]
 
         ci = src.colorinterp
@@ -108,9 +152,9 @@ def export_raster(input, output, **opts):
                                 ci.index(ColorInterp.alpha) + 1)
 
         if ColorInterp.alpha in ci:
-            mask = src.read(ci.index(ColorInterp.alpha) + 1)
+            mask = reader.read(ci.index(ColorInterp.alpha) + 1, window=win)
         else:
-            mask = src.dataset_mask()
+            mask = reader.dataset_mask(window=win)
 
         cmap = None
         if color_map:
@@ -148,8 +192,18 @@ def export_raster(input, output, **opts):
         if src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg:
             dst_crs = "EPSG:{}".format(epsg)
 
-            transform, width, height = calculate_default_transform(
-                src.crs, dst_crs, src.width, src.height, *src.bounds)
+            if win_bounds is not None:
+                transform, width, height = calculate_default_transform(
+                    src.crs, dst_crs, src.width, src.height,
+                    left=win_bounds[0],
+                    bottom=win_bounds[1],
+                    right=win_bounds[2],
+                    top=win_bounds[3],
+                    dst_width=dst_width,
+                    dst_height=dst_height)
+            else:
+                transform, width, height = calculate_default_transform(
+                    src.crs, dst_crs, src.width, src.height, *src.bounds)
 
             profile.update(
                 crs=dst_crs,
@@ -161,7 +215,7 @@ def export_raster(input, output, **opts):
             def write_band(arr, dst, band_num):
                 reproject(source=arr, 
                         destination=rasterio.band(dst, band_num),
-                        src_transform=src.transform,
+                        src_transform=win_transform,
                         src_crs=src.crs,
                         dst_transform=transform,
                         dst_crs=dst_crs,
@@ -192,7 +246,7 @@ def export_raster(input, output, **opts):
                 except ValueError:
                     pass
 
-            data = src.read(indexes=indexes, out_dtype=np.float32)
+            data = reader.read(indexes=indexes, window=win, out_dtype=np.float32)
             arr = dict(zip(bands_names, data))
             arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
 
@@ -229,7 +283,7 @@ def export_raster(input, output, **opts):
         elif dem:
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                arr = src.read()
+                arr = reader.read(window=win)
 
                 intensity = None
                 if hillshade is not None and hillshade > 0:
@@ -266,7 +320,7 @@ def export_raster(input, output, **opts):
                 band_num = 1
                 for idx in indexes:
                     ci = src.colorinterp[idx - 1]
-                    arr = src.read(idx)
+                    arr = reader.read(idx, window=win)
 
                     if ci == ColorInterp.alpha:
                         if with_alpha:
@@ -281,7 +335,11 @@ def export_raster(input, output, **opts):
                     new_ci = [ci for ci in new_ci if ci != ColorInterp.alpha]
                     
                 dst.colorinterp = new_ci
-                
+        
+        # Close warped vrt
+        if vrt_options is not None:
+            reader.close()
+        
         if kmz:
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
                                         "-co", "Name={}".format(name),

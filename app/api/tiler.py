@@ -382,7 +382,7 @@ class Tiles(TaskNestedView):
                 cutline = None
             
             if cutline is not None:
-                    vrt_options = {'cutline': cutline}
+                vrt_options = {'cutline': cutline}
             else:
                 vrt_options = None
 
@@ -629,7 +629,7 @@ class Export(TaskNestedView):
 
         if asset_type in ['orthophoto', 'dsm', 'dtm']:
             # Shortcut the process if no processing is required
-            if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None:
+            if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
                 celery_task_id = export_raster.delay(url, epsg=epsg, 
@@ -639,7 +639,8 @@ class Export(TaskNestedView):
                                                         color_map=color_map,
                                                         hillshade=hillshade,
                                                         asset_type=asset_type,
-                                                        name=task.name).task_id
+                                                        name=task.name,
+                                                        crop=task.crop.wkt if task.crop is not None else None).task_id
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})
         elif asset_type == 'georeferenced_model':
             # Shortcut the process if no processing is required
