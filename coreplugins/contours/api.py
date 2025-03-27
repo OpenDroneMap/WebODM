@@ -47,7 +47,8 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, cro
         dem_vrt = os.path.join(tmpdir, "dem.vrt")
         with open(crop_geojson, "w", encoding="utf-8") as f:
             f.write(crop)
-        p = subprocess.Popen([gdalwarp_bin, "-cutline", crop_geojson, 
+        p = subprocess.Popen([gdalwarp_bin, "-cutline", crop_geojson,
+                '--config', 'GDALWARP_DENSIFY_CUTLINE', 'NO', 
                 '-crop_to_cutline', '-dstnodata', '-9999', '-of', 'VRT',
                 dem, dem_vrt], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
