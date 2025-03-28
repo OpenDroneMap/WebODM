@@ -9,12 +9,13 @@ from django.utils.translation import gettext_lazy as _
 class ContoursException(Exception):
     pass
 
-def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1):
+def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, crop = None):
     import os
     import subprocess
     import tempfile
     import shutil
     import glob
+    import json
     from webodm import settings
 
     ext = ""
@@ -31,11 +32,32 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1):
     tmpdir = os.path.join(settings.MEDIA_TMP, os.path.basename(tempfile.mkdtemp('_contours', dir=settings.MEDIA_TMP)))
     gdal_contour_bin = shutil.which("gdal_contour")
     ogr2ogr_bin = shutil.which("ogr2ogr")
+    gdalwarp_bin = shutil.which("gdalwarp")
 
     if gdal_contour_bin is None:
         return {'error': 'Cannot find gdal_contour'}
     if ogr2ogr_bin is None:
         return {'error': 'Cannot find ogr2ogr'}
+    if gdalwarp_bin is None and crop is not None:
+        return {'error': 'Cannot find gdalwarp'}
+
+    # Make a VRT with the crop area
+    if crop is not None:
+        crop_geojson = os.path.join(tmpdir, "crop.geojson")
+        dem_vrt = os.path.join(tmpdir, "dem.vrt")
+        with open(crop_geojson, "w", encoding="utf-8") as f:
+            f.write(crop)
+        p = subprocess.Popen([gdalwarp_bin, "-cutline", crop_geojson,
+                '--config', 'GDALWARP_DENSIFY_CUTLINE', 'NO', 
+                '-crop_to_cutline', '-dstnodata', '-9999', '-of', 'VRT',
+                dem, dem_vrt], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        out = out.decode('utf-8').strip()
+        err = err.decode('utf-8').strip()
+        if p.returncode != 0:
+            return {'error': f'Error calling gdalwarp: {str(err)}'}
+
+        dem = dem_vrt
     
     contours_file = f"contours.gpkg"
     p = subprocess.Popen([gdal_contour_bin, "-q", "-a", "level", "-3d", "-f", "GPKG", "-i", str(interval), dem, contours_file], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -46,7 +68,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1):
     success = p.returncode == 0
 
     if not success:
-        return {'error', f'Error calling gdal_contour: {str(err)}'}
+        return {'error': f'Error calling gdal_contour: {str(err)}'}
     
     outfile = os.path.join(tmpdir, f"output.{ext}")
     p = subprocess.Popen([ogr2ogr_bin, outfile, contours_file, "-simplify", str(simplify), "-f", output_format, "-t_srs", f"EPSG:{epsg}", "-nln", "contours",
@@ -58,7 +80,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1):
     success = p.returncode == 0
 
     if not success:
-        return {'error', f'Error calling ogr2ogr: {str(err)}'}
+        return {'error': f'Error calling ogr2ogr: {str(err)}'}
     
     if not os.path.isfile(outfile):
         return {'error': f'Cannot find output file: {outfile}'}
@@ -104,7 +126,7 @@ class TaskContoursGenerate(TaskView):
             simplify = float(request.data.get('simplify', 0.01))
             zfactor = float(request.data.get('zfactor', 1))
 
-            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify, zfactor).task_id
+            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify, zfactor, task.crop.geojson if task.crop is not None else None).task_id
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
         except ContoursException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)

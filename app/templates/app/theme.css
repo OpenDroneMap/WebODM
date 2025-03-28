@@ -293,6 +293,11 @@ pre.prettyprint:focus,
 	border-color: {% scalebyiv theme_secondary 0.90 %} !important;
 }
 
+.leaflet-bar a.selected{
+	background-color: {{ theme_button_default }} !important;
+	color: {{ theme_secondary }} !important;
+}
+
 .leaflet-popup-content-wrapper{
 	background-color: {{ theme_secondary }} !important;
 	color: {{ theme_primary }} !important;

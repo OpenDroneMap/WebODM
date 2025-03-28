@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'ReactDOM';
 import '../css/AssetDownloadButtons.scss';
 import AssetDownloads from '../classes/AssetDownloads';
 import PropTypes from 'prop-types';
@@ -11,7 +12,9 @@ class AssetDownloadButtons extends React.Component {
         direction: "down", // or "up",
         buttonClass: "btn-primary",
         task: null,
-        showLabel: true
+        showLabel: true,
+        hideItems: [],
+        modalContainer: null
     };
 
     static propTypes = {
@@ -21,7 +24,9 @@ class AssetDownloadButtons extends React.Component {
         buttonClass: PropTypes.string,
         showLabel: PropTypes.bool,
         onModalOpen: PropTypes.func,
-        onModalClose: PropTypes.func
+        onModalClose: PropTypes.func,
+        hideItems: PropTypes.array,
+        modalContainer: PropTypes.object
     };
 
     constructor(props){
@@ -37,20 +42,38 @@ class AssetDownloadButtons extends React.Component {
         if (this.props.onModalClose) this.props.onModalClose();
     }
 
+    componentDidUpdate(prevProps, prevState){
+        // Do we need to render the export dialog to a specific dom node
+        // (rather then inline?)
+        if (this.props.modalContainer && prevState.exportDialogProps !== this.state.exportDialogProps){
+            ReactDOM.render(this.getAssetDialog(), this.props.modalContainer);
+        }
+    }
+
+    getAssetDialog = () => {
+        let assetDialog = "";
+        
+        if (this.state.exportDialogProps){
+            assetDialog = (<ExportAssetDialog task={this.props.task}
+                    asset={this.state.exportDialogProps.asset}
+                    exportFormats={this.state.exportDialogProps.exportFormats}  
+                    exportParams={this.state.exportDialogProps.exportParams}
+                    onHide={this.onHide}
+                    assetLabel={this.state.exportDialogProps.assetLabel}
+            />);
+        }
+
+        return assetDialog;
+    }
+
     render(){
         const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
-
+        
         return (<div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
           
-          {this.state.exportDialogProps ? 
-            <ExportAssetDialog task={this.props.task}
-                               asset={this.state.exportDialogProps.asset}
-                               exportFormats={this.state.exportDialogProps.exportFormats}  
-                               exportParams={this.state.exportDialogProps.exportParams}
-                               onHide={this.onHide}
-                               assetLabel={this.state.exportDialogProps.assetLabel}
-            /> 
-            : ""}
+          {this.state.exportDialogProps && !this.props.modalContainer ? 
+           this.getAssetDialog()
+          : ""}
 
           <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
             <i className="glyphicon glyphicon-download"></i><span className="hidden-xs hidden-sm">{this.props.showLabel ? " " + _("Download Assets") : ""}</span>
@@ -60,7 +83,9 @@ class AssetDownloadButtons extends React.Component {
                 <span className="caret"></span>
           </button> : ""}
           <ul className="dropdown-menu">
-            {assetDownloads.map((asset, i) => {
+            {assetDownloads.filter(asset => {
+                return this.props.hideItems.indexOf(asset.asset) === -1;
+            }).map((asset, i) => {
                 if (asset.separator){
                     return (<li key={i} className="divider"></li>);
                 }else{
@@ -82,9 +107,9 @@ class AssetDownloadButtons extends React.Component {
                         </li>);
                 }
             })}
-            <li>
+            {this.props.hideItems.indexOf("backup.zip") === -1 ? <li>
                 <a href={`/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/backup`}><i className="fa fa-file-download fa-fw"></i> {_("Backup")}</a>
-            </li>
+            </li> : ""}
           </ul>
         </div>);
     }

@@ -20,16 +20,6 @@
         }
     }
 
-    .crop-control{
-        position: absolute;
-        top: 50px;
-        left: 8px;
-        z-index: 999;
-        .btn:active, .btn:focus{
-            outline: none;
-        }
-    }
-
     .leaflet-control-layers-expanded{
         .leaflet-control-layers-base{
             overflow: hidden;
@@ -38,18 +28,7 @@
         overflow: hidden;
     }
 
-    .map-preview-marker-layer{
-        &:hover{
-            cursor: crosshair;
-        }
-    }
-
-    .map-preview-accept-button{
-        &:hover{
-            cursor: pointer;
-        }
-    }
-    .map-preview-delete{
+    .crop-button-delete{
         min-width: 70px;
     }
 
