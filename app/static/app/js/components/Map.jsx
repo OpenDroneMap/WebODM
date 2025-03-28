@@ -21,6 +21,7 @@ import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
+import AssetDownloadButtons from './AssetDownloadButtons';
 import CropButton from './CropButton';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
@@ -363,9 +364,9 @@ class Map extends React.Component {
                                 </div>
                                 <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" class="opacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-                                <ul class="asset-links loading">
-                                    <li><i class="fa fa-spin fa-sync fa-spin fa-fw"></i></li>
-                                </ul>
+                                <div class="popup-download-assets loading">
+                                  <i class="fa loading fa-spin fa-sync fa-spin fa-fw"></i>
+                                </div>
 
                                 <button
                                     onclick="location.href='${this.tdPopupButtonUrl(meta.task)}';"
@@ -730,7 +731,7 @@ _('Example:'),
         pulse: true,
         willCrop: () => {
           this.removeSideBySideCtrl();
-          
+
           for (let layer of this.state.imageryLayers){
             const meta = layer[Symbol.for("meta")];
             if (meta.task.crop){
@@ -780,29 +781,27 @@ _('Example:'),
             if (e.popup && e.popup._source && e.popup._content && !e.popup.options.lazyrender){
                 const infoWindow = e.popup._content;
                 if (typeof infoWindow === 'string') return;
-
-                const $assetLinks = $("ul.asset-links", infoWindow);
                 
-                if ($assetLinks.length > 0 && $assetLinks.hasClass('loading')){
-                    const {id, project} = (e.popup._source[Symbol.for("meta")] || {}).task;
-
-                    $.getJSON(`/api/projects/${project}/tasks/${id}/`)
-                        .done(res => {
-                            const { available_assets } = res;
-                            const assets = AssetDownloads.excludeSeparators();
-                            const linksHtml = assets.filter(a => available_assets.indexOf(a.asset) !== -1)
-                                              .map(asset => {
-                                                    return `<li><a href="${asset.downloadUrl(project, id)}">${asset.label}</a></li>`;
-                                              })
-                                              .join("");
-                            $assetLinks.append($(linksHtml));
-                        })
-                        .fail(() => {
-                            $assetLinks.append($("<li>" + _("Error: cannot load assets list.") + "</li>"));
-                        })
-                        .always(() => {
-                            $assetLinks.removeClass('loading');
-                        });
+                const $downloadAssets = $(".popup-download-assets", infoWindow);
+                if ($downloadAssets.length > 0 && $downloadAssets.hasClass('loading')){
+                  const {id, project} = (e.popup._source[Symbol.for("meta")] || {}).task;
+                  
+                  $.getJSON(`/api/projects/${project}/tasks/${id}/`)
+                  .done(task => {
+                    if (task){
+                      ReactDOM.render(<AssetDownloadButtons task={task} 
+                                      showLabel={false} 
+                                      buttonClass="btn-secondary"
+                                      hideItems={this.props.permissions.indexOf("change") !== -1 ? [] : ["all.zip", "backup.zip"]} 
+                                      modalContainer={this.modalContainer} />, $downloadAssets.get(0));
+                    }
+                  })
+                  .fail(() => {
+                      $downloadAssets.append($(_("Error: cannot load assets list.")));
+                  })
+                  .always(() => {
+                      $downloadAssets.removeClass('loading');
+                  });
                 }
             }
 
@@ -941,6 +940,8 @@ _('Example:'),
   render() {
     return (
       <div style={{height: "100%"}} className="map">
+        <div className="map-modal-container" ref={(domNode) => this.modalContainer = domNode}></div>
+
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
             <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" className="opacity" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
