@@ -39,6 +39,7 @@ from app.cogeo import assure_cogeo
 from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
+from app.geoutils import geom_transform
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -1089,6 +1090,12 @@ class Task(models.Model):
             }
         }
 
+    def get_projected_crop_bounds(self):
+        if self.crop is None or self.epsg is None:
+            return None
+        
+        return geom_transform(self.crop, self.epsg)
+
     def get_model_display_params(self):
         """
         Subset of a task fields used in the 3D model display view
@@ -1099,7 +1106,8 @@ class Task(models.Model):
             'available_assets': self.available_assets,
             'public': self.public,
             'public_edit': self.public_edit,
-            'epsg': self.epsg
+            'epsg': self.epsg,
+            'crop_projected': self.get_projected_crop_bounds() 
         }
 
     def generate_deferred_asset(self, archive, directory, stream=False):

@@ -25,7 +25,7 @@ from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list, get_auto_bands
 from .tasks import TaskNestedView
-from .geoutils import geom_transform_wkt_bbox
+from app.geoutils import geom_transform_wkt_bbox
 from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster, export_pointcloud

@@ -36,7 +36,7 @@ from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 from .fields import PolygonGeometryField
-from .geoutils import geom_transform_wkt_bbox
+from app.geoutils import geom_transform_wkt_bbox
 from webodm import settings
 
 def flatten_files(request_files):

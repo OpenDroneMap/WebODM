@@ -3,7 +3,7 @@ import os
 import subprocess
 import json
 import rasterio
-from app.api.geoutils import geom_transform_wkt_bbox
+from app.geoutils import geom_transform_wkt_bbox
 from django.contrib.gis.geos import GEOSGeometry
 from app.security import double_quote
 

@@ -363,6 +363,13 @@ class ModelView extends React.Component {
             this.setState({error: "Could not load point cloud. This task doesn't seem to have one. Try processing the task again."});
             return;
           }
+          
+          // Set crop vertices if needed
+          if (this.props.task.crop_projected && this.props.task.crop_projected.length >= 3){
+            e.pointcloud.material.cropVertices = this.props.task.crop_projected.map(coord => {
+                return new THREE.Vector3(coord[0], coord[1], 0.0);
+            });
+          }
 
           // Automatically load 3D model if required
           if (this.hasTexturedModel() && this.props.modelType === "mesh"){

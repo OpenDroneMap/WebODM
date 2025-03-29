@@ -14,7 +14,7 @@ from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
-from app.api.geoutils import geom_transform_wkt_bbox
+from app.geoutils import geom_transform_wkt_bbox
 from rio_tiler.io import COGReader
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 
