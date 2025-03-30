@@ -690,11 +690,9 @@ _('Example:'),
           }
         }
 
-        $.when(...requests)
-          .done(responses => {
-            if (Array.isArray(responses)){
-              responses = responses[0];
-            }else{
+        Promise.all(requests)
+          .then(responses => {
+            if (!Array.isArray(responses)){
               responses = [responses];
             }
 
@@ -715,10 +713,10 @@ _('Example:'),
             
             this.loadImageryLayers();
           })
-          .fail(e => {
+          .catch(e => {
             this.setState({error: _("Cannot set cropping area. Check your internet connection.")});
             console.error(e);
-          }).always(() => {
+          }).finally(() => {
             setTimeout(() => {
               this.cropButton.deletePolygon({triggerEvents: false, fade: true});
             }, 1000);
@@ -731,19 +729,23 @@ _('Example:'),
         pulse: true,
         willCrop: () => {
           this.removeSideBySideCtrl();
+          let foundCrop = false;
 
           for (let layer of this.state.imageryLayers){
             const meta = layer[Symbol.for("meta")];
             if (meta.task.crop){
-              if (window.confirm(_('Are you sure you want to set a new crop area?'))){
-                updateCropArea(null);
-              }else{
-                // Stop crop button from toggling
-                return true;
-              }
+              foundCrop = true;
+              break;
             }
-
-            break;
+          }
+          
+          if (foundCrop){
+            if (window.confirm(_('Are you sure you want to set a new crop area?'))){
+              updateCropArea(null);
+            }else{
+              // Stop crop button from toggling
+              return true;
+            }
           }
         },
         onPolygonChange: updateCropArea
