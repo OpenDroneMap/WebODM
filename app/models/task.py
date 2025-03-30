@@ -976,6 +976,19 @@ class Task(models.Model):
             except shutil.Error as e:
                 logger.warning("Cannot restore from backup: %s" % str(e))
                 raise NodeServerError("Cannot restore from backup")
+        else:
+            # Check if the zip file contained a top level directory
+            # which shouldn't be there and try to fix the structure
+            top_level = [os.path.join(assets_dir, d) for d in os.listdir(assets_dir)]
+            logger.info(top_level)
+            if len(top_level) == 1 and os.path.isdir(top_level[0]):
+                second_level = [os.path.join(top_level[0], f) for f in os.listdir(top_level[0])]
+                if len(second_level) > 0:
+                    logger.info("Top level directory found in imported archive, attempting to fix")
+                    for f in second_level:
+                        shutil.move(f, assets_dir)
+                    shutil.rmtree(top_level[0])
+
 
         # Populate *_extent fields
         extent_fields = self.get_extent_fields()
