@@ -54,3 +54,4 @@ def catch_signal(signal):
     signal.connect(handler, dispatch_uid=str(random.random()))
     yield handler
     signal.disconnect(handler)
+

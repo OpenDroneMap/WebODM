@@ -59,6 +59,14 @@ export default {
         return (url.indexOf("?") !== -1 ? url.slice(0, url.indexOf("?")) : url) + this.toSearchQuery(params);
     },
 
+    buildUrlReplaceParams: function(url, params){
+      let q = this.queryParams({search: url});
+      for (let k in params){
+        q[k] = params[k];
+      }
+      return this.buildUrlWithQuery(url, q);
+    },
+
     clone: function(obj){
       return JSON.parse(JSON.stringify(obj));
     },
