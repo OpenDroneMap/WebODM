@@ -789,10 +789,19 @@ _('Example:'),
                   $.getJSON(`/api/projects/${project}/tasks/${id}/`)
                   .done(task => {
                     if (task){
+                      let hideItems = [];
+                      if (this.props.permissions.indexOf("change") === -1){
+                        if (task.crop){
+                          hideItems = ["all.zip", "backup.zip"];
+                        }else{
+                          hideItems = ["backup.zip"];
+                        }
+                      }
+
                       ReactDOM.render(<AssetDownloadButtons task={task} 
                                       showLabel={false} 
                                       buttonClass="btn-secondary"
-                                      hideItems={this.props.permissions.indexOf("change") !== -1 ? [] : ["all.zip", "backup.zip"]} 
+                                      hideItems={hideItems} 
                                       modalContainer={this.modalContainer} />, $downloadAssets.get(0));
                     }
                   })
