@@ -1103,7 +1103,7 @@ class Task(models.Model):
             }
         }
 
-    def get_projected_crop_bounds(self):
+    def get_projected_crop(self):
         if self.crop is None or self.epsg is None:
             return None
         
@@ -1120,7 +1120,7 @@ class Task(models.Model):
             'public': self.public,
             'public_edit': self.public_edit,
             'epsg': self.epsg,
-            'crop_projected': self.get_projected_crop_bounds() 
+            'crop_projected': self.get_projected_crop() 
         }
 
     def generate_deferred_asset(self, archive, directory, stream=False):

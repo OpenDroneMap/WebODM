@@ -174,11 +174,11 @@ class Metadata(TaskNestedView):
         try:
             with COGReader(raster_path) as src:
                 band_count = src.dataset.meta['count']
-                if crop and task.crop is not None:
-                    cutline, bounds = geom_transform_wkt_bbox(task.crop, src.dataset)
-                elif boundaries_feature is not None:
+                if boundaries_feature is not None:
                     cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                     bounds = featureBounds(boundaries_feature)
+                elif crop and task.crop is not None:
+                    cutline, bounds = geom_transform_wkt_bbox(task.crop, src.dataset)
                 else:
                     cutline = None
                     bounds = None
@@ -371,13 +371,13 @@ class Tiles(TaskNestedView):
             if z < minzoom - ZOOM_EXTRA_LEVELS or z > maxzoom + ZOOM_EXTRA_LEVELS:
                 raise exceptions.NotFound()
 
-            if crop and task.crop is not None:
-                cutline, bounds = geom_transform_wkt_bbox(task.crop, src.dataset)
-            elif boundaries_feature is not None:
+            if boundaries_feature is not None:
                 try:
                     cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
                 except:
                     raise exceptions.ValidationError(_("Invalid boundaries"))
+            elif crop and task.crop is not None:
+                cutline, bounds = geom_transform_wkt_bbox(task.crop, src.dataset)
             else:
                 cutline = None
             

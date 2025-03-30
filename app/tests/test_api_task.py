@@ -259,6 +259,9 @@ class TestApiTask(BootTransactionTestCase):
             # Size should be zero
             self.assertEqual(task.size, 0)
 
+            # Crop should be none
+            self.assertTrue(task.crop is None)
+
             # tiles.json, bounds, metadata should not be accessible at this point
             tile_types = ['orthophoto', 'dsm', 'dtm']
             endpoints = ['tiles.json', 'bounds', 'metadata']
@@ -412,6 +415,9 @@ class TestApiTask(BootTransactionTestCase):
 
             # Size should be updated
             self.assertTrue(task.size > 0)
+
+            # Crop should still be none
+            self.assertTrue(task.crop is None)
 
             # The owner's used quota should have increased
             self.assertTrue(task.project.owner.profile.used_quota_cached() > 0)
@@ -709,6 +715,29 @@ class TestApiTask(BootTransactionTestCase):
             res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/20/32042/46185.png".format(project.id, task.id))
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
+            crop_geojson = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-91.99424117803576,46.84230591442068],[-91.99366182088853,46.84228940253027],[-91.99393808841705,46.84257010397711],[-91.99424117803576,46.84230591442068]]]}}
+
+            # Cannot update with invalid crop
+            res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+                'crop': "invalid"
+            }, format="json")
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+            task.refresh_from_db()
+            self.assertTrue(task.crop is None)
+
+            # Can update with valid crop
+            res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+                'crop': crop_geojson
+            }, format="json")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertTrue(res.data['crop'] is not None)
+            task.refresh_from_db()
+            self.assertTrue(task.crop is not None)
+
+            # Can get thumbnail when crop is set
+            res = client.get("/api/projects/{}/tasks/{}/thumbnail?size=64".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
             # Can access hillshade, formulas, bands, rescale, color_map
             params = [
                 ("dsm", "color_map=jet&hillshade=3&rescale=150,170", status.HTTP_200_OK),
@@ -754,6 +783,12 @@ class TestApiTask(BootTransactionTestCase):
             for tile_type, url, sc in params:
                 res = client.get("/api/projects/{}/tasks/{}/{}/tiles/{}?{}".format(project.id, task.id, tile_type, tile_path[tile_type], url))
                 self.assertEqual(res.status_code, sc)
+
+                # With crop parameter also
+                crop_url = url + ("" if url == "" else "&") + "crop=1"
+                res = client.get("/api/projects/{}/tasks/{}/{}/tiles/{}?{}".format(project.id, task.id, tile_type, tile_path[tile_type], crop_url))
+                self.assertEqual(res.status_code, sc)
+                
             
             # Can request PNG/JPG/WEBP tiles explicitely
             for ext in ["png", "jpg", "webp"]:
