@@ -15,6 +15,7 @@ A user-friendly, commercial grade software for drone image processing. Generate 
       + [Manage Processing Nodes](#manage-processing-nodes)
       + [Enable MicMac](#enable-micmac)
       + [Enable SSL](#enable-ssl)
+      + [Enable IPv6](#enable-ipv6)
       + [Where Are My Files Stored?](#where-are-my-files-stored)
       + [Common Troubleshooting](#common-troubleshooting)
          - [Images Missing from Lightning Assets](#images-missing-from-lightning-assets)
@@ -164,6 +165,25 @@ That's it! The certificate will automatically renew when needed.
 If you want to specify your own key/certificate pair, simply pass the `--ssl-key` and `--ssl-cert` option to `./webodm.sh`. See `./webodm.sh --help` for more information.
 
 Note! You cannot pass an IP address to the hostname parameter! You need a DNS record setup.
+
+### Enable IPv6
+
+Your installation must first have a public IPv6 address.
+To enable IPv6 on your installation, you need to activate IPv6 in Docker by adding the following to a file located at /etc/docker/daemon.json:
+```bash
+{
+  "ipv6": true,
+  "fixed-cidr-v6": "fdb4:4d19:7eb5::/64"
+}
+```
+Restart Docker:
+`systemctl restart docker`
+
+To add IPv6, simply run:
+
+`./webodm.sh restart --ipv6`
+
+Note: When using `--ssl` mode, you cannot pass an IP address to the hostname parameter; you must set up a DNS AAAA record. Without `--ssl` mode enabled, access the site at (e.g., http://[2001:0db8:3c4d:0015::1]:8000). The brackets around the IPv6 address are essential!
 
 ### Where Are My Files Stored?
 
