@@ -1,0 +1,9 @@
+version: '2.2'
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.21.0.0/16"
+        - subnet: "fdec:cc68:5178::/64"
