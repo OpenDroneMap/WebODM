@@ -56,11 +56,3 @@ services:
       - WO_SECRET_KEY
     restart: unless-stopped
     oom_score_adj: 250
-networks:
-  default:
-    enable_ipv6: true
-    ipam:
-      driver: default
-      config:
-        - subnet: "172.21.0.0/16"
-        - subnet: "fdec:cc68:5178::/64"
