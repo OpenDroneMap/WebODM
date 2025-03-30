@@ -36,9 +36,18 @@ class TestCrop(BootTestCase):
         bbox[2] -= 0.0001 # Move X
         bbox[3] -= 0.0001 # Move Y
         
-
         t.orthophoto_extent = Polygon.from_bbox(bbox)
         t.save()
+
+        # Cannot set a self-intersecting polygon
+        # (should silently fail)
+        crop_invalid = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-91.99406415224075,46.84238582215199],[-91.99387907981874,46.84261331845379],[-91.99374094605449,46.84243168841939],[-91.99411109089851,46.8425454365936],[-91.99406415224075,46.84238582215199]]]}}
+        res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, t.id), {
+            'crop': crop_invalid
+        }, format="json")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        t.refresh_from_db()
+        self.assertTrue(t.crop is None)
 
         # Can update with valid crop
         res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, t.id), {
