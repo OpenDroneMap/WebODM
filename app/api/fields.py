@@ -33,7 +33,7 @@ class PolygonGeometryField(Field):
         if isinstance(value, GEOSGeometry):
             return value
         if isinstance(value, dict):
-            if value['geometry']:
+            if value.get('geometry'):
                 value = value['geometry']
             value = json.dumps(value)
         
