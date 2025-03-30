@@ -365,11 +365,7 @@ class ModelView extends React.Component {
           }
           
           // Set crop vertices if needed
-          if (this.props.task.crop_projected && this.props.task.crop_projected.length >= 3){
-            e.pointcloud.material.cropVertices = this.props.task.crop_projected.map(coord => {
-                return new THREE.Vector3(coord[0], coord[1], 0.0);
-            });
-          }
+          e.pointcloud.material.cropVertices = this.getCropCoordinates();
 
           // Automatically load 3D model if required
           if (this.hasTexturedModel() && this.props.modelType === "mesh"){
@@ -477,6 +473,14 @@ class ModelView extends React.Component {
     viewer.renderer.domElement.addEventListener( 'mousedown', this.handleRenderMouseClick );
     viewer.renderer.domElement.addEventListener( 'mousemove', this.handleRenderMouseMove );
     
+  }
+
+  getCropCoordinates(){
+    if (this.props.task.crop_projected && this.props.task.crop_projected.length >= 3){
+        return this.props.task.crop_projected.map(coord => {
+            return new THREE.Vector3(coord[0], coord[1], 0.0);
+        });
+    }
   }
 
   componentWillUnmount(){
@@ -650,7 +654,8 @@ class ModelView extends React.Component {
         xhr => {
             // called while loading is progressing
         },
-        error => { cb(error); }
+        error => { cb(error); },
+        {crop: this.getCropCoordinates()}
     );
   }
 
