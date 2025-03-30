@@ -184,6 +184,7 @@ To add IPv6, simply run:
 `./webodm.sh restart --ipv6`
 
 Note: When using `--ssl` mode, you cannot pass an IP address to the hostname parameter; you must set up a DNS AAAA record. Without `--ssl` mode enabled, access the site at (e.g., http://[2001:0db8:3c4d:0015::1]:8000). The brackets around the IPv6 address are essential!
+You can add a new NodeODM node in WebODM by specifying an IPv6 address. Don’t forget to include brackets around the address! e.g., [2001:0db8:fd8a:ae80::1]
 
 ### Where Are My Files Stored?
 
