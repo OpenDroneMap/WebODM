@@ -150,6 +150,7 @@ case $key in
     ;;
     --ipv6)
     ipv6=true
+    export WO_IPV6=YES
     shift # past argument
     ;;
     *)    # unknown option
@@ -373,6 +374,7 @@ start(){
 	echo "================================"
 	echo "Host: $WO_HOST"
 	echo "Port: $WO_PORT"
+ 	echo "IPv6: $WO_IPV6"
 	echo "Media directory: $WO_MEDIA_DIR"
 	echo "Postgres DB directory: $WO_DB_DIR"
 	echo "SSL: $WO_SSL"
