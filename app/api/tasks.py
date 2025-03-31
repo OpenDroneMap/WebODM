@@ -623,8 +623,11 @@ class TaskAssetsImport(APIView):
         if not import_url and len(files) != 1:
             raise exceptions.ValidationError(detail=_("Cannot create task, you need to upload 1 file"))
 
-        if import_url and len(files) > 0:
-            raise exceptions.ValidationError(detail=_("Cannot create task, either specify a URL or upload 1 file."))
+        if import_url:
+            if len(files) > 0:
+                raise exceptions.ValidationError(detail=_("Cannot create task, either specify a URL or upload 1 file."))
+            if re.match(r"^https?:\/\/.+$", import_url.lower()) is None:
+                raise exceptions.ValidationError(detail=_("Invalid URL. Did you mean %(hint)s ?") % { 'hint': f'http://{import_url}'})
 
         chunk_index = request.data.get('dzchunkindex')
         uuid = request.data.get('dzuuid') 

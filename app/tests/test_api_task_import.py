@@ -125,6 +125,12 @@ class TestApiTask(BootTransactionTestCase):
             file_import_task.public = True
             file_import_task.save()
 
+            # Cannot import an invalid URL
+            res = client.post("/api/projects/{}/tasks/import".format(project.id), {
+                'url': "javascript:void(0)"
+            })
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
             # Import with URL method
             assets_import_url = "http://{}:{}/task/{}/download/all.zip".format(pnode.hostname, pnode.port, task_uuid)
             res = client.post("/api/projects/{}/tasks/import".format(project.id), {
