@@ -1,12 +1,11 @@
 # This configuration does not include a processing node
 # Which makes for faster setup times
-version: '2.1'
 volumes:
   dbdata:
   appmedia:
 services:
   db:
-    image: opendronemap/webodm_db
+    image: opendronemap/webodm_db:latest
     container_name: db
     expose:
       - "5432"
@@ -15,7 +14,7 @@ services:
     restart: unless-stopped
     oom_score_adj: -100
   webapp:
-    image: opendronemap/webodm_webapp
+    image: opendronemap/webodm_webapp:latest
     container_name: webapp
     entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
     volumes:
@@ -37,12 +36,12 @@ services:
     restart: unless-stopped
     oom_score_adj: 0
   broker:
-    image: redis:7.0.10
+    image: redis:7.0.15
     container_name: broker
     restart: unless-stopped
     oom_score_adj: -500
   worker:
-    image: opendronemap/webodm_webapp
+    image: opendronemap/webodm_webapp:latest
     container_name: worker
     entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/wait-for-it.sh -t 0 webapp:8000 -- /webodm/worker.sh start"
     volumes:
