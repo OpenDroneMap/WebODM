@@ -150,6 +150,7 @@ case $key in
     ;;
     --ipv6)
     ipv6=true
+    export WO_IPV6=YES
     shift # past argument
     ;;
     *)    # unknown option
@@ -373,6 +374,7 @@ start(){
 	echo "================================"
 	echo "Host: $WO_HOST"
 	echo "Port: $WO_PORT"
+ 	echo "IPv6: $WO_IPV6"
 	echo "Media directory: $WO_MEDIA_DIR"
 	echo "Postgres DB directory: $WO_DB_DIR"
 	echo "SSL: $WO_SSL"
@@ -490,10 +492,6 @@ down(){
 		command+=" -f docker-compose.nodeodm.yml"
 	fi
 
- 	if [[ $ipv6 = true ]]; then
-        	command+=" -f docker-compose.ipv6.yml"
-    	fi
-
 	command+=" -f docker-compose.nodemicmac.yml down --remove-orphans"
 
 	run "${command}"
@@ -596,11 +594,7 @@ elif [[ $1 = "stop" ]]; then
 	else
 		command+=" -f docker-compose.nodeodm.yml"
 	fi
-
- 	if [[ $ipv6 = true ]]; then
-        	command+=" -f docker-compose.ipv6.yml"
-    	fi
-
+ 
 	command+=" -f docker-compose.nodemicmac.yml stop"
 	run "${command}"
 elif [[ $1 = "restart" ]]; then
