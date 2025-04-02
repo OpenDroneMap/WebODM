@@ -980,7 +980,6 @@ class Task(models.Model):
             # Check if the zip file contained a top level directory
             # which shouldn't be there and try to fix the structure
             top_level = [os.path.join(assets_dir, d) for d in os.listdir(assets_dir)]
-            logger.info(top_level)
             if len(top_level) == 1 and os.path.isdir(top_level[0]):
                 second_level = [os.path.join(top_level[0], f) for f in os.listdir(top_level[0])]
                 if len(second_level) > 0:
