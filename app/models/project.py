@@ -1,5 +1,7 @@
 import logging
 import uuid
+import shutil
+import os
 
 from django.conf import settings
 from django.db import models
@@ -16,6 +18,7 @@ from django.db import transaction
 from app import pending_actions
 
 from nodeodm import status_codes
+from webodm import settings as wo_settings
 
 logger = logging.getLogger('app.logger')
 
@@ -36,7 +39,28 @@ class Project(models.Model):
         # No tasks?
         if self.task_set.count() == 0:
             # Just delete normally
+
+            project_dir = os.path.join(wo_settings.MEDIA_ROOT, "project", str(self.id))
+            if os.path.isdir(project_dir):
+                entries = os.listdir(project_dir)
+                empty_project_folder = False
+
+                if len(entries) == 0:
+                    empty_project_folder = True
+                elif len(entries) == 1 and entries[0] == "task":
+                    empty_project_folder = len(os.listdir(os.path.join(project_dir, "task"))) == 0
+
+                if empty_project_folder:
+                    logger.info(f"Deleting {project_dir}")
+                    try:
+                        shutil.rmtree(project_dir)
+                    except Exception as e:
+                        logger.warning(f"Cannot delete {project_dir}: {str(e)}")
+                else:
+                    logger.warning(f"Project {self.id} is being deleted, but data is stored on disk. We will keep the data at {project_dir}, but will become orphaned")
+
             logger.info("Deleted project {}".format(self.id))
+
             super().delete(*args)
         else:
             # Need to remove all tasks before we can remove this project
