@@ -384,6 +384,10 @@ UI_MAX_PROCESSING_NODES = None
 # are removed (or None to disable)
 CLEANUP_PARTIAL_TASKS = 72
 
+# Number of hours before empty projects
+# are removed for users that have zero quotas
+CLEANUP_EMPTY_PROJECTS = None
+
 # Maximum number of threads that a worker should use for processing
 WORKERS_MAX_THREADS = 1
 

@@ -68,6 +68,18 @@ def cleanup_projects():
     if total > 0 and 'app.Project' in count_dict:
         logger.info("Deleted {} projects".format(count_dict['app.Project']))
 
+    # Delete projects that have no tasks and are owned by users with
+    # no disk quota
+    if settings.CLEANUP_EMPTY_PROJECTS is not None:
+        total, count_dict = Project.objects.filter(
+            owner__profile__quota=0,
+            created_at__lte=timezone.now() - timedelta(hours=settings.CLEANUP_EMPTY_PROJECTS)
+        ).annotate(
+            tasks_count=Count('task')
+        ).filter(tasks_count=0).delete()
+        if total > 0 and 'app.Project' in count_dict:
+            logger.info("Deleted {} projects".format(count_dict['app.Project']))
+
 @app.task(ignore_result=True)
 def cleanup_tasks():
     # Delete tasks that are older than 
