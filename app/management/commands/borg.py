@@ -35,7 +35,7 @@ class Command(BaseCommand):
             print("")
             print("# Skip projects")
             for sp in skip_projects:
-                print("- " + os.path.join("project", str(sp.id)))
+                print("! " + os.path.join("project", str(sp.id)))
 
             if options.get('skip_images'):
                 print("")
