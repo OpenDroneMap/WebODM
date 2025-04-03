@@ -384,6 +384,10 @@ UI_MAX_PROCESSING_NODES = None
 # are removed (or None to disable)
 CLEANUP_PARTIAL_TASKS = 72
 
+# Number of hours before empty projects
+# are removed for users that have zero quotas
+CLEANUP_EMPTY_PROJECTS = None
+
 # Maximum number of threads that a worker should use for processing
 WORKERS_MAX_THREADS = 1
 
@@ -395,6 +399,10 @@ DOCS_LINK = "https://docs.opendronemap.org"
 
 # Link to task options docs
 TASK_OPTIONS_DOCS_LINK = "https://docs.opendronemap.org/arguments/"
+
+# Whether to display onboarding instructions and 
+# automatically create a first project on first login
+DASHBOARD_ONBOARDING = True
 
 if TESTING or FLUSHING:
     CELERY_TASK_ALWAYS_EAGER = True

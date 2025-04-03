@@ -15,6 +15,7 @@ A user-friendly, commercial grade software for drone image processing. Generate 
       + [Manage Processing Nodes](#manage-processing-nodes)
       + [Enable MicMac](#enable-micmac)
       + [Enable SSL](#enable-ssl)
+      + [Enable IPv6](#enable-ipv6)
       + [Where Are My Files Stored?](#where-are-my-files-stored)
       + [Common Troubleshooting](#common-troubleshooting)
          - [Images Missing from Lightning Assets](#images-missing-from-lightning-assets)
@@ -59,7 +60,6 @@ Don't expect to process more than a few hundred images with these specifications
 WebODM runs best on Linux, but works well on Windows and Mac too. If you are technically inclined, you can get WebODM to run natively on all three platforms.
 
 WebODM by itself is just a user interface (see [below](#odm-nodeodm-webodm-what)) and does not require many resources. WebODM can be loaded on a machine with just 1 or 2 GB of RAM and work fine without NodeODM. You can then use a processing service such as the [lightning network](https://webodm.net) or run NodeODM on a separate, more powerful machine.
-
 
 ## Manual installation (Docker)
 To install WebODM manually on your machine with docker:
@@ -128,6 +128,18 @@ If you don't need the default "node-odm-1" node, simply pass `--default-nodes 0`
 
 Then from the web interface simply manually remove the "node-odm-1" node.
 
+## Distributed Installation Using NAS (Qnap)
+If you use lightning or another processor node the requirements for WebODM are low enough for it to run on a fairly low power device such as a NAS. Testing has been done on a Qnap-TS264 with 32Gb of RAM (Celeron  N5095 processor)
+To install WebODM on a Qnap NAS:-
+1) Enable ssh access to the NAS in control panel
+2) Install git. This might be easily achieved using the [qgit qkpg](https://www.myqnap.org/product/qgit/)
+3) Now follow the “Installation with Docker” instructions above.
+4) A new "webodm" application should appear in container station along with four individual containers for the app.
+5) Webodm should be available at port 8000 of the NAS.
+6) Setup a lightning account online and configure it within "processing nodes". It's also possible to setup a more powerful computer to run processing tasks instead of lightning.
+   
+This method of working may be useful if using the WebODM Lightning PAYG model as it offers somewhere to host your models outwith the three day window offered as part of PAYG
+
 ### Enable MicMac
 
 WebODM can use [MicMac](https://github.com/OpenDroneMap/micmac) as a processing engine via [NodeMICMAC](https://github.com/OpenDroneMap/NodeMICMAC/). To add MicMac, simply run:
@@ -153,6 +165,26 @@ That's it! The certificate will automatically renew when needed.
 If you want to specify your own key/certificate pair, simply pass the `--ssl-key` and `--ssl-cert` option to `./webodm.sh`. See `./webodm.sh --help` for more information.
 
 Note! You cannot pass an IP address to the hostname parameter! You need a DNS record setup.
+
+### Enable IPv6
+
+Your installation must first have a public IPv6 address.
+To enable IPv6 on your installation, you need to activate IPv6 in Docker by adding the following to a file located at /etc/docker/daemon.json:
+```bash
+{
+  "ipv6": true,
+  "fixed-cidr-v6": "fdb4:4d19:7eb5::/64"
+}
+```
+Restart Docker:
+`systemctl restart docker`
+
+To add IPv6, simply run:
+
+`./webodm.sh restart --ipv6`
+
+Note: When using `--ssl` mode, you cannot pass an IP address to the hostname parameter; you must set up a DNS AAAA record. Without `--ssl` mode enabled, access the site at (e.g., http://[2001:0db8:3c4d:0015::1]:8000). The brackets around the IPv6 address are essential!
+You can add a new NodeODM node in WebODM by specifying an IPv6 address. Don’t forget to include brackets around the address! e.g., [2001:0db8:fd8a:ae80::1]
 
 ### Where Are My Files Stored?
 

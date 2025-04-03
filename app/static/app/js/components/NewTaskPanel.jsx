@@ -7,12 +7,15 @@ import ResizeModes from '../classes/ResizeModes';
 import MapPreview from './MapPreview';
 import update from 'immutability-helper';
 import PluginsAPI from '../classes/plugins/API';
+import statusCodes from '../classes/StatusCodes';
 import { _, interpolate } from '../classes/gettext';
 
 class NewTaskPanel extends React.Component {
   static defaultProps = {
     filesCount: 0,
-    showResize: false
+    showResize: false,
+    showAlign: false,
+    projectId: null
   };
 
   static propTypes = {
@@ -20,7 +23,9 @@ class NewTaskPanel extends React.Component {
       onCancel: PropTypes.func,
       filesCount: PropTypes.number,
       showResize: PropTypes.bool,
+      showAlign: PropTypes.bool,
       getFiles: PropTypes.func,
+      projectId: PropTypes.number,
       suggestedTaskName: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
   };
 
@@ -31,6 +36,9 @@ class NewTaskPanel extends React.Component {
       editTaskFormLoaded: false,
       resizeMode: Storage.getItem('resize_mode') === null ? ResizeModes.YES : ResizeModes.fromString(Storage.getItem('resize_mode')),
       resizeSize: parseInt(Storage.getItem('resize_size')) || 2048,
+      alignTo: "auto",
+      alignTasks: [], // loaded on mount if showAlign is true
+      loadingAlignTasks: false,
       items: [], // Coming from plugins,
       taskInfo: {},
       inReview: false,
@@ -61,6 +69,25 @@ class NewTaskPanel extends React.Component {
             items: {$push: [item]}
         }));
     });
+  }
+
+  componentWillUnmount(){
+    if (this.alignTasksRequest) this.alignTasksRequest.abort();
+  }
+
+  loadAlignTasks = (bbox) => {
+    this.setState({alignTasks: [], alignTo: "auto", loadingAlignTasks: true});
+
+    this.alignTasksRequest = 
+      $.getJSON(`/api/projects/${this.props.projectId}/tasks/?ordering=-created_at&status=${statusCodes.COMPLETED}&available_assets=georeferenced_model.laz&bbox=${bbox.join(",")}`, tasks => {
+        if (Array.isArray(tasks)){
+          this.setState({loadingAlignTasks: false, alignTasks: tasks});
+        }else{
+          this.setState({loadingAlignTasks: false});
+        }
+      }).fail(() => {
+        this.setState({loadingAlignTasks: false});
+      });
   }
 
   save(e){
@@ -99,7 +126,8 @@ class NewTaskPanel extends React.Component {
   getTaskInfo(){
     return Object.assign(this.taskForm.getTaskInfo(), {
       resizeSize: this.state.resizeSize,
-      resizeMode: this.state.resizeMode 
+      resizeMode: this.state.resizeMode,
+      alignTo: this.state.alignTo
     });
   }
 
@@ -148,6 +176,27 @@ class NewTaskPanel extends React.Component {
     if (this.taskForm) this.taskForm.forceUpdate();
   }
 
+  handleImagesBboxChange = (bbox) => {
+    if (this.props.showAlign){
+      this.loadAlignTasks(bbox);
+    }
+  }
+
+  handleAlignToChanged = e => {
+    this.setState({alignTo: e.target.value});
+    if (this.mapPreview){
+      if (e.target.value !== "auto"){
+        this.mapPreview.setAlignmentPolygon(this.state.alignTasks.find(t => t.id === e.target.value));
+      }else{
+        this.mapPreview.setAlignmentPolygon(null);
+      }
+    }
+
+    setTimeout(() => {
+        this.handleFormChanged();
+    }, 0);
+  }
+
   render() {
     let filesCountOk = true;
     if (this.taskForm && !this.taskForm.checkFilesCount(this.props.filesCount)) filesCountOk = false;
@@ -176,6 +225,7 @@ class NewTaskPanel extends React.Component {
             {this.state.showMapPreview ? <MapPreview 
               getFiles={this.props.getFiles}
               onPolygonChange={this.handlePolygonChange}
+              onImagesBboxChanged={this.handleImagesBboxChange}
               ref={(domNode) => {this.mapPreview = domNode; }}
             /> : ""}
 
@@ -188,6 +238,22 @@ class NewTaskPanel extends React.Component {
               getCropPolygon={this.getCropPolygon}
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
+
+            {this.state.editTaskFormLoaded && this.props.showAlign && this.state.showMapPreview && this.state.alignTasks.length > 0 ?
+              <div>
+                <div className="form-group">
+                  <label className="col-sm-2 control-label">{_("Alignment")}</label>
+                  <div className="col-sm-10">
+                    <select className="form-control" disabled={this.state.loadingAlignTasks} value={this.state.alignTo} onChange={this.handleAlignToChanged}>
+                      <option value="auto" key="auto">{this.state.loadingAlignTasks ? _("Loading...") : _("Automatic")}</option>
+                      {this.state.alignTasks.map(t => 
+                        <option value={t.id} key={t.id}>{t.name}</option>
+                      )}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            : ""}
 
             {this.state.editTaskFormLoaded && this.props.showResize ?
               <div>
@@ -228,6 +294,7 @@ class NewTaskPanel extends React.Component {
                 </div>)}
               </div>
             : ""}
+
           </div>
 
           {this.state.editTaskFormLoaded ? 

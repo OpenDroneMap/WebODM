@@ -156,4 +156,15 @@
     .name-link{
         margin-right: 4px;
     }
+
+    .task-thumbnail{
+        width: 164px;
+        height: 164px;
+        max-width: 100%;
+        max-height: 164px;
+        overflow: hidden;
+        &:hover{
+            opacity: 0.9;
+        }
+    }
 }

@@ -10,7 +10,7 @@ from app.tests.classes import BootTestCase
 
 logger = logging.getLogger('app.logger')
 
-class TestApiPreset(BootTestCase):
+class TestApiTags(BootTestCase):
     def setUp(self):
         super().setUp()
 
@@ -91,3 +91,18 @@ class TestApiPreset(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(1, len(res.data))
         self.assertEqual(res.data[0]['tasks'][0], task2.id)
+
+        # Can search by username
+        res = client.get("/api/projects/?search=@tEstUsEr")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(3, len(res.data))
+
+        # Can search by username and task name
+        res = client.get("/api/projects/?search=@tEstUsEr%20TestTask2")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(1, len(res.data))
+
+        # Bad username
+        res = client.get("/api/projects/?search=@TestTask2")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(0, len(res.data))

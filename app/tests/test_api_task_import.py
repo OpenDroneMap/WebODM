@@ -40,6 +40,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Create processing node
             pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+            assign_perm('view_processingnode', user, pnode)
             client.login(username="testuser", password="test1234")
 
             # Create task
@@ -123,6 +124,12 @@ class TestApiTask(BootTransactionTestCase):
             # Set task public so we can download from it without auth
             file_import_task.public = True
             file_import_task.save()
+
+            # Cannot import an invalid URL
+            res = client.post("/api/projects/{}/tasks/import".format(project.id), {
+                'url': "javascript:void(0)"
+            })
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
             # Import with URL method
             assets_import_url = "http://{}:{}/task/{}/download/all.zip".format(pnode.hostname, pnode.port, task_uuid)
@@ -233,6 +240,8 @@ class TestApiTask(BootTransactionTestCase):
 
             # Create processing node
             pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+            assign_perm('view_processingnode', user, pnode)
+
             client.login(username="testuser", password="test1234")
 
             # Create task

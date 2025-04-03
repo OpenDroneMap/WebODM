@@ -1,4 +1,5 @@
 import logging
+import os
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -132,3 +133,42 @@ class TestApiProjects(BootTestCase):
         # Project is still there
         res = client.get("/api/projects/{}/".format(project.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Simulate some folders
+        project_dir = project.get_project_dir()
+        task_dir = os.path.join(project_dir, "task")
+
+        os.makedirs(task_dir, exist_ok=True)
+        self.assertTrue(os.path.isdir(task_dir))
+
+        # Delete the project
+        res = client.delete('/api/projects/{}/'.format(project.id))
+        self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
+        
+        # Folders should have been deleted
+        self.assertFalse(os.path.isdir(task_dir))
+        self.assertFalse(os.path.isdir(project_dir))
+
+        # Recreate, but this time add some content in the task folder
+        project = Project.objects.create(
+            owner=user,
+            name="test project"
+        )
+        project_dir = project.get_project_dir()
+        task_dir = os.path.join(project_dir, "task", "123", "assets")
+
+        os.makedirs(task_dir, exist_ok=True)
+        self.assertTrue(os.path.isdir(task_dir))
+
+        # Delete the project
+        res = client.delete('/api/projects/{}/'.format(project.id))
+        self.assertTrue(res.status_code == status.HTTP_204_NO_CONTENT)
+
+        # The folder should still be there because it wasn't empty
+        self.assertTrue(os.path.isdir(task_dir))
+        self.assertTrue(os.path.isdir(project_dir))
+
+        
+
+
+        

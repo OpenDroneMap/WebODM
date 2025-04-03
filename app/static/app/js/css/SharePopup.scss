@@ -14,7 +14,23 @@
 		position: relative;
 		display: block;
 	    left: -26px;
-    	min-width: 232px;
+    	min-width: 280px;
+
+		.fa-exclamation-triangle{
+			margin-right: 4px;
+		}
+
+		.close{
+			right: 0;
+		}
+
+		.link-alert{
+			padding: 8px;
+		}
+
+		label{
+			width: 100%;
+		}
 
 		&.top{
 			top: -43px;
@@ -32,10 +48,20 @@
 			left: 25px;
 		}
 
+		&.shareProject.top{
+			left: 0px;
+
+			& > .arrow{
+				right: 20px;
+			}
+		}
+
 		h3.popover-title{
+			font-size: 20px;
 			padding-top: 8px;
 			display: flex;
 			justify-content: space-between;
+			align-items: center;
 		}
 
 		.checkboxes{

@@ -55,6 +55,8 @@ class ProjectFilter(filters.FilterSet):
         value = value.replace(":", "#")
         tag_pattern = re.compile("#[^\s]+")
         tags = set(re.findall(tag_pattern, value))
+        user_pattern = re.compile("@[^\s]+")
+        users = list(set(re.findall(user_pattern, value)))
 
         task_tags = set([t for t in tags if t.startswith("##")])
         project_tags = tags - task_tags
@@ -62,8 +64,11 @@ class ProjectFilter(filters.FilterSet):
         task_tags = [t.replace("##", "") for t in task_tags]
         project_tags = [t.replace("#", "") for t in project_tags]
 
-        names = re.sub("\s+", " ", re.sub(tag_pattern, "", value)).strip()
+        names = re.sub("\s+", " ", re.sub(user_pattern, "", re.sub(tag_pattern, "", value))).strip()
 
+        if len(users) > 0:
+            qs = qs.filter(owner__username__iexact=users[0][1:])
+        
         if len(names) > 0:
             project_name_vec = SearchVector("name")
             task_name_vec = SearchVector(StringAgg("task__name", delimiter=' '))

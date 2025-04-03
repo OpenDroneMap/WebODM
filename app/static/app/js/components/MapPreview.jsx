@@ -13,23 +13,21 @@ import Standby from './Standby';
 import exifr from '../vendor/exifr';
 import '../vendor/leaflet/leaflet-markers-canvas';
 import { _, interpolate } from '../classes/gettext';
+import CropButton from './CropButton';
 import 'leaflet-fullscreen/dist/Leaflet.fullscreen';
 import 'leaflet-fullscreen/dist/leaflet.fullscreen.css';
-
-const Colors = {
-  fill: '#fff',
-  stroke: '#1a1a1a'
-};
 
 class MapPreview extends React.Component {
   static defaultProps = {
     getFiles: null,
-    onPolygonChange: () => {}
+    onPolygonChange: () => {},
+    onImagesBboxChanged: () => {}
   };
     
   static propTypes = {
     getFiles: PropTypes.func.isRequired,
-    onPolygonChange: PropTypes.func
+    onPolygonChange: PropTypes.func,
+    onImagesBboxChanged: PropTypes.func
   };
 
   constructor(props) {
@@ -37,8 +35,7 @@ class MapPreview extends React.Component {
     
     this.state = {
         showLoading: true,
-        error: "",
-        cropping: false
+        error: ""
     };
 
     this.basemaps = {};
@@ -145,6 +142,15 @@ _('Example:'),
         });
     }
 
+    this.cropButton = new CropButton({
+      position:'bottomleft',
+      title: _("Set Reconstruction Area (optional)"),
+      group: this.group,
+      onPolygonCreated: this.onPolygonCreated,
+      onPolygonChange: this.props.onPolygonChange
+    });
+    this.map.addControl(this.cropButton);
+
     this.map.fitBounds([
      [13.772919746115805,
      45.664640939831735],
@@ -153,6 +159,21 @@ _('Example:'),
     this.map.attributionControl.setPrefix("");
 
     this.loadNewFiles();
+  }
+
+  onPolygonCreated = (polygon) => {
+    const popupContainer = L.DomUtil.create('div');
+    popupContainer.className = "crop-button-delete";
+    const deleteLink = L.DomUtil.create('a');
+    deleteLink.href = "javascript:void(0)";
+    deleteLink.innerHTML = `<i class="fa fa-trash"></i> ${_("Delete")}`;
+    deleteLink.onclick = (e) => {
+        L.DomEvent.stop(e);
+        this.cropButton.deletePolygon();
+    };
+    popupContainer.appendChild(deleteLink);
+
+    polygon.bindPopup(popupContainer);
   }
 
   sampled = (arr, N) => {
@@ -214,11 +235,27 @@ _('Example:'),
         this.map.fitBounds(this.imagesGroup.getBounds());
       }
 
+      this.props.onImagesBboxChanged(this.computeBbox(this.exifData));
+
       this.setState({showLoading: false});
 
     }).catch(e => {
       this.setState({showLoading: false, error: e.message});
     });
+  }
+
+  computeBbox = exifData => {
+    // minx, miny, maxx, maxy
+    let bbox = [Infinity, Infinity, -Infinity, -Infinity];
+    exifData.forEach(ed => {
+      if (ed.gps){
+        bbox[0] = Math.min(bbox[0], ed.gps.longitude);
+        bbox[1] = Math.min(bbox[1], ed.gps.latitude);
+        bbox[2] = Math.max(bbox[2], ed.gps.longitude);
+        bbox[3] = Math.max(bbox[3], ed.gps.latitude);
+      }
+    });
+    return bbox;
   }
 
   readExifData = () => {
@@ -298,219 +335,48 @@ _('Example:'),
   }
 
   getCropPolygon = () => {
-    if (!this.polygon) return null;
-    return this.polygon.toGeoJSON(14);
+    return this.cropButton.getCropPolygon();
   }
 
-  toggleCrop = () => {
-    const { cropping } = this.state;
-
-    let crop = !cropping;
-    if (!crop) {
-      if (this.captureMarker) {
-        this.captureMarker.off('click', this.handleMarkerClick);
-        this.captureMarker.off('dblclick', this.handleMarkerDblClick);
-        this.captureMarker.off('mousemove', this.handleMarkerMove);
-        this.captureMarker.off('contextmenu', this.handleMarkerContextMenu);
-
-        this.map.off('move', this.onMapMove);
-        this.map.off('resize', this.onMapResize);
-
-        this.group.removeLayer(this.captureMarker);
-        this.captureMarker = null;
-      }
-
-      if (this.acceptMarker) {
-        this.group.removeLayer(this.acceptMarker);
-        this.acceptMarker = null;
-      }
-      if (this.measureBoundary) {
-        this.group.removeLayer(this.measureBoundary);
-        this.measureBoundary = null;
-      }
-      if (this.measureArea) {
-        this.group.removeLayer(this.measureArea);
-        this.measureArea = null;
-      }
-      this.cropButton.blur();
+  setAlignmentPolygon = (task) => {
+    if (this.alignPoly){
+      this.map.removeLayer(this.alignPoly);
+      this.alignPoly = null;
     }
-    else{
-      if (!this.captureMarker) {
-        this.captureMarker = L.marker(this.map.getCenter(), {
-          clickable: true,
-          zIndexOffset: 10001
-        }).setIcon(L.divIcon({
-          iconSize: this.map.getSize().multiplyBy(2),
-          className: "map-preview-marker-layer"
-        })).addTo(this.group);
 
-        this.captureMarker.on('click', this.handleMarkerClick);
-        this.captureMarker.on('dblclick', this.handleMarkerDblClick);
-        this.captureMarker.on('mousemove', this.handleMarkerMove);
-        this.captureMarker.on('contextmenu', this.handleMarkerContextMenu);
-
-        this.map.on('move', this.onMapMove);
-        this.map.on('resize', this.onMapResize);
-      }
-
-      if (this.polygon){
-        this.group.removeLayer(this.polygon);
-        this.polygon = null;
-        this.props.onPolygonChange();
-      }
-
-      // Reset latlngs
-      this.latlngs = [];
+    if (!task || !task.extent){
+      if (this.imagesGroup) this.map.fitBounds(this.imagesGroup.getBounds());
+      return;
     }
+
+    const [xmin, ymin, xmax, ymax] = task.extent;
     
+    this.alignPoly = L.polygon([
+      [ymin, xmin],
+      [ymax, xmin],
+      [ymax, xmax],
+      [ymin, xmax],
+      [ymin, xmin]
+    ], {
+      clickable: true,
+      weight: 3,
+      opacity: 0.9,
+      color: "#808f9b",
+      fillColor: "#808f9b",
+      fillOpacity: 0.2
+    }).bindPopup(task.name).addTo(this.map);
 
-    this.setState({cropping: !cropping});
-  }
-
-  handleMarkerClick = e => {
-    L.DomEvent.stop(e);
-
-    const latlng = this.map.mouseEventToLatLng(e.originalEvent);
-    this.uniqueLatLonPush(latlng);
-
-    if (this.latlngs.length >= 1) {
-      if (!this.measureBoundary) {
-        this.measureBoundary = L.polyline(this.latlngs.concat(latlng), {
-          clickable: false,
-          color: Colors.stroke,
-          weight: 2,
-          opacity: 0.9,
-          fill: false,
-        }).addTo(this.group);
-      } else {
-        this.measureBoundary.setLatLngs(this.latlngs.concat(latlng));
-      }
-    }
-
-    if (this.latlngs.length >= 2) {
-      if (!this.measureArea) {
-        this.measureArea = L.polygon(this.latlngs.concat(latlng), {
-          clickable: false,
-          stroke: false,
-          fillColor: Colors.fill,
-          fillOpacity: 0.2,
-        }).addTo(this.group);
-      } else {
-        this.measureArea.setLatLngs(this.latlngs.concat(latlng));
-      }
-    }
-
-    if (this.latlngs.length >= 3) {
-      if (this.acceptMarker) {
-        this.group.removeLayer(this.acceptMarker);
-        this.acceptMarker = null;
-      }
-
-      const onAccept = e => {
-        L.DomEvent.stop(e);
-        this.confirmPolygon();
-        return false;
-      };
-
-      let acceptLatlng = this.latlngs[0];
-
-      this.acceptMarker = L.marker(acceptLatlng, {
-        icon: L.icon({
-          iconUrl: `/static/app/img/accept.png`,
-          iconSize: [20, 20],
-          iconAnchor: [10, 10],
-          className: "map-preview-accept-button",
-        }),
-        zIndexOffset: 99999
-      }).addTo(this.group)
-        .on("click", onAccept)
-        .on("contextmenu", onAccept);
-    }
-  };
-
-  confirmPolygon = () => {
-    if (this.latlngs.length >= 3){
-      const popupContainer = L.DomUtil.create('div');
-      popupContainer.className = "map-preview-delete";
-      const deleteLink = L.DomUtil.create('a');
-      deleteLink.href = "javascript:void(0)";
-      deleteLink.innerHTML = `<i class="fa fa-trash"></i> ${_("Delete")}`;
-      deleteLink.onclick = (e) => {
-        L.DomEvent.stop(e);
-        if (this.polygon){
-          this.group.removeLayer(this.polygon);
-          this.polygon = null;
-          this.props.onPolygonChange();
-        }
-      };
-      popupContainer.appendChild(deleteLink);
-
-      this.polygon = L.polygon(this.latlngs, {
-        clickable: true,
-        weight: 3,
-        opacity: 0.9,
-        color: "#ffa716",
-        fillColor: "#ffa716",
-        fillOpacity: 0.2
-      }).bindPopup(popupContainer).addTo(this.group);
-
-      this.props.onPolygonChange();
-    }
-
-    this.toggleCrop();
-  }
-
-  uniqueLatLonPush = latlng => {
-    if (this.latlngs.length === 0) this.latlngs.push(latlng);
-    else{
-      const last = this.latlngs[this.latlngs.length - 1];
-      if (last.lat !== latlng.lat && last.lng !== latlng.lng) this.latlngs.push(latlng);
-    }
-  };
-
-  handleMarkerDblClick = e => {
-    if (this.latlngs.length >= 2){
-      const latlng = this.map.mouseEventToLatLng(e.originalEvent);
-      this.uniqueLatLonPush(latlng);
-      this.confirmPolygon();
-    }
-  }
-
-  handleMarkerMove = e => {
-    const latlng = this.map.mouseEventToLatLng(e.originalEvent);
-    let lls = this.latlngs.concat(latlng);
-    lls.push(lls[0]);
-    if (this.measureBoundary) {
-      this.measureBoundary.setLatLngs(lls);
-    }
-    if (this.measureArea) {
-      this.measureArea.setLatLngs(lls);
-    }
-  }
-
-  handleMarkerContextMenu = e => {
-    if (this.latlngs.length >= 2){
-      const latlng = this.map.mouseEventToLatLng(e.originalEvent);
-      this.uniqueLatLonPush(latlng);
-      this.confirmPolygon();
-    }
-
-    return false;
-  }
-
-  onMapMove = () => {
-    if (this.captureMarker) this.captureMarker.setLatLng(this.map.getCenter());
-  };
-
-  onMapResize = () => {
-    if (this.captureMarker) this.captureMarker.setIcon(L.divIcon({
-        iconSize: this._map.getSize().multiplyBy(2)
-      }));
+    this.alignPoly.bringToBack();
+    this.map.fitBounds(this.alignPoly.getBounds());
   }
 
   download = format => {
     let output = "";
     let filename = `images.${format}`;
+    if (format === "geo"){
+      filename = "geo.txt";
+    }
+
     const feats = {
       type: "FeatureCollection",
       features: this.exifData.map(ed => {
@@ -537,6 +403,10 @@ _('Example:'),
     }else if (format === 'csv'){
       output = `Filename,Timestamp,Latitude,Longitude,Altitude\r\n${feats.features.map(feat => {
         return `${feat.properties.Filename},${feat.properties.Timestamp},${feat.geometry.coordinates[1]},${feat.geometry.coordinates[0]},${feat.geometry.coordinates[2]}`
+      }).join("\r\n")}`;
+    }else if (format === 'geo'){
+      output = `EPSG:4326\r\n${feats.features.map(feat => {
+        return `${feat.properties.Filename} ${feat.geometry.coordinates[0]} ${feat.geometry.coordinates[1]} ${feat.geometry.coordinates[2]}`
       }).join("\r\n")}`;
     }else{
       console.error("Invalid format");
@@ -567,19 +437,12 @@ _('Example:'),
           </button>
           <ul className="dropdown-menu">
             <li>
-              <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> GeoJSON</a>
-              <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> CSV</a>
+              <a href="javascript:void(0);" onClick={() => this.download('geojson')}><i className="fas fa-map fa-fw"></i> {_("GeoJSON")}</a>
+              <a href="javascript:void(0);" onClick={() => this.download('csv')}><i className="fas fa-file-alt fa-fw"></i> {_("CSV")}</a>
+              <a href="javascript:void(0);" onClick={() => this.download('geo')}><i className="fas fa-file-alt fa-fw"></i> {_("Geolocation File")}</a>
             </li>
           </ul>
         </div> : ""}
-
-        {this.state.error === "" ? 
-            <div className="crop-control">
-              <button ref={(domNode) => {this.cropButton = domNode; }} type="button" onClick={this.toggleCrop} className={"btn btn-sm " + (this.state.cropping ? "btn-default" : "btn-secondary")} title={_("Set Reconstruction Area (optional)")}>
-              <i className="fa fa-crop-alt"></i>
-            </button>
-            </div>
-          : ""}
 
         <div 
           style={{height: "100%"}}

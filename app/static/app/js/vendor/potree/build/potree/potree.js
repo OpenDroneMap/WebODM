@@ -57597,6 +57597,10 @@ uniform int clipMethod;
 	uniform mat4 uClipPolygonWVP[num_clippolygons];
 #endif
 
+#if defined(num_cropvertices) && num_cropvertices > 0
+	uniform vec2 uCropVertices[num_cropvertices];
+#endif
+
 
 uniform float size;
 uniform float minSize;
@@ -58241,6 +58245,21 @@ float getPointSize(){
 	return pointSize;
 }
 
+#if defined(num_cropvertices) && num_cropvertices > 0
+bool pointInCropPolygon(vec3 point) {
+  int j = num_cropvertices - 1;
+  bool c = false;
+  for (int i = 0; i < num_cropvertices; i++) {
+    if ( ((uCropVertices[i].y>point.y) != (uCropVertices[j].y>point.y)) &&
+		 (point.x<(uCropVertices[j].x-uCropVertices[i].x) * (point.y-uCropVertices[i].y) / (uCropVertices[j].y-uCropVertices[i].y) + uCropVertices[i].x) ){
+       c = !c;
+	}
+	j = i;
+  }
+  return c;
+}
+#endif
+
 #if defined(num_clippolygons) && num_clippolygons > 0
 bool pointInClipPolygon(vec3 point, int polyIdx) {
 
@@ -58352,6 +58371,16 @@ void doClipping(){
 			clipVolumesCount++;
 		}	
 	#endif
+
+	#if defined(num_cropvertices) && num_cropvertices > 0
+		// vec4 worldPos = modelMatrix * vec4(position, 1.0);
+
+		if (!pointInCropPolygon(position)){
+			gl_Position = vec4(100.0, 100.0, 100.0, 0.0);
+			return;
+		}
+	#endif
+
 
 	#if defined(num_clippolygons) && num_clippolygons > 0
 		for(int i = 0; i < num_clippolygons; i++) {
@@ -63192,6 +63221,18 @@ void main() {
 					}
 				}
 
+				if (material.cropVertices && material.cropVertices.length > 0){
+					let flattenedVertices = new Array(2 * material.cropVertices.length);
+					for(let i = 0; i < material.cropVertices.length; i++){
+						// We simply subtract the translation elements from the world matrix
+						// since we know that the other parameters are the identity matrix
+						flattenedVertices[i * 2 + 0] = material.cropVertices[i].x - world.elements[12];
+						flattenedVertices[i * 2 + 1] = material.cropVertices[i].y - world.elements[13];
+					}
+					const lCropVertices = shader.uniformLocations["uCropVertices[0]"];
+					gl.uniform2fv(lCropVertices, flattenedVertices);
+				}
+
 
 				//shader.setUniformMatrix4("modelMatrix", world);
 				//shader.setUniformMatrix4("modelViewMatrix", worldView);
@@ -63479,6 +63520,7 @@ void main() {
 					let numClipBoxes = (material.clipBoxes && material.clipBoxes.length) ? material.clipBoxes.length : 0;
 					let numClipSpheres = (params.clipSpheres && params.clipSpheres.length) ? params.clipSpheres.length : 0;
 					let numClipPolygons = (material.clipPolygons && material.clipPolygons.length) ? material.clipPolygons.length : 0;
+					let numCropVertices = (material.cropVertices && material.cropVertices.length) ? material.cropVertices.length : 0;
 
 					let defines = [
 						`#define num_shadowmaps ${shadowMaps.length}`,
@@ -63486,6 +63528,7 @@ void main() {
 						`#define num_clipboxes ${numClipBoxes}`,
 						`#define num_clipspheres ${numClipSpheres}`,
 						`#define num_clippolygons ${numClipPolygons}`,
+						`#define num_cropvertices ${numCropVertices}`,
 					];
 
 

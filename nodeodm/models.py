@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.dispatch import receiver
 from guardian.models import GroupObjectPermissionBase
 from guardian.models import UserObjectPermissionBase
+from guardian.shortcuts import get_objects_for_user
 from django.utils.translation import gettext_lazy as _
 
 from webodm import settings
@@ -43,13 +44,20 @@ class ProcessingNode(models.Model):
             return '{}:{}'.format(self.hostname, self.port)
 
     @staticmethod
-    def find_best_available_node():
+    def find_best_available_node(user = None):
         """
         Attempts to find an available node (seen in the last 5 minutes, and with lowest queue count)
         :return: ProcessingNode | None
         """
-        return ProcessingNode.objects.filter(last_refreshed__gte=timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES)) \
-                                     .order_by('queue_count').first()
+        if user is not None:
+            nodes = get_objects_for_user(user, 'view_processingnode', ProcessingNode, accept_global_perms=False)
+        else:
+            nodes = ProcessingNode.objects.all()
+
+        if not settings.NODE_OPTIMISTIC_MODE:
+            nodes = nodes.filter(last_refreshed__gte=timezone.now() - timedelta(minutes=settings.NODE_OFFLINE_MINUTES))
+        
+        return nodes.order_by('queue_count').first()
 
     def is_online(self):
         if settings.NODE_OPTIMISTIC_MODE:
@@ -71,7 +79,11 @@ class ProcessingNode(models.Model):
 
             self.api_version = info.version
             self.queue_count = info.task_queue_count
-            self.max_images = info.max_images
+
+            if isinstance(info.max_images, (int, float)):
+                self.max_images = max(0, info.max_images)
+            else:
+                self.max_images = None
             self.engine_version = info.engine_version
             self.engine = info.engine
 
