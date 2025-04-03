@@ -13,6 +13,7 @@ from app.plugins.signals import task_completed
 from app.tests.classes import BootTransactionTestCase
 from app.models import Project, Task
 from nodeodm.models import ProcessingNode
+from guardian.shortcuts import assign_perm
 from nodeodm import status_codes
 
 import worker
@@ -58,7 +59,9 @@ class TestApiTask(BootTransactionTestCase):
 
             # Create processing node
             pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
-
+            assign_perm('view_processingnode', user, pnode)
+            assign_perm('view_processingnode', other_user, pnode)
+            
             # task creation via file upload
             image1 = open("app/fixtures/tiny_drone_image.jpg", 'rb')
             image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
@@ -162,40 +165,62 @@ class TestApiTask(BootTransactionTestCase):
                 ('georeferenced_model', {'format': 'tif'}, False, ".laz", status.HTTP_400_BAD_REQUEST),
             ]
 
-            for p in params:
-                asset_type, data, shortcut_link, extension, exp_status = p
-                logger.info("Testing {}".format(p))
-                res = client.post("/api/projects/{}/tasks/{}/{}/export".format(project.id, task.id, asset_type), data)
-                self.assertEqual(res.status_code, exp_status)
+            def testExport(crop = False):
+                for p in params:
+                    asset_type, data, shortcut_link, extension, exp_status = p
+                    
+                    # When cropping, there should never be shortcut links
+                    if shortcut_link and crop:
+                        shortcut_link = False
+                    
+                    logger.info("Testing {}".format(p))
+                    res = client.post("/api/projects/{}/tasks/{}/{}/export".format(project.id, task.id, asset_type), data)
+                    self.assertEqual(res.status_code, exp_status)
 
-                reply = json.loads(res.content.decode("utf-8"))
+                    reply = json.loads(res.content.decode("utf-8"))
 
-                if res.status_code == status.HTTP_200_OK:
-                    self.assertTrue("filename" in reply)
-                    self.assertEqual(reply["filename"], "test-task-" + asset_type + extension)
+                    if res.status_code == status.HTTP_200_OK:
+                        self.assertTrue("filename" in reply)
+                        self.assertEqual(reply["filename"], "test-task-" + asset_type + extension)
 
-                    if shortcut_link:
-                        self.assertFalse("celery_task_id" in reply)
-                        self.assertTrue("url" in reply)
+                        if shortcut_link:
+                            self.assertFalse("celery_task_id" in reply)
+                            self.assertTrue("url" in reply)
 
-                        # Can download
-                        res = client.get(reply["url"])
-                        self.assertEqual(res.status_code, status.HTTP_200_OK)
+                            # Can download
+                            res = client.get(reply["url"])
+                            self.assertEqual(res.status_code, status.HTTP_200_OK)
+                        else:
+                            self.assertTrue("celery_task_id" in reply)
+                            self.assertFalse("url" in reply)
+
+                            cres = TestSafeAsyncResult(celery_task_id)
+                            c = 0
+                            while not cres.ready():
+                                time.sleep(0.2)
+                                c += 1
+                                if c > 50:
+                                    self.assertTrue(False)
+                                    break
+                            
+                            res = client.get("/api/workers/get/{}?filename={}".format(celery_task_id, reply["filename"]))
+                            self.assertEqual(res.status_code, status.HTTP_200_OK)
+                            self.assertEqual(res._headers['content-disposition'][1], 'attachment; filename={}'.format(reply["filename"]))
                     else:
-                        self.assertTrue("celery_task_id" in reply)
-                        self.assertFalse("url" in reply)
+                        self.assertTrue(len(reply[0]) > 0) # Error message
 
-                        cres = TestSafeAsyncResult(celery_task_id)
-                        c = 0
-                        while not cres.ready():
-                            time.sleep(0.2)
-                            c += 1
-                            if c > 50:
-                                self.assertTrue(False)
-                                break
-                        
-                        res = client.get("/api/workers/get/{}?filename={}".format(celery_task_id, reply["filename"]))
-                        self.assertEqual(res.status_code, status.HTTP_200_OK)
-                        self.assertEqual(res._headers['content-disposition'][1], 'attachment; filename={}'.format(reply["filename"]))
-                else:
-                    self.assertTrue(len(reply[0]) > 0) # Error message
+            # Test without crop
+            testExport()
+
+            # Set crop
+
+            crop_geojson = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-91.99424117803576,46.84230591442068],[-91.99366182088853,46.84228940253027],[-91.99393808841705,46.84257010397711],[-91.99424117803576,46.84230591442068]]]}}
+            res = client.patch("/api/projects/{}/tasks/{}/".format(project.id, task.id), {
+                'crop': crop_geojson
+            }, format="json")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            task.refresh_from_db()
+            self.assertTrue(task.crop is not None)
+
+            # Test with crop
+            testExport(crop=True)

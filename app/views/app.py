@@ -46,12 +46,13 @@ def dashboard(request):
         permissions.append('add_project')
     
     # Create first project automatically
-    if no_projects and 'add_project' in permissions:
+    if settings.DASHBOARD_ONBOARDING and no_projects and 'add_project' in permissions:
         Project.objects.create(owner=request.user, name=_("First Project"))
 
     return render(request, 'app/dashboard.html', {'title': _('Dashboard'),
         'no_processingnodes': no_processingnodes,
         'no_tasks': no_tasks,
+        'onboarding': settings.DASHBOARD_ONBOARDING,
         'params': {
             'permissions': json.dumps(permissions)
         }.items()
@@ -71,9 +72,11 @@ def map(request, project_pk=None, task_pk=None):
             task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
             title = task.name or task.id
             mapItems = [task.get_map_items()]
+            projectInfo = None
         else:
             title = project.name or project.id
             mapItems = project.get_map_items()
+            projectInfo = project.get_public_info()
 
     return render(request, 'app/map.html', {
             'title': title,
@@ -82,7 +85,8 @@ def map(request, project_pk=None, task_pk=None):
                 'title': title,
                 'public': 'false',
                 'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
-                'permissions': json.dumps(get_permissions(request.user, project))
+                'permissions': json.dumps(get_permissions(request.user, project)),
+                'project': json.dumps(projectInfo),
             }.items()
         })
 

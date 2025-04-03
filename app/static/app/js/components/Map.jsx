@@ -21,6 +21,8 @@ import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
+import AssetDownloadButtons from './AssetDownloadButtons';
+import CropButton from './CropButton';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
@@ -50,7 +52,8 @@ class Map extends React.Component {
     publicEdit: PropTypes.bool,
     shareButtons: PropTypes.bool,
     permissions: PropTypes.array,
-    thermal: PropTypes.bool
+    thermal: PropTypes.bool,
+    project: PropTypes.object
   };
 
   constructor(props) {
@@ -106,12 +109,12 @@ class Map extends React.Component {
     }
   }
 
-  typeToHuman = (type) => {
+  typeToHuman = (type, thermal = false) => {
       switch(type){
           case "orthophoto":
               return _("Orthophoto");
           case "plant":
-              return this.props.thermal ? _("Thermal") : _("Plant Health");
+              return thermal ? _("Thermal") : _("Plant Health");
           case "dsm":
               return _("Surface Model");
           case "dtm":
@@ -120,12 +123,12 @@ class Map extends React.Component {
       return "";
   }
 
-  typeToIcon = (type) => {
+  typeToIcon = (type, thermal = false) => {
     switch(type){
         case "orthophoto":
             return "far fa-image fa-fw"
         case "plant":
-            return this.props.thermal ? "fa fa-thermometer-half fa-fw" : "fa fa-seedling fa-fw";
+            return thermal ? "fa fa-thermometer-half fa-fw" : "fa fa-seedling fa-fw";
         case "dsm":
         case "dtm":
             return "fa fa-chart-area fa-fw";
@@ -183,21 +186,37 @@ class Map extends React.Component {
         let metaUrl = url + "metadata";
         let unitForward = value => value;
         let unitBackward = value => value;
+        let queryParams = {};
 
         if (type == "plant"){
           if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
             // Single band, probably thermal dataset, in any case we can't render NDVI
             // because it requires 3 bands
-            metaUrl += "?formula=Celsius&bands=L&color_map=magma";
+            queryParams = {
+              formula: 'Celsius',
+              bands: 'L',
+              color_map: 'magma'
+            };
           }else if (meta.task && meta.task.orthophoto_bands){
             let formula = this.hasBands(["red", "green", "nir"], meta.task.orthophoto_bands) ? "NDVI" : "VARI";
-            metaUrl += `?formula=${formula}&bands=auto&color_map=rdylgn`;
+            queryParams = {
+              formula,
+              bands: 'auto',
+              color_map: 'rdylgn'
+            };
           }else{
             // This should never happen?
-            metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
+            queryParams = {
+              formula: 'NDVI',
+              bands: 'RGN',
+              color_map: 'rdylgn'
+            };
           }
         }else if (type == "dsm" || type == "dtm"){
-          metaUrl += "?hillshade=6&color_map=viridis";
+          queryParams = {
+            hillshade: 6,
+            color_map: 'viridis'
+          };
           unitForward = value => {
             return unitSystem().elevation(value).value;
           };
@@ -207,6 +226,10 @@ class Map extends React.Component {
             return toMetric(unitValue).value;
           };
         }
+
+        if (meta.task.crop) queryParams.crop = 1;
+
+        metaUrl += Utils.toSearchQuery(queryParams);
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
@@ -240,18 +263,21 @@ class Map extends React.Component {
                         max = Math.max(statistics[b]["max"]);
                       }
                     }
-                    params["rescale"] = encodeURIComponent(`${min},${max}`);              
+                    params.rescale = encodeURIComponent(`${min},${max}`);              
                 }else{
                     console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
-                    params["rescale"] = encodeURIComponent("-1,1");
+                    params.rescale = encodeURIComponent("-1,1");
                 }
                 
-                params["size"] = TILESIZE;
+                params.size = TILESIZE;
+                if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }else{
-                tileUrl = Utils.buildUrlWithQuery(tileUrl, { size: TILESIZE });
+                let params = { size: TILESIZE };
+                if (meta.task.crop) params.crop = 1;
+                tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
-
+            
             const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,
                   minZoom: 0,
@@ -265,8 +291,12 @@ class Map extends React.Component {
                 });
             
             // Associate metadata with this layer
-            meta.name = this.typeToHuman(type);
-            meta.icon = this.typeToIcon(type);
+            let thermal = typeof(mres) === 'object' && mres.band_descriptions && 
+                          Array.isArray(mres.band_descriptions) && mres.band_descriptions.length > 0 &&
+                          mres.band_descriptions[0].indexOf("lwir") !== -1;
+
+            meta.name = this.typeToHuman(type, this.props.thermal || thermal);
+            meta.icon = this.typeToIcon(type, this.props.thermal || thermal);
             meta.type = type;
             meta.raster = true;
             meta.autoExpand = this.taskCount === 1 && type === this.props.mapType;
@@ -334,9 +364,9 @@ class Map extends React.Component {
                                 </div>
                                 <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" class="opacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-                                <ul class="asset-links loading">
-                                    <li><i class="fa fa-spin fa-sync fa-spin fa-fw"></i></li>
-                                </ul>
+                                <div class="popup-download-assets loading">
+                                  <i class="fa loading fa-spin fa-sync fa-spin fa-fw"></i>
+                                </div>
 
                                 <button
                                     onclick="location.href='${this.tdPopupButtonUrl(meta.task)}';"
@@ -633,6 +663,96 @@ _('Example:'),
     });
     new AddOverlayCtrl().addTo(this.map);
 
+    if (this.props.permissions.indexOf("change") !== -1){
+      const updateCropArea = geojson => {
+        // Find tasks IDs
+        const taskMap = {};
+        const requests = [];
+        if (!geojson) geojson = '';
+
+        // Crop affects all tasks in the map
+        for (let layer of this.state.imageryLayers){
+          if (layer._map){
+            const meta = layer[Symbol.for("meta")];
+            const task = meta.task;
+            if (!taskMap[task.id]){
+              requests.push($.ajax({
+                url: `/api/projects/${task.project}/tasks/${task.id}/`,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                  crop: geojson
+                }),
+                dataType: 'json',
+                type: 'PATCH'
+              }));
+              taskMap[task.id] = meta;
+            }
+          }
+        }
+
+        Promise.all(requests)
+          .then(responses => {
+            if (!Array.isArray(responses)){
+              responses = [responses];
+            }
+
+            // Update task in meta and tiles objects
+            responses.forEach(task => {
+              if (!task) return;
+
+              const meta = taskMap[task.id];
+              meta.task = task;
+
+              for (let i = 0; i < this.props.tiles.length; i++){
+                const tile = this.props.tiles[i];
+                if (tile.meta && tile.meta.task.id === task.id){
+                  tile.meta.task = task;                  
+                }
+              }
+            });
+            
+            this.loadImageryLayers();
+          })
+          .catch(e => {
+            this.setState({error: _("Cannot set cropping area. Check your internet connection.")});
+            console.error(e);
+          }).finally(() => {
+            setTimeout(() => {
+              this.cropButton.deletePolygon({triggerEvents: false, fade: true});
+            }, 1000);
+          });
+      };
+
+      this.cropButton = new CropButton({
+        position:'topright',
+        color:'#fff',
+        pulse: true,
+        willCrop: () => {
+          this.removeSideBySideCtrl();
+          let foundCrop = false;
+
+          for (let layer of this.state.imageryLayers){
+            const meta = layer[Symbol.for("meta")];
+            if (meta.task.crop){
+              foundCrop = true;
+              break;
+            }
+          }
+          
+          if (foundCrop){
+            if (window.confirm(_('Are you sure you want to set a new crop area?'))){
+              updateCropArea(null);
+            }else{
+              // Stop crop button from toggling
+              return true;
+            }
+          }
+        },
+        onPolygonChange: updateCropArea
+      });
+      this.map.addControl(this.cropButton);
+    }
+
     this.map.fitBounds([
      [13.772919746115805,
      45.664640939831735],
@@ -663,29 +783,36 @@ _('Example:'),
             if (e.popup && e.popup._source && e.popup._content && !e.popup.options.lazyrender){
                 const infoWindow = e.popup._content;
                 if (typeof infoWindow === 'string') return;
-
-                const $assetLinks = $("ul.asset-links", infoWindow);
                 
-                if ($assetLinks.length > 0 && $assetLinks.hasClass('loading')){
-                    const {id, project} = (e.popup._source[Symbol.for("meta")] || {}).task;
+                const $downloadAssets = $(".popup-download-assets", infoWindow);
+                if ($downloadAssets.length > 0 && $downloadAssets.hasClass('loading')){
+                  const {id, project} = (e.popup._source[Symbol.for("meta")] || {}).task;
+                  
+                  $.getJSON(`/api/projects/${project}/tasks/${id}/`)
+                  .done(task => {
+                    if (task){
+                      let hideItems = [];
+                      if (this.props.permissions.indexOf("change") === -1){
+                        if (task.crop){
+                          hideItems = ["all.zip", "backup.zip"];
+                        }else{
+                          hideItems = ["backup.zip"];
+                        }
+                      }
 
-                    $.getJSON(`/api/projects/${project}/tasks/${id}/`)
-                        .done(res => {
-                            const { available_assets } = res;
-                            const assets = AssetDownloads.excludeSeparators();
-                            const linksHtml = assets.filter(a => available_assets.indexOf(a.asset) !== -1)
-                                              .map(asset => {
-                                                    return `<li><a href="${asset.downloadUrl(project, id)}">${asset.label}</a></li>`;
-                                              })
-                                              .join("");
-                            $assetLinks.append($(linksHtml));
-                        })
-                        .fail(() => {
-                            $assetLinks.append($("<li>" + _("Error: cannot load assets list.") + "</li>"));
-                        })
-                        .always(() => {
-                            $assetLinks.removeClass('loading');
-                        });
+                      ReactDOM.render(<AssetDownloadButtons task={task} 
+                                      showLabel={false} 
+                                      buttonClass="btn-secondary"
+                                      hideItems={hideItems} 
+                                      modalContainer={this.modalContainer} />, $downloadAssets.get(0));
+                    }
+                  })
+                  .fail(() => {
+                      $downloadAssets.append($(_("Error: cannot load assets list.")));
+                  })
+                  .always(() => {
+                      $downloadAssets.removeClass('loading');
+                  });
                 }
             }
 
@@ -761,10 +888,14 @@ _('Example:'),
         this.sideBySideCtrl.setRightLayers(rightLayers);
       }
     }else{
-      if (this.sideBySideCtrl){
-        this.sideBySideCtrl.remove();
-        this.sideBySideCtrl = null;
-      }
+      this.removeSideBySideCtrl();
+    }
+  }
+
+  removeSideBySideCtrl = () => {
+    if (this.sideBySideCtrl){
+      this.sideBySideCtrl.remove();
+      this.sideBySideCtrl = null;
     }
   }
 
@@ -788,8 +919,12 @@ _('Example:'),
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
                             prevState.overlays !== this.state.overlays ||
                             prevState.annotations !== this.state.annotations)){
-        this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
+      this.updateLayersControl();
     }
+  }
+
+  updateLayersControl = () => {
+    this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
   }
 
   componentWillUnmount() {
@@ -816,6 +951,8 @@ _('Example:'),
   render() {
     return (
       <div style={{height: "100%"}} className="map">
+        <div className="map-modal-container" ref={(domNode) => this.modalContainer = domNode}></div>
+
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
             <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" className="opacity" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
@@ -833,15 +970,18 @@ _('Example:'),
         />
 
         <div className="actionButtons">
+          
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
-          {(this.props.shareButtons && !this.props.public && this.state.singleTask !== null) ? 
+          {((this.state.singleTask || this.props.project) && this.props.shareButtons && !this.props.public) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
-              task={this.state.singleTask} 
+              task={this.state.singleTask}
+              project={this.props.project}
               linksTarget="map"
               queryParams={{t: this.props.mapType}}
             />
           : ""}
+          
           <SwitchModeButton 
             task={this.state.singleTask}
             type="mapToModel" 

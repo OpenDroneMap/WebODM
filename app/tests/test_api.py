@@ -222,10 +222,17 @@ class TestApi(BootTestCase):
         # Task should have failed to be restarted
         self.assertTrue("has no processing node" in task.last_error)
 
-        # Cannot cancel, restart or delete a task for which we don't have permission
-        for action in ['cancel', 'remove', 'restart']:
+        # Cannot cancel, restart, delete, compact a task for which we don't have permission
+        for action in ['cancel', 'remove', 'restart', 'compact']:
             res = client.post('/api/projects/{}/tasks/{}/{}/'.format(other_project.id, other_task.id, action))
             self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Can compact
+        self.assertFalse(task.compacted)
+        res = client.post('/api/projects/{}/tasks/{}/compact/'.format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        task.refresh_from_db()
+        self.assertTrue(task.compacted)
 
         # Can delete
         res = client.post('/api/projects/{}/tasks/{}/remove/'.format(project.id, task.id))

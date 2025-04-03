@@ -29,6 +29,7 @@ http {
 
   server {
     listen 8000 deferred;
+    listen [::]:8000 deferred;
     client_max_body_size 0;
 
     server_name $WO_HOST;
@@ -53,6 +54,7 @@ http {
     }
 
     location / {
+      proxy_http_version 1.1;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
       # enable this if and only if you use HTTPS
@@ -62,6 +64,26 @@ http {
       # we don't want nginx trying to do something clever with
       # redirects, we set the Host: header above already.
       proxy_redirect off;
+
+      proxy_pass http://app_server;
+    }
+
+    # Same as above, but adds proxy_buffering off
+    location ~* (download/.*\.zip|backup)$ {
+      proxy_http_version 1.1;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+      # enable this if and only if you use HTTPS
+      # proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header Host $http_host;
+
+      # we don't want nginx trying to do something clever with
+      # redirects, we set the Host: header above already.
+      proxy_redirect off;
+
+      # For streaming requests
+      proxy_buffering off;
+
       proxy_pass http://app_server;
     }
   }

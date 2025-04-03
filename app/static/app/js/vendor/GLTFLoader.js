@@ -63,6 +63,8 @@ const {
 	sRGBEncoding
 } = THREE;
 
+let _opts = {};
+
 var GLTFLoader = ( function () {
 
 	function GLTFLoader( manager ) {
@@ -118,7 +120,8 @@ var GLTFLoader = ( function () {
 
 		constructor: GLTFLoader,
 
-		load: function ( url, onLoad, onProgress, onError ) {
+		load: function ( url, onLoad, onProgress, onError, opts = {} ) {
+			_opts = opts;
 
 			var scope = this;
 
@@ -2892,6 +2895,63 @@ var GLTFLoader = ( function () {
 			} else {
 
 				material = new materialType( materialParams );
+				
+				if (_opts.crop){
+					const crop = _opts.crop;
+					let offsetX = 0;
+					let offsetY = 0;
+					if (extensions.CESIUM_RTC && extensions.CESIUM_RTC.center){
+						offsetX = extensions.CESIUM_RTC.center[0];
+						offsetY = extensions.CESIUM_RTC.center[1];
+					}
+
+					material.onBeforeCompile = (shader) => {
+						const uCropVertices = new Float32Array((crop.length + 1) * 2);
+						for(let i = 0; i < crop.length; i++){
+							uCropVertices[(i + 1) * 2 + 0] = crop[i].x - offsetX;
+							uCropVertices[(i + 1) * 2 + 1] = crop[i].y - offsetY;
+						}
+
+						uCropVertices[0] = uCropVertices[crop.length * 2 + 0];
+						uCropVertices[1] = uCropVertices[crop.length * 2 + 1];
+
+						shader.uniforms.uCropVertices = {value: uCropVertices};
+						shader.vertexShader = shader.vertexShader.replace(`#include <clipping_planes_pars_vertex>`,
+							`#include <clipping_planes_pars_vertex>
+							varying vec3 vPosition;`,
+						);
+						shader.vertexShader = shader.vertexShader.replace(`#include <fog_vertex>`,
+							`#include <fog_vertex>
+							vPosition = position;`,
+						);
+
+						shader.fragmentShader = `
+						varying vec3 vPosition;
+						#define num_cropvertices ${crop.length + 1}
+						uniform vec2 uCropVertices[${crop.length + 1}];
+
+						bool pointInCropPolygon(vec3 point) {
+							bool c = false;
+							for (int i = 1; i < num_cropvertices; i++) {
+								if ( ((uCropVertices[i].y>point.y) != (uCropVertices[i - 1].y>point.y)) &&
+									(point.x<(uCropVertices[i - 1].x-uCropVertices[i].x) * (point.y-uCropVertices[i].y) / (uCropVertices[i - 1].y-uCropVertices[i].y) + uCropVertices[i].x) ){
+									c = !c;
+								}
+							}
+							return c;
+						}
+						` + shader.fragmentShader;
+
+						shader.fragmentShader = shader.fragmentShader.replace(
+							`#include <dithering_fragment>`,
+							`
+							if (!pointInCropPolygon(vPosition)) discard;
+					
+							#include <dithering_fragment>
+							`
+						);
+					};
+				}
 
 			}
 
