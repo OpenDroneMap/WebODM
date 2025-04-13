@@ -325,14 +325,33 @@ def get_dynamic_script_handler(script_path, callback=None, **kwargs):
     return handleRequest
 
 def enable_plugin(plugin_name):
+    db_plugin = Plugin.objects.get(name=plugin_name)  # Use name, not pk, per your schema
+    if db_plugin.enabled:
+        logger.info(f"Plugin {plugin_name} already enabled in DB—skipping enable")
+        return get_plugin_by_name(plugin_name, only_active=False)
     p = get_plugin_by_name(plugin_name, only_active=False)
     p.register()
-    Plugin.objects.get(pk=plugin_name).enable()
+    try:
+        if hasattr(p, 'enable'):
+            p.enable()
+    except Exception as e:
+        logger.warning(f"Plugin: {plugin_name} enable unsuccessful: {str(e)}")
+        raise  # Propagate error to UI
+    db_plugin.enable()
     return p
 
 def disable_plugin(plugin_name):
+    db_plugin = Plugin.objects.get(name=plugin_name)
+    if not db_plugin.enabled:
+        logger.info(f"Plugin {plugin_name} already disabled in DB—skipping disable")
+        return get_plugin_by_name(plugin_name, only_active=False)
     p = get_plugin_by_name(plugin_name, only_active=False)
-    Plugin.objects.get(pk=plugin_name).disable()
+    try:
+        if hasattr(p, 'disable'):
+            p.disable()
+    except:
+        logger.warning("Plugin: "+plugin_name+" disable unsuccessful.")
+    db_plugin.disable()
     return p
 
 def delete_plugin(plugin_name):
