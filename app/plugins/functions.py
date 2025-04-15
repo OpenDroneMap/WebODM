@@ -325,33 +325,37 @@ def get_dynamic_script_handler(script_path, callback=None, **kwargs):
     return handleRequest
 
 def enable_plugin(plugin_name):
-    db_plugin = Plugin.objects.get(name=plugin_name)  # Use name, not pk, per your schema
-    if db_plugin.enabled:
-        logger.info(f"Plugin {plugin_name} already enabled in DB—skipping enable")
-        return get_plugin_by_name(plugin_name, only_active=False)
     p = get_plugin_by_name(plugin_name, only_active=False)
     p.register()
+    # Attempt to call plugin enable method
     try:
+        # Check existence of enable method
         if hasattr(p, 'enable'):
             p.enable()
     except Exception as e:
+        # If enable fails, log warning and raise the exception.
         logger.warning(f"Plugin: {plugin_name} enable unsuccessful: {str(e)}")
-        raise  # Propagate error to UI
-    db_plugin.enable()
+        raise  # Propagate error to UI, DB state not changed, unsure if plugin operational
+    # Mark plugin enabled
+    Plugin.objects.get(pk=plugin_name).enable()
     return p
 
 def disable_plugin(plugin_name):
-    db_plugin = Plugin.objects.get(name=plugin_name)
-    if not db_plugin.enabled:
-        logger.info(f"Plugin {plugin_name} already disabled in DB—skipping disable")
-        return get_plugin_by_name(plugin_name, only_active=False)
     p = get_plugin_by_name(plugin_name, only_active=False)
+    # Attempt to call plugin disable method
     try:
+        # Check existence of disable method
         if hasattr(p, 'disable'):
             p.disable()
     except:
+        # If enable fails, log warning. Exception not raised up as the
+        # plugin is going to be disabled anyhow. DB state not changed.
         logger.warning("Plugin: "+plugin_name+" disable unsuccessful.")
-    db_plugin.disable()
+        # Disable the plugin even on failure
+        Plugin.objects.get(pk=plugin_name).disable()
+        raise # Propagate the error to the UI.
+    # Mark plugin disabled
+    Plugin.objects.get(pk=plugin_name).disable()
     return p
 
 def delete_plugin(plugin_name):
