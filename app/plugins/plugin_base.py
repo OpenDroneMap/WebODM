@@ -57,6 +57,27 @@ class PluginBase(ABC):
                 else:
                     logger.warning("Failed to install requirements.txt for {}".format(self))
 
+    def enable(self):
+        """
+        Should be overriden by plugins to perform persistent setup and configuration
+        (e.g., registering static files, initializing databse entries, or hooking
+        into WebODM’s functionality). Called once, each time a plugin is enabled. If
+        this method throws an exception, it will not be enabled by the system.
+        :return: none
+        """
+        pass
+
+    def disable(self):
+        """
+        Should be overriden by plugins to perform cleanup or other persistent tasks
+        to restore the system to pre-enabled state (e.g., removing hooks, deleting
+        temporary data, or restoring system state). Called once each time a plugin
+        is disabled. If this method fails to complete or throws an exception, it will
+        still be disabled by the system.
+        :return: none
+        """
+        pass
+
     def get_persistent_path(self, *paths):
         return get_plugins_persistent_path(self.name, *paths)
 
