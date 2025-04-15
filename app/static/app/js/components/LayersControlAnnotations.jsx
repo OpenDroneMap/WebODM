@@ -15,7 +15,7 @@ class AnnotationLayer extends React.Component{
     super(props);
 
     this.state = {
-      visible: !!props.layer._map
+      visible: true // !!props.layer._map
     }
   }
 

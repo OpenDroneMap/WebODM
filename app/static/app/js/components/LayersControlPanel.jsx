@@ -49,7 +49,7 @@ export default class LayersControlPanel extends React.Component {
       const scanGroup = destination => {
         return l => {
           const meta = l[Symbol.for("meta")];
-          if (meta.task && meta.task.id) zIndexGroupMap[meta.task.id] = meta.zIndexGroup || 0;
+          if (meta.task && meta.task.id) zIndexGroupMap[meta.task.id] = meta.zIndexGroup || 1;
 
           const group = meta.group;
           if (group){
@@ -99,8 +99,8 @@ export default class LayersControlPanel extends React.Component {
 
       content = (<div>{getGroupContent(main)}
         {Object.keys(groups).sort((a, b) => {
-          const za = zIndexGroupMap[a] || 0;
-          const zb = zIndexGroupMap[b] || 0;
+          const za = zIndexGroupMap[a] || 1;
+          const zb = zIndexGroupMap[b] || 1;
           return za > zb ? -1 : 1;
         }).map(id => {
           return (<div key={id}>
