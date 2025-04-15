@@ -44,10 +44,13 @@ export default class LayersControlPanel extends React.Component {
         layers: [],
         annotations: []
       };
+      const zIndexGroupMap = {};
 
       const scanGroup = destination => {
         return l => {
           const meta = l[Symbol.for("meta")];
+          if (meta.task && meta.task.id) zIndexGroupMap[meta.task.id] = meta.zIndexGroup || 0;
+
           const group = meta.group;
           if (group){
             groups[group.id] = groups[group.id] || {
@@ -95,7 +98,11 @@ export default class LayersControlPanel extends React.Component {
       };
 
       content = (<div>{getGroupContent(main)}
-        {Object.keys(groups).map(id => {
+        {Object.keys(groups).sort((a, b) => {
+          const za = zIndexGroupMap[a] || 0;
+          const zb = zIndexGroupMap[b] || 0;
+          return za > zb ? -1 : 1;
+        }).map(id => {
           return (<div key={id}>
             <div className="layer-group-title" title={groups[id].name}>{groups[id].name}</div>
             {getGroupContent(groups[id])}

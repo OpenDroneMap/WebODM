@@ -76,6 +76,7 @@ class Map extends React.Component {
     this.autolayers = null;
     this.taskCount = 1;
     this.addedCameraShots = {};
+    this.zIndexGroupMap = {};
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
@@ -136,8 +137,8 @@ class Map extends React.Component {
     return "";
   }
 
-  typeZIndex = (type) => {
-    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1;
+  typeZIndex = (type, offset = 0) => {
+    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1 + offset;
   }
 
   hasBands = (bands, orthophoto_bands) => {
@@ -179,8 +180,19 @@ class Map extends React.Component {
     return new Promise((resolve, reject) => {
       this.tileJsonRequests = [];
 
+      // Set a zIndexGroup
+      this.zIndexGroupMap = {};
+      let zIdx = 1;
+      for (let i = tiles.length - 1; i >= 0; i--){
+        if (!tiles[i].zIndexGroup){
+          const taskId = tiles[i].meta.task.id;
+          if (!this.zIndexGroupMap[taskId]) this.zIndexGroupMap[taskId] = zIdx++;
+          tiles[i].zIndexGroup = this.zIndexGroupMap[taskId];
+        }
+      }
+
       async.each(tiles, (tile, done) => {
-        const { url, type } = tile;
+        const { url, type, zIndexGroup } = tile;
         const meta = Utils.clone(tile.meta);
 
         let metaUrl = url + "metadata";
@@ -287,7 +299,7 @@ class Map extends React.Component {
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
                   detectRetina: true,
-                  zIndex: this.typeZIndex(type),
+                  zIndex: this.typeZIndex(type, zIndexGroup * 10),
                 });
             
             // Associate metadata with this layer
@@ -299,6 +311,7 @@ class Map extends React.Component {
             meta.icon = this.typeToIcon(type, this.props.thermal || thermal);
             meta.type = type;
             meta.raster = true;
+            meta.zIndexGroup = zIndexGroup;
             meta.autoExpand = this.taskCount === 1 && type === this.props.mapType;
             meta.metaUrl = metaUrl;
             meta.unitForward = unitForward;
@@ -430,7 +443,11 @@ class Map extends React.Component {
                       shotsLayer.addMarkers(markers, this.map);
                     }
                   });
-                shotsLayer[Symbol.for("meta")] = {name: _("Cameras"), icon: "fa fa-camera fa-fw"};
+                shotsLayer[Symbol.for("meta")] = {
+                  name: _("Cameras"), 
+                  icon: "fa fa-camera fa-fw",
+                  zIndexGroup
+                };
                 if (this.taskCount > 1){
                   // Assign to a group
                   shotsLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
@@ -484,7 +501,12 @@ class Map extends React.Component {
                       gcpLayer.addMarkers(markers, this.map);
                     }
                   });
-                gcpLayer[Symbol.for("meta")] = {name: _("Ground Control Points"), icon: "far fa-dot-circle fa-fw"};
+                gcpLayer[Symbol.for("meta")] = {
+                  name: _("Ground Control Points"), 
+                  icon: "far fa-dot-circle fa-fw",
+                  zIndexGroup
+                };
+                
                 if (this.taskCount > 1){
                   // Assign to a group
                   gcpLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
@@ -846,7 +868,8 @@ _('Example:'),
   handleAddAnnotation = (layer, name, task) => {
       const meta = {
         name: name || "", 
-        icon: "fa fa-sticky-note fa-fw"
+        icon: "fa fa-sticky-note fa-fw",
+        zIndexGroup: this.zIndexGroupMap[task.id] || 0,
       };
       if (this.taskCount > 1 && task){
         meta.group = {id: task.id, name: task.name};
