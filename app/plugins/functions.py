@@ -327,34 +327,22 @@ def get_dynamic_script_handler(script_path, callback=None, **kwargs):
 def enable_plugin(plugin_name):
     p = get_plugin_by_name(plugin_name, only_active=False)
     p.register()
-    # Attempt to call plugin enable method
     try:
-        # Check existence of enable method
-        if hasattr(p, 'enable'):
-            p.enable()
+        p.enable()
     except Exception as e:
-        # If enable fails, log warning and raise the exception.
-        logger.warning(f"Plugin: {plugin_name} enable unsuccessful: {str(e)}")
-        raise  # Propagate error to UI, DB state not changed, unsure if plugin operational
-    # Mark plugin enabled
+        logger.warning(f"Plugin: {plugin_name} enable error: {str(e)}")
+        raise  # Propagate error to UI
     Plugin.objects.get(pk=plugin_name).enable()
     return p
 
 def disable_plugin(plugin_name):
     p = get_plugin_by_name(plugin_name, only_active=False)
-    # Attempt to call plugin disable method
     try:
-        # Check existence of disable method
-        if hasattr(p, 'disable'):
-            p.disable()
-    except:
-        # If enable fails, log warning. Exception not raised up as the
-        # plugin is going to be disabled anyhow. DB state not changed.
-        logger.warning("Plugin: "+plugin_name+" disable unsuccessful.")
-        # Disable the plugin even on failure
+        p.disable()
+    except Exception as e:
+        logger.warning(f"Plugin: {plugin_name} disable error: {str(e)}")
         Plugin.objects.get(pk=plugin_name).disable()
-        raise # Propagate the error to the UI.
-    # Mark plugin disabled
+        raise # Propagate error to UI
     Plugin.objects.get(pk=plugin_name).disable()
     return p
 
