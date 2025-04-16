@@ -865,22 +865,24 @@ _('Example:'),
     });
   }
 
-  handleAddAnnotation = (layer, name, task) => {
+  handleAddAnnotation = (layer, name, task, stored) => {
       const zIndexGroup = this.zIndexGroupMap[task.id] || 1;
       
       const meta = {
         name: name || "", 
         icon: "fa fa-sticky-note fa-fw",
-        zIndexGroup,
+        zIndexGroup
       };
 
       if (this.taskCount > 1 && task){
         meta.group = {id: task.id, name: task.name};
         
-        // Only show annotations for the first task
-        let maxZIndex = Math.max(...Object.values(this.zIndexGroupMap)) || 1;
-        if (zIndexGroup !== maxZIndex){
-          PluginsAPI.Map.toggleAnnotation(layer, false);
+        if (stored){
+          // Only show annotations for the first task
+          let maxZIndex = Math.max(...Object.values(this.zIndexGroupMap)) || 1;
+          if (zIndexGroup !== maxZIndex){
+            PluginsAPI.Map.toggleAnnotation(layer, false);
+          }
         }
       }
       layer[Symbol.for("meta")] = meta;
