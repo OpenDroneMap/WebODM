@@ -137,8 +137,8 @@ class Map extends React.Component {
     return "";
   }
 
-  typeZIndex = (type, offset = 0) => {
-    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1 + offset;
+  typeZIndex = (type, zIndexGroup = 1) => {
+    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1 + zIndexGroup * 10;
   }
 
   hasBands = (bands, orthophoto_bands) => {
@@ -299,7 +299,7 @@ class Map extends React.Component {
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
                   detectRetina: true,
-                  zIndex: this.typeZIndex(type, zIndexGroup * 10),
+                  zIndex: this.typeZIndex(type, zIndexGroup),
                 });
             
             // Associate metadata with this layer
