@@ -17,7 +17,7 @@ export default class LayersControlLayer extends React.Component {
       expanded: false,
       map: null,
       overlay: false,
-      separator: false,
+      separator: false
   };
   static propTypes = {
     layer: PropTypes.object.isRequired,
@@ -81,9 +81,25 @@ export default class LayersControlLayer extends React.Component {
     PluginsAPI.Map.onSideBySideChanged(this.handleSideBySideChange);
   }
 
+  isLayerWithSameTaskIdVisible = () => {
+    if (!this.meta.task) return true;
+
+    const taskId = this.meta.task.id;
+    for (let layer of Object.values(this.props.map._layers)){
+        if (!layer[Symbol.for("meta")] || !layer.isHidden) continue;
+        const meta = layer[Symbol.for("meta")];
+        if (meta.task.id === taskId && 
+            this.props.map.hasLayer(layer) && 
+            !layer.isHidden()){
+            return true;
+        }
+    }
+    return false;
+  }
+
   handleMapTypeChange = (type, autoExpand) => {
     if (this.meta.type !== undefined){
-        const visible = this.meta.type === type;
+        const visible = this.meta.type === type && (autoExpand || this.isLayerWithSameTaskIdVisible());
         const expanded = visible && autoExpand;
         this.setState({visible, expanded});
     }

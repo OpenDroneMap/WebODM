@@ -89,14 +89,7 @@ class TaskSerializer(serializers.ModelSerializer):
         return []
 
     def get_extent(self, obj):
-        if obj.orthophoto_extent is not None:
-            return obj.orthophoto_extent.extent
-        elif obj.dsm_extent is not None:
-            return obj.dsm_extent.extent
-        elif obj.dtm_extent is not None:
-            return obj.dsm_extent.extent
-        else:
-            return None
+        return obj.get_extent()
 
     class Meta:
         model = models.Task
