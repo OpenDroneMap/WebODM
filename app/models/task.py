@@ -374,6 +374,16 @@ class Task(models.Model):
         self.validate_unique()
 
         super(Task, self).save(*args, **kwargs)
+    
+    def get_extent(self):
+        if self.orthophoto_extent is not None:
+            return self.orthophoto_extent.extent
+        elif self.dsm_extent is not None:
+            return self.dsm_extent.extent
+        elif self.dtm_extent is not None:
+            return self.dsm_extent.extent
+        else:
+            return None
 
     def assets_path(self, *args):
         """
@@ -1097,7 +1107,8 @@ class Task(models.Model):
                     'ground_control_points': ground_control_points,
                     'epsg': self.epsg,
                     'orthophoto_bands': self.orthophoto_bands,
-                    'crop': self.crop is not None
+                    'crop': self.crop is not None,
+                    'extent': self.get_extent(),
                 }
             }
         }

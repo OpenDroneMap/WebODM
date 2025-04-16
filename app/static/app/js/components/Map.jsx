@@ -33,6 +33,8 @@ import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
 import { unitSystem, toMetric } from '../classes/Units';
 
+const IOU_THRESHOLD = 0.7;
+
 class Map extends React.Component {
   static defaultProps = {
     showBackground: false,
@@ -77,6 +79,7 @@ class Map extends React.Component {
     this.taskCount = 1;
     this.addedCameraShots = {};
     this.zIndexGroupMap = {};
+    this.ious = {};
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
@@ -151,6 +154,28 @@ class Map extends React.Component {
     return true;
   }
 
+  computeIOU = (b1, b2) => {
+    const [x1Min, y1Min, x1Max, y1Max] = b1;
+    const [x2Min, y2Min, x2Max, y2Max] = b2;
+  
+    const interXMin = Math.max(x1Min, x2Min);
+    const interYMin = Math.max(y1Min, y2Min);
+    const interXMax = Math.min(x1Max, x2Max);
+    const interYMax = Math.min(y1Max, y2Max);
+  
+    const interWidth = Math.max(0, interXMax - interXMin);
+    const interHeight = Math.max(0, interYMax - interYMin);
+    const interArea = interWidth * interHeight;
+  
+    const area1 = (x1Max - x1Min) * (y1Max - y1Min);
+    const area2 = (x2Max - x2Min) * (y2Max - y2Min);
+    const unionArea = area1 + area2 - interArea;
+  
+    if (unionArea === 0) return 0;
+  
+    return interArea / unionArea;
+  }
+
   loadImageryLayers(forceAddLayers = false){
     // Cancel previous requests
     if (this.tileJsonRequests) {
@@ -190,6 +215,28 @@ class Map extends React.Component {
           tiles[i].zIndexGroup = this.zIndexGroupMap[taskId];
         }
       }
+
+      // Compute IoU scores
+      // This gives us an idea of overlap between tasks
+      // so that we can decide to show them in project map view
+      this.ious = {};
+      for (let i = tiles.length - 1; i >= 0; i--){
+        const taskId = tiles[i].meta.task.id;
+        if (this.ious[taskId] === undefined){
+          for (let j = i - 1; j >= 0; j--){
+            const tId = tiles[j].meta.task.id;
+            if (tId === taskId) continue;
+            
+            const iou = this.computeIOU(tiles[i].meta.task.extent, tiles[j].meta.task.extent);
+            if (this.ious[taskId] === undefined){
+              this.ious[taskId] = iou;
+            }else{
+              this.ious[taskId] = Math.max(this.ious[taskId], iou);
+            }
+          }
+        }
+      }
+      this.ious[tiles[0].meta.task.id] = 0; // First task is always visible
 
       async.each(tiles, (tile, done) => {
         const { url, type, zIndexGroup } = tile;
@@ -289,7 +336,7 @@ class Map extends React.Component {
                 if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
-            
+
             const layer = Leaflet.tileLayer(tileUrl, {
                   bounds,
                   minZoom: 0,
@@ -323,8 +370,9 @@ class Map extends React.Component {
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 
+            const iou = this.ious[meta.task.id] || 0;
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
-              if (type === this.props.mapType){
+              if (type === this.props.mapType && iou <= IOU_THRESHOLD){
                 layer.addTo(this.map);
               }
             }
@@ -878,9 +926,8 @@ _('Example:'),
         meta.group = {id: task.id, name: task.name};
         
         if (stored){
-          // Only show annotations for the first task
-          let maxZIndex = Math.max(...Object.values(this.zIndexGroupMap)) || 1;
-          if (zIndexGroup !== maxZIndex){
+          // Only show annotations for top-most tasks
+          if (this.ious[task.id] >= IOU_THRESHOLD){
             PluginsAPI.Map.toggleAnnotation(layer, false);
           }
         }
