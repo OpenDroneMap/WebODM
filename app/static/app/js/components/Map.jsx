@@ -226,6 +226,7 @@ class Map extends React.Component {
           for (let j = i - 1; j >= 0; j--){
             const tId = tiles[j].meta.task.id;
             if (tId === taskId) continue;
+            if (!tiles[i].meta.task.extent || !tiles[j].meta.task.extent) continue;
             
             const iou = this.computeIOU(tiles[i].meta.task.extent, tiles[j].meta.task.extent);
             if (this.ious[taskId] === undefined){
