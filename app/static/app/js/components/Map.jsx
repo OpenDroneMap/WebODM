@@ -33,7 +33,7 @@ import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
 import { unitSystem, toMetric } from '../classes/Units';
 
-const IOU_THRESHOLD = 0.7;
+const IOU_THRESHOLD = 0.3;
 
 class Map extends React.Component {
   static defaultProps = {
