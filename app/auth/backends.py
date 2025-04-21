@@ -8,11 +8,26 @@ import logging
 
 logger = logging.getLogger('app.logger')
 
+def cluster_mismatch(res):
+    if settings.CLUSTER_ID is None:
+        return False
+
+    if 'cluster_id' in res:
+        # Check cluster ID field
+        try:
+            return int(res['cluster_id']) != settings.CLUSTER_ID
+        except ValueError:
+            return True
+    return False
+
 def get_user_from_external_auth_response(res):
     if 'message' in res or 'error' in res:
         return None
 
     if 'user_id' in res and 'username' in res:
+        if cluster_mismatch(res):
+            return None
+        
         try:
             user = User.objects.get(pk=res['user_id'])
         except User.DoesNotExist:
