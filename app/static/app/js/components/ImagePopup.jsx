@@ -104,7 +104,6 @@ class ImagePopup extends React.Component {
         }else{
             document.exitFullscreen();
             this.setState({ expandThumb: false, translateX: 0, translateY: 0, scale: 1 });
-            this.image
         }
     }
 
