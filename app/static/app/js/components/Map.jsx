@@ -33,7 +33,7 @@ import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
 import { unitSystem, toMetric } from '../classes/Units';
 
-const IOU_THRESHOLD = 0.3;
+const IOU_THRESHOLD = 0.7;
 
 class Map extends React.Component {
   static defaultProps = {
@@ -928,7 +928,7 @@ _('Example:'),
         
         if (stored){
           // Only show annotations for top-most tasks
-          if (this.ious[task.id] >= IOU_THRESHOLD){
+          if (this.ious[task.id] >= 0.01){
             PluginsAPI.Map.toggleAnnotation(layer, false);
           }
         }
