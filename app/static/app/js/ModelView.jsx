@@ -472,6 +472,7 @@ class ModelView extends React.Component {
 
     viewer.renderer.domElement.addEventListener( 'mousedown', this.handleRenderMouseClick );
     viewer.renderer.domElement.addEventListener( 'mousemove', this.handleRenderMouseMove );
+    viewer.renderer.domElement.addEventListener( 'touchstart', this.handleRenderTouchStart );
     
   }
 
@@ -486,6 +487,7 @@ class ModelView extends React.Component {
   componentWillUnmount(){
     viewer.renderer.domElement.removeEventListener( 'mousedown', this.handleRenderMouseClick );
     viewer.renderer.domElement.removeEventListener( 'mousemove', this.handleRenderMouseMove );
+    viewer.renderer.domElement.removeEventListener( 'touchstart', this.handleRenderTouchStart );
     
   }
 
@@ -530,6 +532,12 @@ class ModelView extends React.Component {
         viewer.renderer.domElement.classList.remove("pointer-cursor");
     }
     this._prevCamera = camera;
+  }
+
+  handleRenderTouchStart = (evt) => {
+    if (evt.touches.length === 1){
+        this.handleRenderMouseClick({clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY});
+    }
   }
 
   handleRenderMouseClick = (evt) => {

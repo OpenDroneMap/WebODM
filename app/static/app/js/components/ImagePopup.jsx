@@ -37,7 +37,7 @@ class ImagePopup extends React.Component {
     componentDidMount(){
         if (this.image){
             this.image.addEventListener("fullscreenchange", this.onFullscreenChange);
-            this.image.addEventListener("mousewheel", this.onMouseWheel);
+            this.image.addEventListener("wheel", this.onMouseWheel);
             this.image.addEventListener("mousedown", this.onMouseDown);
             this.image.addEventListener("mousemove", this.onMouseMove);
             this.image.addEventListener("mouseup", this.onMouseUp);
@@ -51,7 +51,7 @@ class ImagePopup extends React.Component {
     componentWillUnmount(){
         if (this.image){
             this.image.removeEventListener("fullscreenchange", this.onFullscreenChange);
-            this.image.removeEventListener("mousewheel", this.onMouseWheel);
+            this.image.removeEventListener("wheel", this.onMouseWheel);
             this.image.removeEventListener("mousedown", this.onMouseDown);
             this.image.removeEventListener("mousemove", this.onMouseMove);
             this.image.removeEventListener("mouseup", this.onMouseUp);
