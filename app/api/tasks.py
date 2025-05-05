@@ -165,7 +165,7 @@ class TaskViewSet(viewsets.ViewSet):
         An optional "limit" query param can be passed to limit
         the number of lines to be returned
 
-        An optional "f" query param can be either: "text" (default) or "json"
+        An optional "f" query param can be either: "text" (default), "json" or "raw"
         """
         get_and_check_project(request, project_pk)
         try:
