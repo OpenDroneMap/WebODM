@@ -168,8 +168,20 @@ class TaskListItem extends React.Component {
     });
   }
 
-  consoleOutputUrl(line){
-    return `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/output/?line=${line}`;
+  consoleOutputUrl(line, download){
+    let url = `/api/projects/${this.state.task.project}/tasks/${this.state.task.id}/output/`;
+    
+    if (download !== undefined){
+      url += `?f=raw`;
+    }else{
+      url += `?f=json`;
+    }
+
+    if (line !== undefined){
+      url += `&line=${line}&limit=-502`;
+    }
+
+    return url;
   }
 
   thumbnailUrl = () => {

@@ -12,7 +12,8 @@ class Console extends React.Component {
     super();
 
     this.state = {
-      lines: []
+      lines: [],
+      sourceLinesCount: null // as reported by source
     };
 
     if (typeof props.children === "string"){
@@ -40,15 +41,23 @@ class Console extends React.Component {
     if (this.props.source !== undefined){
       const updateFromSource = () => {
         let sourceUrl = typeof this.props.source === 'function' ?
-                       this.props.source(this.state.lines.length) :
+                       this.props.source(this.state.sourceLinesCount !== null ? this.state.sourceLinesCount : this.state.lines.length) :
                        this.props.source;
 
         // Fetch
-        this.sourceRequest = $.get(sourceUrl, text => {
-          if (text !== ""){
-            let lines = text.split("\n");
-            this.addLines(lines);
+        this.sourceRequest = $.get(sourceUrl, res => {
+          let lines = [];
+
+          if (typeof res === "string"){
+            if (res !== ""){
+              lines = res.split("\n");
+            }
+          }else if (typeof res === "object"){
+            lines = res.lines;
+            this.setState({sourceLinesCount: res.count});
           }
+
+          if (lines.length > 0) this.addLines(lines);
         })
         .always((_, textStatus) => {
           if (textStatus !== "abort" && this.props.refreshInterval !== undefined){
@@ -64,12 +73,20 @@ class Console extends React.Component {
 
   clear(){
     this.tearDownDynamicSource();
-    this.setState({lines: []});
+    this.setState({lines: [], sourceLinesCount: null});
     this.setupDynamicSource();
   }
 
   downloadTxt(filename="console.txt"){
-    Utils.saveAs(this.state.lines.join("\n"), filename);
+    if (this.state.sourceLinesCount !== null){
+      if (this.state.lines.length !== this.state.sourceLinesCount && typeof this.props.source === 'function'){
+        Utils.downloadAs(this.props.source(undefined, true), filename);
+      }else{
+        Utils.saveAs(this.state.lines.join("\n"), filename);
+      }
+    }else{
+      Utils.saveAs(this.state.lines.join("\n"), filename);
+    }
   }
 
   enterFullscreen(){
