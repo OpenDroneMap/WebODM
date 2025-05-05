@@ -73,7 +73,7 @@ class Console extends React.Component {
 
   clear(){
     this.tearDownDynamicSource();
-    this.setState({lines: []});
+    this.setState({lines: [], sourceLinesCount: null});
     this.setupDynamicSource();
   }
 
