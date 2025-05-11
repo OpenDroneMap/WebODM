@@ -26,7 +26,7 @@ COPY sources.list /etc/apt/sources.list
 
 # Build-time dependencies
 RUN apt-get -qq update && \
-    apt-get -qq install -y --no-install-recommends wget curl && \
+    apt-get -qq install -y --no-install-recommends curl && \
     apt-get install -y ca-certificates gnupg
 
 # Node.js deb source
