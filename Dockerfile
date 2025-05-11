@@ -3,17 +3,18 @@ MAINTAINER Piero Toffanin <pt@masseranolabs.com>
 
 ARG TEST_BUILD
 ARG DEBIAN_FRONTEND=noninteractive
+
+ENV WORKDIR=/webodm
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH $PYTHONPATH:/webodm
+ENV PYTHONPATH $PYTHONPATH:$WORKDIR
 ENV PROJ_LIB=/usr/share/proj
 ENV NODE_MAJOR=20
 
-# Copy WebODM files
-ADD . /webodm/
-WORKDIR /webodm
+#### Common setup ####
 
 # Common system configuration, should change very infrequently
 RUN \
+    # Old-releases for 21.04 \
     echo "deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted\n" \
     "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted\n" \
     "deb http://old-releases.ubuntu.com/ubuntu/ hirsute universe\n" \
@@ -50,31 +51,53 @@ RUN apt-get -qq update && \
     # Install pip
     pip install pip==24.0
 
+#### App-dependent setup ####
+
+# Create and change into working directory
+WORKDIR $WORKDIR
+
 # Install Python requirements
+COPY requirements.txt ./
 RUN pip install -r requirements.txt "boto3==1.14.14"
 
+# Cleanup of build requirements
+RUN apt-get remove -y g++ python3-dev libpq-dev && apt-get autoremove -y && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Setup cron
-RUN ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && \
-    chmod 0644 /webodm/nginx/crontab && \
-    service cron start
+COPY --chmod=0644 nginx/crontab ./nginx/crontab
+RUN ln -s ./nginx/crontab /var/spool/cron/crontabs/root && \
+    service cron enable
 
-# WebODM app config
-RUN chmod +x /webodm/nginx/letsencrypt-autogen.sh && \
-    /webodm/nodeodm/setup.sh && \
-    /webodm/nodeodm/cleanup.sh
+# Install project Node dependencies
+COPY package.json ./
+RUN npm install --quiet
 
-# Install Node deps
-RUN cd /webodm && \
-    npm install --quiet -g webpack@5.89.0 && npm install --quiet -g webpack-cli@5.1.4 && npm install --quiet && webpack --mode production
+# Install webpack
+RUN npm install --quiet -g webpack@5.89.0 && \
+    npm install --quiet -g webpack-cli@5.1.4
+
+# Run webpack build
+COPY webpack.config.js ./
+RUN webpack --mode production
+
+# NodeODM setup
+COPY --chmod=0755 nginx/letsencrypt-autogen.sh ./nginx/letsencrypt-autogen.sh
+COPY nodeodm ./nodeodm
+RUN ./nodeodm/setup.sh && \
+    ./nodeodm/cleanup.sh
+
+# Copy remaining files
+COPY . ./
 
 # Django setup
 RUN python manage.py collectstatic --noinput && \
     python manage.py rebuildplugins && \
     python manage.py translate build --safe
 
-# Cleanup
-RUN apt-get remove -y g++ python3-dev libpq-dev && apt-get autoremove -y && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+# Final cleanup
+RUN rm -rf /tmp/* /var/tmp/* && \
+    # Remove auto-generated secret key (happens on import of settings when none is defined)
     rm /webodm/webodm/secret_key.py
 
 VOLUME /webodm/app/media
