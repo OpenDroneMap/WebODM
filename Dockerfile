@@ -14,20 +14,15 @@ ENV NODE_MAJOR=20
 
 # Common system configuration, should change very infrequently
 RUN \
-    # Old-releases for 21.04 \
-    echo "deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted\n" \
-    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted\n" \
-    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute universe\n" \
-    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates universe\n" \
-    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute multiverse\n" \
-    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates multiverse\n" \
-    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-backports main restricted universe multiverse" > /etc/apt/sources.list && \
     # Default to 3 retries for apt-get acquire's.
     # Remove in apt 2.3.2 where 3 tries is default.
     # Ref: https://askubuntu.com/questions/875213/apt-get-to-retry-downloading
     echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
     # Set timezone to UTC
     echo "UTC" > /etc/timezone
+
+# Old-releases for 21.04
+COPY sources.list /etc/apt/sources.list
 
 # Build-time dependencies
 RUN apt-get -qq update && \
