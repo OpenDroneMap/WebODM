@@ -61,8 +61,7 @@ RUN apt-get remove -y g++ python3-dev libpq-dev && apt-get autoremove -y && \
 
 # Setup cron
 COPY --chmod=0644 nginx/crontab ./nginx/crontab
-RUN ln -s ./nginx/crontab /var/spool/cron/crontabs/root && \
-    service cron enable
+RUN ln -s ./nginx/crontab /var/spool/cron/crontabs/root
 
 # Install project Node dependencies
 COPY package.json ./
