@@ -7,41 +7,73 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH $PYTHONPATH:/webodm
 ENV PROJ_LIB=/usr/share/proj
 
-# Prepare directory
+# Copy WebODM files
 ADD . /webodm/
 WORKDIR /webodm
 
-# Use old-releases for 21.04
-RUN printf "deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute universe\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates universe\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute multiverse\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates multiverse\ndeb http://old-releases.ubuntu.com/ubuntu/ hirsute-backports main restricted universe multiverse" > /etc/apt/sources.list
+# Common system configuration, should change very infrequently
+RUN \
+    echo "deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted\n" \
+    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted\n" \
+    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute universe\n" \
+    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates universe\n" \
+    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute multiverse\n" \
+    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates multiverse\n" \
+    "deb http://old-releases.ubuntu.com/ubuntu/ hirsute-backports main restricted universe multiverse" > /etc/apt/sources.list && \
+    # Default to 3 retries for apt-get acquire's.
+    # Remove in apt 2.3.2 where 3 tries is default.
+    # Ref: https://askubuntu.com/questions/875213/apt-get-to-retry-downloading
+    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    # Set timezone to UTC
+    echo "UTC" > /etc/timezone
 
-# Default to 3 retries for apt-get acquire's.
-# Remove in apt 2.3.2 where 3 tries is default.
-# Ref: https://askubuntu.com/questions/875213/apt-get-to-retry-downloading
-RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries
+# Build-time dependencies
+RUN apt-get -qq update && \
+    apt-get -qq install -y --no-install-recommends wget curl && \
+    apt-get install -y ca-certificates gnupg
 
-# Install Node.js using new Node install method
-RUN apt-get -qq update && apt-get -qq install -y --no-install-recommends wget curl && \
-    apt-get install -y ca-certificates gnupg && \
-    mkdir -p /etc/apt/keyrings && \
+# Node.js deb source
+RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     NODE_MAJOR=20 && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    apt-get -qq update && apt-get -qq install -y nodejs && \
-    # Install Python3, GDAL, PDAL, nginx, letsencrypt, psql
-    apt-get -qq update && apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin pdal libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2 && \
-    # Install pip reqs
-    pip install pip==24.0 && pip install -r requirements.txt "boto3==1.14.14" && \
-    # Setup cron
-    ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && chmod 0644 /webodm/nginx/crontab && service cron start && chmod +x /webodm/nginx/letsencrypt-autogen.sh && \
-    /webodm/nodeodm/setup.sh && /webodm/nodeodm/cleanup.sh && cd /webodm && \
-    npm install --quiet -g webpack@5.89.0 && npm install --quiet -g webpack-cli@5.1.4 && npm install --quiet && webpack --mode production && \
-    echo "UTC" > /etc/timezone && \
-    python manage.py collectstatic --noinput && \
+    apt-get -qq update && \
+    apt-get -qq install -y nodejs
+
+# Install Python3, GDAL, PDAL, nginx, letsencrypt, psql
+RUN apt-get -qq update && \
+    apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git g++ python3-dev python2.7-dev libpq-dev binutils libproj-dev gdal-bin pdal libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata && \
+    # Python2 with priority 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
+    # Python3 with priority 2 (default)
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2 && \
+    # Install pip
+    pip install pip==24.0
+
+# Install Python requirements
+RUN pip install -r requirements.txt "boto3==1.14.14"
+
+# Setup cron
+RUN ln -s /webodm/nginx/crontab /var/spool/cron/crontabs/root && \
+    chmod 0644 /webodm/nginx/crontab && \
+    service cron start
+
+# WebODM app config
+RUN chmod +x /webodm/nginx/letsencrypt-autogen.sh && \
+    /webodm/nodeodm/setup.sh && \
+    /webodm/nodeodm/cleanup.sh
+
+# Install Node deps
+RUN cd /webodm && \
+    npm install --quiet -g webpack@5.89.0 && npm install --quiet -g webpack-cli@5.1.4 && npm install --quiet && webpack --mode production
+
+# Django setup
+RUN python manage.py collectstatic --noinput && \
     python manage.py rebuildplugins && \
-    python manage.py translate build --safe && \
-    # Cleanup
-    apt-get remove -y g++ python3-dev libpq-dev && apt-get autoremove -y && \
+    python manage.py translate build --safe
+
+# Cleanup
+RUN apt-get remove -y g++ python3-dev libpq-dev && apt-get autoremove -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /webodm/webodm/secret_key.py
 
