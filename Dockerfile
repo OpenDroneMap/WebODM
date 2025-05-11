@@ -68,19 +68,19 @@ RUN ln -s ./nginx/crontab /var/spool/cron/crontabs/root && \
 COPY package.json ./
 RUN npm install --quiet
 
-# Install webpack
-RUN npm install --quiet -g webpack@5.89.0 && \
-    npm install --quiet -g webpack-cli@5.1.4
-
-# Run webpack build
-COPY webpack.config.js ./
-RUN webpack --mode production
-
 # NodeODM setup
 COPY --chmod=0755 nginx/letsencrypt-autogen.sh ./nginx/letsencrypt-autogen.sh
 COPY nodeodm ./nodeodm
 RUN ./nodeodm/setup.sh && \
     ./nodeodm/cleanup.sh
+
+# Install and run webpack build
+# Note webpack CLI is also used in `rebuildplugins` below
+COPY webpack.config.js ./
+COPY app ./app
+RUN npm install --quiet -g webpack@5.89.0 && \
+    npm install --quiet -g webpack-cli@5.1.4 && \
+    webpack --mode production
 
 # Copy remaining files
 COPY . ./
