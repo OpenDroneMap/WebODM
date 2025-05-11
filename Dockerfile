@@ -1,12 +1,12 @@
 FROM ubuntu:21.04
-MAINTAINER Piero Toffanin <pt@masseranolabs.com>
+LABEL maintainer="Piero Toffanin <pt@masseranolabs.com>"
 
 ARG TEST_BUILD
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV WORKDIR=/webodm
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH $WORKDIR
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=$WORKDIR
 ENV PROJ_LIB=/usr/share/proj
 ENV NODE_MAJOR=20
 
