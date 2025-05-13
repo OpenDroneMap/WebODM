@@ -49,7 +49,9 @@ RUN <<EOT
     # Install common deps, starting with NodeJS
     apt-get -qq install -y nodejs
     # Python3, GDAL, PDAL, nginx, letsencrypt, psql
-    apt-get -qq install -y --no-install-recommends python3 python3-pip python3-setuptools python3-wheel git python2.7-dev binutils libproj-dev gdal-bin pdal libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata
+    apt-get -qq install -y --no-install-recommends \
+        python3 python3-pip python3-setuptools python3-wheel git python2.7-dev binutils libproj-dev gdal-bin pdal \
+        libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata
     # Python2 with priority 1
     update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
     # Python3 with priority 2 (default)
