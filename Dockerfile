@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:21.04
+FROM ubuntu:22.04
 LABEL maintainer="Piero Toffanin <pt@masseranolabs.com>"
 
 ARG TEST_BUILD
@@ -10,19 +10,9 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=$WORKDIR
 ENV PROJ_LIB=/usr/share/proj
 ENV NODE_MAJOR=20
+ENV RELEASE_CODENAME=jammy
 
 #### Common setup ####
-
-# Old-releases for 21.04
-COPY <<EOF /etc/apt/sources.list
-deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted
-deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted
-deb http://old-releases.ubuntu.com/ubuntu/ hirsute universe
-deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates universe
-deb http://old-releases.ubuntu.com/ubuntu/ hirsute multiverse
-deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates multiverse
-deb http://old-releases.ubuntu.com/ubuntu/ hirsute-backports main restricted universe multiverse
-EOF
 
 # Create and change into working directory
 WORKDIR $WORKDIR
@@ -38,30 +28,39 @@ SHELL ["sh", "-exc"]
 
 RUN <<EOT
     # Common system configuration, should change very infrequently
-    # Default to 3 retries for apt-get acquire's.
-    # Remove in apt 2.3.2 where 3 tries is default.
-    # Ref: https://askubuntu.com/questions/875213/apt-get-to-retry-downloading
-    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries
     # Set timezone to UTC
     echo "UTC" > /etc/timezone
     # Build-time dependencies
     apt-get -qq update
     apt-get -qq install -y --no-install-recommends curl
-    apt-get install -y ca-certificates gnupg
+    apt-get install -y ca-certificates gnupg software-properties-common
+    # Enable universe, for pdal
+    add-apt-repository universe
+    # Python 3.9 support
+    add-apt-repository ppa:deadsnakes/ppa
     # Node.js deb source
-    mkdir -p /etc/apt/keyrings
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/nodesource.gpg
+    echo "deb https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" > /etc/apt/sources.list.d/nodesource.list
+    # Postgres 13
+    # curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+    # echo "deb http://apt.postgresql.org/pub/repos/apt $RELEASE_CODENAME-pgdg main" > /etc/apt/sources.list.d/postgresql.list
     # Update package list
-    apt-get -qq update
+    apt-get update
     # Install common deps, starting with NodeJS
     apt-get -qq install -y nodejs
-    # Python3, GDAL, PDAL, nginx, letsencrypt, psql
-    apt-get -qq install -y --no-install-recommends \
-        python3 python3-pip python3-setuptools python3-wheel git binutils libproj-dev gdal-bin pdal \
-        libgdal-dev python3-gdal nginx certbot gettext-base cron postgresql-client-13 gettext tzdata
-    # Python3 with priority 1 (default)
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+    # Python3.9, GDAL, PDAL, nginx, letsencrypt, psql
+    apt-get install -y --no-install-recommends \
+        python3.9 python3.9-venv git binutils libproj-dev gdal-bin pdal \
+        libgdal-dev nginx certbot gettext-base cron postgresql-client gettext tzdata
+    # Create virtualenv
+    python3.9 -m venv $WORKDIR/venv
+EOT
+
+# Modify PATH to prioritize venv, effectively activating venv
+ENV PATH="$WORKDIR/venv/bin:$PATH"
+
+RUN <<EOT
+    # Install Python dependencies
     # Install pip
     pip install pip==24.0
     # Install webpack, webpack CLI
@@ -69,11 +68,13 @@ RUN <<EOT
     npm install --quiet -g webpack@5.89.0
     npm install --quiet -g webpack-cli@5.1.4
     # Build-only deps
-    apt-get -qq install -y --no-install-recommends g++ python3-dev libpq-dev
+    apt-get -qq install -y --no-install-recommends g++ python3.9-dev libpq-dev
     # Install Python requirements
     pip install -r requirements.txt "boto3==1.14.14"
+
+RUN <<EOT
     # Cleanup of build requirements
-    apt-get remove -y g++ python3-dev libpq-dev
+    apt-get remove -y g++ python3.9-dev libpq-dev
     apt-get autoremove -y
     apt-get clean
     rm -rf /var/lib/apt/lists/*
