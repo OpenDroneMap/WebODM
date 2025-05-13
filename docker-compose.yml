@@ -55,5 +55,6 @@ services:
       - WO_BROKER
       - WO_DEBUG
       - WO_SECRET_KEY
+      - WEB_CONCURRENCY
     restart: unless-stopped
     oom_score_adj: 250
