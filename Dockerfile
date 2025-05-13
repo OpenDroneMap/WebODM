@@ -80,9 +80,9 @@ RUN \
     # NodeODM setup
     chmod +x ./nginx/letsencrypt-autogen.sh && \
     ./nodeodm/setup.sh && \
-    ./nodeodm/cleanup.sh \
+    ./nodeodm/cleanup.sh && \
     # Run webpack build, Django setup and final cleanup
-    webpack --mode production \
+    webpack --mode production && \
     # Django setup
     python manage.py collectstatic --noinput && \
     python manage.py rebuildplugins && \
