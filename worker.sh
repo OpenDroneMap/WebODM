@@ -45,6 +45,18 @@ environment_check(){
 		echo -e "\033[91mWO_BROKER environment variable is not set. Defaulting to redis://localhost\033[39m"
 		export WO_BROKER=redis://localhost
 	fi
+
+  # Only set if `WEB_CONCURRENCY` is not defined, allows overriding.
+  # See: https://docs.gunicorn.org/en/latest/settings.html#workers
+  if [ -z "$WEB_CONCURRENCY" ]; then
+      # Default gunicorn worker count to 2 x availabe cores + 1
+      # nproc gives _available_ (rather than physicall present) CPU cores.
+      CPU_COUNT=$(nproc)
+      export WEB_CONCURRENCY=$((2*$CPU_COUNT+1))
+      echo "Setting WEB_CONCURRENCY based on $CPU_COUNT available CPU cores to start $WEB_CONCURRENCY gunicorn workers."
+  else
+      echo "Using pre-defined WEB_CONCURRENCY override to start $WEB_CONCURRENCY gunicorn workers."
+  fi
 }
 
 
@@ -52,7 +64,7 @@ start(){
 	action=$1
 
 	echo "Starting worker using broker at $WO_BROKER"
-	celery -A worker worker --autoscale $(grep -c '^processor' /proc/cpuinfo),2 --max-tasks-per-child 1000 --loglevel=warn > /dev/null
+	celery -A worker worker --autoscale $WEB_CONCURRENCY,2 --max-tasks-per-child 1000 --loglevel=warn > /dev/null
 }
 
 start_scheduler(){
