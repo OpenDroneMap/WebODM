@@ -23,7 +23,7 @@ class CloudLibrary(PlatformExtension):
         
     def serialize(self, **kwargs):
         base_payload = {'name': self.name, 'folder_url_example': self.folder_url_example}
-        if kwargs['user'] != None:
+        if kwargs['user'] is not None:
             ds = get_current_plugin().get_user_data_store(kwargs['user'])
             server_url_field = self.get_server_url_field()
             stored_value = server_url_field.get_stored_value(ds)
@@ -102,7 +102,7 @@ class GetAllFoldersTaskView(TaskView):
     def get(self, request, platform_name):
         platform = get_platform_by_name(platform_name)
         
-        if platform == None:
+        if platform is None:
             return Response({'error': 'Failed to find a platform with the name \'{}\''.format(platform_name)}, status=status.HTTP_400_BAD_REQUEST)
         
         ds = get_current_plugin().get_user_data_store(request.user)
