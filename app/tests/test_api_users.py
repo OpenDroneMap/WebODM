@@ -17,7 +17,7 @@ class TestApiUsers(BootTestCase):
     def test_users(self):
         client = APIClient()
 
-        user = User.objects.get(username="testuser")
+        User.objects.get(username="testuser")
 
         # Cannot list users (anonymous)
         res = client.get("/api/users/?limit=30")

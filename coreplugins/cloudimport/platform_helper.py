@@ -7,7 +7,7 @@ platforms = None
 def get_all_platforms():
     # Cache platforms search
     global platforms
-    if platforms == None:
+    if platforms is None:
         platforms = read_platform_from_files()
     return platforms   
 

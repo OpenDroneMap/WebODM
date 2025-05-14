@@ -19,7 +19,8 @@ from .globals import PROJECT_NAME, ION_API_URL
 from .uploader import upload_to_ion
 
 
-pluck = lambda dic, *keys: [dic[k] if k in dic else None for k in keys]
+def pluck(dic, *keys):
+    return [dic[k] if k in dic else None for k in keys]
 
 
 ###                        ###
@@ -193,7 +194,7 @@ class ShareTaskView(TaskView):
             asset_type = FILE_TO_ASSET[file_name]
 
             asset_info = get_asset_info(task.id, asset_type)
-            ion_id = asset_info["id"]
+            asset_info["id"]
             is_error = len(asset_info["error"]) > 0
             is_task = is_asset_task(asset_info)
             is_exported = asset_info["id"] is not None and not is_task

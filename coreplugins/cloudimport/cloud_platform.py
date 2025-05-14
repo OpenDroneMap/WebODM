@@ -31,7 +31,7 @@ class CloudPlatform(ABC):
   
     def import_from_folder(self, folder_url):
         # Verify the url
-        if self.verify_folder_url(folder_url) == None:
+        if self.verify_folder_url(folder_url) is None:
             raise Exception('Invalid URL')
 
         # Parse the url and get all necessary information

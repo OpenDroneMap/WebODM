@@ -44,7 +44,7 @@ class TestApiTask(BootTransactionTestCase):
                 owner=user,
                 name="test project"
             )
-            other_project = Project.objects.create(
+            Project.objects.create(
                 owner=other_user,
                 name="another test project"
             )

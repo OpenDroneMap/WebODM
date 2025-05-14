@@ -269,7 +269,6 @@ class TestApiTask(BootTransactionTestCase):
             self.assertEqual(task.status, status_codes.COMPLETED)
 
             # Download task backup
-            task_uuid = task.uuid
             res = client.get("/api/projects/{}/tasks/{}/backup".format(project.id, task.id))
             self.assertEqual(res.status_code, status.HTTP_200_OK)
 

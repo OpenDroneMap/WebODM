@@ -88,7 +88,6 @@ def export_raster(input, output, **opts):
         # Output format
         driver = "GTiff"
         compress = None
-        max_bands = 9999
         with_alpha = True
         rgb = False
         indexes = src.indexes

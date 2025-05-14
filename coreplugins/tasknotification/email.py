@@ -17,7 +17,7 @@ def send(subject : str, message : str, smtp_config : dict = None):
       timeout=10
   )
 
-  result = send_mail(
+  send_mail(
       subject,
       message,
       smtp_config.get('smtp_from_address'),

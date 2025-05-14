@@ -75,7 +75,8 @@ def hours_minutes_secs(milliseconds):
     h = milliseconds // ch
     m = (milliseconds - h * ch) // cm
     s = round((milliseconds - h * ch - m * cm) / 1000)
-    pad = lambda n: '0' + str(n) if n < 10 else str(n)
+    def pad(n):
+        return '0' + str(n) if n < 10 else str(n)
 
     if s == 60:
         m += 1
