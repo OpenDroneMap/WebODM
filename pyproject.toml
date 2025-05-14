@@ -71,3 +71,8 @@ dependencies = [
     "webcolors==1.5",
     "zipstream-ng==1.8.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.9",
+]
