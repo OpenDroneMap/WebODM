@@ -8,7 +8,6 @@ import uuid as uuid_module
 from zipstream.ng import ZipStream
 
 import json
-from shlex import quote
 
 import errno
 import piexif
@@ -49,7 +48,6 @@ from .project import Project
 from django.utils.translation import gettext_lazy as _, gettext
 
 from functools import partial
-import subprocess
 from app.classes.console import Console
 
 logger = logging.getLogger('app.logger')
@@ -689,7 +687,7 @@ class Task(models.Model):
                 self.pending_action = None
                 self.save()
 
-            if self.auto_processing_node and not self.status in [status_codes.FAILED, status_codes.CANCELED]:
+            if self.auto_processing_node and self.status not in [status_codes.FAILED, status_codes.CANCELED]:
                 # No processing node assigned and need to auto assign
                 if self.processing_node is None:
                     # Assign first online node with lowest queue count
@@ -801,7 +799,7 @@ class Task(models.Model):
                             # Good to go
                             try:
                                 self.processing_node.restart_task(self.uuid, self.options)
-                            except (NodeServerError, NodeResponseError) as e:
+                            except (NodeServerError, NodeResponseError):
                                 # Something went wrong
                                 logger.warning("Could not restart {}, will start a new one".format(self))
                                 need_to_reprocess = True
@@ -948,9 +946,9 @@ class Task(models.Model):
             self.set_failure(str(e))
         except NodeConnectionError as e:
             logger.warning("{} connection/timeout error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
-        except TaskInterruptedException as e:
+        except TaskInterruptedException:
             # Task was interrupted during image resize / upload
-            logger.warning("{} interrupted".format(self, str(e)))
+            logger.warning("{} interrupted".format(self, ))
 
     def extract_assets_and_complete(self):
         """

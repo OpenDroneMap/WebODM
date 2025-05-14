@@ -2,7 +2,7 @@ import os
 
 from rest_framework import status
 from rest_framework.response import Response
-from app.plugins.views import TaskView, CheckTask, GetTaskResult
+from app.plugins.views import TaskView, GetTaskResult
 from app.plugins.worker import run_function_async
 from django.utils.translation import gettext_lazy as _
 
@@ -15,7 +15,6 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, cro
     import tempfile
     import shutil
     import glob
-    import json
     from webodm import settings
 
     ext = ""
@@ -59,7 +58,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, cro
 
         dem = dem_vrt
     
-    contours_file = f"contours.gpkg"
+    contours_file = "contours.gpkg"
     p = subprocess.Popen([gdal_contour_bin, "-q", "-a", "level", "-3d", "-f", "GPKG", "-i", str(interval), dem, contours_file], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
 
@@ -121,7 +120,7 @@ class TaskContoursGenerate(TaskView):
             interval = float(request.data.get('interval', 1))
             format = request.data.get('format', 'GPKG')
             supported_formats = ['GPKG', 'ESRI Shapefile', 'DXF', 'GeoJSON']
-            if not format in supported_formats:
+            if format not in supported_formats:
                 raise ContoursException("Invalid format {} (must be one of: {})".format(format, ",".join(supported_formats)))
             simplify = float(request.data.get('simplify', 0.01))
             zfactor = float(request.data.get('zfactor', 1))

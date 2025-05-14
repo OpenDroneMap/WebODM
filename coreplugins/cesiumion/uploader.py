@@ -17,7 +17,6 @@ def upload_to_ion(
     import requests
     from os import path, remove
     from shutil import rmtree
-    from enum import Enum
     from app.plugins import logger
     
     try:
@@ -101,7 +100,7 @@ def upload_to_ion(
     except ImportError:
         import subprocess
 
-        asset_logger.info(f"Manually installing boto3...")
+        asset_logger.info("Manually installing boto3...")
         subprocess.call([sys.executable, "-m", "pip", "install", "boto3"])
         import boto3
 
@@ -112,7 +111,7 @@ def upload_to_ion(
                 generated_zipfile = asset_path
                 asset_path, del_directory = to_ion_texture_model(asset_path)
                 logger.info("Created ion texture model!")
-            except IonInvalidZip as e:
+            except IonInvalidZip:
                 logger.info("Non geo-referenced texture model, using default file.")
             except Exception as e:
                 logger.warning(f"Failed to convert to ion texture model: {e}")
@@ -183,7 +182,7 @@ def upload_to_ion(
             state, percent_complete = pluck(res.json(), "status", "percentComplete")
             progress = float(percent_complete) / 100
             if "ERROR" in state.upper():
-                asset_info["error"] = f"Processing failed"
+                asset_info["error"] = "Processing failed"
                 asset_logger.info("Processing failed...")
                 refresh = False
             if progress >= 1:

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from app.plugins import get_current_plugin
 from coreplugins.cloudimport.cloud_platform import CloudPlatform
 
 class PlatformExtension(CloudPlatform):

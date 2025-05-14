@@ -1,7 +1,5 @@
-import re
-import json
 
-from app.plugins import PluginBase, Menu, MountPoint, logger
+from app.plugins import PluginBase, Menu, MountPoint
 
 from .globals import PROJECT_NAME
 from .api_views import ShareTaskView, RefreshIonTaskView, ClearErrorsTaskView

@@ -1,0 +1,65 @@
+# This configuration does not include a processing node
+# Which makes for faster setup times
+version: '2.1'
+volumes:
+  dbdata:
+  appmedia:
+services:
+  db:
+    image: opendronemap/webodm_db
+    container_name: db
+    expose:
+      - "5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data:Z
+    restart: unless-stopped
+    oom_score_adj: -100
+    mem_limit: 256M
+    mem_reservation: 64M
+  webapp:
+    image: opendronemap/webodm_webapp
+    container_name: webapp
+    entrypoint: /bin/bash -c "chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
+    volumes:
+      - appmedia:/webodm/app/media:z
+    ports:
+      - "2948:8000"
+    depends_on:
+      - db
+      - broker
+      - worker
+    environment:
+      WO_HOST: odm.dokterbob.net
+      WO_PORT: 2948
+      WO_DEBUG: NO
+      WO_BROKER: redis://broker
+      WO_DEV: NO
+    restart: unless-stopped
+    oom_score_adj: 0
+    mem_limit: 384M
+    mem_reservation: 128M
+  broker:
+    image: redis:7.0.10
+    container_name: broker
+    restart: unless-stopped
+    oom_score_adj: -500
+    mem_limit: 128M
+    mem_reservation: 32M
+    command: redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru
+  worker:
+    image: opendronemap/webodm_webapp
+    container_name: worker
+    entrypoint: /bin/bash -c "/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/wait-for-it.sh -t 0 webapp:8000 -- /webodm/worker.sh start"
+    volumes:
+      - appmedia:/webodm/app/media:z
+    depends_on:
+      - db
+      - broker
+    environment:
+      WO_DEBUG: NO
+      WO_BROKER: redis://broker
+      WO_SECRET_KEY: pO/7WTFJwqFM5UWtu6BVTiQVPNVogsOBasiWhbSys0t/ESAGgyXaFaNOqVilAFfkMa4=
+    restart: unless-stopped
+    oom_score_adj: 250
+    mem_limit: 256M
+    mem_reservation: 64M

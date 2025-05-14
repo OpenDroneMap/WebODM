@@ -18,12 +18,12 @@ class Platform(CloudLibrary):
     def parse_url(self, url):
         parse_result = urlparse(url)
         paths = parse_result.query.split('/')
-        if not 'category' in paths or paths.index('category') >= len(paths) - 1:
+        if 'category' not in paths or paths.index('category') >= len(paths) - 1:
             raise Exception('Wrong URL format')
         else:
             category_id = paths[paths.index('category') + 1]
             path = parse_result.path
-            if not 'index.php' in path:
+            if 'index.php' not in path:
                  raise Exception('Wrong URL format')
             
             path = path[0:path.index('index.php')]

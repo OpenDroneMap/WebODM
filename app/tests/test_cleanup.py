@@ -1,5 +1,4 @@
-from django.contrib.auth.models import User, Group
-from rest_framework import status
+from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from app.models import Task, Project
 from django.utils import timezone

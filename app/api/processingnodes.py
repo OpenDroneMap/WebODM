@@ -96,6 +96,6 @@ class ProcessingNodeOptionsView(APIView):
                     if not found:
                         common_option['_delete'] = True
 
-        common_options = [co for co in common_options if not '_delete' in co]
+        common_options = [co for co in common_options if '_delete' not in co]
 
         return Response(common_options)

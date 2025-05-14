@@ -1,7 +1,6 @@
 import os
 from datetime import timedelta, datetime
 
-import requests
 from django.test import TestCase
 from django.utils import six
 import time

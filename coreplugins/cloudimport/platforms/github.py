@@ -1,8 +1,6 @@
 # Check https://github.com/
 from urllib.parse import urlparse
-from os import path
 from coreplugins.cloudimport.cloud_platform import File, Folder, CloudPlatform
-from app.plugins import logger
 
 class Platform(CloudPlatform):
     def __init__(self):

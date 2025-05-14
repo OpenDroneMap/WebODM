@@ -3,9 +3,11 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import uuid, os, pickle, tempfile
+import uuid
+import os
+import pickle
+import tempfile
 
-from webodm import settings
 
 tasks = []
 task_ids = {} # map old task IDs --> new task IDs

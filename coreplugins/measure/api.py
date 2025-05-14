@@ -2,7 +2,7 @@ import os
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
-from app.api.workers import GetTaskResult, TaskResultOutputError
+from app.api.workers import GetTaskResult
 from app.models import Task
 from app.plugins.views import TaskView
 from django.utils.translation import gettext_lazy as _

@@ -1,14 +1,10 @@
-import importlib
 import requests
-import os
-from os import path
 
 from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
 from app.plugins import get_current_plugin
 
-from worker.celery import app
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -100,8 +96,6 @@ class PlatformsTaskView(TaskView):
 
 
 def import_files(task_id, files):
-    import requests
-    from app import models
     from app.plugins import logger
     from app.security import path_traversal_check
 

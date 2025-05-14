@@ -1,5 +1,4 @@
-from app.plugins import PluginBase, Menu, MountPoint
-from django.shortcuts import render
+from app.plugins import PluginBase
 
 class Plugin(PluginBase):
     def include_js_files(self):

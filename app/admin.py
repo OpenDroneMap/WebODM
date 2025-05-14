@@ -24,7 +24,7 @@ from django import forms
 from codemirror2.widgets import CodeMirrorEditor
 from webodm import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext_lazy as _
 
 
 class ProjectAdmin(GuardedModelAdmin):

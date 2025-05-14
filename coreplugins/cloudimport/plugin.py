@@ -1,4 +1,4 @@
-from app.plugins import PluginBase, Menu, MountPoint, logger
+from app.plugins import PluginBase, Menu, MountPoint
 
 from .api_views import PlatformsTaskView, PlatformsVerifyTaskView, ImportFolderTaskView, CheckUrlTaskView
 from .app_views import HomeView, LoadButtonsView

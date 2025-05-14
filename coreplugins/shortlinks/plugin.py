@@ -1,7 +1,4 @@
-from app.plugins import PluginBase, Menu, MountPoint
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.utils.translation import gettext as _
+from app.plugins import PluginBase, MountPoint
 from .api import GetShortLink, HandleShortLink
 
 class Plugin(PluginBase):

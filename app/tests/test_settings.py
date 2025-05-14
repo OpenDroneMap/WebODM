@@ -1,5 +1,4 @@
 import os
-import time
 
 from django.core.exceptions import ValidationError
 from django.core.files import File

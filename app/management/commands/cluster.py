@@ -1,9 +1,6 @@
-import os
 import json
 import math
 from django.core.management.base import BaseCommand
-from django.core.management import call_command
-from app.models import Project
 from webodm import settings
 from django.db import connection
 

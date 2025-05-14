@@ -1,5 +1,4 @@
 import json
-import rio_tiler.utils
 from rasterio.enums import ColorInterp
 from rasterio.crs import CRS
 from rasterio.features import bounds as featureBounds
@@ -12,7 +11,7 @@ from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.utils import has_alpha_band, \
     non_alpha_indexes, render, create_cutline
 from rio_tiler.utils import _stats as raster_stats
-from rio_tiler.models import ImageStatistics, ImageData
+from rio_tiler.models import ImageStatistics
 from rio_tiler.models import Metadata as RioMetadata
 from rio_tiler.profiles import img_profiles
 from rio_tiler.colormap import cmap as colormap, apply_cmap
@@ -75,7 +74,7 @@ def get_extent(task, tile_type):
         'dsm': task.dsm_extent,
         'dtm': task.dtm_extent,
     }
-    if not tile_type in extent_map:
+    if tile_type not in extent_map:
         raise exceptions.NotFound()
 
     extent = extent_map[tile_type]
@@ -551,9 +550,9 @@ class Export(TaskNestedView):
 
         expr = None
 
-        if asset_type in ['orthophoto', 'dsm', 'dtm'] and not export_format in ['gtiff', 'gtiff-rgb', 'jpg', 'png', 'kmz']:
+        if asset_type in ['orthophoto', 'dsm', 'dtm'] and export_format not in ['gtiff', 'gtiff-rgb', 'jpg', 'png', 'kmz']:
             raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
-        if asset_type == 'georeferenced_model' and not export_format in ['laz', 'las', 'ply', 'csv']:
+        if asset_type == 'georeferenced_model' and export_format not in ['laz', 'las', 'ply', 'csv']:
             raise exceptions.ValidationError(_("Unsupported format: %(value)s") % {'value': export_format})
         
         # Default color map, hillshade

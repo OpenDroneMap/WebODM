@@ -9,7 +9,6 @@ from django.db import transaction
 from django.contrib.auth.models import User
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.contrib.postgres.aggregates import StringAgg
-from django.db.models import Q
 
 from app import models
 from .tasks import TaskIDsSerializer
@@ -187,16 +186,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 continue
 
                             # Has permission in database but not in form?
-                            if user.has_perm(perm, project) and not p in perms_map[username]:
+                            if user.has_perm(perm, project) and p not in perms_map[username]:
                                 remove_perm(perm, user, project)
                             
                             # Has permission in form but not in database?
                             elif p in perms_map[username] and not user.has_perm(perm, project):
                                 assign_perm(perm, user, project)
 
-        except User.DoesNotExist as e:
+        except User.DoesNotExist:
             return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
-        except AttributeError as e:
+        except AttributeError:
             return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)

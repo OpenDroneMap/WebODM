@@ -1,6 +1,4 @@
 import logging
-import os
-from pathlib import Path
 
 from django.db.models import signals
 from django.db import models
@@ -10,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 
-from webodm import settings
 
 logger = logging.getLogger('app.logger')
 
