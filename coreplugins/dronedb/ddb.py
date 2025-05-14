@@ -1,6 +1,4 @@
-from functools import reduce
 import requests
-from os import path
 from app.plugins import logger
 from urllib.parse import urlparse
 

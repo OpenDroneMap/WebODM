@@ -1,11 +1,8 @@
-import math
 import re 
 
 from rest_framework import status
 from rest_framework.response import Response
 from app.plugins.views import TaskView
-from app.plugins import get_current_plugin, signals as plugin_signals
-from django.dispatch import receiver
 from app.plugins import GlobalDataStore
 from django.http import Http404
 from django.shortcuts import redirect

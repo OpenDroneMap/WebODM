@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
 
-import json, shutil
+import shutil
 
 def get_memory_stats():
     """

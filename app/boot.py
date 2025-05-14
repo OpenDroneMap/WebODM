@@ -1,9 +1,8 @@
 import os
-import sys
 
 import kombu
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files import File
 from django.db.utils import ProgrammingError
@@ -15,10 +14,8 @@ from app.models import Theme
 from app.plugins import init_plugins
 from nodeodm.models import ProcessingNode
 # noinspection PyUnresolvedReferencesapp/boot.py#L20
-from webodm.settings import MEDIA_ROOT
-from . import signals
 import logging
-from .models import Task, Setting
+from .models import Setting
 from webodm import settings
 from webodm.wsgi import booted
 

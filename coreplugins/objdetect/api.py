@@ -68,7 +68,7 @@ class TaskObjDetect(TaskView):
             'planes': ('aerovision', ['plane']),
         }
 
-        if not model in model_map:
+        if model not in model_map:
             return Response({'error': 'Invalid model'}, status=status.HTTP_200_OK)
 
         model_id, classes = model_map[model]

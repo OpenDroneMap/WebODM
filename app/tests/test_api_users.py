@@ -2,10 +2,8 @@ import logging
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
-from app.models import Project
 from .classes import BootTestCase
 
-from webodm import settings
 logger = logging.getLogger('app.logger')
 
 

@@ -6,7 +6,7 @@ from rest_framework_jwt.settings import api_settings
 from django.contrib.auth.hashers import check_password
 
 from .classes import BootTestCase
-from app.api.admin import UserSerializer, GroupSerializer
+from app.api.admin import GroupSerializer
 
 
 class TestApi(BootTestCase):

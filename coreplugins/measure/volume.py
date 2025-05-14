@@ -8,7 +8,6 @@ def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decima
         from scipy.optimize import curve_fit
         from scipy.interpolate import griddata
         import numpy as np
-        import json
         import warnings
 
         osr.UseExceptions()
@@ -124,7 +123,7 @@ def read_polygon(file):
         features = [data]
 
     for feature in features:
-        if not 'geometry' in feature:
+        if 'geometry' not in feature:
             continue
 
         # Check if the feature geometry type is Polygon

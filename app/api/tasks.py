@@ -11,7 +11,7 @@ from PIL import Image
 import io
 import numpy as np
 
-from shutil import copyfileobj, move
+from shutil import copyfileobj
 from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction

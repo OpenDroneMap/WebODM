@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
-from webodm import settings
 
 class Migration(migrations.Migration):
 

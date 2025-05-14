@@ -1,5 +1,8 @@
 import json
-import logging, os, sys, subprocess
+import logging
+import os
+import sys
+import subprocess
 from abc import ABC
 from app.plugins import UserDataStore, GlobalDataStore
 from app.plugins.functions import get_plugins_persistent_path

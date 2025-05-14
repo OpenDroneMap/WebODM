@@ -41,6 +41,6 @@ class PolygonGeometryField(Field):
             return GEOSGeometry(value)
         except GEOSException:
             raise ValidationError('Invalid format: not GeoJSON')
-        except (ValueError, TypeError, GDALException) as e:
+        except (ValueError, TypeError, GDALException):
             raise ValidationError('Unable to create GEOSGeometry')
 

@@ -1,4 +1,3 @@
-import os
 from django.test import Client
 from webodm import settings
 from .classes import BootTestCase

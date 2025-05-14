@@ -2,14 +2,20 @@ from django.http import Http404
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 
-from django.contrib import messages
 from django.utils.translation import ugettext as _
-from django import forms
 from webodm import settings
 from django.http import JsonResponse
 from django.utils.translation import get_language
 import requests
-import json, tempfile, os, logging, shutil, subprocess, zipfile, glob, pathlib
+import json
+import tempfile
+import os
+import logging
+import shutil
+import subprocess
+import zipfile
+import glob
+import pathlib
 
 logger = logging.getLogger('app.logger')
 

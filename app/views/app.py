@@ -5,7 +5,6 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from guardian.shortcuts import get_objects_for_user
 
 from nodeodm.models import ProcessingNode
 from app.models import Project, Task

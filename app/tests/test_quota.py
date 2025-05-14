@@ -1,8 +1,6 @@
-from django.contrib.auth.models import User, Group
-from rest_framework import status
+from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from app.models import Task, Project
-from nodeodm.models import ProcessingNode
 from worker.tasks import check_quotas
 from .classes import BootTestCase
 

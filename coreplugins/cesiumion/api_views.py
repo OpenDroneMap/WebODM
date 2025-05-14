@@ -1,8 +1,4 @@
-import sys
-import time
-import logging
 import requests
-from os import path
 from enum import Enum
 from itertools import chain as iter_chain
 
@@ -15,7 +11,6 @@ from worker.celery import app
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.fields import ChoiceField, CharField, JSONField
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import serializers
@@ -68,7 +63,6 @@ def get_processing_assets(task_id):
     ispc = app.control.inspect()
     ion_tasks = set()
     active = set()
-    from uuid import UUID
 
     for wtask in iter_chain(*ispc.active().values(), *ispc.reserved().values()):
         args = eval(wtask["args"])

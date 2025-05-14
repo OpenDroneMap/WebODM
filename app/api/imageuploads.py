@@ -4,7 +4,6 @@ import math
 
 from .tasks import TaskNestedView
 from rest_framework import exceptions
-from app.models.task import assets_directory_path
 from PIL import Image, ImageDraw, ImageOps
 from django.http import HttpResponse
 from .tasks import download_file_response

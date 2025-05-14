@@ -1,4 +1,4 @@
-from app.plugins import PluginBase, Menu, MountPoint, logger
+from app.plugins import PluginBase, Menu, MountPoint
 from coreplugins.dronedb.app_views import LoadButtonsView
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL
 

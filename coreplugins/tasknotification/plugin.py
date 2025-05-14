@@ -67,11 +67,11 @@ class ConfigurationForm(forms.Form):
             settings = Setting.objects.first()
             email.send(f'{self.cleaned_data["notification_app_name"]} - Testing Notification', 'Hi, just testing if notification is working', self.cleaned_data)
             messages.success(request, f"Email sent successfully, check your inbox at {self.cleaned_data.get('smtp_to_address')}")
-        except SMTPAuthenticationError as e:
+        except SMTPAuthenticationError:
             messages.error(request, 'Invalid SMTP username or password')
-        except SMTPConnectError as e:
+        except SMTPConnectError:
             messages.error(request, 'Could not connect to the SMTP server')
-        except SMTPDataError as e:
+        except SMTPDataError:
             messages.error(request, 'Error sending email. Please try again later')
         except Exception as e:
             messages.error(request, f'An error occured: {e}')
