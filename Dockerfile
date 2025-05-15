@@ -14,7 +14,15 @@ ENV NODE_MAJOR=20
 #### Common setup ####
 
 # Old-releases for 21.04
-COPY sources.list /etc/apt/sources.list
+COPY <<EOF /etc/apt/sources.list
+deb http://old-releases.ubuntu.com/ubuntu/ hirsute main restricted
+deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates main restricted
+deb http://old-releases.ubuntu.com/ubuntu/ hirsute universe
+deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates universe
+deb http://old-releases.ubuntu.com/ubuntu/ hirsute multiverse
+deb http://old-releases.ubuntu.com/ubuntu/ hirsute-updates multiverse
+deb http://old-releases.ubuntu.com/ubuntu/ hirsute-backports main restricted universe multiverse
+EOF
 
 # Create and change into working directory
 WORKDIR $WORKDIR
