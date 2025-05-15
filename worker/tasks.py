@@ -48,7 +48,7 @@ def update_nodes_info():
         if processing_node.hostname == check_hostname and not processing_node.is_online():
             try:
                 socket.gethostbyname(processing_node.hostname)
-            except:
+            except:  #  noqa: E722
                 # Hostname was invalid, try renaming
                 processing_node.hostname = 'webodm-node-odm-1'
                 processing_node.update_node_info()
@@ -158,7 +158,8 @@ def process_task(taskId):
             logger.error(
                 "Uncaught error! This is potentially bad. Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
                     e, traceback.format_exc()))
-            if settings.TESTING: raise e
+            if settings.TESTING:
+                raise e
     finally:
         if cancel_monitor is not None:
             cancel_monitor()
