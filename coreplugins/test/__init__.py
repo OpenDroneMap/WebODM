@@ -1,1 +1,1 @@
-from .plugin import *
+from .plugin import *  # noqa: F403
