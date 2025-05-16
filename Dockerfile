@@ -139,7 +139,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get -qq install -y nodejs
     # Python3.9, GDAL, PDAL, nginx, letsencrypt, psql
     apt-get install -y --no-install-recommends \
-        python3.9 git gdal-bin pdal \
+        python3.9 python3.9-distutils git gdal-bin pdal \
         nginx certbot gettext-base cron postgresql-client gettext tzdata
     # Cleanup of build requirements
     apt-get autoremove -y
