@@ -142,10 +142,14 @@ class Metadata(TaskNestedView):
         defined_range = self.request.query_params.get('range')
         crop = self.request.query_params.get('crop') == '1'
         boundaries_feature = self.request.query_params.get('boundaries')
-        if formula == '': formula = None
-        if bands == '': bands = None
-        if defined_range == '': defined_range = None
-        if boundaries_feature == '': boundaries_feature = None
+        if formula == '':
+            formula = None
+        if bands == '':
+            bands = None
+        if defined_range == '':
+            defined_range = None
+        if boundaries_feature == '':
+            boundaries_feature = None
         if boundaries_feature is not None:
             boundaries_feature = json.loads(boundaries_feature)
         
@@ -323,12 +327,18 @@ class Tiles(TaskNestedView):
             except json.JSONDecodeError:
                 raise exceptions.ValidationError(_("Invalid boundaries parameter"))
 
-        if formula == '': formula = None
-        if bands == '': bands = None
-        if rescale == '': rescale = None
-        if color_map == '': color_map = None
-        if hillshade == '' or hillshade == '0': hillshade = None
-        if tilesize == '' or tilesize is None: tilesize = 256
+        if formula == '':
+            formula = None
+        if bands == '':
+            bands = None
+        if rescale == '':
+            rescale = None
+        if color_map == '':
+            color_map = None
+        if hillshade == '' or hillshade == '0':
+            hillshade = None
+        if tilesize == '' or tilesize is None:
+            tilesize = 256
         if bands == 'auto' and formula:
             bands, _discard_ = get_auto_bands(task.orthophoto_bands, formula)
 
@@ -540,11 +550,15 @@ class Export(TaskNestedView):
         hillshade = request.data.get('hillshade')
         resample = request.data.get('resample', 0)
 
-        if formula == '': formula = None
-        if bands == '': bands = None
-        if rescale == '': rescale = None
+        if formula == '':
+            formula = None
+        if bands == '':
+            bands = None
+        if rescale == '':
+            rescale = None
         if epsg == '': epsg = None
-        if color_map == '': color_map = None
+        if color_map == '':
+            color_map = None
         if hillshade == '': hillshade = None
         if resample == '': resample = 0
 
