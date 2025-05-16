@@ -41,8 +41,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     # Build-time dependencies
     apt-get -qq update
     apt-get install -y --no-install-recommends curl ca-certificates gnupg
-    # Enable universe, for pdal
-    echo "deb http://archive.ubuntu.com/ubuntu $RELEASE_CODENAME universe" >> /etc/apt/sources.list
     # Python 3.9 support
     curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf23c5a6cf475977595c89f51ba6932366a755776' | gpg --dearmor -o /etc/apt/trusted.gpg.d/deadsnakes.gpg
     echo "deb http://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu $RELEASE_CODENAME main" > /etc/apt/sources.list.d/deadsnakes.list
@@ -120,8 +118,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     # Run-time dependencies
     apt-get -qq update
     apt-get install -y --no-install-recommends curl ca-certificates gnupg
-    # Enable universe, for pdal
-    echo "deb http://archive.ubuntu.com/ubuntu $RELEASE_CODENAME universe" >> /etc/apt/sources.list
     # Legacy Python support
     curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf23c5a6cf475977595c89f51ba6932366a755776' | gpg --dearmor -o /etc/apt/trusted.gpg.d/deadsnakes.gpg
     echo "deb http://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu $RELEASE_CODENAME main" > /etc/apt/sources.list.d/deadsnakes.list
