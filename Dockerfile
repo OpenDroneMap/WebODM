@@ -71,7 +71,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install pip==24.0
     # Install Python requirements, including correct Python GDAL bindings.
     pip install -r requirements.txt "boto3==1.14.14" gdal[numpy]=="$(gdal-config --version).*"
-
 EOT
 
 # Install project Node dependencies
@@ -80,7 +79,6 @@ RUN --mount=type=cache,target=/root/.npm \
     <<EOT
     npm install --quiet
     # Install webpack, webpack CLI
-    # Note webpack CLI is also used in `rebuildplugins` below
     npm install --quiet -g webpack@5.89.0
     npm install --quiet -g webpack-cli@5.1.4
 EOT
@@ -117,6 +115,7 @@ ENV PATH="$WORKDIR/venv/bin:$PATH"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/root/.npm \
     <<EOT
     # Run-time dependencies
     apt-get -qq update
@@ -137,6 +136,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get install -y --no-install-recommends \
         python$PYTHON_VERSION python$PYTHON_VERSION-distutils gdal-bin pdal \
         nginx certbot gettext-base cron postgresql-client gettext tzdata
+    # Install webpack, webpack CLI
+    npm install --quiet -g webpack@5.89.0
+    npm install --quiet -g webpack-cli@5.1.4
     # Cleanup of build requirements
     apt-get autoremove -y
     apt-get clean
