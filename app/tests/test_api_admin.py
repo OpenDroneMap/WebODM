@@ -37,7 +37,7 @@ class TestApi(BootTestCase):
         res = client.post('/api/admin/users/', {'username': 'testuser999', 'email': 'testuser999@test.com', 'password': 'test999', 'is_active': True})
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         user = User.objects.get(username='testuser999')
-        self.assertTrue(user != None)
+        self.assertIsNotNone(user)
         self.assertFalse(user.is_superuser)
         self.assertTrue(user.is_active)
 
@@ -54,7 +54,8 @@ class TestApi(BootTestCase):
         res = client.put('/api/admin/users/{}/'.format(created_user_id), {'username': 'testuser888', 'email': 'testuser888@test.com', 'password': 'test888'})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         user = User.objects.filter(id=created_user_id).first()
-        self.assertTrue(user != None and (not user.is_superuser))
+        self.assertIsNotNone(user)
+        self.assertIsNot(user.is_superuser)
         res = client.get('/api/admin/users/{}/'.format(created_user_id)) # ReGet user
         self.assertEqual(res.data['username'], user.username)
         self.assertEqual(res.data['email'], user.email)
@@ -133,7 +134,7 @@ class TestApi(BootTestCase):
         res = client.post('/api/admin/groups/', {'name': 'Test', 'permissions': [53, 54]})
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         group = Group.objects.get(name='Test')
-        self.assertTrue(group != None)
+        self.assertIsNotNone(group)
         serializer = GroupSerializer(group)
         self.assertEqual([53, 54], serializer.data['permissions'])
 
@@ -147,7 +148,7 @@ class TestApi(BootTestCase):
         res = client.put('/api/admin/groups/{}/'.format(created_group_id), {'name': 'TestTest', 'permissions': [37, 38]})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         group = Group.objects.filter(id=created_group_id).first()
-        self.assertTrue(group != None)
+        self.assertIsNotNone(group)
         serializer = GroupSerializer(group)
         res = client.get('/api/admin/groups/{}/'.format(created_group_id)) # ReGet group
         self.assertEqual('TestTest', serializer.data['name'])
