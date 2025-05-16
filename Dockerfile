@@ -69,8 +69,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     # Install Python dependencies
     # Install pip
     pip install pip==24.0
-    # Install Python requirements
-    pip install -r requirements.txt "boto3==1.14.14"
+    # Install Python requirements, including correct Python GDAL bindings.
+    pip install -r requirements.txt "boto3==1.14.14" gdal[numpy]=="$(gdal-config --version).*"
+
 EOT
 
 # Install project Node dependencies
