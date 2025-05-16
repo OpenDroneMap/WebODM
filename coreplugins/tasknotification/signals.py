@@ -17,7 +17,7 @@ def handle_task_completed(sender, task_id, **kwargs):
     logger.info("TaskNotification: Task Completed")
 
     config_data = config.load()
-    if config_data.get("notify_task_completed") == True:
+    if config_data.get("notify_task_completed"):
         task = Task.objects.get(id=task_id)
         notification_app_name = config_data['notification_app_name'] or settings.app_name
 
@@ -36,7 +36,7 @@ def handle_task_removed(sender, task_id, **kwargs):
     logger.info("TaskNotification: Task Removed")
 
     config_data = config.load()
-    if config_data.get("notify_task_removed") == True:
+    if config_data.get("notify_task_removed"):
         task = Task.objects.get(id=task_id)
         notification_app_name = config_data['notification_app_name'] or settings.app_name
         console_output = reverse_output(task.console.output())
@@ -54,7 +54,7 @@ def handle_task_failed(sender, task_id, **kwargs):
     logger.info("TaskNotification: Task Failed")
 
     config_data = config.load()
-    if config_data.get("notify_task_failed") == True:
+    if config_data.get("notify_task_failed"):
         task = Task.objects.get(id=task_id)
         notification_app_name = config_data['notification_app_name'] or settings.app_name
         console_output = reverse_output(task.console.output())
