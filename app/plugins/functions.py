@@ -148,7 +148,7 @@ def webpack_watch_process_count():
                     count += 1
             except IOError:  # proc has already terminated
                 continue
-    except:
+    except:  # noqa: E722
         logger.warning("webpack_watch_process_count is not supported on this platform.")
 
     return count
@@ -371,5 +371,5 @@ def versionToInt(version):
 
     try:
         return sum([reduce(lambda mult, ver: mult * ver, i) for i in zip([100000, 100, 1], map(int, version.split(".")))])
-    except:
+    except:  # noqa: E722
         return -1

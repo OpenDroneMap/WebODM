@@ -90,7 +90,7 @@ class ExternalBackend(ModelBackend):
             res = r.json()
 
             return get_user_from_external_auth_response(res)
-        except:
+        except:  # noqa: E722
             return None
     
     def get_user(self, user_id):

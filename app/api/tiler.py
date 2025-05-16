@@ -389,7 +389,7 @@ class Tiles(TaskNestedView):
             if boundaries_feature is not None:
                 try:
                     cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
-                except:
+                except:  # noqa: E722
                     raise exceptions.ValidationError(_("Invalid boundaries"))
             elif crop and task.crop is not None:
                 cutline, bounds = geom_transform_wkt_bbox(task.crop, src.dataset)
@@ -624,7 +624,7 @@ class Export(TaskNestedView):
                 hillshade = float(hillshade)
                 if hillshade < 0:
                     raise Exception("Hillshade must be > 0")
-            except:
+            except:  # noqa: E722
                 raise exceptions.ValidationError(_("Invalid hillshade value: %(value)s") % {'value': hillshade})
         
         if asset_type == 'georeferenced_model':

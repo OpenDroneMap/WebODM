@@ -55,14 +55,14 @@ class Setting(models.Model):
                 try:
                     os.unlink(old_logo_path)
                     logger.info("Removed {}".format(old_logo_path))
-                except:
+                except:  # noqa: E722
                     logger.warning("Cannot cleanup {}".format(old_logo_path))
 
             if os.path.exists(old_logo_path_caches):
                 try:
                     rmtree(old_logo_path_caches)
                     logger.info("Removed {}".format(old_logo_path_caches))
-                except:
+                except:  # noqa: E722
                     logger.warning("Cannot cleanup {}".format(old_logo_path_caches))
 
             self.__original_app_logo_name = self.app_logo.name

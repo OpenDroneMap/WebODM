@@ -37,7 +37,7 @@ class DroneDB:
         try:
             result = urlparse(url)
             return all([result.scheme, result.netloc])
-        except:
+        except:  # noqa: E722
             return False
 
     def login(self):

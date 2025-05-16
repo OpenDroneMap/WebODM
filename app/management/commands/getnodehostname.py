@@ -14,7 +14,7 @@ class Command(BaseCommand):
         try:
             socket.gethostbyname(host)
             print(host)
-        except:
+        except:  # noqa: E722
             # Try replacing _ with "-"
             host = host.replace("_", "-")
             print(host)

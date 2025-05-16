@@ -43,7 +43,7 @@ def process_task(creating_task):
             with open(images_json) as f:
                 images = json.load(f)
                 creating_task.images_count = len(images)
-        except:
+        except:  # noqa: E722
             print("Cannot read images count from imported task {}".format(creating_task))
             pass
     extent_fields = [
