@@ -40,8 +40,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     <<EOT
     # Build-time dependencies
     apt-get -qq update
-    apt-get -qq install -y --no-install-recommends curl
-    apt-get install -y ca-certificates gnupg
+    apt-get install -y --no-install-recommends curl ca-certificates gnupg
     # Enable universe, for pdal
     echo "deb http://archive.ubuntu.com/ubuntu $RELEASE_CODENAME universe" >> /etc/apt/sources.list
     # Python 3.9 support
@@ -120,8 +119,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     <<EOT
     # Run-time dependencies
     apt-get -qq update
-    apt-get -qq install -y --no-install-recommends curl
-    apt-get install -y ca-certificates gnupg
+    apt-get install -y --no-install-recommends curl ca-certificates gnupg
     # Enable universe, for pdal
     echo "deb http://archive.ubuntu.com/ubuntu $RELEASE_CODENAME universe" >> /etc/apt/sources.list
     # Legacy Python support
