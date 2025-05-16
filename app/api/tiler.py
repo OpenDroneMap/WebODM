@@ -308,7 +308,6 @@ class Tiles(TaskNestedView):
 
         indexes = None
         nodata = None
-        rgb_tile = None
 
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
@@ -418,7 +417,7 @@ class Tiles(TaskNestedView):
                         # Fallback to first three
                         indexes = (1, 2, 3,)
                 elif has_alpha:
-                    indexes = non_alpha_indexes(src.dataset)
+                    non_alpha_indexes(src.dataset)
 
             # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
             if nodata is None and tile_type == 'orthophoto':

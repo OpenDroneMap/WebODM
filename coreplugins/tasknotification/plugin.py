@@ -64,7 +64,6 @@ class ConfigurationForm(forms.Form):
 
     def test_settings(self, request):
         try:
-            settings = Setting.objects.first()
             email.send(f'{self.cleaned_data["notification_app_name"]} - Testing Notification', 'Hi, just testing if notification is working', self.cleaned_data)
             messages.success(request, f"Email sent successfully, check your inbox at {self.cleaned_data.get('smtp_to_address')}")
         except SMTPAuthenticationError:
