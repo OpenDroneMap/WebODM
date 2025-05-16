@@ -11,6 +11,7 @@ ENV PYTHONPATH=$WORKDIR
 ENV PROJ_LIB=/usr/share/proj
 ENV NODE_MAJOR=20
 ENV RELEASE_CODENAME=jammy
+ENV PYTHON_VERSION=3.9
 
 #### Common setup ####
 
@@ -54,7 +55,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get -qq install -y nodejs
     # Python3.9, GDAL, PDAL, nginx, letsencrypt, psql
     apt-get install -y --no-install-recommends \
-        python3.9 python3.9-venv python3.9-dev libpq-dev build-essential git libproj-dev gdal-bin pdal \
+        python$PYTHON_VERSION python$PYTHON_VERSION-venv python$PYTHON_VERSION-dev libpq-dev build-essential git libproj-dev gdal-bin pdal \
         libgdal-dev nginx certbot gettext-base cron postgresql-client gettext tzdata
     # Cleanup after apt
     apt-get autoremove -y
@@ -63,7 +64,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     # Remove stale temp files
     rm -rf /tmp/* /var/tmp/*
     # Create virtualenv
-    python3.9 -m venv $WORKDIR/venv
+    python$PYTHON_VERSION -m venv $WORKDIR/venv
 EOT
 
 # Modify PATH to prioritize venv, effectively activating venv
@@ -128,7 +129,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get install -y ca-certificates gnupg software-properties-common
     # Enable universe, for pdal
     add-apt-repository universe
-    # Python 3.9 support
+    # Legacy Python support
     add-apt-repository ppa:deadsnakes/ppa
     # Node.js deb source
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/nodesource.gpg
@@ -137,9 +138,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update
     # Install common deps, starting with NodeJS
     apt-get -qq install -y nodejs
-    # Python3.9, GDAL, PDAL, nginx, letsencrypt, psql
+    # Python, GDAL, PDAL, nginx, letsencrypt, psql
     apt-get install -y --no-install-recommends \
-        python3.9 python3.9-distutils gdal-bin pdal \
+        python$PYTHON_VERSION python$PYTHON_VERSION-distutils gdal-bin pdal \
         nginx certbot gettext-base cron postgresql-client gettext tzdata
     # Cleanup of build requirements
     apt-get autoremove -y
