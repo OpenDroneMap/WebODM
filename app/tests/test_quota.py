@@ -59,8 +59,8 @@ class TestQuota(BootTestCase):
         res = c.get('/dashboard/', follow=True)
         body = res.content.decode("utf-8")
 
-        self.assertTrue("disk quota is being exceeded" in body)
-        self.assertTrue("in 8 hours" in body)
+        self.assertIn("disk quota is being exceeded", body)
+        self.assertIn("in 8 hours", body)
 
         # Running the workers check_quota function will not remove tasks
         check_quotas()

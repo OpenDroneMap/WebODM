@@ -1,3 +1,4 @@
 **/.git
 .secret_key
 node_modules/
+.venv/

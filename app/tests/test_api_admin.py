@@ -246,7 +246,7 @@ class TestApi(BootTestCase):
         
         # Update quota deadlines
 
-        self.assertTrue(user.profile.get_quota_deadline() is None)
+        self.assertIsNone(user.profile.get_quota_deadline())
 
         # Miss parameters
         res = client.post('/api/admin/profiles/%s/update_quota_deadline/' % user.id)
