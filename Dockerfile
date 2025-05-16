@@ -57,12 +57,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get install -y --no-install-recommends \
         python$PYTHON_VERSION python$PYTHON_VERSION-venv python$PYTHON_VERSION-dev libpq-dev build-essential git libproj-dev gdal-bin pdal \
         libgdal-dev nginx certbot gettext-base cron postgresql-client gettext tzdata
-    # Cleanup after apt
-    apt-get autoremove -y
-    apt-get clean
-    rm -rf /var/lib/apt/lists/*
-    # Remove stale temp files
-    rm -rf /tmp/* /var/tmp/*
     # Create virtualenv
     python$PYTHON_VERSION -m venv $WORKDIR/venv
 EOT
