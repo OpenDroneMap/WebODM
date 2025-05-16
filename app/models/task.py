@@ -82,7 +82,7 @@ def validate_task_options(value):
         for option in value:
             if not option['name']: raise ValidationError("Name key not found in option")
             if not option['value']: raise ValidationError("Value key not found in option")
-    except:
+    except:  # noqa: E722
         raise ValidationError("Invalid options")
 
 
@@ -661,7 +661,7 @@ class Task(models.Model):
                 with open(images_json) as f:
                     images = json.load(f)
                     self.images_count = len(images)
-            except:
+            except:  # noqa: E722
                 logger.warning("Cannot read images count from imported task {}".format(self))
                 pass
 
@@ -1356,7 +1356,7 @@ class Task(models.Model):
         tp = self.task_path()
         try:
             return [e.name for e in os.scandir(tp) if e.is_file()]
-        except:
+        except:  # noqa: E722
             return []
 
     def get_image_path(self, filename):
@@ -1377,7 +1377,7 @@ class Task(models.Model):
         if os.path.exists(alignment_file):
             try:
                 os.link(alignment_file, dst_file)
-            except:
+            except:  # noqa: E722
                 shutil.copy(alignment_file, dst_file)
         else:
             logger.warn("Cannot set alignment file for {}, {} does not exist".format(self, alignment_file))

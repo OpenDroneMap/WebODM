@@ -13,5 +13,5 @@ def check_default_group(sender, instance, created, **kwargs):
             instance.groups.add(default_group)
             instance.save()
             logger.info("Added {} to default group".format(instance.username))
-        except:
+        except:  # noqa: E722
             pass # Group "Default" is not available, probably loading fixtures at this moment...

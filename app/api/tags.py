@@ -19,7 +19,7 @@ def parse_tags_input(tags):
                 return r
             else:
                 raise Exception("Invalid tags string")
-        except:
+        except:  # noqa: E722
             return []
     elif isinstance(tags, list):
         return list(map(str, tags))

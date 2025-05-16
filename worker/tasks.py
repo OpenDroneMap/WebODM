@@ -48,7 +48,7 @@ def update_nodes_info():
         if processing_node.hostname == check_hostname and not processing_node.is_online():
             try:
                 socket.gethostbyname(processing_node.hostname)
-            except:  #  noqa: E722
+            except:  # noqa: E722  #  noqa: E722
                 # Hostname was invalid, try renaming
                 processing_node.hostname = 'webodm-node-odm-1'
                 processing_node.update_node_info()

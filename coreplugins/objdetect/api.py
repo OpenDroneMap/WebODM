@@ -80,5 +80,5 @@ class TaskObjDownload(GetTaskResult):
     def handle_output(self, output, result, **kwargs):
         try:
             return json.loads(output)
-        except:
+        except:  # noqa: E722
             raise TaskResultOutputError("Invalid GeoJSON")

@@ -225,7 +225,7 @@ class TaskViewSet(viewsets.ViewSet):
         if bbox is not None:
             try:
                 xmin, ymin, xmax, ymax = [float(v) for v in bbox.split(",")]
-            except:
+            except:  # noqa: E722
                 raise exceptions.ValidationError("Invalid bbox parameter")   
 
             geom = Polygon.from_bbox((xmin, ymin, xmax, ymax))

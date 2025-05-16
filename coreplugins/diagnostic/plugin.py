@@ -27,7 +27,7 @@ def get_memory_stats():
             ret['free'] *= 1024
             ret['used'] *= 1024
         return ret
-    except:
+    except:  # noqa: E722
         return {}
 
 
