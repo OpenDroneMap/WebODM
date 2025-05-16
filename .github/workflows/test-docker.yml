@@ -23,7 +23,7 @@ jobs:
         context: .
         push: false
         tags: opendronemap/webodm_webapp:latest
-        build-arg: TEST_BUILD=ON
+        build-args: TEST_BUILD=ON
         cache-from: type=gha
         cache-to: type=gha,mode=max
     - name: Build db
