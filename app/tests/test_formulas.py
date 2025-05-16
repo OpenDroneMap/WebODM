@@ -23,7 +23,7 @@ class TestFormulas(TestCase):
 
         # Functions work
         self.assertTrue(lookup_formula("_TESTFUNC", "RGB")[0] == "b1+(sqrt(b3))")
-        self.assertTrue(lookup_formula("_TESTFUNC", "RGB")[1] == None)
+        self.assertIsNone(lookup_formula("_TESTFUNC", "RGB")[1])
 
     def test_algo_list(self):
         al = get_algorithm_list()
