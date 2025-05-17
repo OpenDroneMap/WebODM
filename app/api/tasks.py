@@ -532,13 +532,12 @@ class TaskThumbnail(TaskNestedView):
                     out_width = int(thumb_size * ratio)
 
 
-                with WarpedVRT(raster, cutline=cutline) as vrt:
+                with WarpedVRT(raster, cutline=cutline, nodata=0) as vrt:
                     rgb = vrt.read(indexes=indexes, window=win, fill_value=0, out_shape=(
                         len(indexes),
                         out_height,
                         out_width,
                     ), resampling=rasterio.enums.Resampling.nearest)
-                
                 img = np.zeros((len(indexes), thumb_size, thumb_size), dtype=rgb.dtype)
                 y_offset = (thumb_size - out_height) // 2
                 x_offset = (thumb_size - out_width) // 2
@@ -558,12 +557,12 @@ class TaskThumbnail(TaskNestedView):
                     thumb_size,
                     thumb_size,
                 ), resampling=rasterio.enums.Resampling.nearest)
-            
+
             img = img.transpose((1, 2, 0))
 
         if img.dtype != np.uint8:
             img = img.astype(np.float32)
-            
+
             # Ignore alpha values
             minval = img[:,:,:3].min()
             maxval = img[:,:,:3].max()
@@ -571,6 +570,10 @@ class TaskThumbnail(TaskNestedView):
             if minval != maxval:
                 img[:,:,:3] -= minval
                 img[:,:,:3] *= (255.0/(maxval-minval))
+
+            # Normalize alpha
+            if img.shape[2] == 4:
+                img[:,:,3] = np.where(img[:,:,3]==0, 0, 255)
             
             img = img.astype(np.uint8)
 

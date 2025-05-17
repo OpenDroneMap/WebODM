@@ -47,7 +47,7 @@ def export_raster(input, output, **opts):
             crop = GEOSGeometry(crop_wkt)
             crop.srid = 4326
             cutline, bounds = geom_transform_wkt_bbox(crop, ds, 'raster')
-            vrt_options = {'cutline': cutline}
+            vrt_options = {'cutline': cutline, 'nodata': 0}
     else:
         vrt_options = None
     
