@@ -563,7 +563,7 @@ class TaskThumbnail(TaskNestedView):
 
         if img.dtype != np.uint8:
             img = img.astype(np.float32)
-            
+
             # Ignore alpha values
             minval = img[:,:,:3].min()
             maxval = img[:,:,:3].max()
@@ -571,6 +571,10 @@ class TaskThumbnail(TaskNestedView):
             if minval != maxval:
                 img[:,:,:3] -= minval
                 img[:,:,:3] *= (255.0/(maxval-minval))
+
+            # Normalize alpha
+            if img.shape[2] == 4:
+                img[:,:,3] = np.where(img[:,:,3]==0, 0, 255)
             
             img = img.astype(np.uint8)
 
