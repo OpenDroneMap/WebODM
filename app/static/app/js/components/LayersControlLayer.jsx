@@ -288,7 +288,8 @@ export default class LayersControlLayer extends React.Component {
         bands,
         hillshade,
         rescale: this.rescale,
-        size: 512
+        size: 512,
+        crop: 1
     };
   }
   
