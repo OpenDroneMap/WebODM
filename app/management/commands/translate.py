@@ -24,7 +24,7 @@ class Command(BaseCommand):
         
         if options.get('action') == 'extract':
             print("Extracting .po files from Django/React")
-            locale_params = ["--locale=%s" % l for l in locales]
+            locale_params = ["--locale=%s" % locale for locale in locales]
             
             locale_dir = os.path.join(root, "locale")
             if not os.path.exists(locale_dir):
@@ -49,9 +49,9 @@ class Command(BaseCommand):
 
         elif options.get('action') == 'build':
             if options.get('safe'):
-                for l in locales:
-                    print("Building %s .po files into .mo" % l)
-                    call_command('compilemessages', '--locale=%s' % l)
+                for locale in locales:
+                    print("Building %s .po files into .mo" % locale)
+                    call_command('compilemessages', '--locale=%s' % locale)
             else:
                 print("Building .po files into .mo")
                 call_command('compilemessages')
