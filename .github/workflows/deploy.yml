@@ -4,7 +4,7 @@ name: Deploy WebODM on Commit
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   deploy:
@@ -18,16 +18,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build and deploy WebODM
+      - name: Pull latest code
         run: |
           cd /home/gennady/SFUODM
-
-          echo "🛠 Pull latest code"
           git pull origin master
+      - name: Stop WebODM
+        run: |
+          cd /home/gennady/SFUODM
+          ./webodm.sh stop
 
-          echo "🚀 Build and replace containers"
-          docker compose up -d --build --remove-orphans
+      - name: Build WebODM images
+        run: |
+          cd /home/gennady/SFUODM
+          ./webodm.sh rebuild
 
-          echo "🧹 Prune unused images and volumes"
+      - name: Start WebODM
+        run: |
+          cd /home/gennady/SFUODM
+          ./webodm.sh start \
+            --detached \
+            --media-dir /odm-data/media \
+            --db-dir /odm-data/db/
+
+      - name: Prune unused Docker images and volumes
+        run: |
           docker image prune -f
           docker volume prune -f
