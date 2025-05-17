@@ -163,7 +163,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # GCP should have been scaled
             with open(resized_task.task_path("gcp.txt")) as f:
-                lines = list(map(lambda l: l.strip(), f.readlines()))
+                lines = list(map(lambda line: line.strip(), f.readlines()))
 
                 [x, y, z, px, py, imagename, *extras] = lines[1].split(' ')
                 self.assertTrue(imagename == "tiny_drone_image.JPG") # case insensitive
@@ -203,7 +203,7 @@ class TestApiTask(BootTransactionTestCase):
                 # We just pass it along, it will get errored out during processing
                 # But we shouldn't fail.
                 with open(malformed_gcp_task.task_path("gcp_malformed.txt")) as f:
-                    lines = list(map(lambda l: l.strip(), f.readlines()))
+                    lines = list(map(lambda line: line.strip(), f.readlines()))
                     self.assertTrue(lines[1] == "<O_O>")
 
                 image1.seek(0)
