@@ -1,12 +1,14 @@
 import time
+
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
+
 from app.models import Task
-from django.db.models import Sum
-from django.core.cache import cache
 from webodm import settings
 
 

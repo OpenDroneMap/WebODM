@@ -1,7 +1,8 @@
-from django.db import models
-from django.contrib.postgres import fields
 from django.conf import settings
+from django.contrib.postgres import fields
+from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 
 class PluginDatum(models.Model):
     key = models.CharField(max_length=255, help_text=_("Setting key"), db_index=True, verbose_name=_("Key"))

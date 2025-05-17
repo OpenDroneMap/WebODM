@@ -1,11 +1,11 @@
-import requests
 import logging
-import piexif
 
+import piexif
+import requests
 from osgeo import ogr, osr
 from PIL import Image
-from .plugin import config
 
+from .plugin import config
 
 point_ref = osr.SpatialReference()
 point_ref.ImportFromEPSG(4326)

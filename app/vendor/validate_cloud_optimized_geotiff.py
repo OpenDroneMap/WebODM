@@ -32,6 +32,7 @@
 import os.path
 import struct
 import sys
+
 from osgeo import gdal
 
 

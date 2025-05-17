@@ -1,9 +1,9 @@
+from django import forms
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-from app.plugins import PluginBase, Menu, MountPoint
-from django.contrib.auth.decorators import login_required
-from django import forms
+from app.plugins import Menu, MountPoint, PluginBase
 
 from .api import Info, Share
 

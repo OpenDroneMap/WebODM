@@ -1,20 +1,26 @@
 import os
 import shutil
-
 import sys
 
 from django.contrib.auth.models import User
 from django.test import Client
 from rest_framework import status
 
-from app.models import Plugin
-from app.models import Project
-from app.models import Task
-from app.plugins import UserDataStore, enable_plugin
-from app.plugins import get_plugin_by_name
-from app.plugins import sync_plugin_db, get_plugins_persistent_path
+from app.models import Plugin, Project, Task
+from app.plugins import (
+    UserDataStore,
+    enable_plugin,
+    get_plugin_by_name,
+    get_plugins_persistent_path,
+    sync_plugin_db,
+)
 from app.plugins.data_store import InvalidDataStoreValue
-from app.plugins.pyutils import parse_requirements, compute_file_md5, requirements_installed
+from app.plugins.pyutils import (
+    compute_file_md5,
+    parse_requirements,
+    requirements_installed,
+)
+
 from .classes import BootTestCase
 
 

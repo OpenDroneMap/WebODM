@@ -1,7 +1,8 @@
+import logging
+
+from django.contrib.auth.models import Group, User
 from django.db.models import signals
 from django.dispatch import receiver
-from django.contrib.auth.models import User, Group
-import logging
 
 logger = logging.getLogger('app.logger')
 

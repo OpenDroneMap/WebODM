@@ -1,14 +1,14 @@
-import os
 import mimetypes
+import os
+from wsgiref.util import FileWrapper
+
+from django.http import FileResponse, HttpResponse
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from worker.tasks import TestSafeAsyncResult
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status, permissions
 
-from django.http import FileResponse
-from django.http import HttpResponse
-from wsgiref.util import FileWrapper
 
 class CheckTask(APIView):
     permission_classes = (permissions.AllowAny,)

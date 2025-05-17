@@ -1,15 +1,15 @@
 import requests
-
 from pyodm.exceptions import NodeServerError
+from rest_framework import status
+from rest_framework.response import Response
+
 from app import models, pending_actions
+from app.plugins import get_current_plugin
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
-from app.plugins import get_current_plugin
-
-from rest_framework.response import Response
-from rest_framework import status
 
 from .platform_helper import get_all_platforms, get_platform_by_name
+
 
 class ImportFolderTaskView(TaskView):
     def post(self, request, project_pk=None, pk=None):

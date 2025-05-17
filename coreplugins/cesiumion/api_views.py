@@ -1,21 +1,20 @@
-import requests
 from enum import Enum
 from itertools import chain as iter_chain
 
-from app.plugins.views import TaskView
-from app.plugins.worker import run_function_async
-from app.plugins.data_store import GlobalDataStore
-from app.plugins import signals as plugin_signals
-
-from worker.celery import app
+import requests
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.fields import ChoiceField, CharField, JSONField
+from rest_framework import serializers, status
+from rest_framework.fields import CharField, ChoiceField, JSONField
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import serializers
 
-from .globals import PROJECT_NAME, ION_API_URL
+from app.plugins import signals as plugin_signals
+from app.plugins.data_store import GlobalDataStore
+from app.plugins.views import TaskView
+from app.plugins.worker import run_function_async
+from worker.celery import app
+
+from .globals import ION_API_URL, PROJECT_NAME
 from .uploader import upload_to_ion
 
 

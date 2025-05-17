@@ -1,12 +1,16 @@
 from abc import abstractmethod
+
 from django import forms
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
+
 from app.plugins import get_current_plugin, logger
 from app.plugins.views import TaskView
-from ..platform_helper import get_platform_by_name
+
 from ..platform_extension import PlatformExtension, StringField
-    
+from ..platform_helper import get_platform_by_name
+
+
 class CloudLibrary(PlatformExtension):
     """A Cloud Library is an online platform that has images organized in folders or albums.
        It differs from a Cloud Platform, in the way that it can also list all folders it contains, so that a user can

@@ -1,30 +1,35 @@
 import os
+import shutil
 import tempfile
 import zipfile
-import shutil
 
+from codemirror2.widgets import CodeMirrorEditor
+from django import forms
 from django.conf.urls import url
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
-from guardian.admin import GuardedModelAdmin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
-
-from app.models import PluginDatum
-from app.models import Preset
-from app.models import Plugin
-from app.models import Profile
-from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin, delete_plugin, valid_plugin, \
-    get_plugins_persistent_path, clear_plugins_cache, init_plugins
-from .models import Project, Task, Setting, Theme
-from django import forms
-from codemirror2.widgets import CodeMirrorEditor
-from webodm import settings
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext_lazy as _
+from guardian.admin import GuardedModelAdmin
+
+from app.models import Plugin, PluginDatum, Preset, Profile
+from app.plugins import (
+    clear_plugins_cache,
+    delete_plugin,
+    disable_plugin,
+    enable_plugin,
+    get_plugin_by_name,
+    get_plugins_persistent_path,
+    init_plugins,
+    valid_plugin,
+)
+from webodm import settings
+
+from .models import Project, Setting, Task, Theme
 
 
 class ProjectAdmin(GuardedModelAdmin):

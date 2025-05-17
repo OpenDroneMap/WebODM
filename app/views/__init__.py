@@ -1,4 +1,3 @@
-from . import app
-from . import public
+from . import app, public
 
 __all__ = ['app', 'public']

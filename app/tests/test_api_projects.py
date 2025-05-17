@@ -1,11 +1,14 @@
 import logging
 import os
+
 from django.contrib.auth.models import User
+from guardian.shortcuts import get_perms
 from rest_framework import status
 from rest_framework.test import APIClient
+
 from app.models import Project
+
 from .classes import BootTestCase
-from guardian.shortcuts import get_perms
 
 logger = logging.getLogger('app.logger')
 

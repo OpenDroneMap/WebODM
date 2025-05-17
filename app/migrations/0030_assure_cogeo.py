@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from app.cogeo import assure_cogeo
-from django.db import migrations
 import glob
 import os
+
+from django.db import migrations
+
+from app.cogeo import assure_cogeo
 from webodm import settings
+
 
 def find_and_assure_cogeo(apps, schema_editor):
     for asset_filename in ["odm_orthophoto.tif", "dsm.tif", "dtm.tif"]:

@@ -1,10 +1,11 @@
+from django import forms
+from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 
-from app.plugins import PluginBase, Menu, MountPoint, get_current_plugin
+from app.plugins import Menu, MountPoint, PluginBase, get_current_plugin
 from app.plugins.views import TaskView
-from django.shortcuts import render
-from django import forms
+
 
 class TestForm(forms.Form):
     testField = forms.CharField(label='Test')

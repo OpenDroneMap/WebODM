@@ -1,8 +1,10 @@
 # Check http://piwigo.com/
-from urllib.parse import urlparse
 from os import path
+from urllib.parse import urlparse
+
 from coreplugins.cloudimport.cloud_platform import File, Folder
 from coreplugins.cloudimport.extensions.cloud_library import CloudLibrary
+
 
 class Platform(CloudLibrary):
     def __init__(self):

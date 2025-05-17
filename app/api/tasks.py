@@ -1,43 +1,54 @@
+import io
+import mimetypes
 import os
 import re
 import shutil
+from shutil import copyfileobj
 from wsgiref.util import FileWrapper
 
-import mimetypes
-import rasterio
-from rasterio.vrt import WarpedVRT
-from rasterio.enums import ColorInterp
-from PIL import Image
-import io
 import numpy as np
-
-from shutil import copyfileobj
-from django.core.exceptions import ObjectDoesNotExist, SuspiciousFileOperation, ValidationError
+import rasterio
+from django.contrib.gis.geos import Polygon
+from django.core.exceptions import (
+    ObjectDoesNotExist,
+    SuspiciousFileOperation,
+    ValidationError,
+)
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
-from django.http import FileResponse
-from django.http import HttpResponse
-from django.http import StreamingHttpResponse
-from django.contrib.gis.geos import Polygon
-from zipstream.ng import ZipStream
-from rest_framework import status, serializers, viewsets, filters, exceptions, permissions, parsers
+from django.db.models import Q
+from django.http import FileResponse, HttpResponse, StreamingHttpResponse
+from django.utils.translation import gettext_lazy as _
+from PIL import Image
+from rasterio.enums import ColorInterp
+from rasterio.vrt import WarpedVRT
+from rest_framework import (
+    exceptions,
+    filters,
+    parsers,
+    permissions,
+    serializers,
+    status,
+    viewsets,
+)
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Q
+from zipstream.ng import ZipStream
 
 from app import models, pending_actions
+from app.geoutils import geom_transform_wkt_bbox
+from app.security import path_traversal_check
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
-from worker import tasks as worker_tasks
-from .common import get_and_check_project, get_asset_download_filename
-from .tags import TagsField
-from app.security import path_traversal_check
-from django.utils.translation import gettext_lazy as _
-from .fields import PolygonGeometryField
-from app.geoutils import geom_transform_wkt_bbox
 from webodm import settings
+from worker import tasks as worker_tasks
+
+from .common import get_and_check_project, get_asset_download_filename
+from .fields import PolygonGeometryField
+from .tags import TagsField
+
 
 def flatten_files(request_files):
     # MultiValueDict in, flat array of files out

@@ -1,9 +1,8 @@
 import os
+from shutil import rmtree
 
 from django.contrib.auth.models import User
-from django.test import TestCase
-from django.test import TransactionTestCase
-from shutil import rmtree
+from django.test import TestCase, TransactionTestCase
 
 from app.boot import boot
 from app.models import Project

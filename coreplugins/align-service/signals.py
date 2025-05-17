@@ -1,11 +1,13 @@
 import logging
-from django.dispatch import receiver
-from app.plugins.signals import task_resizing_images
-from app.plugins.functions import get_current_plugin
-from . import config
-from app.models import Task
 
-from .process import get_coords_from_images, generate_align_tif
+from django.dispatch import receiver
+
+from app.models import Task
+from app.plugins.functions import get_current_plugin
+from app.plugins.signals import task_resizing_images
+
+from . import config
+from .process import generate_align_tif, get_coords_from_images
 
 logger = logging.getLogger('app.logger')
 

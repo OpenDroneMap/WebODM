@@ -2,8 +2,8 @@ import datetime
 import os
 
 from django.contrib.auth.models import User
-from guardian.shortcuts import assign_perm, get_objects_for_user
 from django.utils import timezone
+from guardian.shortcuts import assign_perm, get_objects_for_user
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_jwt.settings import api_settings
@@ -13,8 +13,9 @@ from app.plugins.signals import processing_node_removed
 from app.tests.utils import catch_signal
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
-from .classes import BootTestCase
 from webodm import settings
+
+from .classes import BootTestCase
 
 
 class TestApi(BootTestCase):

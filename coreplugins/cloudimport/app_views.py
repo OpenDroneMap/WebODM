@@ -1,11 +1,11 @@
 
 from django import forms
 from django.contrib import messages
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-
+from django.shortcuts import render
 
 from .platform_helper import get_all_extended_platforms
+
 
 class DynamicForm(forms.Form):
     """This dynamic form will go through all the extended platforms, and retrieve their fields"""

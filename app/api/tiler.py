@@ -1,35 +1,37 @@
 import json
-from rasterio.enums import ColorInterp
-from rasterio.crs import CRS
-from rasterio.features import bounds as featureBounds
-from rasterio.errors import NotGeoreferencedWarning
-import urllib
 import os
-from .common import get_asset_download_filename
+import urllib
+import warnings
+
+import numpy as np
 from django.http import HttpResponse
-from rio_tiler.errors import TileOutsideBounds
-from rio_tiler.utils import has_alpha_band, \
-    non_alpha_indexes, render, create_cutline
-from rio_tiler.utils import _stats as raster_stats
+from django.utils.translation import gettext as _
+from rasterio.crs import CRS
+from rasterio.enums import ColorInterp
+from rasterio.errors import NotGeoreferencedWarning
+from rasterio.features import bounds as featureBounds
+from rest_framework import exceptions
+from rest_framework.response import Response
+from rio_tiler.colormap import apply_cmap
+from rio_tiler.colormap import cmap as colormap
+from rio_tiler.errors import AlphaBandWarning, InvalidColorMapName, TileOutsideBounds
+from rio_tiler.io import COGReader
 from rio_tiler.models import ImageStatistics
 from rio_tiler.models import Metadata as RioMetadata
 from rio_tiler.profiles import img_profiles
-from rio_tiler.colormap import cmap as colormap, apply_cmap
-from rio_tiler.io import COGReader
-from rio_tiler.errors import InvalidColorMapName, AlphaBandWarning
-import numpy as np
-from .custom_colormaps_helper import custom_colormaps
-from app.raster_utils import extension_for_export_format, ZOOM_EXTRA_LEVELS
-from .hsvblend import hsv_blend
-from .hillshade import LightSource
-from .formulas import lookup_formula, get_algorithm_list, get_auto_bands
-from .tasks import TaskNestedView
+from rio_tiler.utils import _stats as raster_stats
+from rio_tiler.utils import create_cutline, has_alpha_band, non_alpha_indexes, render
+
 from app.geoutils import geom_transform_wkt_bbox
-from rest_framework import exceptions
-from rest_framework.response import Response
-from worker.tasks import export_raster, export_pointcloud
-from django.utils.translation import gettext as _
-import warnings
+from app.raster_utils import ZOOM_EXTRA_LEVELS, extension_for_export_format
+from worker.tasks import export_pointcloud, export_raster
+
+from .common import get_asset_download_filename
+from .custom_colormaps_helper import custom_colormaps
+from .formulas import get_algorithm_list, get_auto_bands, lookup_formula
+from .hillshade import LightSource
+from .hsvblend import hsv_blend
+from .tasks import TaskNestedView
 
 # Disable: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix be returned.
 warnings.filterwarnings("ignore", category=NotGeoreferencedWarning)

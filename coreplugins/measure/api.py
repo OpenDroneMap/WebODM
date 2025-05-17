@@ -1,14 +1,16 @@
 import os
-from rest_framework import serializers
-from rest_framework import status
+
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers, status
 from rest_framework.response import Response
+
 from app.api.workers import GetTaskResult
 from app.models import Task
 from app.plugins.views import TaskView
-from django.utils.translation import gettext_lazy as _
 from app.plugins.worker import run_function_async
 
 from .volume import calc_volume
+
 
 class VolumeRequestSerializer(serializers.Serializer):
     area = serializers.JSONField(help_text="GeoJSON Polygon contour defining the volume area to compute")

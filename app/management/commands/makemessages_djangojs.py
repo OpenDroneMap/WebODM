@@ -1,5 +1,6 @@
 from django.core.management.commands.makemessages import Command as MMCommand
 
+
 # https://medium.com/@hugosousa/hacking-djangos-makemessages-for-better-translations-matching-in-jsx-components-1174b57a13b1
 class Command(MMCommand):
     """

@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+
 from nodeodm.models import ProcessingNode
+
 
 class Command(BaseCommand):
     requires_system_checks = []

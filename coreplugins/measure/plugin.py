@@ -1,6 +1,7 @@
-from app.plugins import MountPoint
-from app.plugins import PluginBase
+from app.plugins import MountPoint, PluginBase
+
 from .api import TaskVolume, TaskVolumeResult
+
 
 class Plugin(PluginBase):
     def include_js_files(self):

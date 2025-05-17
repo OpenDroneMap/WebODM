@@ -1,7 +1,9 @@
+import os
+
 from django.contrib.gis.gdal import GDALRaster
 
 from .classes import BootTestCase
-import os
+
 
 class TestApi(BootTestCase):
     def setUp(self):

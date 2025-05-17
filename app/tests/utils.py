@@ -1,15 +1,11 @@
-import os
-import shutil
-import time
-
-import subprocess
-
 import logging
-
-from unittest import mock
-from contextlib import contextmanager
-
+import os
 import random
+import shutil
+import subprocess
+import time
+from contextlib import contextmanager
+from unittest import mock
 
 from webodm import settings
 

@@ -6,12 +6,13 @@ https://mozilla.org/MPL/2.0/.
 '''
 
 # How to authenticate and process drone images using WebODM
-import requests
-import sys
-import os
 import glob
 import json
+import os
+import sys
 import time
+
+import requests
 import status_codes
 
 if len(sys.argv) < 2:

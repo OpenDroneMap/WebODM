@@ -1,7 +1,8 @@
-from .tasks import TaskNestedView
-from .common import get_and_check_project
-from rest_framework.response import Response
 from rest_framework import exceptions
+from rest_framework.response import Response
+
+from .common import get_and_check_project
+from .tasks import TaskNestedView
 
 
 class Scene(TaskNestedView):

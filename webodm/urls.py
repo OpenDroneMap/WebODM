@@ -16,14 +16,14 @@ Including another URLconf
 import os
 
 from django.conf.urls import include, url
-from django.urls import re_path
 from django.contrib import admin
-from . import settings
+from django.urls import re_path
 from django.views.static import serve
-
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
+from . import settings
 
 admin.site.site_header = 'WebODM Administration'
 

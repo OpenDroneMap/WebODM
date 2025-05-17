@@ -1,7 +1,6 @@
-from app.plugins import PluginBase
-from app.plugins import MountPoint
-from .api import TaskObjDetect
-from .api import TaskObjDownload
+from app.plugins import MountPoint, PluginBase
+
+from .api import TaskObjDetect, TaskObjDownload
 
 
 class Plugin(PluginBase):

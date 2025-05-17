@@ -1,12 +1,12 @@
 import logging
 
 from django.contrib.auth.models import User
+from django.contrib.gis.geos import Polygon
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from app.models import Project, Task
 from app.tests.classes import BootTestCase
-from django.contrib.gis.geos import Polygon
 
 logger = logging.getLogger('app.logger')
 

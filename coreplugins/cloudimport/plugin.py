@@ -1,6 +1,11 @@
-from app.plugins import PluginBase, Menu, MountPoint
+from app.plugins import Menu, MountPoint, PluginBase
 
-from .api_views import PlatformsTaskView, PlatformsVerifyTaskView, ImportFolderTaskView, CheckUrlTaskView
+from .api_views import (
+    CheckUrlTaskView,
+    ImportFolderTaskView,
+    PlatformsTaskView,
+    PlatformsVerifyTaskView,
+)
 from .app_views import HomeView, LoadButtonsView
 from .platform_helper import get_all_extended_platforms
 

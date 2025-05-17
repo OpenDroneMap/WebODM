@@ -5,10 +5,11 @@ from django.core.files import File
 from django.test import Client
 
 from app.contexts.settings import load as load_settings
-from app.models import Setting
-from app.models import Theme
+from app.models import Setting, Theme
 from webodm import settings as webodm_settings
+
 from .classes import BootTestCase
+
 
 class TestSettings(BootTestCase):
 

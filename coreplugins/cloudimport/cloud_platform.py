@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-import requests
 from os import path
+
+import requests
+
 from app.plugins import logger
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']

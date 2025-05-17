@@ -1,6 +1,8 @@
-from django import template
-from app.plugins import get_active_plugins
 import itertools
+
+from django import template
+
+from app.plugins import get_active_plugins
 
 register = template.Library()
 

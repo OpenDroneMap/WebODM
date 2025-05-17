@@ -1,12 +1,14 @@
 import time
-from django.contrib.auth.models import User, Group
+
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import Group, User
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_jwt.settings import api_settings
-from django.contrib.auth.hashers import check_password
+
+from app.api.admin import GroupSerializer
 
 from .classes import BootTestCase
-from app.api.admin import GroupSerializer
 
 
 class TestApi(BootTestCase):

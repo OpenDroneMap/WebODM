@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 logger = logging.getLogger('app.logger')
 
 class Console:

@@ -1,14 +1,14 @@
-import re 
+import logging
+import re
 
-from rest_framework import status
-from rest_framework.response import Response
-from app.plugins.views import TaskView
-from app.plugins import GlobalDataStore
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import status
+from rest_framework.response import Response
 
-import logging
+from app.plugins import GlobalDataStore
+from app.plugins.views import TaskView
 
 logger = logging.getLogger('app.logger')
 

@@ -1,13 +1,15 @@
-import os
 import logging
-import tempfile
-import shutil
-import rasterio
+import os
 import re
+import shutil
 import subprocess
+import tempfile
 from pipes import quote
-from rio_cogeo.cogeo import cog_validate, cog_translate
+
+import rasterio
+from rio_cogeo.cogeo import cog_translate, cog_validate
 from rio_tiler.utils import has_alpha_band
+
 from webodm import settings
 
 logger = logging.getLogger('app.logger')

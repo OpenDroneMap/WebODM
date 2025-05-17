@@ -1,23 +1,20 @@
 import json
-from datetime import datetime
+import logging
 import os
+from datetime import datetime
 from urllib.parse import urlencode
 
 import piexif
+import requests
+from django.dispatch import receiver
 from PIL import Image
-from rest_framework import serializers
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.response import Response
 
-from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals
+from app.plugins import GlobalDataStore, get_site_settings
+from app.plugins import signals as plugin_signals
 from app.plugins.views import TaskView
 from app.plugins.worker import task
-
-from django.dispatch import receiver
-
-import requests
-
-import logging
 
 logger = logging.getLogger('app.logger')
 ds = GlobalDataStore('openaerialmap')

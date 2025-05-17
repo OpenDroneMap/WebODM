@@ -1,20 +1,23 @@
 import os
 
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
-from app.plugins.views import TaskView, GetTaskResult
+
+from app.plugins.views import GetTaskResult, TaskView
 from app.plugins.worker import run_function_async
-from django.utils.translation import gettext_lazy as _
+
 
 class ContoursException(Exception):
     pass
 
 def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, crop = None):
+    import glob
     import os
+    import shutil
     import subprocess
     import tempfile
-    import shutil
-    import glob
+
     from webodm import settings
 
     ext = ""

@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from nodeodm.models import ProcessingNode
 from webodm import settings
 
+
 class ProcessingNodeSerializer(serializers.ModelSerializer):
     online = serializers.SerializerMethodField()
     label = serializers.SerializerMethodField()

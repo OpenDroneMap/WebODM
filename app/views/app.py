@@ -1,19 +1,20 @@
 import json
 
+from django import forms
+from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.shortcuts import render, redirect, get_object_or_404
-
-from nodeodm.models import ProcessingNode
-from app.models import Project, Task
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import ugettext as _
-from django import forms
+
+from app.models import Project, Task
 from app.views.utils import get_permissions
+from nodeodm.models import ProcessingNode
 from webodm import settings
+
 
 def index(request):
     # Check first access

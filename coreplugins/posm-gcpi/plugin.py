@@ -1,7 +1,9 @@
-from app.plugins import PluginBase, Menu, MountPoint
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.translation import gettext as _
-from django.contrib.auth.decorators import login_required
+
+from app.plugins import Menu, MountPoint, PluginBase
+
 
 class Plugin(PluginBase):
 

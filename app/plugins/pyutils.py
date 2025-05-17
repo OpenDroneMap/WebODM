@@ -1,7 +1,8 @@
+import hashlib
 import os
 import re
 import subprocess
-import hashlib
+
 
 def parse_requirements(requirements_file):
     """

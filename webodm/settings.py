@@ -10,11 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
+import datetime
+import json
 import os
 import sys
-import json
-
-import datetime
 
 import tzlocal
 from django.contrib.messages import constants as messages

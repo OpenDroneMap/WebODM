@@ -1,8 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
-from app.models import Task, Project
+
+from app.models import Project, Task
 from worker.tasks import check_quotas
+
 from .classes import BootTestCase
+
 
 class TestQuota(BootTestCase):
     def setUp(self):

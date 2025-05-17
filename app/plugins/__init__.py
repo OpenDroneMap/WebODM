@@ -1,8 +1,8 @@
-from .data_store import UserDataStore, GlobalDataStore
-from .plugin_base import PluginBase
+from .data_store import GlobalDataStore, UserDataStore
+from .functions import *
 from .menu import Menu
 from .mount_point import MountPoint
-from .functions import *
+from .plugin_base import PluginBase
 
 __all__ = [
     'UserDataStore', 'GlobalDataStore',

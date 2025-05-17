@@ -1,9 +1,11 @@
-from app.plugins import PluginBase, Menu, MountPoint
-from django.shortcuts import render
+import shutil
+
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 from django.utils.translation import gettext as _
 
-import shutil
+from app.plugins import Menu, MountPoint, PluginBase
+
 
 def get_memory_stats():
     """

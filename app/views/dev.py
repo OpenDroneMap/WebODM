@@ -1,21 +1,21 @@
-from django.http import Http404
-from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import render
-
-from django.utils.translation import ugettext as _
-from webodm import settings
-from django.http import JsonResponse
-from django.utils.translation import get_language
-import requests
+import glob
 import json
-import tempfile
-import os
 import logging
+import os
+import pathlib
 import shutil
 import subprocess
+import tempfile
 import zipfile
-import glob
-import pathlib
+
+import requests
+from django.contrib.auth.decorators import user_passes_test
+from django.http import Http404, JsonResponse
+from django.shortcuts import render
+from django.utils.translation import get_language
+from django.utils.translation import ugettext as _
+
+from webodm import settings
 
 logger = logging.getLogger('app.logger')
 

@@ -2,6 +2,7 @@
 
 import json
 
+
 def extract_potree_strings(translation_json, output):
     strings = []
     with open(translation_json) as f:

@@ -1,20 +1,25 @@
-import os
 import json
+import os
+
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
-from app.plugins.views import TaskView, GetTaskResult, TaskResultOutputError
+
+from app.plugins.views import GetTaskResult, TaskResultOutputError, TaskView
 from app.plugins.worker import run_function_async
-from django.utils.translation import gettext_lazy as _
+
 
 def detect(orthophoto, model, classes=None, crop=None, progress_callback=None):
     import os
-    import subprocess
     import shutil
+    import subprocess
     import tempfile
+
     from webodm import settings
 
     try:
-        from geodeep import detect as gdetect, models
+        from geodeep import detect as gdetect
+        from geodeep import models
         models.cache_dir = os.path.join(settings.MEDIA_ROOT, "CACHE", "detection_models")
     except ImportError:
         return {'error': "GeoDeep library is missing"}

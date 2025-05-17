@@ -1,9 +1,9 @@
 
-from app.plugins import PluginBase, Menu, MountPoint
+from app.plugins import Menu, MountPoint, PluginBase
 
-from .globals import PROJECT_NAME
-from .api_views import ShareTaskView, RefreshIonTaskView, ClearErrorsTaskView
+from .api_views import ClearErrorsTaskView, RefreshIonTaskView, ShareTaskView
 from .app_views import HomeView, LoadButtonView
+from .globals import PROJECT_NAME
 
 
 class Plugin(PluginBase):

@@ -2,8 +2,10 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
-from .task import validate_task_options
 from django.utils.translation import gettext_lazy as _
+
+from .task import validate_task_options
+
 
 class Preset(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, help_text=_("The person who owns this preset"), verbose_name=_("Owner"))

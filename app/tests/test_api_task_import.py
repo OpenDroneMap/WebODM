@@ -2,14 +2,13 @@ import os
 import time
 
 from django.contrib.auth.models import User
-from guardian.shortcuts import remove_perm, assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from rest_framework import status
 from rest_framework.test import APIClient
 
 import worker
 from app.cogeo import valid_cogeo
-from app.models import Project
-from app.models import Task
+from app.models import Project, Task
 from app.tests.classes import BootTransactionTestCase
 from app.tests.utils import clear_test_media_root, start_processing_node
 from nodeodm import status_codes

@@ -1,41 +1,44 @@
 import io
+import json
+import logging
 import os
 import time
-
-
-import logging
 from datetime import timedelta
 
-import json
 import requests
-from PIL import Image
 from django.contrib.auth.models import User
+from django.contrib.gis.geos import Polygon
+from django.utils import timezone
+from guardian.shortcuts import assign_perm
+from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient
-from django.contrib.gis.geos import Polygon
 
 import worker
-from django.utils import timezone
-
 from app import pending_actions
 from app.api.formulas import algos, get_camera_filters_for
 from app.api.tiler import ZOOM_EXTRA_LEVELS
 from app.cogeo import valid_cogeo
 from app.models import Project, Task
-from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
+from app.models.task import (
+    TaskInterruptedException,
+    full_task_directory_path,
+    task_directory_path,
+)
 from app.plugins.signals import task_completed, task_removed, task_removing
 from app.tests.classes import BootTransactionTestCase
+from app.testwatch import testWatch
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
-from guardian.shortcuts import assign_perm
-from app.testwatch import testWatch
-from .utils import start_processing_node, clear_test_media_root, catch_signal
 
 # We need to test the task API in a TransactionTestCase because
 # task processing happens on a separate thread, and normal TestCases
 # do not commit changes to the DB, so spawning a new thread will show no
 # data in it.
 from webodm import settings
+
+from .utils import catch_signal, clear_test_media_root, start_processing_node
+
 logger = logging.getLogger('app.logger')
 
 DELAY = 2  # time to sleep for during process launch, background processing, etc.

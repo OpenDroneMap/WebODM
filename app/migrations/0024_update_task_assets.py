@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import os
+
 from django.db import migrations
 
 from webodm import settings

@@ -1,6 +1,8 @@
 import importlib
-from os import path, listdir
+from os import listdir, path
+
 from app.plugins import logger
+
 from .platform_extension import PlatformExtension
 
 platforms = None

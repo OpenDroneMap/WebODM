@@ -6,11 +6,12 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFit
-from django.utils.translation import gettext_lazy as _
 
 from webodm import settings
+
 from .theme import Theme, update_theme_css
 
 logger = logging.getLogger('app.logger')

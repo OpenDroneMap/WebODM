@@ -1,5 +1,7 @@
-from rest_framework import serializers
 import json
+
+from rest_framework import serializers
+
 
 class TagsField(serializers.JSONField):
     def to_representation(self, tags):

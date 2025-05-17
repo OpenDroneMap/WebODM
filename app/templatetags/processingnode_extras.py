@@ -1,8 +1,8 @@
 from django import template
 from guardian.shortcuts import get_objects_for_user
-from webodm import settings
 
 from nodeodm.models import ProcessingNode
+from webodm import settings
 
 register = template.Library()
 
