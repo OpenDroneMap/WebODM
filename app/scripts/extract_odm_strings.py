@@ -52,11 +52,12 @@ def extract_odm_strings(url, outfile):
             new_body.append(stmt)
 
     root.body = new_body
+
+    # This is supposed get us config in our local context.
     exec(compile(root, filename="<ast>", mode="exec"), globals())
 
+    config(["--project-path", "/bogus", "name"], parser=ArgumentParserStub())  # noqa: F821
 
-
-    config(["--project-path", "/bogus", "name"], parser=ArgumentParserStub())
     for opt in options:
         h = options[opt].get('help')
         if h:
