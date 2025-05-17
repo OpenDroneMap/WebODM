@@ -1,3 +1,5 @@
+import json
+
 def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decimals=4,
                 base_method="triangulate", custom_base_z=None):
     try:
