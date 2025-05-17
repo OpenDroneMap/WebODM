@@ -21,6 +21,8 @@ import PluginsAPI from '../classes/plugins/API';
 import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import LayersControl from './LayersControl';
+import AssetDownloadButtons from './AssetDownloadButtons';
+import CropButton from './CropButton';
 import update from 'immutability-helper';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
@@ -30,6 +32,8 @@ import '../vendor/leaflet/Leaflet.SideBySide/leaflet-side-by-side';
 import { _ } from '../classes/gettext';
 import UnitSelector from './UnitSelector';
 import { unitSystem, toMetric } from '../classes/Units';
+
+const IOU_THRESHOLD = 0.7;
 
 class Map extends React.Component {
   static defaultProps = {
@@ -50,7 +54,8 @@ class Map extends React.Component {
     publicEdit: PropTypes.bool,
     shareButtons: PropTypes.bool,
     permissions: PropTypes.array,
-    thermal: PropTypes.bool
+    thermal: PropTypes.bool,
+    project: PropTypes.object
   };
 
   constructor(props) {
@@ -73,6 +78,8 @@ class Map extends React.Component {
     this.autolayers = null;
     this.taskCount = 1;
     this.addedCameraShots = {};
+    this.zIndexGroupMap = {};
+    this.ious = {};
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
@@ -133,8 +140,8 @@ class Map extends React.Component {
     return "";
   }
 
-  typeZIndex = (type) => {
-    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1;
+  typeZIndex = (type, zIndexGroup = 1) => {
+    return ["dsm", "dtm", "orthophoto", "plant"].indexOf(type) + 1 + zIndexGroup * 10;
   }
 
   hasBands = (bands, orthophoto_bands) => {
@@ -145,6 +152,28 @@ class Map extends React.Component {
     }
     
     return true;
+  }
+
+  computeIOU = (b1, b2) => {
+    const [x1Min, y1Min, x1Max, y1Max] = b1;
+    const [x2Min, y2Min, x2Max, y2Max] = b2;
+  
+    const interXMin = Math.max(x1Min, x2Min);
+    const interYMin = Math.max(y1Min, y2Min);
+    const interXMax = Math.min(x1Max, x2Max);
+    const interYMax = Math.min(y1Max, y2Max);
+  
+    const interWidth = Math.max(0, interXMax - interXMin);
+    const interHeight = Math.max(0, interYMax - interYMin);
+    const interArea = interWidth * interHeight;
+  
+    const area1 = (x1Max - x1Min) * (y1Max - y1Min);
+    const area2 = (x2Max - x2Min) * (y2Max - y2Min);
+    const unionArea = area1 + area2 - interArea;
+  
+    if (unionArea === 0) return 0;
+  
+    return interArea / unionArea;
   }
 
   loadImageryLayers(forceAddLayers = false){
@@ -176,28 +205,78 @@ class Map extends React.Component {
     return new Promise((resolve, reject) => {
       this.tileJsonRequests = [];
 
+      // Set a zIndexGroup
+      this.zIndexGroupMap = {};
+      let zIdx = 1;
+      for (let i = tiles.length - 1; i >= 0; i--){
+        if (!tiles[i].zIndexGroup){
+          const taskId = tiles[i].meta.task.id;
+          if (!this.zIndexGroupMap[taskId]) this.zIndexGroupMap[taskId] = zIdx++;
+          tiles[i].zIndexGroup = this.zIndexGroupMap[taskId];
+        }
+      }
+
+      // Compute IoU scores
+      // This gives us an idea of overlap between tasks
+      // so that we can decide to show them in project map view
+      this.ious = {};
+      for (let i = tiles.length - 1; i >= 0; i--){
+        const taskId = tiles[i].meta.task.id;
+        if (this.ious[taskId] === undefined){
+          for (let j = i - 1; j >= 0; j--){
+            const tId = tiles[j].meta.task.id;
+            if (tId === taskId) continue;
+            if (!tiles[i].meta.task.extent || !tiles[j].meta.task.extent) continue;
+            
+            const iou = this.computeIOU(tiles[i].meta.task.extent, tiles[j].meta.task.extent);
+            if (this.ious[taskId] === undefined){
+              this.ious[taskId] = iou;
+            }else{
+              this.ious[taskId] = Math.max(this.ious[taskId], iou);
+            }
+          }
+        }
+      }
+      this.ious[tiles[0].meta.task.id] = 0; // First task is always visible
+
       async.each(tiles, (tile, done) => {
-        const { url, type } = tile;
+        const { url, type, zIndexGroup } = tile;
         const meta = Utils.clone(tile.meta);
 
         let metaUrl = url + "metadata";
         let unitForward = value => value;
         let unitBackward = value => value;
+        let queryParams = {};
 
         if (type == "plant"){
           if (meta.task && meta.task.orthophoto_bands && meta.task.orthophoto_bands.length === 2){
             // Single band, probably thermal dataset, in any case we can't render NDVI
             // because it requires 3 bands
-            metaUrl += "?formula=Celsius&bands=L&color_map=magma";
+            queryParams = {
+              formula: 'Celsius',
+              bands: 'L',
+              color_map: 'magma'
+            };
           }else if (meta.task && meta.task.orthophoto_bands){
             let formula = this.hasBands(["red", "green", "nir"], meta.task.orthophoto_bands) ? "NDVI" : "VARI";
-            metaUrl += `?formula=${formula}&bands=auto&color_map=rdylgn`;
+            queryParams = {
+              formula,
+              bands: 'auto',
+              color_map: 'rdylgn'
+            };
           }else{
             // This should never happen?
-            metaUrl += "?formula=NDVI&bands=RGN&color_map=rdylgn";
+            queryParams = {
+              formula: 'NDVI',
+              bands: 'RGN',
+              color_map: 'rdylgn'
+            };
           }
         }else if (type == "dsm" || type == "dtm"){
-          metaUrl += "?hillshade=6&color_map=viridis";
+          queryParams = {
+            hillshade: 6,
+            color_map: 'viridis'
+          };
           unitForward = value => {
             return unitSystem().elevation(value).value;
           };
@@ -207,6 +286,10 @@ class Map extends React.Component {
             return toMetric(unitValue).value;
           };
         }
+
+        if (meta.task.crop) queryParams.crop = 1;
+
+        metaUrl += Utils.toSearchQuery(queryParams);
 
         this.tileJsonRequests.push($.getJSON(metaUrl)
           .done(mres => {
@@ -240,16 +323,19 @@ class Map extends React.Component {
                         max = Math.max(statistics[b]["max"]);
                       }
                     }
-                    params["rescale"] = encodeURIComponent(`${min},${max}`);              
+                    params.rescale = encodeURIComponent(`${min},${max}`);              
                 }else{
                     console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
-                    params["rescale"] = encodeURIComponent("-1,1");
+                    params.rescale = encodeURIComponent("-1,1");
                 }
                 
-                params["size"] = TILESIZE;
+                params.size = TILESIZE;
+                if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }else{
-                tileUrl = Utils.buildUrlWithQuery(tileUrl, { size: TILESIZE });
+                let params = { size: TILESIZE };
+                if (meta.task.crop) params.crop = 1;
+                tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
 
             const layer = Leaflet.tileLayer(tileUrl, {
@@ -261,7 +347,7 @@ class Map extends React.Component {
                   tms: scheme === 'tms',
                   opacity: this.state.opacity / 100,
                   detectRetina: true,
-                  zIndex: this.typeZIndex(type),
+                  zIndex: this.typeZIndex(type, zIndexGroup),
                 });
             
             // Associate metadata with this layer
@@ -273,6 +359,7 @@ class Map extends React.Component {
             meta.icon = this.typeToIcon(type, this.props.thermal || thermal);
             meta.type = type;
             meta.raster = true;
+            meta.zIndexGroup = zIndexGroup;
             meta.autoExpand = this.taskCount === 1 && type === this.props.mapType;
             meta.metaUrl = metaUrl;
             meta.unitForward = unitForward;
@@ -284,8 +371,9 @@ class Map extends React.Component {
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
 
+            const iou = this.ious[meta.task.id] || 0;
             if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
-              if (type === this.props.mapType){
+              if (type === this.props.mapType && iou <= IOU_THRESHOLD){
                 layer.addTo(this.map);
               }
             }
@@ -338,9 +426,9 @@ class Map extends React.Component {
                                 </div>
                                 <div class="popup-opacity-slider">Opacity: <input id="layerOpacity" class="opacity" type="range" value="${layer.options.opacity}" min="0" max="1" step="0.01" /></div>
                                 <div>Bounds: [${layer.options.bounds.toBBoxString().split(",").join(", ")}]</div>
-                                <ul class="asset-links loading">
-                                    <li><i class="fa fa-spin fa-sync fa-spin fa-fw"></i></li>
-                                </ul>
+                                <div class="popup-download-assets loading">
+                                  <i class="fa loading fa-spin fa-sync fa-spin fa-fw"></i>
+                                </div>
 
                                 <button
                                     onclick="location.href='${this.tdPopupButtonUrl(meta.task)}';"
@@ -404,7 +492,11 @@ class Map extends React.Component {
                       shotsLayer.addMarkers(markers, this.map);
                     }
                   });
-                shotsLayer[Symbol.for("meta")] = {name: _("Cameras"), icon: "fa fa-camera fa-fw"};
+                shotsLayer[Symbol.for("meta")] = {
+                  name: _("Cameras"), 
+                  icon: "fa fa-camera fa-fw",
+                  zIndexGroup
+                };
                 if (this.taskCount > 1){
                   // Assign to a group
                   shotsLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
@@ -458,7 +550,12 @@ class Map extends React.Component {
                       gcpLayer.addMarkers(markers, this.map);
                     }
                   });
-                gcpLayer[Symbol.for("meta")] = {name: _("Ground Control Points"), icon: "far fa-dot-circle fa-fw"};
+                gcpLayer[Symbol.for("meta")] = {
+                  name: _("Ground Control Points"), 
+                  icon: "far fa-dot-circle fa-fw",
+                  zIndexGroup
+                };
+                
                 if (this.taskCount > 1){
                   // Assign to a group
                   gcpLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
@@ -637,6 +734,96 @@ _('Example:'),
     });
     new AddOverlayCtrl().addTo(this.map);
 
+    if (this.props.permissions.indexOf("change") !== -1){
+      const updateCropArea = geojson => {
+        // Find tasks IDs
+        const taskMap = {};
+        const requests = [];
+        if (!geojson) geojson = '';
+
+        // Crop affects all tasks in the map
+        for (let layer of this.state.imageryLayers){
+          if (layer._map){
+            const meta = layer[Symbol.for("meta")];
+            const task = meta.task;
+            if (!taskMap[task.id]){
+              requests.push($.ajax({
+                url: `/api/projects/${task.project}/tasks/${task.id}/`,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                  crop: geojson
+                }),
+                dataType: 'json',
+                type: 'PATCH'
+              }));
+              taskMap[task.id] = meta;
+            }
+          }
+        }
+
+        Promise.all(requests)
+          .then(responses => {
+            if (!Array.isArray(responses)){
+              responses = [responses];
+            }
+
+            // Update task in meta and tiles objects
+            responses.forEach(task => {
+              if (!task) return;
+
+              const meta = taskMap[task.id];
+              meta.task = task;
+
+              for (let i = 0; i < this.props.tiles.length; i++){
+                const tile = this.props.tiles[i];
+                if (tile.meta && tile.meta.task.id === task.id){
+                  tile.meta.task = task;                  
+                }
+              }
+            });
+            
+            this.loadImageryLayers();
+          })
+          .catch(e => {
+            this.setState({error: _("Cannot set cropping area. Check your internet connection.")});
+            console.error(e);
+          }).finally(() => {
+            setTimeout(() => {
+              this.cropButton.deletePolygon({triggerEvents: false, fade: true});
+            }, 1000);
+          });
+      };
+
+      this.cropButton = new CropButton({
+        position:'topright',
+        color:'#fff',
+        pulse: true,
+        willCrop: () => {
+          this.removeSideBySideCtrl();
+          let foundCrop = false;
+
+          for (let layer of this.state.imageryLayers){
+            const meta = layer[Symbol.for("meta")];
+            if (meta.task.crop){
+              foundCrop = true;
+              break;
+            }
+          }
+          
+          if (foundCrop){
+            if (window.confirm(_('Are you sure you want to set a new crop area?'))){
+              updateCropArea(null);
+            }else{
+              // Stop crop button from toggling
+              return true;
+            }
+          }
+        },
+        onPolygonChange: updateCropArea
+      });
+      this.map.addControl(this.cropButton);
+    }
+
     this.map.fitBounds([
      [13.772919746115805,
      45.664640939831735],
@@ -667,29 +854,36 @@ _('Example:'),
             if (e.popup && e.popup._source && e.popup._content && !e.popup.options.lazyrender){
                 const infoWindow = e.popup._content;
                 if (typeof infoWindow === 'string') return;
-
-                const $assetLinks = $("ul.asset-links", infoWindow);
                 
-                if ($assetLinks.length > 0 && $assetLinks.hasClass('loading')){
-                    const {id, project} = (e.popup._source[Symbol.for("meta")] || {}).task;
+                const $downloadAssets = $(".popup-download-assets", infoWindow);
+                if ($downloadAssets.length > 0 && $downloadAssets.hasClass('loading')){
+                  const {id, project} = (e.popup._source[Symbol.for("meta")] || {}).task;
+                  
+                  $.getJSON(`/api/projects/${project}/tasks/${id}/`)
+                  .done(task => {
+                    if (task){
+                      let hideItems = [];
+                      if (this.props.permissions.indexOf("change") === -1){
+                        if (task.crop){
+                          hideItems = ["all.zip", "backup.zip"];
+                        }else{
+                          hideItems = ["backup.zip"];
+                        }
+                      }
 
-                    $.getJSON(`/api/projects/${project}/tasks/${id}/`)
-                        .done(res => {
-                            const { available_assets } = res;
-                            const assets = AssetDownloads.excludeSeparators();
-                            const linksHtml = assets.filter(a => available_assets.indexOf(a.asset) !== -1)
-                                              .map(asset => {
-                                                    return `<li><a href="${asset.downloadUrl(project, id)}">${asset.label}</a></li>`;
-                                              })
-                                              .join("");
-                            $assetLinks.append($(linksHtml));
-                        })
-                        .fail(() => {
-                            $assetLinks.append($("<li>" + _("Error: cannot load assets list.") + "</li>"));
-                        })
-                        .always(() => {
-                            $assetLinks.removeClass('loading');
-                        });
+                      ReactDOM.render(<AssetDownloadButtons task={task} 
+                                      showLabel={false} 
+                                      buttonClass="btn-secondary"
+                                      hideItems={hideItems} 
+                                      modalContainer={this.modalContainer} />, $downloadAssets.get(0));
+                    }
+                  })
+                  .fail(() => {
+                      $downloadAssets.append($(_("Error: cannot load assets list.")));
+                  })
+                  .always(() => {
+                      $downloadAssets.removeClass('loading');
+                  });
                 }
             }
 
@@ -720,13 +914,24 @@ _('Example:'),
     });
   }
 
-  handleAddAnnotation = (layer, name, task) => {
+  handleAddAnnotation = (layer, name, task, stored) => {
+      const zIndexGroup = this.zIndexGroupMap[task.id] || 1;
+      
       const meta = {
         name: name || "", 
-        icon: "fa fa-sticky-note fa-fw"
+        icon: "fa fa-sticky-note fa-fw",
+        zIndexGroup
       };
+
       if (this.taskCount > 1 && task){
         meta.group = {id: task.id, name: task.name};
+        
+        if (stored){
+          // Only show annotations for top-most tasks
+          if (this.ious[task.id] >= 0.01){
+            PluginsAPI.Map.toggleAnnotation(layer, false);
+          }
+        }
       }
       layer[Symbol.for("meta")] = meta;
 
@@ -765,10 +970,14 @@ _('Example:'),
         this.sideBySideCtrl.setRightLayers(rightLayers);
       }
     }else{
-      if (this.sideBySideCtrl){
-        this.sideBySideCtrl.remove();
-        this.sideBySideCtrl = null;
-      }
+      this.removeSideBySideCtrl();
+    }
+  }
+
+  removeSideBySideCtrl = () => {
+    if (this.sideBySideCtrl){
+      this.sideBySideCtrl.remove();
+      this.sideBySideCtrl = null;
     }
   }
 
@@ -792,8 +1001,12 @@ _('Example:'),
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
                             prevState.overlays !== this.state.overlays ||
                             prevState.annotations !== this.state.annotations)){
-        this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
+      this.updateLayersControl();
     }
+  }
+
+  updateLayersControl = () => {
+    this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.annotations);
   }
 
   componentWillUnmount() {
@@ -820,6 +1033,8 @@ _('Example:'),
   render() {
     return (
       <div style={{height: "100%"}} className="map">
+        <div className="map-modal-container" ref={(domNode) => this.modalContainer = domNode}></div>
+
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
             <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" className="opacity" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
@@ -837,15 +1052,18 @@ _('Example:'),
         />
 
         <div className="actionButtons">
+          
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
-          {(this.props.shareButtons && !this.props.public && this.state.singleTask !== null) ? 
+          {((this.state.singleTask || this.props.project) && this.props.shareButtons && !this.props.public) ? 
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
-              task={this.state.singleTask} 
+              task={this.state.singleTask}
+              project={this.props.project}
               linksTarget="map"
               queryParams={{t: this.props.mapType}}
             />
           : ""}
+          
           <SwitchModeButton 
             task={this.state.singleTask}
             type="mapToModel" 

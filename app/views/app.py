@@ -72,9 +72,11 @@ def map(request, project_pk=None, task_pk=None):
             task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
             title = task.name or task.id
             mapItems = [task.get_map_items()]
+            projectInfo = None
         else:
             title = project.name or project.id
             mapItems = project.get_map_items()
+            projectInfo = project.get_public_info()
 
     return render(request, 'app/map.html', {
             'title': title,
@@ -83,7 +85,8 @@ def map(request, project_pk=None, task_pk=None):
                 'title': title,
                 'public': 'false',
                 'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
-                'permissions': json.dumps(get_permissions(request.user, project))
+                'permissions': json.dumps(get_permissions(request.user, project)),
+                'project': json.dumps(projectInfo),
             }.items()
         })
 

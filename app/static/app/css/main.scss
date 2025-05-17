@@ -220,11 +220,12 @@ button i.glyphicon{
 
 .dropdown-menu>li>a{
     padding-left: 10px;
-    color: #222;
+    color: #222 !important;
     .fa, .far, .fas, .fab, .glyphicon{
         margin-right: 4px;
     }
 }
+
 
 /* This is to make the Header and navigation more mobile friendly */
 

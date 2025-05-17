@@ -39,6 +39,7 @@ from app.cogeo import assure_cogeo
 from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
+from app.geoutils import geom_transform
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -254,8 +255,8 @@ class Task(models.Model):
     available_assets = fields.ArrayField(models.CharField(max_length=80), default=list, blank=True, help_text=_("List of available assets to download"), verbose_name=_("Available Assets"))
 
     orthophoto_extent = GeometryField(null=True, blank=True, srid=4326, help_text=_("Extent of the orthophoto"), verbose_name=_("Orthophoto Extent"))
-    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DSM", verbose_name=_("DSM Extent"))
-    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text="Extent of the DTM", verbose_name=_("DTM Extent"))
+    dsm_extent = GeometryField(null=True, blank=True, srid=4326, help_text=_("Extent of the DSM"), verbose_name=_("DSM Extent"))
+    dtm_extent = GeometryField(null=True, blank=True, srid=4326, help_text=_("Extent of the DTM"), verbose_name=_("DTM Extent"))
 
     # mission
     created_at = models.DateTimeField(default=timezone.now, help_text=_("Creation date"), verbose_name=_("Created at"))
@@ -287,7 +288,8 @@ class Task(models.Model):
     orthophoto_bands = fields.JSONField(default=list, blank=True, help_text=_("List of orthophoto bands"), verbose_name=_("Orthophoto Bands"))
     size = models.FloatField(default=0.0, blank=True, help_text=_("Size of the task on disk in megabytes"), verbose_name=_("Size"))
     compacted = models.BooleanField(default=False, help_text=_("A flag indicating whether this task was compacted"), verbose_name=_("Compact"))
-    
+    crop = GeometryField(null=True, blank=True, srid=4326, help_text=_("Polygon defining the crop area of this task"), verbose_name=_("Crop Polygon"))
+
     
     class Meta:
         verbose_name = _("Task")
@@ -353,10 +355,35 @@ class Task(models.Model):
         if errors:
             raise ValidationError(errors)
 
+        # Validate crop area
+        # must be enclosed within all raster extents
+        # and have a positive area
+        if self.crop is not None:
+            if self.crop.valid:
+                has_extents = False
+                for extent in [self.orthophoto_extent, self.dsm_extent, self.dtm_extent]:
+                    if extent is not None:
+                        has_extents = True
+                        self.crop = extent.intersection(self.crop)
+                if not has_extents or self.crop.area <= 0:
+                    self.crop = None
+            else:
+                self.crop = None
+
         self.clean()
         self.validate_unique()
 
         super(Task, self).save(*args, **kwargs)
+    
+    def get_extent(self):
+        if self.orthophoto_extent is not None:
+            return self.orthophoto_extent.extent
+        elif self.dsm_extent is not None:
+            return self.dsm_extent.extent
+        elif self.dtm_extent is not None:
+            return self.dsm_extent.extent
+        else:
+            return None
 
     def assets_path(self, *args):
         """
@@ -453,9 +480,6 @@ class Task(models.Model):
                     try:
                         # Try to use hard links first
                         shutil.copytree(self.task_path(), task.task_path(), copy_function=os.link)
-
-                        # Make sure the console output is not linked to the original task
-                        task.console.delink()
                     except Exception as e:
                         logger.warning("Cannot duplicate task using hard links, will use normal copy instead: {}".format(str(e)))
                         shutil.copytree(self.task_path(), task.task_path())
@@ -484,7 +508,8 @@ class Task(models.Model):
                 'public': self.public,
                 'resize_to': self.resize_to,
                 'potree_scene': self.potree_scene,
-                'tags': self.tags
+                'tags': self.tags,
+                'crop': json.loads(self.crop.geojson) if self.crop is not None else None,
             }))
     
     def read_backup_file(self):
@@ -503,6 +528,10 @@ class Task(models.Model):
                     self.resize_to = backup.get('resize_to', self.resize_to)
                     self.potree_scene = backup.get('potree_scene', self.potree_scene)
                     self.tags = backup.get('tags', self.tags)
+
+                    crop = backup.get('crop')
+                    if crop is not None:
+                        self.crop = json.dumps(crop)
 
             except Exception as e:
                 logger.warning("Cannot read backup file: %s" % str(e))
@@ -954,16 +983,21 @@ class Task(models.Model):
             except shutil.Error as e:
                 logger.warning("Cannot restore from backup: %s" % str(e))
                 raise NodeServerError("Cannot restore from backup")
+        else:
+            # Check if the zip file contained a top level directory
+            # which shouldn't be there and try to fix the structure
+            top_level = [os.path.join(assets_dir, d) for d in os.listdir(assets_dir)]
+            if len(top_level) == 1 and os.path.isdir(top_level[0]) and (not top_level[0].endswith("odm_orthophoto")):
+                second_level = [os.path.join(top_level[0], f) for f in os.listdir(top_level[0])]
+                if len(second_level) > 0:
+                    logger.info("Top level directory found in imported archive, attempting to fix")
+                    for f in second_level:
+                        shutil.move(f, assets_dir)
+                    shutil.rmtree(top_level[0])
+
 
         # Populate *_extent fields
-        extent_fields = [
-            (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
-             'orthophoto_extent'),
-            (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
-             'dsm_extent'),
-            (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
-             'dtm_extent'),
-        ]
+        extent_fields = self.get_extent_fields()
 
         for raster_path, field in extent_fields:
             if os.path.exists(raster_path):
@@ -989,6 +1023,13 @@ class Task(models.Model):
                 setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
 
                 logger.info("Populated extent field with {} for {}".format(raster_path, self))
+        
+        # Flushes the changes to the *_extent fields
+        # and immediately reads them back into Python
+        # This is required because GEOS screws up the X/Y conversion
+        # from the raster CRS to 4326, whereas PostGIS seems to do it correctly :/
+        self.save()
+        self.refresh_from_db()
 
         self.update_available_assets_field()
         self.update_epsg_field()
@@ -996,6 +1037,7 @@ class Task(models.Model):
         self.update_size()
         self.potree_scene = {}
         self.running_progress = 1.0
+        self.crop = None
         self.status = status_codes.COMPLETED
 
         if is_backup:
@@ -1003,11 +1045,32 @@ class Task(models.Model):
             self.import_url = ""
         else:
             self.console += gettext("Done!") + "\n"
+
+        task_output = self.assets_path("task_output.txt")
+        if os.path.isfile(task_output):
+            # Guarantee consistency, save space
+            self.console.link(task_output)
         
         self.save()
 
         from app.plugins import signals as plugin_signals
         plugin_signals.task_completed.send_robust(sender=self.__class__, task_id=self.id)
+
+    def get_extent_fields(self):
+        return [
+            (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
+             'orthophoto_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dsm.tif")),
+             'dsm_extent'),
+            (os.path.realpath(self.assets_path("odm_dem", "dtm.tif")),
+             'dtm_extent'),
+        ]
+
+    def get_reference_raster(self):
+        extent_fields = self.get_extent_fields()
+        for file, field in extent_fields:
+            if getattr(self, field) is not None:
+                return file 
 
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))
@@ -1046,9 +1109,17 @@ class Task(models.Model):
                     'ground_control_points': ground_control_points,
                     'epsg': self.epsg,
                     'orthophoto_bands': self.orthophoto_bands,
+                    'crop': self.crop is not None,
+                    'extent': self.get_extent(),
                 }
             }
         }
+
+    def get_projected_crop(self):
+        if self.crop is None or self.epsg is None:
+            return None
+        
+        return geom_transform(self.crop, self.epsg)
 
     def get_model_display_params(self):
         """
@@ -1060,7 +1131,8 @@ class Task(models.Model):
             'available_assets': self.available_assets,
             'public': self.public,
             'public_edit': self.public_edit,
-            'epsg': self.epsg
+            'epsg': self.epsg,
+            'crop_projected': self.get_projected_crop() 
         }
 
     def generate_deferred_asset(self, archive, directory, stream=False):
@@ -1172,6 +1244,16 @@ class Task(models.Model):
 
         self.compacted = True
         self.update_size(commit=True)
+
+    def check_public_edit(self):
+        """
+        Returns whether we need to check change permissions on this task
+        during an API call that needs to make edits
+        """
+        public = self.public or self.project.public
+        public_edit = self.public_edit or self.project.public_edit
+
+        return (not public) or (public and not public_edit)
 
     def set_failure(self, error_message):
         logger.error("FAILURE FOR {}: {}".format(self, error_message))

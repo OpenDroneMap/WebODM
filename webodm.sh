@@ -148,6 +148,11 @@ case $key in
     shift # past argument
     shift # past value
     ;;
+    --ipv6)
+    ipv6=true
+    export WO_IPV6=YES
+    shift # past argument
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -192,6 +197,7 @@ usage(){
   echo "	--settings	Path to a settings.py file to enable modifications of system settings (default: None)"
   echo "	--worker-memory	Maximum amount of memory allocated for the worker process (default: unlimited)"
   echo "	--worker-cpus	Maximum number of CPUs allocated for the worker process (default: all)"
+  echo "	--ipv6	Enable IPV6"
   
   exit
 }
@@ -368,6 +374,7 @@ start(){
 	echo "================================"
 	echo "Host: $WO_HOST"
 	echo "Port: $WO_PORT"
+ 	echo "IPv6: $WO_IPV6"
 	echo "Media directory: $WO_MEDIA_DIR"
 	echo "Postgres DB directory: $WO_DB_DIR"
 	echo "SSL: $WO_SSL"
@@ -456,6 +463,10 @@ start(){
 	if [ ! -z "$WO_WORKER_CPUS" ]; then
 		command+=" -f docker-compose.worker-cpu.yml"
 	fi
+
+ 	if [[ $ipv6 = true ]]; then
+        command+=" -f docker-compose.ipv6.yml"
+    	fi
 
 	command="$command up"
 
@@ -583,7 +594,7 @@ elif [[ $1 = "stop" ]]; then
 	else
 		command+=" -f docker-compose.nodeodm.yml"
 	fi
-
+ 
 	command+=" -f docker-compose.nodemicmac.yml stop"
 	run "${command}"
 elif [[ $1 = "restart" ]]; then

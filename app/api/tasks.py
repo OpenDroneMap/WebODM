@@ -5,6 +5,7 @@ from wsgiref.util import FileWrapper
 
 import mimetypes
 import rasterio
+from rasterio.vrt import WarpedVRT
 from rasterio.enums import ColorInterp
 from PIL import Image
 import io
@@ -34,6 +35,8 @@ from .common import get_and_check_project, get_asset_download_filename
 from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
+from .fields import PolygonGeometryField
+from app.geoutils import geom_transform_wkt_bbox
 from webodm import settings
 
 def flatten_files(request_files):
@@ -55,6 +58,7 @@ class TaskSerializer(serializers.ModelSerializer):
     statistics = serializers.SerializerMethodField()
     extent = serializers.SerializerMethodField()
     tags = TagsField(required=False)
+    crop = PolygonGeometryField(required=False, allow_null=True)
 
     def get_processing_node_name(self, obj):
         if obj.processing_node is not None:
@@ -85,14 +89,7 @@ class TaskSerializer(serializers.ModelSerializer):
         return []
 
     def get_extent(self, obj):
-        if obj.orthophoto_extent is not None:
-            return obj.orthophoto_extent.extent
-        elif obj.dsm_extent is not None:
-            return obj.dsm_extent.extent
-        elif obj.dtm_extent is not None:
-            return obj.dsm_extent.extent
-        else:
-            return None
+        return obj.get_extent()
 
     class Meta:
         model = models.Task
@@ -161,8 +158,14 @@ class TaskViewSet(viewsets.ViewSet):
     def output(self, request, pk=None, project_pk=None):
         """
         Retrieve the console output for this task.
+
         An optional "line" query param can be passed to retrieve
         only the output starting from a certain line number.
+
+        An optional "limit" query param can be passed to limit
+        the number of lines to be returned
+
+        An optional "f" query param can be either: "text" (default), "json" or "raw"
         """
         get_and_check_project(request, project_pk)
         try:
@@ -170,8 +173,36 @@ class TaskViewSet(viewsets.ViewSet):
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
-        line_num = max(0, int(request.query_params.get('line', 0)))
-        return Response('\n'.join(task.console.output().rstrip().split('\n')[line_num:]))
+        try:
+            line_num = max(0, int(request.query_params.get('line', 0)))
+            limit = int(request.query_params.get('limit', 0)) or None
+            fmt = request.query_params.get('f', 'text')
+            if fmt not in ['text', 'json', 'raw']:
+                raise ValueError("Invalid format")
+        except ValueError:
+            raise exceptions.ValidationError("Invalid parameter")
+
+        lines = task.console.output().rstrip().split('\n')
+        count = len(lines)
+        line_start = min(line_num, count)
+        line_end = None
+
+        if limit is not None:
+            if limit > 0:
+                line_end = line_num + limit
+            else:
+                line_start = line_start if count - line_start <= abs(limit) else count - abs(limit) 
+                line_end = None 
+
+        if fmt == 'text':
+            return Response('\n'.join(lines[line_start:line_end]))
+        elif fmt == 'raw':
+            return HttpResponse('\n'.join(lines[line_start:line_end]), content_type="text/plain; charset=utf-8")
+        else:
+            return Response({
+                'lines': lines[line_start:line_end],
+                'count': count
+            })
 
     def list(self, request, project_pk=None):
         get_and_check_project(request, project_pk)
@@ -213,7 +244,7 @@ class TaskViewSet(viewsets.ViewSet):
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
-        if not task.public:
+        if not (task.public or task.project.public):
             get_and_check_project(request, task.project.id)
 
         serializer = TaskSerializer(task)
@@ -372,7 +403,7 @@ class TaskNestedView(APIView):
             raise exceptions.NotFound()
 
         # Check for permissions, unless the task is public
-        if not task.public:
+        if not (task.public or task.project.public):
             get_and_check_project(request, task.project.id)
 
         return task
@@ -486,22 +517,52 @@ class TaskThumbnail(TaskNestedView):
             if ColorInterp.alpha in ci:
                 indexes += (ci.index(ColorInterp.alpha) + 1, )
             
-            w = raster.width
-            h = raster.height
-            d = max(w, h)
-            dw = (d - w) // 2
-            dh = (d - h) // 2
-            win = rasterio.windows.Window(-dw, -dh, d, d)
+            if task.crop is not None:
+                cutline, (minx, miny, maxx, maxy) = geom_transform_wkt_bbox(task.crop, raster, 'raster')
 
-            img = raster.read(indexes=indexes, window=win, boundless=True, fill_value=0, out_shape=(
-                len(indexes),
-                thumb_size,
-                thumb_size,
-            ), resampling=rasterio.enums.Resampling.nearest).transpose((1, 2, 0))
-        
+                w = maxx - minx
+                h = maxy - miny
+                win = rasterio.windows.Window(minx, miny, w, h)
+                ratio = w / h
+                if ratio > 1:
+                    out_width = thumb_size
+                    out_height = int(thumb_size / ratio)
+                else:
+                    out_height = thumb_size
+                    out_width = int(thumb_size * ratio)
+
+
+                with WarpedVRT(raster, cutline=cutline, nodata=0) as vrt:
+                    rgb = vrt.read(indexes=indexes, window=win, fill_value=0, out_shape=(
+                        len(indexes),
+                        out_height,
+                        out_width,
+                    ), resampling=rasterio.enums.Resampling.nearest)
+                img = np.zeros((len(indexes), thumb_size, thumb_size), dtype=rgb.dtype)
+                y_offset = (thumb_size - out_height) // 2
+                x_offset = (thumb_size - out_width) // 2
+
+                # Place the output image in the center
+                img[:, y_offset:y_offset + out_height, x_offset:x_offset + out_width] = rgb
+            else:
+                w = raster.width
+                h = raster.height
+                d = max(w, h)
+                dw = (d - w) // 2
+                dh = (d - h) // 2
+                win = rasterio.windows.Window(-dw, -dh, d, d)
+
+                img = raster.read(indexes=indexes, window=win, boundless=True, fill_value=0, out_shape=(
+                    len(indexes),
+                    thumb_size,
+                    thumb_size,
+                ), resampling=rasterio.enums.Resampling.nearest)
+
+            img = img.transpose((1, 2, 0))
+
         if img.dtype != np.uint8:
             img = img.astype(np.float32)
-            
+
             # Ignore alpha values
             minval = img[:,:,:3].min()
             maxval = img[:,:,:3].max()
@@ -509,6 +570,10 @@ class TaskThumbnail(TaskNestedView):
             if minval != maxval:
                 img[:,:,:3] -= minval
                 img[:,:,:3] *= (255.0/(maxval-minval))
+
+            # Normalize alpha
+            if img.shape[2] == 4:
+                img[:,:,3] = np.where(img[:,:,3]==0, 0, 255)
             
             img = img.astype(np.uint8)
 
@@ -588,8 +653,11 @@ class TaskAssetsImport(APIView):
         if not import_url and len(files) != 1:
             raise exceptions.ValidationError(detail=_("Cannot create task, you need to upload 1 file"))
 
-        if import_url and len(files) > 0:
-            raise exceptions.ValidationError(detail=_("Cannot create task, either specify a URL or upload 1 file."))
+        if import_url:
+            if len(files) > 0:
+                raise exceptions.ValidationError(detail=_("Cannot create task, either specify a URL or upload 1 file."))
+            if re.match(r"^https?:\/\/.+$", import_url.lower()) is None:
+                raise exceptions.ValidationError(detail=_("Invalid URL. Did you mean %(hint)s ?") % { 'hint': f'http://{import_url}'})
 
         chunk_index = request.data.get('dzchunkindex')
         uuid = request.data.get('dzuuid') 

@@ -13,6 +13,7 @@
     }
 
     div.image{
+        overflow: hidden;
         a{
             cursor: zoom-in;
         }
@@ -28,11 +29,19 @@
                 top: 45%;
             }
             a{
-                cursor: zoom-out;
+                cursor: default;
             }
             img{
+                image-rendering: pixelated;
                 max-width: 100%;
                 max-height: 100%;
+                transform-origin: 0 0;
+            }
+        }
+
+        &.dragging{
+            a{
+                cursor: move;
             }
         }
     }   

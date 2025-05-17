@@ -1,0 +1,40 @@
+.crop-control:active, .crop-control:focus{
+    outline: none;
+}
+
+.crop-button-marker-layer{
+    &:hover{
+        cursor: crosshair;
+    }
+}
+
+.crop-button-accept-button{
+    &:hover{
+        cursor: pointer;
+    }
+}
+
+.crop-button i{
+    font-size: 1.3em;
+    margin-top: 7px;
+}
+
+.leaflet-interactive.crop.pulse {
+    animation: cropPulseFill 1s infinite ease-in-out;
+}
+.leaflet-interactive.crop.fade{
+    -webkit-transition-duration: 1s;
+    transition-duration: 1s;
+}
+
+@keyframes cropPulseFill {
+    0% {
+      fill-opacity: 0.2;
+    }
+    50% {
+      fill-opacity: 0.4;
+    }
+    100% {
+      fill-opacity: 0.2;
+    }
+}

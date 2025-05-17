@@ -59,6 +59,14 @@ export default {
         return (url.indexOf("?") !== -1 ? url.slice(0, url.indexOf("?")) : url) + this.toSearchQuery(params);
     },
 
+    buildUrlReplaceParams: function(url, params){
+      let q = this.queryParams({search: url});
+      for (let k in params){
+        q[k] = params[k];
+      }
+      return this.buildUrlWithQuery(url, q);
+    },
+
     clone: function(obj){
       return JSON.parse(JSON.stringify(obj));
     },
@@ -93,6 +101,15 @@ export default {
     saveAs: function(text, filename){
       var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
       FileSaver.saveAs(blob, filename);
+    },
+
+    downloadAs: function(url, filename){
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     },
 
     // http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript

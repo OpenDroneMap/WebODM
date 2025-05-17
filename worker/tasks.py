@@ -62,11 +62,24 @@ def update_nodes_info():
 def cleanup_projects():
     # Delete all projects that are marked for deletion
     # and that have no tasks left
-    total, count_dict = Project.objects.filter(deleting=True).annotate(
+    deletion_projects = Project.objects.filter(deleting=True).annotate(
         tasks_count=Count('task')
-    ).filter(tasks_count=0).delete()
-    if total > 0 and 'app.Project' in count_dict:
-        logger.info("Deleted {} projects".format(count_dict['app.Project']))
+    ).filter(tasks_count=0)
+    for p in deletion_projects:
+        p.delete()     
+
+    # Delete projects that have no tasks and are owned by users with
+    # no disk quota
+    if settings.CLEANUP_EMPTY_PROJECTS is not None:
+        empty_projects = Project.objects.filter(
+            owner__profile__quota=0,
+            created_at__lte=timezone.now() - timedelta(hours=settings.CLEANUP_EMPTY_PROJECTS)
+        ).annotate(
+            tasks_count=Count('task')
+        ).filter(tasks_count=0)
+        for p in empty_projects:
+            p.delete()
+
 
 @app.task(ignore_result=True)
 def cleanup_tasks():

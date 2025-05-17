@@ -46,6 +46,9 @@ class Console:
             try:
                 if not os.path.isdir(self.base_dir):
                     os.makedirs(self.base_dir, exist_ok=True)
+
+                if os.path.isfile(self.file):
+                    os.unlink(self.file)
                 
                 with open(self.file, "w", encoding="utf-8") as f:
                     f.write(text)
@@ -62,3 +65,15 @@ class Console:
                     f.write(text)
         except OSError:
             logger.warn("Cannot delink console file: %s" % self.file)
+    
+    def link(self, src_file):
+        try:
+            if not os.path.isfile(src_file):
+                raise OSError("Source file does not exist")
+            
+            if os.path.isfile(self.file):
+                os.unlink(self.file)
+            
+            os.link(src_file, self.file)
+        except OSError:
+            logger.warn("Cannot link console file: %s --> %s" % (src_file, self.file))

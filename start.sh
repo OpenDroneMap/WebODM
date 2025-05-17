@@ -144,10 +144,17 @@ else
         conf="nginx-ssl.conf"
     fi
 
+    # Only set if `WEB_CONCURRENCY` is not defined, allows overriding.
+    # See: https://docs.gunicorn.org/en/latest/settings.html#workers
+    if [ -z "$WEB_CONCURRENCY" ]; then
+        export WEB_CONCURRENCY=$((2*$(nproc)+1))
+    fi
+    echo "Web concurrency set to $WEB_CONCURRENCY"
+
     congrats
 
     nginx -c $(pwd)/nginx/$conf
-    gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 300000 --max-requests 500 --workers $((2*$(grep -c '^processor' /proc/cpuinfo)+1)) --preload
+    gunicorn webodm.wsgi --bind unix:/tmp/gunicorn.sock --timeout 300000 --max-requests 500 --workers $WEB_CONCURRENCY --preload
 fi
 
 # If this is executed, it means the previous command failed, don't display the congratulations message

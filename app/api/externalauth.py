@@ -3,7 +3,7 @@ from django.contrib.auth import login
 from rest_framework.views import APIView
 from rest_framework import exceptions, permissions, parsers
 from rest_framework.response import Response
-from app.auth.backends import get_user_from_external_auth_response
+from app.auth.backends import get_user_from_external_auth_response, cluster_mismatch
 import requests
 from webodm import settings
 
@@ -30,6 +30,8 @@ class ExternalTokenAuth(APIView):
                 if user is not None:
                     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                     return Response({'redirect': '/'})
+                elif cluster_mismatch(res) and settings.CLUSTER_URL != '':
+                    return Response({'redirect': settings.CLUSTER_URL % res['cluster_id']})
                 else:
                     return Response({'error': 'Invalid credentials'})
             else:
