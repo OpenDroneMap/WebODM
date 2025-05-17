@@ -1,5 +1,6 @@
 import requests
 
+from pyodm.exceptions import NodeServerError
 from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
