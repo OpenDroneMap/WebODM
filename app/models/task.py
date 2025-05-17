@@ -17,7 +17,6 @@ import requests
 from PIL import Image
 from zipstream.ng import ZipStream
 
-Image.MAX_IMAGE_PIXELS = 4096000000
 from functools import partial
 
 from django.contrib.gis.db.models.fields import GeometryField
@@ -52,6 +51,7 @@ from webodm import settings
 
 from .project import Project
 
+Image.MAX_IMAGE_PIXELS = 4096000000
 logger = logging.getLogger('app.logger')
 
 class TaskInterruptedException(Exception):
