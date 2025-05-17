@@ -18,7 +18,7 @@ def extract_plugin_manifest_strings(plugins_dir, output):
     print("Found %s manifest strings" % len(strings))
     if len(strings) > 0:
         with open(output, "w") as f:
-            f.write("// Auto-generated with extract_plugin_manifest_strings.py, do not edit!\n\n")
+            f.write("# Auto-generated with extract_plugin_manifest_strings.py, do not edit!\n\n")
             f.write("from django.utils.translation import gettext as _\n")
             
             for s in strings:
