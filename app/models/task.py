@@ -1,54 +1,56 @@
+import errno
+import json
 import logging
 import os
-import shutil
-import time
-import struct
-from datetime import datetime
-import uuid as uuid_module
-from zipstream.ng import ZipStream
-
-import json
-
-import errno
-import piexif
 import re
-
+import shutil
+import struct
+import time
+import uuid as uuid_module
 import zipfile
-import rasterio
+from datetime import datetime
 from shutil import copyfile
+
+import piexif
+import rasterio
 import requests
 from PIL import Image
+from zipstream.ng import ZipStream
+
 Image.MAX_IMAGE_PIXELS = 4096000000
-from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.gdal import OGRGeometry
+from functools import partial
+
+from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.gdal import GDALRaster, OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields
+from django.core.exceptions import SuspiciousFileOperation, ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.exceptions import ValidationError, SuspiciousFileOperation
-from django.db import models
-from django.db import transaction
-from django.db import connection
+from django.db import connection, models, transaction
 from django.utils import timezone
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from pyodm.exceptions import (
+    NodeConnectionError,
+    NodeResponseError,
+    NodeServerError,
+    OdmError,
+)
 from urllib3.exceptions import ReadTimeoutError
 
 from app import pending_actions
-from django.contrib.gis.db.models.fields import GeometryField
-
+from app.classes.console import Console
+from app.classes.gcp import GCPFile
 from app.cogeo import assure_cogeo
-from app.pointcloud_utils import is_pointcloud_georeferenced
-from app.testwatch import testWatch
-from app.security import path_traversal_check
 from app.geoutils import geom_transform
+from app.pointcloud_utils import is_pointcloud_georeferenced
+from app.security import path_traversal_check
+from app.testwatch import testWatch
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
-from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
 from webodm import settings
-from app.classes.gcp import GCPFile
-from .project import Project
-from django.utils.translation import gettext_lazy as _, gettext
 
-from functools import partial
-from app.classes.console import Console
+from .project import Project
 
 logger = logging.getLogger('app.logger')
 

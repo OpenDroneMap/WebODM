@@ -7,25 +7,21 @@ and places them in <root>/build/tests/mocks
 It will only run when called explicitly via:
     python manage.py test app.tests.test_generate_ui_mocks
 """
+import logging
 import os
 import sys
-
 from shutil import rmtree
-
-import logging
 
 from django.contrib.auth.models import User
 from rest_framework.renderers import JSONRenderer
 
+from app.api.presets import PresetSerializer
 from app.api.projects import ProjectSerializer
 from app.api.tasks import TaskSerializer
-from app.models import Project
-from app.models import Task
+from app.models import Preset, Project, Task
 from webodm import settings
-from .classes import BootTestCase
-from app.models import Preset
-from app.api.presets import PresetSerializer
 
+from .classes import BootTestCase
 
 logger = logging.getLogger('app.logger')
 BUILD_MOCKS_PATH = os.path.join(settings.BASE_DIR, "build", "mocks")

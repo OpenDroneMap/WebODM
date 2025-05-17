@@ -1,10 +1,10 @@
-from django.contrib.auth.decorators import login_required, permission_required
 from django import forms
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
-
-from app.plugins import PluginBase, Menu, MountPoint
 from django.utils.translation import gettext as _
+
+from app.plugins import Menu, MountPoint, PluginBase
 
 
 class ConfigurationForm(forms.Form):

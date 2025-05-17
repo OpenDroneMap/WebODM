@@ -1,6 +1,8 @@
-from django.core.exceptions import SuspiciousFileOperation
-from shlex import _find_unsafe
 import os
+from shlex import _find_unsafe
+
+from django.core.exceptions import SuspiciousFileOperation
+
 
 def path_traversal_check(unsafe_path, known_safe_path):
     known_safe_path = os.path.abspath(known_safe_path)

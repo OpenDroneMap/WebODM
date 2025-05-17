@@ -1,14 +1,14 @@
 import json
-from django.http import Http404
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from app.api.tasks import TaskSerializer
-from app.models import Task, Project
+from app.models import Project, Task
 from app.views.utils import get_permissions
-from django.views.decorators.csrf import ensure_csrf_cookie
 from webodm import settings
+
 
 def get_public_task(task_pk):
     """

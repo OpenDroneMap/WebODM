@@ -1,24 +1,25 @@
-from app.plugins import PluginBase, Menu, MountPoint
+from django import forms
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+from app.plugins import Menu, MountPoint, PluginBase
 from coreplugins.dronedb.app_views import LoadButtonsView
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL
 
 from .api_views import (
-    CheckUrlTaskView, 
-    FoldersTaskView, 
-    ImportDatasetTaskView, 
-    CheckCredentialsTaskView, 
-    OrganizationsTaskView, 
-    DatasetsTaskView, 
-    StatusTaskView, 
-    VerifyUrlTaskView, 
+    CheckCredentialsTaskView,
+    CheckUrlTaskView,
+    DatasetsTaskView,
+    FoldersTaskView,
+    ImportDatasetTaskView,
     InfoTaskView,
-    ShareTaskView
+    OrganizationsTaskView,
+    ShareTaskView,
+    StatusTaskView,
+    VerifyUrlTaskView,
 )
 
-from django.contrib import messages
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django import forms
 
 class SettingsForm(forms.Form):
     username = forms.CharField(label='Username', required=False, max_length=1024, widget=forms.TextInput(attrs={'placeholder': 'Username'}))

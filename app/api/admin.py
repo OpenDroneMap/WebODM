@@ -1,11 +1,13 @@
-from django.contrib.auth.models import User, Group
-from app.models import Profile
-from rest_framework import serializers, viewsets, status, exceptions
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Group, User
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import exceptions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.hashers import make_password
+
+from app.models import Profile
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

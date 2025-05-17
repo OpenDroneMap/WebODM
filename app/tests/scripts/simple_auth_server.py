@@ -1,9 +1,10 @@
-from http.server import SimpleHTTPRequestHandler
+import json
 import socketserver
 import sys
 import threading
+from http.server import SimpleHTTPRequestHandler
 from time import sleep
-import json
+
 
 class MyHandler(SimpleHTTPRequestHandler):
     def do_GET(self):

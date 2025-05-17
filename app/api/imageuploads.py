@@ -1,14 +1,15 @@
-import os
 import io
 import math
+import os
 
-from .tasks import TaskNestedView
-from rest_framework import exceptions
-from PIL import Image, ImageDraw, ImageOps
-from django.http import HttpResponse
-from .tasks import download_file_response
-from .common import hex2rgb
 import numpy as np
+from django.http import HttpResponse
+from PIL import Image, ImageDraw, ImageOps
+from rest_framework import exceptions
+
+from .common import hex2rgb
+from .tasks import TaskNestedView, download_file_response
+
 
 def normalize(img):
     """

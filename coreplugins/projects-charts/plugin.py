@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.utils.translation import gettext as _
 
 from app.models import Project, Task
-from app.plugins import PluginBase, Menu, MountPoint
+from app.plugins import Menu, MountPoint, PluginBase
 
 
 def get_first_year():

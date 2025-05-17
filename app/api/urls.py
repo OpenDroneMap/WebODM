@@ -1,20 +1,28 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
+from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_nested import routers
 
 from app.api.presets import PresetViewSet
 from app.plugins.views import api_view_handler
-from .projects import ProjectViewSet
-from .tasks import TaskViewSet, TaskDownloads, TaskThumbnail, TaskAssets, TaskBackup, TaskAssetsImport
-from .imageuploads import Thumbnail, ImageDownload
-from .processingnodes import ProcessingNodeViewSet, ProcessingNodeOptionsView
-from .admin import AdminUserViewSet, AdminGroupViewSet, AdminProfileViewSet
-from rest_framework_nested import routers
-from rest_framework_jwt.views import obtain_jwt_token
-from .tiler import TileJson, Bounds, Metadata, Tiles, Export
-from .potree import Scene, CameraView
-from .workers import CheckTask, GetTaskResult
-from .users import UsersList
-from .externalauth import ExternalTokenAuth
 from webodm import settings
+
+from .admin import AdminGroupViewSet, AdminProfileViewSet, AdminUserViewSet
+from .externalauth import ExternalTokenAuth
+from .imageuploads import ImageDownload, Thumbnail
+from .potree import CameraView, Scene
+from .processingnodes import ProcessingNodeOptionsView, ProcessingNodeViewSet
+from .projects import ProjectViewSet
+from .tasks import (
+    TaskAssets,
+    TaskAssetsImport,
+    TaskBackup,
+    TaskDownloads,
+    TaskThumbnail,
+    TaskViewSet,
+)
+from .tiler import Bounds, Export, Metadata, TileJson, Tiles
+from .users import UsersList
+from .workers import CheckTask, GetTaskResult
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet)

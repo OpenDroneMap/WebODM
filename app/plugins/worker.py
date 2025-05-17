@@ -1,4 +1,5 @@
 import inspect
+
 from worker.celery import app
 
 task = app.task

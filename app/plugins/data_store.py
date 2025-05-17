@@ -1,7 +1,9 @@
-from abc import ABC
-from django.core.exceptions import MultipleObjectsReturned, ValidationError
-from app.models import PluginDatum
 import logging
+from abc import ABC
+
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
+
+from app.models import PluginDatum
 
 logger = logging.getLogger('app.logger')
 

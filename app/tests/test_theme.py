@@ -1,8 +1,10 @@
 
 from django.test import Client
 
-from .classes import BootTestCase
 from app.contexts.settings import load as load_settings
+
+from .classes import BootTestCase
+
 
 class TestSettings(BootTestCase):
 

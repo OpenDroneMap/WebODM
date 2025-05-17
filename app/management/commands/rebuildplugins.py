@@ -1,8 +1,11 @@
+import glob
 import os
 import shutil
-import glob
+
 from django.core.management.base import BaseCommand
+
 from app.plugins import build_plugins
+
 
 def cleanup():
     # Delete all node_modules and build directories within plugins' public/ folders

@@ -1,8 +1,10 @@
 import json
 import math
+
 from django.core.management.base import BaseCommand
-from webodm import settings
 from django.db import connection
+
+from webodm import settings
 
 
 class Command(BaseCommand):

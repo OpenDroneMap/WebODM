@@ -1,23 +1,22 @@
+# noinspection PyUnresolvedReferencesapp/boot.py#L20
+import logging
 import os
 
 import kombu
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.files import File
 from django.db.utils import ProgrammingError
 from guardian.shortcuts import assign_perm
 
-from worker import tasks as worker_tasks
-from app.models import Preset
-from app.models import Theme
+from app.models import Preset, Theme
 from app.plugins import init_plugins
 from nodeodm.models import ProcessingNode
-# noinspection PyUnresolvedReferencesapp/boot.py#L20
-import logging
-from .models import Setting
 from webodm import settings
 from webodm.wsgi import booted
+from worker import tasks as worker_tasks
+
+from .models import Setting
 
 
 def boot():

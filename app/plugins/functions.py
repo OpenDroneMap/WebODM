@@ -1,22 +1,19 @@
-import os
-import sys
-import logging
 import importlib
-import subprocess
-import traceback
-import platform
-
 import json
-
+import logging
+import os
+import platform
 import shutil
+import subprocess
+import sys
+import traceback
 from functools import reduce
 from string import Template
 
+from django.conf import settings
 from django.http import HttpResponse
 
-from app.models import Plugin
-from app.models import Setting
-from django.conf import settings
+from app.models import Plugin, Setting
 from app.security import path_traversal_check
 
 logger = logging.getLogger('app.logger')

@@ -1,13 +1,14 @@
 import os
+from urllib.parse import urlparse
+
+from django.conf.urls import url
+from django.http import Http404
+from django.views.static import serve
 
 from app.api.workers import CheckTask as CheckTask
 from app.api.workers import GetTaskResult as GetTaskResult
 
-from django.http import Http404
-from .functions import get_plugin_by_name, get_active_plugins
-from django.conf.urls import url
-from django.views.static import serve
-from urllib.parse import urlparse
+from .functions import get_active_plugins, get_plugin_by_name
 
 
 def try_resolve_url(request, url):

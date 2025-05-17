@@ -1,5 +1,7 @@
-from django.core.management.base import BaseCommand
 import socket
+
+from django.core.management.base import BaseCommand
+
 
 class Command(BaseCommand):
     requires_system_checks = []

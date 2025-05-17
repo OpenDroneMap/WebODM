@@ -1,5 +1,6 @@
 import re
 
+
 class MountPoint:
     def __init__(self, url, view, *args, **kwargs):
         """

@@ -1,18 +1,24 @@
 import json
 
+from django.contrib.auth.decorators import login_required
 from django.dispatch import receiver
 from django.http import HttpResponse
-from guardian.shortcuts import get_objects_for_user, assign_perm
-from django.utils.translation import gettext as _
-
-from app.plugins import GlobalDataStore, logger
-from app.plugins import PluginBase, Menu, MountPoint, UserDataStore, signals
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
+from guardian.shortcuts import assign_perm, get_objects_for_user
 
-from nodeodm.models import ProcessingNode
 from app.api.processingnodes import ProcessingNodeSerializer
+from app.plugins import (
+    GlobalDataStore,
+    Menu,
+    MountPoint,
+    PluginBase,
+    UserDataStore,
+    logger,
+    signals,
+)
+from nodeodm.models import ProcessingNode
 
 ds = GlobalDataStore('lightning')
 

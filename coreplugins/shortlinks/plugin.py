@@ -1,5 +1,7 @@
-from app.plugins import PluginBase, MountPoint
+from app.plugins import MountPoint, PluginBase
+
 from .api import GetShortLink, HandleShortLink
+
 
 class Plugin(PluginBase):
     def build_jsx_components(self):

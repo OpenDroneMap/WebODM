@@ -1,5 +1,7 @@
 import math
+
 from .common import hex2rgb
+
 
 def discrete_cmap_from_hex(hex_colors):
     rgb_colors = [hex2rgb(h, with_alpha=True) for h in hex_colors]

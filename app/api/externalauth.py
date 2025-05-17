@@ -1,10 +1,12 @@
-from django.contrib.auth import login
-from rest_framework.views import APIView
-from rest_framework import permissions, parsers
-from rest_framework.response import Response
-from app.auth.backends import get_user_from_external_auth_response, cluster_mismatch
 import requests
+from django.contrib.auth import login
+from rest_framework import parsers, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from app.auth.backends import cluster_mismatch, get_user_from_external_auth_response
 from webodm import settings
+
 
 class ExternalTokenAuth(APIView):
     permission_classes = (permissions.AllowAny,)

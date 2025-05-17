@@ -1,11 +1,14 @@
 import logging
-from django.dispatch import receiver
+
 from django.conf import settings
-from app.plugins.signals import task_completed, task_failed, task_removed
-from app.plugins.functions import get_current_plugin
-from . import email as notification
-from . import config
+from django.dispatch import receiver
+
 from app.models import Task
+from app.plugins.functions import get_current_plugin
+from app.plugins.signals import task_completed, task_failed, task_removed
+
+from . import config
+from . import email as notification
 
 logger = logging.getLogger('app.logger')
 

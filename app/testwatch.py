@@ -1,6 +1,6 @@
+import logging
 import time
 
-import logging
 from webodm import settings
 
 logger = logging.getLogger('app.logger')

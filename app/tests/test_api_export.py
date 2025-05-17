@@ -1,20 +1,20 @@
-import time
-import logging
 import json
+import logging
+import time
 
 from django.contrib.auth.models import User
+from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APIClient
-from app.tests.classes import BootTransactionTestCase
-from app.models import Project, Task
-from nodeodm.models import ProcessingNode
-from guardian.shortcuts import assign_perm
-from nodeodm import status_codes
 
 import worker
+from app.models import Project, Task
+from app.tests.classes import BootTransactionTestCase
+from nodeodm import status_codes
+from nodeodm.models import ProcessingNode
 from worker.tasks import TestSafeAsyncResult
 
-from .utils import start_processing_node, clear_test_media_root
+from .utils import clear_test_media_root, start_processing_node
 
 # We need to test in a TransactionTestCase because
 # task processing happens on a separate thread, and normal TestCases

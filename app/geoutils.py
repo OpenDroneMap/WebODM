@@ -1,5 +1,5 @@
-import rasterio.warp
 import numpy as np
+import rasterio.warp
 from rasterio.crs import CRS
 
 # GEOS has some weird bug where

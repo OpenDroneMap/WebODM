@@ -1,13 +1,16 @@
-from app.plugins import PluginBase, Menu, MountPoint
-from app.models import Setting
-from django.utils.translation import gettext as _
-from django.shortcuts import render
+from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError
+
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django import forms
-from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError
-from . import email
-from . import config
+from django.shortcuts import render
+from django.utils.translation import gettext as _
+
+from app.models import Setting
+from app.plugins import Menu, MountPoint, PluginBase
+
+from . import config, email
+
 
 class ConfigurationForm(forms.Form):
     notification_app_name = forms.CharField(

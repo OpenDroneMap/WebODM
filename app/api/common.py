@@ -1,8 +1,10 @@
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import exceptions
 import re
 
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import exceptions
+
 from app import models
+
 
 def get_and_check_project(request, project_pk, perms=('view_project',)):
     """

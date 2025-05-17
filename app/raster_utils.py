@@ -1,22 +1,26 @@
-import rasterio
-import re
 import logging
 import os
+import re
 import subprocess
-import numpy as np
+
 import numexpr as ne
+import numpy as np
+import rasterio
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
 from rasterio.vrt import WarpedVRT
-from rasterio.windows import Window, bounds as window_bounds
-from rio_tiler.utils import has_alpha_band, linear_rescale
-from rio_tiler.colormap import cmap as colormap, apply_cmap
+from rasterio.warp import Resampling, calculate_default_transform, reproject
+from rasterio.windows import Window
+from rasterio.windows import bounds as window_bounds
+from rio_tiler.colormap import apply_cmap
+from rio_tiler.colormap import cmap as colormap
 from rio_tiler.errors import InvalidColorMapName
-from app.api.hsvblend import hsv_blend
-from app.api.hillshade import LightSource
-from app.geoutils import geom_transform_wkt_bbox
 from rio_tiler.io import COGReader
-from rasterio.warp import calculate_default_transform, reproject, Resampling
+from rio_tiler.utils import has_alpha_band, linear_rescale
+
+from app.api.hillshade import LightSource
+from app.api.hsvblend import hsv_blend
+from app.geoutils import geom_transform_wkt_bbox
 
 logger = logging.getLogger('app.logger')
 

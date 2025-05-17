@@ -1,20 +1,22 @@
 import re
-from guardian.shortcuts import get_perms, get_users_with_perms, assign_perm, remove_perm
-from rest_framework import serializers, viewsets
+
+from django.contrib.auth.models import User
+from django.contrib.postgres.aggregates import StringAgg
+from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.db import transaction
+from django.utils.translation import gettext as _
+from django_filters import rest_framework as filters
+from guardian.shortcuts import assign_perm, get_perms, get_users_with_perms, remove_perm
+from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import status
-from django_filters import rest_framework as filters
-from django.db import transaction
-from django.contrib.auth.models import User
-from django.contrib.postgres.search import SearchQuery, SearchVector
-from django.contrib.postgres.aggregates import StringAgg
 
 from app import models
-from .tasks import TaskIDsSerializer
-from .tags import TagsField, parse_tags_input
+
 from .common import get_and_check_project
-from django.utils.translation import gettext as _
+from .tags import TagsField, parse_tags_input
+from .tasks import TaskIDsSerializer
+
 
 def normalized_perm_names(perms):
     return list(map(lambda p: p.replace("_project", ""),perms))

@@ -1,7 +1,10 @@
 import os
+
 from django.core.management.base import BaseCommand
+
 from app.models import Project
 from webodm import settings
+
 
 class Command(BaseCommand):
     requires_system_checks = []

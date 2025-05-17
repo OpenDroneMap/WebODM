@@ -1,22 +1,19 @@
 import logging
-import uuid
-import shutil
 import os
+import shutil
+import uuid
 
 from django.conf import settings
-from django.db import models
-from django.db.models import Q
-from django.db.models import signals
+from django.db import models, transaction
+from django.db.models import Q, signals
 from django.dispatch import receiver
 from django.utils import timezone
-from guardian.models import GroupObjectPermissionBase
-from guardian.models import UserObjectPermissionBase
-from guardian.shortcuts import get_perms_for_model, assign_perm
-from django.utils.translation import gettext_lazy as _, gettext
-from django.db import transaction
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from guardian.models import GroupObjectPermissionBase, UserObjectPermissionBase
+from guardian.shortcuts import assign_perm, get_perms_for_model
 
 from app import pending_actions
-
 from nodeodm import status_codes
 from webodm import settings as wo_settings
 

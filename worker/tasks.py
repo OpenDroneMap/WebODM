@@ -1,30 +1,29 @@
+import json
 import os
 import shutil
-import tempfile
-import traceback
-import json
 import socket
-
+import tempfile
 import time
+import traceback
+from datetime import timedelta
 from threading import Event, Thread
+
+import redis
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count
-from django.db.models import Q
-from app.models import Profile
+from django.db.models import Count, Q
+from django.utils import timezone
 
-from app.models import Project
-from app.models import Task
+import worker
+from app.models import Profile, Project, Task
+from app.pointcloud_utils import export_pointcloud as export_pointcloud_sync
+from app.raster_utils import export_raster as export_raster_sync
+from app.raster_utils import extension_for_export_format
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
-import worker
+
 from .celery import app
-from app.raster_utils import export_raster as export_raster_sync, extension_for_export_format
-from app.pointcloud_utils import export_pointcloud as export_pointcloud_sync
-from django.utils import timezone
-from datetime import timedelta
-import redis
 
 logger = get_task_logger("app.logger")
 redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)

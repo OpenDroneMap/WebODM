@@ -1,7 +1,9 @@
 from django.contrib.gis.geos import GEOSGeometry
 
+from app.models import Project, Task
+
 from .classes import BootTestCase
-from app.models import Task, Project
+
 
 class TestApi(BootTestCase):
     def setUp(self):

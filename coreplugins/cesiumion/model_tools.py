@@ -1,8 +1,8 @@
-from os import path, mkdir, walk, remove as removeFile
-from zipfile import ZipFile, ZIP_DEFLATED
+from os import mkdir, path, walk
+from os import remove as removeFile
 from shutil import rmtree
 from tempfile import mkdtemp
-
+from zipfile import ZIP_DEFLATED, ZipFile
 
 DELETE_EXTENSIONS = (".conf", ".vec", ".spt")
 OBJ_FILE_EXTENSION = ".obj"

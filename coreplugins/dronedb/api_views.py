@@ -1,24 +1,22 @@
-from genericpath import isfile
-from posixpath import join
-import time
-import requests
 import os
+import time
+from genericpath import isfile
 from os import listdir, path
+from posixpath import join
 
+import requests
+from django.dispatch import receiver
 from pyodm.exceptions import NodeServerError
+from rest_framework import status
+from rest_framework.response import Response
+
 from app import models, pending_actions
-from app.security import path_traversal_check
-from app.plugins.views import TaskView
-from app.plugins.worker import run_function_async, task
 from app.plugins import get_current_plugin
 from app.plugins import signals as plugin_signals
-
+from app.plugins.views import TaskView
+from app.plugins.worker import run_function_async, task
+from app.security import path_traversal_check
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL, DroneDB, parse_url, verify_url
-
-from django.dispatch import receiver
-
-from rest_framework.response import Response
-from rest_framework import status
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 

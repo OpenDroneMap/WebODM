@@ -1,11 +1,11 @@
-from .project import Project
-from .task import Task, validate_task_options, gcp_directory_path
-from .preset import Preset
-from .theme import Theme
-from .setting import Setting
-from .plugin_datum import PluginDatum
 from .plugin import Plugin
+from .plugin_datum import PluginDatum
+from .preset import Preset
 from .profile import Profile
+from .project import Project
+from .setting import Setting
+from .task import Task, gcp_directory_path, validate_task_options
+from .theme import Theme
 
 __all__ = [
     'Project',

@@ -1,6 +1,8 @@
-import requests
-from app.plugins import logger
 from urllib.parse import urlparse
+
+import requests
+
+from app.plugins import logger
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 DEFAULT_HUB_URL = 'https://hub.dronedb.app'

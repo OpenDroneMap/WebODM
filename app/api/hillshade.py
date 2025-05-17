@@ -6,6 +6,7 @@
 
 import numpy as np
 
+
 def _vector_magnitude(arr):
     # things that don't work here:
     #  * np.linalg.norm

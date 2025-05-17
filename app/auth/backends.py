@@ -1,10 +1,12 @@
+import logging
+
 import requests
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
+from guardian.shortcuts import assign_perm
+
 from nodeodm.models import ProcessingNode
 from webodm import settings
-from guardian.shortcuts import assign_perm
-import logging
 
 logger = logging.getLogger('app.logger')
 

@@ -11,46 +11,48 @@ def upload_to_ion(
     attribution="",
     options={},
 ):
+    import logging
     import sys
     import time
-    import logging
-    import requests
     from os import path, remove
     from shutil import rmtree
+
+    import requests
+
     from app.plugins import logger
     
     try:
         # Import from coreplugins if using Docker
         from coreplugins.cesiumion.api_views import (
-            get_asset_info,
-            set_asset_info,
-            AssetType,
+            ASSET_TO_FILE,
             ASSET_TO_OUTPUT,
             ASSET_TO_SOURCE,
-            ASSET_TO_FILE,
+            AssetType,
+            get_asset_info,
             pluck,
-            )
-        from coreplugins.cesiumion.model_tools import (
-            to_ion_texture_model, 
-            IonInvalidZip,
-            )
+            set_asset_info,
+        )
         from coreplugins.cesiumion.globals import ION_API_URL
+        from coreplugins.cesiumion.model_tools import (
+            IonInvalidZip,
+            to_ion_texture_model,
+        )
     except ImportError:
         # Import from plugins if imported as a plugin on exe application
         from plugins.cesiumion.api_views import (
-        get_asset_info,
-        set_asset_info,
-        AssetType,
-        ASSET_TO_OUTPUT,
-        ASSET_TO_SOURCE,
-        ASSET_TO_FILE,
-        pluck,
+            ASSET_TO_FILE,
+            ASSET_TO_OUTPUT,
+            ASSET_TO_SOURCE,
+            AssetType,
+            get_asset_info,
+            pluck,
+            set_asset_info,
         )
-        from plugins.cesiumion.model_tools import (
-            to_ion_texture_model, 
-            IonInvalidZip,
-            )
         from plugins.cesiumion.globals import ION_API_URL
+        from plugins.cesiumion.model_tools import (
+            IonInvalidZip,
+            to_ion_texture_model,
+        )
     
     class LoggerAdapter(logging.LoggerAdapter):
         def __init__(self, prefix, logger):

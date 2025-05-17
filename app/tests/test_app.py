@@ -1,15 +1,15 @@
-from django.contrib.auth.models import User, Group
-from django.test import Client
-from rest_framework import status
-from guardian.shortcuts import assign_perm
-from nodeodm.models import ProcessingNode
-
-from app.models import Project, Task
-from app.models import Setting
-from app.models import Theme
-from webodm import settings
-from .classes import BootTestCase
+from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
+from django.test import Client
+from guardian.shortcuts import assign_perm
+from rest_framework import status
+
+from app.models import Project, Setting, Task, Theme
+from nodeodm.models import ProcessingNode
+from webodm import settings
+
+from .classes import BootTestCase
+
 
 class TestApp(BootTestCase):
     fixtures = ['test_processingnodes', ]

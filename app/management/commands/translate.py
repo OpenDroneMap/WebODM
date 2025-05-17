@@ -1,6 +1,7 @@
 import os
-from django.core.management.base import BaseCommand
+
 from django.core.management import call_command
+from django.core.management.base import BaseCommand
 
 from app.scripts.extract_odm_strings import extract_odm_strings
 from app.scripts.extract_plugin_manifest_strings import extract_plugin_manifest_strings

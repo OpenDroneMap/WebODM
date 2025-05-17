@@ -1,10 +1,12 @@
 import datetime
-import math
 import logging
+import math
 import time
+
 from django import template
-from webodm import settings
 from django.utils.translation import gettext as _
+
+from webodm import settings
 
 register = template.Library()
 logger = logging.getLogger('app.logger')

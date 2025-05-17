@@ -1,10 +1,9 @@
+import errno
 import tempfile
 
-import errno
+from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.core.files.uploadhandler import FileUploadHandler
-
-from django.conf import settings
 
 """
 Same as Django's TemporaryFileUploadHandler, but closes the file

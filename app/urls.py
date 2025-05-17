@@ -1,12 +1,14 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.views.i18n import JavaScriptCatalog
 
-from .views import app as app_views, public as public_views, dev as dev_views
-from .plugins.views import app_view_handler, root_url_patterns
-
 from app.boot import boot
-from webodm import settings
 from app.plugins import sync_plugin_db
+from webodm import settings
+
+from .plugins.views import app_view_handler, root_url_patterns
+from .views import app as app_views
+from .views import dev as dev_views
+from .views import public as public_views
 
 # Test cases call boot() independently
 # Also don't execute boot with celery workers

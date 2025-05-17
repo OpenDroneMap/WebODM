@@ -1,6 +1,15 @@
 import re
+
 from django.test import TestCase
-from app.api.formulas import lookup_formula, get_algorithm_list, get_camera_filters_for, algos, get_auto_bands
+
+from app.api.formulas import (
+    algos,
+    get_algorithm_list,
+    get_auto_bands,
+    get_camera_filters_for,
+    lookup_formula,
+)
+
 
 class TestFormulas(TestCase):
     def setUp(self):

@@ -1,10 +1,12 @@
 from django.contrib.auth.models import User
-from nodeodm.models import ProcessingNode
 from rest_framework.test import APIClient
+
+from nodeodm.models import ProcessingNode
+from webodm import settings
 
 from .classes import BootTestCase
 from .utils import start_simple_auth_server
-from webodm import settings
+
 
 class TestAuth(BootTestCase):
     def setUp(self):

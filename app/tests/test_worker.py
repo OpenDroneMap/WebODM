@@ -1,18 +1,19 @@
+import json
 import os
 from stat import ST_ATIME, ST_MTIME
 
-import json
+from rest_framework import status
+from rest_framework.test import APIClient
 
 import worker
-from app.models import Project
-from app.models import Task
+from app.models import Project, Task
 from nodeodm.models import ProcessingNode
 from webodm import settings
+from worker.tasks import redis_client
+
 from .classes import BootTestCase
 from .utils import start_processing_node
-from worker.tasks import redis_client
-from rest_framework.test import APIClient
-from rest_framework import status
+
 
 class TestWorker(BootTestCase):
     def setUp(self):

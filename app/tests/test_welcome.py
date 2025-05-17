@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import Client
 
 from app.models import Project
+
 from .classes import BootTestCase
 
 

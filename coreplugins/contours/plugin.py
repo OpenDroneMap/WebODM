@@ -1,7 +1,6 @@
-from app.plugins import PluginBase
-from app.plugins import MountPoint
-from .api import TaskContoursGenerate
-from .api import TaskContoursDownload
+from app.plugins import MountPoint, PluginBase
+
+from .api import TaskContoursDownload, TaskContoursGenerate
 
 
 class Plugin(PluginBase):

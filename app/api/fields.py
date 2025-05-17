@@ -5,6 +5,7 @@ from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.core.exceptions import ValidationError
 from rest_framework.fields import Field
 
+
 class PolygonGeometryField(Field):
     """
     Handle GeoDjango Polygon Geometry fields

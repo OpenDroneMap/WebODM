@@ -1,11 +1,15 @@
-from django.contrib.auth.models import User
-from rest_framework.test import APIClient
-from app.models import Task, Project
-from django.utils import timezone
 from datetime import timedelta
-from worker.tasks import cleanup_tasks, cleanup_projects
-from .classes import BootTestCase
+
+from django.contrib.auth.models import User
+from django.utils import timezone
+from rest_framework.test import APIClient
+
+from app.models import Project, Task
 from webodm import settings
+from worker.tasks import cleanup_projects, cleanup_tasks
+
+from .classes import BootTestCase
+
 
 class TestCleanup(BootTestCase):
     def setUp(self):

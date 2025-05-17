@@ -1,16 +1,18 @@
 import json
 
+
 def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decimals=4,
                 base_method="triangulate", custom_base_z=None):
     try:
         import os
+        import warnings
+
+        import numpy as np
         import rasterio
         import rasterio.mask
         from osgeo import osr
-        from scipy.optimize import curve_fit
         from scipy.interpolate import griddata
-        import numpy as np
-        import warnings
+        from scipy.optimize import curve_fit
 
         osr.UseExceptions()
         warnings.filterwarnings("ignore", module='scipy.optimize')
