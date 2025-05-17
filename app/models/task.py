@@ -987,7 +987,7 @@ class Task(models.Model):
             # Check if the zip file contained a top level directory
             # which shouldn't be there and try to fix the structure
             top_level = [os.path.join(assets_dir, d) for d in os.listdir(assets_dir)]
-            if len(top_level) == 1 and os.path.isdir(top_level[0]):
+            if len(top_level) == 1 and os.path.isdir(top_level[0]) and top_level[0][-14:] != "odm_orthophoto":
                 second_level = [os.path.join(top_level[0], f) for f in os.listdir(top_level[0])]
                 if len(second_level) > 0:
                     logger.info("Top level directory found in imported archive, attempting to fix")
