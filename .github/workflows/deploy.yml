@@ -1,0 +1,33 @@
+# .github/workflows/deploy.yml
+name: Deploy WebODM on Commit
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+      - prod
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and deploy WebODM
+        run: |
+          cd /home/gennady/SFUODM
+
+          echo "🛠 Pull latest code"
+          git pull origin main
+
+          echo "🚀 Build and replace containers"
+          docker compose up -d --build --remove-orphans
+
+          echo "🧹 Prune unused images and volumes"
+          docker image prune -f
+          docker volume prune -f
