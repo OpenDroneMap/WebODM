@@ -32,7 +32,8 @@ def dump(apps, schema_editor):
     tmp_path = os.path.join(tempfile.gettempdir(), "public_task_uuids_migration.pickle")
     pickle.dump((tasks, task_ids), open(tmp_path, 'wb'))
 
-    if len(tasks) > 0: print("Dumped tasks")
+    if len(tasks) > 0: 
+        print("Dumped tasks")
 
 
 class Migration(migrations.Migration):

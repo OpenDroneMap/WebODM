@@ -555,11 +555,14 @@ class Export(TaskNestedView):
             bands = None
         if rescale == '':
             rescale = None
-        if epsg == '': epsg = None
+        if epsg == '': 
+            epsg = None
         if color_map == '':
             color_map = None
-        if hillshade == '': hillshade = None
-        if resample == '': resample = 0
+        if hillshade == '': 
+            hillshade = None
+        if resample == '': 
+            resample = 0
 
         expr = None
 

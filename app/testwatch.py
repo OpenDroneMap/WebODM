@@ -81,7 +81,8 @@ class TestWatch:
         tw = kwargs.get('testWatch', testWatch)
         def outer(func):
             def wrapper(*args, **kwargs):
-                if tw.hook_pre(func, *args, **kwargs): return
+                if tw.hook_pre(func, *args, **kwargs): 
+                    return
                 ret = func(*args, **kwargs)
                 tw.hook_post(func, *args, **kwargs)
                 return ret

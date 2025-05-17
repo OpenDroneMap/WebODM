@@ -76,12 +76,15 @@ def validate_task_options(value):
     """
     Make sure that the format of this options field is valid
     """
-    if len(value) == 0: return
+    if len(value) == 0: 
+        return
 
     try:
         for option in value:
-            if not option['name']: raise ValidationError("Name key not found in option")
-            if not option['value']: raise ValidationError("Value key not found in option")
+            if not option['name']: 
+                raise ValidationError("Name key not found in option")
+            if not option['value']: 
+                raise ValidationError("Value key not found in option")
     except:  # noqa: E722
         raise ValidationError("Invalid options")
 
@@ -1085,14 +1088,18 @@ class Task(models.Model):
         if 'orthophoto.tif' in self.available_assets: 
             types.append('orthophoto')
             types.append('plant')
-        if 'dsm.tif' in self.available_assets: types.append('dsm')
-        if 'dtm.tif' in self.available_assets: types.append('dtm')
+        if 'dsm.tif' in self.available_assets: 
+            types.append('dsm')
+        if 'dtm.tif' in self.available_assets: 
+            types.append('dtm')
 
         camera_shots = ''
-        if 'shots.geojson' in self.available_assets: camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)
+        if 'shots.geojson' in self.available_assets: 
+            camera_shots = '/api/projects/{}/tasks/{}/download/shots.geojson'.format(self.project.id, self.id)
 
         ground_control_points = ''
-        if 'ground_control_points.geojson' in self.available_assets: ground_control_points = '/api/projects/{}/tasks/{}/download/ground_control_points.geojson'.format(self.project.id, self.id)
+        if 'ground_control_points.geojson' in self.available_assets: 
+            ground_control_points = '/api/projects/{}/tasks/{}/download/ground_control_points.geojson'.format(self.project.id, self.id)
 
         return {
             'tiles': [{'url': self.get_tile_base_url(t), 'type': t} for t in types],
@@ -1158,7 +1165,8 @@ class Task(models.Model):
         """
         all_assets = list(self.ASSETS_MAP.keys())
         self.available_assets = [asset for asset in all_assets if self.is_asset_available_slow(asset)]
-        if commit: self.save()
+        if commit: 
+            self.save()
 
     
     def update_epsg_field(self, commit=False):
@@ -1187,7 +1195,8 @@ class Task(models.Model):
                 epsg = None
 
         self.epsg = epsg
-        if commit: self.save()
+        if commit: 
+            self.save()
 
 
     def update_orthophoto_bands_field(self, commit=False):
@@ -1208,7 +1217,8 @@ class Task(models.Model):
                     })
 
         self.orthophoto_bands = bands
-        if commit: self.save()
+        if commit: 
+            self.save()
 
     def delete(self, using=None, keep_parents=False):
         task_id = self.id
@@ -1321,7 +1331,8 @@ class Task(models.Model):
 
         # Skip geo.txt, image_groups.txt, align.(las|laz|tif) files
         gcp_path = list(filter(lambda p: os.path.basename(p).lower() not in ['geo.txt', 'image_groups.txt', 'align.las', 'align.laz', 'align.tif'], gcp_path))
-        if len(gcp_path) == 0: return None
+        if len(gcp_path) == 0: 
+            return None
 
         # Assume we only have a single GCP file per task
         gcp_path = gcp_path[0]
@@ -1420,7 +1431,8 @@ class Task(models.Model):
                     if not os.path.islink(fp):
                         total_bytes += os.path.getsize(fp)
             self.size = (total_bytes / 1024 / 1024)
-            if commit: self.save()
+            if commit: 
+                self.save()
 
             self.project.owner.profile.clear_used_quota_cache()
         except Exception as e:
