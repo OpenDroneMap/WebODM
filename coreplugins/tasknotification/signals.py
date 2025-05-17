@@ -5,7 +5,7 @@ from app.plugins.signals import task_completed, task_failed, task_removed
 from app.plugins.functions import get_current_plugin
 from . import email as notification
 from . import config
-from app.models import Task, Setting
+from app.models import Task
 
 logger = logging.getLogger('app.logger')
 

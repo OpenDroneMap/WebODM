@@ -1,2 +1,3 @@
 from .plugin import *
-from . import signals
+# Import needed for signal registration - don't remove
+from . import signals  # noqa: F401

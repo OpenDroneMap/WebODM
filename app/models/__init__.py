@@ -7,6 +7,17 @@ from .plugin_datum import PluginDatum
 from .plugin import Plugin
 from .profile import Profile
 
+__all__ = [
+    'Project',
+    'Task', 'validate_task_options', 'gcp_directory_path',
+    'Preset',
+    'Theme',
+    'Setting',
+    'PluginDatum',
+    'Plugin',
+    'Profile',
+]
+
 # deprecated
 def image_directory_path(image_upload, filename):
     raise Exception("Deprecated")
