@@ -419,7 +419,7 @@ class Tiles(TaskNestedView):
                         # Fallback to first three
                         indexes = (1, 2, 3,)
                 elif has_alpha:
-                    non_alpha_indexes(src.dataset)
+                    indexes = non_alpha_indexes(src.dataset)
 
             # Workaround for https://github.com/OpenDroneMap/WebODM/issues/894
             if nodata is None and tile_type == 'orthophoto':
@@ -443,11 +443,13 @@ class Tiles(TaskNestedView):
                     tile = src.tile(x, y, z, expression=expr, tilesize=tilesize, nodata=nodata,
                                     padding=padding,
                                     tile_buffer=tile_buffer,
+                                    indexes=indexes,
                                     resampling_method=resampling, vrt_options=vrt_options)
                 else:
                     tile = src.tile(x, y, z, tilesize=tilesize, nodata=nodata,
                                     padding=padding,
                                     tile_buffer=tile_buffer,
+                                    indexes=indexes,
                                     resampling_method=resampling, vrt_options=vrt_options)
             except TileOutsideBounds:
                 raise exceptions.NotFound(_("Outside of bounds"))
