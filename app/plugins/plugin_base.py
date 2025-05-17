@@ -260,7 +260,8 @@ class PluginBase(ABC):
 
     def get_manifest(self):
         # Lazy loading
-        if self.manifest: return self.manifest
+        if self.manifest: 
+            return self.manifest
 
         manifest_path = self.get_path("manifest.json")
 

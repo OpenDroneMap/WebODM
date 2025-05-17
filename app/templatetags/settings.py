@@ -97,7 +97,8 @@ def get_footer(context):
         logger.warning("Cannot get SETTINGS key from context. The footer will not be displayed.")
         return ""
 
-    if settings.theme.html_footer == "": return ""
+    if settings.theme.html_footer == "": 
+        return ""
 
     organization = ""
     if settings.organization_name != "" and settings.organization_website != "":
