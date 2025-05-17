@@ -23,7 +23,7 @@ jobs:
           cd /home/gennady/SFUODM
 
           echo "🛠 Pull latest code"
-          git pull origin main
+          git pull origin master
 
           echo "🚀 Build and replace containers"
           docker compose up -d --build --remove-orphans
