@@ -2,16 +2,18 @@
 FROM ubuntu:22.04 AS common
 LABEL maintainer="Piero Toffanin <pt@masseranolabs.com>"
 
+# Build-time variables
 ARG TEST_BUILD
 ARG DEBIAN_FRONTEND=noninteractive
+ARG NODE_MAJOR=20
+ARG PYTHON_VERSION=3.9
+ARG RELEASE_CODENAME=jammy
+ARG WORKDIR=/webodm
 
-ENV WORKDIR=/webodm
+# Run-time variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=$WORKDIR
 ENV PROJ_LIB=/usr/share/proj
-ENV NODE_MAJOR=20
-ENV RELEASE_CODENAME=jammy
-ENV PYTHON_VERSION=3.9
 
 #### Common setup ####
 
