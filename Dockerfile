@@ -168,6 +168,22 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rm -rf /tmp/* /var/tmp/*
 EOT
 
-COPY --from=build $WORKDIR ./
+ARG APP_USER=webodm
+ARG APP_GROUP=webodm
+ARG APP_UID=1000
+ARG APP_GID=1000
+
+# Create webodm user, group and home directory
+RUN <<EOT
+    # Create user and group
+    groupadd -g $APP_GID $APP_GROUP
+    useradd -u $APP_UID -g $APP_GID -s /usr/sbin/nologin -d $WORKDIR $APP_USER
+    chown $APP_USER:$APP_GROUP $WORKDIR
+EOT
+
+# Copy from builder stage to runtime stage
+COPY --chown=$APP_USER:$APP_GROUP --chmod=755 --from=build $WORKDIR ./
+
+USER $APP_USER
 
 VOLUME /webodm/app/media
