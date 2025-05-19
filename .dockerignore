@@ -1,4 +1,13 @@
-**/.git
-.secret_key
-node_modules/
+**/.git/
+**/node_modules/
+**/.ruff_cache/
+**/__pycache__/
+**/.github/
 .venv/
+.secret_key
+slate/
+service/
+screenshots/
+db/
+dpkg/
+build/
