@@ -42,6 +42,7 @@ rcssmin==1.0.6
 redis==3.2.0
 requests-toolbelt==0.9.1
 requests>=2.21.0
+urllib3<2.0 # https://stackoverflow.com/a/76177575/231332
 rfc3987==1.3.7
 rjsmin==1.0.12
 simplejson==3.10.0
