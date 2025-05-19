@@ -49,8 +49,6 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
 
-from .project import Project
-
 Image.MAX_IMAGE_PIXELS = 4096000000
 logger = logging.getLogger('app.logger')
 
@@ -247,7 +245,7 @@ class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid_module.uuid4, unique=True, serialize=False, editable=False, verbose_name=_("Id"))
 
     uuid = models.CharField(max_length=255, db_index=True, default='', blank=True, help_text=_("Identifier of the task (as returned by NodeODM API)"), verbose_name=_("UUID"))
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text=_("Project that this task belongs to"), verbose_name=_("Project"))
+    project = models.ForeignKey('app.Project', on_delete=models.CASCADE, help_text=_("Project that this task belongs to"), verbose_name=_("Project"))
     name = models.CharField(max_length=255, null=True, blank=True, help_text=_("A label for the task"), verbose_name=_("Name"))
     processing_time = models.IntegerField(default=-1, help_text=_("Number of milliseconds that elapsed since the beginning of this task (-1 indicates that no information is available)"), verbose_name=_("Processing Time"))
     processing_node = models.ForeignKey(ProcessingNode, on_delete=models.SET_NULL, null=True, blank=True, help_text=_("Processing node assigned to this task (or null if this task has not been associated yet)"), verbose_name=_("Processing Node"))

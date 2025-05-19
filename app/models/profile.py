@@ -1,5 +1,6 @@
 import time
 
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import models
@@ -8,7 +9,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
-from app.models import Task
 from webodm import settings
 
 
@@ -20,6 +20,9 @@ class Profile(models.Model):
         return self.quota != -1
 
     def used_quota(self):
+        # Lazy import Task model
+        Task = apps.get_model('app.Task')
+
         q = Task.objects.filter(project__owner=self.user).aggregate(total=Sum('size'))['total']
         if q is None:
             q = 0
