@@ -150,6 +150,13 @@ def export_raster(input, output, **opts):
                                 ci.index(ColorInterp.green) + 1,
                                 ci.index(ColorInterp.blue) + 1,
                                 ci.index(ColorInterp.alpha) + 1)
+            
+            # Only 2 bands (common with thermal)?
+            elif len(ci) <= 2 and ColorInterp.gray in ci and ColorInterp.alpha in ci:
+                indexes = (ci.index(ColorInterp.gray) + 1,
+                            ci.index(ColorInterp.gray) + 1,
+                            ci.index(ColorInterp.gray) + 1,
+                            ci.index(ColorInterp.alpha) + 1)
 
         if ColorInterp.alpha in ci:
             mask = reader.read(ci.index(ColorInterp.alpha) + 1, window=win)
