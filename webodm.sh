@@ -174,7 +174,7 @@ usage(){
   echo "	liveupdate		Update WebODM to the latest release without stopping it"
   echo "	rebuild			Rebuild all docker containers and perform cleanups"
   echo "	checkenv		Do an environment check and install missing components"
-  echo "	test			Run the unit test suite (developers only)"
+  echo "	test [frontend|backend] [args]	Run tests (all tests, or just frontend/backend with optional arguments)"
   echo "	resetadminpassword \"<new password>\"	Reset the administrator's password to a new one. WebODM must be running when executing this command and the password must be enclosed in double quotes."
   echo ""
   echo "Options:"
@@ -510,17 +510,26 @@ run_tests(){
     # If in a container, we run the actual test commands
     # otherwise we launch this command from the container
     if [[ -f /.dockerenv ]]; then
-        echo -e "\033[1mRunning frontend tests\033[0m"
-        run "npm run test"
+        test_type=${1:-"all"}
+        shift || true
+        
+        if [[ $test_type = "frontend" || $test_type = "all" ]]; then
+            echo -e "\033[1mRunning frontend tests\033[0m"
+            run "npm run test $@"
+        fi
 
-        echo "\033[1mRunning backend tests\033[0m"
-        run "python manage.py test"
+        if [[ $test_type = "backend" || $test_type = "all" ]]; then
+            echo -e "\033[1mRunning backend tests\033[0m"
+            run "python manage.py test $@"
+        fi
 
-        echo ""
-        echo -e "\033[1mDone!\033[0m Everything looks in order."
+        if [[ $test_type = "all" ]]; then
+            echo ""
+            echo -e "\033[1mDone!\033[0m Everything looks in order."
+        fi
     else
         echo "Running tests in webapp container"
-        run "$docker_compose exec webapp /bin/bash -c \"/webodm/webodm.sh test\""
+        run "$docker_compose exec webapp /bin/bash -c \"/webodm/webodm.sh test $@\""
     fi
 }
 
@@ -622,7 +631,8 @@ elif [[ $1 = "liveupdate" ]]; then
 elif [[ $1 = "checkenv" ]]; then
 	environment_check
 elif [[ $1 = "test" ]]; then
-	run_tests
+	shift || true
+	run_tests "$@"
 elif [[ $1 = "resetadminpassword" ]]; then
 	resetpassword "$2"
 else
