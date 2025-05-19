@@ -57,7 +57,7 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         user = User.objects.filter(id=created_user_id).first()
         self.assertIsNotNone(user)
-        self.assertIsNot(user.is_superuser)
+        self.assertFalse(user.is_superuser)
         res = client.get('/api/admin/users/{}/'.format(created_user_id)) # ReGet user
         self.assertEqual(res.data['username'], user.username)
         self.assertEqual(res.data['email'], user.email)
