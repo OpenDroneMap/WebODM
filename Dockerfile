@@ -3,7 +3,6 @@ FROM ubuntu:22.04 AS common
 LABEL maintainer="Piero Toffanin <pt@masseranolabs.com>"
 
 # Build-time variables
-ARG TEST_BUILD
 ARG DEBIAN_FRONTEND=noninteractive
 ARG NODE_MAJOR=20
 ARG PYTHON_VERSION=3.9
@@ -85,6 +84,9 @@ EOT
 
 # Copy remaining files
 COPY . ./
+
+# Defining this here allows for caching of previous layers.
+ARG TEST_BUILD
 
 RUN <<EOT
     # Final build steps (in one roll to prevent too many layers).
