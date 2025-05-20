@@ -15,9 +15,31 @@ jobs:
       uses: pierotofy/set-swap-space@master
       with:
         swap-size-gb: 12
-    - name: Build and Test
-      run: |
-        docker compose -f docker-compose.yml -f docker-compose.build.yml build --build-arg TEST_BUILD=ON
-        docker compose -f docker-compose.yml -f docker-compose.build.yml up -d
-        sleep 20
-        docker compose exec -T webapp /webodm/webodm.sh test
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Build webapp
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: false
+        load: true
+        tags: opendronemap/webodm_webapp:latest
+        build-args: TEST_BUILD=ON
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    - name: Build db
+      uses: docker/build-push-action@v6
+      with:
+        context: db
+        push: false
+        load: true
+        tags: opendronemap/webodm_db:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    - name: Start WebODM service
+      run: docker compose -f docker-compose.yml -f docker-compose.build.yml up --wait
+    - name: Sleep for 20 seconds
+      run: sleep 20s
+      shell: bash
+    - name: Run WebODM tests
+      run: docker compose exec -T webapp /webodm/webodm.sh test
