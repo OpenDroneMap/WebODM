@@ -100,7 +100,7 @@ def upload_to_ion(
     except ImportError:
         import subprocess
 
-        asset_logger.info(f"Manually installing boto3...")
+        asset_logger.info("Manually installing boto3...")
         subprocess.call([sys.executable, "-m", "pip", "install", "boto3"])
         import boto3
 
@@ -182,7 +182,7 @@ def upload_to_ion(
             state, percent_complete = pluck(res.json(), "status", "percentComplete")
             progress = float(percent_complete) / 100
             if "ERROR" in state.upper():
-                asset_info["error"] = f"Processing failed"
+                asset_info["error"] = "Processing failed"
                 asset_logger.info("Processing failed...")
                 refresh = False
             if progress >= 1:

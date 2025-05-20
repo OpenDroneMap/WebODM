@@ -58,7 +58,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, cro
 
         dem = dem_vrt
     
-    contours_file = f"contours.gpkg"
+    contours_file = "contours.gpkg"
     p = subprocess.Popen([gdal_contour_bin, "-q", "-a", "level", "-3d", "-f", "GPKG", "-i", str(interval), dem, contours_file], cwd=tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
 
