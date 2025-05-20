@@ -66,7 +66,7 @@ class Info(TaskView):
             # TODO: for better data we could look over all images
             # and find actual end and start time
             # Here we're picking an image at random and assuming a one hour flight
-            if not 'sensor' in task_info:
+            if 'sensor' not in task_info:
                 task_info['endDate'] = datetime.utcnow().timestamp() * 1000
                 task_info['sensor'] = ''
                 task_info['title'] = task.name

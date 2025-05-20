@@ -27,7 +27,7 @@ class Scene(TaskNestedView):
             raise exceptions.ValidationError(detail="Invalid potree scene")
         
         for k in scene:
-            if not k in ["view", "pointclouds", "settings"]:
+            if k not in ["view", "pointclouds", "settings"]:
                 task.potree_scene[k] = scene[k]
 
         task.save()

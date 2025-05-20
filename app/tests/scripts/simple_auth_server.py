@@ -27,7 +27,7 @@ class MyHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == '/auth':
-            if not 'Content-Length' in self.headers:
+            if 'Content-Length' not in self.headers:
                 self.send_error(403, "Missing form data")
                 return
 

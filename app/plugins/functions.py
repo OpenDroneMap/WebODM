@@ -22,7 +22,7 @@ from app.security import path_traversal_check
 logger = logging.getLogger('app.logger')
 
 # Add additional python path to discover plugins
-if not settings.MEDIA_ROOT in sys.path:
+if settings.MEDIA_ROOT not in sys.path:
     sys.path.append(settings.MEDIA_ROOT)
 
 def init_plugins():
@@ -100,7 +100,7 @@ def build_plugins():
         # Check if we need to generate a webpack.config.js
         if len(plugin.build_jsx_components()) > 0 and plugin.path_exists('public'):
             build_paths = map(lambda p: os.path.join(plugin.get_path('public'), p), plugin.build_jsx_components())
-            paths_ok = not (False in map(lambda p: os.path.exists, build_paths))
+            paths_ok = False not in map(lambda p: os.path.exists, build_paths)
 
             if paths_ok:
                 wpc_path = os.path.join(settings.BASE_DIR, 'app', 'plugins', 'templates', 'webpack.config.js.tmpl')

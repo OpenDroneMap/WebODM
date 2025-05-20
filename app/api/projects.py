@@ -186,7 +186,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                 continue
 
                             # Has permission in database but not in form?
-                            if user.has_perm(perm, project) and not p in perms_map[username]:
+                            if user.has_perm(perm, project) and p not in perms_map[username]:
                                 remove_perm(perm, user, project)
                             
                             # Has permission in form but not in database?

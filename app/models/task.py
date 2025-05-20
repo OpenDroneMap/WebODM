@@ -687,7 +687,7 @@ class Task(models.Model):
                 self.pending_action = None
                 self.save()
 
-            if self.auto_processing_node and not self.status in [status_codes.FAILED, status_codes.CANCELED]:
+            if self.auto_processing_node and self.status not in [status_codes.FAILED, status_codes.CANCELED]:
                 # No processing node assigned and need to auto assign
                 if self.processing_node is None:
                     # Assign first online node with lowest queue count

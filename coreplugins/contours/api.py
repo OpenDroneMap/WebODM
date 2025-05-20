@@ -120,7 +120,7 @@ class TaskContoursGenerate(TaskView):
             interval = float(request.data.get('interval', 1))
             format = request.data.get('format', 'GPKG')
             supported_formats = ['GPKG', 'ESRI Shapefile', 'DXF', 'GeoJSON']
-            if not format in supported_formats:
+            if format not in supported_formats:
                 raise ContoursException("Invalid format {} (must be one of: {})".format(format, ",".join(supported_formats)))
             simplify = float(request.data.get('simplify', 0.01))
             zfactor = float(request.data.get('zfactor', 1))

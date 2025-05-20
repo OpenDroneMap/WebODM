@@ -126,7 +126,7 @@ def read_polygon(file):
         features = [data]
 
     for feature in features:
-        if not 'geometry' in feature:
+        if 'geometry' not in feature:
             continue
 
         # Check if the feature geometry type is Polygon
