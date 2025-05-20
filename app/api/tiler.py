@@ -304,7 +304,6 @@ class Tiles(TaskNestedView):
 
         indexes = None
         nodata = None
-        rgb_tile = None
 
         formula = self.request.query_params.get('formula')
         bands = self.request.query_params.get('bands')
