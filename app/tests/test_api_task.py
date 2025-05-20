@@ -88,7 +88,7 @@ class TestApiTask(BootTransactionTestCase):
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
                 'images': [image1, image2]
             }, format="multipart")
-            self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN);
+            self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
             image1.seek(0)
             image2.seek(0)
 
@@ -1283,7 +1283,7 @@ class TestApiTask(BootTransactionTestCase):
                 'auto_processing_node': 'true',
                 'partial': 'true'
             }, format="multipart")
-            self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN);
+            self.assertTrue(res.status_code == status.HTTP_403_FORBIDDEN)
 
             client.login(username="testuser", password="test1234")
 
