@@ -1,15 +1,10 @@
-import os
 import time
-from worker.celery import app as celery
 import logging
 import json
 
-import requests
-from PIL import Image
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
-from app.plugins.signals import task_completed
 from app.tests.classes import BootTransactionTestCase
 from app.models import Project, Task
 from nodeodm.models import ProcessingNode
@@ -19,13 +14,12 @@ from nodeodm import status_codes
 import worker
 from worker.tasks import TestSafeAsyncResult
 
-from .utils import start_processing_node, clear_test_media_root, catch_signal
+from .utils import start_processing_node, clear_test_media_root
 
 # We need to test in a TransactionTestCase because
 # task processing happens on a separate thread, and normal TestCases
 # do not commit changes to the DB, so spawning a new thread will show no
 # data in it.
-from webodm import settings
 logger = logging.getLogger('app.logger')
 
 DELAY = 2  # time to sleep for during process launch, background processing, etc.

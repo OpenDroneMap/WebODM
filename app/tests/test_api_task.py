@@ -2,9 +2,7 @@ import io
 import os
 import time
 
-import threading
 
-from worker.celery import app as celery
 import logging
 from datetime import timedelta
 

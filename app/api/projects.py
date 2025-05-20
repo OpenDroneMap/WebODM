@@ -9,7 +9,6 @@ from django.db import transaction
 from django.contrib.auth.models import User
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.contrib.postgres.aggregates import StringAgg
-from django.db.models import Q
 
 from app import models
 from .tasks import TaskIDsSerializer

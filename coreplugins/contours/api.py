@@ -15,7 +15,6 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, cro
     import tempfile
     import shutil
     import glob
-    import json
     from webodm import settings
 
     ext = ""

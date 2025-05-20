@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from app.models import Profile
-from rest_framework import serializers, viewsets, generics, status, exceptions
+from rest_framework import serializers, viewsets, status, exceptions
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response

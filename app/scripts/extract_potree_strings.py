@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import json, os
+import json
 
 def extract_potree_strings(translation_json, output):
     strings = []

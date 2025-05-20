@@ -1,7 +1,4 @@
-import os
-import re
 
-from django.contrib.staticfiles import finders
 from django.test import Client
 
 from .classes import BootTestCase

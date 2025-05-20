@@ -2,9 +2,7 @@ from django.http import Http404
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 
-from django.contrib import messages
 from django.utils.translation import ugettext as _
-from django import forms
 from webodm import settings
 from django.http import JsonResponse
 from django.utils.translation import get_language

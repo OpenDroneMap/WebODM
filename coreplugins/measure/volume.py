@@ -10,7 +10,6 @@ def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decima
         from scipy.optimize import curve_fit
         from scipy.interpolate import griddata
         import numpy as np
-        import json
         import warnings
 
         osr.UseExceptions()

@@ -1,6 +1,5 @@
 import logging
 from django.dispatch import receiver
-from django.core.mail import send_mail
 from app.plugins.signals import task_completed, task_failed, task_removed
 from app.plugins.functions import get_current_plugin
 from . import email as notification

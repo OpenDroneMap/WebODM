@@ -3,7 +3,6 @@ import json
 from django.dispatch import receiver
 from django.http import HttpResponse
 from guardian.shortcuts import get_objects_for_user, assign_perm
-from rest_framework.renderers import JSONRenderer
 from django.utils.translation import gettext as _
 
 from app.plugins import GlobalDataStore, logger

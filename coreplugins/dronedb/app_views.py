@@ -1,10 +1,5 @@
-import requests
 
-from django import forms
-from django.contrib import messages
-from django.http import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
 from app.plugins import logger
 

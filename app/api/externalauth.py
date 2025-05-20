@@ -1,7 +1,6 @@
-from django.contrib.auth.models import User
 from django.contrib.auth import login
 from rest_framework.views import APIView
-from rest_framework import exceptions, permissions, parsers
+from rest_framework import permissions, parsers
 from rest_framework.response import Response
 from app.auth.backends import get_user_from_external_auth_response, cluster_mismatch
 import requests

@@ -17,7 +17,6 @@ def upload_to_ion(
     import requests
     from os import path, remove
     from shutil import rmtree
-    from enum import Enum
     from app.plugins import logger
     
     try:

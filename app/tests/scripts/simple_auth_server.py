@@ -1,4 +1,3 @@
-import http.server
 from http.server import SimpleHTTPRequestHandler
 import socketserver
 import sys

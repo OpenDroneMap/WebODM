@@ -1,6 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import exceptions
-import os
 import re
 
 from app import models

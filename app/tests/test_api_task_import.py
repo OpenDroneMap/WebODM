@@ -1,8 +1,6 @@
 import os
 import time
 
-import io
-import requests
 from django.contrib.auth.models import User
 from guardian.shortcuts import remove_perm, assign_perm
 from rest_framework import status

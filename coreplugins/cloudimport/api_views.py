@@ -1,7 +1,6 @@
 import importlib
 import requests
 import os
-from os import path
 
 from pyodm.exceptions import NodeServerError
 from app import models, pending_actions

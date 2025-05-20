@@ -5,7 +5,7 @@ from app.api.workers import CheckTask as CheckTask
 from app.api.workers import GetTaskResult as GetTaskResult
 from app.api.workers import TaskResultOutputError
 
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from .functions import get_plugin_by_name, get_active_plugins
 from django.conf.urls import url
 from django.views.static import serve

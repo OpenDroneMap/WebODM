@@ -1,6 +1,4 @@
 import logging
-import os
-from pathlib import Path
 
 from django.db.models import signals
 from django.db import models

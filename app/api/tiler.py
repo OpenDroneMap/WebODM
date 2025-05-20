@@ -1,5 +1,4 @@
 import json
-import rio_tiler.utils
 from rasterio.enums import ColorInterp
 from rasterio.crs import CRS
 from rasterio.features import bounds as featureBounds
@@ -12,7 +11,7 @@ from rio_tiler.errors import TileOutsideBounds
 from rio_tiler.utils import has_alpha_band, \
     non_alpha_indexes, render, create_cutline
 from rio_tiler.utils import _stats as raster_stats
-from rio_tiler.models import ImageStatistics, ImageData
+from rio_tiler.models import ImageStatistics
 from rio_tiler.models import Metadata as RioMetadata
 from rio_tiler.profiles import img_profiles
 from rio_tiler.colormap import cmap as colormap, apply_cmap

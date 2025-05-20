@@ -8,7 +8,6 @@ import uuid as uuid_module
 from zipstream.ng import ZipStream
 
 import json
-from shlex import quote
 
 import errno
 import piexif
@@ -49,7 +48,6 @@ from .project import Project
 from django.utils.translation import gettext_lazy as _, gettext
 
 from functools import partial
-import subprocess
 from app.classes.console import Console
 
 logger = logging.getLogger('app.logger')
