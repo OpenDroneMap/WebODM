@@ -82,33 +82,54 @@ RUN --mount=type=cache,target=/root/.npm \
     npm install --quiet -g webpack-cli@5.1.4
 EOT
 
-# Copy remaining files
-COPY . ./
+COPY nginx ./nginx
+RUN <<EOT
+    # nginx setup
+    chmod 0644 ./nginx/crontab
+    ln -s ./nginx/crontab /var/spool/cron/crontabs/root
+    chmod +x ./nginx/letsencrypt-autogen.sh
+EOT
 
 # Defining this here allows for caching of previous layers.
 ARG TEST_BUILD
 
+COPY nodeodm ./nodeodm
 RUN <<EOT
-    # Final build steps (in one roll to prevent too many layers).
-    # Setup cron
-    chmod 0644 ./nginx/crontab
-    ln -s ./nginx/crontab /var/spool/cron/crontabs/root
-    # NodeODM setup
-    chmod +x ./nginx/letsencrypt-autogen.sh
+    # Setup NodeODM (only relevant in TEST_BUILD).
     ./nodeodm/setup.sh
     ./nodeodm/cleanup.sh
-    # Run webpack build, Django setup and final cleanup
-    webpack --mode production
-    # Django setup
-    python manage.py collectstatic --noinput
-    python manage.py rebuildplugins
-    python manage.py translate build --safe
-    # Final cleanup
-    # Remove stale temp files
-    rm -rf /tmp/* /var/tmp/*
-    # Remove auto-generated secret key (happens on import of settings when none is defined)
-    rm /webodm/webodm/secret_key.py
 EOT
+
+# Copy Python code
+COPY webodm ./webodm
+COPY app ./app
+COPY worker ./worker
+COPY manage.py ./
+
+# Compile Python code
+RUN python -m compileall .
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Rebuild plugins
+COPY coreplugins ./coreplugins
+RUN python manage.py rebuildplugins
+
+# Render translations
+COPY LOCALES ./
+COPY locale ./locale
+RUN python manage.py translate build --safe
+
+# Webpack build of app
+COPY webpack.config.js ./
+RUN webpack --mode production
+
+# Remove stale temp files and auto-generated secret key (happens on import of settings when none is defined)
+RUN rm -rvf /tmp/* /var/tmp/* /webodm/webodm/secret_key.py
+
+# Remaining remaining files from /
+COPY . ./
 
 FROM common AS app
 
@@ -147,6 +168,22 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rm -rf /tmp/* /var/tmp/*
 EOT
 
-COPY --from=build $WORKDIR ./
+ARG APP_USER=webodm
+ARG APP_GROUP=webodm
+ARG APP_UID=1000
+ARG APP_GID=1000
+
+# Create webodm user, group and home directory
+RUN <<EOT
+    # Create user and group
+    groupadd -g $APP_GID $APP_GROUP
+    useradd -u $APP_UID -g $APP_GID -s /usr/sbin/nologin -d $WORKDIR $APP_USER
+    chown $APP_USER:$APP_GROUP $WORKDIR
+EOT
+
+# Copy from builder stage to runtime stage
+COPY --chown=$APP_USER:$APP_GROUP --chmod=755 --from=build $WORKDIR ./
+
+USER $APP_USER
 
 VOLUME /webodm/app/media
