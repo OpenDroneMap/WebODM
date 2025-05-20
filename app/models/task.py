@@ -799,7 +799,7 @@ class Task(models.Model):
                             # Good to go
                             try:
                                 self.processing_node.restart_task(self.uuid, self.options)
-                            except (NodeServerError, NodeResponseError) as e:
+                            except (NodeServerError, NodeResponseError):
                                 # Something went wrong
                                 logger.warning("Could not restart {}, will start a new one".format(self))
                                 need_to_reprocess = True

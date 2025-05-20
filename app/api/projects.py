@@ -193,9 +193,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             elif p in perms_map[username] and not user.has_perm(perm, project):
                                 assign_perm(perm, user, project)
 
-        except User.DoesNotExist as e:
+        except User.DoesNotExist:
             return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
-        except AttributeError as e:
+        except AttributeError:
             return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)

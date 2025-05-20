@@ -111,7 +111,7 @@ def upload_to_ion(
                 generated_zipfile = asset_path
                 asset_path, del_directory = to_ion_texture_model(asset_path)
                 logger.info("Created ion texture model!")
-            except IonInvalidZip as e:
+            except IonInvalidZip:
                 logger.info("Non geo-referenced texture model, using default file.")
             except Exception as e:
                 logger.warning(f"Failed to convert to ion texture model: {e}")
