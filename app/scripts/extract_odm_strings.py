@@ -54,9 +54,8 @@ def extract_odm_strings(url, outfile):
     root.body = new_body
     exec(compile(root, filename="<ast>", mode="exec"), globals())
 
-
-
-    config(["--project-path", "/bogus", "name"], parser=ArgumentParserStub())
+    # config is supposedly defined in above exec()
+    config(["--project-path", "/bogus", "name"], parser=ArgumentParserStub())  # noqa: F821
     for opt in options:
         h = options[opt].get('help')
         if h:
