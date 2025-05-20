@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
-import json, os, glob
+import json
+import os
+import glob
 
 def extract_plugin_manifest_strings(plugins_dir, output):
     strings = []

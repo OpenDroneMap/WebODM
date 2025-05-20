@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
-import argparse, urllib.request, ast
+import argparse
+import urllib.request
+import ast
 
 # Misc variables needed to get config to run
 __version__ = '?'

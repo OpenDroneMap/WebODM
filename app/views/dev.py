@@ -7,7 +7,15 @@ from webodm import settings
 from django.http import JsonResponse
 from django.utils.translation import get_language
 import requests
-import json, tempfile, os, logging, shutil, subprocess, zipfile, glob, pathlib
+import json
+import tempfile
+import os
+import logging
+import shutil
+import subprocess
+import zipfile
+import glob
+import pathlib
 
 logger = logging.getLogger('app.logger')
 
