@@ -515,12 +515,12 @@ run_tests(){
         
         if [[ $test_type = "frontend" || $test_type = "all" ]]; then
             echo -e "\033[1mRunning frontend tests\033[0m"
-            run "npm run test $@"
+            run "npm run test $*"
         fi
 
         if [[ $test_type = "backend" || $test_type = "all" ]]; then
             echo -e "\033[1mRunning backend tests\033[0m"
-            run "python manage.py test $@"
+            run "python manage.py test $*"
         fi
 
         if [[ $test_type = "all" ]]; then
@@ -530,7 +530,8 @@ run_tests(){
     else
 		environment_check
         echo "Running tests in webapp container"
-        run "$docker_compose exec webapp /bin/bash -c \"/webodm/webodm.sh test $@\""
+        test_command="/webodm/webodm.sh test $*"
+        run "$docker_compose exec webapp /bin/bash -c \"$test_command\""
     fi
 }
 
