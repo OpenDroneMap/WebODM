@@ -14,6 +14,15 @@ services:
       - ${WO_DB_DIR}:/var/lib/postgresql/data:Z
     restart: unless-stopped
     oom_score_adj: -100
+  # Ensure volumes have correct ownership and permissions.
+  # Legacy support for users who were running as root.
+  chown_media:
+    image: opendronemap/webodm_webapp
+    user: root
+    entrypoint:
+      echo "Setting ownership and permissions of media folder" && \
+      chown -R webodm:webodm /webodm/app/media && chmod -R chmod -Rv o=rwX,go=rX /webodm/app/media
+    restart: no
   webapp:
     image: opendronemap/webodm_webapp
     container_name: webapp
@@ -26,6 +35,7 @@ services:
       - db
       - broker
       - worker
+      - chown_media
     environment:
       - WO_PORT
       - WO_HOST
