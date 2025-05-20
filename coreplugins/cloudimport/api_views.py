@@ -6,7 +6,8 @@ from pyodm.exceptions import NodeServerError
 from app import models, pending_actions
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async
-from app.plugins import get_current_plugin
+from app.plugins import get_current_plugin, logger
+from app.security import path_traversal_check
 
 from worker.celery import app
 from rest_framework.response import Response
@@ -100,11 +101,6 @@ class PlatformsTaskView(TaskView):
 
 
 def import_files(task_id, files):
-    import requests
-    from app import models
-    from app.plugins import logger
-    from app.security import path_traversal_check
-
     def download_file(task, file):
         path = path_traversal_check(task.task_path(file['name']), task.task_path())
         download_stream = requests.get(file['url'], stream=True, timeout=60)

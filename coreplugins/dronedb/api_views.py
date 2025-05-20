@@ -4,13 +4,15 @@ import time
 import os
 from os import listdir, path
 
+import requests
+
 from pyodm.exceptions import NodeServerError
 from app import models, pending_actions
 from app.security import path_traversal_check
 from app.plugins.views import TaskView
 from app.plugins.worker import run_function_async, task
 from app.plugins import get_current_plugin
-from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals
+from app.plugins import GlobalDataStore, get_site_settings, signals as plugin_signals, logger
 
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL, DroneDB, parse_url, verify_url
 
@@ -203,11 +205,6 @@ class ImportDatasetTaskView(TaskView):
         return Response({}, status=status.HTTP_200_OK)
 
 def import_files(task_id, carrier):
-    import requests
-    from app import models
-    from app.plugins import logger
-    from app.security import path_traversal_check
-
     files = carrier['files']
     
     headers = {}
