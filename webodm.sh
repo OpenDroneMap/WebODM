@@ -528,6 +528,7 @@ run_tests(){
             echo -e "\033[1mDone!\033[0m Everything looks in order."
         fi
     else
+		environment_check
         echo "Running tests in webapp container"
         run "$docker_compose exec webapp /bin/bash -c \"/webodm/webodm.sh test $@\""
     fi
