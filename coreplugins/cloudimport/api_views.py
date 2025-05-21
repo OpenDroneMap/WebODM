@@ -23,18 +23,18 @@ class ImportFolderTaskView(TaskView):
         platform_name = request.data.get('platform', None)
         
         # Make sure both values are set
-        if folder_url == None or platform_name == None:
+        if folder_url is None or platform_name is None:
             return Response({'error': 'Folder URL and platform name must be set.'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Fetch the platform by name    
         platform = get_platform_by_name(platform_name)
         
         # Make sure that the platform actually exists
-        if platform == None:
+        if platform is None:
             return Response({'error': 'Failed to find a platform with the name \'{}\''.format(platform_name)}, status=status.HTTP_400_BAD_REQUEST)
         
         # Verify that the folder url is valid    
-        if platform.verify_folder_url(folder_url) == None:
+        if platform.verify_folder_url(folder_url) is None:
             return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Get the files from the folder
@@ -66,7 +66,7 @@ class CheckUrlTaskView(TaskView):
         combined_id = "{}_{}".format(project_pk, pk)
         folder_url = get_current_plugin().get_global_data_store().get_string(combined_id, default = None)
 
-        if folder_url == None:
+        if folder_url is None:
             return Response({}, status=status.HTTP_200_OK)
         else:
             return Response({'folder_url': folder_url}, status=status.HTTP_200_OK)
@@ -80,12 +80,12 @@ class PlatformsVerifyTaskView(TaskView):
         platform = get_platform_by_name(platform_name)
         
         # Make sure that the platform actually exists
-        if platform == None:
+        if platform is None:
             return Response({'error': 'Failed to find a platform with the name \'{}\''.format(platform_name)}, status=status.HTTP_400_BAD_REQUEST)
         
         # Verify that the folder url is valid    
         folder = platform.verify_folder_url(folder_url)
-        if folder == None:
+        if folder is None:
             return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Return the folder

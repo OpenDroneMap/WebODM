@@ -501,7 +501,7 @@ class TestApi(BootTestCase):
     def test_token_auth(self):
         client = APIClient()
 
-        pnode = ProcessingNode.objects.create(
+        ProcessingNode.objects.create(
             hostname="localhost",
             port=999
         )

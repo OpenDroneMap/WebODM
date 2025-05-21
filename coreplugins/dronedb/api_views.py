@@ -46,7 +46,7 @@ def update_token(request, token):
 def get_ddb(request):
     registry_url, username, password, token = get_settings(request)
 
-    if registry_url == None or username == None or password == None:
+    if registry_url is None or username is None or password is None:
         raise ValueError('Credentials must be set.')
 
     return DroneDB(registry_url, username, password, token, lambda token: update_token(request, token))
@@ -63,7 +63,7 @@ class CheckCredentialsTaskView(TaskView):
         password = request.data.get('password', None)
 
         # Make sure both values are set
-        if hub_url == None or username == None or password == None:
+        if hub_url is None or username is None or password is None:
             return Response({'error': 'All fields must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -93,7 +93,7 @@ class OrganizationsTaskView(TaskView):
 class DatasetsTaskView(TaskView):
     def get(self, request, org=None):
 
-        if org == None:
+        if org is None:
             return Response({'error': 'Organization must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -110,7 +110,7 @@ class DatasetsTaskView(TaskView):
 class FoldersTaskView(TaskView):
     def get(self, request, org=None, ds=None):
 
-        if org == None or ds == None:
+        if org is None or ds is None:
             return Response({'error': 'Organization and dataset must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -130,7 +130,7 @@ class VerifyUrlTaskView(TaskView):
         # Read form data
         url = request.data.get('url', None)
 
-        if url == None:
+        if url is None:
             return Response({'error': 'Url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
 
         _, username, password, _ = get_settings(request)
@@ -164,7 +164,7 @@ class ImportDatasetTaskView(TaskView):
         # Read form data
         ddb_url = request.data.get('ddb_url', None)
                       
-        if ddb_url == None:
+        if ddb_url is None:
             return Response({'error': 'DroneDB url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
         
         registry_url, orgSlug, dsSlug, folder = parse_url(ddb_url).values()
@@ -214,7 +214,7 @@ def import_files(task_id, carrier):
     
     headers = {}
 
-    if carrier['token'] != None:
+    if carrier['token'] is not None:
         headers['Authorization'] = 'Bearer ' + carrier['token']
 
     def download_file(task, file):
@@ -258,7 +258,7 @@ class CheckUrlTaskView(TaskView):
         combined_id = "{}_{}".format(project_pk, pk)
         data = get_current_plugin().get_global_data_store().get_json(combined_id, default = None)
 
-        if data == None or 'ddbWebUrl' not in data:
+        if data is None or 'ddbWebUrl' not in data:
             return Response({'ddbWebUrl': None}, status=status.HTTP_200_OK)
         else:
             return Response({'ddbUrl': data['ddbWebUrl']}, status=status.HTTP_200_OK)
@@ -288,7 +288,7 @@ def ddb_cleanup(sender, task_id, **kwargs):
 class StatusTaskView(TaskView):
     def get(self, request, pk):
 
-        task = self.get_and_check_task(request, pk)
+        self.get_and_check_task(request, pk)
 
         # Associate the folder url with the project and task
         status_key = get_status_key(pk)

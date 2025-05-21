@@ -210,7 +210,7 @@ def upload_to_ion(
         asset_info["error"] = str(e)
         asset_logger.error(e)
 
-    if del_directory != None:
+    if del_directory is not None:
         rmtree(del_directory)
 
     set_asset_info(task_id, asset_type, asset_info)

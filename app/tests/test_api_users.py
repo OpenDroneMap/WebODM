@@ -19,8 +19,6 @@ class TestApiUsers(BootTestCase):
     def test_users(self):
         client = APIClient()
 
-        user = User.objects.get(username="testuser")
-
         # Cannot list users (anonymous)
         res = client.get("/api/users/?limit=30")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)

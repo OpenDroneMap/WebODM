@@ -176,7 +176,7 @@ def get_plugins():
     """
     # Cache plugins search
     global plugins
-    if plugins != None: return plugins
+    if plugins is not None: return plugins
 
     plugins_paths = get_plugins_paths()
     plugins = []

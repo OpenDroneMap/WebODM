@@ -73,7 +73,8 @@ def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decima
                 x_grid, y_grid = np.meshgrid(np.linspace(0, w - 1, w), np.linspace(0, h - 1, h))
 
                 # Perform curve fitting
-                linear_func = lambda xy, m1, m2, b: m1 * xy[0] + m2 * xy[1] + b
+                def linear_func(xy, m1, m2, b):
+                    return m1 * xy[0] + m2 * xy[1] + b
                 params, covariance = curve_fit(linear_func, np.vstack((xs, ys)), zs)
 
                 base = linear_func((x_grid, y_grid), *params)
