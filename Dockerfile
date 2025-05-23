@@ -132,10 +132,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update
     # Install common deps, starting with NodeJS
     apt-get -qq install -y nodejs
-    # Python, GDAL, PDAL, nginx, letsencrypt, psql
+    # Python, GDAL, PDAL, nginx, letsencrypt, psql, git
     apt-get install -y --no-install-recommends \
         python$PYTHON_VERSION python$PYTHON_VERSION-distutils gdal-bin pdal \
-        nginx certbot gettext-base cron postgresql-client gettext tzdata
+        nginx certbot gettext-base cron postgresql-client gettext tzdata git
     # Install webpack, webpack CLI
     npm install --quiet -g webpack@5.89.0
     npm install --quiet -g webpack-cli@5.1.4
