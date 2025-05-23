@@ -6,6 +6,8 @@ services:
       - "35729:35729"
     volumes:
       - .:/webodm
+      - /webodm/venv
   worker:
     volumes:
       - .:/webodm
+      - /webodm/venv
