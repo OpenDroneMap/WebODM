@@ -57,10 +57,11 @@ rio-cogeo==2.3.1
 rasterio==1.2.9 ; sys_platform == 'linux' or sys_platform == 'darwin'
 https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/rasterio-1.2.10-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
 https://github.com/OpenDroneMap/WebODM/releases/download/v1.9.7/GDAL-3.3.3-cp39-cp39-win_amd64.whl ; sys_platform == "win32"
-Shapely==1.7.0 ; sys_platform == "win32"
+Shapely==1.8.0 ; sys_platform == "win32"
 eventlet==0.32.0 ; sys_platform == "win32"
-pyopenssl==19.1.0 ; sys_platform == "win32"
+pyopenssl==24.0.0 ; sys_platform == "win32"
 numpy==1.26.2
 scipy==1.11.3
 drf-yasg==1.20.0
 zipstream-ng==1.8.0
+whitenoise==5.3.0
