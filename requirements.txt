@@ -64,4 +64,3 @@ numpy==1.26.2
 scipy==1.11.3
 drf-yasg==1.20.0
 zipstream-ng==1.8.0
-whitenoise==5.3.0
