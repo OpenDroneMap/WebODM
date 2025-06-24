@@ -949,7 +949,7 @@ class Task(models.Model):
             logger.warning("{} connection/timeout error: {}. We'll try reprocessing at the next tick.".format(self, str(e)))
         except TaskInterruptedException as e:
             # Task was interrupted during image resize / upload
-            logger.warning("{} interrupted".format(self, str(e)))
+            logger.warning("{} interrupted: {}".format(self, str(e)))
 
     def extract_assets_and_complete(self):
         """
