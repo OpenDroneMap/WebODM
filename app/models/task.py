@@ -183,6 +183,7 @@ class Task(models.Model):
             'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
             'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
             'orthophoto.kmz': os.path.join('odm_orthophoto', 'odm_orthophoto.kmz'),
+            'cutline.gpkg': os.path.join('odm_orthophoto', 'cutline.gpkg'),
             'georeferenced_model.las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.las'),
             'georeferenced_model.laz': os.path.join('odm_georeferencing', 'odm_georeferenced_model.laz'),
             'georeferenced_model.ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
@@ -1086,6 +1087,7 @@ class Task(models.Model):
         if 'orthophoto.tif' in self.available_assets: 
             types.append('orthophoto')
             types.append('plant')
+        if 'cutline.gpkg' in self.available_assets: types.append('cutline')
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
 
