@@ -9,7 +9,7 @@ import Workers from '../classes/Workers';
 
 export default class ExportAssetPanel extends React.Component {
   static defaultProps = {
-      exportFormats: ["gtiff-rgb", "gtiff", "jpg", "png", "kmz"],
+      exportFormats: ["gtiff-rgb", "gtiff", "jpg", "png", "kmz","gpkg"],
       asset: "",
       exportParams: {},
       task: null,
@@ -67,7 +67,11 @@ export default class ExportAssetPanel extends React.Component {
         'csv': {
             label: "CSV",
             icon: "fas fa-file-alt"
-        }        
+        },        
+        'gpkg': {
+            label: "GeoPackage",
+            icon: "far fa-image"
+        }
     };
 
     this.state = {
