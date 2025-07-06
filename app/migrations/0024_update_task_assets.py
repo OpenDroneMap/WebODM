@@ -13,6 +13,7 @@ ASSETS_MAP = {
     'orthophoto.tif': os.path.join('odm_orthophoto', 'odm_orthophoto.tif'),
     'orthophoto.png': os.path.join('odm_orthophoto', 'odm_orthophoto.png'),
     'orthophoto.mbtiles': os.path.join('odm_orthophoto', 'odm_orthophoto.mbtiles'),
+    'cutline.gpkg': os.path.join('odm_orthophoto', 'cutline.gpkg'),
     'georeferenced_model.las': os.path.join('odm_georeferencing', 'odm_georeferenced_model.las'),
     'georeferenced_model.laz': os.path.join('odm_georeferencing', 'odm_georeferenced_model.laz'),
     'georeferenced_model.ply': os.path.join('odm_georeferencing', 'odm_georeferenced_model.ply'),
