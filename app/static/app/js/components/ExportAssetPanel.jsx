@@ -9,7 +9,7 @@ import Workers from '../classes/Workers';
 
 export default class ExportAssetPanel extends React.Component {
   static defaultProps = {
-      exportFormats: ["gtiff-rgb", "gtiff", "jpg", "png", "kmz","gpkg"],
+      exportFormats: ["gtiff-rgb", "gtiff", "jpg", "png", "kmz"],
       asset: "",
       exportParams: {},
       task: null,
