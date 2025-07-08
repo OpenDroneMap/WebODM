@@ -1,8 +1,0 @@
-*.gem
-.bundle
-Gemfile.lock
-pkg/*
-.rvmrc
-.DS_Store
-.rbenv-version
-.ruby-version

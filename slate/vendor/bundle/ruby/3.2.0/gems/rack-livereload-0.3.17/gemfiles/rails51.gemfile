@@ -1,5 +1,0 @@
-source "http://rubygems.org"
-
-gem "rails", "~> 5.1.6"
-
-gemspec :path=>"../"

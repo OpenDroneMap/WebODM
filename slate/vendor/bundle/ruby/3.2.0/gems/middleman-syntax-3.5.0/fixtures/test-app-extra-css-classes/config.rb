@@ -1,1 +1,0 @@
-activate :syntax, :extra_css_classes => ["custom-class", "another-class"] 
