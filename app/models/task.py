@@ -1087,7 +1087,6 @@ class Task(models.Model):
         if 'orthophoto.tif' in self.available_assets: 
             types.append('orthophoto')
             types.append('plant')
-        if 'cutline.gpkg' in self.available_assets: types.append('cutline')
         if 'dsm.tif' in self.available_assets: types.append('dsm')
         if 'dtm.tif' in self.available_assets: types.append('dtm')
 
