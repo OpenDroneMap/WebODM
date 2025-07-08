@@ -67,11 +67,7 @@ export default class ExportAssetPanel extends React.Component {
         'csv': {
             label: "CSV",
             icon: "fas fa-file-alt"
-        },        
-        'gpkg': {
-            label: "GeoPackage",
-            icon: "far fa-image"
-        }
+        }        
     };
 
     this.state = {
