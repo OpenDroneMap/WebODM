@@ -1,0 +1,150 @@
+current directory: /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ext/nokogiri
+/usr/bin/ruby3.2 -I/usr/lib/ruby/vendor_ruby extconf.rb
+checking for whether -g is accepted as CFLAGS... yes
+checking for whether -Winline is accepted as CFLAGS... yes
+checking for whether -Wmissing-noreturn is accepted as CFLAGS... yes
+Building nokogiri using packaged libraries.
+Static linking is enabled.
+Cross build is disabled.
+checking for gzdopen() in -lz... yes
+Using mini_portile version 2.5.3
+checking for iconv... yes
+---------- IMPORTANT NOTICE ----------
+Building Nokogiri with a packaged version of libxml2-2.9.12.
+Configuration options: --host\=x86_64-linux-gnu --enable-static --disable-shared --libdir\=/home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ports/x86_64-linux-gnu/libxml2/2.9.12/lib --with-iconv\=yes --without-python --without-readline --with-c14n --with-debug --with-threads --disable-shared --enable-static CFLAGS\=-O2\ -U_FORTIFY_SOURCE\ -g\ -fPIC
+The following patches are being applied:
+  - 0001-Remove-script-macro-support.patch
+  - 0002-Update-entities-to-remove-handling-of-ssi.patch
+  - 0003-libxml2.la-is-in-top_builddir.patch
+  - 0004-use-glibc-strlen.patch
+  - 0005-avoid-isnan-isinf.patch
+  - 0006-update-automake-files-for-arm64.patch
+  - 0007-Fix-XPath-recursion-limit.patch
+
+The Nokogiri maintainers intend to provide timely security updates, but if
+this is a concern for you and want to use your OS/distro system library
+instead, then abort this installation process and install nokogiri as
+instructed at:
+
+  https://nokogiri.org/tutorials/installing_nokogiri.html#installing-using-standard-system-libraries
+
+Note, however, that nokogiri cannot guarantee compatiblity with every
+version of libxml2 that may be provided by OS/package vendors.
+
+Extracting libxml2-2.9.12.tar.gz into tmp/x86_64-linux-gnu/ports/libxml2/2.9.12... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxml2/0001-Remove-script-macro-support.patch... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxml2/0002-Update-entities-to-remove-handling-of-ssi.patch... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxml2/0003-libxml2.la-is-in-top_builddir.patch... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxml2/0004-use-glibc-strlen.patch... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxml2/0005-avoid-isnan-isinf.patch... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxml2/0006-update-automake-files-for-arm64.patch... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxml2/0007-Fix-XPath-recursion-limit.patch... OK
+Running 'configure' for libxml2 2.9.12... OK
+Running 'compile' for libxml2 2.9.12... OK
+Running 'install' for libxml2 2.9.12... OK
+Activating libxml2 2.9.12 (from /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ports/x86_64-linux-gnu/libxml2/2.9.12)...
+Using mini_portile version 2.5.3
+---------- IMPORTANT NOTICE ----------
+Building Nokogiri with a packaged version of libxslt-1.1.34.
+Configuration options: --host\=x86_64-linux-gnu --enable-static --disable-shared --libdir\=/home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ports/x86_64-linux-gnu/libxslt/1.1.34/lib --without-python --without-crypto --with-debug --with-libxml-prefix\=/home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ports/x86_64-linux-gnu/libxml2/2.9.12 --disable-shared --enable-static CFLAGS\=-O2\ -U_FORTIFY_SOURCE\ -g\ -fPIC
+The following patches are being applied:
+  - 0001-update-automake-files-for-arm64.patch
+  - 0002-Fix-xml2-config-check-in-configure-script.patch
+
+The Nokogiri maintainers intend to provide timely security updates, but if
+this is a concern for you and want to use your OS/distro system library
+instead, then abort this installation process and install nokogiri as
+instructed at:
+
+  https://nokogiri.org/tutorials/installing_nokogiri.html#installing-using-standard-system-libraries
+
+Extracting libxslt-1.1.34.tar.gz into tmp/x86_64-linux-gnu/ports/libxslt/1.1.34... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxslt/0001-update-automake-files-for-arm64.patch... OK
+Running git apply with /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/patches/libxslt/0002-Fix-xml2-config-check-in-configure-script.patch... OK
+Running 'configure' for libxslt 1.1.34... OK
+Running 'compile' for libxslt 1.1.34... OK
+Running 'install' for libxslt 1.1.34... OK
+Activating libxslt 1.1.34 (from /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ports/x86_64-linux-gnu/libxslt/1.1.34)...
+checking for whether -DNOKOGIRI_PACKAGED_LIBRARIES is accepted as CPPFLAGS... yes
+checking for whether -DNOKOGIRI_LIBXML2_PATCHES="\"0001-Remove-script-macro-support.patch 0002-Update-entities-to-remove-handling-of-ssi.patch 0003-libxml2.la-is-in-top_builddir.patch 0004-use-glibc-strlen.patch 0005-avoid-isnan-isinf.patch 0006-update-automake-files-for-arm64.patch 0007-Fix-XPath-recursion-limit.patch\"" is accepted as CPPFLAGS... yes
+checking for -llzma... no
+checking for -lliblzma... no
+checking for whether -DNOKOGIRI_LIBXSLT_PATCHES="\"0001-update-automake-files-for-arm64.patch 0002-Fix-xml2-config-check-in-configure-script.patch\"" is accepted as CPPFLAGS... yes
+checking for xmlParseDoc() in libxml/parser.h... yes
+checking for xsltParseStylesheetDoc() in libxslt/xslt.h... yes
+checking for exsltFuncRegister() in libexslt/exslt.h... yes
+checking for xmlHasFeature()... yes
+checking for xmlFirstElementChild()... yes
+checking for xmlRelaxNGSetParserStructuredErrors()... yes
+checking for xmlRelaxNGSetValidStructuredErrors()... yes
+checking for xmlSchemaSetValidStructuredErrors()... yes
+checking for xmlSchemaSetParserStructuredErrors()... yes
+checking for vasprintf()... yes
+checking for whether -DNOKOGIRI_OTHER_LIBRARY_VERSIONS="\"\"" is accepted as CPPFLAGS... yes
+creating Makefile
+
+current directory: /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ext/nokogiri
+make DESTDIR\= sitearchdir\=./.gem.20250708-35723-l15hnf sitelibdir\=./.gem.20250708-35723-l15hnf clean
+
+current directory: /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ext/nokogiri
+make DESTDIR\= sitearchdir\=./.gem.20250708-35723-l15hnf sitelibdir\=./.gem.20250708-35723-l15hnf
+compiling html_document.c
+compiling html_element_description.c
+compiling html_entity_lookup.c
+compiling html_sax_parser_context.c
+compiling html_sax_push_parser.c
+compiling libxml2_backwards_compat.c
+compiling nokogiri.c
+compiling test_global_handlers.c
+compiling xml_attr.c
+compiling xml_attribute_decl.c
+compiling xml_cdata.c
+compiling xml_comment.c
+compiling xml_document.c
+compiling xml_document_fragment.c
+compiling xml_dtd.c
+compiling xml_element_content.c
+compiling xml_element_decl.c
+compiling xml_encoding_handler.c
+compiling xml_entity_decl.c
+compiling xml_entity_reference.c
+compiling xml_namespace.c
+compiling xml_node.c
+compiling xml_node_set.c
+compiling xml_processing_instruction.c
+compiling xml_reader.c
+compiling xml_relax_ng.c
+compiling xml_sax_parser.c
+xml_sax_parser.c: In function ‘error_func’:
+xml_sax_parser.c:226:3: warning: ignoring return value of ‘vasprintf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  226 |   vasprintf(&message, msg, args);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+xml_sax_parser.c: In function ‘warning_func’:
+xml_sax_parser.c:208:3: warning: ignoring return value of ‘vasprintf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  208 |   vasprintf(&message, msg, args);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compiling xml_sax_parser_context.c
+compiling xml_sax_push_parser.c
+compiling xml_schema.c
+compiling xml_syntax_error.c
+compiling xml_text.c
+compiling xml_xpath_context.c
+xml_xpath_context.c: In function ‘xpath_generic_exception_handler’:
+xml_xpath_context.c:262:3: warning: ignoring return value of ‘vasprintf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  262 |   vasprintf(&message, msg, args);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compiling xslt_stylesheet.c
+xslt_stylesheet.c: In function ‘xslt_generic_error_handler’:
+xslt_stylesheet.c:30:3: warning: ignoring return value of ‘vasprintf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   30 |   vasprintf(&message, msg, args);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+linking shared-object nokogiri/nokogiri.so
+Cleaning files only used during build.
+
+current directory: /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ext/nokogiri
+make DESTDIR\= sitearchdir\=./.gem.20250708-35723-l15hnf sitelibdir\=./.gem.20250708-35723-l15hnf install
+/usr/bin/install -c -m 0755 nokogiri.so ./.gem.20250708-35723-l15hnf/nokogiri
+installing nokogiri libraries
+
+current directory: /home/runner/work/WebODM/WebODM/slate/vendor/bundle/ruby/3.2.0/gems/nokogiri-1.11.7/ext/nokogiri
+make DESTDIR\= sitearchdir\=./.gem.20250708-35723-l15hnf sitelibdir\=./.gem.20250708-35723-l15hnf clean

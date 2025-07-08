@@ -1,0 +1,52 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: >-
+      Test (${{ matrix.ruby }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        gemfile: [Gemfile]
+        ruby:
+          - "2.4"
+          - "2.5"
+          - "2.6"
+          - "2.7"
+          - "3.0"
+          - "3.1"
+          - "3.2"
+          - "3.3"
+          - jruby
+          - truffleruby
+        include:
+          - ruby: 2.5
+            gemfile: gemfiles/rubyracer
+          - ruby: jruby
+            gemfile: gemfiles/rubyrhino
+          - ruby: 2.5
+            gemfile: gemfiles/alaska
+            alaska: 1
+    env:
+      BUNDLE_GEMFILE: ${{ matrix.gemfile }}
+      ALASKA: ${{ matrix.alaska}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - run: bundle exec rake spec
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+          bundler-cache: true
+      - run: bundle exec rubocop --format github

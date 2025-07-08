@@ -1,0 +1,16 @@
+language: ruby
+rvm:
+  - 2.4.1
+  - 2.3.4
+  - 2.2.7
+gemfile:
+  - Gemfile
+  - Gemfile3
+script:
+  - bundle exec rake test
+env:
+  - RUBYOPT=W0
+sudo: false
+cache: bundler
+matrix:
+  fast_finish: true

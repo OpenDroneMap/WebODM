@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: bundler
+    directory: "/"
+    schedule:
+      interval: monthly
+      time: "06:00"
+      timezone: Asia/Hong_Kong
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+      time: "06:00"
+      timezone: Asia/Hong_Kong
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"

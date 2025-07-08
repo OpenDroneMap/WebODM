@@ -1,0 +1,15 @@
+<% if with_swf? %>
+  <script type="text/javascript">
+    WEB_SOCKET_SWF_LOCATION = "/__rack/WebSocketMain.swf";
+    <% if force_swf? %>
+      WEB_SOCKET_FORCE_FLASH = true;
+    <% end %>
+  </script>
+  <script type="text/javascript" src="<%= app_root %>/__rack/swfobject.js"></script>
+  <script type="text/javascript" src="<%= app_root %>/__rack/web_socket.js"></script>
+<% end %>
+<script type="text/javascript">
+  RACK_LIVERELOAD_PORT = <%= @options[:live_reload_port] %>;
+</script>
+<script type="text/javascript" src="<%= livereload_source %>"></script>
+

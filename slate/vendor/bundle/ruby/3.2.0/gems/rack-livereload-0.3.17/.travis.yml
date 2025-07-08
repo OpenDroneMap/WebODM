@@ -1,0 +1,17 @@
+rvm:
+  - 1.9.3
+  - 2.0.0
+  - 2.5.1
+branches:
+  only:
+    - master
+gemfile:
+  - gemfiles/rails32.gemfile
+  - gemfiles/rails40.gemfile
+  - gemfiles/rails51.gemfile
+matrix:
+  exclude:
+    - rvm: 1.9.3
+      gemfile: gemfiles/rails51.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/rails51.gemfile

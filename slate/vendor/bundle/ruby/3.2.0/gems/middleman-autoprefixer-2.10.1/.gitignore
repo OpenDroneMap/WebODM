@@ -1,0 +1,8 @@
+Gemfile.lock
+Gemfile3.lock
+
+.sass-cache
+
+coverage
+pkg
+tmp
