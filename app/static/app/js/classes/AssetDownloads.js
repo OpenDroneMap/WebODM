@@ -46,6 +46,7 @@ const api = {
       new AssetDownload(_("Orthophoto"),"orthophoto.tif","far fa-image", tiffExportFormats),
       new AssetDownload(_("Orthophoto (MBTiles)"),"orthophoto.mbtiles","far fa-image"),
       new AssetDownload(_("Orthophoto (Tiles)"),"orthophoto_tiles.zip","fa fa-table"),
+      new AssetDownload(_("Orthophoto Cutline"),"cutline.gpkg","fa fa-image"),
       new AssetDownload(_("Terrain Model"),"dtm.tif","fa fa-chart-area", tiffExportFormats, elevationExportParams),
       new AssetDownload(_("Terrain Model (Tiles)"),"dtm_tiles.zip","fa fa-table"),
       new AssetDownload(_("Surface Model"),"dsm.tif","fa fa-chart-area", tiffExportFormats, elevationExportParams),
