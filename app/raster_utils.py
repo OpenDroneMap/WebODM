@@ -162,11 +162,6 @@ def export_raster(input, output, **opts):
                 indexes = (ci.index(ColorInterp.gray) + 1,) * 3 + \
                            (ci.index(ColorInterp.alpha) + 1, )
 
-        if ColorInterp.alpha in ci:
-            mask = reader.read(ci.index(ColorInterp.alpha) + 1, window=win)
-        else:
-            mask = reader.dataset_mask(window=win)
-
         cmap = None
         if color_map:
             try:
@@ -240,7 +235,7 @@ def export_raster(input, output, **opts):
 
             def write_to(arr, dst):
                 reproject(source=arr, 
-                        destination=dst,
+                        destination=rasterio.band(dst, indexes),
                         src_transform=win_transform,
                         src_crs=src.crs,
                         dst_transform=transform,
