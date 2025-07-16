@@ -29,6 +29,39 @@ def extension_for_export_format(export_format):
     }
     return extensions.get(export_format, export_format)
 
+# Based on https://github.com/uav4geo/GeoDeep/blob/main/geodeep/slidingwindow.py
+def compute_subwindows(window, max_window_size, overlap_pixels=0):
+    win_size_x = max_window_size
+    win_size_y = max_window_size
+    win_size_x = min(win_size_x, window.width)
+    win_size_y = min(win_size_y, window.height)
+
+    step_size_x = win_size_x - overlap_pixels
+    step_size_y = win_size_y - overlap_pixels
+
+    last_x = window.width - win_size_x
+    last_y = window.height - win_size_y
+    x_offsets = list(range(0, last_x + 1, step_size_x))
+    y_offsets = list(range(0, last_y + 1, step_size_y))
+
+    if len(x_offsets) == 0 or x_offsets[-1] != last_x:
+        x_offsets.append(last_x)
+    if len(y_offsets) == 0 or y_offsets[-1] != last_y:
+        y_offsets.append(last_y)
+
+    # Generate the list of windows
+    windows = []
+    for x_offset in x_offsets:
+        for y_offset in y_offsets:
+                windows.append(Window(
+                    x_offset,
+                    y_offset,
+                    win_size_x,
+                    win_size_y,
+                ))
+
+    return windows
+
 def export_raster(input, output, **opts):
     epsg = opts.get('epsg')
     expression = opts.get('expression')
@@ -233,7 +266,8 @@ def export_raster(input, output, **opts):
                 height=height
             )
 
-            def write_to(arr, dst):
+            def write_to(arr, dst, window=None):
+                # TODO
                 reproject(source=arr, 
                         destination=rasterio.band(dst, indexes),
                         src_transform=win_transform,
@@ -245,8 +279,8 @@ def export_raster(input, output, **opts):
 
         else:
             # No reprojection needed
-            def write_to(arr, dst):
-                dst.write(arr)
+            def write_to(arr, dst, window=None):
+                dst.write(arr, window=window)
 
         if expression is not None:
             # Apply band math
@@ -333,8 +367,11 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                arr = reader.read(indexes=indexes, window=win)
-                write_to(process(arr), dst)
+                subwins = compute_subwindows(win, 100000)
+                for w in subwins:
+                    logger.info(w)
+                    arr = reader.read(indexes=indexes, window=w)
+                    write_to(process(arr), dst, window=w)
                 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
                 if not with_alpha:
