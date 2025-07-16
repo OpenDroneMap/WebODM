@@ -8,7 +8,7 @@ import numexpr as ne
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
 from rasterio.vrt import WarpedVRT
-from rasterio.windows import Window, bounds as window_bounds
+from rasterio.windows import Window, bounds as window_bounds, from_bounds
 from rio_tiler.utils import has_alpha_band, linear_rescale
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
@@ -31,16 +31,19 @@ def extension_for_export_format(export_format):
 
 # Based on https://github.com/uav4geo/GeoDeep/blob/main/geodeep/slidingwindow.py
 def compute_subwindows(window, max_window_size, overlap_pixels=0):
-    win_size_x = max_window_size
-    win_size_y = max_window_size
-    win_size_x = min(win_size_x, window.width)
-    win_size_y = min(win_size_y, window.height)
+    col_off = int(window.col_off)
+    row_off = int(window.row_off)
+    width = int(window.width)
+    height = int(window.height)
+
+    win_size_x = min(max_window_size, width)
+    win_size_y = min(max_window_size, height)
 
     step_size_x = win_size_x - overlap_pixels
     step_size_y = win_size_y - overlap_pixels
 
-    last_x = window.width - win_size_x
-    last_y = window.height - win_size_y
+    last_x = width - win_size_x - col_off
+    last_y = height - win_size_y - row_off
     x_offsets = list(range(0, last_x + 1, step_size_x))
     y_offsets = list(range(0, last_y + 1, step_size_y))
 
@@ -54,8 +57,8 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
     for x_offset in x_offsets:
         for y_offset in y_offsets:
                 windows.append(Window(
-                    x_offset,
-                    y_offset,
+                    x_offset + col_off,
+                    y_offset + row_off,
                     win_size_x,
                     win_size_y,
                 ))
@@ -91,14 +94,14 @@ def export_raster(input, output, **opts):
         src = ds_src.dataset
         profile = src.meta.copy()
         win_bounds = None
-        win_transform = None
+        src_transform = None
         dst_width = src.width
         dst_height = src.height
 
         if vrt_options is None:
             reader = src
             win = Window(0, 0, dst_width, dst_height)
-            win_transform = src.transform
+            src_transform = src.transform
         else:
             reader = WarpedVRT(src, **vrt_options)
             dst_width = bounds[2] - bounds[0]
@@ -106,7 +109,7 @@ def export_raster(input, output, **opts):
             win = Window(bounds[0], bounds[1], dst_width, dst_height)
             win_bounds = window_bounds(win, profile['transform'])
 
-            win_transform, width, height = calculate_default_transform(
+            src_transform, width, height = calculate_default_transform(
                 src.crs, src.crs, src.width, src.height,
                 left=win_bounds[0],
                 bottom=win_bounds[1],
@@ -116,7 +119,7 @@ def export_raster(input, output, **opts):
                 dst_height=dst_height)
 
             profile.update(
-                transform=win_transform,
+                transform=src_transform,
                 width=width,
                 height=height
             )
@@ -241,13 +244,13 @@ def export_raster(input, output, **opts):
         if dem and rgb and profile.get('nodata') is not None:
             profile.update(nodata=None)
 
-        # Define write band function
+        # Define write to function
         # Reprojection needed?
         if src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg:
             dst_crs = "EPSG:{}".format(epsg)
 
             if win_bounds is not None:
-                transform, width, height = calculate_default_transform(
+                dst_transform, width, height = calculate_default_transform(
                     src.crs, dst_crs, src.width, src.height,
                     left=win_bounds[0],
                     bottom=win_bounds[1],
@@ -256,12 +259,12 @@ def export_raster(input, output, **opts):
                     dst_width=dst_width,
                     dst_height=dst_height)
             else:
-                transform, width, height = calculate_default_transform(
+                dst_transform, width, height = calculate_default_transform(
                     src.crs, dst_crs, src.width, src.height, *src.bounds)
 
             profile.update(
                 crs=dst_crs,
-                transform=transform,
+                transform=dst_transform,
                 width=width,
                 height=height
             )
@@ -270,17 +273,28 @@ def export_raster(input, output, **opts):
                 # TODO
                 reproject(source=arr, 
                         destination=rasterio.band(dst, indexes),
-                        src_transform=win_transform,
+                        src_transform=src_transform,
                         src_crs=src.crs,
-                        dst_transform=transform,
+                        dst_transform=dst_transform,
                         dst_crs=dst_crs,
                         resampling=Resampling.nearest,
                         num_threads=4)
 
         else:
             # No reprojection needed
+            dst_transform = src_transform
+
             def write_to(arr, dst, window=None):
                 dst.write(arr, window=window)
+
+        def compute_dst_window(w):
+            dst_w = from_bounds(
+                *window_bounds(w, src_transform),
+                transform=dst_transform,
+            )
+
+            return Window(int(round(dst_w.col_off)), int(round(dst_w.row_off)),
+                          int(round(dst_w.width)), int(round(dst_w.height)))
 
         if expression is not None:
             # Apply band math
@@ -367,11 +381,11 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                subwins = compute_subwindows(win, 100000)
+                subwins = compute_subwindows(win, 1024)
                 for w in subwins:
                     logger.info(w)
                     arr = reader.read(indexes=indexes, window=w)
-                    write_to(process(arr), dst, window=w)
+                    write_to(process(arr), dst, window=compute_dst_window(w))
                 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
                 if not with_alpha:

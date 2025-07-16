@@ -203,6 +203,7 @@ def export_raster(self, input, **opts):
 
         return result
     except Exception as e:
+        logger.error(traceback.format_exc())
         logger.error(str(e))
         return {'error': str(e)}
 
