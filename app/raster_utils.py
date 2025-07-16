@@ -16,7 +16,7 @@ from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
 from app.geoutils import geom_transform_wkt_bbox
 from rio_tiler.io import COGReader
-from rasterio.warp import calculate_default_transform, reproject, Resampling
+from rasterio.warp import calculate_default_transform, reproject, Resampling, transform_bounds
 
 logger = logging.getLogger('app.logger')
 
@@ -269,32 +269,46 @@ def export_raster(input, output, **opts):
                 height=height
             )
 
-            def write_to(arr, dst, window=None):
-                # TODO
+            def write_to(arr, dst, window):
+                # bnds = window_bounds(window, dst_transform)
+
+                # _, width, height = calculate_default_transform(
+                # src.crs, src.crs, src.width, src.height,
+                # left=win_bounds[0],
+                # bottom=win_bounds[1],
+                # right=win_bounds[2],
+                # top=win_bounds[3],
+                # dst_width=dst_width,
+                # dst_height=dst_height)
+                dst_arr = np.zeros((arr.shape[0], int(window.height), int(window.width)), dtype=arr.dtype)
                 reproject(source=arr, 
-                        destination=rasterio.band(dst, indexes),
+                        destination=dst_arr,
                         src_transform=src_transform,
                         src_crs=src.crs,
                         dst_transform=dst_transform,
                         dst_crs=dst_crs,
                         resampling=Resampling.nearest,
                         num_threads=4)
+                
+                dst.write(dst_arr, window=window)
 
         else:
             # No reprojection needed
             dst_transform = src_transform
+            dst_crs = src.crs
 
-            def write_to(arr, dst, window=None):
+            def write_to(arr, dst, window):
                 dst.write(arr, window=window)
 
         def compute_dst_window(w):
+            src_bounds = window_bounds(w, src_transform)
+            dst_bounds = transform_bounds(src.crs, dst_crs, *src_bounds, densify_pts=21)
             dst_w = from_bounds(
-                *window_bounds(w, src_transform),
+                *dst_bounds,
                 transform=dst_transform,
             )
-
-            return Window(int(round(dst_w.col_off)) - win.col_off, int(round(dst_w.row_off)) - win.row_off,
-                          int(round(dst_w.width)), int(round(dst_w.height)))
+            return Window(int(dst_w.col_off) - win.col_off, int(dst_w.row_off) - win.row_off,
+                          int(dst_w.width), int(dst_w.height))
 
         if expression is not None:
             # Apply band math
@@ -381,6 +395,7 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
+                logger.info(f"MAIN: {win}")
                 subwins = compute_subwindows(win, 2048)
                 for w in subwins:
                     logger.info(w)
