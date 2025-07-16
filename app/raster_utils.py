@@ -42,6 +42,9 @@ def export_raster(input, output, **opts):
 
     dem = asset_type in ['dsm', 'dtm']
 
+    import time
+    now = time.time()
+
     if crop_wkt is not None:
         with rasterio.open(input) as ds:
             crop = GEOSGeometry(crop_wkt)
@@ -137,7 +140,10 @@ def export_raster(input, output, **opts):
             rescale = [md['statistics']['1']['min'], md['statistics']['1']['max']]
 
         ci = src.colorinterp
-
+        alpha_index = None
+        if has_alpha_band(src):
+            alpha_index = src.colorinterp.index(ColorInterp.alpha) + 1
+            
         if rgb and expression is None:
             # More than 4 bands?
             if len(ci) > 4:
@@ -170,14 +176,29 @@ def export_raster(input, output, **opts):
 
 
         def process(arr, skip_rescale=False, skip_alpha=False, skip_type=False):
+            aidx = None
+            if alpha_index is not None:
+                aidx = indexes.index(alpha_index)
+
+                # Alpha must (should) be the last band
+                if aidx != len(indexes) - 1:
+                    # TODO remove
+                    print("Alpha index is not the last one")
+                    aidx = None
+            bands, w, h = arr.shape
+
             if not skip_rescale and rescale is not None:
-                arr = linear_rescale(arr, in_range=rescale)
-            if not skip_alpha and not with_alpha:
-                arr[mask==0] = jpg_background
+                arr[:aidx,:,:] = linear_rescale(arr[:aidx,:,:], in_range=rescale)
+            if not skip_alpha and not with_alpha and aidx is not None:
+                background = arr[aidx]==0
+                arr[:aidx, :, :][:, background] = jpg_background
             if not skip_type and rgb and arr.dtype != np.uint8:
                 arr = arr.astype(np.uint8)
 
-            return arr
+            if not with_alpha and aidx is not None:
+                return arr[:aidx,:,:]
+            else:
+                return arr
 
         def update_rgb_colorinterp(dst):
             if with_alpha:
@@ -217,9 +238,9 @@ def export_raster(input, output, **opts):
                 height=height
             )
 
-            def write_band(arr, dst, band_num):
+            def write_to(arr, dst):
                 reproject(source=arr, 
-                        destination=rasterio.band(dst, band_num),
+                        destination=dst,
                         src_transform=win_transform,
                         src_crs=src.crs,
                         dst_transform=transform,
@@ -229,8 +250,8 @@ def export_raster(input, output, **opts):
 
         else:
             # No reprojection needed
-            def write_band(arr, dst, band_num):
-                dst.write(arr, band_num)
+            def write_to(arr, dst):
+                dst.write(arr)
 
         if expression is not None:
             # Apply band math
@@ -243,13 +264,8 @@ def export_raster(input, output, **opts):
             rgb_expr = expression.split(",")
             indexes = tuple([int(b.replace("b", "")) for b in bands_names])
 
-            alpha_index = None
-            if has_alpha_band(src):
-                try:
-                    alpha_index = src.colorinterp.index(ColorInterp.alpha) + 1
-                    indexes += (alpha_index, )
-                except ValueError:
-                    pass
+            if alpha_index is not None:
+                indexes += (alpha_index, )
 
             data = reader.read(indexes=indexes, window=win, out_dtype=np.float32)
             arr = dict(zip(bands_names, data))
@@ -322,18 +338,8 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                band_num = 1
-                for idx in indexes:
-                    ci = src.colorinterp[idx - 1]
-                    arr = reader.read(idx, window=win)
-
-                    if ci == ColorInterp.alpha:
-                        if with_alpha:
-                            write_band(arr, dst, band_num)
-                            band_num += 1
-                    else:
-                        write_band(process(arr), dst, band_num)
-                        band_num += 1
+                arr = reader.read(indexes=indexes, window=win)
+                write_to(process(arr), dst)
                 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
                 if not with_alpha:
@@ -344,6 +350,8 @@ def export_raster(input, output, **opts):
         # Close warped vrt
         if vrt_options is not None:
             reader.close()
+
+        logger.info(f"Finished in {time.time() - now}s")
         
         if kmz:
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
