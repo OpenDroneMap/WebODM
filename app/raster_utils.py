@@ -270,27 +270,19 @@ def export_raster(input, output, **opts):
             )
 
             def write_to(arr, dst, window):
-                # bnds = window_bounds(window, dst_transform)
-
-                # _, width, height = calculate_default_transform(
-                # src.crs, src.crs, src.width, src.height,
-                # left=win_bounds[0],
-                # bottom=win_bounds[1],
-                # right=win_bounds[2],
-                # top=win_bounds[3],
-                # dst_width=dst_width,
-                # dst_height=dst_height)
-                dst_arr = np.zeros((arr.shape[0], int(window.height), int(window.width)), dtype=arr.dtype)
+                # dst_arr = np.zeros((arr.shape[0], int(window.height), int(window.width)), dtype=arr.dtype)
+                # for band in range(arr.shape[0]):
+                current = dst.read(window=window)
                 reproject(source=arr, 
-                        destination=dst_arr,
+                        destination=current,
                         src_transform=src_transform,
                         src_crs=src.crs,
                         dst_transform=dst_transform,
                         dst_crs=dst_crs,
                         resampling=Resampling.nearest,
-                        num_threads=4)
-                
-                dst.write(dst_arr, window=window)
+                        num_threads=4,
+                        init_dest_nodata=False)
+                dst.write(current, window=window)
 
         else:
             # No reprojection needed
@@ -395,8 +387,10 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
+                pass
+            with rasterio.open(output_raster, 'r+', **profile) as dst:
                 logger.info(f"MAIN: {win}")
-                subwins = compute_subwindows(win, 2048)
+                subwins = compute_subwindows(win, 512)
                 for w in subwins:
                     logger.info(w)
                     logger.info(compute_dst_window(w))
