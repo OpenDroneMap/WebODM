@@ -42,10 +42,10 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
     step_size_x = win_size_x - overlap_pixels
     step_size_y = win_size_y - overlap_pixels
 
-    last_x = width - win_size_x - col_off
-    last_y = height - win_size_y - row_off
-    x_offsets = list(range(0, last_x + 1, step_size_x))
-    y_offsets = list(range(0, last_y + 1, step_size_y))
+    last_x = col_off + width - win_size_x
+    last_y = row_off + height - win_size_y
+    x_offsets = list(range(col_off, last_x + 1, step_size_x))
+    y_offsets = list(range(row_off, last_y + 1, step_size_y))
 
     if len(x_offsets) == 0 or x_offsets[-1] != last_x:
         x_offsets.append(last_x)
@@ -57,8 +57,8 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
     for x_offset in x_offsets:
         for y_offset in y_offsets:
                 windows.append(Window(
-                    x_offset + col_off,
-                    y_offset + row_off,
+                    x_offset,
+                    y_offset,
                     win_size_x,
                     win_size_y,
                 ))
@@ -293,7 +293,7 @@ def export_raster(input, output, **opts):
                 transform=dst_transform,
             )
 
-            return Window(int(round(dst_w.col_off)), int(round(dst_w.row_off)),
+            return Window(int(round(dst_w.col_off)) - win.col_off, int(round(dst_w.row_off)) - win.row_off,
                           int(round(dst_w.width)), int(round(dst_w.height)))
 
         if expression is not None:
@@ -381,12 +381,18 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                subwins = compute_subwindows(win, 1024)
+                subwins = compute_subwindows(win, 2048)
                 for w in subwins:
                     logger.info(w)
+                    logger.info(compute_dst_window(w))
+                    logger.info("====")
                     arr = reader.read(indexes=indexes, window=w)
                     write_to(process(arr), dst, window=compute_dst_window(w))
+
+                # arr = reader.read(indexes=indexes, window=win)
+                # write_to(process(arr), dst, window=compute_dst_window(win))
                 
+
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
                 if not with_alpha:
                     new_ci = [ci for ci in new_ci if ci != ColorInterp.alpha]
