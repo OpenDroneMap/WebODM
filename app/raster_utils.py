@@ -245,7 +245,10 @@ def export_raster(input, output, **opts):
 
         def process(arr, skip_rescale=False, skip_background=False, skip_type=False, mask=None, includes_alpha=True, drop_last_band=False):
             if not skip_rescale and rescale is not None:
-                arr = linear_rescale(arr, in_range=rescale)
+                if includes_alpha:
+                    arr[:-1, :, :] = linear_rescale(arr[:-1, :, :], in_range=rescale)
+                else:
+                    arr = linear_rescale(arr, in_range=rescale)
             if not skip_background and (mask is not None or includes_alpha):
                 if mask is not None:
                     background = mask==0
@@ -256,6 +259,9 @@ def export_raster(input, output, **opts):
                 else:
                     arr[:, background] = jpg_background
             if not skip_type and rgb and arr.dtype != np.uint8:
+                if includes_alpha:
+                    arr[-1][arr[-1] > 255] = 255
+                    
                 arr = arr.astype(np.uint8)
             
             if drop_last_band:
