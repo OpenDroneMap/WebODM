@@ -128,6 +128,7 @@ def export_raster(input, output, **opts):
         driver = "GTiff"
         compress = None
         max_bands = 9999
+        window_size = 512
         with_alpha = True
         rgb = False
         indexes = src.indexes
@@ -348,11 +349,10 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                subwins = compute_subwindows(win, 512)
+                subwins = compute_subwindows(win, window_size)
                 for w in subwins:
                     arr = reader.read(indexes=indexes, window=w)
-                    dst_w = Window(w.col_off - win.col_off, w.row_off - win.row_off,
-                                    w.width, w.height)
+                    dst_w = Window(w.col_off - win.col_off, w.row_off - win.row_off, w.width, w.height)
                     dst.write(process(arr), window=dst_w)
 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
