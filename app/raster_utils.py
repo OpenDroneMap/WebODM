@@ -134,7 +134,6 @@ def export_raster(input, output, **opts):
         # Output format
         driver = "GTiff"
         compress = None
-        max_bands = 9999
         window_size = 512
         with_alpha = True
         rgb = False
@@ -320,42 +319,43 @@ def export_raster(input, output, **opts):
                         update_rgb_colorinterp(dst)
                     else:
                         # Raw
-                        # write_band(process(arr)[0], dst, 1)
-                        dst.write(process(arr)[0], window=dst_w) 
+                        dst.write(process(arr), window=dst_w) 
         elif dem:
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                arr = reader.read(window=win)
-
-                intensity = None
-                if hillshade is not None and hillshade > 0:
-                    delta_scale = ZOOM_EXTRA_LEVELS ** 2
-                    dx = src.meta["transform"][0] * delta_scale
-                    dy = src.meta["transform"][4] * delta_scale
-                    ls = LightSource(azdeg=315, altdeg=45)
-                    intensity = ls.hillshade(arr[0], dx=dx, dy=dy, vert_exag=hillshade)
-                    intensity = intensity * 255.0
-
-                # Apply colormap?
-                if rgb and cmap is not None:
-                    rgb_data, _ = apply_cmap(process(arr, skip_background=True), cmap)
-                    arr = None
-
-                    if intensity is not None:
-                        rgb_data = hsv_blend(rgb_data, intensity)
-                        
-                    band_num = 1
-                    for b in rgb_data:
-                        write_band(process(b, skip_rescale=True), dst, band_num)
-                        band_num += 1
+                for w, dst_w in subwins:
+                    arr = reader.read(window=w)[:1]
                     
-                    if with_alpha:
-                        write_band(mask, dst, band_num)
+                    # Apply colormap?
+                    if rgb and cmap is not None:
+                        nodata = profile.get('nodata')
+                        if nodata is None:
+                            nodata = -9999
+                        
+                        mask = arr[0] != nodata
 
-                    update_rgb_colorinterp(dst)
-                else:
-                    # Raw
-                    write_band(process(arr)[0], dst, 1)
+                        intensity = None
+                        if hillshade is not None and hillshade > 0:
+                            delta_scale = ZOOM_EXTRA_LEVELS ** 2
+                            dx = src.meta["transform"][0] * delta_scale
+                            dy = src.meta["transform"][4] * delta_scale
+                            ls = LightSource(azdeg=315, altdeg=45)
+                            intensity = ls.hillshade(arr[0], dx=dx, dy=dy, vert_exag=hillshade)
+                            intensity = intensity * 255.0
+
+                        rgb_data, _ = apply_cmap(process(arr, skip_background=True, includes_alpha=False), cmap)
+
+                        if intensity is not None:
+                            rgb_data = hsv_blend(rgb_data, intensity)
+                        
+                        dst.write(process(rgb_data, skip_rescale=True, mask=mask, includes_alpha=False), window=dst_w, indexes=(1,2,3))
+                        if with_alpha:
+                            dst.write(mask.astype(np.uint8) * 255, 4, window=dst_w)
+
+                        update_rgb_colorinterp(dst)
+                    else:
+                        # Raw
+                         dst.write(process(arr), window=dst_w)
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
@@ -384,12 +384,6 @@ def export_raster(input, output, **opts):
                                     "-of", "VRT",
                                     "-t_srs", f"EPSG:{epsg}",
                                     output_raster, output_vrt])
-            # subprocess.check_output(["gdalwarp", "-r", "near", 
-            #                         "-multi",
-            #                         "-wo", "NUM_THREADS=4",
-            #                         "-t_srs", f"EPSG:{epsg}",
-            #                         "--config", "GDAL_CACHEMAX", "25%",
-            #                         output_raster, output])
             gt_args = ["-r", "nearest", "--config", "GDAL_CACHEMAX", "25%"]
             if bigtiff and not jpg and not png:
                 gt_args += ["-co", "BIGTIFF=IF_SAFER", 
