@@ -1,4 +1,4 @@
-// Auto-generated with extract_plugin_manifest_strings.py, do not edit!
+# Auto-generated with extract_plugin_manifest_strings.py, do not edit!
 
 from django.utils.translation import gettext as _
 _("Upload and tile ODM assets with Cesium ion.")
