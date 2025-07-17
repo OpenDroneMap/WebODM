@@ -56,12 +56,19 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
     windows = []
     for x_offset in x_offsets:
         for y_offset in y_offsets:
-                windows.append(Window(
+            w = Window(
                     x_offset,
                     y_offset,
                     win_size_x,
                     win_size_y,
-                ))
+                )
+            dst_w = Window(
+                x_offset - window.col_off, 
+                y_offset - window.row_off, 
+                win_size_x, win_size_y
+            )
+             
+            windows.append((w, dst_w))
 
     return windows
 
@@ -201,7 +208,9 @@ def export_raster(input, output, **opts):
         alpha_index = None
         if has_alpha_band(src):
             alpha_index = src.colorinterp.index(ColorInterp.alpha) + 1
-            
+        
+        subwins = compute_subwindows(win, window_size)
+
         if rgb and expression is None:
             # More than 4 bands?
             if len(ci) > 4:
@@ -228,26 +237,23 @@ def export_raster(input, output, **opts):
                 logger.warning("Invalid colormap {}".format(color_map))
 
 
-        def process(arr, skip_rescale=False, skip_alpha=False, skip_type=False):
-            aidx = None
-            if alpha_index is not None:
-                aidx = indexes.index(alpha_index)
-
-                # Alpha must (should) be the last band
-                if aidx != len(indexes) - 1:
-                    aidx = None
-            bands, w, h = arr.shape
+        def process(arr, skip_rescale=False, skip_background=False, skip_type=False, mask=None):
+            # To include or exclude alpha
+            ax = -1 if alpha_index is not None else None
 
             if not skip_rescale and rescale is not None:
-                arr[:aidx,:,:] = linear_rescale(arr[:aidx,:,:], in_range=rescale)
-            if not skip_alpha and not with_alpha and aidx is not None:
-                background = arr[aidx]==0
-                arr[:aidx, :, :][:, background] = jpg_background
+                arr[:ax,:,:] = linear_rescale(arr[:ax,:,:], in_range=rescale)
+            if not skip_background and not with_alpha and (ax is not None or mask is not None):
+                if mask is not None:
+                    background = mask==0
+                else:
+                    background = arr[ax]==0
+                arr[:ax, :, :][:, background] = jpg_background
             if not skip_type and rgb and arr.dtype != np.uint8:
                 arr = arr.astype(np.uint8)
 
-            if not with_alpha and aidx is not None:
-                return arr[:aidx,:,:]
+            if not with_alpha and ax is not None:
+                return arr[:ax,:,:]
             else:
                 return arr
 
@@ -278,40 +284,40 @@ def export_raster(input, output, **opts):
             if alpha_index is not None:
                 indexes += (alpha_index, )
 
-            data = reader.read(indexes=indexes, window=win, out_dtype=np.float32)
-            arr = dict(zip(bands_names, data))
-            arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
-
-            # Set nodata values
-            index_band = arr[0]
-            if alpha_index is not None:
-                # -1 is the last band = alpha
-                index_band[data[-1] == 0] = -9999
-
-            # Remove infinity values
-            index_band[index_band>1e+30] = -9999
-            index_band[index_band<-1e+30] = -9999
-
-            # Make sure this is float32
-            arr = arr.astype(np.float32)
-
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                # Apply colormap?
-                if rgb and cmap is not None:
-                    rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
+                for w, dst_w in subwins:
+                    data = reader.read(indexes=indexes, window=w, out_dtype=np.float32)
+                    arr = dict(zip(bands_names, data))
+                    arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
 
-                    band_num = 1
-                    for b in rgb_data:
-                        write_band(process(b, skip_rescale=True), dst, band_num)
-                        band_num += 1
+                    # Set nodata values
+                    index_band = arr[0]
+                    if alpha_index is not None:
+                        # -1 is the last band = alpha
+                        index_band[data[-1] == 0] = -9999
 
-                    if with_alpha:
-                        write_band(mask, dst, band_num)
-                    
-                    update_rgb_colorinterp(dst)
-                else:
-                    # Raw
-                    write_band(process(arr)[0], dst, 1)
+                    # Remove infinity values
+                    index_band[index_band>1e+30] = -9999
+                    index_band[index_band<-1e+30] = -9999
+
+                    # Make sure this is float32
+                    arr = arr.astype(np.float32)
+
+                    # Apply colormap?
+                    if rgb and cmap is not None:
+                        rgb_data, mask = apply_cmap(process(arr, skip_background=True), cmap)
+
+                        logger.warning(rgb_data.shape)
+                        dst.write(process(rgb_data, skip_rescale=True, mask=mask), window=dst_w, indexes=(1,2,3))
+
+                        if with_alpha:
+                            dst.write(mask, 4, window=dst_w)
+
+                        update_rgb_colorinterp(dst)
+                    else:
+                        # Raw
+                        # write_band(process(arr)[0], dst, 1)
+                        dst.write(process(arr)[0], window=dst_w) 
         elif dem:
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
@@ -328,7 +334,7 @@ def export_raster(input, output, **opts):
 
                 # Apply colormap?
                 if rgb and cmap is not None:
-                    rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
+                    rgb_data, _ = apply_cmap(process(arr, skip_background=True), cmap)
                     arr = None
 
                     if intensity is not None:
@@ -349,10 +355,8 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                subwins = compute_subwindows(win, window_size)
-                for w in subwins:
+                for w, dst_w in subwins:
                     arr = reader.read(indexes=indexes, window=w)
-                    dst_w = Window(w.col_off - win.col_off, w.row_off - win.row_off, w.width, w.height)
                     dst.write(process(arr), window=dst_w)
 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
