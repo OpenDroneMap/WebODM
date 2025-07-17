@@ -8,13 +8,12 @@ import numexpr as ne
 import time
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
-from rasterio.windows import Window, bounds as window_bounds, from_bounds
+from rasterio.windows import Window
 from rio_tiler.utils import has_alpha_band, linear_rescale
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
-from rasterio.warp import calculate_default_transform
 from rio_tiler.io import COGReader
 
 logger = logging.getLogger('app.logger')
