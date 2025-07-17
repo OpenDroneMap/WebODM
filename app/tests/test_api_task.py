@@ -143,8 +143,7 @@ class TestApiTask(BootTransactionTestCase):
                 'images': [image1, image2, multispec_image, gcp],
                 'name': 'test_task',
                 'processing_node': pnode.id,
-                'resize_to': img1.size[0] / 2.0,
-                'orthophoto-cutline': True
+                'resize_to': img1.size[0] / 2.0
             }, format="multipart")
             self.assertTrue(res.status_code == status.HTTP_201_CREATED)
             resized_task = Task.objects.latest('created_at')
