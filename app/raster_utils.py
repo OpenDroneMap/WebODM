@@ -5,18 +5,16 @@ import os
 import subprocess
 import numpy as np
 import numexpr as ne
+import time
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
-from rasterio.vrt import WarpedVRT
-from rasterio.windows import Window, bounds as window_bounds
+from rasterio.windows import Window
 from rio_tiler.utils import has_alpha_band, linear_rescale
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
-from app.geoutils import geom_transform_wkt_bbox
 from rio_tiler.io import COGReader
-from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 logger = logging.getLogger('app.logger')
 
@@ -29,7 +27,62 @@ def extension_for_export_format(export_format):
     }
     return extensions.get(export_format, export_format)
 
-def export_raster(input, output, **opts):
+# Based on https://github.com/uav4geo/GeoDeep/blob/main/geodeep/slidingwindow.py
+def compute_subwindows(window, max_window_size, overlap_pixels=0):
+    col_off = int(window.col_off)
+    row_off = int(window.row_off)
+    width = int(window.width)
+    height = int(window.height)
+
+    win_size_x = min(max_window_size, width)
+    win_size_y = min(max_window_size, height)
+
+    step_size_x = win_size_x - overlap_pixels
+    step_size_y = win_size_y - overlap_pixels
+
+    last_x = col_off + width - win_size_x
+    last_y = row_off + height - win_size_y
+    x_offsets = list(range(col_off, last_x + 1, step_size_x))
+    y_offsets = list(range(row_off, last_y + 1, step_size_y))
+
+    if len(x_offsets) == 0 or x_offsets[-1] != last_x:
+        x_offsets.append(last_x)
+    if len(y_offsets) == 0 or y_offsets[-1] != last_y:
+        y_offsets.append(last_y)
+
+    # Generate the list of windows
+    windows = []
+    for x_offset in x_offsets:
+        for y_offset in y_offsets:
+            w = Window(
+                    x_offset,
+                    y_offset,
+                    win_size_x,
+                    win_size_y,
+                )
+            dst_w = Window(
+                x_offset - window.col_off, 
+                y_offset - window.row_off, 
+                win_size_x, win_size_y
+            )
+             
+            windows.append((w, dst_w))
+
+    return windows
+
+def padded_window(w, pad):
+    return Window(w.col_off - pad, w.row_off - pad, w.width + pad * 2, w.height + pad * 2)
+
+def export_raster(input, output, progress_callback=None, **opts):
+    now = time.time()
+
+    current_progress = 0
+    def p(text, perc=0):
+        nonlocal current_progress
+        current_progress += perc
+        if progress_callback is not None:
+            progress_callback(text, current_progress)
+
     epsg = opts.get('epsg')
     expression = opts.get('expression')
     export_format = opts.get('format')
@@ -41,67 +94,65 @@ def export_raster(input, output, **opts):
     crop_wkt = opts.get('crop')
 
     dem = asset_type in ['dsm', 'dtm']
+    path_base, _ = os.path.splitext(output)
+    resampling = 'nearest'
+    if dem:
+        resampling = 'bilinear'
 
     if crop_wkt is not None:
-        with rasterio.open(input) as ds:
-            crop = GEOSGeometry(crop_wkt)
-            crop.srid = 4326
-            cutline, bounds = geom_transform_wkt_bbox(crop, ds, 'raster')
-            vrt_options = {'cutline': cutline, 'nodata': 0}
-    else:
-        vrt_options = None
+        crop = GEOSGeometry(crop_wkt)
+        crop.srid = 4326
+
+        crop_geojson = os.path.join(path_base, "crop.geojson")
+        raster_vrt = os.path.join(path_base, "raster.vrt")
+
+        os.makedirs(os.path.dirname(crop_geojson), exist_ok=True)
+        with open(crop_geojson, "w", encoding="utf-8") as f:
+            f.write(crop.geojson)
+
+        subprocess.check_output(["gdalwarp", "-cutline", crop_geojson,
+                '--config', 'GDALWARP_DENSIFY_CUTLINE', 'NO', 
+                '-crop_to_cutline', '-of', 'VRT', '-r', resampling,
+                 input, raster_vrt])
+
+        input = raster_vrt
     
-    with COGReader(input, vrt_options=vrt_options) as ds_src:
+    with COGReader(input) as ds_src:
         src = ds_src.dataset
         profile = src.meta.copy()
-        win_bounds = None
-        win_transform = None
-        dst_width = src.width
-        dst_height = src.height
-
-        if vrt_options is None:
-            reader = src
-            win = Window(0, 0, dst_width, dst_height)
-            win_transform = src.transform
-        else:
-            reader = WarpedVRT(src, **vrt_options)
-            dst_width = bounds[2] - bounds[0]
-            dst_height = bounds[3] - bounds[1]
-            win = Window(bounds[0], bounds[1], dst_width, dst_height)
-            win_bounds = window_bounds(win, profile['transform'])
-
-            win_transform, width, height = calculate_default_transform(
-                src.crs, src.crs, src.width, src.height,
-                left=win_bounds[0],
-                bottom=win_bounds[1],
-                right=win_bounds[2],
-                top=win_bounds[3],
-                dst_width=dst_width,
-                dst_height=dst_height)
-
-            profile.update(
-                transform=win_transform,
-                width=width,
-                height=height
-            )
+        win = Window(0, 0, src.width, src.height)
             
         # Output format
         driver = "GTiff"
         compress = None
-        max_bands = 9999
+        window_size = 512
         with_alpha = True
         rgb = False
+        bigtiff = False
         indexes = src.indexes
         output_raster = output
         jpg_background = 255 # white
+        reproject = src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg
 
         # KMZ is special, we just export it as GeoTIFF
         # and then call GDAL to tile/package it
         kmz = export_format == "kmz"
         if kmz:
             export_format = "gtiff-rgb"
-            path_base, _ = os.path.splitext(output)
             output_raster = path_base + ".kmz.tif"
+
+        # JPG and PNG are exported to GeoTIFF only if reprojection is needed
+        jpg = export_format == "jpg"
+        png = export_format == "png"
+        if reproject:
+            if jpg:
+                export_format = 'gtiff-rgb'
+                path_base, _ = os.path.splitext(output)
+                output_raster = path_base + ".jpg.tif"
+            if png:
+                export_format = 'gtiff-rgb'
+                path_base, _ = os.path.splitext(output)
+                output_raster = path_base + ".png.tif"
 
         if export_format == "jpg":
             driver = "JPEG"
@@ -115,16 +166,26 @@ def export_raster(input, output, **opts):
             rgb = True
         elif export_format == "gtiff-rgb":
             compress = "JPEG"
+            bigtiff = True
             profile.update(jpeg_quality=90)
-            profile.update(BIGTIFF='IF_SAFER')
             band_count = 4
             rgb = True
+            if jpg:
+                band_count = 3
+                with_alpha = False
         else:
+            bigtiff = True
             compress = "DEFLATE"
-            profile.update(BIGTIFF='IF_SAFER')
             band_count = src.count
 
-        if compress is not None:
+        if bigtiff:
+            profile.update(BIGTIFF='IF_SAFER')
+
+        if reproject:
+            path_base, _ = os.path.splitext(output_raster)
+            output_raster = path_base + ".base.tif"
+
+        if compress is not None and not reproject:
             profile.update(compress=compress)
             profile.update(predictor=2 if compress == "DEFLATE" else 1)
 
@@ -133,10 +194,15 @@ def export_raster(input, output, **opts):
             nodata = None
             if asset_type == 'orthophoto':
                 nodata = 0
-            md = ds_src.metadata(pmin=2.0, pmax=98.0, hist_options={"bins": 255}, nodata=nodata, vrt_options=vrt_options)
+            md = ds_src.metadata(pmin=2.0, pmax=98.0, hist_options={"bins": 255}, nodata=nodata)
             rescale = [md['statistics']['1']['min'], md['statistics']['1']['max']]
 
         ci = src.colorinterp
+        alpha_index = None
+        if has_alpha_band(src):
+            alpha_index = src.colorinterp.index(ColorInterp.alpha) + 1
+        
+        subwins = compute_subwindows(win, window_size)
 
         if rgb and expression is None:
             # More than 4 bands?
@@ -156,11 +222,6 @@ def export_raster(input, output, **opts):
                 indexes = (ci.index(ColorInterp.gray) + 1,) * 3 + \
                            (ci.index(ColorInterp.alpha) + 1, )
 
-        if ColorInterp.alpha in ci:
-            mask = reader.read(ci.index(ColorInterp.alpha) + 1, window=win)
-        else:
-            mask = reader.dataset_mask(window=win)
-
         cmap = None
         if color_map:
             try:
@@ -169,15 +230,31 @@ def export_raster(input, output, **opts):
                 logger.warning("Invalid colormap {}".format(color_map))
 
 
-        def process(arr, skip_rescale=False, skip_alpha=False, skip_type=False):
+        def process(arr, skip_rescale=False, skip_background=False, skip_type=False, mask=None, includes_alpha=True, drop_last_band=False):
             if not skip_rescale and rescale is not None:
-                arr = linear_rescale(arr, in_range=rescale)
-            if not skip_alpha and not with_alpha:
-                arr[mask==0] = jpg_background
+                if includes_alpha:
+                    arr[:-1, :, :] = linear_rescale(arr[:-1, :, :], in_range=rescale)
+                else:
+                    arr = linear_rescale(arr, in_range=rescale)
+            if not skip_background and (mask is not None or includes_alpha):
+                if mask is not None:
+                    background = mask==0
+                elif includes_alpha:
+                    background = arr[-1]==0
+                if includes_alpha:
+                    arr[:-1, :, :][:, background] = jpg_background
+                else:
+                    arr[:, background] = jpg_background
             if not skip_type and rgb and arr.dtype != np.uint8:
+                if includes_alpha:
+                    arr[-1][arr[-1] > 255] = 255
+                    
                 arr = arr.astype(np.uint8)
-
-            return arr
+            
+            if drop_last_band:
+                return arr[:-1, :, :]
+            else:
+                return arr
 
         def update_rgb_colorinterp(dst):
             if with_alpha:
@@ -192,45 +269,10 @@ def export_raster(input, output, **opts):
         if dem and rgb and profile.get('nodata') is not None:
             profile.update(nodata=None)
 
-        # Define write band function
-        # Reprojection needed?
-        if src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg:
-            dst_crs = "EPSG:{}".format(epsg)
-
-            if win_bounds is not None:
-                transform, width, height = calculate_default_transform(
-                    src.crs, dst_crs, src.width, src.height,
-                    left=win_bounds[0],
-                    bottom=win_bounds[1],
-                    right=win_bounds[2],
-                    top=win_bounds[3],
-                    dst_width=dst_width,
-                    dst_height=dst_height)
-            else:
-                transform, width, height = calculate_default_transform(
-                    src.crs, dst_crs, src.width, src.height, *src.bounds)
-
-            profile.update(
-                crs=dst_crs,
-                transform=transform,
-                width=width,
-                height=height
-            )
-
-            def write_band(arr, dst, band_num):
-                reproject(source=arr, 
-                        destination=rasterio.band(dst, band_num),
-                        src_transform=win_transform,
-                        src_crs=src.crs,
-                        dst_transform=transform,
-                        dst_crs=dst_crs,
-                        resampling=Resampling.nearest,
-                        num_threads=4)
-
-        else:
-            # No reprojection needed
-            def write_band(arr, dst, band_num):
-                dst.write(arr, band_num)
+        
+        post_perc = 20 if reproject or kmz else 0
+        num_wins = len(subwins)
+        progress_per_win = (100 - post_perc) / num_wins if num_wins > 0 else 0
 
         if expression is not None:
             # Apply band math
@@ -243,109 +285,146 @@ def export_raster(input, output, **opts):
             rgb_expr = expression.split(",")
             indexes = tuple([int(b.replace("b", "")) for b in bands_names])
 
-            alpha_index = None
-            if has_alpha_band(src):
-                try:
-                    alpha_index = src.colorinterp.index(ColorInterp.alpha) + 1
-                    indexes += (alpha_index, )
-                except ValueError:
-                    pass
-
-            data = reader.read(indexes=indexes, window=win, out_dtype=np.float32)
-            arr = dict(zip(bands_names, data))
-            arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
-
-            # Set nodata values
-            index_band = arr[0]
             if alpha_index is not None:
-                # -1 is the last band = alpha
-                index_band[data[-1] == 0] = -9999
-
-            # Remove infinity values
-            index_band[index_band>1e+30] = -9999
-            index_band[index_band<-1e+30] = -9999
-
-            # Make sure this is float32
-            arr = arr.astype(np.float32)
+                indexes += (alpha_index, )
 
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                # Apply colormap?
-                if rgb and cmap is not None:
-                    rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
+                for idx, (w, dst_w) in enumerate(subwins):
+                    p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
-                    band_num = 1
-                    for b in rgb_data:
-                        write_band(process(b, skip_rescale=True), dst, band_num)
-                        band_num += 1
+                    data = src.read(indexes=indexes, window=w, out_dtype=np.float32)
+                    arr = dict(zip(bands_names, data))
+                    arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
 
-                    if with_alpha:
-                        write_band(mask, dst, band_num)
-                    
-                    update_rgb_colorinterp(dst)
-                else:
-                    # Raw
-                    write_band(process(arr)[0], dst, 1)
+                    # Set nodata values
+                    index_band = arr[0]
+                    mask = None
+                    if alpha_index is not None:
+                        # -1 is the last band = alpha
+                        mask = data[-1] != 0
+                        index_band[~mask] = -9999
+
+                    # Remove infinity values
+                    index_band[index_band>1e+30] = -9999
+                    index_band[index_band<-1e+30] = -9999
+
+                    # Make sure this is float32
+                    arr = arr.astype(np.float32)
+
+                    # Apply colormap?
+                    if rgb and cmap is not None:
+                        rgb_data, _ = apply_cmap(process(arr, skip_background=True, includes_alpha=False), cmap)
+                        dst.write(process(rgb_data, skip_rescale=True, mask=mask, includes_alpha=False), window=dst_w, indexes=(1,2,3))
+
+                        if with_alpha:
+                            dst.write(mask.astype(np.uint8) * 255, 4, window=dst_w)
+
+                        update_rgb_colorinterp(dst)
+                    else:
+                        # Raw
+                        dst.write(process(arr), window=dst_w) 
         elif dem:
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                arr = reader.read(window=win)
+                for idx, (w, dst_w) in enumerate(subwins):
+                    p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
-                intensity = None
-                if hillshade is not None and hillshade > 0:
-                    delta_scale = ZOOM_EXTRA_LEVELS ** 2
-                    dx = src.meta["transform"][0] * delta_scale
-                    dy = src.meta["transform"][4] * delta_scale
-                    ls = LightSource(azdeg=315, altdeg=45)
-                    intensity = ls.hillshade(arr[0], dx=dx, dy=dy, vert_exag=hillshade)
-                    intensity = intensity * 255.0
+                    # Apply colormap?
+                    if rgb and cmap is not None:
+                        nodata = profile.get('nodata')
+                        if nodata is None:
+                            nodata = -9999
 
-                # Apply colormap?
-                if rgb and cmap is not None:
-                    rgb_data, _ = apply_cmap(process(arr, skip_alpha=True), cmap)
-                    arr = None
+                        pad = 16
+                        elevation = src.read(window=padded_window(w, pad), boundless=True, fill_value=nodata, out_shape=(
+                            1,
+                            window_size + pad * 2,
+                            window_size + pad * 2,
+                        ), resampling=rasterio.enums.Resampling.bilinear)[:1][0]
 
-                    if intensity is not None:
-                        rgb_data = hsv_blend(rgb_data, intensity)
+                        elevation[0:pad, 0:pad] = nodata
+                        elevation[pad+window_size:pad*2+window_size, 0:pad] = nodata
+                        elevation[0:pad, pad+window_size:pad*2+window_size] = nodata
+                        elevation[pad+window_size:pad*2+window_size, pad+window_size:pad*2+window_size] = nodata
+
+                        mask = elevation != nodata
+
+                        intensity = None
+                        if hillshade is not None and hillshade > 0:
+                            delta_scale = ZOOM_EXTRA_LEVELS ** 2
+                            dx = src.meta["transform"][0] * delta_scale
+                            dy = src.meta["transform"][4] * delta_scale
+                            ls = LightSource(azdeg=315, altdeg=45)
+
+                            intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
+                            intensity = intensity[pad:pad+window_size, pad:pad+window_size]
+                            intensity = intensity * 255.0
+
+                        rgb_data, _ = apply_cmap(process(elevation[pad:window_size+pad, pad:window_size+pad][np.newaxis,:], skip_background=True, includes_alpha=False), cmap)
+
+                        if intensity is not None:
+                            rgb_data = hsv_blend(rgb_data, intensity)
                         
-                    band_num = 1
-                    for b in rgb_data:
-                        write_band(process(b, skip_rescale=True), dst, band_num)
-                        band_num += 1
-                    
-                    if with_alpha:
-                        write_band(mask, dst, band_num)
+                        mask = mask[pad:window_size+pad, pad:window_size+pad]
+                        dst.write(process(rgb_data, skip_rescale=True, mask=mask, includes_alpha=False), window=dst_w, indexes=(1,2,3))
+                        if with_alpha:
+                            dst.write(mask.astype(np.uint8) * 255, 4, window=dst_w)
 
-                    update_rgb_colorinterp(dst)
-                else:
-                    # Raw
-                    write_band(process(arr)[0], dst, 1)
+                        update_rgb_colorinterp(dst)
+                    else:
+                        # Raw
+                        arr = src.read(window=w)[:1]
+                        dst.write(process(arr), window=dst_w)
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                band_num = 1
-                for idx in indexes:
-                    ci = src.colorinterp[idx - 1]
-                    arr = reader.read(idx, window=win)
+                for idx, (w, dst_w) in enumerate(subwins):
+                    p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
-                    if ci == ColorInterp.alpha:
-                        if with_alpha:
-                            write_band(arr, dst, band_num)
-                            band_num += 1
-                    else:
-                        write_band(process(arr), dst, band_num)
-                        band_num += 1
-                
+                    arr = src.read(indexes=indexes, window=w)
+                    dst.write(process(arr, drop_last_band=not with_alpha), window=dst_w)
+
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
                 if not with_alpha:
                     new_ci = [ci for ci in new_ci if ci != ColorInterp.alpha]
                     
                 dst.colorinterp = new_ci
         
-        # Close warped vrt
-        if vrt_options is not None:
-            reader.close()
-        
         if kmz:
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
                                         "-co", "Name={}".format(name),
                                         "-co", "FORMAT=AUTO", output_raster, output])
+            p("Finalizing", post_perc)
+
+        elif reproject:
+            output_vrt = path_base + ".vrt"
+
+            subprocess.check_output(["gdalwarp", "-r", "near" if resampling == "nearest" else resampling, 
+                                    "-of", "VRT",
+                                    "-t_srs", f"EPSG:{epsg}",
+                                    output_raster, output_vrt])
+            gt_args = ["-r", resampling, "--config", "GDAL_CACHEMAX", "25%"]
+            if bigtiff and not jpg and not png:
+                gt_args += ["-co", "BIGTIFF=IF_SAFER", 
+                            "-co", "BLOCKXSIZE=512", 
+                            "-co", "BLOCKYSIZE=512", 
+                            "-co", "NUM_THREADS=4",]
+            
+            if compress and not png:
+                if jpg:
+                    gt_args += ["-co", "QUALITY=90"]
+                else:
+                    gt_args += ["-co", f"COMPRESS={compress}", 
+                                "-co", "PREDICTOR=2"]
+
+            subprocess.check_output(["gdal_translate"] +  
+                                    gt_args +
+                                    [output_vrt, output])
+            
+            if os.path.isfile(output_raster):
+                os.unlink(output_raster)
+
+            p("Finalizing", post_perc)
+            
+        logger.info(f"Exported {output} in {round(time.time() - now, 2)}s")
+        
