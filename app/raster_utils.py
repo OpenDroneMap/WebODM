@@ -8,16 +8,14 @@ import numexpr as ne
 import time
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
-from rasterio.vrt import WarpedVRT
 from rasterio.windows import Window, bounds as window_bounds, from_bounds
 from rio_tiler.utils import has_alpha_band, linear_rescale
 from rio_tiler.colormap import cmap as colormap, apply_cmap
 from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
-from app.geoutils import geom_transform_wkt_bbox
-from rio_tiler.io import COGReader
 from rasterio.warp import calculate_default_transform
+from rio_tiler.io import COGReader
 
 logger = logging.getLogger('app.logger')
 
@@ -77,6 +75,8 @@ def padded_window(w, pad):
     return Window(w.col_off - pad, w.row_off - pad, w.width + pad * 2, w.height + pad * 2)
 
 def export_raster(input, output, progress_callback=None, **opts):
+    now = time.time()
+
     current_progress = 0
     def p(text, perc=0):
         nonlocal current_progress
@@ -95,50 +95,33 @@ def export_raster(input, output, progress_callback=None, **opts):
     crop_wkt = opts.get('crop')
 
     dem = asset_type in ['dsm', 'dtm']
-    now = time.time()
+    path_base, _ = os.path.splitext(output)
+    resampling = 'nearest'
+    if dem:
+        resampling = 'bilinear'
 
     if crop_wkt is not None:
-        with rasterio.open(input) as ds:
-            crop = GEOSGeometry(crop_wkt)
-            crop.srid = 4326
-            cutline, bounds = geom_transform_wkt_bbox(crop, ds, 'raster')
-            vrt_options = {'cutline': cutline, 'nodata': 0}
-    else:
-        vrt_options = None
+        crop = GEOSGeometry(crop_wkt)
+        crop.srid = 4326
+
+        crop_geojson = os.path.join(path_base, "crop.geojson")
+        raster_vrt = os.path.join(path_base, "raster.vrt")
+
+        os.makedirs(os.path.dirname(crop_geojson), exist_ok=True)
+        with open(crop_geojson, "w", encoding="utf-8") as f:
+            f.write(crop.geojson)
+
+        subprocess.check_output(["gdalwarp", "-cutline", crop_geojson,
+                '--config', 'GDALWARP_DENSIFY_CUTLINE', 'NO', 
+                '-crop_to_cutline', '-of', 'VRT', '-r', resampling,
+                 input, raster_vrt])
+
+        input = raster_vrt
     
-    with COGReader(input, vrt_options=vrt_options) as ds_src:
+    with COGReader(input) as ds_src:
         src = ds_src.dataset
         profile = src.meta.copy()
-        win_bounds = None
-        src_transform = None
-        dst_width = src.width
-        dst_height = src.height
-
-        if vrt_options is None:
-            reader = src
-            win = Window(0, 0, dst_width, dst_height)
-            src_transform = src.transform
-        else:
-            reader = WarpedVRT(src, **vrt_options)
-            dst_width = bounds[2] - bounds[0]
-            dst_height = bounds[3] - bounds[1]
-            win = Window(bounds[0], bounds[1], dst_width, dst_height)
-            win_bounds = window_bounds(win, profile['transform'])
-
-            src_transform, width, height = calculate_default_transform(
-                src.crs, src.crs, src.width, src.height,
-                left=win_bounds[0],
-                bottom=win_bounds[1],
-                right=win_bounds[2],
-                top=win_bounds[3],
-                dst_width=dst_width,
-                dst_height=dst_height)
-
-            profile.update(
-                transform=src_transform,
-                width=width,
-                height=height
-            )
+        win = Window(0, 0, src.width, src.height)
             
         # Output format
         driver = "GTiff"
@@ -151,7 +134,6 @@ def export_raster(input, output, progress_callback=None, **opts):
         output_raster = output
         jpg_background = 255 # white
         reproject = src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg
-        path_base, _ = os.path.splitext(output)
 
         # KMZ is special, we just export it as GeoTIFF
         # and then call GDAL to tile/package it
@@ -213,7 +195,7 @@ def export_raster(input, output, progress_callback=None, **opts):
             nodata = None
             if asset_type == 'orthophoto':
                 nodata = 0
-            md = ds_src.metadata(pmin=2.0, pmax=98.0, hist_options={"bins": 255}, nodata=nodata, vrt_options=vrt_options)
+            md = ds_src.metadata(pmin=2.0, pmax=98.0, hist_options={"bins": 255}, nodata=nodata)
             rescale = [md['statistics']['1']['min'], md['statistics']['1']['max']]
 
         ci = src.colorinterp
@@ -311,7 +293,7 @@ def export_raster(input, output, progress_callback=None, **opts):
                 for idx, (w, dst_w) in enumerate(subwins):
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
-                    data = reader.read(indexes=indexes, window=w, out_dtype=np.float32)
+                    data = src.read(indexes=indexes, window=w, out_dtype=np.float32)
                     arr = dict(zip(bands_names, data))
                     arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
 
@@ -355,7 +337,7 @@ def export_raster(input, output, progress_callback=None, **opts):
                             nodata = -9999
 
                         pad = 16
-                        elevation = reader.read(window=padded_window(w, pad), boundless=True, fill_value=nodata, out_shape=(
+                        elevation = src.read(window=padded_window(w, pad), boundless=True, fill_value=nodata, out_shape=(
                             1,
                             window_size + pad * 2,
                             window_size + pad * 2,
@@ -392,7 +374,7 @@ def export_raster(input, output, progress_callback=None, **opts):
                         update_rgb_colorinterp(dst)
                     else:
                         # Raw
-                        arr = reader.read(window=w)[:1]
+                        arr = src.read(window=w)[:1]
                         dst.write(process(arr), window=dst_w)
         else:
             # Copy bands as-is
@@ -400,7 +382,7 @@ def export_raster(input, output, progress_callback=None, **opts):
                 for idx, (w, dst_w) in enumerate(subwins):
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
-                    arr = reader.read(indexes=indexes, window=w)
+                    arr = src.read(indexes=indexes, window=w)
                     dst.write(process(arr, drop_last_band=not with_alpha), window=dst_w)
 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
@@ -409,10 +391,6 @@ def export_raster(input, output, progress_callback=None, **opts):
                     
                 dst.colorinterp = new_ci
         
-        # Close warped vrt
-        if vrt_options is not None:
-            reader.close()
-
         if kmz:
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
                                         "-co", "Name={}".format(name),
@@ -426,7 +404,7 @@ def export_raster(input, output, progress_callback=None, **opts):
                                     "-of", "VRT",
                                     "-t_srs", f"EPSG:{epsg}",
                                     output_raster, output_vrt])
-            gt_args = ["-r", "nearest", "--config", "GDAL_CACHEMAX", "25%"]
+            gt_args = ["-r", resampling, "--config", "GDAL_CACHEMAX", "25%"]
             if bigtiff and not jpg and not png:
                 gt_args += ["-co", "BIGTIFF=IF_SAFER", 
                             "-co", "BLOCKXSIZE=512", 
