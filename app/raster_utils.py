@@ -399,7 +399,7 @@ def export_raster(input, output, progress_callback=None, **opts):
         elif reproject:
             output_vrt = path_base + ".vrt"
 
-            subprocess.check_output(["gdalwarp", "-r", "near", 
+            subprocess.check_output(["gdalwarp", "-r", "near" if resampling == "nearest" else resampling, 
                                     "-of", "VRT",
                                     "-t_srs", f"EPSG:{epsg}",
                                     output_raster, output_vrt])
