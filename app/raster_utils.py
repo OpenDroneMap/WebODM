@@ -138,6 +138,7 @@ def export_raster(input, output, **opts):
         window_size = 512
         with_alpha = True
         rgb = False
+        bigtiff = False
         indexes = src.indexes
         output_raster = output
         jpg_background = 255 # white
@@ -176,23 +177,26 @@ def export_raster(input, output, **opts):
             rgb = True
         elif export_format == "gtiff-rgb":
             compress = "JPEG"
+            bigtiff = True
             profile.update(jpeg_quality=90)
-            profile.update(BIGTIFF='IF_SAFER')
             band_count = 4
             rgb = True
             if jpg:
                 band_count = 3
                 with_alpha = False
         else:
+            bigtiff = True
             compress = "DEFLATE"
-            profile.update(BIGTIFF='IF_SAFER')
             band_count = src.count
+
+        if bigtiff:
+            profile.update(BIGTIFF='IF_SAFER')
 
         if reproject:
             path_base, _ = os.path.splitext(output_raster)
             output_raster = path_base + ".base.tif"
 
-        if compress is not None:
+        if compress is not None and not reproject:
             profile.update(compress=compress)
             profile.update(predictor=2 if compress == "DEFLATE" else 1)
 
@@ -374,14 +378,38 @@ def export_raster(input, output, **opts):
                                         "-co", "Name={}".format(name),
                                         "-co", "FORMAT=AUTO", output_raster, output])
         elif reproject:
-            # TODO: we could use A VRT for better compression
-            # https://gdal.org/en/stable/programs/gdalwarp.html#compressed-output
+            output_vrt = path_base + ".vrt"
+
             subprocess.check_output(["gdalwarp", "-r", "near", 
-                                    "-multi",
-                                    "-wo", "NUM_THREADS=4",
+                                    "-of", "VRT",
                                     "-t_srs", f"EPSG:{epsg}",
-                                    "--config", "GDAL_CACHEMAX", "25%",
-                                    output_raster, output])
+                                    output_raster, output_vrt])
+            # subprocess.check_output(["gdalwarp", "-r", "near", 
+            #                         "-multi",
+            #                         "-wo", "NUM_THREADS=4",
+            #                         "-t_srs", f"EPSG:{epsg}",
+            #                         "--config", "GDAL_CACHEMAX", "25%",
+            #                         output_raster, output])
+            gt_args = ["-r", "nearest", "--config", "GDAL_CACHEMAX", "25%"]
+            if bigtiff and not jpg and not png:
+                gt_args += ["-co", "BIGTIFF=IF_SAFER", 
+                            "-co", "BLOCKXSIZE=512", 
+                            "-co", "BLOCKYSIZE=512", 
+                            "-co", "NUM_THREADS=4",]
+            
+            if compress and not png:
+                if jpg:
+                    gt_args += ["-co", "QUALITY=90"]
+                else:
+                    gt_args += ["-co", f"COMPRESS={compress}", 
+                                "-co", "PREDICTOR=2"]
+
+            subprocess.check_output(["gdal_translate"] +  
+                                    gt_args +
+                                    [output_vrt, output])
+            
+            if os.path.isfile(output_raster):
+                os.unlink(output_raster)
 
         logger.info(f"Finished in {time.time() - now}s")
         
