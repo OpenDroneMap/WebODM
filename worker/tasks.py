@@ -195,7 +195,10 @@ def export_raster(self, input, **opts):
     try:
         logger.info("Exporting raster {} with options: {}".format(input, json.dumps(opts)))
         tmpfile = tempfile.mktemp('_raster.{}'.format(extension_for_export_format(opts.get('format', 'gtiff'))), dir=settings.MEDIA_TMP)
-        export_raster_sync(input, tmpfile, **opts)
+        def progress_callback(status, perc):
+            self.update_state(state="PROGRESS", meta={"status": status, "progress": perc})
+        
+        export_raster_sync(input, tmpfile, progress_callback=progress_callback, **opts)
         result = {'file': tmpfile}
 
         if settings.TESTING:
@@ -203,7 +206,7 @@ def export_raster(self, input, **opts):
 
         return result
     except Exception as e:
-        logger.error(traceback.format_exc())
+        # logger.error(traceback.format_exc())
         logger.error(str(e))
         return {'error': str(e)}
 

@@ -5,6 +5,7 @@ import os
 import subprocess
 import numpy as np
 import numexpr as ne
+import time
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
 from rasterio.vrt import WarpedVRT
@@ -75,7 +76,14 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
 def padded_window(w, pad):
     return Window(w.col_off - pad, w.row_off - pad, w.width + pad * 2, w.height + pad * 2)
 
-def export_raster(input, output, **opts):
+def export_raster(input, output, progress_callback=None, **opts):
+    current_progress = 0
+    def p(text, perc=0):
+        nonlocal current_progress
+        current_progress += perc
+        if progress_callback is not None:
+            progress_callback(text, current_progress)
+
     epsg = opts.get('epsg')
     expression = opts.get('expression')
     export_format = opts.get('format')
@@ -87,8 +95,6 @@ def export_raster(input, output, **opts):
     crop_wkt = opts.get('crop')
 
     dem = asset_type in ['dsm', 'dtm']
-
-    import time
     now = time.time()
 
     if crop_wkt is not None:
@@ -282,6 +288,11 @@ def export_raster(input, output, **opts):
         if dem and rgb and profile.get('nodata') is not None:
             profile.update(nodata=None)
 
+        
+        post_perc = 20 if reproject or kmz else 0
+        num_wins = len(subwins)
+        progress_per_win = (100 - post_perc) / num_wins if num_wins > 0 else 0
+
         if expression is not None:
             # Apply band math
             if rgb:
@@ -297,7 +308,9 @@ def export_raster(input, output, **opts):
                 indexes += (alpha_index, )
 
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                for w, dst_w in subwins:
+                for idx, (w, dst_w) in enumerate(subwins):
+                    p(f"Processing tile {idx}/{num_wins}", progress_per_win)
+
                     data = reader.read(indexes=indexes, window=w, out_dtype=np.float32)
                     arr = dict(zip(bands_names, data))
                     arr = np.array([np.nan_to_num(ne.evaluate(bloc.strip(), local_dict=arr)) for bloc in rgb_expr])
@@ -332,7 +345,9 @@ def export_raster(input, output, **opts):
         elif dem:
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                for w, dst_w in subwins:
+                for idx, (w, dst_w) in enumerate(subwins):
+                    p(f"Processing tile {idx}/{num_wins}", progress_per_win)
+
                     # Apply colormap?
                     if rgb and cmap is not None:
                         nodata = profile.get('nodata')
@@ -382,7 +397,9 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                for w, dst_w in subwins:
+                for idx, (w, dst_w) in enumerate(subwins):
+                    p(f"Processing tile {idx}/{num_wins}", progress_per_win)
+
                     arr = reader.read(indexes=indexes, window=w)
                     dst.write(process(arr, drop_last_band=not with_alpha), window=dst_w)
 
@@ -400,6 +417,8 @@ def export_raster(input, output, **opts):
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
                                         "-co", "Name={}".format(name),
                                         "-co", "FORMAT=AUTO", output_raster, output])
+            p("Finalizing", post_perc)
+
         elif reproject:
             output_vrt = path_base + ".vrt"
 
@@ -428,5 +447,7 @@ def export_raster(input, output, **opts):
             if os.path.isfile(output_raster):
                 os.unlink(output_raster)
 
-        logger.info(f"Finished in {time.time() - now}s")
+            p("Finalizing", post_perc)
+            
+        logger.info(f"Exported {output} in {round(time.time() - now, 2)}s")
         
