@@ -16,7 +16,7 @@ from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
 from app.geoutils import geom_transform_wkt_bbox
 from rio_tiler.io import COGReader
-from rasterio.warp import calculate_default_transform, reproject, Resampling, transform_bounds
+from rasterio.warp import calculate_default_transform
 
 logger = logging.getLogger('app.logger')
 
@@ -133,14 +133,28 @@ def export_raster(input, output, **opts):
         indexes = src.indexes
         output_raster = output
         jpg_background = 255 # white
+        reproject = src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg
+        path_base, _ = os.path.splitext(output)
 
         # KMZ is special, we just export it as GeoTIFF
         # and then call GDAL to tile/package it
         kmz = export_format == "kmz"
         if kmz:
             export_format = "gtiff-rgb"
-            path_base, _ = os.path.splitext(output)
             output_raster = path_base + ".kmz.tif"
+
+        # JPG and PNG are exported to GeoTIFF only if reprojection is needed
+        jpg = export_format == "jpg"
+        png = export_format == "png"
+        if reproject:
+            if jpg:
+                export_format = 'gtiff-rgb'
+                path_base, _ = os.path.splitext(output)
+                output_raster = path_base + ".jpg.tif"
+            if png:
+                export_format = 'gtiff-rgb'
+                path_base, _ = os.path.splitext(output)
+                output_raster = path_base + ".png.tif"
 
         if export_format == "jpg":
             driver = "JPEG"
@@ -158,10 +172,17 @@ def export_raster(input, output, **opts):
             profile.update(BIGTIFF='IF_SAFER')
             band_count = 4
             rgb = True
+            if jpg:
+                band_count = 3
+                with_alpha = False
         else:
             compress = "DEFLATE"
             profile.update(BIGTIFF='IF_SAFER')
             band_count = src.count
+
+        if reproject:
+            path_base, _ = os.path.splitext(output_raster)
+            output_raster = path_base + ".base.tif"
 
         if compress is not None:
             profile.update(compress=compress)
@@ -213,8 +234,6 @@ def export_raster(input, output, **opts):
 
                 # Alpha must (should) be the last band
                 if aidx != len(indexes) - 1:
-                    # TODO remove
-                    print("Alpha index is not the last one")
                     aidx = None
             bands, w, h = arr.shape
 
@@ -243,64 +262,6 @@ def export_raster(input, output, **opts):
 
         if dem and rgb and profile.get('nodata') is not None:
             profile.update(nodata=None)
-
-        # Define write to function
-        # Reprojection needed?
-        if src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg:
-            dst_crs = "EPSG:{}".format(epsg)
-
-            if win_bounds is not None:
-                dst_transform, width, height = calculate_default_transform(
-                    src.crs, dst_crs, src.width, src.height,
-                    left=win_bounds[0],
-                    bottom=win_bounds[1],
-                    right=win_bounds[2],
-                    top=win_bounds[3],
-                    dst_width=dst_width,
-                    dst_height=dst_height)
-            else:
-                dst_transform, width, height = calculate_default_transform(
-                    src.crs, dst_crs, src.width, src.height, *src.bounds)
-
-            profile.update(
-                crs=dst_crs,
-                transform=dst_transform,
-                width=width,
-                height=height
-            )
-
-            def write_to(arr, dst, window):
-                # dst_arr = np.zeros((arr.shape[0], int(window.height), int(window.width)), dtype=arr.dtype)
-                # for band in range(arr.shape[0]):
-                current = dst.read(window=window)
-                reproject(source=arr, 
-                        destination=current,
-                        src_transform=src_transform,
-                        src_crs=src.crs,
-                        dst_transform=dst_transform,
-                        dst_crs=dst_crs,
-                        resampling=Resampling.nearest,
-                        num_threads=4,
-                        init_dest_nodata=False)
-                dst.write(current, window=window)
-
-        else:
-            # No reprojection needed
-            dst_transform = src_transform
-            dst_crs = src.crs
-
-            def write_to(arr, dst, window):
-                dst.write(arr, window=window)
-
-        def compute_dst_window(w):
-            src_bounds = window_bounds(w, src_transform)
-            dst_bounds = transform_bounds(src.crs, dst_crs, *src_bounds, densify_pts=21)
-            dst_w = from_bounds(
-                *dst_bounds,
-                transform=dst_transform,
-            )
-            return Window(int(dst_w.col_off) - win.col_off, int(dst_w.row_off) - win.row_off,
-                          int(dst_w.width), int(dst_w.height))
 
         if expression is not None:
             # Apply band math
@@ -387,20 +348,12 @@ def export_raster(input, output, **opts):
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
-                pass
-            with rasterio.open(output_raster, 'r+', **profile) as dst:
-                logger.info(f"MAIN: {win}")
                 subwins = compute_subwindows(win, 512)
                 for w in subwins:
-                    logger.info(w)
-                    logger.info(compute_dst_window(w))
-                    logger.info("====")
                     arr = reader.read(indexes=indexes, window=w)
-                    write_to(process(arr), dst, window=compute_dst_window(w))
-
-                # arr = reader.read(indexes=indexes, window=win)
-                # write_to(process(arr), dst, window=compute_dst_window(win))
-                
+                    dst_w = Window(w.col_off - win.col_off, w.row_off - win.row_off,
+                                    w.width, w.height)
+                    dst.write(process(arr), window=dst_w)
 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
                 if not with_alpha:
@@ -412,9 +365,17 @@ def export_raster(input, output, **opts):
         if vrt_options is not None:
             reader.close()
 
-        logger.info(f"Finished in {time.time() - now}s")
-        
         if kmz:
             subprocess.check_output(["gdal_translate", "-of", "KMLSUPEROVERLAY", 
                                         "-co", "Name={}".format(name),
                                         "-co", "FORMAT=AUTO", output_raster, output])
+        elif reproject:
+            subprocess.check_output(["gdalwarp", "-r", "near", 
+                                    "-multi",
+                                    "-wo", "NUM_THREADS=4",
+                                    "-t_srs", f"EPSG:{epsg}",
+                                    "--config", "GDAL_CACHEMAX", "25%",
+                                    output_raster, output])
+
+        logger.info(f"Finished in {time.time() - now}s")
+        
