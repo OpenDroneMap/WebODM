@@ -237,23 +237,23 @@ def export_raster(input, output, **opts):
                 logger.warning("Invalid colormap {}".format(color_map))
 
 
-        def process(arr, skip_rescale=False, skip_background=False, skip_type=False, mask=None):
-            # To include or exclude alpha
-            ax = -1 if alpha_index is not None else None
-
+        def process(arr, skip_rescale=False, skip_background=False, skip_type=False, mask=None, includes_alpha=True, drop_last_band=False):
             if not skip_rescale and rescale is not None:
-                arr[:ax,:,:] = linear_rescale(arr[:ax,:,:], in_range=rescale)
-            if not skip_background and not with_alpha and (ax is not None or mask is not None):
+                arr = linear_rescale(arr, in_range=rescale)
+            if not skip_background and (mask is not None or includes_alpha):
                 if mask is not None:
                     background = mask==0
+                elif includes_alpha:
+                    background = arr[-1]==0
+                if includes_alpha:
+                    arr[:-1, :, :][:, background] = jpg_background
                 else:
-                    background = arr[ax]==0
-                arr[:ax, :, :][:, background] = jpg_background
+                    arr[:, background] = jpg_background
             if not skip_type and rgb and arr.dtype != np.uint8:
                 arr = arr.astype(np.uint8)
-
-            if not with_alpha and ax is not None:
-                return arr[:ax,:,:]
+            
+            if drop_last_band:
+                return arr[:-1, :, :]
             else:
                 return arr
 
@@ -292,9 +292,11 @@ def export_raster(input, output, **opts):
 
                     # Set nodata values
                     index_band = arr[0]
+                    mask = None
                     if alpha_index is not None:
                         # -1 is the last band = alpha
-                        index_band[data[-1] == 0] = -9999
+                        mask = data[-1] != 0
+                        index_band[~mask] = -9999
 
                     # Remove infinity values
                     index_band[index_band>1e+30] = -9999
@@ -305,13 +307,11 @@ def export_raster(input, output, **opts):
 
                     # Apply colormap?
                     if rgb and cmap is not None:
-                        rgb_data, mask = apply_cmap(process(arr, skip_background=True), cmap)
-
-                        logger.warning(rgb_data.shape)
-                        dst.write(process(rgb_data, skip_rescale=True, mask=mask), window=dst_w, indexes=(1,2,3))
+                        rgb_data, _ = apply_cmap(process(arr, skip_background=True, includes_alpha=False), cmap)
+                        dst.write(process(rgb_data, skip_rescale=True, mask=mask, includes_alpha=False), window=dst_w, indexes=(1,2,3))
 
                         if with_alpha:
-                            dst.write(mask, 4, window=dst_w)
+                            dst.write(mask.astype(np.uint8) * 255, 4, window=dst_w)
 
                         update_rgb_colorinterp(dst)
                     else:
@@ -357,7 +357,7 @@ def export_raster(input, output, **opts):
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for w, dst_w in subwins:
                     arr = reader.read(indexes=indexes, window=w)
-                    dst.write(process(arr), window=dst_w)
+                    dst.write(process(arr, drop_last_band=not with_alpha), window=dst_w)
 
                 new_ci = [src.colorinterp[idx - 1] for idx in indexes]
                 if not with_alpha:
@@ -374,6 +374,8 @@ def export_raster(input, output, **opts):
                                         "-co", "Name={}".format(name),
                                         "-co", "FORMAT=AUTO", output_raster, output])
         elif reproject:
+            # TODO: we could use A VRT for better compression
+            # https://gdal.org/en/stable/programs/gdalwarp.html#compressed-output
             subprocess.check_output(["gdalwarp", "-r", "near", 
                                     "-multi",
                                     "-wo", "NUM_THREADS=4",
