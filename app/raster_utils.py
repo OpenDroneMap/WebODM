@@ -72,6 +72,9 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
 
     return windows
 
+def padded_window(w, pad):
+    return Window(w.col_off - pad, w.row_off - pad, w.width + pad * 2, w.height + pad * 2)
+
 def export_raster(input, output, **opts):
     epsg = opts.get('epsg')
     expression = opts.get('expression')
@@ -324,15 +327,25 @@ def export_raster(input, output, **opts):
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for w, dst_w in subwins:
-                    arr = reader.read(window=w)[:1]
-                    
                     # Apply colormap?
                     if rgb and cmap is not None:
                         nodata = profile.get('nodata')
                         if nodata is None:
                             nodata = -9999
-                        
-                        mask = arr[0] != nodata
+
+                        pad = 16
+                        elevation = reader.read(window=padded_window(w, pad), boundless=True, fill_value=nodata, out_shape=(
+                            1,
+                            window_size + pad * 2,
+                            window_size + pad * 2,
+                        ), resampling=rasterio.enums.Resampling.bilinear)[:1][0]
+
+                        elevation[0:pad, 0:pad] = nodata
+                        elevation[pad+window_size:pad*2+window_size, 0:pad] = nodata
+                        elevation[0:pad, pad+window_size:pad*2+window_size] = nodata
+                        elevation[pad+window_size:pad*2+window_size, pad+window_size:pad*2+window_size] = nodata
+
+                        mask = elevation != nodata
 
                         intensity = None
                         if hillshade is not None and hillshade > 0:
@@ -340,14 +353,17 @@ def export_raster(input, output, **opts):
                             dx = src.meta["transform"][0] * delta_scale
                             dy = src.meta["transform"][4] * delta_scale
                             ls = LightSource(azdeg=315, altdeg=45)
-                            intensity = ls.hillshade(arr[0], dx=dx, dy=dy, vert_exag=hillshade)
+
+                            intensity = ls.hillshade(elevation, dx=dx, dy=dy, vert_exag=hillshade)
+                            intensity = intensity[pad:pad+window_size, pad:pad+window_size]
                             intensity = intensity * 255.0
 
-                        rgb_data, _ = apply_cmap(process(arr, skip_background=True, includes_alpha=False), cmap)
+                        rgb_data, _ = apply_cmap(process(elevation[pad:window_size+pad, pad:window_size+pad][np.newaxis,:], skip_background=True, includes_alpha=False), cmap)
 
                         if intensity is not None:
                             rgb_data = hsv_blend(rgb_data, intensity)
                         
+                        mask = mask[pad:window_size+pad, pad:window_size+pad]
                         dst.write(process(rgb_data, skip_rescale=True, mask=mask, includes_alpha=False), window=dst_w, indexes=(1,2,3))
                         if with_alpha:
                             dst.write(mask.astype(np.uint8) * 255, 4, window=dst_w)
@@ -355,7 +371,8 @@ def export_raster(input, output, **opts):
                         update_rgb_colorinterp(dst)
                     else:
                         # Raw
-                         dst.write(process(arr), window=dst_w)
+                        arr = reader.read(window=w)[:1]
+                        dst.write(process(arr), window=dst_w)
         else:
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
