@@ -76,7 +76,8 @@ export default class ExportAssetPanel extends React.Component {
         epsg: this.props.task.epsg || null,
         customEpsg: Storage.getItem("last_export_custom_epsg") || "4326",
         resample: 0,
-        exporting: false
+        exporting: false,
+        progress: null
     }
   }
 
@@ -132,7 +133,7 @@ export default class ExportAssetPanel extends React.Component {
         if (typeof cb !== 'function') cb = undefined;
         
         const { task } = this.props;
-        this.setState({exporting: true, error: ""});
+        this.setState({exporting: true, error: "", progress: null});
         const data = this.getExportParams(format);
 
         if (this.state.epsg === "custom") Storage.setItem("last_export_custom_epsg", data.epsg);
@@ -152,6 +153,8 @@ export default class ExportAssetPanel extends React.Component {
                             Workers.downloadFile(result.celery_task_id, result.filename);
                             if (cb !== undefined) cb();
                         }
+                    }, (_, progress) => {
+                      this.setState({progress});
                     });
                 }else if (result.url){
                     // Simple download
@@ -182,7 +185,7 @@ export default class ExportAssetPanel extends React.Component {
   }
 
   render(){
-    const {epsg, customEpsg, exporting, format, resample } = this.state;
+    const {epsg, customEpsg, exporting, format, resample, progress } = this.state;
     const { exportFormats } = this.props;
     const utmEPSG = this.props.task.epsg;
 
@@ -233,7 +236,7 @@ export default class ExportAssetPanel extends React.Component {
             <div className={"btn-group " + (this.props.dropUp ?  "dropup" : "")}>
                 <button onClick={this.handleExport(exportFormats[0])}
                     disabled={disabled} type="button" className="btn btn-sm btn-primary btn-export">
-                    {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exporting...") : this.efInfo[exportFormats[0]].label}
+                    {exporting ? <i className="fa fa-spin fa-circle-notch"/> : <i className={this.efInfo[exportFormats[0]].icon + " fa-fw"}/>} {exporting ? _("Exporting...") : this.efInfo[exportFormats[0]].label} {exporting && progress !== null ? ` (${progress.toFixed(0)}%)` : ""}
                 </button>
                 <button disabled={disabled} type="button" className="btn btn-sm dropdown-toggle btn-primary" data-toggle="dropdown"><span className="caret"></span></button>
                 <ul className="dropdown-menu pull-right">
