@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      ruby-version: 3.2
+      ruby-version: 3.2.3
 
     steps:
     - uses: actions/checkout@v3
