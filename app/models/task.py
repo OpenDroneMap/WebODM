@@ -652,7 +652,7 @@ class Task(models.Model):
 
         try:
             self.extract_assets_and_complete()
-        except zipfile.BadZipFile:
+        except (zipfile.BadZipFile, FileNotFoundError):
             raise NodeServerError(gettext("Invalid zip file"))
         except NotImplementedError:
             raise NodeServerError(gettext("Unsupported compression method"))
