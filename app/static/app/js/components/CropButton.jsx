@@ -110,16 +110,22 @@ class CropButton extends React.Component {
             this.latlngs = [];
         }
 
-        this.setState({cropping: !cropping});
+        this.setState({cropping: !cropping, shiftPressed: false});
+    }
+
+    // Helper function to get mouse position with optional angle snapping
+    getMouseLatLng = (e) => {
+        let latlng = this.map.mouseEventToLatLng(e.originalEvent);
+        if (this.state.shiftPressed && this.latlngs.length > 0) {
+            latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
+        }
+        return latlng;
     }
 
     handleMarkerClick = e => {
         L.DomEvent.stop(e);
 
-        let latlng = this.map.mouseEventToLatLng(e.originalEvent);
-        if (this.state.shiftPressed && this.latlngs.length > 0) {
-            latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
-        }
+        const latlng = this.getMouseLatLng(e);
         this.uniqueLatLonPush(latlng);
 
         if (this.latlngs.length >= 1) {
@@ -221,27 +227,20 @@ class CropButton extends React.Component {
         if (this.latlngs.length === 0) this.latlngs.push(latlng);
         else{
             const last = this.latlngs[this.latlngs.length - 1];
-            if (last.lat !== latlng.lat && last.lng !== latlng.lng) this.latlngs.push(latlng);
+            if (last.lat !== latlng.lat || last.lng !== latlng.lng) this.latlngs.push(latlng);
         }
     };
 
     handleMarkerDblClick = e => {
         if (this.latlngs.length >= 2){
-            let latlng = this.map.mouseEventToLatLng(e.originalEvent);
-            if (this.state.shiftPressed && this.latlngs.length > 0) {
-                latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
-            }
-
+            const latlng = this.getMouseLatLng(e);
             this.uniqueLatLonPush(latlng);
             this.confirmPolygon();
         }
     }
 
     handleMarkerMove = e => {
-        let latlng = this.map.mouseEventToLatLng(e.originalEvent);
-        if (this.state.shiftPressed && this.latlngs.length > 0) {
-            latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
-        }
+        const latlng = this.getMouseLatLng(e);
 
         let lls = this.latlngs.concat(latlng);
         lls.push(lls[0]);
@@ -282,11 +281,7 @@ class CropButton extends React.Component {
 
     handleMarkerContextMenu = e => {
         if (this.latlngs.length >= 2){
-            let latlng = this.map.mouseEventToLatLng(e.originalEvent);
-            if (this.state.shiftPressed && this.latlngs.length > 0) {
-                latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
-            }
-
+            const latlng = this.getMouseLatLng(e);
             this.uniqueLatLonPush(latlng);
             this.confirmPolygon();
         }else if (this.state.cropping){
