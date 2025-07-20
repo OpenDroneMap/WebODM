@@ -35,7 +35,8 @@ class CropButton extends React.Component {
     super(props);
 
     this.state = {
-        cropping: false
+        cropping: false,
+        shiftPressed: false
     }
 
     this.map = props.map;
@@ -63,6 +64,9 @@ class CropButton extends React.Component {
                 this.group.removeLayer(this.captureMarker);
                 this.captureMarker = null;
             }
+
+            document.removeEventListener('keydown', this.handleKeyDown);
+            document.removeEventListener('keyup', this.handleKeyUp);
 
             if (this.acceptMarker) {
                 this.group.removeLayer(this.acceptMarker);
@@ -97,6 +101,9 @@ class CropButton extends React.Component {
                 this.map.on('resize', this.onMapResize);
             }
 
+            document.addEventListener('keydown', this.handleKeyDown);
+            document.addEventListener('keyup', this.handleKeyUp);
+
             this.deletePolygon();
 
             // Reset latlngs
@@ -109,7 +116,10 @@ class CropButton extends React.Component {
     handleMarkerClick = e => {
         L.DomEvent.stop(e);
 
-        const latlng = this.map.mouseEventToLatLng(e.originalEvent);
+        let latlng = this.map.mouseEventToLatLng(e.originalEvent);
+        if (this.state.shiftPressed && this.latlngs.length > 0) {
+            latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
+        }
         this.uniqueLatLonPush(latlng);
 
         if (this.latlngs.length >= 1) {
@@ -217,14 +227,22 @@ class CropButton extends React.Component {
 
     handleMarkerDblClick = e => {
         if (this.latlngs.length >= 2){
-            const latlng = this.map.mouseEventToLatLng(e.originalEvent);
+            let latlng = this.map.mouseEventToLatLng(e.originalEvent);
+            if (this.state.shiftPressed && this.latlngs.length > 0) {
+                latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
+            }
+
             this.uniqueLatLonPush(latlng);
             this.confirmPolygon();
         }
     }
 
     handleMarkerMove = e => {
-        const latlng = this.map.mouseEventToLatLng(e.originalEvent);
+        let latlng = this.map.mouseEventToLatLng(e.originalEvent);
+        if (this.state.shiftPressed && this.latlngs.length > 0) {
+            latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
+        }
+
         let lls = this.latlngs.concat(latlng);
         lls.push(lls[0]);
         if (this.measureBoundary) {
@@ -235,9 +253,40 @@ class CropButton extends React.Component {
         }
     }
 
+    // Snap the current point to the nearest 30deg angle
+    snapToAngle = (lastPoint, currentPoint) => {
+        const dx = currentPoint.lng - lastPoint.lng;
+        const dy = currentPoint.lat - lastPoint.lat;
+        
+        const angle = Math.atan2(dy, dx);
+        const snapAngle = Math.round(angle / (Math.PI / 6)) * (Math.PI / 6);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const snappedLng = lastPoint.lng + Math.cos(snapAngle) * distance;
+        const snappedLat = lastPoint.lat + Math.sin(snapAngle) * distance;
+        
+        return L.latLng(snappedLat, snappedLng);
+    }
+
+    handleKeyDown = e => {
+        if (e.key === 'Shift') {
+            this.setState({ shiftPressed: true });
+        }
+    }
+
+    handleKeyUp = e => {
+        if (e.key === 'Shift') {
+            this.setState({ shiftPressed: false });
+        }
+    }
+
     handleMarkerContextMenu = e => {
         if (this.latlngs.length >= 2){
-            const latlng = this.map.mouseEventToLatLng(e.originalEvent);
+            let latlng = this.map.mouseEventToLatLng(e.originalEvent);
+            if (this.state.shiftPressed && this.latlngs.length > 0) {
+                latlng = this.snapToAngle(this.latlngs[this.latlngs.length - 1], latlng);
+            }
+
             this.uniqueLatLonPush(latlng);
             this.confirmPolygon();
         }else if (this.state.cropping){
@@ -252,7 +301,7 @@ class CropButton extends React.Component {
     };
 
     onMapResize = () => {
-        if (this.captureMarker) this.captureMarker.setIcon(L.divIcon({
+        if (this.captureMarker && this._map) this.captureMarker.setIcon(L.divIcon({
             iconSize: this._map.getSize().multiplyBy(2)
         }));
     }
