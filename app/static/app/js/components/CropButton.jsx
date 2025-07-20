@@ -113,7 +113,6 @@ class CropButton extends React.Component {
         this.setState({cropping: !cropping, shiftPressed: false});
     }
 
-    // Helper function to get mouse position with optional angle snapping
     getMouseLatLng = (e) => {
         let latlng = this.map.mouseEventToLatLng(e.originalEvent);
         if (this.state.shiftPressed && this.latlngs.length > 0) {
