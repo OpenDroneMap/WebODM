@@ -123,7 +123,7 @@ def setInterval(interval, func, *args):
     t.start()
     return stopped.set
 
-@app.task(ignore_result=True)
+@app.task(ignore_result=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT)
 def process_task(taskId):
     lock_id = 'task_lock_{}'.format(taskId)
     cancel_monitor = None
@@ -190,7 +190,7 @@ def process_pending_tasks():
         process_task.delay(task.id)
 
 
-@app.task(bind=True)
+@app.task(bind=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT)
 def export_raster(self, input, **opts):
     try:
         logger.info("Exporting raster {} with options: {}".format(input, json.dumps(opts)))
@@ -210,7 +210,7 @@ def export_raster(self, input, **opts):
         logger.error(str(e))
         return {'error': str(e)}
 
-@app.task(bind=True)
+@app.task(bind=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT)
 def export_pointcloud(self, input, **opts):
     try:
         logger.info("Exporting point cloud {} with options: {}".format(input, json.dumps(opts)))
