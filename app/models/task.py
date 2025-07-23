@@ -1305,8 +1305,9 @@ class Task(models.Model):
                 self.check_if_canceled()
                 last_update = time.time()
 
-        resized_images = list(map(partial(resize_image, resize_to=self.resize_to, done=callback), images_path))
-
+        resized_images = [im for im in list(map(partial(resize_image, resize_to=self.resize_to, done=callback), images_path)) 
+                          if im is not None]
+        
         Task.objects.filter(pk=self.id).update(resize_progress=1.0)
 
         return resized_images
