@@ -1,5 +1,6 @@
 import inspect
 from worker.celery import app
+from webodm import settings
 
 task = app.task
 
@@ -15,7 +16,7 @@ def run_function_async(func, *args, **kwargs):
     return eval_async.delay(source, func.__name__, *args, **kwargs)
 
 
-@app.task(bind=True)
+@app.task(bind=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT)
 def eval_async(self, source, funcname, *args, **kwargs):
     """
     Run Python code asynchronously using Celery.
