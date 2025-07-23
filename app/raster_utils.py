@@ -15,6 +15,7 @@ from rio_tiler.errors import InvalidColorMapName
 from app.api.hsvblend import hsv_blend
 from app.api.hillshade import LightSource
 from rio_tiler.io import COGReader
+from webodm import settings
 
 logger = logging.getLogger('app.logger')
 
@@ -408,8 +409,8 @@ def export_raster(input, output, progress_callback=None, **opts):
                 gt_args += ["-co", "BIGTIFF=IF_SAFER", 
                             "-co", "BLOCKXSIZE=512", 
                             "-co", "BLOCKYSIZE=512", 
-                            "-co", "NUM_THREADS=4",]
-            
+                            "-co", "NUM_THREADS=%s" % settings.WORKERS_MAX_THREADS,]
+
             if compress and not png:
                 if jpg:
                     gt_args += ["-co", "QUALITY=90"]
