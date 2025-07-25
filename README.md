@@ -293,46 +293,10 @@ webpack --mode production
 python manage.py collectstatic --noinput
 python manage.py migrate
 ```
-## Run the docker version as a Linux Service
-
-If you wish to run the docker version with auto start/monitoring/stop, etc, as a systemd style Linux Service, a systemd unit file is included in the service folder of the repo.
-
-This should work on any Linux OS capable of running WebODM, and using a SystemD based service daemon (such as Ubuntu 16.04 server for example).
-
-This has only been tested on Ubuntu 16.04 server and Red Hat Enterprise Linux 9.
-
-The following pre-requisites are required:
- * Requires odm user
- * Requires docker installed via system (ubuntu: `sudo apt-get install docker.io`)
- * Requires 'screen' package to be installed
- * Requires odm user member of docker group
- * Required WebODM directory checked out/cloned to /opt/WebODM
- * Requires that /opt/WebODM is recursively owned by odm:odm
- * Requires that a Python 3 environment is used at /opt/WebODM/python3-venv
-
-If all pre-requisites have been met, and repository is checked out/cloned to /opt/WebODM folder, then you can use the following steps to enable and manage the service:
-
-First, to install the service, and enable the services to run at startup from now on:
-```bash
-sudo systemctl enable /opt/WebODM/service/webodm-docker.service
-```
-
-To manually start/stop the service:
-```bash
-sudo systemctl stop webodm-docker
-sudo systemctl start webodm-docker
-```
-
-To manually check service status:
-```bash
-sudo systemctl status webodm-docker
-```
-
-For the adventurous, the repository can be put anyplace you like by editing the ./WebODM/service/webodm-docker.service file before enabling the service the reflect your repository location, and modifying the systemctl enable command to that directiory.
 
 ## Run it natively
 
-WebODM can run natively on Windows, MacOS and Linux. We don't recommend to run WebODM natively (using docker is easier), but it's possible.
+WebODM can run natively on Windows, MacOS and Linux. We don't recommend nor support running WebODM natively (using docker is easier), but it's possible.
 
 Ubuntu 16.04 LTS users can refer to [this community script](/contrib/ubuntu_1604_install.sh) to install WebODM natively on a new machine.
 
