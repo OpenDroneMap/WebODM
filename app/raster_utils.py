@@ -53,8 +53,8 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
 
     # Generate the list of windows
     windows = []
-    for x_offset in x_offsets:
-        for y_offset in y_offsets:
+    for y_offset in y_offsets:
+        for x_offset in x_offsets:
             w = Window(
                     x_offset,
                     y_offset,
@@ -71,18 +71,39 @@ def compute_subwindows(window, max_window_size, overlap_pixels=0):
 
     return windows
 
+def compute_block_aligned_subwindows(src, win):
+    subwins = []
+    for _, w in src.block_windows(1):
+        dst_w = Window(
+            w.col_off - win.col_off, 
+            w.row_off - win.row_off, 
+            w.width, 
+            w.height
+        )
+        subwins.append([w, dst_w])
+    
+    return subwins
+
 def padded_window(w, pad):
     return Window(w.col_off - pad, w.row_off - pad, w.width + pad * 2, w.height + pad * 2)
 
-def export_raster(input, output, progress_callback=None, **opts):
+def export_raster(input, output, progress_callback=None, is_aborted=None, **opts):
     now = time.time()
 
     current_progress = 0
+    last_update = 0
+
     def p(text, perc=0):
         nonlocal current_progress
+        nonlocal last_update
+
+        t = time.time()
         current_progress += perc
-        if progress_callback is not None:
-            progress_callback(text, current_progress)
+
+        if t - last_update >= 1:
+            if progress_callback is not None:
+                progress_callback(text, current_progress)
+            last_update = t
 
     epsg = opts.get('epsg')
     expression = opts.get('expression')
@@ -204,6 +225,7 @@ def export_raster(input, output, progress_callback=None, **opts):
             alpha_index = src.colorinterp.index(ColorInterp.alpha) + 1
         
         subwins = compute_subwindows(win, window_size)
+        # subwins = compute_block_aligned_subwindows(src, win)
 
         if rgb and expression is None:
             # More than 4 bands?
@@ -291,6 +313,8 @@ def export_raster(input, output, progress_callback=None, **opts):
 
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for idx, (w, dst_w) in enumerate(subwins):
+                    if is_aborted is not None and is_aborted():
+                        return
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
                     data = src.read(indexes=indexes, window=w, out_dtype=np.float32)
@@ -328,6 +352,8 @@ def export_raster(input, output, progress_callback=None, **opts):
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for idx, (w, dst_w) in enumerate(subwins):
+                    if is_aborted is not None and is_aborted():
+                        return
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
                     # Apply colormap?
@@ -380,6 +406,8 @@ def export_raster(input, output, progress_callback=None, **opts):
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for idx, (w, dst_w) in enumerate(subwins):
+                    if is_aborted is not None and is_aborted():
+                        return
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
                     arr = src.read(indexes=indexes, window=w)

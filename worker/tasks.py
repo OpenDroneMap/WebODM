@@ -20,6 +20,7 @@ from nodeodm.models import ProcessingNode
 from webodm import settings
 import worker
 from .celery import app
+from celery.contrib.abortable import AbortableTask
 from app.raster_utils import export_raster as export_raster_sync, extension_for_export_format
 from app.pointcloud_utils import export_pointcloud as export_pointcloud_sync
 from django.utils import timezone
@@ -190,15 +191,17 @@ def process_pending_tasks():
         process_task.delay(task.id)
 
 
-@app.task(bind=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT)
+@app.task(bind=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT, base=AbortableTask)
 def export_raster(self, input, **opts):
     try:
         logger.info("Exporting raster {} with options: {}".format(input, json.dumps(opts)))
         tmpfile = tempfile.mktemp('_raster.{}'.format(extension_for_export_format(opts.get('format', 'gtiff'))), dir=settings.MEDIA_TMP)
         def progress_callback(status, perc):
             self.update_state(state="PROGRESS", meta={"status": status, "progress": perc})
+        def is_aborted():
+            return self.is_aborted()
         
-        export_raster_sync(input, tmpfile, progress_callback=progress_callback, **opts)
+        export_raster_sync(input, tmpfile, progress_callback=progress_callback, is_aborted=is_aborted, **opts)
         result = {'file': tmpfile}
 
         if settings.TESTING:
