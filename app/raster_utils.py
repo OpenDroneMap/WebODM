@@ -87,7 +87,7 @@ def compute_block_aligned_subwindows(src, win):
 def padded_window(w, pad):
     return Window(w.col_off - pad, w.row_off - pad, w.width + pad * 2, w.height + pad * 2)
 
-def export_raster(input, output, progress_callback=None, is_aborted=None, **opts):
+def export_raster(input, output, progress_callback=None, **opts):
     now = time.time()
 
     current_progress = 0
@@ -313,8 +313,6 @@ def export_raster(input, output, progress_callback=None, is_aborted=None, **opts
 
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for idx, (w, dst_w) in enumerate(subwins):
-                    if is_aborted is not None and is_aborted():
-                        return
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
                     data = src.read(indexes=indexes, window=w, out_dtype=np.float32)
@@ -352,8 +350,6 @@ def export_raster(input, output, progress_callback=None, is_aborted=None, **opts
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for idx, (w, dst_w) in enumerate(subwins):
-                    if is_aborted is not None and is_aborted():
-                        return
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
                     # Apply colormap?
@@ -406,8 +402,6 @@ def export_raster(input, output, progress_callback=None, is_aborted=None, **opts
             # Copy bands as-is
             with rasterio.open(output_raster, 'w', **profile) as dst:
                 for idx, (w, dst_w) in enumerate(subwins):
-                    if is_aborted is not None and is_aborted():
-                        return
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
                     arr = src.read(indexes=indexes, window=w)
