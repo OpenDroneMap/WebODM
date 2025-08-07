@@ -97,7 +97,7 @@ algos = {
         'help': _('Optimized Soil Adjusted Vegetation Index is based on SAVI, but tends to work better in areas with little vegetation where soil is visible.')
     },
     'LAI': {
-        'expr': '3.618 * (2.5 * (N - R) / (N + 6*R - 7.5*B + 1)) * 0.118',
+        'expr': '3.618 * (2.5 * (N - R) / (N + 6*R - 7.5*B + 1)) - 0.118',
         'help': _('Leaf Area Index estimates foliage areas and predicts crop yields.'),
         'range': (-1, 1)
     },
