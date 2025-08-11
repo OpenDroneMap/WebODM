@@ -1,21 +1,106 @@
 import os
 import json
 import math
+import shutil
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from app.models import Project
 from webodm import settings
 from django.db import connection
+from django.contrib.auth.models import User
 
+
+def die(msg):
+    print(msg)
+    exit(1)
+
+def export_user(user_id, dry_run=False, cluster_export_dir=None):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        die("User ID does not exist")
+
+    if dry_run:
+        print("!!! Dry run !!!")
+
+    def make_dir(d):
+        if not os.path.isdir(d):
+            print("Creating %s" % d)
+            if not dry_run:
+                os.makedirs(d)
+        else:
+            print("Dir exists: %s" % d)
+    
+    def remove_dir(d):
+        if os.path.isdir(d):
+            print("Removing %s" % d)
+            if not dry_run:
+                shutil.rmtree(d)
+    
+    def list_safe(d):
+        if os.path.isdir(d):
+            return os.listdir(d)
+        else:
+            return []
+    
+    def copy_dir(src, dst):
+        if os.path.isdir(src):
+            print("Copying %s --> %s" % (src, dst))
+            if not dry_run:
+                shutil.copytree(src, dst)
+        else:
+            print("Skipping %s (does not exist)" % src)
+                
+    print("Exporting user: %s" % user.username)
+
+    if cluster_export_dir is None:
+        cluster_export_dir = os.path.join(settings.MEDIA_ROOT, "cluster_migrations")
+    user_export_dir = os.path.join(cluster_export_dir, str(user.id))
+    projects_export_dir = os.path.join(user_export_dir, "projects")
+
+    print("Cluster export directory: %s" % cluster_export_dir)
+    
+    # Few basic checks
+    if os.path.isdir(cluster_export_dir):
+        contents = list_safe(cluster_export_dir)
+
+        # There should be no folders, or just folders with numbers
+        if len(contents) > 0 and not all([d.isnumeric() for d in contents]):
+            die("Cluster export directory exists and has existing directories that don't match an export location?")
+
+    make_dir(cluster_export_dir)
+    make_dir(user_export_dir)
+    make_dir(projects_export_dir)
+    
+    print("User export directory: %s" % user_export_dir)
+    print("Projects export directory: %s" % projects_export_dir)
+
+    # Get list of projects for this user
+    user_projects = Project.objects.filter(owner=user)
+    print("Total projects: %s" % len(user_projects))
+    print([p.id for p in user_projects])
+
+    if len(list_safe(projects_export_dir)) > 0:
+        print("Export directory not empty, removing/recreating")
+        remove_dir(projects_export_dir)
+        make_dir(projects_export_dir)
+    
+    # Copy all project folders (note some do not exist)
+    for p in user_projects:
+        copy_dir(p.get_project_dir(), os.path.join(projects_export_dir, str(p.id)))
+
+    
 
 class Command(BaseCommand):
     requires_system_checks = []
 
     def add_arguments(self, parser):
-        parser.add_argument("action", type=str, choices=['stagger', 'getref'])
+        parser.add_argument("action", type=str, choices=['stagger', 'getref', 'export', 'import'])
         parser.add_argument("--refs", required=False, help="JSON array of reference dictionaries")
         parser.add_argument("--id-buffer", required=False, default=1000, help="ID increment buffer when assigning next seq IDs")
         parser.add_argument("--dry-run", required=False, action="store_true", help="Don't actually modify tables, just test")
+        parser.add_argument("--user", required=False, default=None, help="User ID to migrate")
+        parser.add_argument("--cluster-export-dir", required=False, default=None, help="Override default export cluster dir")
         
         
         super(Command, self).add_arguments(parser)
@@ -72,7 +157,15 @@ class Command(BaseCommand):
                 print(json.dumps(ref))
 
 
-
+        elif options.get('action') == 'export':
+            user_id = options.get('user')
+            if user_id is None:
+                print("--user <USER_ID> is required")
+                exit(1)
+            print(options.get('cluster_export_dir'))
+            export_user(user_id, dry_run=dry_run, cluster_export_dir=options.get('cluster_export_dir'))
+        else:
+            print("Invalid action %s" % options.get('action'))
             
             
 
