@@ -41,6 +41,7 @@ class FormDialog extends React.Component {
             showModal: props.show,
             saving: false,
             deleting: false,
+            saveProgress: null,
             error: ""
         };
 
@@ -90,7 +91,7 @@ class FormDialog extends React.Component {
 
     show(){
         if (this.props.reset) this.props.reset();
-        this.setState({showModal: true, saving: false, error: ""});
+        this.setState({showModal: true, saving: false, error: "", saveProgress: null});
     }
 
     hide(){
@@ -102,6 +103,11 @@ class FormDialog extends React.Component {
         }
     }
 
+    updateSaveProgress = progress => {
+        if (progress === undefined) progress = null;
+        this.setState({saveProgress: progress});
+    }
+
     handleEnter = e => {
         if (e.key === 'Enter' || e.keyCode === 13){
           this.handleSave(e);
@@ -111,7 +117,7 @@ class FormDialog extends React.Component {
     handleSave(e){
         e.preventDefault();
 
-        this.setState({saving: true, error: ""});
+        this.setState({saving: true, error: "", saveProgress: null});
 
         if (this.props.handleSaveFunction){
             this.props.handleSaveFunction(err => {
@@ -200,7 +206,7 @@ class FormDialog extends React.Component {
                         <button type="button" className="btn btn-primary save" onClick={this.handleSave} disabled={this.state.saving}>
                             {this.state.saving ? 
                                 <span>
-                                    <i className="fa fa-circle-notch fa-spin"></i> {this.props.savingLabel}
+                                    <i className="fa fa-circle-notch fa-spin"></i> {this.props.savingLabel}{this.state.saveProgress !== null ? ` (${this.state.saveProgress.toFixed(0)}%)` : ""}
                                 </span>
                             :   <span>
                                     <i className={this.props.saveIcon}></i> {this.props.saveLabel}
