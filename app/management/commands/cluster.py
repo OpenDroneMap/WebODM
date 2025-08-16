@@ -31,6 +31,7 @@ def serialize(obj):
         for user in perms:
             if user.id == obj.owner.id:
                 data['permissions'] = perms[user]
+                assert len(data['permissions']) == 4, "Default permissions, other combinations should never happen"
             else:
                 print(f"Warning! Permissions for [{obj.name}] ({obj.id}) are related to \"{user.username}\" which is not going to be exported.")
     elif model == "app.task":
@@ -55,6 +56,10 @@ def deserialize(data, username=None, user=None):
     model = data['model']
     f = data['fields']
 
+    if model != 'auth.user':
+        if user is None:
+            raise Exception("user expected")
+
     if model == 'auth.user':
         if username is None:
             raise Exception("username expected")
@@ -62,18 +67,16 @@ def deserialize(data, username=None, user=None):
             print("Importing exported user %s as %s" % (f['username'], username))
             f['username'] = username
     elif model == 'app.profile':
-        if user is None:
-            raise Exception("user expected")
         data['pk'] = user.profile.id
         f['user'] = int(user.id)
     elif model == 'app.preset':
-        if user is None:
-            raise Exception("user expected")
         f['owner'] = int(user.id)
     elif model == 'app.plugindatum':
-        if user is None:
-            raise Exception("user expected")
         f['user'] = int(user.id)
+    elif model == 'app.project':
+        f['owner'] = int(user.id)
+    elif model == 'app.task':
+        pass
     else:
         raise Exception("Unknown model: %s" % model)
 
@@ -117,7 +120,7 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
         else:
             print("Skipping %s (does not exist)" % src)
 
-    def move_dir(src, dst):
+    def move_dir(src, dst, check_dst=True):
         if os.path.isdir(src):
             print("Moving %s --> %s" % (src, dst))
             if not dry_run:
@@ -171,6 +174,7 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
             make_dir(projects_export_dir)
         
         db = {
+            'version': settings.VERSION,
             'projects': [serialize(p) for p in user_projects],
             'tasks': [serialize(t) for t in user_tasks],
             'profile': serialize(user.profile),
@@ -214,6 +218,7 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
         with open(db_dump_file, "r", encoding="utf-8") as f:
             db = json.loads(f.read())
         
+        print("Version: %s" % db['version'])
         print("Projects: %s" % len(db['projects']))
         print("Tasks: %s" % len(db['tasks']))
         print("Presets: %s" % len(db['presets']))
@@ -223,8 +228,11 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
                 print("%s: yes" % k.capitalize())
             else:
                 die("Missing key '%s'" % k)
+        
+        if db['version'] != settings.VERSION:
+            die("Version mismatch: %s vs %s" % (db['version'], settings.VERSION))
 
-        # Validate projects
+        # Validate project directories
         project_ids = list_safe(projects_import_dir)
         print("Project folders: %s" % len(project_ids))
 
@@ -275,7 +283,40 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
                 for pd in db['plugin_datum']:
                     pd = deserialize(pd, user=user)
                     pd.save()
+
+                print("Importing projects")
+                for project in db['projects']:
+                    try:
+                        existing_project = Project.objects.get(pk=project['pk'])
+                        if existing_project.owner.username == user.username:
+                            print("Overriding existing project")
+                        else:
+                            print("Cannot import project %s because a project with the same ID already exists and is owned by a different user (%s)" % (project['pk'], existing_project.owner.username))
+                            raise Exception("Project import failed")
+                    except Project.DoesNotExist:
+                        pass
+                    
+                    permissions = project['permissions']
+                    del project['permissions']
+                    
+                    p = deserialize(project, user=user)
+                    p.save()
+                    p = Project.objects.get(pk=p.object.pk)
+
+                    # Quick check, the owner should have default permissions
+                    # to the project
+                    for perm in permissions:
+                        assert user.has_perm(perm, p)
                 
+                    print("[%s] (%s)" % (str(p), p.id))
+                
+                print("Importing tasks")
+                for task in db['tasks']:
+                    t = deserialize(task, user=user)
+                    t.save()
+                
+                    print("%s (%s)" % (str(t.object), t.object.project.id))
+
                 if dry_run:
                     raise DryRunException()
         except DryRunException:
