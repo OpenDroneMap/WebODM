@@ -4,7 +4,7 @@ import math
 import shutil
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
-from app.models import Project, Task, Preset, PluginDatum
+from app.models import Project, Task, Preset, PluginDatum, Redirect
 from webodm import settings
 from django.db import connection
 from django.contrib.auth.models import User
@@ -330,26 +330,58 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
         
         # Cleanup
         remove_dir(user_import_dir)
+
+def redirect(username, to_cluster, dry_run=False):
+    if settings.CLUSTER_ID == to_cluster:
+        die("Cannot redirect to itself (this server's cluster ID is %s)" % to_cluster)
+
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        die("User does not exist")
+
+    print("Setting up redirects for: %s" % user.username)
+    user_projects = Project.objects.filter(owner=user).order_by('created_at')
+    user_tasks = Task.objects.filter(project__owner=user).order_by('created_at')
+    
+    print("Target cluster: %s" % to_cluster)
+    print("Projects: %s" % len(user_projects))
+    print("Tasks: %s" % len(user_tasks))
+
+    try:
+        count = 0
+        with transaction.atomic():
+            for p in user_projects:
+                Redirect.objects.create(project_id=p.id, project_public_id=p.public_id, cluster_id=to_cluster)
+                count += 1
+            for p in user_tasks:
+                Redirect.objects.create(task_id=p.id, cluster_id=to_cluster)
+                count += 1
                 
+            print("Setup %s redirects" % count)
+            if dry_run:
+                raise DryRunException()
+    except DryRunException:
+        print("Dry run, rolling back")
+
 class Command(BaseCommand):
     requires_system_checks = []
 
     def add_arguments(self, parser):
-        parser.add_argument("action", type=str, choices=['stagger', 'getref', 'export', 'import'])
+        parser.add_argument("action", type=str, choices=['stagger', 'getref', 'export', 'import', 'redirect', 'delete'])
         parser.add_argument("--refs", required=False, help="JSON array of reference dictionaries")
         parser.add_argument("--id-buffer", required=False, default=1000, help="ID increment buffer when assigning next seq IDs")
         parser.add_argument("--dry-run", required=False, action="store_true", help="Don't actually modify tables, just test")
         parser.add_argument("--user", required=False, default=None, help="User ID to migrate")
         parser.add_argument("--cluster-export-dir", required=False, default=None, help="Override default export cluster dir")
         parser.add_argument("--merge", required=False, action="store_true", help="Try to merge imported results for a user if the user already exist")
-        
-        
+        parser.add_argument("--to-cluster", required=False, default=-1, help="Cluster ID to redirect to")
+                
         super(Command, self).add_arguments(parser)
 
     def handle(self, **options):
         if settings.CLUSTER_ID is None:
-            print("CLUSTER_ID is not set")
-            exit(1)
+            die("CLUSTER_ID is not set")
 
         dry_run = options.get('dry_run', False)
         action = options.get('action')
@@ -359,11 +391,9 @@ class Command(BaseCommand):
             id_buffer = int(options.get('id_buffer'))
 
             if not isinstance(refs, list):
-                print("Invalid refs, must be an array")
-                exit(1)
+                die("Invalid refs, must be an array")
             if len(refs) <= 1:
-                print("Invalid refs, must have 2 or more items")
-                exit(1)
+                die("Invalid refs, must have 2 or more items")
             
             max_project_id = max([r['next_project_id'] for r in refs])
             start_project_id = max_project_id + id_buffer
@@ -402,10 +432,18 @@ class Command(BaseCommand):
         elif action == 'export' or action == 'import':
             user = options.get('user')
             if user is None:
-                print("--user <username> is required")
-                exit(1)
+                die("--user <username> is required")
             importexport_user(action, user, dry_run=dry_run, cluster_export_dir=options.get('cluster_export_dir'), merge=options.get('merge'))
         
+        elif action == 'redirect':
+            user = options.get('user')
+            if user is None:
+                die("--user <username> is required")
+            to_cluster = options.get('to_cluster')
+            if to_cluster is None or to_cluster == -1:
+                die("--to-cluster <id> is required")
+            to_cluster = int(to_cluster)
+            redirect(user, to_cluster, dry_run=dry_run)
         else:
             print("Invalid action %s" % options.get('action'))
             
