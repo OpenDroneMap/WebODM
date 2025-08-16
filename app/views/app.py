@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django import forms
-from app.views.utils import get_permissions
+from app.views.utils import get_permissions, get_project_or_raise, get_task_or_raise, handle_302
 from webodm import settings
 
 def index(request):
@@ -60,16 +60,17 @@ def dashboard(request):
 
 
 @login_required
+@handle_302
 def map(request, project_pk=None, task_pk=None):
     title = _("Map")
 
     if project_pk is not None:
-        project = get_object_or_404(Project, pk=project_pk)
+        project = get_project_or_raise(pk=project_pk)
         if not request.user.has_perm('app.view_project', project):
             raise Http404()
         
         if task_pk is not None:
-            task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
+            task = get_task_or_raise(pk=task_pk, project=project)
             title = task.name or task.id
             mapItems = [task.get_map_items()]
             projectInfo = None
@@ -92,16 +93,17 @@ def map(request, project_pk=None, task_pk=None):
 
 
 @login_required
+@handle_302
 def model_display(request, project_pk=None, task_pk=None):
     title = _("3D Model Display")
 
     if project_pk is not None:
-        project = get_object_or_404(Project, pk=project_pk)
+        project = get_project_or_raise(pk=project_pk)
         if not request.user.has_perm('app.view_project', project):
             raise Http404()
 
         if task_pk is not None:
-            task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
+            task = get_task_or_raise(pk=task_pk, project=project)
             title = task.name or task.id
         else:
             raise Http404()
