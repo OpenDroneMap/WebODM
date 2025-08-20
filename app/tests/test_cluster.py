@@ -1,9 +1,12 @@
+import os
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
-from app.models import Task, Project
+from app.models import Task, Project, Redirect
 from .classes import BootTestCase
 from webodm import settings
+from django.core.management import call_command
+import worker
 
 class TestCluster(BootTestCase):
     def setUp(self):
@@ -21,6 +24,12 @@ class TestCluster(BootTestCase):
         
         user = User.objects.get(username="testuser")
         self.assertIsNone(user.profile.cluster_id)
+
+        other_user = User.objects.get(username="testuser2")
+        other_project = Project.objects.create(owner=other_user, name="another test project")
+        other_task = Task.objects.create(project=other_project, name='Test')
+        other_assets_path = other_task.assets_path("")
+        os.makedirs(other_assets_path, exist_ok=True)
 
         # Can access dashboard as usual
         res = c.get('/dashboard/', follow=False)
@@ -54,13 +63,12 @@ class TestCluster(BootTestCase):
         
         settings.CLUSTER_ID = None
 
-        p = Project.objects.create(owner=user, name='Test')
-        p.public = True 
-        p.save()
-        p.refresh_from_db()
-
+        p = Project.objects.create(owner=user, name='Test', public=True)
         t = Task.objects.create(project=p, name='Test')
-        t.save()
+
+
+        assets_path = t.assets_path("")
+        os.makedirs(assets_path, exist_ok=True)
 
         # Can access project, tasks
         def test_urls(expect_status, url_redirect_prefix=None):
@@ -77,6 +85,9 @@ class TestCluster(BootTestCase):
             test_url('/public/task/%s/3d/' % (t.id))
             test_url('/public/task/%s/iframe/map/' % (t.id))
             test_url('/public/task/%s/iframe/3d/' % (t.id))
+            
+            test_url('/public/task/%s/map/?t=dsm' % (t.id))
+            
 
         self.assertIsNone(settings.CLUSTER_ID)        
         test_urls(status.HTTP_200_OK)
@@ -89,3 +100,61 @@ class TestCluster(BootTestCase):
         settings.CLUSTER_ID = 3
         test_urls(status.HTTP_302_FOUND, "http://test%s.dev" % user.profile.cluster_id)
         
+        # Setup redirects (dry run)
+        call_command('cluster', 'redirect', '--user', user.username, '--to-cluster', '4', '--dry-run')
+
+        # No redirects should have been setup, projects, tasks still there
+        self.assertEqual(Redirect.objects.all().count(), 0)
+        self.assertTrue(Project.objects.filter(pk=p.id).count() == 1)
+        self.assertTrue(Task.objects.filter(pk=t.id).count() == 1)
+        self.assertTrue(os.path.isdir(assets_path))
+
+        # No changes to user profile
+        user.profile.refresh_from_db()
+        self.assertEqual(user.profile.cluster_id, 2)
+
+        # Setup redirect without deleting tasks/projects      
+        call_command('cluster', 'redirect', '--user', user.username, '--to-cluster', '4')
+
+        user.profile.refresh_from_db()
+        self.assertEqual(user.profile.cluster_id, 4)
+        self.assertEqual(Project.objects.filter(pk=p.id).count(), 1)
+        self.assertEqual(Task.objects.filter(pk=t.id).count(), 1)
+        self.assertTrue(os.path.isdir(assets_path))
+        self.assertEqual(Redirect.objects.all().count(), 0)
+
+        # Setup redirect and also delete asks/projects      
+        call_command('cluster', 'redirect', '--user', user.username, '--to-cluster', '5', '--delete')
+        worker.tasks.process_pending_tasks()
+        worker.tasks.cleanup_projects()
+
+        user.profile.refresh_from_db()
+        self.assertEqual(user.profile.cluster_id, 5)
+        self.assertEqual(Project.objects.filter(pk=p.id).count(), 0)
+        self.assertEqual(Task.objects.filter(pk=t.id).count(), 0)
+        self.assertFalse(os.path.isdir(assets_path))
+        self.assertEqual(Redirect.objects.all().count(), 3)
+
+        self.assertEqual(Redirect.objects.filter(project_id=p.id, project_public_id=p.public_id).count(), 1)
+        self.assertEqual(Redirect.objects.filter(task_id=t.id).count(), 1)
+        
+        # Redirects should still work
+        test_urls(status.HTTP_302_FOUND, "http://test5.dev")
+        
+        res = c.get('/dashboard/', follow=False)
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(res.url, "http://test5.dev/dashboard/")
+
+        # Other user's projects / tasks are still there
+        self.assertEqual(Project.objects.filter(owner=other_user).count(), 2)
+        self.assertEqual(Task.objects.filter(project__owner=other_user).count(), 1)
+        self.assertTrue(os.path.isdir(other_assets_path))
+        
+
+
+
+
+        
+
+
+

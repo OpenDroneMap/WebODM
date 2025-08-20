@@ -331,7 +331,7 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
         # Cleanup
         remove_dir(user_import_dir)
 
-def redirect(username, to_cluster, dry_run=False):
+def redirect(username, to_cluster, dry_run=False, delete_projects_tasks=False):
     if settings.CLUSTER_ID == to_cluster:
         die("Cannot redirect to itself (this server's cluster ID is %s)" % to_cluster)
 
@@ -340,26 +340,8 @@ def redirect(username, to_cluster, dry_run=False):
     except User.DoesNotExist:
         die("User does not exist")
 
-    print("Setting up redirects for: %s" % user.username)
-    user_projects = Project.objects.filter(owner=user).order_by('created_at')
-    user_tasks = Task.objects.filter(project__owner=user).order_by('created_at')
-    
-    print("Target cluster: %s" % to_cluster)
-    print("Projects: %s" % len(user_projects))
-    print("Tasks: %s" % len(user_tasks))
-
     try:
-        count = 0
         with transaction.atomic():
-            for p in user_projects:
-                Redirect.objects.create(project_id=p.id, project_public_id=p.public_id, cluster_id=to_cluster)
-                count += 1
-            for p in user_tasks:
-                Redirect.objects.create(task_id=p.id, cluster_id=to_cluster)
-                count += 1
-
-            print("Setup %s redirects" % count)
-
             user.profile.cluster_id = to_cluster
             user.profile.save()
 
@@ -369,6 +351,43 @@ def redirect(username, to_cluster, dry_run=False):
                 raise DryRunException()
     except DryRunException:
         print("Dry run, rolling back")
+
+    if delete_projects_tasks:
+        print("Setting up redirects for: %s" % user.username)
+        user_projects = Project.objects.filter(owner=user).order_by('created_at')
+        user_tasks = Task.objects.filter(project__owner=user).order_by('created_at')
+        
+        print("Target cluster: %s" % to_cluster)
+        print("Projects: %s" % len(user_projects))
+        print("Tasks: %s" % len(user_tasks))
+
+        try:
+            count = 0
+            with transaction.atomic():
+                for p in user_projects:
+                    Redirect.objects.create(project_id=p.id, project_public_id=p.public_id, cluster_id=to_cluster)
+                    count += 1
+                for p in user_tasks:
+                    Redirect.objects.create(task_id=p.id, cluster_id=to_cluster)
+                    count += 1
+
+                print("Setup %s redirects" % count)
+
+                for p in user_projects:
+                    if not dry_run:
+                        try:
+                            p.delete()
+                        except Exception as e:
+                            print("Cannot delete project %s: %s" % (p.id, str(e)))
+                    else:
+                        print("Deleting project %s (dry run)" % (p.id))
+
+                if dry_run:
+                    raise DryRunException()
+        except DryRunException:
+            print("Dry run, rolling back")
+
+
 
 class Command(BaseCommand):
     requires_system_checks = []
@@ -381,18 +400,19 @@ class Command(BaseCommand):
         parser.add_argument("--user", required=False, default=None, help="User ID to migrate")
         parser.add_argument("--cluster-export-dir", required=False, default=None, help="Override default export cluster dir")
         parser.add_argument("--merge", required=False, action="store_true", help="Try to merge imported results for a user if the user already exist")
+        parser.add_argument("--delete", required=False, action="store_true", help="Permanently delete user projects and tasks after setting up redirect")
         parser.add_argument("--to-cluster", required=False, default=-1, help="Cluster ID to redirect to")
                 
         super(Command, self).add_arguments(parser)
 
     def handle(self, **options):
-        if settings.CLUSTER_ID is None:
-            die("CLUSTER_ID is not set")
-
         dry_run = options.get('dry_run', False)
         action = options.get('action')
 
         if action == 'stagger':
+            if settings.CLUSTER_ID is None:
+                die("CLUSTER_ID is not set")
+
             refs = json.loads(options.get('refs'))
             id_buffer = int(options.get('id_buffer'))
 
@@ -423,6 +443,9 @@ class Command(BaseCommand):
 
 
         elif action == 'getref':
+            if settings.CLUSTER_ID is None:
+                die("CLUSTER_ID is not set")
+
             with connection.cursor() as c:
                 c.execute("SELECT last_value FROM app_project_id_seq")
                 next_project_id = c.fetchone()[0]
@@ -449,7 +472,7 @@ class Command(BaseCommand):
             if to_cluster is None or to_cluster == -1:
                 die("--to-cluster <id> is required")
             to_cluster = int(to_cluster)
-            redirect(user, to_cluster, dry_run=dry_run)
+            redirect(user, to_cluster, dry_run=dry_run, delete_projects_tasks=options.get('delete', False))
         else:
             print("Invalid action %s" % options.get('action'))
             
