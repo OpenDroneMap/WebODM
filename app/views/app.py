@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from django import forms
-from app.views.utils import get_permissions, get_project_or_raise, get_task_or_raise, handle_302
+from app.views.utils import get_permissions, get_project_or_raise, get_task_or_raise, handle_302, ResponseClusterRedirect
 from webodm import settings
 
 def index(request):
@@ -34,6 +34,10 @@ def index(request):
 
 @login_required
 def dashboard(request):
+    if settings.CLUSTER_ID is not None:    
+        if request.user.profile.cluster_id is not None and request.user.profile.cluster_id != settings.CLUSTER_ID:
+            return ResponseClusterRedirect(request, request.user.profile.cluster_id)
+    
     no_processingnodes = ProcessingNode.objects.count() == 0
     if no_processingnodes and settings.PROCESSING_NODES_ONBOARDING is not None:
         return redirect(settings.PROCESSING_NODES_ONBOARDING)

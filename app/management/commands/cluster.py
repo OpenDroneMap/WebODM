@@ -357,8 +357,14 @@ def redirect(username, to_cluster, dry_run=False):
             for p in user_tasks:
                 Redirect.objects.create(task_id=p.id, cluster_id=to_cluster)
                 count += 1
-                
+
             print("Setup %s redirects" % count)
+
+            user.profile.cluster_id = to_cluster
+            user.profile.save()
+
+            print ("Saved user profile cluster ID (%s)" % to_cluster)
+
             if dry_run:
                 raise DryRunException()
     except DryRunException:

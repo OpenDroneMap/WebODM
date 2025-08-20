@@ -16,6 +16,9 @@ class HttpRedirect302(Exception):
     def __init__(self, to_cluster):
         self.to_cluster = to_cluster
 
+def ResponseClusterRedirect(request, to_cluster):
+    return HttpResponseRedirect((settings.CLUSTER_URL % to_cluster) + request.get_full_path())
+
 
 def handle_302(func):
     @wraps(func)
@@ -23,7 +26,7 @@ def handle_302(func):
         try:
             return func(request, *args, **kwargs)
         except HttpRedirect302 as r:
-            return HttpResponseRedirect((settings.CLUSTER_URL % r.to_cluster) + request.get_full_path())
+            return ResponseClusterRedirect(request, r.to_cluster)
     return wrap
 
 def get_project_or_raise(pk=None, public_id=None):
