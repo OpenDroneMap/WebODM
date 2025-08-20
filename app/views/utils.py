@@ -19,6 +19,8 @@ class HttpRedirect302(Exception):
 def ResponseClusterRedirect(request, to_cluster):
     return HttpResponseRedirect((settings.CLUSTER_URL % to_cluster) + request.get_full_path())
 
+def cluster_mode():
+    return settings.CLUSTER_ID is not None
 
 def handle_302(func):
     @wraps(func)
@@ -37,10 +39,15 @@ def get_project_or_raise(pk=None, public_id=None):
         kwargs['public_id'] = public_id
     
     try:
-        return get_object_or_404(Project, **kwargs)
+        p = get_object_or_404(Project, **kwargs)
+        if cluster_mode():
+            # Make sure the owner hasn't been moved
+            if p.owner.profile.cluster_id is not None and p.owner.profile.cluster_id != settings.CLUSTER_ID:
+                raise HttpRedirect302(p.owner.profile.cluster_id)
+        return p
     except Http404 as err404:
-        # Check for redirects if cluster mode is enabled
-        if settings.CLUSTER_ID is not None:
+        # Check for redirects
+        if cluster_mode():
             p = {}
             if pk is not None:
                 p['project_id'] = pk
@@ -62,10 +69,14 @@ def get_task_or_raise(pk=None, project=None):
     if project is not None:
         kwargs['project'] = project
     try:
-        return get_object_or_404(Task, **kwargs)
+        t = get_object_or_404(Task, **kwargs)
+        if cluster_mode():
+            # Make sure the owner hasn't been moved
+            if t.project.owner.profile.cluster_id is not None and t.project.owner.profile.cluster_id != settings.CLUSTER_ID:
+                raise HttpRedirect302(t.project.owner.profile.cluster_id)
     except Http404 as err404:
-        # Check for redirects if cluster mode is enabled
-        if settings.CLUSTER_ID is not None:
+        # Check for redirects
+        if cluster_mode():
             try:
                 r = Redirect.objects.get(task_id=pk)
                 raise HttpRedirect302(r.cluster_id)
