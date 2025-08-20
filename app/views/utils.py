@@ -74,6 +74,7 @@ def get_task_or_raise(pk=None, project=None):
             # Make sure the owner hasn't been moved
             if t.project.owner.profile.cluster_id is not None and t.project.owner.profile.cluster_id != settings.CLUSTER_ID:
                 raise HttpRedirect302(t.project.owner.profile.cluster_id)
+        return t
     except Http404 as err404:
         # Check for redirects
         if cluster_mode():
