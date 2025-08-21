@@ -136,6 +136,10 @@ export default {
             v = c === 'x' ? r : r & 0x3 | 0x8;
         return v.toString(16);
       });
+    },
+
+    isNumeric(n){
+      return !isNaN(parseFloat(n)) && isFinite(n);
     }
 };
 
