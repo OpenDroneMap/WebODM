@@ -150,6 +150,7 @@ export default class ContoursPanel extends React.Component {
 
     meterInterval = toMetric(meterInterval, su.lengthUnit(1)).value;
     meterSimplify = toMetric(meterSimplify, su.lengthUnit(1)).value;
+    if (meterSimplify < 0.01) meterSimplify = 0.01;
     
     const zfactor = preview ? 1 : su.lengthUnit(1).factor;
 
@@ -279,7 +280,7 @@ export default class ContoursPanel extends React.Component {
 
     const intervalStart = unitSystem === "metric" ? 1 : 4;
     const intervalValues = [intervalStart / 4, intervalStart / 2, intervalStart, intervalStart * 2, intervalStart * 4];
-    const simplifyValues = [{label: _('Do not simplify'), value: 0},
+    const simplifyValues = [{label: _('Minimal'), value: 0.01},
                             {label: _('Normal'), value: unitSystem === "metric" ? 0.2 : 0.5},
                             {label: _('Aggressive'), value: unitSystem === "metric" ? 1 : 4}];
 
