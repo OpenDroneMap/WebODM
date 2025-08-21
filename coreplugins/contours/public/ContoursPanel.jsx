@@ -280,7 +280,7 @@ export default class ContoursPanel extends React.Component {
 
     const intervalStart = unitSystem === "metric" ? 1 : 4;
     const intervalValues = [intervalStart / 4, intervalStart / 2, intervalStart, intervalStart * 2, intervalStart * 4];
-    const simplifyValues = [{label: _('Minimal'), value: 0.01},
+    const simplifyValues = [{label: _('Minimal'), value: unitSystem === "metric" ? 0.01 : 0.04},
                             {label: _('Normal'), value: unitSystem === "metric" ? 0.2 : 0.5},
                             {label: _('Aggressive'), value: unitSystem === "metric" ? 1 : 4}];
 
