@@ -1028,6 +1028,7 @@ class Task(models.Model):
         # and immediately reads them back into Python
         # This is required because GEOS screws up the X/Y conversion
         # from the raster CRS to 4326, whereas PostGIS seems to do it correctly :/
+        self.status = status_codes.RUNNING # avoid telling clients that task is completed prematurely
         self.save()
         self.refresh_from_db()
 
