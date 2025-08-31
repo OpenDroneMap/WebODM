@@ -5,6 +5,7 @@ import os
 import subprocess
 import numpy as np
 import numexpr as ne
+import json
 import time
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
@@ -130,7 +131,13 @@ def export_raster(input, output, progress_callback=None, **opts):
 
         os.makedirs(os.path.dirname(crop_geojson), exist_ok=True)
         with open(crop_geojson, "w", encoding="utf-8") as f:
-            f.write(crop.geojson)
+            j = json.loads(crop.geojson)
+
+            # Swap lat/lon
+            for i, c in enumerate(j["coordinates"]):
+                j["coordinates"][i] = [[y,x] for x,y in c]
+            
+            f.write(json.dumps(j))
 
         subprocess.check_output(["gdalwarp", "-cutline", crop_geojson,
                 '--config', 'GDALWARP_DENSIFY_CUTLINE', 'NO', 
