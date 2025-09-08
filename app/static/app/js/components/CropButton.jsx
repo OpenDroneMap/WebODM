@@ -185,7 +185,7 @@ class CropButton extends React.Component {
     deletePolygon = (opts = {}) => {
         if (this.polygon){
             const remove = () => {
-                this.group.removeLayer(this.polygon);
+                if (this.polygon !== null) this.group.removeLayer(this.polygon);
                 this.polygon = null;
                 if (opts.triggerEvents) this.props.onPolygonChange(null);
             };
