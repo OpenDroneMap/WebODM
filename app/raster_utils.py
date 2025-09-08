@@ -124,20 +124,13 @@ def export_raster(input, output, progress_callback=None, **opts):
 
     if crop_wkt is not None:
         crop = GEOSGeometry(crop_wkt)
-        crop.srid = 4326
 
         crop_geojson = os.path.join(path_base, "crop.geojson")
         raster_vrt = os.path.join(path_base, "raster.vrt")
 
         os.makedirs(os.path.dirname(crop_geojson), exist_ok=True)
         with open(crop_geojson, "w", encoding="utf-8") as f:
-            j = json.loads(crop.geojson)
-
-            # Swap lat/lon
-            for i, c in enumerate(j["coordinates"]):
-                j["coordinates"][i] = [[y,x] for x,y in c]
-            
-            f.write(json.dumps(j))
+            f.write(crop.geojson)
 
         subprocess.check_output(["gdalwarp", "-cutline", crop_geojson,
                 '--config', 'GDALWARP_DENSIFY_CUTLINE', 'NO', 

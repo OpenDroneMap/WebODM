@@ -330,10 +330,11 @@ class Map extends React.Component {
                 }
                 
                 params.size = TILESIZE;
+                params.cache = Math.floor(Math.random() * 1000000); // cache bust
                 if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }else{
-                let params = { size: TILESIZE };
+                let params = { size: TILESIZE, cache: Math.floor(Math.random() * 1000000) };
                 if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
