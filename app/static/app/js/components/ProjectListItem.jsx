@@ -140,14 +140,14 @@ class ProjectListItem extends React.Component {
           url : 'TO_BE_CHANGED',
           parallelUploads: 4,
           uploadMultiple: false,
-          acceptedFiles: "image/*,text/plain,.las,.laz,video/*,.srt",
+          acceptedFiles: "image/*,text/plain,.las,.laz,video/*,.srt,.dng,.nef",
           autoProcessQueue: false,
           createImageThumbnails: false,
           clickable: this.uploadButton,
           maxFilesize: 131072, // 128G
           timeout: 2147483647,
           chunking: true,
-          chunkSize: 1000000,//16000000, // 16MB,
+          chunkSize: 16000000, // 16MB,
           retryChunks: true,
           retryChunksLimit: 20,
           
