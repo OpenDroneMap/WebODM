@@ -145,8 +145,11 @@ class ProjectListItem extends React.Component {
           createImageThumbnails: false,
           clickable: this.uploadButton,
           maxFilesize: 131072, // 128G
-          chunkSize: 2147483647,
           timeout: 2147483647,
+          chunking: true,
+          chunkSize: 1000000,//16000000, // 16MB,
+          retryChunks: true,
+          retryChunksLimit: 20,
           
           headers: {
             [csrf.header]: csrf.token
@@ -260,7 +263,8 @@ class ProjectListItem extends React.Component {
                 }else{
                     // Check response
                     let response = JSON.parse(file.xhr.response);
-                    if (response.success && response.uploaded && response.uploaded[file.upload.filename] === file.size){
+                    if (response.success){
+                      if (response.uploaded && response.uploaded[file.upload.filename] === file.size){
                         // Update progress by removing the tracked progress and 
                         // use the file size as the true number of bytes
                         let totalBytesSent = this.state.upload.totalBytesSent + file.size;
@@ -273,8 +277,11 @@ class ProjectListItem extends React.Component {
                             totalBytesSent,
                             uploadedCount: this.state.upload.uploadedCount + 1
                         });
+                      }else{
+                        // Chunk success, wait for end
+                      }
 
-                        this.dz.processQueue();
+                      this.dz.processQueue();
                     }else{
                         retry();
                     }

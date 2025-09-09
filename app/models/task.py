@@ -1391,7 +1391,7 @@ class Task(models.Model):
         if isinstance(file, str) and os.path.isfile(file):
             return file
 
-    def handle_images_upload(self, files):
+    def handle_images_upload(self, files, chunk_info=None):
         uploaded = {}
         for file in files:
             name = file.name
@@ -1402,15 +1402,35 @@ class Task(models.Model):
             if not os.path.exists(tp):
                 os.makedirs(tp, exist_ok=True)
 
+            if chunk_info is not None:
+                if os.path.isfile(chunk_info['tmp_upload_file']) and chunk_info['chunk_index'] == 0:
+                    os.unlink(chunk_info['tmp_upload_file'])
+                
+                with open(chunk_info['tmp_upload_file'], 'ab') as fd:
+                    fd.seek(chunk_info['byte_offset'])
+                    if isinstance(file, InMemoryUploadedFile):
+                        for chunk in file.chunks():
+                            fd.write(chunk)
+                    else:
+                        with open(file.temporary_file_path(), 'rb') as f:
+                            shutil.copyfileobj(f, fd)
+                
+                if chunk_info['chunk_index'] + 1 < chunk_info['total_chunk_count']:
+                    continue # will wait for next chunk
+
             dst_path = self.get_image_path(name)
 
-            with open(dst_path, 'wb+') as fd:
-                if isinstance(file, InMemoryUploadedFile):
-                    for chunk in file.chunks():
-                        fd.write(chunk)
-                else:
-                    with open(file.temporary_file_path(), 'rb') as f:
-                        shutil.copyfileobj(f, fd)
+            if chunk_info is not None:
+                if chunk_info['tmp_upload_file'] is not None and os.path.isfile(chunk_info['tmp_upload_file']):
+                    shutil.move(chunk_info['tmp_upload_file'], dst_path)
+            else:
+                with open(dst_path, 'wb+') as fd:
+                    if isinstance(file, InMemoryUploadedFile):
+                        for chunk in file.chunks():
+                            fd.write(chunk)
+                    else:
+                        with open(file.temporary_file_path(), 'rb') as f:
+                            shutil.copyfileobj(f, fd)
             
             uploaded[name] = os.path.getsize(dst_path)
         return uploaded
