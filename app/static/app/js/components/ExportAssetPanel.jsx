@@ -129,8 +129,9 @@ export default class ExportAssetPanel extends React.Component {
   handleExport = (format) => {
     if (!format) format = this.state.format;
 
-    return (cb) => {
+    return (cb, onProgress) => {
         if (typeof cb !== 'function') cb = undefined;
+        if (typeof onProgress !== 'function') onProgress = undefined;
         
         const { task } = this.props;
         this.setState({exporting: true, error: "", progress: null});
@@ -155,6 +156,7 @@ export default class ExportAssetPanel extends React.Component {
                         }
                     }, (_, progress) => {
                       this.setState({progress});
+                      if (onProgress !== undefined) onProgress(progress);
                     });
                 }else if (result.url){
                     // Simple download
