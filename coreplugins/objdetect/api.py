@@ -16,7 +16,7 @@ def detect(orthophoto, model, classes=None, crop=None, progress_callback=None):
 
     try:
         from geodeep import detect as gdetect, models
-        models.cache_dir = os.path.join(settings.MEDIA_ROOT, "CACHE", "detection_models")
+        models.cache_dir = os.path.join(settings.MEDIA_CACHE, "detection_models")
     except ImportError:
         return {'error': "GeoDeep library is missing"}
 

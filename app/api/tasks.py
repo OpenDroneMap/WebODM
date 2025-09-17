@@ -748,3 +748,26 @@ class TaskAssetsImport(APIView):
 
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+"""
+Task textured model LOD endpoint
+"""
+class TaskTexturedModelLOD(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None, lod=None):
+        """
+        Downloads a task textured model LOD (if available)
+        """
+        task = self.get_and_check_task(request, pk)
+
+        # Check and download
+        if not 'textured_model.glb' in available_assets:
+            raise exceptions.NotFound(_("Asset does not exist"))
+        
+        try:
+            lod_file = task.get_textured_model_lod(lod)
+            return download_file_response(request, lod_file, 'attachment')
+        except FileNotFoundError:
+            raise exceptions.NotFound(_("Asset does not exist"))
+        except ValueError:
+            raise exceptions.ValidationError("Invalid lod parameter")

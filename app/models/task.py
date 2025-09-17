@@ -8,6 +8,7 @@ import uuid as uuid_module
 from zipstream.ng import ZipStream
 
 import json
+import redis
 from shlex import quote
 
 import errno
@@ -53,6 +54,8 @@ import subprocess
 from app.classes.console import Console
 
 logger = logging.getLogger('app.logger')
+redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
+
 
 class TaskInterruptedException(Exception):
     pass
@@ -1036,6 +1039,7 @@ class Task(models.Model):
         self.update_epsg_field()
         self.update_orthophoto_bands_field()
         self.update_size()
+        self.clear_task_assets_cache()
         self.potree_scene = {}
         self.running_progress = 1.0
         self.crop = None
@@ -1228,6 +1232,7 @@ class Task(models.Model):
             shutil.rmtree(directory_to_delete)
         except FileNotFoundError as e:
             logger.warning(e)
+        self.clear_task_assets_cache()
 
         self.project.owner.profile.clear_used_quota_cache()
 
@@ -1449,3 +1454,67 @@ class Task(models.Model):
             self.project.owner.profile.clear_used_quota_cache()
         except Exception as e:
             logger.warn("Cannot update size for task {}: {}".format(self, str(e)))
+
+
+    def get_task_assets_cache(self):
+        return os.path.join(settings.MEDIA_CACHE, "task_assets", str(self.id))
+    
+    def clear_task_assets_cache(self):
+        d = self.get_task_assets_cache()
+        if os.path.isdir(d):
+            try:
+                shutil.rmtree(d)
+            except Exception as e:
+                logger.warning("Cannot clear task assets cache {}: {}".format(d, str(e)))
+
+    def get_textured_model_lod(lod):
+        if not isinstance(lod, int):
+            try:
+                lod = int(lod)
+            except (ValueError, TypeError):
+                raise ValueError("LOD must be an integer")
+
+        if lod < 0:
+            raise ValueError("LOD must be a positive integer")
+
+        if not 'textured_model.glb' in self.available_assets:
+            raise FileNotFoundError("GLB asset does not exist")
+
+
+        p, ext = os.path.splitext(glb_file)
+
+        glb_lod_file = os.path.join(self.get_task_assets_cache(), f"{p}-{lod}{ext}")
+        if os.path.isfile(glb_lod_file):
+            # Cached, return immediately
+            return glb_lod_file
+
+        lock_id = 'glb_lod_lock_{}_{}'.format(lod, task_id)
+
+        try:
+
+            lod_lock_last_update = redis_client.getset(lock_id, time.time())
+            while lod_lock_last_update is not None:
+                # Check if lock has expired
+                if time.time() - float(lod_lock_last_update) <= 60:
+                    # Locked
+                    time.sleep(2)
+                    lod_lock_last_update = redis_client.getset(lock_id, time.time())
+                else:
+                    # Expired
+                    logger.warning("LOD lock {} has expired! LODs might be taking too long to build.".format(task_id))
+                    break
+
+
+            if not os.path.isdir(task_assets_cache):
+                os.makedirs(task_assets_cache, exist_ok=True)
+
+
+        except Exception as e:
+            logger.warning("Could not generate LOD for {}: {}".format(str(self.id), str(e)))
+            return self.get_check_file_asset_path('textured_model.glb')
+        finally:
+            try:
+                redis_client.delete(lock_id)
+            except redis.exceptions.RedisError:
+                # Ignore errors, the lock will expire at some point
+                pass

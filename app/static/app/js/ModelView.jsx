@@ -648,19 +648,37 @@ class ModelView extends React.Component {
     });
   }
 
+  initGltfLoader = () => {
+      if (!this.gltfLoader) this.gltfLoader = new THREE.GLTFLoader();
+      if (!this.dracoLoader) {
+          this.dracoLoader = new THREE.DRACOLoader();
+          this.dracoLoader.setDecoderPath( '/static/app/js/vendor/draco/' );
+          this.gltfLoader.setDRACOLoader( this.dracoLoader );
+      }
+  }
+
   loadGltf = (url, cb) => {
-    if (!this.gltfLoader) this.gltfLoader = new THREE.GLTFLoader();
-    if (!this.dracoLoader) {
-        this.dracoLoader = new THREE.DRACOLoader();
-        this.dracoLoader.setDecoderPath( '/static/app/js/vendor/draco/' );
-        this.gltfLoader.setDRACOLoader( this.dracoLoader );
-    }
+    this.initGltfLoader();
 
     // Load a glTF resource
     this.gltfLoader.load(url,
         gltf => { cb(null, gltf) },
         xhr => {
             // called while loading is progressing
+        },
+        error => { cb(error); },
+        {crop: this.getCropCoordinates()}
+    );
+  }
+
+  loadProgressiveGltf = (url, cb) => {
+    this.initGltfLoader();
+
+    // Load a glTF resource
+    this.gltfLoader.load(url,
+        gltf => { cb(null, gltf) },
+        xhr => {
+            console.log(xhr.target.getAllResponseHeaders());
         },
         error => { cb(error); },
         {crop: this.getCropCoordinates()}
@@ -692,7 +710,7 @@ class ModelView extends React.Component {
         }
 
         if (this.getTexturedModelType() === 'gltf'){
-            this.loadGltf(this.glbFilePath(), (err, gltf) => {
+            this.loadProgressiveGltf(this.glbFilePath(), (err, gltf) => {
                 if (err){
                     this.setState({initializingModel: false, error: err});
                     return;
