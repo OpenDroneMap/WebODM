@@ -1481,8 +1481,8 @@ class Task(models.Model):
         
         levels = {
             3: (512, 0.25),
-            2: (1024, 0.50),
-            1: (2048, 1)
+            2: (2048, 0.50),
+            1: (4096, 1)
         }
         tex_size, simplify_ratio = levels[lod]
 
@@ -1503,6 +1503,8 @@ class Task(models.Model):
             # Cached, return immediately
             return output_glb
 
+        # Prevent multiple requests from generating the same LOD
+        # by putting an exclusive lock on the process
         lock_id = 'glb_lod_lock_{}_{}'.format(lod, str(self.id))
 
         try:
@@ -1511,32 +1513,36 @@ class Task(models.Model):
             while lod_lock_last_update is not None:
                 # Check if lock has expired
                 if time.time() - float(lod_lock_last_update) <= 60:
-                    # Locked
+                    # Locked, wait
                     time.sleep(2)
                     lod_lock_last_update = redis_client.getset(lock_id, time.time())
                 else:
                     # Expired
                     logger.warning("LOD lock {} has expired! LODs might be taking too long to build.".format(task_id))
                     break
+            
+            if os.path.isfile(output_glb):
+                # Cached, return immediately
+                return output_glb
 
             if not os.path.isdir(cache_dir):
                 os.makedirs(cache_dir, exist_ok=True)
 
             glbopti_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../scripts/glbopti.js"))
+            output_glb_tmp = output_glb + ".tmp.glb"
+
             subprocess.run(["node", glbopti_path,
                             "--input", quote(input_glb), 
-                            "--output", quote(output_glb),
+                            "--output", quote(output_glb_tmp),
                             "--texture-size", str(tex_size),
                             "--simplify-ratio", str(simplify_ratio)])
 
-            if not os.path.isfile(output_glb):
+            if not os.path.isfile(output_glb_tmp):
                 raise FileNotFoundError("LOD generation failed")
             
+            os.rename(output_glb_tmp, output_glb)            
             return output_glb
         except Exception as e:
-            import traceback
-            logger.error(traceback.format_exc())
-
             logger.warning("Could not generate LOD for {}: {}".format(str(self.id), str(e)))
             return input_glb
         finally:
