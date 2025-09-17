@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { NodeIO, Extension } = require('@gltf-transform/core');
 const { KHRONOS_EXTENSIONS } = require('@gltf-transform/extensions');
 const { textureCompress, simplify, weld, draco } = require('@gltf-transform/functions');
@@ -63,7 +65,7 @@ async function main() {
     }
 
     if (!inputFile || !outputFile){
-        console.log('Usage: node glb_optimize.js --input <input.glb> --output <output.glb> [--texture-size <size>]');
+        console.log('Usage: node glb_optimize.js --input <input.glb> --output <output.glb> [--texture-size <size>] [--simplify-ratio <ratio>]');
         process.exit(1);
     }
 
@@ -95,6 +97,13 @@ async function main() {
 
     const document = await io.read(inputFile);
     await document.transform(...transforms);
+
+    const outputDir = path.dirname(outputFile);
+    if (fs.existsSync(outputDir)) {
+        await io.write(outputFile, document);
+    } else {
+        throw new Error(`Output directory does not exist: ${outputDir}`);
+    }
     await io.write(outputFile, document);
 }
 

@@ -162,8 +162,12 @@ class ModelView extends React.Component {
     this.cameraMeshes = [];
   }
 
+  apiTaskPath = () => {
+    return `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}`;
+  }
+
   assetsPath = () => {
-    return `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/assets`
+    return `${this.apiTaskPath()}/assets`;
   }
 
   urlExists = (url, cb) => {
@@ -267,8 +271,12 @@ class ModelView extends React.Component {
     });
   }
 
-  glbFilePath = () => {
-    return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.glb';
+  glbFilePath = (lod) => {
+    if (lod > 0) {
+        return this.apiTaskPath() + `/textured_model/${lod}`;
+    }else{
+        return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.glb';
+    } 
   }
 
   mtlFilename = (cb) => {
@@ -710,7 +718,7 @@ class ModelView extends React.Component {
         }
 
         if (this.getTexturedModelType() === 'gltf'){
-            this.loadProgressiveGltf(this.glbFilePath(), (err, gltf) => {
+            this.loadProgressiveGltf(this.glbFilePath(3), (err, gltf) => {
                 if (err){
                     this.setState({initializingModel: false, error: err});
                     return;

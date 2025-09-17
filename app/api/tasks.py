@@ -760,10 +760,6 @@ class TaskTexturedModelLOD(TaskNestedView):
         """
         task = self.get_and_check_task(request, pk)
 
-        # Check and download
-        if not 'textured_model.glb' in available_assets:
-            raise exceptions.NotFound(_("Asset does not exist"))
-        
         try:
             lod_file = task.get_textured_model_lod(lod)
             return download_file_response(request, lod_file, 'attachment')

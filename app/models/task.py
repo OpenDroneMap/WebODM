@@ -1467,7 +1467,7 @@ class Task(models.Model):
             except Exception as e:
                 logger.warning("Cannot clear task assets cache {}: {}".format(d, str(e)))
 
-    def get_textured_model_lod(lod):
+    def get_textured_model_lod(self, lod):
         if not isinstance(lod, int):
             try:
                 lod = int(lod)
@@ -1476,19 +1476,34 @@ class Task(models.Model):
 
         if lod < 0:
             raise ValueError("LOD must be a positive integer")
+        if lod > 3:
+            raise ValueError("Max LOD is 3")
+        
+        levels = {
+            3: (512, 0.25),
+            2: (1024, 0.50),
+            1: (2048, 1)
+        }
+        tex_size, simplify_ratio = levels[lod]
 
-        if not 'textured_model.glb' in self.available_assets:
+        input_glb = self.get_check_file_asset_path('textured_model.glb')
+        if input_glb is None or (not 'textured_model.glb' in self.available_assets):
             raise FileNotFoundError("GLB asset does not exist")
+        
+        if lod == 0:
+            # Base model
+            return input_glb
 
+        p, ext = os.path.splitext(input_glb)
+        base = os.path.basename(p)
+        cache_dir = self.get_task_assets_cache()
 
-        p, ext = os.path.splitext(glb_file)
-
-        glb_lod_file = os.path.join(self.get_task_assets_cache(), f"{p}-{lod}{ext}")
-        if os.path.isfile(glb_lod_file):
+        output_glb = os.path.join(cache_dir, f"{base}-{lod}{ext}")
+        if os.path.isfile(output_glb):
             # Cached, return immediately
-            return glb_lod_file
+            return output_glb
 
-        lock_id = 'glb_lod_lock_{}_{}'.format(lod, task_id)
+        lock_id = 'glb_lod_lock_{}_{}'.format(lod, str(self.id))
 
         try:
 
@@ -1504,14 +1519,26 @@ class Task(models.Model):
                     logger.warning("LOD lock {} has expired! LODs might be taking too long to build.".format(task_id))
                     break
 
+            if not os.path.isdir(cache_dir):
+                os.makedirs(cache_dir, exist_ok=True)
 
-            if not os.path.isdir(task_assets_cache):
-                os.makedirs(task_assets_cache, exist_ok=True)
+            glbopti_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../scripts/glbopti.js"))
+            subprocess.run(["node", glbopti_path,
+                            "--input", quote(input_glb), 
+                            "--output", quote(output_glb),
+                            "--texture-size", str(tex_size),
+                            "--simplify-ratio", str(simplify_ratio)])
 
-
+            if not os.path.isfile(output_glb):
+                raise FileNotFoundError("LOD generation failed")
+            
+            return output_glb
         except Exception as e:
+            import traceback
+            logger.error(traceback.format_exc())
+
             logger.warning("Could not generate LOD for {}: {}".format(str(self.id), str(e)))
-            return self.get_check_file_asset_path('textured_model.glb')
+            return input_glb
         finally:
             try:
                 redis_client.delete(lock_id)
