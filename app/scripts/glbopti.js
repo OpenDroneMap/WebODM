@@ -70,21 +70,10 @@ async function main() {
     }
 
     const encoder = require('sharp');
-
-    let transforms = [
-        textureCompress({
-            encoder,
-            resize: [textureSize, textureSize],
-            targetFormat: undefined,
-            limitInputPixels: true,
-        }),
-        draco({
-            quantizationVolume: "scene"
-        })
-    ]
-
+    let transforms = [];
     if (simplifyRatio < 1){
-        transforms.unshift(
+        transforms.push(weld());
+        transforms.push(
             simplify({
                 simplifier: MeshoptSimplifier,
                 error: 0.0001,
@@ -92,8 +81,22 @@ async function main() {
                 lockBorder: false,
             }),
         );
-        transforms.unshift(weld());
     }
+
+    transforms.push(
+        textureCompress({
+                encoder,
+                resize: [textureSize, textureSize],
+                targetFormat: undefined,
+                limitInputPixels: true,
+        })
+    );
+
+    transforms.push(
+        draco({
+            quantizationVolume: "scene"
+        })
+    );
 
     const document = await io.read(inputFile);
     await document.transform(...transforms);

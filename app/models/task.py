@@ -1481,8 +1481,8 @@ class Task(models.Model):
         
         levels = {
             3: (512, 0.25),
-            2: (2048, 0.50),
-            1: (4096, 1)
+            2: (1024, 0.5),
+            1: (2048, 1)
         }
         tex_size, simplify_ratio = levels[lod]
 
@@ -1498,7 +1498,7 @@ class Task(models.Model):
         base = os.path.basename(p)
         cache_dir = self.get_task_assets_cache()
 
-        output_glb = os.path.join(cache_dir, f"{base}-{lod}{ext}")
+        output_glb = os.path.join(cache_dir, f"{base}-{lod}-{tex_size}{ext}")
         if os.path.isfile(output_glb):
             # Cached, return immediately
             return output_glb
@@ -1515,10 +1515,11 @@ class Task(models.Model):
                 if time.time() - float(lod_lock_last_update) <= 60:
                     # Locked, wait
                     time.sleep(2)
-                    lod_lock_last_update = redis_client.getset(lock_id, time.time())
+                    lod_lock_last_update = redis_client.get(lock_id)
                 else:
                     # Expired
-                    logger.warning("LOD lock {} has expired! LODs might be taking too long to build.".format(task_id))
+                    logger.warning("LOD lock {} has expired! LODs might be taking too long to build.".format(str(self.id)))
+                    redis_client.set(lock_id, time.time())
                     break
             
             if os.path.isfile(output_glb):
