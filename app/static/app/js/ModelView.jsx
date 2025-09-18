@@ -152,10 +152,11 @@ class ModelView extends React.Component {
       error: "",
       showingTexturedModel: false,
       initializingModel: false,
+      currentLod: 3,
+      currentLodSize: -1,
       selectedCamera: null,
       modalOpen: false
     };
-
     this.pointCloud = null;
     this.modelReference = null;
 
@@ -683,10 +684,11 @@ class ModelView extends React.Component {
     this.initGltfLoader();
 
     // Load a glTF resource
+    let bytesSize = -1;
     this.gltfLoader.load(url,
-        gltf => { cb(null, gltf) },
+        gltf => { cb(null, gltf, bytesSize) },
         xhr => {
-            console.log(xhr.target.getAllResponseHeaders());
+            bytesSize = xhr.total;
         },
         error => { cb(error); },
         {crop: this.getCropCoordinates()}
@@ -697,28 +699,38 @@ class ModelView extends React.Component {
     const value = e.target.checked;
 
     if (value){
-      // Need to load model for the first time?
-      if (this.modelReference === null && !this.state.initializingModel){
+      this.setState({showingTexturedModel: true});
+      this.state.showingTexturedModel = true; // Don't wait for react
 
-        this.setState({initializingModel: true});
+      const addReplaceObject = (object, offset) => {
+        object.translateX(offset.x);
+        object.translateY(offset.y);
 
-        const addObject = (object, offset) => {
-            object.translateX(offset.x);
-            object.translateY(offset.y);
-
-            viewer.scene.scene.add(object);
-
-            this.modelReference = object;
+        // Swap if needed
+        if (this.modelReference !== null){
+            viewer.scene.scene.remove(this.modelReference);
+        }
+        this.modelReference = object;
+        viewer.scene.scene.add(object);
+        
+        if (this.state.showingTexturedModel){
             this.setPointCloudsVisible(false);
-
-            this.setState({
-                initializingModel: false,
-                showingTexturedModel: true
-            });
+            object.visible = true;
+        }else{
+            this.setPointCloudsVisible(true);
+            object.visible = false;
         }
 
-        if (this.getTexturedModelType() === 'gltf'){
-            this.loadProgressiveGltf(this.glbFilePath(3), (err, gltf) => {
+        this.setState({
+            initializingModel: false
+        });
+      }
+
+      const loadLOD = (lod) => {
+        const LOD_MAX_SIZE = 1024 * 1024 * 90; // MB
+        if (lod >= 0 && (this.state.currentLodSize === -1 || this.state.currentLodSize < LOD_MAX_SIZE) && this.state.showingTexturedModel){
+            // console.log("Loading LOD ", lod)
+            this.loadProgressiveGltf(this.glbFilePath(lod), (err, gltf, bytesSize) => {
                 if (err){
                     this.setState({initializingModel: false, error: err});
                     return;
@@ -730,8 +742,26 @@ class ModelView extends React.Component {
                     offset.y = gltf.scene.CESIUM_RTC.center[1];
                 }
 
-                addObject(gltf.scene, offset);
+                addReplaceObject(gltf.scene, offset);
+                
+                this.setState({currentLod: lod, currentLodSize: bytesSize});
+
+                // Load next LOD if needed
+                loadLOD(lod - 1);
             });
+        }else{
+            // console.log("Done loading LODs");
+        }
+      };
+
+      const isGltf = this.getTexturedModelType() === 'gltf';
+
+      // Need to load model for the first time?
+      if (this.modelReference === null && !this.state.initializingModel){
+        this.setState({initializingModel: true});
+
+        if (isGltf){
+            loadLOD(this.state.currentLod);
         }else{
             // Legacy OBJ
 
@@ -747,7 +777,7 @@ class ModelView extends React.Component {
                     this.objFilePath(filePath => {
                         objLoader.load(filePath, (object) => {
                             this.loadGeoreferencingOffset((offset) => {
-                                addObject(object, offset);
+                                addReplaceObject(object, offset);
                             });
                         });
                     });
@@ -758,7 +788,11 @@ class ModelView extends React.Component {
         // Already initialized
         this.modelReference.visible = true;
         this.setPointCloudsVisible(false);
-        this.setState({showingTexturedModel: true});
+
+        if (isGltf){
+            // Load next LOD if needed
+            loadLOD(this.state.currentLod - 1);
+        }
       }
     }else{
       this.modelReference.visible = false;

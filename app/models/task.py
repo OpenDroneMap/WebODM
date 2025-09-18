@@ -1535,7 +1535,7 @@ class Task(models.Model):
                             "--input", quote(input_glb), 
                             "--output", quote(output_glb_tmp),
                             "--texture-size", str(tex_size),
-                            "--simplify-ratio", str(simplify_ratio)])
+                            "--simplify-ratio", str(simplify_ratio)], timeout=180)
 
             if not os.path.isfile(output_glb_tmp):
                 raise FileNotFoundError("LOD generation failed")

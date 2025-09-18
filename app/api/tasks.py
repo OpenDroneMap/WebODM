@@ -762,6 +762,8 @@ class TaskTexturedModelLOD(TaskNestedView):
 
         try:
             lod_file = task.get_textured_model_lod(lod)
+            import time
+            time.sleep(3)
             return download_file_response(request, lod_file, 'attachment')
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
