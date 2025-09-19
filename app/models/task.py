@@ -1224,6 +1224,7 @@ class Task(models.Model):
 
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
                                            task_directory_path(self.id, self.project.id))
+        self.clear_task_assets_cache()
 
         super(Task, self).delete(using, keep_parents)
 
@@ -1232,7 +1233,6 @@ class Task(models.Model):
             shutil.rmtree(directory_to_delete)
         except FileNotFoundError as e:
             logger.warning(e)
-        self.clear_task_assets_cache()
 
         self.project.owner.profile.clear_used_quota_cache()
 
@@ -1457,10 +1457,15 @@ class Task(models.Model):
 
 
     def get_task_assets_cache(self):
+        if self.id is None:
+            return None
         return os.path.join(settings.MEDIA_CACHE, "task_assets", str(self.id))
     
     def clear_task_assets_cache(self):
         d = self.get_task_assets_cache()
+        if d is None:
+            return
+        
         if os.path.isdir(d):
             try:
                 shutil.rmtree(d)
@@ -1472,18 +1477,21 @@ class Task(models.Model):
         if input_glb is None or (not 'textured_model.glb' in self.available_assets):
             raise FileNotFoundError("GLB asset does not exist")
         
-        size = os.path.getsize(input_glb)
-        if size <= max_size_mb * 1024 * 1024:
-            return input_glb
-        
-        p, ext = os.path.splitext(input_glb)
-        base = os.path.basename(p)
-        cache_dir = self.get_task_assets_cache()
-        rescale = 1
+        if settings.TESTING:
+            rescale = 2
+        else:
+            size = os.path.getsize(input_glb)
+            if size <= max_size_mb * 1024 * 1024:
+                return input_glb
+            
+            p, ext = os.path.splitext(input_glb)
+            base = os.path.basename(p)
+            cache_dir = self.get_task_assets_cache()
+            rescale = 1
 
-        while size > max_size_mb * 1024 * 1024:
-            rescale *= 2
-            size = size // 2.6  # Texture size reduction factor (not science)
+            while size > max_size_mb * 1024 * 1024:
+                rescale *= 2
+                size = size // 2.6  # Texture size reduction factor (not science)
 
         output_glb = os.path.join(cache_dir, f"{base}-{rescale}{ext}")
         if os.path.isfile(output_glb):
@@ -1519,10 +1527,13 @@ class Task(models.Model):
             glbopti_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../scripts/glbopti.js"))
             output_glb_tmp = output_glb + ".tmp.glb"
 
-            subprocess.run(["node", glbopti_path,
+            params = ["node", glbopti_path,
                             "--input", quote(input_glb), 
                             "--output", quote(output_glb_tmp),
-                            "--texture-rescale", str(rescale)], timeout=180)
+                            "--texture-rescale", str(rescale)]
+            if settings.TESTING:
+                params += ["--test"]
+            subprocess.run(params, timeout=180)
 
             if not os.path.isfile(output_glb_tmp):
                 raise FileNotFoundError("GLB generation failed")

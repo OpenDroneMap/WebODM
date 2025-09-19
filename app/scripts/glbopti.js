@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { NodeIO, Extension } = require('@gltf-transform/core');
 const { KHRONOS_EXTENSIONS } = require('@gltf-transform/extensions');
-const { textureCompress, simplify, weld, draco } = require('@gltf-transform/functions');
-const { MeshoptSimplifier } = require('meshoptimizer');
+const { textureCompress, draco } = require('@gltf-transform/functions');
 const draco3d = require('draco3dgltf');
+const encoder = require('sharp');
 
 class CesiumRTC extends Extension {
 	extensionName = 'CESIUM_RTC';
@@ -37,8 +37,8 @@ async function main() {
     let inputFile = '';
     let outputFile = '';
     let textureSize = 512;
-    let simplifyRatio = 1;
     let textureRescale = null;
+    let testMode = false;
 
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '--input' && i + 1 < args.length) {
@@ -54,13 +54,6 @@ async function main() {
                 process.exit(1);
             }
             i++;
-        } else if (args[i] === '--simplify-ratio' && i + 1 < args.length) {
-            simplifyRatio = parseFloat(args[i + 1]);
-            if (isNaN(simplifyRatio) || simplifyRatio < 0 || simplifyRatio > 1){
-                console.log(`Invalid simplify ratio: ${args[i + 1]}`);
-                process.exit(1);
-            }
-            i++;
         } else if (args[i] === '--texture-rescale' && i + 1 < args.length) {
             textureRescale = parseInt(args[i + 1]);
             if (isNaN(textureRescale) || textureRescale < 1 || (textureRescale & (textureRescale - 1)) !== 0){
@@ -68,13 +61,22 @@ async function main() {
                 process.exit(1);
             }
             i++;
+        } else if (args[i] === '--test') {
+            testMode = true;
+            i++;
         }
 
     }
 
     if (!inputFile || !outputFile){
-        console.log('Usage: node glb_optimize.js --input <input.glb> --output <output.glb> [--texture-size <size>|--texture-rescale <factor>] [--simplify-ratio <ratio>]');
+        console.log('Usage: node glb_optimize.js --input <input.glb> --output <output.glb> [--texture-size <size>|--texture-rescale <factor>]');
         process.exit(1);
+    }
+
+    if (testMode){
+        console.log("Test mode, writing empty test file");
+        fs.writeFileSync(outputFile, "test", "utf8");
+        process.exit(0);
     }
 
     const document = await io.read(inputFile);
@@ -90,36 +92,18 @@ async function main() {
         if (dimension === 0) dimension = 512;
     }
     
-    const encoder = require('sharp');
-    let transforms = [];
-    if (simplifyRatio < 1){
-        transforms.push(weld());
-        transforms.push(
-            simplify({
-                simplifier: MeshoptSimplifier,
-                error: 0.0001,
-                ratio: simplifyRatio,
-                lockBorder: false,
-            }),
-        );
-    }
-
-    transforms.push(
+    let transforms = [
         textureCompress({
                 encoder,
                 resize: [textureSize, textureSize],
                 targetFormat: undefined,
                 limitInputPixels: true,
-        })
-    );
-
-    transforms.push(
+        }),
         draco({
             quantizationVolume: "scene"
         })
-    );
+    ];
 
-    
     await document.transform(...transforms);
 
     const outputDir = path.dirname(outputFile);

@@ -109,7 +109,7 @@ def cleanup_tmp_directory():
             else:
                 shutil.rmtree(filepath, ignore_errors=True)
 
-            logger.info('Cleaned up: %s (%s)' % (f, modified))
+            logger.info('Cleaned up: %s (%s)' % (filepath, modified))
 
 
 @app.task(ignore_result=True)
@@ -129,7 +129,7 @@ def cleanup_cache_directory():
                 else:
                     shutil.rmtree(filepath, ignore_errors=True)
 
-                logger.info('Cleaned up: %s (%s)' % (f, modified))
+                logger.info('Cleaned up: %s (%s)' % (filepath, modified))
 
 # Based on https://stackoverflow.com/questions/22498038/improve-current-implementation-of-a-setinterval-python/22498708#22498708
 def setInterval(interval, func, *args):
