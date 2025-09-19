@@ -6,6 +6,7 @@ class Standby extends React.Component {
   static defaultProps = {
       message: "",
       show: false,
+      progress: null,
       opacity: 0.5
   };
 
@@ -20,7 +21,8 @@ class Standby extends React.Component {
 
     this.state = {
         message: props.message,
-        show: props.show
+        show: props.show,
+        progress: props.progress
     };
   }
 
@@ -42,12 +44,20 @@ class Standby extends React.Component {
   render() {
     return (
       <div className="standby"
-           style={{display: this.state.show ? "block" : "none"}}>
-        <div className="cover" style={{opacity: this.props.opacity}}>&nbsp;</div>
-        <div className="content">
+         style={{display: this.state.show ? "block" : "none"}}>
+      <div className="cover" style={{opacity: this.props.opacity}}>&nbsp;</div>
+      <div className="content">
+        {this.state.progress !== null ? (
+          <div className="standby-progress">
+            <div className="standby-bar" style={{
+              width: `${this.state.progress}%`,
+            }}></div>
+          </div>
+          ) :
           <i className="fa fa-spinner fa-spin fa-2x fa-fw"></i>
-          <p>{this.state.message}</p>
-        </div>
+        }
+        <p>{this.state.message}</p>
+      </div>
       </div>
     );
   }

@@ -38,6 +38,7 @@ async function main() {
     let outputFile = '';
     let textureSize = 512;
     let simplifyRatio = 1;
+    let textureRescale = null;
 
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '--input' && i + 1 < args.length) {
@@ -60,15 +61,35 @@ async function main() {
                 process.exit(1);
             }
             i++;
+        } else if (args[i] === '--texture-rescale' && i + 1 < args.length) {
+            textureRescale = parseInt(args[i + 1]);
+            if (isNaN(textureRescale) || textureRescale < 1 || (textureRescale & (textureRescale - 1)) !== 0){
+                console.log(`Invalid texture rescale factor: ${args[i + 1]} (must be a power of 2)`);
+                process.exit(1);
+            }
+            i++;
         }
 
     }
 
     if (!inputFile || !outputFile){
-        console.log('Usage: node glb_optimize.js --input <input.glb> --output <output.glb> [--texture-size <size>] [--simplify-ratio <ratio>]');
+        console.log('Usage: node glb_optimize.js --input <input.glb> --output <output.glb> [--texture-size <size>|--texture-rescale <factor>] [--simplify-ratio <ratio>]');
         process.exit(1);
     }
 
+    const document = await io.read(inputFile);
+
+    if (textureRescale !== null){
+        let dimension = 0;
+        const textures = document.getRoot().listTextures();
+        textures.forEach(tex => {
+            const [ width, height ] = tex.getSize();
+            dimension = Math.max(dimension, width, height);
+        });
+        textureSize = (dimension / textureRescale);
+        if (dimension === 0) dimension = 512;
+    }
+    
     const encoder = require('sharp');
     let transforms = [];
     if (simplifyRatio < 1){
@@ -98,7 +119,7 @@ async function main() {
         })
     );
 
-    const document = await io.read(inputFile);
+    
     await document.transform(...transforms);
 
     const outputDir = path.dirname(outputFile);

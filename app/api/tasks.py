@@ -751,19 +751,17 @@ class TaskAssetsImport(APIView):
 
 
 """
-Task textured model LOD endpoint
+Task safe textured model endpoint
 """
-class TaskTexturedModelLOD(TaskNestedView):
-    def get(self, request, pk=None, project_pk=None, lod=None):
+class TaskSafeTexturedModel(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
         """
-        Downloads a task textured model LOD (if available)
+        Downloads a task's safe textured model (if available)
         """
         task = self.get_and_check_task(request, pk)
 
         try:
-            lod_file = task.get_textured_model_lod(lod)
-            return download_file_response(request, lod_file, 'attachment')
+            model_file = task.get_safe_textured_model()
+            return download_file_response(request, model_file, 'attachment')
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
-        except ValueError:
-            raise exceptions.ValidationError("Invalid lod parameter")

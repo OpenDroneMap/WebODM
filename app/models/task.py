@@ -1467,45 +1467,32 @@ class Task(models.Model):
             except Exception as e:
                 logger.warning("Cannot clear task assets cache {}: {}".format(d, str(e)))
 
-    def get_textured_model_lod(self, lod):
-        if not isinstance(lod, int):
-            try:
-                lod = int(lod)
-            except (ValueError, TypeError):
-                raise ValueError("LOD must be an integer")
-
-        if lod < 0:
-            raise ValueError("LOD must be a positive integer")
-        if lod > 3:
-            raise ValueError("Max LOD is 3")
-        
-        levels = {
-            3: (512, 0.25),
-            2: (1024, 0.5),
-            1: (2048, 1)
-        }
-        tex_size, simplify_ratio = levels[lod]
-
+    def get_safe_textured_model(self, max_size_mb=150):
         input_glb = self.get_check_file_asset_path('textured_model.glb')
         if input_glb is None or (not 'textured_model.glb' in self.available_assets):
             raise FileNotFoundError("GLB asset does not exist")
         
-        if lod == 0:
-            # Base model
+        size = os.path.getsize(input_glb)
+        if size <= max_size_mb * 1024 * 1024:
             return input_glb
-
+        
         p, ext = os.path.splitext(input_glb)
         base = os.path.basename(p)
         cache_dir = self.get_task_assets_cache()
+        rescale = 1
 
-        output_glb = os.path.join(cache_dir, f"{base}-{lod}-{tex_size}{ext}")
+        while size > max_size_mb * 1024 * 1024:
+            rescale *= 2
+            size = size // 2.6  # Texture size reduction factor (not science)
+
+        output_glb = os.path.join(cache_dir, f"{base}-{rescale}{ext}")
         if os.path.isfile(output_glb):
             # Cached, return immediately
             return output_glb
 
-        # Prevent multiple requests from generating the same LOD
+        # Prevent multiple requests from generating the same rescale
         # by putting an exclusive lock on the process
-        lock_id = 'glb_lod_lock_{}_{}'.format(lod, str(self.id))
+        lock_id = 'glb_gen_lock_{}_{}'.format(rescale, str(self.id))
 
         try:
 
@@ -1518,7 +1505,7 @@ class Task(models.Model):
                     lod_lock_last_update = redis_client.get(lock_id)
                 else:
                     # Expired
-                    logger.warning("LOD lock {} has expired! LODs might be taking too long to build.".format(str(self.id)))
+                    logger.warning("GLB generation lock {} has expired! Generation might be taking too long.".format(str(self.id)))
                     redis_client.set(lock_id, time.time())
                     break
             
@@ -1535,16 +1522,15 @@ class Task(models.Model):
             subprocess.run(["node", glbopti_path,
                             "--input", quote(input_glb), 
                             "--output", quote(output_glb_tmp),
-                            "--texture-size", str(tex_size),
-                            "--simplify-ratio", str(simplify_ratio)], timeout=180)
+                            "--texture-rescale", str(rescale)], timeout=180)
 
             if not os.path.isfile(output_glb_tmp):
-                raise FileNotFoundError("LOD generation failed")
+                raise FileNotFoundError("GLB generation failed")
             
             os.rename(output_glb_tmp, output_glb)            
             return output_glb
         except Exception as e:
-            logger.warning("Could not generate LOD for {}: {}".format(str(self.id), str(e)))
+            logger.warning("Could not generate GLB for {}: {}".format(str(self.id), str(e)))
             return input_glb
         finally:
             try:

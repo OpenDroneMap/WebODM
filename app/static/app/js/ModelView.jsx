@@ -152,23 +152,23 @@ class ModelView extends React.Component {
       error: "",
       showingTexturedModel: false,
       initializingModel: false,
-      currentLod: 3,
-      currentLodSize: -1,
+      texModelLoadProgress: null,
       selectedCamera: null,
       modalOpen: false
     };
+
     this.pointCloud = null;
     this.modelReference = null;
 
     this.cameraMeshes = [];
   }
 
-  apiTaskPath = () => {
+  basePath = () => {
     return `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}`;
   }
 
   assetsPath = () => {
-    return `${this.apiTaskPath()}/assets`;
+    return `${this.basePath()}/assets`;
   }
 
   urlExists = (url, cb) => {
@@ -272,12 +272,8 @@ class ModelView extends React.Component {
     });
   }
 
-  glbFilePath = (lod) => {
-    if (lod > 0) {
-        return this.apiTaskPath() + `/textured_model/${lod}`;
-    }else{
-        return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.glb';
-    } 
+  glbFilePath = () => {
+    return this.basePath() + '/textured_model/';
   }
 
   mtlFilename = (cb) => {
@@ -657,39 +653,18 @@ class ModelView extends React.Component {
     });
   }
 
-  initGltfLoader = () => {
-      if (!this.gltfLoader) this.gltfLoader = new THREE.GLTFLoader();
-      if (!this.dracoLoader) {
-          this.dracoLoader = new THREE.DRACOLoader();
-          this.dracoLoader.setDecoderPath( '/static/app/js/vendor/draco/' );
-          this.gltfLoader.setDRACOLoader( this.dracoLoader );
-      }
-  }
-
-  loadGltf = (url, cb) => {
-    this.initGltfLoader();
+  loadGltf = (url, cb, onProgress) => {
+    if (!this.gltfLoader) this.gltfLoader = new THREE.GLTFLoader();
+    if (!this.dracoLoader) {
+        this.dracoLoader = new THREE.DRACOLoader();
+        this.dracoLoader.setDecoderPath( '/static/app/js/vendor/draco/' );
+        this.gltfLoader.setDRACOLoader( this.dracoLoader );
+    }
 
     // Load a glTF resource
     this.gltfLoader.load(url,
         gltf => { cb(null, gltf) },
-        xhr => {
-            // called while loading is progressing
-        },
-        error => { cb(error); },
-        {crop: this.getCropCoordinates()}
-    );
-  }
-
-  loadProgressiveGltf = (url, cb) => {
-    this.initGltfLoader();
-
-    // Load a glTF resource
-    let bytesSize = -1;
-    this.gltfLoader.load(url,
-        gltf => { cb(null, gltf, bytesSize) },
-        xhr => {
-            bytesSize = xhr.total;
-        },
+        onProgress,
         error => { cb(error); },
         {crop: this.getCropCoordinates()}
     );
@@ -699,69 +674,47 @@ class ModelView extends React.Component {
     const value = e.target.checked;
 
     if (value){
-      this.setState({showingTexturedModel: true});
-      this.state.showingTexturedModel = true; // Don't wait for react
+      // Need to load model for the first time?
+      if (this.modelReference === null && !this.state.initializingModel){
 
-      const addReplaceObject = (object, offset) => {
-        object.translateX(offset.x);
-        object.translateY(offset.y);
+        this.setState({initializingModel: true});
 
-        // Swap if needed
-        if (this.modelReference !== null){
-            viewer.scene.scene.remove(this.modelReference);
-        }
-        this.modelReference = object;
-        viewer.scene.scene.add(object);
-        
-        if (this.state.showingTexturedModel){
+        const addObject = (object, offset) => {
+            object.translateX(offset.x);
+            object.translateY(offset.y);
+
+            viewer.scene.scene.add(object);
+
+            this.modelReference = object;
             this.setPointCloudsVisible(false);
-            object.visible = true;
-        }else{
-            this.setPointCloudsVisible(true);
-            object.visible = false;
+
+            this.setState({
+                initializingModel: false,
+                showingTexturedModel: true
+            });
         }
 
-        this.setState({
-            initializingModel: false
-        });
-      }
-
-      const loadLOD = (lod) => {
-        const LOD_MAX_SIZE = 1024 * 1024 * 90; // MB
-        if (lod >= 0 && (this.state.currentLodSize === -1 || this.state.currentLodSize < LOD_MAX_SIZE) && this.state.showingTexturedModel){
-            // console.log("Loading LOD ", lod)
-            this.loadProgressiveGltf(this.glbFilePath(lod), (err, gltf, bytesSize) => {
+        if (this.getTexturedModelType() === 'gltf'){
+            this.loadGltf(this.glbFilePath(), (err, gltf) => {
                 if (err){
                     this.setState({initializingModel: false, error: err});
                     return;
                 }
-
-                const offset = {x: 0, y: 0};
-                if (gltf.scene.CESIUM_RTC && gltf.scene.CESIUM_RTC.center){
-                    offset.x = gltf.scene.CESIUM_RTC.center[0];
-                    offset.y = gltf.scene.CESIUM_RTC.center[1];
-                }
-
-                addReplaceObject(gltf.scene, offset);
+                this.setState({texModelLoadProgress: null});
                 
-                this.setState({currentLod: lod, currentLodSize: bytesSize});
-
-                // Load next LOD if needed
-                loadLOD(lod - 1);
+                setTimeout(() => {
+                    const offset = {x: 0, y: 0};
+                    if (gltf.scene.CESIUM_RTC && gltf.scene.CESIUM_RTC.center){
+                        offset.x = gltf.scene.CESIUM_RTC.center[0];
+                        offset.y = gltf.scene.CESIUM_RTC.center[1];
+                    }
+    
+                    addObject(gltf.scene, offset);
+                }, 0);
+            }, xhr => {
+                const progress = Math.round((xhr.loaded / xhr.total) * 100);
+                this.setState({texModelLoadProgress: progress});
             });
-        }else{
-            // console.log("Done loading LODs");
-        }
-      };
-
-      const isGltf = this.getTexturedModelType() === 'gltf';
-
-      // Need to load model for the first time?
-      if (this.modelReference === null && !this.state.initializingModel){
-        this.setState({initializingModel: true});
-
-        if (isGltf){
-            loadLOD(this.state.currentLod);
         }else{
             // Legacy OBJ
 
@@ -777,7 +730,7 @@ class ModelView extends React.Component {
                     this.objFilePath(filePath => {
                         objLoader.load(filePath, (object) => {
                             this.loadGeoreferencingOffset((offset) => {
-                                addReplaceObject(object, offset);
+                                addObject(object, offset);
                             });
                         });
                     });
@@ -788,11 +741,7 @@ class ModelView extends React.Component {
         // Already initialized
         this.modelReference.visible = true;
         this.setPointCloudsVisible(false);
-
-        if (isGltf){
-            // Load next LOD if needed
-            loadLOD(this.state.currentLod - 1);
-        }
+        this.setState({showingTexturedModel: true});
       }
     }else{
       this.modelReference.visible = false;
@@ -851,6 +800,7 @@ class ModelView extends React.Component {
           <Standby 
             message={_("Loading textured model...")}
             show={this.state.initializingModel}
+            progress={this.state.texModelLoadProgress}
             />
       </div>);
   }
@@ -878,4 +828,3 @@ $(function(){
 });
 
 export default ModelView;
-    
