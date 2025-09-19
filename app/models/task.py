@@ -8,6 +8,7 @@ import uuid as uuid_module
 from zipstream.ng import ZipStream
 
 import json
+import redis
 from shlex import quote
 
 import errno
@@ -53,6 +54,8 @@ import subprocess
 from app.classes.console import Console
 
 logger = logging.getLogger('app.logger')
+redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
+
 
 class TaskInterruptedException(Exception):
     pass
@@ -1036,6 +1039,7 @@ class Task(models.Model):
         self.update_epsg_field()
         self.update_orthophoto_bands_field()
         self.update_size()
+        self.clear_task_assets_cache()
         self.potree_scene = {}
         self.running_progress = 1.0
         self.crop = None
@@ -1220,6 +1224,7 @@ class Task(models.Model):
 
         directory_to_delete = os.path.join(settings.MEDIA_ROOT,
                                            task_directory_path(self.id, self.project.id))
+        self.clear_task_assets_cache()
 
         super(Task, self).delete(using, keep_parents)
 
@@ -1449,3 +1454,98 @@ class Task(models.Model):
             self.project.owner.profile.clear_used_quota_cache()
         except Exception as e:
             logger.warn("Cannot update size for task {}: {}".format(self, str(e)))
+
+
+    def get_task_assets_cache(self):
+        if self.id is None:
+            return None
+        return os.path.join(settings.MEDIA_CACHE, "task_assets", str(self.id))
+    
+    def clear_task_assets_cache(self):
+        d = self.get_task_assets_cache()
+        if d is None:
+            return
+        
+        if os.path.isdir(d):
+            try:
+                shutil.rmtree(d)
+            except Exception as e:
+                logger.warning("Cannot clear task assets cache {}: {}".format(d, str(e)))
+
+    def get_safe_textured_model(self, max_size_mb=150):
+        input_glb = self.get_check_file_asset_path('textured_model.glb')
+        if input_glb is None or (not 'textured_model.glb' in self.available_assets):
+            raise FileNotFoundError("GLB asset does not exist")
+        
+        if settings.TESTING:
+            rescale = 2
+        else:
+            size = os.path.getsize(input_glb)
+            if size <= max_size_mb * 1024 * 1024:
+                return input_glb
+            
+            rescale = 1
+
+            while size > max_size_mb * 1024 * 1024:
+                rescale *= 2
+                size = size // 2.6  # Texture size reduction factor (not science)
+
+        p, ext = os.path.splitext(input_glb)
+        base = os.path.basename(p)
+        cache_dir = self.get_task_assets_cache()
+        output_glb = os.path.join(cache_dir, f"{base}-{rescale}{ext}")
+        if os.path.isfile(output_glb):
+            # Cached, return immediately
+            return output_glb
+
+        # Prevent multiple requests from generating the same rescale
+        # by putting an exclusive lock on the process
+        lock_id = 'glb_gen_lock_{}_{}'.format(rescale, str(self.id))
+
+        try:
+
+            lod_lock_last_update = redis_client.getset(lock_id, time.time())
+            while lod_lock_last_update is not None:
+                # Check if lock has expired
+                if time.time() - float(lod_lock_last_update) <= 60:
+                    # Locked, wait
+                    time.sleep(2)
+                    lod_lock_last_update = redis_client.get(lock_id)
+                else:
+                    # Expired
+                    logger.warning("GLB generation lock {} has expired! Generation might be taking too long.".format(str(self.id)))
+                    redis_client.set(lock_id, time.time())
+                    break
+            
+            if os.path.isfile(output_glb):
+                # Cached, return immediately
+                return output_glb
+
+            if not os.path.isdir(cache_dir):
+                os.makedirs(cache_dir, exist_ok=True)
+
+            glbopti_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../scripts/glbopti.js"))
+            output_glb_tmp = output_glb + ".tmp.glb"
+
+            params = ["node", glbopti_path,
+                            "--input", quote(input_glb), 
+                            "--output", quote(output_glb_tmp),
+                            "--texture-rescale", str(rescale)]
+            if settings.TESTING:
+                params += ["--test"]
+            subprocess.run(params, timeout=180)
+
+            if not os.path.isfile(output_glb_tmp):
+                raise FileNotFoundError("GLB generation failed")
+            
+            os.rename(output_glb_tmp, output_glb)            
+            return output_glb
+        except Exception as e:
+            logger.warning("Could not generate GLB for {}: {}".format(str(self.id), str(e)))
+            return input_glb
+        finally:
+            try:
+                redis_client.delete(lock_id)
+            except redis.exceptions.RedisError:
+                # Ignore errors, the lock will expire at some point
+                pass

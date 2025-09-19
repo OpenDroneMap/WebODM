@@ -44,6 +44,14 @@ app.conf.beat_schedule = {
             'retry': False
         }
     },
+    'cleanup-cache-directory': {
+        'task': 'worker.tasks.cleanup_cache_directory',
+        'schedule': 21600,
+        'options': {
+            'expires': 10799,
+            'retry': False
+        }
+    },
     'process-pending-tasks': {
         'task': 'worker.tasks.process_pending_tasks',
         'schedule': 5,

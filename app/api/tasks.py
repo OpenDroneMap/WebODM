@@ -748,3 +748,20 @@ class TaskAssetsImport(APIView):
 
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+"""
+Task safe textured model endpoint
+"""
+class TaskSafeTexturedModel(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Downloads a task's safe textured model (if available)
+        """
+        task = self.get_and_check_task(request, pk)
+
+        try:
+            model_file = task.get_safe_textured_model()
+            return download_file_response(request, model_file, 'attachment')
+        except FileNotFoundError:
+            raise exceptions.NotFound(_("Asset does not exist"))

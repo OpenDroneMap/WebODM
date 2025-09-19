@@ -813,6 +813,19 @@ class TestApiTask(BootTransactionTestCase):
                 res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png?size={}".format(project.id, task.id, tile_path['orthophoto'], s))
                 self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
             
+            # This task's assets cache should not exist
+            ta_cache_dir = task.get_task_assets_cache()
+            self.assertFalse(os.path.isdir(ta_cache_dir))
+
+            # Can access the safe textured model endpoint
+            res = client.get("/api/projects/{}/tasks/{}/textured_model/".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+            # The resulting GLB cache should have been created
+            self.assertTrue(os.path.isdir(ta_cache_dir))
+            self.assertTrue(os.path.isfile(os.path.join(ta_cache_dir, "odm_textured_model_geo-2.glb")))
+            
+
             # Another user does not have access to the resources
             other_client = APIClient()
             other_client.login(username="testuser2", password="test1234")
@@ -954,6 +967,9 @@ class TestApiTask(BootTransactionTestCase):
 
             task_assets_path = os.path.join(settings.MEDIA_ROOT, task_directory_path(task.id, task.project.id))
             self.assertFalse(os.path.exists(task_assets_path))
+
+            # Assets cache should also be removed
+            self.assertFalse(os.path.isdir(ta_cache_dir))
 
 
         # Create a task

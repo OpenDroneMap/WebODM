@@ -51,8 +51,45 @@ class TestWorker(BootTestCase):
             self.assertTrue(Task.objects.filter(pk=task.id).exists())
             self.assertTrue(Project.objects.filter(pk=project.id).exists())
 
+            # Generate some mock cached assets
+            ta_cache_dir = task.get_task_assets_cache()
+            self.assertFalse(os.path.isdir(ta_cache_dir))
+            os.makedirs(ta_cache_dir)
+            mock_asset = os.path.join(ta_cache_dir, "test.txt")
+            with open(mock_asset, 'w', encoding='utf-8') as f:
+                f.write("test")
+            
+            # Set modified date
+            st = os.stat(ta_cache_dir)
+            atime = st[ST_ATIME]
+            mtime = st[ST_MTIME]
+            new_mtime = mtime - (29 * 24 * 3600)  # 29 days ago
+            os.utime(ta_cache_dir, (atime, new_mtime))
+            worker.tasks.cleanup_cache_directory()
+
+            # File should still be there
+            self.assertTrue(os.path.isfile(mock_asset))
+            self.assertTrue(os.path.isdir(ta_cache_dir))
+
+            new_mtime = mtime - (31 * 24 * 3600)  # 31 days ago
+            os.utime(ta_cache_dir, (atime, new_mtime))
+            worker.tasks.cleanup_cache_directory()
+
+            # File and cache dirs should be gone
+            self.assertFalse(os.path.isfile(mock_asset))
+            self.assertFalse(os.path.isdir(ta_cache_dir))
+
+            # Regenerate...
+            os.makedirs(ta_cache_dir)
+            mock_asset = os.path.join(ta_cache_dir, "asset.txt")
+            with open(mock_asset, 'w', encoding='utf-8') as f:
+                f.write("1")
+
             # Remove task
             task.delete()
+
+            # Cache dir should be gone
+            self.assertFalse(os.path.isdir(ta_cache_dir))
 
             worker.tasks.cleanup_projects()
 
