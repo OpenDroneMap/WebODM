@@ -120,7 +120,7 @@ def theme(context, color):
         return getattr(context['SETTINGS'].theme, color)
     except Exception as e:
         logger.warning("Cannot load configuration from theme(): " + str(e))
-        return "blue" # dah buh dih ah buh daa..
+        return "#0000FF" # dah buh dih ah buh daa..
 
 @register.simple_tag
 def complementary(hexcolor):

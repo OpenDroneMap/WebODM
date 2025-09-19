@@ -1484,15 +1484,15 @@ class Task(models.Model):
             if size <= max_size_mb * 1024 * 1024:
                 return input_glb
             
-            p, ext = os.path.splitext(input_glb)
-            base = os.path.basename(p)
-            cache_dir = self.get_task_assets_cache()
             rescale = 1
 
             while size > max_size_mb * 1024 * 1024:
                 rescale *= 2
                 size = size // 2.6  # Texture size reduction factor (not science)
 
+        p, ext = os.path.splitext(input_glb)
+        base = os.path.basename(p)
+        cache_dir = self.get_task_assets_cache()
         output_glb = os.path.join(cache_dir, f"{base}-{rescale}{ext}")
         if os.path.isfile(output_glb):
             # Cached, return immediately
