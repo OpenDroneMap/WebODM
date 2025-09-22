@@ -1632,18 +1632,17 @@ var Dropzone = function (_Emitter) {
 
       var files = e.dataTransfer.files;
 
-      this.emit("addedfiles", files);
-
       // Even if it's a folder, files.length will contain the folders.
       if (files.length) {
         var items = e.dataTransfer.items;
-
+        
         if (items && items.length && items[0].webkitGetAsEntry != null) {
           // The browser supports dropping of folders, so handle items instead of files
           this._addFilesFromItems(items);
         } else {
           this.handleFiles(files);
         }
+        this.emit("addedfiles", files);
       }
     }
   }, {
@@ -1668,9 +1667,9 @@ var Dropzone = function (_Emitter) {
     value: function handleFiles(files) {
       var _this5 = this;
 
-      return files.map(function (file) {
-        return _this5.addFile(file);
-      });
+      for (var i = 0; i < files.length; i++){
+        return _this5.addFile(files[i]);
+      }
     }
 
     // When a folder is dropped (or files are pasted), items must be handled
