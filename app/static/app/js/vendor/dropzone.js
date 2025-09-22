@@ -1640,7 +1640,11 @@ var Dropzone = function (_Emitter) {
           // The browser supports dropping of folders, so handle items instead of files
           var self = this;
           this._addFilesFromItems(items, function(files){
-            self.emit("addedfiles", files);
+            let acceptedFiles = [];
+            for (var i = 0; i < files.length; i++){
+              if (files[i].accepted) acceptedFiles.push(files[i]);
+            }
+            self.emit("addedfiles", acceptedFiles);
           });
         } else {
           this.handleFiles(files);
@@ -1714,7 +1718,9 @@ var Dropzone = function (_Emitter) {
                 for (var i = 0; i < added.length; i++){
                   result.push(added[i]);
                 }
-                if (--readingDirs === 0) done(result);
+                setTimeout(function(){
+                  if (--readingDirs === 0) done(result);
+                }, 0);
               });
             } else {
               result.push(undefined);
@@ -1750,11 +1756,11 @@ var Dropzone = function (_Emitter) {
 
       var errorHandler = function errorHandler(error) {
         return __guardMethod__(console, 'log', function (o) {
-          done(added);
           return o.log(error);
         });
       };
       
+      var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
 
       var readEntries = function () {
         return dirReader.readEntries(function (entries) {
@@ -1777,23 +1783,28 @@ var Dropzone = function (_Emitter) {
                 readingFiles++;
                 entry.file(function (file) {
                   if (_this7.options.ignoreHiddenFiles && file.name.substring(0, 1) === '.') {
-                    if (readingDirs === 0 && --readingFiles === 0) done(added);
+                    if (readingDirs === 0 && --readingFiles === 0) done(added, true);
                     return;
                   }
                   file.fullPath = path + "/" + file.name;
                   added.push(file);
                   var f = _this7.addFile(file);
-                  if (readingDirs === 0 && --readingFiles === 0) done(added);
+                  if (readingDirs === 0 && --readingFiles === 0) done(added, true);
                     
                   return f;
                 });
               } else if (entry.isDirectory) {
                 readingDirs++;
-                _this7._addFilesFromDirectory(entry, path + "/" + entry.name, function(entries){
+                _this7._addFilesFromDirectory(entry, path + "/" + entry.name, function(entries, skipPush){
                   for (var i = 0; i < entries.length; i++){
-                    added.push(entries[i]);
+                    if (isFirefox){
+                      if (!skipPush) added.push(entries[i]);
+                    }else added.push(entries[i]);
                   }
-                  if (--readingDirs === 0 && readingFiles === 0) done(added);
+
+                  setTimeout(function(){
+                    if (--readingDirs === 0 && readingFiles === 0) done(added);
+                  }, 0);
                 });
               }
             }
