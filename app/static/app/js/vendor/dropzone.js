@@ -1638,11 +1638,14 @@ var Dropzone = function (_Emitter) {
         
         if (items && items.length && items[0].webkitGetAsEntry != null) {
           // The browser supports dropping of folders, so handle items instead of files
-          this._addFilesFromItems(items);
+          var self = this;
+          this._addFilesFromItems(items, function(files){
+            self.emit("addedfiles", files);
+          });
         } else {
           this.handleFiles(files);
+          this.emit("addedfiles", files);
         }
-        this.emit("addedfiles", files);
       }
     }
   }, {
@@ -1677,7 +1680,7 @@ var Dropzone = function (_Emitter) {
 
   }, {
     key: "_addFilesFromItems",
-    value: function _addFilesFromItems(items) {
+    value: function _addFilesFromItems(items, done) {
       var _this6 = this;
 
       return function () {
@@ -1697,18 +1700,30 @@ var Dropzone = function (_Emitter) {
           var item = _ref13;
 
           var entry;
+          var readingDirs = 0;
+
           if (item.webkitGetAsEntry != null && (entry = item.webkitGetAsEntry())) {
             if (entry.isFile) {
-              result.push(_this6.addFile(item.getAsFile()));
+              var f = item.getAsFile();
+              _this6.addFile(f);
+              result.push(f);
             } else if (entry.isDirectory) {
+              readingDirs++;
               // Append all files from that directory to files
-              result.push(_this6._addFilesFromDirectory(entry, entry.name));
+              _this6._addFilesFromDirectory(entry, entry.name, function(added){
+                for (var i = 0; i < added.length; i++){
+                  result.push(added[i]);
+                }
+                if (--readingDirs === 0) done(result);
+              });
             } else {
               result.push(undefined);
             }
           } else if (item.getAsFile != null) {
             if (item.kind == null || item.kind === "file") {
-              result.push(_this6.addFile(item.getAsFile()));
+              var f = item.getAsFile();
+              _this6.addFile(f);
+              result.push(f);
             } else {
               result.push(undefined);
             }
@@ -1716,6 +1731,7 @@ var Dropzone = function (_Emitter) {
             result.push(undefined);
           }
         }
+        if (readingDirs === 0) done(result);
         return result;
       }();
     }
@@ -1724,18 +1740,23 @@ var Dropzone = function (_Emitter) {
 
   }, {
     key: "_addFilesFromDirectory",
-    value: function _addFilesFromDirectory(directory, path) {
+    value: function _addFilesFromDirectory(directory, path, done) {
       var _this7 = this;
 
       var dirReader = directory.createReader();
+      var added = [];
+      var readingDirs = 0;
+      var readingFiles = 0;
 
       var errorHandler = function errorHandler(error) {
         return __guardMethod__(console, 'log', function (o) {
+          done(added);
           return o.log(error);
         });
       };
+      
 
-      var readEntries = function readEntries() {
+      var readEntries = function () {
         return dirReader.readEntries(function (entries) {
           if (entries.length > 0) {
             for (var _iterator15 = entries, _isArray15 = true, _i16 = 0, _iterator15 = _isArray15 ? _iterator15 : _iterator15[Symbol.iterator]();;) {
@@ -1753,15 +1774,27 @@ var Dropzone = function (_Emitter) {
               var entry = _ref14;
 
               if (entry.isFile) {
+                readingFiles++;
                 entry.file(function (file) {
                   if (_this7.options.ignoreHiddenFiles && file.name.substring(0, 1) === '.') {
+                    if (readingDirs === 0 && --readingFiles === 0) done(added);
                     return;
                   }
                   file.fullPath = path + "/" + file.name;
-                  return _this7.addFile(file);
+                  added.push(file);
+                  var f = _this7.addFile(file);
+                  if (readingDirs === 0 && --readingFiles === 0) done(added);
+                    
+                  return f;
                 });
               } else if (entry.isDirectory) {
-                _this7._addFilesFromDirectory(entry, path + "/" + entry.name);
+                readingDirs++;
+                _this7._addFilesFromDirectory(entry, path + "/" + entry.name, function(entries){
+                  for (var i = 0; i < entries.length; i++){
+                    added.push(entries[i]);
+                  }
+                  if (--readingDirs === 0 && readingFiles === 0) done(added);
+                });
               }
             }
 
@@ -1769,7 +1802,8 @@ var Dropzone = function (_Emitter) {
             // the first 100 entries.
             // See: https://developer.mozilla.org/en-US/docs/Web/API/DirectoryReader#readEntries
             readEntries();
-          }
+          }else if (readingDirs === 0 && readingFiles === 0) done(added);
+
           return null;
         }, errorHandler);
       };
