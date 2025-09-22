@@ -46,7 +46,9 @@ A user-friendly, commercial grade software for drone image processing. Generate 
 
 Windows and macOS users can purchase an automated [installer](https://www.opendronemap.org/webodm/download#installer), which makes the installation process easier.
 
-There's also a cloud-hosted version of WebODM available from [webodm.net](https://webodm.net).
+You can also skip the installation entirely and run WebODM from [webodm.net](https://webodm.net).
+
+To manually install WebODM on your machine, continue reading.
 
 ## Recommended Machine Specs
 
