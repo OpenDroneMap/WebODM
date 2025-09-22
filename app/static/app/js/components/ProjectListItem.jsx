@@ -227,6 +227,10 @@ class ProjectListItem extends React.Component {
             const retry = () => {
                 const MAX_RETRIES = 20;
 
+                if (!file.accepted){
+                  throw new Error(interpolate(_('%(filename)s is not a valid file'), {filename: file.name }));
+                }
+
                 if (file.retries < MAX_RETRIES){
                     // Update progress
                     const totalBytesSent = this.state.upload.totalBytesSent - file.trackedBytesSent;
