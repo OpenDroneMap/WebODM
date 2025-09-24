@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvents } from "react-leaflet";
+import '../leafletConfig.js'; // Configure Leaflet icons
 import exifr from 'exifr';
 import proj4 from 'proj4';
 import './GcpInterface.css';

@@ -1,5 +1,6 @@
 import {GeoJSON, MapContainer, TileLayer} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import '../leafletConfig.js'; // Configure Leaflet icons
 import {useEffect, useState, useRef} from 'react';
 import "./resultmap.css"
 import {ScaleLoader, SyncLoader} from "react-spinners";

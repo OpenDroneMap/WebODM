@@ -2,6 +2,7 @@ import Upload from "./Upload.jsx";
 import React, { useEffect, useState } from "react";
 import exifr from "exifr";
 import 'leaflet/dist/leaflet.css';
+import '../leafletConfig.js'; // Configure Leaflet icons
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { authorizedFetch } from '../utils/api.js';
 import './createtask.css';
