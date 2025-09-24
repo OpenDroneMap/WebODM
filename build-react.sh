@@ -12,6 +12,12 @@ cd locane || { echo "❌ Error: locane folder not found!"; exit 1; }
 echo "📦 Installing React dependencies..."
 npm install
 
+# Step 2.5: Build Potree library
+echo "🎯 Building Potree library..."
+cd public/potree
+npm install
+cd ../..
+
 # Step 3: Build React app
 echo "🏗️  Building React app..."
 npm run build

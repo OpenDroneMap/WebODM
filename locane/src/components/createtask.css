@@ -50,3 +50,20 @@
 .options {
     display: flex;
 }
+
+.task-btn {
+    padding: 0.85rem 1.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    background: #007bff !important; /* Blue color */
+    color: white !important; /* Ensure text color is white */
+}
+
+.cancel-btn {
+    background: #a6a6a6 !important; /* Gray color */
+    margin-left: 10px;
+}

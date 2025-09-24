@@ -62,6 +62,7 @@ function Task({ images, defaultTaskName, onSubmit,isDisabled }) {
     const [selectedOption, setSelectedOption] = useState(null);
     const [resizeOption, setResizeOption] = useState(-1);
     const [taskName, setTaskName] = useState("");
+    const [processingNodeId, setProcessingNodeId] = useState(null);
 
     useEffect(() => {
         const fetchPresets = async () => {
@@ -84,7 +85,37 @@ function Task({ images, defaultTaskName, onSubmit,isDisabled }) {
                 console.error("Error fetching presets:", error);
             }
         };
+
+        const fetchProcessingNodes = async () => {
+            const reqOptions = {
+                method: 'GET',
+            };
+            try {
+                const response = await authorizedFetch(`/api/processingnodes/`, reqOptions);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch processing nodes. Status: ${response.status}`);
+                }
+                const nodes = await response.json();
+                // Find the first online node
+                const onlineNode = nodes.find(node => node.online === true);
+                if (onlineNode) {
+                    setProcessingNodeId(onlineNode.id);
+                    console.log(`Selected processing node: ${onlineNode.label} (ID: ${onlineNode.id})`);
+                } else {
+                    console.warn("No online processing nodes available");
+                    // Fallback to the first node if no online nodes found
+                    if (nodes.length > 0) {
+                        setProcessingNodeId(nodes[0].id);
+                        console.log(`Fallback to processing node: ${nodes[0].label} (ID: ${nodes[0].id})`);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching processing nodes:", error);
+            }
+        };
+
         fetchPresets();
+        fetchProcessingNodes();
     }, []);
 
     const handleOptionChange = (e) => {
@@ -101,8 +132,13 @@ function Task({ images, defaultTaskName, onSubmit,isDisabled }) {
         if (selectedOption) {
             formData.append("options", JSON.stringify(selectedOption.options));
         }
-        formData.append('processing_node', 2);
-
+        // Use the automatically selected processing node ID
+        if (processingNodeId) {
+            formData.append('processing_node', processingNodeId);
+        } else {
+            console.warn("No processing node selected, using fallback ID 4");
+            formData.append('processing_node', 4);
+        }
 
         onSubmit(formData);
     };
@@ -328,7 +364,9 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
     return (
         <div className="task-card">
             {step > 1 && <button onClick={prevStep} disabled={isSubmitting} className="task-btn">Back</button>}
+            {step > 1 && <button onClick={exit} disabled={isSubmitting} className="task-btn cancel-btn">Cancel</button>}
             {step < 2 && <button onClick={nextStep} className="task-btn">Next</button>}
+            {step < 2 && <button onClick={exit} className="task-btn cancel-btn">Cancel</button>}
 
             {step === 1 && (
                 <Upload 

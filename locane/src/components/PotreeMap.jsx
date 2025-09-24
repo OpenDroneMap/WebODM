@@ -11,6 +11,9 @@ export default function PotreeMap({ task_details }) {
     const taskId = task_details.id;
     const projectId = task_details.projectId;
     const base = '/api';
+    
+    // Use correct base path for Potree assets
+    const potreeBasePath = import.meta.env.DEV ? '/potree' : '/static/potree';
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
@@ -84,27 +87,27 @@ export default function PotreeMap({ task_details }) {
         const loadAssets = async () => {
             // JS dependencies (order is important)
             const scripts = [
-                '/potree/libs/jquery/jquery-3.1.1.min.js',
-                '/potree/libs/spectrum/spectrum.js',
-                '/potree/libs/jquery-ui/jquery-ui.min.js',
-                '/potree/libs/other/BinaryHeap.js',
-                '/potree/libs/tween/tween.min.js',
-                '/potree/libs/d3/d3.js',
-                '/potree/libs/proj4/proj4.js',
-                '/potree/libs/openlayers3/ol.js',
-                '/potree/libs/i18next/i18next.js',
-                '/potree/libs/jstree/jstree.js',
-                '/potree/libs/copc/index.js',
-                '/potree/build/potree/potree.js',
-                '/potree/libs/plasio/js/laslaz.js',
+                `${potreeBasePath}/libs/jquery/jquery-3.1.1.min.js`,
+                `${potreeBasePath}/libs/spectrum/spectrum.js`,
+                `${potreeBasePath}/libs/jquery-ui/jquery-ui.min.js`,
+                `${potreeBasePath}/libs/other/BinaryHeap.js`,
+                `${potreeBasePath}/libs/tween/tween.min.js`,
+                `${potreeBasePath}/libs/d3/d3.js`,
+                `${potreeBasePath}/libs/proj4/proj4.js`,
+                `${potreeBasePath}/libs/openlayers3/ol.js`,
+                `${potreeBasePath}/libs/i18next/i18next.js`,
+                `${potreeBasePath}/libs/jstree/jstree.js`,
+                `${potreeBasePath}/libs/copc/index.js`,
+                `${potreeBasePath}/build/potree/potree.js`,
+                `${potreeBasePath}/libs/plasio/js/laslaz.js`,
             ];
             // Load CSS first
             await Promise.all([
-                loadCSS('/potree/build/potree/potree.css'),
-                loadCSS('/potree/libs/jquery-ui/jquery-ui.min.css'),
-                loadCSS('/potree/libs/openlayers3/ol.css'),
-                loadCSS('/potree/libs/spectrum/spectrum.css'),
-                loadCSS('/potree/libs/jstree/themes/mixed/style.css'),
+                loadCSS(`${potreeBasePath}/build/potree/potree.css`),
+                loadCSS(`${potreeBasePath}/libs/jquery-ui/jquery-ui.min.css`),
+                loadCSS(`${potreeBasePath}/libs/openlayers3/ol.css`),
+                loadCSS(`${potreeBasePath}/libs/spectrum/spectrum.css`),
+                loadCSS(`${potreeBasePath}/libs/jstree/themes/mixed/style.css`),
             ]);
 
             for (const src of scripts) {
@@ -213,7 +216,7 @@ export default function PotreeMap({ task_details }) {
                 id="potree_render_area"
                 ref={renderAreaRef}
                 className="potree-viewer"
-                style={{ backgroundImage: "url('/potree/build/potree/resources/images/background.jpg')" }}
+                style={{ backgroundImage: `url('${potreeBasePath}/build/potree/resources/images/background.jpg')` }}
             />
             <div id="potree_sidebar_container" />
         </div>
