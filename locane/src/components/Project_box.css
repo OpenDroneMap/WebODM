@@ -1,0 +1,163 @@
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.project-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.project-box:hover {
+  transform: translateY(-5px);
+}
+
+.project-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #222;
+}
+
+.project-description {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.add-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #007bff;
+  color: white;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background: #0056b3;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modal-actions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-actions .save-btn {
+  background: #007bff;
+  color: white;
+}
+
+.modal-actions .cancel-btn {
+  background: #ddd;
+}
+.project-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.edit-link, .task-link {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.edit-link:hover, .task-link:hover, .view-task-link:hover {
+  text-decoration: none;
+}
+
+.edit-input,
+.edit-textarea {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #222;
+  box-shadow: none;
+  outline: none;
+}
+
+.edit-textarea {
+  resize: none;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.save-link, .cancel-link, .delete-link, .view-task-link {
+  cursor: pointer;
+}
+
+.delete-dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+.delete-dialog-btn {
+  background: #e74c3c;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+}
+.delete-dialog-btn.no {
+  background: #ddd;
+  color: #222;
+}

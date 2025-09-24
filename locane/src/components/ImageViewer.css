@@ -1,0 +1,143 @@
+
+.image-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.no-scroll {
+  overflow: hidden !important;
+}
+
+
+.viewer-header {
+  display: flex;
+  flex-direction: column;
+  background: #444;
+  color: white;
+  padding: 0;
+}
+
+.viewer-title {
+  padding: 8px 12px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-bottom: 1px solid #333;
+}
+
+.viewer-controls-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #444;
+  border-bottom: 1px solid #333;
+}
+
+
+.viewer-controls-row button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+}
+
+.viewer-controls-row button:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.viewer-controls-row button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.close-btn {
+  background: red;
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+.viewer-body {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-container-for-marker {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-wrapper-for-marker {
+  position: relative; 
+  display: inline-block; 
+  line-height: 0;
+}
+
+.zoom-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; 
+  display: block;
+}
+
+.image-marker {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: rgba(220, 53, 69, 0.8);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  transition: transform 0.1s ease-out;
+}
+
+.image-marker:hover .marker-delete-btn {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.marker-delete-btn {
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+  width: 5px;
+  height: 5px;
+  font-size: 3px;
+  line-height: 20px;
+  text-align: center;
+  position: absolute;
+  top: -9px;
+  right: -3px;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.9);
+  transition: all 0.2s ease-in-out;
+}
+
+.marker-delete-btn:hover {
+    transform: scale(1.2);
+}
+
+.viewer-footer-notice {
+    text-align: center;
+    padding: 8px;
+    background-color: #f0ad4e;
+    color: #333;
+    font-weight: bold;
+}

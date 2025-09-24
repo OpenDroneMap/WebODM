@@ -1,0 +1,52 @@
+.createtaskbox {
+    display: flex;
+    flex-direction: column;
+    width: 90vw;
+    max-width: 600px;
+    height: 50vh;
+    max-height: 400px;
+    justify-content: flex-start;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    box-sizing: border-box;
+    margin: 20px auto;
+    background-color: var(--panel-color);
+    gap: 15px;
+}
+.createtaskbox.disabled {
+    /* Prevents all clicks, hovers, and pointer events on the container and its children */
+    pointer-events: none;
+
+    /* Reduces opacity to create a grayed-out effect */
+    opacity: 0.5;
+
+    /* Optional: Changes the cursor to indicate the element is not interactive */
+    cursor: not-allowed;
+}
+.taskbox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.mapcontainer {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.options-resize-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.options {
+    display: flex;
+}

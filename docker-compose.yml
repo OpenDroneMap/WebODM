@@ -20,6 +20,9 @@ services:
     entrypoint: /bin/bash -c "service cron start && chmod +x /webodm/*.sh && /bin/bash -c \"/webodm/wait-for-postgres.sh db /webodm/wait-for-it.sh -t 0 broker:6379 -- /webodm/start.sh\""
     volumes:
       - ${WO_MEDIA_DIR}:/webodm/app/media:z
+      - ./app:/webodm/app
+      - ./locane:/webodm/locane 
+      - ./webodm:/webodm/webodm
     ports:
       - "${WO_PORT}:8000"
     depends_on:

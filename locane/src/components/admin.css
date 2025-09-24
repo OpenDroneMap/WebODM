@@ -1,0 +1,94 @@
+.admin {
+    padding: 1rem;
+    font-family: Arial, sans-serif;
+}
+
+.admin h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.admin button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin button:hover {
+    background-color: #0056b3;
+}
+
+.admin table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.admin table th, .admin table td {
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    text-align: left;
+}
+
+.admin table th {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.admin table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.admin table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.admin table td button {
+    margin-right: 0.5rem;
+}
+
+
+.dialog {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dialog p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+.dialog button {
+    margin: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.dialog button:first-child {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.dialog button:first-child:hover {
+    background-color: #c0392b;
+}
+
+.dialog button:last-child {
+    background-color: #ddd;
+    color: #333;
+}
+
+.dialog button:last-child:hover {
+    background-color: #bbb;
+}

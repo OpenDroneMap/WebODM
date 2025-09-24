@@ -1,0 +1,14 @@
+:root {
+    --body-bg-color: #f0f0f0;
+}
+
+
+body {
+    background-color: var(--body-bg-color);
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+

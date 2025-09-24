@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>Potree Viewer</title>
+
+	<link rel="stylesheet" type="text/css" href="../build/potree/potree.css">
+	<link rel="stylesheet" type="text/css" href="../libs/jquery-ui/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="../libs/openlayers3/ol.css">
+	<link rel="stylesheet" type="text/css" href="../libs/spectrum/spectrum.css">
+	<link rel="stylesheet" type="text/css" href="../libs/jstree/themes/mixed/style.css">
+</head>
+
+<body>
+	<script src="../libs/jquery/jquery-3.1.1.min.js"></script>
+	<script src="../libs/spectrum/spectrum.js"></script>
+	<script src="../libs/jquery-ui/jquery-ui.min.js"></script>
+	<script src="../libs/other/BinaryHeap.js"></script>
+	<script src="../libs/tween/tween.min.js"></script>
+	<script src="../libs/d3/d3.js"></script>
+	<script src="../libs/proj4/proj4.js"></script>
+	<script src="../libs/openlayers3/ol.js"></script>
+	<script src="../libs/i18next/i18next.js"></script>
+	<script src="../libs/jstree/jstree.js"></script>
+	<script src="../build/potree/potree.js"></script>
+	<script src="../libs/plasio/js/laslaz.js"></script>
+	<script src="../libs/shapefile/shapefile.js"></script>
+
+
+
+	
+	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
+	<!-- INCLUDE SETTINGS HERE -->
+	
+	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
+		<div id="potree_render_area" style="background-image: url('../build/potree/resources/images/background.jpg');"></div>
+		<div id="potree_sidebar_container"> </div>
+	</div>
+	
+	<script type="module">
+
+		import * as THREE from "../libs/three.js/build/three.module.js";
+	
+		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+		
+		viewer.setServer("http://localhost:3000");
+		
+		viewer.setEDLEnabled(false);
+		viewer.setFOV(60);
+		viewer.setPointBudget(3_000_000);
+		viewer.loadSettingsFromURL();
+		
+		viewer.setDescription('San Simeon, CA Central Coast point cloud taken from <a href="http://opentopo.sdsc.edu/gridsphere/gridsphere?cid=geonlidarframeportlet&gs_action=lidarDataset&opentopoID=OTLAS.032013.26910.2" target="_blank">Open Topography</a> (17.7b points)');
+		
+		viewer.loadGUI(() => {
+			viewer.setLanguage('en');
+			$("#menu_tools").next().show();
+			$("#menu_scene").next().show();
+			viewer.toggleSidebar();
+		});
+		
+		// Load and add point cloud to scene
+		Potree.loadPointCloud("http://5.9.65.151/mschuetz/potree/resources/pointclouds/opentopography/CA13_1.4/cloud.js", "CA13", async e => {
+
+			let scene = viewer.scene;
+			let pointcloud = e.pointcloud;
+			let material = pointcloud.material;
+			scene.addPointCloud(pointcloud);
+			
+			material.pointSizeType = Potree.PointSizeType.FIXED;
+			material.size = 1;
+			
+			scene.view.position.set(697757.85, 3913444.33, 2827.33);
+			scene.view.lookAt(new THREE.Vector3(695231.74, 3916988.94, 87.64));
+			
+			{
+				// define the transformation from shapefile to point cloud coordinate systems
+				proj4.defs("WGS84", "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs");
+				proj4.defs("pointcloud", pointcloud.projection);
+				let transform = proj4("WGS84", "pointcloud");
+
+				const loader = new Potree.ShapefileLoader();
+				loader.transform = transform;
+
+				// group all shapefile scene nodes into this node
+				const shapeNode = new THREE.Object3D();
+				viewer.scene.scene.add(shapeNode);
+
+
+				// load points.shp
+				const shpPoints = await loader.load("./morro_bay_shp/shape/points.shp");
+				shapeNode.add(shpPoints.node);
+				
+
+				// load natural.shp and change colors to green
+				const shpNatural = await loader.load("./morro_bay_shp/shape/natural.shp");
+				shapeNode.add(shpNatural.node);
+
+				shpNatural.node.traverse(node => {
+					if(node.material){
+						node.material.color.setRGB(0, 1, 0)
+					}
+				});
+				
+
+				// load waterways.shp and change colors to blue
+				const shpWaterways = await loader.load("./morro_bay_shp/shape/waterways.shp");
+				shapeNode.add(shpWaterways.node);
+				window.shpWaterways = shpWaterways;
+
+				shpWaterways.node.traverse(node => {
+					if(node.material){
+						node.material.color.setRGB(0.3, 0.3, 1)
+					}
+				});
+				
+
+				// add roads.shp and change colors to yellow
+				const shpRoads = await loader.load("./morro_bay_shp/shape/roads.shp");
+				shapeNode.add(shpRoads.node);
+
+				shpRoads.node.traverse(node => {
+					if(node.material){
+						node.material.color.setRGB(1, 1, 0)
+					}
+				});
+
+				// this is necessary so that fat lines are correctly sized
+				viewer.addEventListener("update", () => {
+					const size = viewer.renderer.getSize(new THREE.Vector2());
+
+					shpRoads.setResolution(size.width, size.height);
+					shpWaterways.setResolution(size.width, size.height);
+					shpNatural.setResolution(size.width, size.height);
+					shpPoints.setResolution(size.width, size.height);
+				});
+
+
+				viewer.onGUILoaded(() => {
+					// Add entry to object list in sidebar
+					let tree = $(`#jstree_scene`);
+					let parentNode = "other";
+
+					let shpPointsID = tree.jstree('create_node', parentNode, { 
+							"text": "points", 
+							"icon": `${Potree.resourcePath}/icons/triangle.svg`,
+							"object": shpPoints.node,
+							"data": shpPoints.node,
+						}, 
+						"last", false, false);
+					tree.jstree(shpPoints.node.visible ? "check_node" : "uncheck_node", shpPointsID);
+
+					let shpNaterialID = tree.jstree('create_node', parentNode, { 
+							"text": "natural", 
+							"icon": `${Potree.resourcePath}/icons/triangle.svg`,
+							"object": shpNatural.node,
+							"data": shpNatural.node,
+						}, 
+						"last", false, false);
+					tree.jstree(shpNatural.node.visible ? "check_node" : "uncheck_node", shpNaterialID);
+
+					let shpWaterwaysID = tree.jstree('create_node', parentNode, { 
+							"text": "waterways", 
+							"icon": `${Potree.resourcePath}/icons/triangle.svg`,
+							"object": shpWaterways.node,
+							"data": shpWaterways.node,
+						}, 
+						"last", false, false);
+					tree.jstree(shpWaterways.node.visible ? "check_node" : "uncheck_node", shpWaterwaysID);
+
+					let shpRoadsID = tree.jstree('create_node', parentNode, { 
+							"text": "roads", 
+							"icon": `${Potree.resourcePath}/icons/triangle.svg`,
+							"object": shpRoads.node,
+							"data": shpRoads.node,
+						}, 
+						"last", false, false);
+					tree.jstree(shpRoads.node.visible ? "check_node" : "uncheck_node", shpRoadsID);
+
+
+				});
+				
+			}
+
+			
+				
+		});
+		
+	</script>
+	
+	
+  </body>
+</html>

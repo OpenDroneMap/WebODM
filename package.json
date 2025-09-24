@@ -75,5 +75,8 @@
     "webpack": "5.89.0",
     "webpack-bundle-tracker": "0.4.3",
     "webpack-livereload-plugin": "3.0.2"
+  },
+  "devDependencies": {
+    "webpack-cli": "^6.0.1"
   }
 }

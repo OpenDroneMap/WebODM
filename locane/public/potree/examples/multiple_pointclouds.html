@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>Potree Viewer</title>
+
+	<link rel="stylesheet" type="text/css" href="../build/potree/potree.css">
+	<link rel="stylesheet" type="text/css" href="../libs/jquery-ui/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="../libs/openlayers3/ol.css">
+	<link rel="stylesheet" type="text/css" href="../libs/spectrum/spectrum.css">
+	<link rel="stylesheet" type="text/css" href="../libs/jstree/themes/mixed/style.css">
+</head>
+
+<body>
+	<script src="../libs/jquery/jquery-3.1.1.min.js"></script>
+	<script src="../libs/spectrum/spectrum.js"></script>
+	<script src="../libs/jquery-ui/jquery-ui.min.js"></script>
+	
+	
+	<script src="../libs/other/BinaryHeap.js"></script>
+	<script src="../libs/tween/tween.min.js"></script>
+	<script src="../libs/d3/d3.js"></script>
+	<script src="../libs/proj4/proj4.js"></script>
+	<script src="../libs/openlayers3/ol.js"></script>
+	<script src="../libs/i18next/i18next.js"></script>
+	<script src="../libs/jstree/jstree.js"></script>
+	<script src="../build/potree/potree.js"></script>
+	<script src="../libs/plasio/js/laslaz.js"></script>
+	
+	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
+	<!-- INCLUDE SETTINGS HERE -->
+	
+	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
+		<div id="potree_render_area" style="background-image: url('../build/potree/resources/images/background.jpg');"></div>
+		<div id="potree_sidebar_container"> </div>
+	</div>
+	
+	<script type="module">
+
+	import * as THREE from "../libs/three.js/build/three.module.js";
+	
+		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+		
+		viewer.setEDLEnabled(true);
+		viewer.setFOV(60);
+		viewer.setPointBudget(1_000_000);
+		viewer.setMinNodeSize(10);
+		viewer.loadSettingsFromURL();
+		
+		viewer.setDescription(`Sorvilier point cloud courtesy of <a target='_blank' href='https://www.sigeom.ch/'>sigeom sa</a>`);
+		
+		viewer.loadGUI(() => {
+			viewer.setLanguage('en');
+			$("#menu_scene").next().show();
+			$("#menu_tools").next().show();
+			viewer.toggleSidebar();
+		});
+
+
+		// wrap load code into an async function so that we can use "await"
+		async function load(){
+
+			// specify point clouds that are to be loaded and callbacks to invoke 
+			let pointclouds = [
+				{
+					url: "../pointclouds/vol_total/cloud.js", 
+					callback: (pointcloud) => {
+						pointcloud.name = "sorvilier";
+
+						let material = pointcloud.material;
+						material.size = 1;
+						material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+					},
+				},{
+					url: "../pointclouds/lion_takanawa/cloud.js", 
+					callback: (pointcloud) => {
+						pointcloud.name = "lion 1";
+
+						let material = pointcloud.material;
+						material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+
+						pointcloud.position.set(589927.44, 231479.04, 726.87);
+						pointcloud.scale.set(10, 10, 10);
+						pointcloud.rotation.set(0, 0, 0.8 * Math.PI);
+					},
+				},{
+					url: "../pointclouds/lion_takanawa/cloud.js", 
+					callback: (pointcloud) => {
+						pointcloud.name = "lion 2";
+
+						let material = pointcloud.material;
+
+						material.size = 1;
+						material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+						material.activeAttributeName = "elevation";
+						material.heightMin = 720;
+						material.heightMax = 780;
+						
+						pointcloud.position.set(589997.44, 231479.04, 726.87);
+						pointcloud.scale.set(10, 10, 10);
+						pointcloud.rotation.set(0, 0, 0.8 * Math.PI);
+					},
+				},{
+					url: "../pointclouds/lion_takanawa/cloud.js", 
+					callback: (pointcloud) => {
+						pointcloud.name = "lion 3";
+
+						let material = pointcloud.material;
+						material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+
+						material.color = new THREE.Color().setRGB(0.4, 0.6, 0.7);
+						
+						pointcloud.position.set(589927.44 -70, 231479.04, 726.87);
+						pointcloud.scale.set(10, 10, 10);
+						pointcloud.rotation.set(0, 0, 0.8 * Math.PI);
+					},
+				},{
+					url: "http://5.9.65.151/mschuetz/potree/resources/pointclouds/archpro/heidentor/cloud.js", 
+					callback: (pointcloud) => {
+						pointcloud.name = "Heidentor";
+						
+						pointcloud.position.set(589817.920, 231358.010, 744.865);
+						pointcloud.scale.set(6, 6, 6);
+						pointcloud.rotation.z = -1.9;
+					},
+				}
+			];
+
+			// start loading all point clouds asynchronously, get a promise for each one that resolves when it's loaded
+			let promises = pointclouds.map(p => Potree.loadPointCloud(p.url));
+			
+			// now iterate over all promises in order
+			for(let i = 0; i < promises.length; i++){
+
+				// wait until this point cloud is loaded before processing the next one
+				let pointcloud = (await promises[i]).pointcloud;
+
+				pointclouds[i].callback(pointcloud);
+				viewer.scene.addPointCloud(pointcloud);
+			}
+
+			
+			viewer.scene.view.setView(
+				[589974.341, 231698.397, 986.146],
+				[589851.587, 231428.213, 715.634],
+			);
+		}
+
+		load();
+	</script>
+	
+	
+  </body>
+</html>

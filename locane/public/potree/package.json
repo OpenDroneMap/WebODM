@@ -1,0 +1,34 @@
+{
+  "name": "potree",
+  "private": true,
+  "version": "1.8.0",
+  "description": "WebGL point cloud viewer",
+  "keywords": [
+    "point",
+    "cloud",
+    "pointcloud",
+    "octree",
+    "entwine",
+    "viewer",
+    "threejs",
+    "webgl",
+    "browser",
+    "tool"
+  ],
+  "main": "./build/potree/potree.js",
+  "scripts": {
+    "start": "gulp watch",
+    "build": "gulp build pack",
+    "postinstall": "npm run build"
+  },
+  "dependencies": {
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-connect": "^5.7.0",
+    "json5": "^2.1.3",
+    "rollup": "^1.31.1",
+    "through": "~2.3.4"
+  },
+  "author": "Markus Schütz",
+  "license": "BSD-2-CLAUSE"
+}

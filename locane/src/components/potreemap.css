@@ -1,0 +1,65 @@
+.potree-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    
+}
+
+.potree-viewer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.potree-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #333;
+    z-index: 10;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fullscreen-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.fullscreen-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.05);
+}
+
+.fullscreen-btn:active {
+    transform: scale(0.95);
+}

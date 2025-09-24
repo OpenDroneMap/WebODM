@@ -1,0 +1,243 @@
+.export-modal ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.export-container {
+    position: relative;
+    z-index: 1001; 
+}
+
+.export-container button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.export-container button:hover {
+    background-color: #45a049;
+}
+
+.export-container button::after {
+    content: '\25BC';
+}
+
+.export-container button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.export-dropdown {
+    position: absolute;
+    bottom: 100%; 
+    left: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000; 
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 200px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.export-dropdown li {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.export-dropdown li:hover {
+    background: #f0f0f0;
+}
+
+/* Styles for the scrollbar to match the green button */
+.export-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.export-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.export-dropdown::-webkit-scrollbar-thumb {
+    background: #4caf50;
+    border-radius: 10px;
+}
+
+.export-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #45a049;
+}
+
+
+.dialog h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+}
+
+.dialog-content{
+    width: 30vw
+}
+
+.dialog-content label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.dialog-content select, .dialog-content input {
+    font-size: 15px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dialog-content input[type="number"] {
+    max-width: 150px;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.dialog-actions button {
+    font-size: 15px;
+    padding: 10px 15px;
+}
+
+.submit-btn, .cancel-btn {
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background-color: #aaa;
+}
+
+.export-status {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #333;
+}
+
+/* Full-screen loading overlay during export */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.loading-box {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 260px;
+}
+
+.spinner {
+    width: 22px;
+    height: 22px;
+    border: 3px solid #4caf50;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+.loading-text {
+    color: #333;
+    font-size: 14px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.download-progress {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.download-progress progress {
+    width: 200px;
+    height: 12px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Chrome/Safari */
+.download-progress progress::-webkit-progress-bar {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+.download-progress progress::-webkit-progress-value {
+    background: linear-gradient(90deg, #4caf50, #2e7d32);
+    border-radius: 10px;
+}
+/* Firefox */
+.download-progress progress::-moz-progress-bar {
+    background: linear-gradient(90deg, #4caf50, #2e7d32);
+    border-radius: 10px;
+}
+
+/* Indeterminate bar when content-length is missing */
+.indeterminate-bar {
+    position: relative;
+    width: 200px;
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.indeterminate-fill {
+    position: absolute;
+    top: 0;
+    left: -40%;
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(90deg, #4caf50, #2e7d32);
+    border-radius: 10px;
+    animation: indeterminate-move 1.1s ease-in-out infinite;
+}
+@keyframes indeterminate-move {
+    0% { left: -40%; }
+    50% { left: 30%; width: 60%; }
+    100% { left: 100%; width: 40%; }
+}
+.download-progress.overlay {
+    width: 100%;
+}

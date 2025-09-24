@@ -2,3 +2,19 @@
 .secret_key
 node_modules/
 .venv/
+# Ignore node_modules to avoid copying them
+locane/node_modules
+locane/dist
+locane/.vite
+
+# Other ignores
+.git
+.gitignore
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.env
+.nyc_output
+coverage
+.cache

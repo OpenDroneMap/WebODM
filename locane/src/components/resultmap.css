@@ -1,0 +1,969 @@
+.resultMapContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 400px; /* Fallback minimum height */
+}
+.controls{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 1000;
+    top:10px;
+    right:10px;
+    margin-top:20px ;
+    margin-right:10px;
+    align-content: center;
+    
+}
+
+.resultMap-controls-main {
+
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 280px;
+    font-size: 14px;
+}
+
+ label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+    display: block;
+}
+
+ select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+ select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+ select:hover {
+    border-color: #9ca3af;
+}
+
+.resultMap-controls-main input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.resultMap-controls-main input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transition: all 0.2s ease;
+}
+
+.resultMap-controls-main input[type="range"]::-webkit-slider-thumb:hover {
+    background: #2563eb;
+    transform: scale(1.1);
+}
+
+.resultMap-controls-main input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transition: all 0.2s ease;
+}
+
+.resultMap-controls-main input[type="range"]::-moz-range-thumb:hover {
+    background: #2563eb;
+    transform: scale(1.1);
+}
+
+
+.resultMapContainer .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0;
+    margin: 0px !important;
+}
+
+
+    .app-container {
+    background-color: #1f2937;
+    padding: 2rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 4rem;
+    box-sizing: border-box;
+}
+
+
+    /* --- Main Panel --- */
+    .contours-panel {
+
+        background-color: #ffffff;
+        color: rgba(0, 0, 0, 0);
+        border-radius: 0.5rem;
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        width: 100%;
+        max-width: 26rem; /* Increased max-width slightly for better spacing */
+        border: 1px solid rgb(75 85 99 / 0.5);
+    }
+
+    /* --- Panel Header --- */
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid rgb(75 85 99 / 0.5);
+    }
+
+    .panel-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #353535;
+    }
+
+    .close-button {
+        color: #9ca3af;
+        transition: color 150ms;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    .close-button:hover {
+        color: #000000;
+    }
+
+    /* --- Form Fields --- */
+    .form-fields {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-field {
+        display: grid;
+        grid-template-columns: 100px 1fr; /* Fixed label width */
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-label {
+        color: #424242;
+        font-weight: 500;
+        text-align: right;
+        font-size: 0.875rem;
+        padding-right: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+    }
+
+    /* --- EPSG Conditional Container --- */
+    .epsg-container {
+        transition: opacity 300ms ease-in-out, max-height 300ms ease-in-out;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+    }
+
+    .epsg-container.show {
+        opacity: 1;
+        max-height: 10rem;
+    }
+
+    /* --- Action Buttons --- */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background-color: rgb(0 0 0 / 0.1);
+        gap: 0.75rem;
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        border-radius: 0.375rem;
+        transition: background-color 150ms, border-color 150ms;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .btn .icon {
+        margin-right: 0.5rem;
+    }
+
+    .btn-secondary {
+        background-color: rgb(75 85 99 / 0.5);
+        color: #e5e7eb;
+    }
+    .btn-secondary:hover {
+        background-color: rgb(107 114 128 / 0.5);
+        border-color: #9ca3af;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        color: #ffffff;
+        border-color: #3b82f6;
+    }
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+    }
+
+    /* --- Slider with Input --- */
+    .slider-with-input {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        background: #dddddd;
+        border-radius: 3px;
+        outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid #1e2a3b;
+    }
+    .slider::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid #1e2a3b;
+    }
+
+    .number-input {
+        width: 70px; /* Fixed width for the number input */
+        background-color: rgba(175, 172, 172, 0);
+        border: 1px solid rgb(0, 0, 0);
+        color: #171717;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.25rem 0.5rem 0.5rem;
+        text-align: right;
+    }
+
+    /* --- Segmented Control --- */
+    .segmented-control {
+        display: flex;
+        width: 100%;
+        border-radius: 0.375rem;
+        background-color: rgba(159, 159, 159, 0);
+        padding: 0.25rem;
+        border: 1px solid #000000;
+    }
+
+    .segment-button {
+        flex: 1 1 0%;
+        padding: 0.375rem 0.5rem;
+        text-align: center;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        transition: all 200ms;
+        outline: none;
+        border: none;
+        background: none;
+        color: #d1d5db;
+        cursor: pointer;
+    }
+    .segment-button:hover {
+        background-color: rgb(55 65 81 / 0.5);
+    }
+    .segment-button.active {
+        background-color: #2563eb;
+        color: #ffffff;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+
+    /* --- Text Input --- */
+    .text-input {
+        width: 100%;
+        box-sizing: border-box;
+        background-color: #fdfdfd;
+        border: 1px solid #4b5563;
+        color: #2c2c2c;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* --- Responsive Styles --- */
+    @media (max-width: 480px) {
+        .app-container {
+            padding: 1rem;
+            padding-top: 2rem;
+        }
+        .form-fields {
+            padding: 1rem;
+            gap: 1.25rem;
+        }
+        .form-field {
+            grid-template-columns: 1fr; /* Stack label and control */
+            gap: 0.5rem;
+        }
+        .form-label {
+            text-align: left;
+            padding-right: 0;
+        }
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+        .btn {
+            justify-content: center;
+        }}
+
+.dropdown {
+    position: relative;   /* So the menu positions itself relative to this */
+    display: inline-block;
+}
+
+.dropdown > button {
+    background: #007bff;  /* Blue export button */
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;             /* space between icon and text */
+}
+
+.dropdown > button:hover {
+    background: #0056b3;  /* Darker blue on hover */
+}
+.dropdown-menu {
+    position: absolute;
+    top: -150px;            /* below button */
+    right: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+.export-btn {
+    padding: 10px 14px;
+    text-align: left;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.export-btn:hover {
+    background-color: #f0f0f0;   /* subtle hover */
+}
+
+/* In resultmap.css, add this to the end */
+
+.map-toggle-buttons {
+    display: flex;
+    gap: 8px; /* Space between buttons */
+    margin-bottom: 12px; /* Space between the buttons and the panel below */
+}
+
+.map-control-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.map-control-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #aaa;
+}
+
+.map-control-btn.active {
+    background-color: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+.action-buttons-loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%; 
+    padding-bottom: 20px; 
+}
+
+.resultMapContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 400px; /* Fallback minimum height */
+}
+.controls{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 10000;
+    top:10px;
+    right:10px;
+    margin-top:20px ;
+    margin-right:10px;
+    align-content: center;
+    justify-content: center;
+    gap: 12px; /* Added gap for spacing between button groups */
+}
+
+.resultMap-controls-main {
+
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 280px;
+    font-size: 14px;
+}
+
+ label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+    display: block;
+}
+
+ select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+ select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+ select:hover {
+    border-color: #9ca3af;
+}
+
+.resultMap-controls-main input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.resultMap-controls-main input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transition: all 0.2s ease;
+}
+
+.resultMap-controls-main input[type="range"]::-webkit-slider-thumb:hover {
+    background: #2563eb;
+    transform: scale(1.1);
+}
+
+.resultMap-controls-main input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transition: all 0.2s ease;
+}
+
+.resultMap-controls-main input[type="range"]::-moz-range-thumb:hover {
+    background: #2563eb;
+    transform: scale(1.1);
+}
+
+
+
+    .app-container {
+    background-color: #1f2937;
+    padding: 2rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 4rem;
+    box-sizing: border-box;
+}
+
+
+    /* --- Main Panel --- */
+    .contours-panel {
+
+        background-color: #ffffff;
+        color: rgba(0, 0, 0, 0);
+        border-radius: 0.5rem;
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        width: 100%;
+        max-width: 26rem; /* Increased max-width slightly for better spacing */
+        border: 1px solid rgb(75 85 99 / 0.5);
+    }
+
+    /* --- Panel Header --- */
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid rgb(75 85 99 / 0.5);
+    }
+
+    .panel-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #353535;
+    }
+
+    .close-button {
+        color: #9ca3af;
+        transition: color 150ms;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    .close-button:hover {
+        color: #000000;
+    }
+
+    /* --- Form Fields --- */
+    .form-fields {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-field {
+        display: grid;
+        grid-template-columns: 100px 1fr; /* Fixed label width */
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-label {
+        color: #424242;
+        font-weight: 500;
+        text-align: right;
+        font-size: 0.875rem;
+        padding-right: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+    }
+
+    /* --- EPSG Conditional Container --- */
+    .epsg-container {
+        transition: opacity 300ms ease-in-out, max-height 300ms ease-in-out;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+    }
+
+    .epsg-container.show {
+        opacity: 1;
+        max-height: 10rem;
+    }
+
+    /* --- Action Buttons --- */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background-color: rgb(0 0 0 / 0.1);
+        gap: 0.75rem;
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        border-radius: 0.375rem;
+        transition: background-color 150ms, border-color 150ms;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .btn .icon {
+        margin-right: 0.5rem;
+    }
+
+    .btn-secondary {
+        background-color: rgb(75 85 99 / 0.5);
+        color: #e5e7eb;
+    }
+    .btn-secondary:hover {
+        background-color: rgb(107 114 128 / 0.5);
+        border-color: #9ca3af;
+    }
+
+    .btn-primary {
+        background-color: #2563eb;
+        color: #ffffff;
+        border-color: #3b82f6;
+    }
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+    }
+
+    /* --- Slider with Input --- */
+    .slider-with-input {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        background: #dddddd;
+        border-radius: 3px;
+        outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid #1e2a3b;
+    }
+    .slider::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 2px solid #1e2a3b;
+    }
+
+    .number-input {
+        width: 70px; /* Fixed width for the number input */
+        background-color: rgba(175, 172, 172, 0);
+        border: 1px solid rgb(0, 0, 0);
+        color: #171717;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.25rem 0.5rem 0.5rem;
+        text-align: right;
+    }
+
+    /* --- Segmented Control --- */
+    .segmented-control {
+        display: flex;
+        width: 100%;
+        border-radius: 0.375rem;
+        background-color: rgba(159, 159, 159, 0);
+        padding: 0.25rem;
+        border: 1px solid #000000;
+    }
+
+    .segment-button {
+        flex: 1 1 0%;
+        padding: 0.375rem 0.5rem;
+        text-align: center;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        transition: all 200ms;
+        outline: none;
+        border: none;
+        background: none;
+        color: #d1d5db;
+        cursor: pointer;
+    }
+    .segment-button:hover {
+        background-color: rgb(55 65 81 / 0.5);
+    }
+    .segment-button.active {
+        background-color: #2563eb;
+        color: #ffffff;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+
+    /* --- Text Input --- */
+    .text-input {
+        width: 100%;
+        box-sizing: border-box;
+        background-color: #fdfdfd;
+        border: 1px solid #4b5563;
+        color: #2c2c2c;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* --- Responsive Styles --- */
+    @media (max-width: 480px) {
+        .app-container {
+            padding: 1rem;
+            padding-top: 2rem;
+        }
+        .form-fields {
+            padding: 1rem;
+            gap: 1.25rem;
+        }
+        .form-field {
+            grid-template-columns: 1fr; /* Stack label and control */
+            gap: 0.5rem;
+        }
+        .form-label {
+            text-align: left;
+            padding-right: 0;
+        }
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+        .btn {
+            justify-content: center;
+        }}
+
+.dropdown {
+    position: relative;   /* So the menu positions itself relative to this */
+    display: inline-block;
+}
+
+.dropdown > button {
+    background: #007bff;  /* Blue export button */
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;             /* space between icon and text */
+}
+
+.dropdown > button:hover {
+    background: #0056b3;  /* Darker blue on hover */
+}
+.dropdown-menu {
+    position: absolute;
+    top: -150px;            /* below button */
+    right: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+.export-btn {
+    padding: 10px 14px;
+    text-align: left;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.export-btn:hover {
+    background-color: #f0f0f0;   /* subtle hover */
+}
+
+/* In resultmap.css, add this to the end */
+
+.map-toggle-buttons {
+    display: flex;
+    gap: 8px; /* Space between buttons */
+}
+
+.map-control-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.map-control-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #aaa;
+}
+
+.map-control-btn.active {
+    background-color: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+.action-buttons-loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%; 
+    padding-bottom: 20px; 
+}
+
+/* --- ADDED: Styles for the new terrain buttons --- */
+.terrain-toggle-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 8px; /* Space between buttons */
+}
+
+.terrain-control-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.terrain-control-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #aaa;
+}
+
+.terrain-control-btn.active {
+    background-color: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+.legend-wrapper {
+    position: absolute;
+    bottom: 30px;
+    left: 15px;
+    z-index: 1000; /* Ensures it's on top of the map */
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: 200px;
+}
+
+.legend-gradient {
+    height: 18px;
+    width: 100%;
+    border: 1px solid #999;
+    border-radius: 3px;
+}
+
+.legend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 6px;
+}

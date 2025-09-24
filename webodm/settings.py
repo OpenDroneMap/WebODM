@@ -109,7 +109,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_nested',
     'drf_yasg',
-    'webpack_loader',
+    'webpack_loader',  # Kept temporarily to avoid template errors
     'corsheaders',
     'colorfield',
     'imagekit',
@@ -194,6 +194,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app', 'static'),
+    os.path.join(BASE_DIR, "locane", "dist"),
 ]
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -210,7 +211,8 @@ FILE_UPLOAD_HANDLERS = [
     'app.uploadhandler.TemporaryFileUploadHandler', # Ours doesn't keep file descriptors open by default
 ]
 
-# Webpack
+# Legacy webpack_loader configuration kept temporarily to avoid template errors.
+# Templates still reference webpack bundles but React SPA is the primary UI.
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'app/bundles/',
@@ -263,13 +265,18 @@ LOGGING = {
 
 
 # Auth
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/'
 
 # CORS (very relaxed settings, users might want to change this in production)
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SAMESITE = None
+
+# For production, you should use something like:
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8000",
+# ]
 
 # File uploads
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')

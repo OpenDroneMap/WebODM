@@ -82,6 +82,36 @@ RUN --mount=type=cache,target=/root/.npm \
     npm install --quiet -g webpack-cli@5.1.4
 EOT
 
+# Install and build React app (locane)
+COPY locane/package*.json ./locane/
+RUN --mount=type=cache,target=/root/.npm \
+    <<EOT
+    # Navigate to locane directory and install dependencies
+    cd locane
+    npm install --quiet
+    cd ..
+EOT
+
+# Copy React app source code
+COPY locane/ ./locane/
+
+# Build React app
+RUN <<EOT
+    # Build the React application
+    cd locane
+    npm run build
+    cd ..
+    echo "✅ React app built successfully"
+    # Verify build output exists
+    if [ -d "locane/dist" ]; then
+        echo "✅ React build files found in locane/dist"
+        ls -la locane/dist/
+    else
+        echo "❌ React build failed - no dist folder found"
+        exit 1
+    fi
+EOT
+
 # Copy remaining files
 COPY . ./
 

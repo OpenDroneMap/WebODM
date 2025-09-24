@@ -1,0 +1,135 @@
+.sidebar {
+    height: 92vh;
+    width: 18vw;
+    background-color: #089cc8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 32px;
+    border-radius: 28px;
+    margin: 10px 0 10px 10px;
+    overflow: hidden;
+    position: sticky;
+    top: 10px;
+}
+
+.profile {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 36px;
+}
+
+.sidebar-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 0 0 0 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.sidebar-content button {
+    box-sizing: border-box;
+    position: relative;
+    max-width: calc(100% - 8.5px);
+    text-align: left;
+    padding: 14px 24px;
+
+    border: none;
+    border-radius: 16px 0 0 16px;
+    font-size: 1.08rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    letter-spacing: 0.5px;
+    margin-right: 0;
+}
+.notfocused{
+    background: transparent;
+    color: black;
+
+}
+
+.isfocused {
+    background: #F0F0F0;
+    color: black;
+}
+
+
+.isfocused::before,
+.isfocused::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    height: 18px;
+    width: 10px;
+    background-color: #089cc8;
+    display: none;
+}
+
+
+
+.sidebar-content button::before {
+    top: -18px;
+    box-shadow: 0 8px 0 0 #F0F0F0;
+    border-bottom-right-radius: 50px;
+    
+}
+
+
+.sidebar-content button::after {
+    bottom: -18px;
+    box-shadow: 0 -8px 0 0 #F0F0F0; 
+    border-top-right-radius: 50px;
+}
+
+
+.isfocused::before,
+.isfocused::after {
+    display: block;
+}
+
+.sidebar-content label {
+    text-align: center;
+    width: 100%;
+}
+
+
+.sidebar-logout {
+    margin-top: 24px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.sidebar-logout:hover {
+    background: #c0392b;
+    transform: scale(1.08);
+}
+
+.logout-dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+.logout-dialog-btn {
+  background: #e74c3c;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+}
+.logout-dialog-btn.no {
+  background: #ddd;
+  color: #222;
+}

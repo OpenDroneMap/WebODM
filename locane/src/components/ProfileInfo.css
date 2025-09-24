@@ -1,0 +1,32 @@
+.profile-img-wrapper {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, #089cc8 0%, #ff6a00 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.profile-img-wrapper img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+    display: block;
+}
+
+.profile-name {
+    font-weight: bold;
+    color: black;
+    font-size: 1.1rem;
+    margin-top: 6px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    background: none;
+    width: 100%;
+    display: block;
+}

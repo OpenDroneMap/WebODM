@@ -1,0 +1,60 @@
+/* Switcher.css */
+
+/* Define colors for easy customization */
+:root {
+    --primary-color: #3056d3; /* Equivalent to 'text-primary' */
+    --body-color: #637381;    /* Equivalent to 'text-body-color' */
+    --active-bg: #f4f7ff;     /* Background for the active button */
+    --white: #ffffff;
+}
+
+/* The main container for the switcher */
+.themeSwitcher {
+    display: inline-flex;
+    position: relative;
+    cursor: pointer;
+    user-select: none; /* Disables text selection */
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    padding: 4px; /* p-1 */
+    border-radius: 6px; /* rounded-md */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* This hides the actual checkbox but keeps it accessible */
+.themeSwitcher-checkbox {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Base styles for both "Light Mode" and "Dark Mode" buttons */
+.switcher-button {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Replaces space-x-[6px] */
+    padding: 8px 18px; /* py-2 px-[18px] */
+    border-radius: 4px; /* rounded */
+    font-size: 14px; /* text-sm */
+    font-weight: 500; /* font-medium */
+    color: var(--body-color);
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* The active state for a button */
+.switcher-button.active {
+    color: var(--primary-color);
+    background-color: var(--active-bg);
+}
+
+/* Makes the SVG icon inherit its color from the parent text color */
+.switcher-button svg {
+    fill: currentColor;
+}
