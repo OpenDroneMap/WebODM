@@ -21,8 +21,8 @@ const types = {
  * - TEMPERATURE: Celsius
  * 
  * Each unit object contains:
- * - factor: multiplication factor to convert FROM base unit TO this unit
- *           (e.g., meters × factor = feet)
+ * - factor: multiplication factor to convert FROM base unit (meters) TO this unit
+ *           Example: meters × 3.28084 = feet (since factor for feet is 1/0.3048 ≈ 3.28084)
  * - conversion: for non-linear conversions like temperature (uses functions instead of factors)
  * - abbr: abbreviation displayed to users
  * - round: default decimal places for display
@@ -44,9 +44,9 @@ const units = {
     },
     acres_us: {
         // US Survey foot differs from international foot
-        // US Survey foot = 1200/3937 meters (slightly larger than international foot)
-        // UNCERTAINTY: The math here uses 3937/1200 as the conversion from meters to US feet
-        // This appears to be inverted - should verify this is correct
+        // 1 US Survey foot = 1200/3937 meters (slightly larger than international foot)
+        // To convert: meters → US feet → US square feet → US acres
+        // Factor: (meters × 3937/1200)² ÷ 43560 = US acres
         factor: Math.pow(3937 / 1200, 2) / 43560,
         abbr: 'ac (US)',
         round: 5,
@@ -64,8 +64,8 @@ const units = {
         type: types.LENGTH
     },
     feet_us: {
-        // US Survey foot: 1 meter = 3937/1200 US feet
-        // More precisely: 1 US foot = 1200/3937 meters
+        // US Survey foot: 1 US foot = 1200/3937 meters
+        // To convert meters to US feet: multiply by 3937/1200
         factor: 3937 / 1200,
         abbr: 'ft (US)',
         round: 4,
@@ -196,8 +196,8 @@ const units = {
     },
     cbyards_us: {
         // Cubic yards (US Survey foot standard)
-        // UNCERTAINTY: This uses 3937/3600 for meter to US yard conversion
-        // Need to verify: 1 US yard = 3600/3937 meters (3 US feet)
+        // 1 US yard = 3 US feet = 3 × (1200/3937) meters = 3600/3937 meters
+        // To convert cubic meters to US cubic yards: multiply by (3937/3600)³
         factor: Math.pow(3937/3600, 3),
         abbr: 'yd³ (US)',
         round: 4,
@@ -316,7 +316,7 @@ class UnitSystem {
      */
     area(sqmeters, opts = {}) {
         sqmeters = parseFloat(sqmeters);
-        if (isNaN(sqmeters)) return NanUnit();  // ISSUE: Should return `new NanUnit()`
+        if (isNaN(sqmeters)) return NanUnit();  // BUG: Missing 'new' keyword
 
         // Let the subclass decide which unit is appropriate
         const unit = this.areaUnit(sqmeters, opts);
@@ -339,7 +339,7 @@ class UnitSystem {
      */
     length(meters, opts = {}) {
         meters = parseFloat(meters);
-        if (isNaN(meters)) return NanUnit();  // ISSUE: Should return `new NanUnit()`
+        if (isNaN(meters)) return NanUnit();  // BUG: Missing 'new' keyword
 
         const unit = this.lengthUnit(meters, opts);
         const val = unit.factor * meters;
@@ -351,7 +351,7 @@ class UnitSystem {
      */
     volume(cbmeters, opts = {}) {
         cbmeters = parseFloat(cbmeters);
-        if (isNaN(cbmeters)) return NanUnit();  // ISSUE: Should return `new NanUnit()`
+        if (isNaN(cbmeters)) return NanUnit();  // BUG: Missing 'new' keyword
 
         const unit = this.volumeUnit(cbmeters, opts);
         const val = unit.factor * cbmeters;
@@ -364,7 +364,7 @@ class UnitSystem {
      */
     temperature(celsius, opts = {}) {
         celsius = parseFloat(celsius);
-        if (isNaN(celsius)) return NanUnit();  // ISSUE: Should return `new NanUnit()`
+        if (isNaN(celsius)) return NanUnit();  // BUG: Missing 'new' keyword
 
         const unit = this.temperatureUnit(celsius, opts);
         
@@ -395,14 +395,15 @@ function toMetric(valueUnit, unit) {
         value = parseFloat(valueUnit);
     }
     
-    if (isNaN(value)) return NanUnit();  // ISSUE: Should return `new NanUnit()`
+    if (isNaN(value)) return NanUnit();  // BUG: Missing 'new' keyword
 
     let val;
     
     // Determine conversion method based on unit type
     if (unit.factor !== undefined) {
-        // Simple multiplication for most units
-        // Since factor converts FROM base TO unit, we divide to go back
+        // Simple division for most units
+        // Factor converts FROM base TO unit (meters × factor = target)
+        // So to go back: target ÷ factor = meters
         val = value / unit.factor;
     } else if (unit.conversion !== undefined) {
         // Use backward conversion function for temperature
@@ -412,7 +413,7 @@ function toMetric(valueUnit, unit) {
     }
 
     // Return appropriate base unit based on type
-    // ISSUE: There's a bug here - units.sqmeters is undefined, should be units.sqmeters
+    // BUG: There are typos in the AREA and VOLUME cases below
     if (unit.type === types.LENGTH) {
         return new ValueUnit(val, units.meters);
     } else if (unit.type === types.AREA) {
