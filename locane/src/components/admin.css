@@ -51,13 +51,47 @@
 
 .admin table td button {
     margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.admin table td div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 
-.dialog {
+.dialog h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.dialog form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 1rem;
+}
+
+.dialog label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-weight: bold;
+    color: #555;
+}
+
+.dialog input[type="text"], 
+.dialog input[type="email"], 
+.dialog input[type="password"] {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.dialog input[type="checkbox"] {
+    margin-right: 0.5rem;
 }
 
 .dialog p {

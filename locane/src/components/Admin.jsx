@@ -7,6 +7,7 @@ function Admin({ changeView }) {
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [showUserDialog, setShowUserDialog] = useState(false);
     const [showUserInfoDialog, setShowUserInfoDialog] = useState(false);
+    const [showPasswordDialog, setShowPasswordDialog] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [formData, setFormData] = useState({
@@ -22,6 +23,11 @@ function Admin({ changeView }) {
         user_permissions: []
     });
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordData, setPasswordData] = useState({
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [originalFormData, setOriginalFormData] = useState(null);
 
     useEffect(() => {
         fetchUsers();
@@ -49,28 +55,44 @@ function Admin({ changeView }) {
     };
 
     const handleSaveUser = async () => {
-        if (formData.password !== confirmPassword) {
+        // Only check password confirmation for new users
+        if (!currentUser && formData.password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
         }
         try {
             const method = currentUser ? 'PUT' : 'POST';
             const url = currentUser ? `/api/admin/users/${currentUser.id}/` : '/api/admin/users/';
+            
+            // Send full formData (includes password as received from API for updates)
             await authorizedFetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
             fetchUsers();
-            setShowUserDialog(false);
+            closeUserDialog();
         } catch (error) {
             console.error('Error saving user:', error);
+            alert('Error saving user');
         }
     };
 
     const openUserDialog = (user = null) => {
         setCurrentUser(user);
-        setFormData(user || {
+        const initialData = user ? {
+            // Include password as received from API (not editable in UI)
+            password: user.password || '',
+            is_superuser: user.is_superuser || false,
+            username: user.username || '',
+            first_name: user.first_name || '',
+            last_name: user.last_name || '',
+            email: user.email || '',
+            is_staff: user.is_staff || false,
+            is_active: user.is_active || false,
+            groups: user.groups || [],
+            user_permissions: user.user_permissions || []
+        } : {
             password: '',
             is_superuser: false,
             username: '',
@@ -81,7 +103,9 @@ function Admin({ changeView }) {
             is_active: false,
             groups: [],
             user_permissions: []
-        });
+        };
+        setFormData(initialData);
+        setOriginalFormData(JSON.parse(JSON.stringify(initialData))); // Deep copy
         setConfirmPassword('');
         setShowUserDialog(true);
     };
@@ -93,6 +117,53 @@ function Admin({ changeView }) {
     const openUserInfoDialog = (user) => {
         setSelectedUser(user);
         setShowUserInfoDialog(true);
+    };
+
+    const openPasswordDialog = (user) => {
+        setCurrentUser(user);
+        setPasswordData({
+            newPassword: '',
+            confirmPassword: ''
+        });
+        setShowPasswordDialog(true);
+    };
+
+    const handleUpdatePassword = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
+        if (!passwordData.newPassword) {
+            alert('Password cannot be empty!');
+            return;
+        }
+        try {
+            await authorizedFetch(`/api/admin/users/${currentUser.id}/password/`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ new_password: passwordData.newPassword }),
+            });
+            alert('Password updated successfully!');
+            setShowPasswordDialog(false);
+            setPasswordData({ newPassword: '', confirmPassword: '' });
+        } catch (error) {
+            console.error('Error updating password:', error);
+            alert('Error updating password');
+        }
+    };
+
+    const closeUserDialog = () => {
+        setFormData(originalFormData ? JSON.parse(JSON.stringify(originalFormData)) : {});
+        setConfirmPassword('');
+        setShowUserDialog(false);
+        setCurrentUser(null);
+        setOriginalFormData(null);
+    };
+
+    const closePasswordDialog = () => {
+        setPasswordData({ newPassword: '', confirmPassword: '' });
+        setShowPasswordDialog(false);
+        setCurrentUser(null);
     };
 
     return (
@@ -115,6 +186,7 @@ function Admin({ changeView }) {
                             <td>
                             <div>
                                 <button onClick={() => openUserDialog(user)}>Update User</button>
+                                <button onClick={() => openPasswordDialog(user)}>Update Password</button>
                                 <button onClick={() => openDeletePopup(user.id)}>Delete User</button>
                                 <button onClick={() => openUserInfoDialog(user)}>View User</button>
                             </div>
@@ -150,21 +222,23 @@ function Admin({ changeView }) {
                                 Email:
                                 <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                             </label>
-                            <label>
-                                Password: *
-                                <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required={!currentUser} />
-                            </label>
                             {!currentUser && (
-                                <label>
-                                    Confirm Password: *
-                                    <input
-                                        type="password"
-                                        placeholder="Confirm Password"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        required
-                                    />
-                                </label>
+                                <>
+                                    <label>
+                                        Password: *
+                                        <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
+                                    </label>
+                                    <label>
+                                        Confirm Password: *
+                                        <input
+                                            type="password"
+                                            placeholder="Confirm Password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            required
+                                        />
+                                    </label>
+                                </>
                             )}
                             <label>
                                 First Name:
@@ -192,7 +266,7 @@ function Admin({ changeView }) {
                                 <input type="checkbox" checked={formData.is_active} onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })} /> Active
                             </label>
                             <button type="submit">OK</button>
-                            <button type="button" onClick={() => setShowUserDialog(false)}>Cancel</button>
+                            <button type="button" onClick={closeUserDialog}>Cancel</button>
                         </form>
                     </div>
                 </div>
@@ -212,6 +286,38 @@ function Admin({ changeView }) {
                         <p><strong>Groups:</strong> {selectedUser.groups.join(', ')}</p>
                         <p><strong>Permissions:</strong> {selectedUser.user_permissions.join(', ')}</p>
                         <button onClick={() => setShowUserInfoDialog(false)}>Close</button>
+                    </div>
+                </div>
+            )}
+
+            {showPasswordDialog && currentUser && (
+                <div className="modal-overlay">
+                    <div className="dialog">
+                        <h2>Update Password for {currentUser.username}</h2>
+                        <form onSubmit={(e) => { e.preventDefault(); handleUpdatePassword(); }}>
+                            <label>
+                                New Password: *
+                                <input 
+                                    type="password" 
+                                    placeholder="New Password" 
+                                    value={passwordData.newPassword} 
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} 
+                                    required 
+                                />
+                            </label>
+                            <label>
+                                Confirm New Password: *
+                                <input 
+                                    type="password" 
+                                    placeholder="Confirm New Password" 
+                                    value={passwordData.confirmPassword} 
+                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })} 
+                                    required 
+                                />
+                            </label>
+                            <button type="submit">Update Password</button>
+                            <button type="button" onClick={closePasswordDialog}>Cancel</button>
+                        </form>
                     </div>
                 </div>
             )}

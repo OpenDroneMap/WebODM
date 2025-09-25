@@ -1,30 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import './sidebar.css'
-import ProfileInfo from './ProfileInfo.jsx'
+import React from 'react';
+import './sidebar.css';
+import ProfileInfo from './ProfileInfo.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getCookie } from "../utils/cookieUtils";
-import { authorizedFetch } from '../utils/api';
 
 function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
-    const [isSuperuser, setIsSuperuser] = useState(false);
+    const isSuperuser = sessionStorage.getItem('is_superuser') === 'true'; // Read is_superuser from sessionStorage
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchUserDetails = async () => {
-            try {
-                const response = await authorizedFetch('/api/admin/users/'); 
-                const data = await response.json();
-                if (data && data.results && data.results.length > 0) {
-                    const currentUser = data.results.find(user => user.username === sessionStorage.getItem('username'));
-                    setIsSuperuser(currentUser?.is_superuser || false);
-                }
-            } catch (error) {
-                console.error('Error fetching user details:', error);
-            }
-        };
-
-        fetchUserDetails();
-    }, []);
 
     const doDashboard = () => changeView("dash");
     const doProjects = () => changeView("proj");
@@ -49,7 +30,6 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
             <button onClick={() => setShowLogoutDialog(true)} className="sidebar-logout"> Logout </button>
         </div>
 
-    )
-
+    );
 }
-export default Sidebar
+export default Sidebar;

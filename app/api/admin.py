@@ -32,6 +32,21 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.is_valid(raise_exception=True)
         user.save()
         return Response(user.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['put'], url_path='password')
+    def update_password(self, request, pk=None):
+        user = self.get_object()
+        # We will expect the frontend to send a key named 'new_password'
+        new_password = request.data.get('new_password')
+
+        if not new_password:
+            return Response({'error': 'New password is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Use Django's built-in function to securely hash and set the password
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'status': 'Password updated successfully'}, status=status.HTTP_200_OK)
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:

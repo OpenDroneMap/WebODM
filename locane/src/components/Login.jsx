@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./Login.css";
 import { getCookie } from "../utils/cookieUtils";
+import { authorizedFetch } from "../utils/api";
 
 function Login({ setIsLogged }) {
   const [username, setUsername] = useState("");
@@ -64,6 +65,18 @@ function Login({ setIsLogged }) {
 
       if (response.ok && data && data.ok) {
         sessionStorage.setItem("username", data.username || username);
+        sessionStorage.setItem("is_superuser", false); // Default to false
+
+        // Verify superuser status
+        try {
+          const adminResponse = await authorizedFetch("/api/admin/users/");
+          if (adminResponse.ok) {
+            sessionStorage.setItem("is_superuser", true);
+          }
+        } catch (adminError) {
+          console.warn("Admin check failed, defaulting to non-superuser:", adminError);
+        }
+
         setIsLogged(true);
       } else {
         const msg = (data && data.error) ? data.error : `HTTP ${response.status}`;
