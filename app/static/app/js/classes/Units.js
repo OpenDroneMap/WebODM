@@ -264,9 +264,9 @@ function toMetric(valueUnit, unit){
     if (unit.type === types.LENGTH){
         return new ValueUnit(val, units.meters);
     }else if (unit.type === types.AREA){
-        return new ValueUnit(val, unit.sqmeters);
+        return new ValueUnit(val, units.sqmeters);
     }else if (unit.type === types.VOLUME){
-        return new ValueUnit(val, unit.cbmeters);
+        return new ValueUnit(val, units.cbmeters);
     }else if (unit.type === types.TEMPERATURE){
         return new ValueUnit(val, units.celsius);
     }else{
