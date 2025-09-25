@@ -203,7 +203,7 @@ class UnitSystem{
     
     area(sqmeters, opts = {}){
         sqmeters = parseFloat(sqmeters);
-        if (isNaN(sqmeters)) return NanUnit();
+        if (isNaN(sqmeters)) return new NanUnit();
 
         const unit = this.areaUnit(sqmeters, opts);
         const val = unit.factor * sqmeters;
@@ -216,7 +216,7 @@ class UnitSystem{
 
     length(meters, opts = {}){
         meters = parseFloat(meters);
-        if (isNaN(meters)) return NanUnit();
+        if (isNaN(meters)) return new NanUnit();
 
         const unit = this.lengthUnit(meters, opts);
         const val = unit.factor * meters;
@@ -225,7 +225,7 @@ class UnitSystem{
 
     volume(cbmeters, opts = {}){
         cbmeters = parseFloat(cbmeters);
-        if (isNaN(cbmeters)) return NanUnit();
+        if (isNaN(cbmeters)) return new NanUnit();
 
         const unit = this.volumeUnit(cbmeters, opts);
         const val = unit.factor * cbmeters;
@@ -234,7 +234,7 @@ class UnitSystem{
 
     temperature(celsius, opts = {}){
         celsius = parseFloat(celsius);
-        if (isNaN(celsius)) return NanUnit();
+        if (isNaN(celsius)) return new NanUnit();
 
         const unit = this.temperatureUnit(celsius, opts);
         const val = unit.conversion.forward(celsius);
@@ -250,7 +250,7 @@ function toMetric(valueUnit, unit){
     }else{
         value = parseFloat(valueUnit);
     }
-    if (isNaN(value)) return NanUnit();
+    if (isNaN(value)) return new NanUnit();
 
     let val;
     if (unit.factor !== undefined){
