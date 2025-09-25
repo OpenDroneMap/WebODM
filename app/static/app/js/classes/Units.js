@@ -16,39 +16,39 @@ const units = {
         type: types.AREA
     },
     acres_us: {
-      factor: Math.pow(3937 / 1200, 2) / 43560,
-      abbr: 'ac (US)',
-      round: 5,
-      label: _("Acres"),
-      type: types.AREA
+        factor: Math.pow(3937 / 1200, 2) / 43560,
+        abbr: 'ac (US)',
+        round: 5,
+        label: _("Acres"),
+        type: types.AREA
     },
     feet: {
-      factor: 1 / 0.3048,
-      abbr: 'ft',
-      round: 4,
-      label: _("Feet"),
-      type: types.LENGTH
+        factor: 1 / 0.3048,
+        abbr: 'ft',
+        round: 4,
+        label: _("Feet"),
+        type: types.LENGTH
     },
     feet_us:{
-      factor: 3937 / 1200,
-      abbr: 'ft (US)',
-      round: 4,
-      label: _("Feet"),
-      type: types.LENGTH
+        factor: 3937 / 1200,
+        abbr: 'ft (US)',
+        round: 4,
+        label: _("Feet"),
+        type: types.LENGTH
     },
     hectares: {
-      factor: 0.0001,
-      abbr: 'ha',
-      round: 4,
-      label: _("Hectares"),
-      type: types.AREA
+        factor: 0.0001,
+        abbr: 'ha',
+        round: 4,
+        label: _("Hectares"),
+        type: types.AREA
     },
     meters: {
-      factor: 1,
-      abbr: 'm',
-      round: 3,
-      label: _("Meters"),
-      type: types.LENGTH
+        factor: 1,
+        abbr: 'm',
+        round: 3,
+        label: _("Meters"),
+        type: types.LENGTH
     },
     kilometers: {
         factor: 0.001,
@@ -56,13 +56,13 @@ const units = {
         round: 5,
         label: _("Kilometers"),
         type: types.LENGTH
-    },
+        },
     centimeters: {
-      factor: 100,
-      abbr: 'cm',
-      round: 1,
-      label: _("Centimeters"),
-      type: types.LENGTH
+        factor: 100,
+        abbr: 'cm',
+        round: 1,
+        label: _("Centimeters"),
+        type: types.LENGTH
     },
     miles: {
         factor: (1 / 0.3048) / 5280,
@@ -79,11 +79,11 @@ const units = {
         type: types.LENGTH
     },
     sqfeet: {
-      factor: 1 / (0.3048 * 0.3048),
-      abbr: 'ft²',
-      round: 2,
-      label: _("Square Feet"),
-      type: types.AREA
+        factor: 1 / (0.3048 * 0.3048),
+        abbr: 'ft²',
+        round: 2,
+        label: _("Square Feet"),
+        type: types.AREA
     },
     sqfeet_us: {
         factor: Math.pow(3937 / 1200, 2),
@@ -93,11 +93,11 @@ const units = {
         type: types.AREA
     },
     sqmeters: {
-      factor: 1,
-      abbr: 'm²',
-      round: 2,
-      label: _("Square Meters"),
-      type: types.AREA
+        factor: 1,
+        abbr: 'm²',
+        round: 2,
+        label: _("Square Meters"),
+        type: types.AREA
     },
     sqkilometers: {
         factor: 0.000001,
@@ -107,11 +107,11 @@ const units = {
         type: types.AREA
     },
     sqmiles: {
-      factor: Math.pow((1 / 0.3048) / 5280, 2),
-      abbr: 'mi²',
-      round: 5,
-      label: _("Square Miles"),
-      type: types.AREA
+        factor: Math.pow((1 / 0.3048) / 5280, 2),
+        abbr: 'mi²',
+        round: 5,
+        label: _("Square Miles"),
+        type: types.AREA
     },
     sqmiles_us: {
         factor: Math.pow((3937 / 1200) / 5280, 2),
