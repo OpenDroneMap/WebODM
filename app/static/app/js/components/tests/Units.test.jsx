@@ -125,17 +125,22 @@ describe('Metric conversion', () => {
 
     const km = metric.length(2000);
     const mi = imperial.length(3220);
+    const ft2 = imperial.area(100);
 
     expect(km.unit.abbr).toBe("km");
     expect(km.value).toBe(2);
     expect(mi.unit.abbr).toBe("mi");
-    expect(Math.round(mi.value)).toBe(2)
+    expect(Math.round(mi.value)).toBe(2);
+    expect(ft2.unit.abbr).toBe("ft²");
+    expect(Math.round(ft2.value)).toBe(1076);
 
     expect(toMetric(km).toString()).toBe("2,000 m");
     expect(toMetric(mi).toString()).toBe("3,220 m");
+    expect(ft2.toString()).toBe("1,076.39 ft²");
 
     expect(toMetric(km).value).toBe(2000);
     expect(toMetric(mi).value).toBe(3220);
+    expect(Math.round(toMetric(ft2).value)).toBe(100);
 
     const celsius = metric.temperature(50);
     const fahrenheit = imperial.temperature(50);
@@ -144,5 +149,15 @@ describe('Metric conversion', () => {
     expect(fahrenheit.unit.abbr).toBe("°F");
     expect(toMetric(celsius).value).toBe(50);
     expect(toMetric(fahrenheit).value).toBe(50);
+  });
+});
+
+describe('Handle NaN values', () => {
+  it('it should handle NaN values properly', () => {
+    const { metric } = systems;
+
+    const nan = metric.area(Infinity - Infinity);
+    expect(nan.toString()).toBe("NaN");
+    expect(nan.constructor.name).toBe("NanUnit");
   });
 });
