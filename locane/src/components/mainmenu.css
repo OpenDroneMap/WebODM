@@ -4,14 +4,20 @@
     flex-direction: row;
     width: 100%;
     height: 100%;
+    --sidebar-total-width: calc(18vw + 20px);
+}
 
+/* Update variables when sidebar is collapsed */
+.main-menu:has(.sidebar.collapsed) {
+    --sidebar-total-width: 100px;
 }
 .sidebar-menu{
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
-    width: 20vw;
+    width: var(--sidebar-total-width, 20vw);
+    transition: width 0.3s ease;
 }
 .dialog-close {
 
@@ -19,9 +25,10 @@
 }
 .main-view{
     flex: 1;
-    margin-left: 20vw;
+    margin-left: var(--sidebar-total-width, 20vw);
     height: 100vh;
     overflow-y: auto;
+    transition: margin-left 0.3s ease;
 }
 .modal-overlay {
     background: rgba(0, 0, 0, 0.3);
