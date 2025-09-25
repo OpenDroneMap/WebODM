@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import dp from "../assets/dp.jpg";
 import "./ProfileInfo.css";
 
-function ProfileInfo() {
+function ProfileInfo({ isCollapsed }) {
   const loginkey = sessionStorage.getItem("username"); // Use sessionStorage for username
 
   return (
@@ -10,7 +10,7 @@ function ProfileInfo() {
       <div className="profile-img-wrapper">
         <img src={dp} alt="Profile Picture" />
       </div>
-      <label className="profile-name">{loginkey || "Loading..."}</label>
+      {!isCollapsed && <label className="profile-name">{loginkey || "Loading..."}</label>}
     </div>
   );
 }

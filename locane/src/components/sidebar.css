@@ -1,7 +1,7 @@
 .sidebar {
     height: 92vh;
     width: 18vw;
-    background-color: #089cc8;
+    background: linear-gradient(180deg, #7b2ff7 0%, #00c6ff 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -11,6 +11,60 @@
     overflow: hidden;
     position: sticky;
     top: 10px;
+    transition: width 0.3s ease;
+    cursor: pointer;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+    min-width: 80px;
+}
+
+.sidebar-header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 0 10px 20px;
+    margin-bottom: 10px;
+}
+
+.hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    transition: all 0.3s ease;
+}
+
+.hamburger-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger-btn span {
+    width: 20px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.sidebar.collapsed .hamburger-btn span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.sidebar.collapsed .hamburger-btn span:nth-child(2) {
+    opacity: 0;
+}
+
+.sidebar.collapsed .hamburger-btn span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
 }
 
 .profile {
@@ -18,6 +72,12 @@
     display: flex;
     justify-content: center;
     margin-bottom: 36px;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .profile {
+    margin-bottom: 20px;
+    transform: scale(0.7);
 }
 
 .sidebar-content {
@@ -37,7 +97,6 @@
     max-width: calc(100% - 8.5px);
     text-align: left;
     padding: 14px 24px;
-
     border: none;
     border-radius: 16px 0 0 16px;
     font-size: 1.08rem;
@@ -46,16 +105,49 @@
     outline: none;
     letter-spacing: 0.5px;
     margin-right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(0);
+}
+
+.sidebar.collapsed .sidebar-content button {
+    justify-content: center;
+    border-radius: 32px;
+    margin-right: 10px;
+}
+
+.sidebar-content button img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notfocused:hover img {
+    transform: scale(1.1);
+}
+
+.isfocused img {
+    transform: scale(1.1);
 }
 .notfocused{
     background: transparent;
-    color: black;
+    color: #ffffff;
+    transform: translateX(0) scale(1);
+}
 
+.notfocused:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px) scale(1.02);
 }
 
 .isfocused {
     background: #F0F0F0;
     color: black;
+    transform: translateX(8px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 
@@ -66,7 +158,7 @@
     right: 0;
     height: 18px;
     width: 10px;
-    background-color: #089cc8;
+    background: transparent;
     display: none;
 }
 
@@ -100,20 +192,26 @@
 
 .sidebar-logout {
     margin-top: 24px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background: #e74c3c;
-    color: #fff;
+    padding: 10px;
+    background: transparent;
     border: none;
     cursor: pointer;
     border-radius: 6px;
-    font-weight: 500;
-    transition: background 0.2s, transform 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar-logout:hover {
-    background: #c0392b;
-    transform: scale(1.08);
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.sidebar-logout img {
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .logout-dialog-actions {
@@ -132,4 +230,14 @@
 .logout-dialog-btn.no {
   background: #ddd;
   color: #222;
+}
+
+.sidebar-empty-space {
+    flex: 1;
+    width: 100%;
+}
+
+.sidebar.collapsed .isfocused::before,
+.sidebar.collapsed .isfocused::after {
+    display: none;
 }
