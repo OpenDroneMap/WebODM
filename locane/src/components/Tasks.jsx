@@ -71,16 +71,21 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
     >
       <div className="main-content-area">
         <div className="task-header">
-            <h3>{task.projectName}</h3>
+            <div className="task-info">
+                <h3 className="task-name">{task.taskName}</h3>
+                <p className="task-project-name">{task.projectName}</p>
+            </div>
             <div className="task-status-info">
+                <div className={`status-indicator ${getStatusClass(effectiveStatus)}`}></div>
                 <span className={`status-badge ${getStatusClass(effectiveStatus)}`}>
                     {getStatusText(effectiveStatus)}
                 </span>
-                <span className="task-id">ID: {task.id}</span>
             </div>
         </div>
+        <div className="task-id-row">
+            <span className="task-id">{task.id}</span>
+        </div>
         <div className="task-content">
-            <p className="task-name">{task.taskName}</p>
             {effectiveStatus === 30 && lastError && (
               <p className="task-error"><strong>Error:</strong> {lastError}</p>
             )}
@@ -114,7 +119,6 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
             )}
             {effectiveStatus === 40 && (
                 <>
-                <button className="btn-view" onClick={() => handleAction('view')}>View</button>
                 <Export 
                   projectId={task.projectId} 
                   taskId={task.id} 
@@ -262,7 +266,6 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
           <>
             {categorizedTasks.running.length > 0 && (
               <div className="task-category">
-                <h3>Running Tasks ({categorizedTasks.running.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.running.map((task) => (
                     <TaskBox 
@@ -281,7 +284,6 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.completed.length > 0 && (
               <div className="task-category">
-                <h3>Completed Tasks ({categorizedTasks.completed.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.completed.map((task) => (
                     <TaskBox 
@@ -300,7 +302,6 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.failed.length > 0 && (
               <div className="task-category">
-                <h3>Failed Tasks ({categorizedTasks.failed.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.failed.map((task) => (
                     <TaskBox 
@@ -319,7 +320,6 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.canceled.length > 0 && (
               <div className="task-category">
-                <h3>Canceled Tasks ({categorizedTasks.canceled.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.canceled.map((task) => (
                     <TaskBox 
@@ -338,7 +338,6 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.queued.length > 0 && (
               <div className="task-category">
-                <h3>Queued Tasks ({categorizedTasks.queued.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.queued.map((task) => (
                     <TaskBox 
