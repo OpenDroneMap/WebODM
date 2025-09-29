@@ -13,6 +13,14 @@ def serve_react_app(request):
     Think of it as a waiter bringing your custom menu instead of the default menu
     """
     try:
+        # Check if this is first access (no superusers exist)
+        from django.contrib.auth.models import User
+        from django.shortcuts import redirect
+        
+        if User.objects.filter(is_superuser=True).count() == 0:
+            # First time setup needed - redirect to welcome page
+            return redirect('welcome')
+        
         # Find where your React app is built
         base_dir = os.path.dirname(os.path.dirname(__file__))  # Go up two folders
         index_path = os.path.join(base_dir, 'locane', 'dist', 'index.html')

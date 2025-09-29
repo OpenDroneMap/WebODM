@@ -7,15 +7,15 @@ export default defineConfig(({ command }) => ({
   server: {
     proxy: {
       '/logout': {
-        target: 'http://192.168.1.5:8000',
+        target: 'http://192.168.1.4:8000',
         changeOrigin: true,
       },
       '/login': {
-        target: 'http://192.168.1.5:8000',
+        target: 'http://192.168.1.4:8000',
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://192.168.1.5:8000',
+        target: 'http://192.168.1.4:8000',
         changeOrigin: true,
       }
     }
