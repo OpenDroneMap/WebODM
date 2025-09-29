@@ -161,7 +161,6 @@ export default function PotreeMap({ task_details }) {
                 viewer.setFOV(60);
                 viewer.setPointBudget(2_000_000);
                 viewer.loadSettingsFromURL();
-                viewer.setDescription('Loading Entwine-generated EPT format');
 
                 viewer.loadGUI(() => {
                     viewer.setLanguage('en');
