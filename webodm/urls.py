@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.i18n import JavaScriptCatalog
 from .views import serve_react_app, api_login, api_logout
+from app.views.app import welcome, index
 
 urlpatterns = [
     # Admin panel - keep the original WebODM admin working
@@ -18,6 +19,9 @@ urlpatterns = [
     # Essential i18n routes that templates expect
     url(r'^jsi18n/', JavaScriptCatalog.as_view(packages=['app']), name='javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
+
+    # Welcome page for first-time setup (must come before React app)
+    url(r'^welcome/$', welcome, name='welcome'),
 
     # Auth JSON endpoints for new React frontend
     url(r'^login/?$', api_login, name='api_login'),
