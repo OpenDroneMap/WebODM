@@ -1,263 +1,359 @@
-:root {
-    --panel-color: #ffffff;
-    --header-color: #6c757d;
-    --text-color: #333;
-    --border-color: #dee2e6;
-    --button-bg: #e9ecef;
-    --button-hover-bg: #d4dae0;
-}
+:root { 
+    --panel-color: #f0f0f0; /* Light grey panel background from your last input */ 
+    --header-color: #6c757d; 
+    --text-color: #333; 
+    --border-color: #dee2e6; 
+    --button-bg: #e9ecef; 
+    --button-hover-bg: #d4dae0; 
+} 
 
-.gcp-window {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-}
+/* --- GcpInterface.css Layout Styles --- */ 
 
+.gcp-window { 
+    display: flex; 
+    flex-direction: column; 
+    width: 100%; 
+    height: 100%;  
+} 
 
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    color: var(--text-color);
-    font-weight: bold;
-}
-
-.top-bar .title {
-    font-size: 1.2em;
-    display: flex;
-    align-items: center;
-}
-
-.top-bar {
-    font-size: 1.5em;
-}
-
-.top-bar-left {
-    display: flex;
-    align-items: center;
-}
-
-.top-bar-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.export-button {
-    background-color: var(--panel-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.export-button:hover {
-    background-color: var(--button-bg);
-}
+/* Hide old unused elements */ 
+.top-bar { display: none; } 
+.gcp-list-section .no-points { display: none; }  
+.gcp-list-section ul { padding: 0; margin: 0; }  
+.gcp-list-section ul { list-style-type: none; }  
 
 
-.main-content {
-    display: flex;
-    flex-grow: 1;
-    overflow: hidden;
-}
+.main-content { 
+    display: flex; 
+    flex-grow: 1; 
+    overflow: hidden; 
+} 
 
+.main-content.ui-match-content { 
+    flex-grow: 1; 
+    overflow: hidden; 
+    background-color: var(--panel-color);  
+    border-radius: 8px; 
+} 
 
-.left-panel {
-    flex: 1 1 40%;
-    max-width: 40%;
-    padding: 15px;
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-}
+.left-panel.ui-match-left-panel { 
+    flex: 0 0 350px;  
+    max-width: 350px; 
+    padding: 20px; 
+    border-right: none;  
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto; 
+} 
 
-.right-panel {
-    flex: 1 1 60%;
-    max-width: 60%;
-}
+.right-panel.ui-match-right-panel { 
+    flex: 1; 
+    max-width: none; 
+    padding: 10px;  
+    background: #e0f0ff;  
+} 
 
-.left-panel h4 {
-    color: #888;
-    font-size: 0.9em;
-    margin-top: 0;
+/* --- Panel Headers (Linked Points & How to use) --- */ 
+.left-panel h4 { 
+    /* Resetting the default h4 styles for a cleaner look */ 
+    color: var(--text-color);  
+    font-size: 1.1em; 
+    font-weight: 500; 
+    margin-top: 0; 
+    margin-bottom: 5px; 
+    padding-bottom: 0; 
+} 
+
+.gcp-list-section { 
+    margin-bottom: 20px; 
+} 
+
+.directions-section { 
+    margin-bottom: 20px; 
+} 
+
+.ui-match-header { 
+    cursor: pointer; 
+    user-select: none; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid var(--border-color); /* Grey line below the header */ 
+    padding-bottom: 8px; 
+} 
+
+.ui-match-header span { 
+    font-size: 0.8em; 
+    margin-left: 5px; 
+    color: #666; 
+} 
+
+.directions-section ol { 
+    font-size: 0.9em; 
+    color: #555; 
+    padding-left: 20px; 
+    margin-top: 5px; 
+} 
+
+/* --- Linked Points Mock UI (Blue Tiles - New Design) --- */ 
+
+.linked-points-mock-ui { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    padding: 10px 0; 
+} 
+
+.mock-link-row-ui { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+} 
+
+.mock-link-block { 
+    height: 20px; 
+    width: 90px; 
+    background-color: #4a90e2; /* Blue color for the blocks */ 
+    border-radius: 4px; 
+} 
+
+.mock-link-line { 
+    flex-grow: 1; 
+    height: 2px; 
+    background-color: #ccc; /* Grey line connecting the blocks */ 
+    margin: 0 8px; 
+} 
+
+/* GcpInterface.css */
+/* GcpInterface.css */
+
+/* --- Linked Points List (Actual Data) --- */ 
+
+.linked-points-list { 
+    list-style-type: none; 
+    padding: 0; 
+    margin: 10px 0; 
+    max-height: 200px; 
+    overflow-y: auto; 
+    border-radius: 4px; 
+    background-color: #f0f0f0;
+} 
+
+.linked-points-list li { 
+    /* Set up for the two containers and the delete button */
+    display: flex; 
+    align-items: center; 
+    padding: 6px 12px;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
-}
-
-.gcp-list-section .no-points {
-    color: #999;
-    font-style: italic;
-}
-
-.gcp-list-section ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.directions-section .collapsible {
-    cursor: pointer;
-    user-select: none;
-}
-
-.directions-section ol {
-    font-size: 0.9em;
-    color: #555;
-    padding-left: 20px;
-}
-
-.file-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.file-controls button {
-    padding: 10px;
-    border: 1px dashed var(--border-color);
-    background-color: var(--button-bg);
-    cursor: pointer;
-    text-align: center;
-    border-radius: 4px;
-}
-
-.file-controls button:hover {
-    background-color: var(--button-hover-bg);
-    border-color: #aaa;
-}
-
-
-.image-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(100px, 1fr));
-    gap: 10px;
-}
-
-.thumbnail {
+    
+    /* NEW: Use gap for spacing and make it a relative container for the line */
+    gap: 20px; 
     position: relative;
-    border: 1px solid var(--border-color);
-    padding: 4px;
-}
+} 
 
-.thumbnail img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
+.linked-points-list li:last-child { 
+    border-bottom: none; 
+} 
 
-.thumbnail .image-name {
-    display: none;
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
-    background: rgba(0,0,0,0.7);
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 0.80em;
-    z-index: 2;
-}
-
-.thumbnail:hover .image-name {
-    display: block;
-}
-
-.thumbnail .delete-btn {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: red;
+/* Styles for the blue containers (blocks) */
+.linked-points-list li > .link-image-name,
+.linked-points-list li > .link-gcp-id {
+    background-color: #4a90e2; /* Matching the blue from the mockup */
     color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    line-height: 20px;
-    text-align: center;
-    opacity: 0.8;
-}
-
-.thumbnail .delete-btn:hover {
-    opacity: 1;
-}
-
-.link-count-badge {
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    font-weight: bold;
-    border: 1px solid white;
-    z-index: 3;
-}
-
-
-.right-panel {
-    flex-grow: 1;
-}
-
-.map-container {
-    width: 100%;
-    height: 100%;
-}
-
-.export-button:disabled {
-    background-color: #e9ecef;
-    color: #adb5bd;
-    cursor: not-allowed;
-    border-color: #dee2e6;
-}
-
-.linked-points-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 10px 0;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
     border-radius: 4px;
+    padding: 6px 10px; 
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    line-height: 1; 
+    
+    /* FIX: Enforce equal width */
+    flex: 1 1 0; /* flex-grow: 1, flex-shrink: 1, flex-basis: 0 ensures equal width */
+    min-width: 0; 
 }
 
-.linked-points-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    font-size: 0.85em;
-    border-bottom: 1px solid var(--border-color);
+/* Remove margin and pseudo-element from .link-image-name to enable equal width */
+.linked-points-list li > .link-image-name {
+    /* margin-right: 20px; - REMOVED */
+    /* position: relative; - REMOVED */
 }
 
-.linked-points-list li:last-child {
-    border-bottom: none;
+/* Creating the connecting line using a pseudo-element on the LI itself */
+.linked-points-list li::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    
+    /* FIX: Position the line in the center of the 20px gap: 
+       Start position is half the LI width (50%), minus half the gap (10px), 
+       and minus half the line width (5px). */
+    left: calc(50% - 15px); 
+    
+    width: 10px; 
+    height: 2px;
+    background-color: #6c757d; /* Grey line color */
+    transform: translateY(-50%);
+    z-index: 2; 
 }
 
-.delete-link-btn {
-    background: none;
-    border: none;
-    color: #dc3545;
-    cursor: pointer;
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 0 5px;
+/* Push delete button to the right */
+.delete-link-btn { 
+    background: none; 
+    border: none; 
+    color: #dc3545; 
+    cursor: pointer; 
+    font-size: 1.2em; 
+    font-weight: bold; 
+    padding: 0 5px; 
+    margin-left: 10px; 
+    flex-shrink: 0; /* Prevents button from shrinking */
+}
+.delete-link-btn:hover { 
+    color: #a71d2a; 
 }
 
-.delete-link-btn:hover {
-    color: #a71d2a;
+/* --- File Controls (Choose/Load Buttons) --- */ 
+.file-controls.ui-match-controls { 
+    display: flex; 
+    flex-direction: row;  
+    gap: 15px; 
+    margin: 10px 0 20px 0; 
+} 
+
+.file-controls .ui-match-button { 
+    flex: 1; 
+    padding: 12px 10px; 
+    border: none; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    color: white;  
+    background-color: #4a90e2; /* Blue color */ 
+    transition: background-color 0.2s; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+} 
+
+.file-controls .ui-match-button:hover { 
+    background-color: #357bd1; 
+} 
+
+/* --- Image Grid (Real Images) --- */ 
+.image-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, minmax(100px, 1fr)); 
+    gap: 10px; 
+} 
+
+.thumbnail { 
+    position: relative; 
+    border: 1px solid var(--border-color); 
+    padding: 4px; 
+    cursor: pointer; 
+    background-color: #fff; /* White background for image tile border */ 
+} 
+
+.thumbnail img { 
+    width: 100%; 
+    height: auto; 
+    display: block; 
+} 
+
+/* Removed styles for .thumbnail.mock-thumbnail (grey tiles) */ 
+
+.thumbnail .image-name { 
+    display: none; 
+    position: absolute; 
+    bottom: 4px; 
+    left: 4px; 
+    background: rgba(0,0,0,0.7); 
+    color: #fff; 
+    padding: 2px 6px; 
+    border-radius: 3px; 
+    font-size: 0.80em; 
+    z-index: 2; 
+} 
+
+.thumbnail:hover .image-name { 
+    display: block; 
+} 
+
+.thumbnail .delete-btn { 
+    position: absolute; 
+    top: -5px; 
+    right: -5px; 
+    background-color: red; 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 20px; 
+    height: 20px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    line-height: 20px; 
+    text-align: center; 
+    opacity: 0.8; 
+} 
+
+.thumbnail .delete-btn:hover { 
+    opacity: 1; 
+} 
+
+.link-count-badge { 
+    position: absolute; 
+    top: -5px; 
+    left: -5px; 
+    background-color: #007bff; 
+    color: white; 
+    border-radius: 50%; 
+    width: 20px; 
+    height: 20px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    font-size: 12px; 
+    font-weight: bold; 
+    border: 1px solid white; 
+    z-index: 3; 
+} 
+
+/* --- Map Panel and Export Button --- */ 
+
+.map-container.ui-match-map-container { 
+    width: 100%; 
+    height: 100%; 
+    border-radius: 8px; 
+    overflow: hidden;  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    position: relative;  
+} 
+
+.export-button-overlay { 
+    position: absolute; 
+    bottom: 20px; 
+    right: 20px; 
+    z-index: 1000;  
+} 
+
+.export-button.ui-match-export-button { 
+    padding: 10px 20px; 
+    border: none; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    color: white; 
+    background-color: #4a90e2;  
+    transition: background-color 0.2s; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    text-transform: uppercase;  
+} 
+
+.export-button.ui-match-export-button:hover:not(:disabled) { 
+    background-color: #357bd1; 
+} 
+
+.export-button.ui-match-export-button:disabled { 
+    background-color: #a0c4ec;  
+    color: #fff; 
+    cursor: not-allowed; 
+    border-color: #dee2e6; 
 }
