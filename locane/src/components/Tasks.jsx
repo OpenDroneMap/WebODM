@@ -4,11 +4,23 @@ import ProjectViewer from "./ProjectContainer.jsx";
 import Export from './Export.jsx';
 import { authorizedFetch } from '../utils/api.js';
 
-// New TaskBox component with thumbnail hover functionality
+// Helper function from the first code block for processing time format
+const formatProcessingTime = (milliseconds) => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+// New TaskBox component with processing time functionality and second block's UI
 const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialogOpen = false, openExportTaskId, setOpenExportTaskId }) => {
   const [lastError, setLastError] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
+  // Added state for processing time
+  const [processingTime, setProcessingTime] = useState(null); 
 
   const fetchLastError = useCallback(async () => {
     if (task.status === 30) {
@@ -30,7 +42,11 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
 
   useEffect(() => {
     fetchLastError();
-  }, [fetchLastError]);
+    // Added logic for setting processing time on completion
+    if (task.status === 40 && task.processing_time && !processingTime) {
+      setProcessingTime(task.processing_time);
+    }
+  }, [fetchLastError, task, processingTime]); // Dependency array updated
 
   const getStatusText = (statusCode) => {
     switch (statusCode) {
@@ -71,94 +87,93 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
     >
       <div className="main-content-area">
         <div className="task-header">
-            <div className="task-info">
-                <h3 className="task-name">{task.taskName}</h3>
-                <p className="task-project-name">{task.projectName}</p>
-            </div>
-            <div className="task-status-info">
-                <div className={`status-indicator ${getStatusClass(effectiveStatus)}`}></div>
-                <span className={`status-badge ${getStatusClass(effectiveStatus)}`}>
-                    {getStatusText(effectiveStatus)}
-                </span>
-            </div>
+          <div className="task-info">
+            <h3 className="task-name">{task.taskName}</h3>
+            <p className="task-project-name">{task.projectName}</p>
+          </div>
+          <div className="task-status-info">
+            <div className={`status-indicator ${getStatusClass(effectiveStatus)}`}></div>
+            <span className={`status-badge ${getStatusClass(effectiveStatus)}`}>
+              {getStatusText(effectiveStatus)}
+            </span>
+          </div>
         </div>
         <div className="task-id-row">
-            <span className="task-id">{task.id}</span>
+          <span className="task-id">ID: {task.id}</span>
         </div>
         <div className="task-content">
-            {effectiveStatus === 30 && lastError && (
-              <p className="task-error"><strong>Error:</strong> {lastError}</p>
-            )}
-            {effectiveStatus === 20 && (
-              <div className="task-progress">
-                <div className="progress-info">
-                  <span>
-                    {task.running_progress === 0 ? 'Uploading and Resizing...' : `Progress: ${task.progressPct}%`}
-                  </span>
-                </div>
-                {task.running_progress > 0 && (
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width: `${task.progressPct}%`,
-                        transition: "width 0.5s ease",
-                      }}
-                    />
-                  </div>
-                )}
+          {effectiveStatus === 30 && lastError && (
+            <p className="task-error"><strong>Error:</strong> {lastError}</p>
+          )}
+          {effectiveStatus === 20 && (
+            <div className="task-progress">
+              <div className="progress-info">
+                <span>
+                  {task.running_progress === 0 ? 'Uploading and Resizing...' : `Progress: ${task.progressPct}%`}
+                </span>
               </div>
-            )}
+              {task.running_progress > 0 && (
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{
+                      width: `${task.progressPct}%`,
+                      transition: "width 0.5s ease",
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          {/* Processing Time Display added here, as per the first code block's functionality */}
+          {effectiveStatus === 40 && processingTime && (
+            <div className="task-processing-time">
+              <span className="processing-time-text">{formatProcessingTime(processingTime)}</span>
+            </div>
+          )}
         </div>
         <div className="task-actions">
-            {effectiveStatus === 20 && (
-                <>
-                <button className="btn-cancel" onClick={() => onShowDeleteDialog({ ...task, actionType: 'cancel' })}>Cancel</button>
-                <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
-                </>
-            )}
-            {effectiveStatus === 40 && (
-                <>
-                <Export 
-                  projectId={task.projectId} 
-                  taskId={task.id} 
-                  openExportTaskId={openExportTaskId} 
-                  setOpenExportTaskId={setOpenExportTaskId} 
-                />
-                <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
-                </>
-            )}
-            {effectiveStatus === 30 && (
-                <>
-                <button className="btn-restart" onClick={() => handleAction('restart')}>Restart</button>
-                <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
-                </>
-            )}
-            {effectiveStatus === 50 && (
-                <>
-                <button className="btn-restart" onClick={() => handleAction('restart')}>Restart</button>
-                <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
-                </>
-            )}
-            {effectiveStatus === 10 && (
-                <>
-                <button className="btn-cancel" onClick={() => onShowDeleteDialog({ ...task, actionType: 'cancel' })}>Cancel</button>
-                <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
-                </>
-            )}
+          {effectiveStatus === 20 && (
+            <>
+              <button className="btn-cancel" onClick={() => onShowDeleteDialog({ ...task, actionType: 'cancel' })}>Cancel</button>
+              <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
+            </>
+          )}
+          {effectiveStatus === 40 && (
+            <>
+              <Export 
+                projectId={task.projectId} 
+                taskId={task.id} 
+                openExportTaskId={openExportTaskId} 
+                setOpenExportTaskId={setOpenExportTaskId} 
+              />
+              <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
+            </>
+          )}
+          {effectiveStatus === 30 && (
+            <>
+              <button className="btn-restart" onClick={() => handleAction('restart')}>Restart</button>
+              <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
+            </>
+          )}
+          {effectiveStatus === 50 && (
+            <>
+              <button className="btn-restart" onClick={() => handleAction('restart')}>Restart</button>
+              <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
+            </>
+          )}
+          {effectiveStatus === 10 && (
+            <>
+              <button className="btn-cancel" onClick={() => onShowDeleteDialog({ ...task, actionType: 'cancel' })}>Cancel</button>
+              <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
+            </>
+          )}
         </div>
       </div>
-      {/* Thumbnail container outside the main content but inside the task-box */}
+      {/* Thumbnail container exactly as in the second code block (no click handler) */}
       {isHovering && effectiveStatus === 40 && thumbnailUrl && (
         <div className="task-thumbnail-wrapper">
-          <button
-            type="button"
-            className="thumbnail-button"
-            onClick={() => handleAction('view')}
-            title="View"
-          >
-            <img src={thumbnailUrl} alt={`Thumbnail for task ${task.id}`} className="task-thumbnail" />
-          </button>
+          <img src={thumbnailUrl} alt={`Thumbnail for task ${task.id}`} className="task-thumbnail" />
         </div>
       )}
     </div>
@@ -169,9 +184,7 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
 const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitView,selectedTask, filterProjectId, setFilterProjectId, projects }) => {
   const [deleteDialogTask, setDeleteDialogTask] = useState(null);
   const [filterProjectName, setFilterProjectName] = useState(null);
-  // Share delete dialog state with child components
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  // Add state to track the currently open Export dropdown
   const [openExportTaskId, setOpenExportTaskId] = useState(null);
 
   useEffect(() => {
@@ -266,6 +279,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
           <>
             {categorizedTasks.running.length > 0 && (
               <div className="task-category">
+                <h3>Running Tasks ({categorizedTasks.running.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.running.map((task) => (
                     <TaskBox 
@@ -284,6 +298,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.completed.length > 0 && (
               <div className="task-category">
+                <h3>Completed Tasks ({categorizedTasks.completed.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.completed.map((task) => (
                     <TaskBox 
@@ -302,6 +317,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.failed.length > 0 && (
               <div className="task-category">
+                <h3>Failed Tasks ({categorizedTasks.failed.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.failed.map((task) => (
                     <TaskBox 
@@ -320,6 +336,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.canceled.length > 0 && (
               <div className="task-category">
+                <h3>Canceled Tasks ({categorizedTasks.canceled.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.canceled.map((task) => (
                     <TaskBox 
@@ -338,6 +355,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
             )}
             {categorizedTasks.queued.length > 0 && (
               <div className="task-category">
+                <h3>Queued Tasks ({categorizedTasks.queued.length})</h3>
                 <div className="tasks-grid">
                   {categorizedTasks.queued.map((task) => (
                     <TaskBox 

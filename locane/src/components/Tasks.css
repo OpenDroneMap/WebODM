@@ -374,6 +374,15 @@
   background: #ddd;
   color: #222;
 }
+.task-processing-time {
+  margin-top: 0.75rem;
+}
+
+.processing-time-text {
+  color: #718096;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
 
 /* ====== THUMBNAILS ====== */
 .task-thumbnail {

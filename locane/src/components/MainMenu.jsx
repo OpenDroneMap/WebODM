@@ -125,7 +125,8 @@ export default function MainMenu(props) {
                         ...task,
                         progressPct,
                         status: taskStatus,
-                        running_progress: taskDetail.running_progress || 0
+                        running_progress: taskDetail.running_progress || 0,
+                        processing_time: taskDetail.processing_time || null
                     };
                 } catch (e) {
                     // This catch block handles network errors or JSON parsing errors, but not 404s
@@ -366,6 +367,7 @@ export default function MainMenu(props) {
                                 } finally {
                                     sessionStorage.removeItem('username');
                                     props.setIsLogged(false);
+                                    navigate('/');
                                 }
                             }} className="logout-dialog-btn">Yes</button>
                             <button onClick={() => setShowLogoutDialog(false)} className="logout-dialog-btn no">No</button>
