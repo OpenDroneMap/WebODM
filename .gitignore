@@ -105,3 +105,4 @@ package-lock.json
 dpkg/build
 dpkg/deb
 .secret_key
+locane/public/potree/libs/three.js/build.zip
