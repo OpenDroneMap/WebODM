@@ -930,7 +930,7 @@ _('Example:'),
         
         if (stored){
           // Only show annotations for top-most tasks
-          if (this.ious[task.id] >= 0.01 && !(annotationsVisibility === "all")){
+          if (this.ious[task.id] >= 0.01 && annotationsVisibility !== "all"){
             PluginsAPI.Map.toggleAnnotation(layer, false);
           }
         }
