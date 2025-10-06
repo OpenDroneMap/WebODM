@@ -41,7 +41,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     <<EOT
     # Build-time dependencies
     apt-get -qq update
-    apt-get install -y --no-install-recommends curl ca-certificates gnupg
+    apt-get install -y --no-install-recommends curl ca-certificates gnupg cmake g++ libpdal-dev
     # Python 3.9 support
     curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf23c5a6cf475977595c89f51ba6932366a755776' | gpg --dearmor -o /etc/apt/trusted.gpg.d/deadsnakes.gpg
     echo "deb http://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu $RELEASE_CODENAME main" > /etc/apt/sources.list.d/deadsnakes.list
@@ -58,6 +58,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         libgdal-dev nginx certbot gettext-base cron postgresql-client gettext tzdata
     # Create virtualenv
     python$PYTHON_VERSION -m venv $WORKDIR/venv
+    # Build entwine
+    mkdir /staging && cd /staging
+    git clone -b 290 https://github.com/OpenDroneMap/entwine && cd entwine
+    mkdir build && cmake .. -DWITH_TESTS=OFF -DWITH_ZSTD=OFF -DCMAKE_INSTALL_PREFIX=/staging/entwine/build/install && make -j6 && make install
+    cd /webodm
 EOT
 
 # Modify PATH to prioritize venv, effectively activating venv
@@ -147,6 +152,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rm -rf /tmp/* /var/tmp/*
 EOT
 
+COPY --from=build /staging/entwine/build/install/bin/entwine /usr/bin/entwine
+COPY --from=build /staging/entwine/build/install/lib/libentwine* /usr/lib/
 COPY --from=build $WORKDIR ./
 
 VOLUME /webodm/app/media
