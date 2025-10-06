@@ -410,6 +410,10 @@ class TestApiTask(BootTransactionTestCase):
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
+            # EPT dataset should be there/have been created
+            res = client.get("/api/projects/{}/tasks/{}/assets/entwine_pointcloud/ept.json".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+
              # Orthophoto bands field should be populated
             self.assertEqual(len(task.orthophoto_bands), 4)
 
