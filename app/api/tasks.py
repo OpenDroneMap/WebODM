@@ -289,12 +289,39 @@ class TaskViewSet(viewsets.ViewSet):
         if len(files) == 0:
             raise exceptions.ValidationError(detail=_("No files uploaded"))
 
-        uploaded = task.handle_images_upload(files)
-        task.images_count = len(task.scan_images())
-        # Update other parameters such as processing node, task name, etc.
-        serializer = TaskSerializer(task, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        chunk_info = None
+        chunk_index = request.data.get('dzchunkindex')
+        uuid = request.data.get('dzuuid') 
+        total_chunk_count = request.data.get('dztotalchunkcount', None)
+        if len(files) == 1 and chunk_index is not None and uuid is not None and total_chunk_count is not None:
+            byte_offset = request.data.get('dzchunkbyteoffset', 0)
+            try:
+                chunk_index = int(chunk_index)
+                byte_offset = int(byte_offset)
+                total_chunk_count = int(total_chunk_count)
+            except ValueError:
+                raise exceptions.ValidationError(detail="chunkIndex is not an int")
+            
+            chunk_info = {
+                'uuid': re.sub('[^0-9a-zA-Z-]+', "", uuid),
+                'chunk_index': chunk_index,
+                'byte_offset': byte_offset,
+                'total_chunk_count': total_chunk_count,
+                'tmp_upload_file': os.path.join(settings.FILE_UPLOAD_TEMP_DIR, f"{uuid}.upload")
+            }
+
+        # 50% of the time, raise an exception
+        # import random
+        # if random.random() < 0.5:
+        #     raise exceptions.ValidationError(detail=_("Random upload failure for testing"))
+
+        uploaded = task.handle_images_upload(files, chunk_info)
+        if len(uploaded) > 0:
+            task.images_count = len(task.scan_images())
+            # Update other parameters such as processing node, task name, etc.
+            serializer = TaskSerializer(task, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         
         return Response({'success': True, 'uploaded': uploaded}, status=status.HTTP_200_OK)
 
@@ -687,8 +714,8 @@ class TaskAssetsImport(APIView):
                     for chunk in files[0].chunks():
                         fd.write(chunk)
                 else:
-                    with open(files[0].temporary_file_path(), 'rb') as file:
-                        fd.write(file.read())
+                    with open(files[0].temporary_file_path(), 'rb') as f:
+                        shutil.copyfileobj(f, fd)
             
             if chunk_index + 1 < total_chunk_count:
                 return Response({'uploaded': True}, status=status.HTTP_200_OK)
@@ -721,3 +748,20 @@ class TaskAssetsImport(APIView):
 
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+"""
+Task safe textured model endpoint
+"""
+class TaskSafeTexturedModel(TaskNestedView):
+    def get(self, request, pk=None, project_pk=None):
+        """
+        Downloads a task's safe textured model (if available)
+        """
+        task = self.get_and_check_task(request, pk)
+
+        try:
+            model_file = task.get_safe_textured_model()
+            return download_file_response(request, model_file, 'attachment')
+        except FileNotFoundError:
+            raise exceptions.NotFound(_("Asset does not exist"))

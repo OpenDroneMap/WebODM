@@ -276,6 +276,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media')
 if TESTING:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'app', 'media_test')
 MEDIA_TMP = os.path.join(MEDIA_ROOT, 'tmp')
+MEDIA_CACHE = os.path.join(MEDIA_ROOT, 'CACHE')
 
 FILE_UPLOAD_TEMP_DIR = MEDIA_TMP
 

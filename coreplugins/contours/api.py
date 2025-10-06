@@ -17,7 +17,8 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, cro
     import glob
     import json
     from webodm import settings
-
+    from django.contrib.gis.geos import GEOSGeometry
+    
     ext = ""
     if output_format == "GeoJSON":
         ext = "json"
@@ -46,7 +47,7 @@ def calc_contours(dem, epsg, interval, output_format, simplify, zfactor = 1, cro
         crop_geojson = os.path.join(tmpdir, "crop.geojson")
         dem_vrt = os.path.join(tmpdir, "dem.vrt")
         with open(crop_geojson, "w", encoding="utf-8") as f:
-            f.write(crop)
+            f.write(GEOSGeometry(crop).geojson)
         p = subprocess.Popen([gdalwarp_bin, "-cutline", crop_geojson,
                 '--config', 'GDALWARP_DENSIFY_CUTLINE', 'NO', 
                 '-crop_to_cutline', '-dstnodata', '-9999', '-of', 'VRT',
@@ -126,7 +127,7 @@ class TaskContoursGenerate(TaskView):
             simplify = float(request.data.get('simplify', 0.01))
             zfactor = float(request.data.get('zfactor', 1))
 
-            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify, zfactor, task.crop.geojson if task.crop is not None else None).task_id
+            celery_task_id = run_function_async(calc_contours, dem, epsg, interval, format, simplify, zfactor, task.crop.wkt if task.crop is not None else None).task_id
             return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
         except ContoursException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)

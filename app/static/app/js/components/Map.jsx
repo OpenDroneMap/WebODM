@@ -330,10 +330,11 @@ class Map extends React.Component {
                 }
                 
                 params.size = TILESIZE;
+                params.cache = Math.floor(Math.random() * 1000000); // cache bust
                 if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }else{
-                let params = { size: TILESIZE };
+                let params = { size: TILESIZE, cache: Math.floor(Math.random() * 1000000) };
                 if (meta.task.crop) params.crop = 1;
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
@@ -916,7 +917,8 @@ _('Example:'),
 
   handleAddAnnotation = (layer, name, task, stored) => {
       const zIndexGroup = this.zIndexGroupMap[task.id] || 1;
-      
+      const annotationsVisibility = Utils.queryParams(window.location).annotations || "";
+
       const meta = {
         name: name || "", 
         icon: "fa fa-sticky-note fa-fw",
@@ -928,7 +930,7 @@ _('Example:'),
         
         if (stored){
           // Only show annotations for top-most tasks
-          if (this.ious[task.id] >= 0.01){
+          if (this.ious[task.id] >= 0.01 && annotationsVisibility !== "all"){
             PluginsAPI.Map.toggleAnnotation(layer, false);
           }
         }

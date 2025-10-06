@@ -410,6 +410,10 @@ class TestApiTask(BootTransactionTestCase):
             res = client.get("/api/projects/{}/tasks/{}/assets/odm_orthophoto/odm_orthophoto.tif".format(project.id, task.id))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
 
+            # EPT dataset should be there/have been created
+            res = client.get("/api/projects/{}/tasks/{}/assets/entwine_pointcloud/ept.json".format(project.id, task.id))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+
              # Orthophoto bands field should be populated
             self.assertEqual(len(task.orthophoto_bands), 4)
 
@@ -813,6 +817,19 @@ class TestApiTask(BootTransactionTestCase):
                 res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/{}.png?size={}".format(project.id, task.id, tile_path['orthophoto'], s))
                 self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
             
+            # This task's assets cache should not exist
+            ta_cache_dir = task.get_task_assets_cache()
+            self.assertFalse(os.path.isdir(ta_cache_dir))
+
+            # Can access the safe textured model endpoint
+            res = client.get("/api/projects/{}/tasks/{}/textured_model/".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+            # The resulting GLB cache should have been created
+            self.assertTrue(os.path.isdir(ta_cache_dir))
+            self.assertTrue(os.path.isfile(os.path.join(ta_cache_dir, "odm_textured_model_geo-2.glb")))
+            
+
             # Another user does not have access to the resources
             other_client = APIClient()
             other_client.login(username="testuser2", password="test1234")
@@ -954,6 +971,9 @@ class TestApiTask(BootTransactionTestCase):
 
             task_assets_path = os.path.join(settings.MEDIA_ROOT, task_directory_path(task.id, task.project.id))
             self.assertFalse(os.path.exists(task_assets_path))
+
+            # Assets cache should also be removed
+            self.assertFalse(os.path.isdir(ta_cache_dir))
 
 
         # Create a task
@@ -1261,7 +1281,7 @@ class TestApiTask(BootTransactionTestCase):
         task.refresh_from_db()
         self.assertTrue(task.processing_node is None)
 
-    def test_task_chunked_uploads(self):
+    def test_task_multifile_uploads(self):
         with start_processing_node():
             client = APIClient()
 
@@ -1356,6 +1376,107 @@ class TestApiTask(BootTransactionTestCase):
             image1.close()
             image2.close()
 
+
+    def test_task_chunked_uploads(self):
+        with start_processing_node():
+            client = APIClient()
+
+            user = User.objects.get(username="testuser")
+            self.assertFalse(user.is_superuser)
+
+            project = Project.objects.create(
+                owner=user,
+                name="test project"
+            )
+
+            pnode = ProcessingNode.objects.create(hostname="localhost", port=11223)
+            assign_perm('view_processingnode', user, pnode)
+            
+            # task creation via chunked upload
+            im1 = "app/fixtures/tiny_drone_image.jpg"
+            image1 = open(im1, 'rb')
+            image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
+
+            client.login(username="testuser", password="test1234")
+
+            res = client.post("/api/projects/{}/tasks/".format(project.id), {
+                'auto_processing_node': 'true',
+                'partial': 'true'
+            }, format="multipart")
+            self.assertTrue(res.status_code == status.HTTP_201_CREATED)
+
+            task = Task.objects.get(pk=res.data['id'])
+
+            # Upload works with one chunked image
+            image1_size = os.path.getsize(im1)
+            chunk_1_size = image1_size // 2
+            chunk_1_path = os.path.join(os.path.dirname(im1), "1.jpg")
+            chunk_2_path = os.path.join(os.path.dirname(im1), "2.jpg")
+            with open(chunk_1_path, 'wb') as f:
+                image1.seek(0)
+                f.write(image1.read(chunk_1_size))
+            with open(chunk_2_path, 'wb') as f:
+                f.write(image1.read())
+            
+            chunk_1 = open(chunk_1_path, 'rb')
+            chunk_2 = open(chunk_2_path, 'rb')
+            image1.close()
+
+            res = client.post("/api/projects/{}/tasks/{}/upload/".format(project.id, task.id), {
+                'images': [chunk_1],
+                'dzuuid': 'abc-test',
+                'dzchunkindex': 0,
+                'dztotalchunkcount': 2,
+                'dzchunkbyteoffset': 0
+            }, format="multipart")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(res.data['uploaded']), 0)
+            chunk_1.close()
+                
+            res = client.post("/api/projects/{}/tasks/{}/upload/".format(project.id, task.id), {
+                'images': [chunk_2],
+                'dzuuid': 'abc-test',
+                'dzchunkindex': 1,
+                'dztotalchunkcount': 2,
+                'dzchunkbyteoffset': chunk_1_size
+            }, format="multipart")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(res.data['uploaded']), 1)
+            self.assertEqual(res.data['uploaded']['2.jpg'], image1_size)
+            chunk_2.close()
+
+            # And second image
+            res = client.post("/api/projects/{}/tasks/{}/upload/".format(project.id, task.id), {
+                'images': [image2],
+            }, format="multipart")
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertEqual(res.data['success'], True)
+            image2.seek(0)
+
+            # Task hasn't started
+            self.assertEqual(task.upload_progress, 0.0)
+
+            # Can commit with two images
+            res = client.post("/api/projects/{}/tasks/{}/commit/".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+            self.assertEqual(res.data['id'], str(task.id))
+
+            task.refresh_from_db()
+
+            # No longer partial
+            self.assertFalse(task.partial)
+
+            # Image count has been updated
+            self.assertEqual(task.images_count, 2)
+
+            # Make sure processing begins
+            worker.tasks.process_pending_tasks()
+            time.sleep(DELAY)
+
+            task.refresh_from_db()
+            self.assertEqual(task.upload_progress, 1.0)
+
+            image2.close()
 
     def test_task_list(self):
         user = User.objects.get(username="testuser")

@@ -269,6 +269,9 @@ def get_status_key(task_id):
 @receiver(plugin_signals.task_removed, dispatch_uid="ddb_on_task_removed")
 @receiver(plugin_signals.task_completed, dispatch_uid="ddb_on_task_completed")
 def ddb_cleanup(sender, task_id, **kwargs):
+    p = get_current_plugin(only_active=True)
+    if p is None:
+        return
 
     from app.plugins import logger
 
@@ -277,7 +280,7 @@ def ddb_cleanup(sender, task_id, **kwargs):
 
     logger.info("Cleaning up DroneDB datastore for task {}".format(str(task_id)))
 
-    datastore = get_current_plugin().get_global_data_store()
+    datastore = p.get_global_data_store()
     status_key = get_status_key(task_id)
 
     logger.info("Info task {0} ({1})".format(str(task_id), status_key))

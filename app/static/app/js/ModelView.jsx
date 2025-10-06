@@ -152,6 +152,7 @@ class ModelView extends React.Component {
       error: "",
       showingTexturedModel: false,
       initializingModel: false,
+      texModelLoadProgress: null,
       selectedCamera: null,
       modalOpen: false
     };
@@ -162,8 +163,12 @@ class ModelView extends React.Component {
     this.cameraMeshes = [];
   }
 
+  basePath = () => {
+    return `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}`;
+  }
+
   assetsPath = () => {
-    return `/api/projects/${this.props.task.project}/tasks/${this.props.task.id}/assets`
+    return `${this.basePath()}/assets`;
   }
 
   urlExists = (url, cb) => {
@@ -268,7 +273,7 @@ class ModelView extends React.Component {
   }
 
   glbFilePath = () => {
-    return this.texturedModelDirectoryPath() + 'odm_textured_model_geo.glb';
+    return this.basePath() + '/textured_model/';
   }
 
   mtlFilename = (cb) => {
@@ -648,7 +653,7 @@ class ModelView extends React.Component {
     });
   }
 
-  loadGltf = (url, cb) => {
+  loadGltf = (url, cb, onProgress) => {
     if (!this.gltfLoader) this.gltfLoader = new THREE.GLTFLoader();
     if (!this.dracoLoader) {
         this.dracoLoader = new THREE.DRACOLoader();
@@ -659,9 +664,7 @@ class ModelView extends React.Component {
     // Load a glTF resource
     this.gltfLoader.load(url,
         gltf => { cb(null, gltf) },
-        xhr => {
-            // called while loading is progressing
-        },
+        onProgress,
         error => { cb(error); },
         {crop: this.getCropCoordinates()}
     );
@@ -697,14 +700,20 @@ class ModelView extends React.Component {
                     this.setState({initializingModel: false, error: err});
                     return;
                 }
-
-                const offset = {x: 0, y: 0};
-                if (gltf.scene.CESIUM_RTC && gltf.scene.CESIUM_RTC.center){
-                    offset.x = gltf.scene.CESIUM_RTC.center[0];
-                    offset.y = gltf.scene.CESIUM_RTC.center[1];
-                }
-
-                addObject(gltf.scene, offset);
+                this.setState({texModelLoadProgress: null});
+                
+                setTimeout(() => {
+                    const offset = {x: 0, y: 0};
+                    if (gltf.scene.CESIUM_RTC && gltf.scene.CESIUM_RTC.center){
+                        offset.x = gltf.scene.CESIUM_RTC.center[0];
+                        offset.y = gltf.scene.CESIUM_RTC.center[1];
+                    }
+    
+                    addObject(gltf.scene, offset);
+                }, 0);
+            }, xhr => {
+                const progress = Math.round((xhr.loaded / xhr.total) * 100);
+                this.setState({texModelLoadProgress: progress});
             });
         }else{
             // Legacy OBJ
@@ -791,6 +800,7 @@ class ModelView extends React.Component {
           <Standby 
             message={_("Loading textured model...")}
             show={this.state.initializingModel}
+            progress={this.state.texModelLoadProgress}
             />
       </div>);
   }
@@ -818,4 +828,3 @@ $(function(){
 });
 
 export default ModelView;
-    

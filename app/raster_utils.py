@@ -5,6 +5,7 @@ import os
 import subprocess
 import numpy as np
 import numexpr as ne
+import json
 import time
 from django.contrib.gis.geos import GEOSGeometry
 from rasterio.enums import ColorInterp
@@ -123,7 +124,6 @@ def export_raster(input, output, progress_callback=None, **opts):
 
     if crop_wkt is not None:
         crop = GEOSGeometry(crop_wkt)
-        crop.srid = 4326
 
         crop_geojson = os.path.join(path_base, "crop.geojson")
         raster_vrt = os.path.join(path_base, "raster.vrt")

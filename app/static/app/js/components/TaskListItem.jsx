@@ -507,9 +507,13 @@ class TaskListItem extends React.Component {
           showOrthophotoMissingWarning = task.available_assets.indexOf("orthophoto.tif") === -1;
         }
 
-        addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
-          location.href = `/3d/project/${task.project}/task/${task.id}/`;
-        });
+        if (task.available_assets.indexOf("georeferenced_model.laz") !== -1 || 
+            task.available_assets.indexOf("textured_model.glb") !== -1 ||
+            task.available_assets.indexOf("textured_model.zip") !== -1){
+          addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
+            location.href = `/3d/project/${task.project}/task/${task.id}/`;
+          });
+        }
       }
 
       if (editable || (!task.processing_node)){
