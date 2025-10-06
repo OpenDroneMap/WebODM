@@ -1083,7 +1083,10 @@ class Task(models.Model):
         
         ept_dir = self.assets_path("entwine_pointcloud")
         try:
-            tmp_ept_path = tempfile.mkdtemp('ept', dir=settings.MEDIA_TMP)
+            if not os.path.exists(settings.MEDIA_TMP):
+                os.makedirs(settings.MEDIA_TMP)
+
+            tmp_ept_path = tempfile.mkdtemp('_ept', dir=settings.MEDIA_TMP)
             params = [entwine, "build", "--threads", str(threads), 
                 "--tmp", quote(tmp_ept_path),
                 "-i", quote(point_cloud),
