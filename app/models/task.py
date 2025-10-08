@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import struct
+import tempfile
 from datetime import datetime
 import uuid as uuid_module
 from zipstream.ng import ZipStream
@@ -1027,6 +1028,8 @@ class Task(models.Model):
 
                 logger.info("Populated extent field with {} for {}".format(raster_path, self))
         
+        self.check_ept()
+
         # Flushes the changes to the *_extent fields
         # and immediately reads them back into Python
         # This is required because GEOS screws up the X/Y conversion
@@ -1061,6 +1064,43 @@ class Task(models.Model):
         from app.plugins import signals as plugin_signals
         plugin_signals.task_completed.send_robust(sender=self.__class__, task_id=self.id)
 
+    def check_ept(self, threads=1):
+        # Make sure that the entwine_pointcloud/ept.json file exists
+        # and generate it otherwise
+        ept_file = self.assets_path("entwine_pointcloud", "ept.json")
+        if os.path.isfile(ept_file):
+            return
+        
+        point_cloud = self.get_point_cloud()
+        if point_cloud is None:
+            return
+        
+        # We have the point cloud, but no EPT. Generate EPT.
+        entwine = shutil.which('entwine')
+        if not entwine:
+            logger.warning("Cannot create EPT, entwine program is missing")
+            return None
+        
+        ept_dir = self.assets_path("entwine_pointcloud")
+        try:
+            if not os.path.exists(settings.MEDIA_TMP):
+                os.makedirs(settings.MEDIA_TMP)
+
+            tmp_ept_path = tempfile.mkdtemp('_ept', dir=settings.MEDIA_TMP)
+            params = [entwine, "build", "--threads", str(threads), 
+                "--tmp", quote(tmp_ept_path),
+                "-i", quote(point_cloud),
+                "-o", quote(ept_dir)]
+            
+            subprocess.run(params, timeout=12*60*60)
+
+            if os.path.isdir(tmp_ept_path):
+                shutil.rmtree(tmp_ept_path)
+            return True
+        except Exception as e:
+            logger.warning("Cannot create EPT for %s (%s). 3D point cloud will not display properly." % (point_cloud, str(e)))
+
+
     def get_extent_fields(self):
         return [
             (os.path.realpath(self.assets_path("odm_orthophoto", "odm_orthophoto.tif")),
@@ -1076,6 +1116,11 @@ class Task(models.Model):
         for file, field in extent_fields:
             if getattr(self, field) is not None:
                 return file 
+    
+    def get_point_cloud(self):
+        f = os.path.realpath(self.assets_path(self.ASSETS_MAP["georeferenced_model.laz"]))
+        if os.path.isfile(f):
+            return f
 
     def get_tile_path(self, tile_type, z, x, y):
         return self.assets_path("{}_tiles".format(tile_type), z, x, "{}.png".format(y))

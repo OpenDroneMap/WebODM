@@ -1,5 +1,7 @@
 import os
 import time
+import shutil
+import subprocess
 
 import io
 import requests
@@ -64,13 +66,30 @@ class TestApiTask(BootTransactionTestCase):
 
             self.assertEqual(task.status, status_codes.COMPLETED)
 
+            if not os.path.exists(settings.MEDIA_TMP):
+                os.mkdir(settings.MEDIA_TMP)
+
+            # EPT assets should be there
+            res = client.get("/api/projects/{}/tasks/{}/assets/entwine_pointcloud/ept.json".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+            # Try removing it
+            shutil.rmtree(task.assets_path("entwine_pointcloud"))
+
+            res = client.get("/api/projects/{}/tasks/{}/assets/entwine_pointcloud/ept.json".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+            # Rebuild it
+            self.assertTrue(task.check_ept())
+
+            # EPT available again
+            res = client.get("/api/projects/{}/tasks/{}/assets/entwine_pointcloud/ept.json".format(project.id, task.id))
+            self.assertEqual(res.status_code, status.HTTP_200_OK)
+
             # Download task assets
             task_uuid = task.uuid
             res = client.get("/api/projects/{}/tasks/{}/download/all.zip".format(project.id, task.id))
             self.assertEqual(res.status_code, status.HTTP_200_OK)
-
-            if not os.path.exists(settings.MEDIA_TMP):
-                os.mkdir(settings.MEDIA_TMP)
 
             assets_path = os.path.join(settings.MEDIA_TMP, "all.zip")
 
@@ -318,3 +337,9 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["orthophoto.tif"])))
             self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["dsm.tif"])))
             self.assertTrue(valid_cogeo(file_import_task.assets_path(task.ASSETS_MAP["dtm.tif"])))
+
+    def test_entwine_bin(self):
+        entwine = shutil.which("entwine")
+        self.assertTrue(entwine is not None)
+
+        self.assertEqual(subprocess.run([entwine, "--help"]).returncode, 0)
