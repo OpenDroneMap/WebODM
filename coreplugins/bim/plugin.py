@@ -6,46 +6,21 @@ from app.plugins.views import TaskView
 from django.shortcuts import render
 from django import forms
 
-class TestForm(forms.Form):
-    testField = forms.CharField(label='Test')
-
-
-class TestTaskView(TaskView):
-    def get(self, request, pk=None):
-        task = self.get_and_check_task(request, pk)
-        return Response(task.id, status=status.HTTP_200_OK)
-
+from .app_views import HomeView, TestView
 
 class Plugin(PluginBase):
 
     def main_menu(self):
-        return [Menu("Test", self.public_url("menu_url/"), "test-icon")]
+        return [Menu("Test", "/bim/", "")]
 
-    def include_js_files(self):
-        return ['test.js']
-
-    def include_css_files(self):
-        return ['test.css']
-
-    def build_jsx_components(self):
-        return ['component.jsx']
-
-    def app_mount_points(self):
-        # Show script only if '?print=1' is set
-        def dynamic_cb(request):
-            if 'print' in request.GET:
-                return {'name': 'WebODM'} # Test template substitution
-            else:
-                return False
-
+    def root_mount_points(self):
         return [
-            MountPoint('/app_mountpoint/$', lambda request: render(request, self.template_path("app.html"), {
-                'title': 'Test',
-                'test_form': TestForm()
-            })),
-            MountPoint('task/(?P<pk>[^/.]+)/', TestTaskView.as_view()),
-            MountPoint('/app_dynamic_script.js$', self.get_dynamic_script('dynamic.js', dynamic_cb))
+            MountPoint('bim/$', HomeView(self)),
+            MountPoint('bim/test$', TestView(self)),
         ]
 
-    def get_current_plugin_test(self):
-        return get_current_plugin()
+    def app_mount_points(self):
+        return [
+            MountPoint('$', HomeView(self)),
+            MountPoint('test$', TestView(self)),
+        ]

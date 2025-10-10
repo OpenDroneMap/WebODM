@@ -3,9 +3,5 @@
 {% block content %}
 Hello world!
 
-<form>
-    {% csrf_token %}
-    {% include "app/plugins/templates/form.html" with form=test_form %}
-    <button type="submit">Submit</button>
-</form>
+<a href="{{ test_url }}">Перейти на вторую страницу</a>
 {% endblock %}
