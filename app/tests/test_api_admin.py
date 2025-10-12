@@ -231,15 +231,15 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data) > 0)
 
-        res = client.get('/api/admin/profiles/%s/' % user.id)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue('quota' in res.data)
-        self.assertTrue('user' in res.data)
-
         res = client.get('/api/admin/profiles/%s/used_quota/' % user.id)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue('used' in res.data)
         self.assertTrue('total' in res.data)
+
+        res = client.get('/api/admin/profiles/%s/' % user.id)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue('quota' in res.data)
+        self.assertTrue('user' in res.data)
 
         # User is the primary key (not profile id)
         self.assertEqual(res.data['user'], user.id)
