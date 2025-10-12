@@ -82,3 +82,12 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
             raise exceptions.NotFound()
         
         return Response({'deadline': p.set_quota_deadline(hours)}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def used_quota(self, request, user=None):
+        try:
+            p = Profile.objects.get(user=user)
+        except ObjectDoesNotExist:
+            raise exceptions.NotFound()
+
+        return Response({'used': p.used_quota(), 'total': p.quota}, status=status.HTTP_200_OK)
