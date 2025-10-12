@@ -219,6 +219,10 @@ class TestApi(BootTestCase):
         # Cannot update quota deadlines
         res = client.post('/api/admin/profiles/%s/update_quota_deadline/' % user.id, data={'hours': 1})
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        
+        # Cannot read quota information
+        res = client.get('/api/admin/profiles/%s/used_quota/' % user.id)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
         # Admin can
         client.login(username="testsuperuser", password="test1234")
@@ -231,6 +235,11 @@ class TestApi(BootTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue('quota' in res.data)
         self.assertTrue('user' in res.data)
+
+        res = client.get('/api/admin/profiles/%s/used_quota/' % user.id)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue('used' in res.data)
+        self.assertTrue('total' in res.data)
 
         # User is the primary key (not profile id)
         self.assertEqual(res.data['user'], user.id)
