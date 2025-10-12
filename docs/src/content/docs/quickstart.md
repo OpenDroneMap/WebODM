@@ -21,7 +21,7 @@ $ pip install requests
 </aside>
 
 <aside class="notice">
-The <a href="https://github.com/OpenDroneMap/WebODM/tree/master/slate/examples/process_images.py" target="_blank">source code</a> for this example is available on GitHub</a>.
+The <a href="https://github.com/OpenDroneMap/WebODM/tree/master/docs/examples/process_images.py" target="_blank">source code</a> for this example is available on GitHub</a>.
 </aside>
 
 ```python
