@@ -1,9 +1,9 @@
 ---
-title: For Developers
+title: Contributing
 template: doc
 ---
 
-## Development Quickstart
+Making a code contribution might seem intimidating, but it's not too difficult:
 
 1. Make a fork of the [WebODM repository](https://github.com/OpenDroneMap/WebODM/)
 2. Clone your repository in a directory
@@ -17,17 +17,11 @@ We don't have many rules. Follow the guidelines indicated in the [Contributing](
 
 ## Setup a Development Environment
 
-There are two ways to setup a development environment. The easiest one is to use [docker](#docker-setup).
-
-Once you have a development environment, read about the [project overview](#project-overview) and get hacking!
-
-### Docker Setup
-
-Follow the [Getting Started](https://github.com/OpenDroneMap/WebODM#getting-started) instructions, then run:
+Follow the [WebODM docker installation instructions](https://github.com/OpenDroneMap/WebODM##manual-installation-docker), then run:
 
 `./webodm.sh start --dev`
 
-That's it! You can modify any of the files, including SASS and React.js files. Changes will be reflected in the running WebODM instance automatically. 
+That's it! You can modify any of the files, including SASS and React.js files. Changes will be reflected in the running WebODM instance automatically.
 
 ## Run Unit Tests
 

@@ -25,8 +25,12 @@ export default defineConfig({
 					autogenerate: { directory: 'reference' },
 				},
 				{
-					label: 'For Developers',
-					slug: 'fordevelopers'
+					label: 'Contributing',
+					slug: 'contributing'
+				},
+				{
+					label: 'Plugin Development Guide',
+					slug: 'plugin-development-guide'
 				},
 			],
 		}),
