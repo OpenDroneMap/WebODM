@@ -26,3 +26,5 @@ class TestAutoLogin(BootTestCase):
         self.assertRedirects(res, '/dashboard/')
         self.assertTrue(res.context['user'].is_authenticated)
         self.assertEqual(res.content.decode("utf-8").count('Hello, testuser!'), 1)
+
+        settings.AUTO_LOGIN_USER = None
