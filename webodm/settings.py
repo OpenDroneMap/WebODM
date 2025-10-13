@@ -402,6 +402,10 @@ WORKERS_MAX_THREADS = 1
 # Maximum number of seconds a worker task should take before being terminated
 WORKERS_MAX_TIME_LIMIT = None
 
+# Username to log-in automatically if the user is anonymous
+# (e.g. for a demo or read-only site)
+AUTO_LOGIN_USER = None
+
 # Link to GCP docs
 GCP_DOCS_LINK = "https://docs.opendronemap.org/gcp/#gcp-file-format"
 
