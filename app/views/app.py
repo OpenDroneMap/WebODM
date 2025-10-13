@@ -26,8 +26,11 @@ def index(request):
             # the user is expected to create an admin account
             return redirect('welcome')
 
-    if settings.SINGLE_USER_MODE and not request.user.is_authenticated:
-        login(request, User.objects.get(username="admin"), 'django.contrib.auth.backends.ModelBackend')
+    if not request.user.is_authenticated:
+        if settings.SINGLE_USER_MODE:
+            login(request, User.objects.get(username="admin"), 'django.contrib.auth.backends.ModelBackend')
+        elif settings.AUTO_LOGIN_USER:
+            login(request, User.objects.get(username=settings.AUTO_LOGIN_USER), 'django.contrib.auth.backends.ModelBackend')
 
     return redirect(settings.LOGIN_REDIRECT_URL if request.user.is_authenticated
                     else settings.LOGIN_URL)
