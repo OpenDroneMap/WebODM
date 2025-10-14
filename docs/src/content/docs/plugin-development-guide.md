@@ -7,7 +7,7 @@ WebODM lets you write plugins, which you can distribute as .zip packages or shar
 
 You can turn on/off plugins from the Dashboard via the **Administration** --> **Plugins** menu.
 
-Plugins let you define both server-side (Python) and client-side logic (Javascript). They execute in a shared environment. There are hooks / event handlers that you can subscribe to be notified of things, for example when a task is created/deleted, or when the map view is about to be rendered. There's a limited number of these, but keep in mind that more can be added.
+Plugins let you define both server-side (Python) and client-side logic (Javascript). They execute in a shared environment. There are hooks / event handlers that you can subscribe to be notified of things, for example when a task is created/deleted, or when the map view is about to be rendered. There's a limited number of hooks, but keep in mind that more can be added.
 
 Some basic helpers are provided, for example for running asynchronous tasks (think long running), for doing basic key-value data storage, for installing isolated Python dependencies (via pip) as well as Javascript dependencies (via npm). A client side build system (via webpack) also lets you use React/SCSS in your plugin code and access all of WebODM's client side components (JSX).
 
@@ -49,7 +49,7 @@ from django.utils.translation import gettext as _
 
 class Plugin(PluginBase):
     def main_menu(self):
-        return [Menu(_("Hello World"), self.public_url(""), "fa fa-cog fa-fw")]
+        return [Menu(_("My Plugin"), self.public_url(""), "fa fa-cog fa-fw")]
 
     def app_mount_points(self):
         @login_required
