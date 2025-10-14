@@ -517,6 +517,11 @@ class Map extends React.Component {
                   iconSize: [41, 46],
                   iconAnchor: [17, 46],
                 });
+                const cpIcon = L.icon({
+                  iconUrl: "/static/app/js/icons/marker-cp.png",
+                  iconSize: [41, 46],
+                  iconAnchor: [17, 46],
+                });
                 
                 const gcpLayer = new L.MarkersCanvas();
                 $.getJSON(meta.task.ground_control_points)
@@ -525,9 +530,12 @@ class Map extends React.Component {
                       let markers = [];
 
                       gcps.features.forEach(gcp => {
+                        let icon = gcpIcon;
+                        if (gcp.properties && typeof gcp.properties.id === "string" && gcp.properties.id.startsWith("CHK-")) icon = cpIcon;
+
                         let marker = L.marker(
                           [gcp.geometry.coordinates[1], gcp.geometry.coordinates[0]],
-                          { icon: gcpIcon }
+                          { icon }
                         );
                         markers.push(marker);
 
