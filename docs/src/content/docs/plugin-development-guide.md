@@ -145,4 +145,84 @@ PluginsAPI.App.ready([
 
 ## Client Side Hooks
 
-TBC
+You can be notified of various client side events via hooks. Some of these hooks allow you to return a DOM element, which can be useful for adding buttons, or other components at different times of the UI rendering process:
+
+```javascript
+PluginsAPI.hook([
+    // optional list dependencies to load
+], function(args, optional dependencies]){
+    // Your code here
+
+    // args contains parameters specific to each hook.
+
+    console.log(args);
+
+    var domEl = /* ... */;
+    return domEl;
+});
+
+```
+
+| <div style="width:260px">Hook</div>                            | Triggered                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------ |
+| `App.ready`                     | On DOM load                                                                                |
+| `Dashboard.addTaskActionButton` | When buttons have been added to a task (next to View Map, View 3D Model, ..)             |
+| `Dashboard.addNewTaskPanelItem` | When opening the panel after selecting images and GCPs                                    |
+| `Dashboard.addNewTaskButton`    | When buttons have been added to a project's panel (next to Select Images and GCP, Import)|
+| `Map.willAddControls`           | When Leaflet controls are about to be added                                                    |
+| `Map.didAddControls`            | When Leaflet controls have been added                                                          |
+| `Map.addActionButton`           | When action buttons (bottom right of the screen) are about to be added                    |
+| `SharePopup.addLinkControl`     | When rendering the Share dialog in Map View                                               |
+
+## Client Side Callbacks
+
+Similar to hooks, callbacks can notify you of events happening around the application, but unlike hooks, they don't allow dependencies to be loaded. You can register and unregister callbacks:
+
+```javascript
+var myFunction = function(){
+    return someValue;
+};
+
+PluginsAPI.onCallback(myFunction); // to register
+PluginsAPI.offCallback(myFunction); // to unregister
+```
+
+For example:
+
+```javascript
+PluginsAPI.onHandleClick(function(){
+    console.log("Map clicked!");
+});
+```
+
+| <div style="width:260px">Callback</div> | Triggered When                                                                |
+| --------------------------------------- | ----------------------------------------------------------------------------- |
+| `Map.handleClick`                       | Leaflet map is clicked                                                        |
+| `Map.addAnnotation`                     | Annotation is about to be added                                               |
+| `Map.updateAnnotation`                  | Annotation is about to be changed                                             |
+| `Map.deleteAnnotation`                  | Annotation is about to be deleted                                             |
+| `Map.toggleAnnotation`                  | Annotation is about to be toggled                                             |
+| `Map.annotationDeleted`                 | Annotation has been deleted                                                   |
+| `Map.downloadAnnotations`               | A request to download annotations is initiated                                |
+| `Map.mapTypeChanged`                    | The map type (Orthophoto to Surface Model, to Plant Health, etc.) has changed |
+| `Map.sideBySideChanged`                 | The user has overlayed two layers side-by-side                                |
+
+## NPM dependencies
+
+You can use external dependencies by defining a `package.json` in the `public` folder of your plugin and reference those dependencies in your JSX components (or load them in the browser). This can be created via `npm init`. Dependencies are downloaded and installed automatically during build time.
+
+## PIP dependencies
+
+On the server side, you can install additional Python packages by defining a `requirements.txt` file in the root folder of your plugin (e.g. `coreplugins/myplugin/requirements.txt`).
+
+When the plugin is enabled, the system will first check if any dependency needs to be downloaded and will run `pip install` if required.
+
+In order to avoid versioning/namespacing collisions with WebODM, as well as with other plugins, to use a plugin dependency you need to wrap the import in a `python_imports` context: 
+
+```python
+from app.plugins.functions import get_current_plugin
+
+with get_current_plugin().python_imports():
+    import numpy as np
+    # ...
+```
