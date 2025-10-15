@@ -1,0 +1,129 @@
+{% extends 'registration/registration_base.html' %}
+{% load i18n settings %}
+
+{% block registration_header %}
+
+{% if not firstuserform.errors %}
+<canvas id="canvas" style="position: absolute; top: 0; left: 0;"></canvas>
+{% endif %}
+{% endblock %}
+
+{% block registration_content %}
+{% if firstuserform.errors %}
+<div class="alert alert-warning">
+    <p>{% trans "Uh oh! Could you please check the errors below?" %}</p>
+</div>
+{% else %}
+<h1>AirBim</h1>
+<h2>{% trans "Ваш помощник в проектировании" %}</h2>
+<div style="margin-bottom: 28px;">
+    <button type="submit" class="btn btn-default">{% trans 'Начать работу' %}</button>
+    <button type="submit" class="btn btn-default">{% trans 'Войти в профиль' %}</button>
+</div>
+{% endif %}
+<!-- images + text -->
+<div>
+    <div>
+        <div>
+            <h4>BIM - это круто</h4>
+            <p>BIM (англ. Building Information Modeling) - это реально круто<br>Используйте бим, чтобы были деньги<br>И у нас тоже!</p>
+        </div>
+        <img src="Какая то имага" alt="Тут имага">
+    </div>
+
+    <div>
+        <div>
+            <h4>BIM - это класс</h4>
+            <p>Еще не поняли?</p>
+        </div>
+
+        <img src="Какая то имага" alt="Тут имага">
+    </div>
+</div>
+
+<hr>
+
+<!-- reasons -->
+<div>
+    <h2>{% trans "Почему AirBIM?" %}</h2>
+
+    <div>
+        {% blocktrans %}
+        <h4>Гибкость</h4>
+        <p>AirBIM может снабжен системой плагинов<br>Настройте ваше рабочее окружение под себя'
+        </p>
+        {% endblocktrans %}
+    </div>
+
+    <div>
+        {% blocktrans %}
+        <h4>Удобство</h4><p>Вы работаете, а остальное возьмет на себя AirBIM<br>
+            Удобный интерфейс сделает работу приятнее
+        </p>
+        {% endblocktrans %}
+    </div>
+
+    <div>
+        {% blocktrans %}
+        <h4>Многофункциональность</h4>
+        <p>
+            Подходит не только для BIM, но и для ортофотопланов, 3D моделей
+            <br>
+            Поддержка различных форматов данных
+        </p>
+        {% endblocktrans %}
+    </div>
+
+    <div>
+        {% blocktrans %}
+        <h4>Инструменты для анализа</h4>
+        <p>
+            Получайте не просто данные, но полезные инсайты по проекту
+        </p>
+        {% endblocktrans %}
+    </div>
+
+    <div>
+        {% blocktrans %}
+        <h4>Производительность</h4>
+        <p>
+            AirBIM поддерживает CUDA для ускорения работы с данными
+        </p>
+        {% endblocktrans %}
+    </div>
+
+    <div>
+        {% blocktrans %}
+        <h4>Расширяемость</h4>
+        <p>
+            Используйте несколько вычислительных узлов для работы
+            <br>
+            Ведите несколько проектов сразу
+        </p>
+        {% endblocktrans %}
+    </div>
+</div>
+
+<!-- our team -->
+<div>
+    <h2>{% trans "Наша команда" %}</h2>
+
+    <!-- members -->
+    <div>
+        <div>
+            {% trans "Господин Лягушка" %}
+        </div>
+        <div>
+            {% trans "Удмуртский Скелет" %}
+        </div>
+        <div>
+            {% trans "Топ 1 РК всея мира" %}
+        </div>
+        <div>
+            {% trans "Deus Ex GPT" %}
+        </div>
+    </div>
+</div>
+
+<p>Заглушка футера</p>
+{% endblock %}

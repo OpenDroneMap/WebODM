@@ -164,6 +164,8 @@ def welcome(request):
                       'firstuserform': fuf
                   })
 
+def air_bim_welcome(request):
+        return render(request, 'app/air_bim_welcome.html')
 
 def handler404(request, exception):
     return render(request, '404.html', status=404)

@@ -61,8 +61,6 @@
     </style>
     {% endcache %}
 
-    {% is_desktop_mode as desktop_mode %}
-    {% if desktop_mode %}
     <!-- Hide top nav bar -->
     <style type="text/css">
         .navbar-header { display: none; }
@@ -71,7 +69,6 @@
         .map-view { height: calc(100% + 30px) !important; }
         .model-view { height: calc(100% + 50px) !important; }
     </style>
-    {% endif %}
 
     <style type="text/css">
         {{ SETTINGS.theme.css|safe }}

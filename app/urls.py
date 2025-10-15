@@ -21,6 +21,7 @@ if settings.TESTING:
 
 urlpatterns = [
     url(r'^$', app_views.index, name='index'),
+    url(r'^air_bim_welcome/$', app_views.air_bim_welcome, name='air_bim_welcome'),
     url(r'^welcome/$', app_views.welcome, name='welcome'),
     url(r'^dashboard/$', app_views.dashboard, name='dashboard'),
     url(r'^map/project/(?P<project_pk>[^/.]+)/task/(?P<task_pk>[^/.]+)/$', app_views.map, name='map'),
