@@ -96,7 +96,7 @@ An empty `disabled` file in the root indicates that the plugin should not be ena
 
 ## Django Templates
 
-You can render [Django templates](https://docs.djangoproject.com/en/2.2/topics/templates/) (web pages) by placing template files in the `templates` folder. Then you render the templates by creating *mount points* (just like [Django URLs](https://docs.djangoproject.com/en/2.2/topics/http/urls/)).
+You can render [Django templates](https://docs.djangoproject.com/en/2.2/topics/templates/) by placing template files in the `templates` folder. Then you render the templates by creating *mount points* (just like [Django URLs](https://docs.djangoproject.com/en/2.2/topics/http/urls/)).
 
 ## Javascript Files
 
@@ -226,3 +226,10 @@ with get_current_plugin().python_imports():
     import numpy as np
     # ...
 ```
+
+## Long Running Tasks
+
+## Built-in Data Store
+
+## Final Tips
+

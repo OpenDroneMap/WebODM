@@ -11,6 +11,10 @@ export default defineConfig({
 				src: './src/assets/logo.svg',
 				replacesTitle: true
 			},
+			favicon: './src/assets/favicon.svg',
+			editLink: {
+				baseUrl: 'https://github.com/OpenDroneMap/WebODM/edit/master/docs/',
+			},
 			customCss: [
 				'./src/styles/custom.css',
 			],
