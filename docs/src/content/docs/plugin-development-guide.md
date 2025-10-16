@@ -3,13 +3,13 @@ title: Plugin Development Guide
 template: doc
 ---
 
-WebODM lets you write plugins, which you can distribute as .zip packages or share them with the world by adding them to the `coreplugins` folder of WebODM (and opening a pull request). This is a flexible option for those that don't want to maintain a separate fork, yet want to add new functionalities to WebODM.
+WebODM lets you write plugins, which you can distribute as .zip files or share them with the world by adding them to the `coreplugins` folder of WebODM (and opening a pull request). This is a flexible option for those that don't want to maintain a separate fork, yet want to add new functionalities to WebODM.
 
 You can turn on/off plugins from the Dashboard via the **Administration** --> **Plugins** menu.
 
-Plugins let you define both server-side (Python) and client-side logic (Javascript). They execute in a shared environment. There are hooks / event handlers that you can subscribe to be notified of things, for example when a task is created/deleted, or when the map view is about to be rendered. There's a limited number of hooks, but keep in mind that more can be added.
+Plugins let you define both server-side (Python) and client-side logic (Javascript). They execute in a shared environment. There are hooks / event handlers / signals that you can subscribe to be notified of things, for example when a task is created/deleted, or when the map view is about to be rendered. There's a limited number of these, but keep in mind that more can be added.
 
-Some basic helpers are provided, for example for running asynchronous tasks (think long running), for doing basic key-value data storage, for installing isolated Python dependencies (via pip) as well as Javascript dependencies (via npm). A client side build system (via webpack) also lets you use React/SCSS in your plugin code and access all of WebODM's client side components (JSX).
+Some basic helpers are provided, for example for running long asynchronous tasks, for doing basic key-value data storage, for installing isolated Python dependencies (via pip) as well as Javascript dependencies (via npm). A client side build system (via webpack) also lets you use React/SCSS in your plugin code and access all of WebODM's client side components (JSX).
 
 You can make assets available (images, styles, templates, ...) simply by placing them in a `public` folder.
 
@@ -207,6 +207,34 @@ PluginsAPI.onHandleClick(function(){
 | `Map.mapTypeChanged`                    | The map type (Orthophoto to Surface Model, to Plant Health, etc.) has changed |
 | `Map.sideBySideChanged`                 | The user has overlayed two layers side-by-side                                |
 
+## Server Side Signals
+
+You can register to various [Django signals](https://docs.djangoproject.com/en/2.2/topics/signals/) to be notified of events happening around the application.
+
+```python
+from django.dispatch import receiver
+from app.plugins.signals import task_completed
+from app.plugins.functions import get_current_plugin
+
+@receiver(task_completed)
+def on_complete(sender, task_id, **kwargs):
+    # Don't execute this if the plugin is not active
+    if get_current_plugin(only_active=True) is None:
+        return
+    
+    print("Task %s has completed" % task_id)
+```
+
+| <div style="width:260px">Signal</div> | Triggered When                     |
+| ------------------------------------- | ---------------------------------- |
+| `task_completed`                      | A task has finished successfully   |
+| `task_removing`                       | A task is about to be deleted      |
+| `task_removed`                        | A task has been deleted            |
+| `task_failed`                         | A task has failed                  |
+| `task_resizing_images`                | A task is resizing images          |
+| `task_duplicated`                     | A task has been duplicated         |
+| `processing_node_removed`             | A processing node has been deleted |
+
 ## NPM dependencies
 
 You can use external dependencies by defining a `package.json` in the `public` folder of your plugin and reference those dependencies in your JSX components (or load them in the browser). This can be created via `npm init`. Dependencies are downloaded and installed automatically during build time.
@@ -229,7 +257,100 @@ with get_current_plugin().python_imports():
 
 ## Long Running Tasks
 
+The plugin system offers functions for performing long running server side tasks, as well as client side functions to track the status of such tasks. Long running tasks are executed by worker processes rather than the web server application.
+
+On the server:
+
+```python
+from app.plugins.worker import run_function_async
+from rest_framework import status
+from rest_framework.response import Response
+
+# From "/greet" a mount point
+
+def long_greet(greeting, progress_callback=None):
+    import time # You MUST place imports inside the async function and not at the top of the file
+    time.sleep(30)
+    progress_callback("Almost done!", 50) # optional (text status, [0-100]%)
+    time.sleep(10)
+    return greeting + " there!" # any JSON-serializable output
+
+    # - or - you can also return files by returning a
+    # myfile = 'path/to/file.txt'
+    # return {'file': myfile}
+
+try: 
+    celery_task_id = run_function_async(long_greet, greeting="Hi").task_id
+    return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
+except Exception as e:
+    return Response({'error': str(e)}, status=status.HTTP_200_OK)
+```
+
+On the client:
+
+```javascript
+import Workers from 'webodm/classes/Workers';
+
+$.ajax({
+    type: 'GET',
+    url: `/api/plugins/myplugin/greet/`,
+    contentType: "application/json"
+}).done(res => {
+    Workers.waitForCompletion(res.celery_task_id, error => {
+        if (error){
+            console.error("oh no!");
+        }else{
+            Workers.getOutput(result.celery_task_id, (error, greeting) => {
+                console.log(greeting);
+            });
+            // - or - file downloads also
+            // Workers.downloadFile(res.celery_task_id, res.filename);
+        }
+    }, (status, progress) => {
+        console.log(status, progress)
+    });
+});
+```
+
+:::caution
+You **must** declare all import statements inside your async functions (and not at the top of the file). You also can only pass JSON-serializable arguments to async functions. For example, you cannot pass complex Python objects.
+:::
+
 ## Built-in Data Store
+
+Storing data is a frequent requirement for all kinds of applications, so the plugin system offers a simple key-value store for storing strings, integers, floats, booleans and JSON which can either be global (shared across all users) or user-based (specific to a user).
+
+```python
+from app.plugins import GlobalDataStore, UserDataStore
+
+# from a mount point
+
+ds = GlobalDataStore('myplugin')
+uds = UserDataStore('myplugin', request.user)
+
+ds.set_string("key1", "string")
+ds.set_int("key2", 42)
+ds.set_float("key3", 3.14)
+ds.set_bool("key4", True)
+ds.set_json("key5", {'piero_is': ['cool', 'silly', 'both']})
+
+ds.get_string("key1")
+ds.get_int("key2")
+
+# ...
+```
+
+Data saved in this manner is stored **unencrypted** in the *PluginDatum* table. You can view/edit this data by visiting **Administration** --> **Application** --> **Plugin Datum**.
+
+## Publishing Your Plugin
+
+The easiest way to share your work is to open a pull request in the WebODM repository. At some point in the future we might create some sort of plugin repository where people can browse and download plugins, but we aren't quite there yet.
+
+You can also create a zip file of the entire plugin folder (e.g. `myplugin`) with the folder as the top level entry in the zip archive and distribute the zip file manually. Users can then install the plugin by pressing the **Load Plugin (.zip)** button when visiting **Administration** --> **Plugins**.
 
 ## Final Tips
 
+ * Learn from other plugins! This documentation provides the basics, but it really helps to study how other plugins work by looking at their source code.
+ * If you need a new hook, callback or signal, open a pull request and let's add it into the system.
+ * With time, this documentation might fall out of date. If something doesn't seem to match what you see in this page or doesn't seem to work, check the code! The plugin system is not complicated and can be read from start to finish in less than a few hours. Read `app/plugins` and `app/static/app/js/classes/plugins`.
+ * Have fun :)

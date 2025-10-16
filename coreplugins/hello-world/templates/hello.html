@@ -1,0 +1,24 @@
+{% extends "app/plugins/templates/base.html" %}
+
+{% block content %}
+
+<h2>{{ message }}</h2>
+
+<p>This is just an example plugin. Read more about creating plugins at <a href="https://docs.webodm.org">https://docs.webodm.org</a></p>
+
+<p>If you open the Developers Console and refresh the page you should see a message there too.</p>
+
+<script>
+var pluginName = window.location.pathname.split("/").slice(-2)[0];
+PluginsAPI.App.ready([
+        pluginName + '/build/app.js',
+        pluginName + '/build/app.css'        
+    ], function(args, App){
+    
+    ReactDOM.render(React.createElement(App, {greeting: "Hi"}), $("#hello-component").get(0));
+});
+</script>
+
+<div id="hello-component"></div>
+
+{% endblock %}
