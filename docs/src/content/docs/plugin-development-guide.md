@@ -266,18 +266,21 @@ from app.plugins.worker import run_function_async
 from rest_framework import status
 from rest_framework.response import Response
 
-# From "/greet" a mount point
+# From "greet" mount point
 
 def long_greet(greeting, progress_callback=None):
     import time # You MUST place imports inside the async function and not at the top of the file
     time.sleep(30)
     progress_callback("Almost done!", 50) # optional (text status, [0-100]%)
     time.sleep(10)
-    return greeting + " there!" # any JSON-serializable output
+    return {'output': greeting + " there!"} # any JSON-serializable output
 
     # - or - you can also return files by returning a
     # myfile = 'path/to/file.txt'
     # return {'file': myfile}
+
+    # - or - an error
+    # return {'error': 'oh no'}
 
 try: 
     celery_task_id = run_function_async(long_greet, greeting="Hi").task_id
