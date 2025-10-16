@@ -26,7 +26,8 @@ def export_pointcloud(input, output, **opts):
                             "--filters.reprojection.out_srs=%s" % double_quote("EPSG:" + str(epsg))]
 
     if export_format == "ply":
-        extra_args = ['--writers.ply.sized_types', 'false',
+        extra_args = ['--writers.ply.dims', 'X,Y,Z,Red,Green,Blue',
+                      '--writers.ply.sized_types', 'false',
                       '--writers.ply.storage_mode', 'little endian']
 
     if resample > 0:
