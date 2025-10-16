@@ -183,29 +183,29 @@ var myFunction = function(){
     return someValue;
 };
 
-PluginsAPI.onCallback(myFunction); // to register
-PluginsAPI.offCallback(myFunction); // to unregister
+PluginsAPI.[ns].onCallback(myFunction); // to register
+PluginsAPI.[ns].offCallback(myFunction); // to unregister
 ```
 
 For example:
 
 ```javascript
-PluginsAPI.onHandleClick(function(){
+PluginsAPI.Map.onHandleClick(function(){
     console.log("Map clicked!");
 });
 ```
 
-| <div style="width:260px">Callback</div> | Triggered When                                                                |
-| --------------------------------------- | ----------------------------------------------------------------------------- |
-| `Map.handleClick`                       | Leaflet map is clicked                                                        |
-| `Map.addAnnotation`                     | Annotation is about to be added                                               |
-| `Map.updateAnnotation`                  | Annotation is about to be changed                                             |
-| `Map.deleteAnnotation`                  | Annotation is about to be deleted                                             |
-| `Map.toggleAnnotation`                  | Annotation is about to be toggled                                             |
-| `Map.annotationDeleted`                 | Annotation has been deleted                                                   |
-| `Map.downloadAnnotations`               | A request to download annotations is initiated                                |
-| `Map.mapTypeChanged`                    | The map type (Orthophoto to Surface Model, to Plant Health, etc.) has changed |
-| `Map.sideBySideChanged`                 | The user has overlayed two layers side-by-side                                |
+| Namespace | <div style="width:260px">Callback</div> | Triggered When                                                                |
+| --------- | --------------------------------------- | ----------------------------------------------------------------------------- |
+| `Map`     | `handleClick`                           | Leaflet map is clicked                                                        |
+| `Map`     | `addAnnotation`                     | Annotation is about to be added                                               |                        
+| `Map`     | `updateAnnotation`                  | Annotation is about to be changed                                             |                        
+| `Map`     | `deleteAnnotation`                  | Annotation is about to be deleted                                             |                        
+| `Map`     | `toggleAnnotation`                  | Annotation is about to be toggled                                             |                        
+| `Map`     | `annotationDeleted`                 | Annotation has been deleted                                                   |                        
+| `Map`     | `downloadAnnotations`               | A request to download annotations is initiated                                |                        
+| `Map`     | `mapTypeChanged`                    | The map type (Orthophoto to Surface Model, to Plant Health, etc.) has changed |                        
+| `Map`     | `sideBySideChanged`                 | The user has overlayed two layers side-by-side                                |                        
 
 ## Server Side Signals
 
