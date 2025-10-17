@@ -241,7 +241,7 @@ You can use external dependencies by defining a `package.json` in the `public` f
 
 ## PIP dependencies
 
-On the server side, you can install additional Python packages by defining a `requirements.txt` file in the root folder of your plugin (e.g. `coreplugins/myplugin/requirements.txt`).
+On the server side, you can install additional Python packages by defining a `requirements.txt` file in the root folder of your plugin (e.g. `coreplugins/my-plugin/requirements.txt`).
 
 When the plugin is enabled, the system will first check if any dependency needs to be downloaded and will run `pip install` if required.
 
@@ -296,7 +296,7 @@ import Workers from 'webodm/classes/Workers';
 
 $.ajax({
     type: 'GET',
-    url: `/api/plugins/myplugin/greet/`,
+    url: `/api/plugins/my-plugin/greet/`,
     contentType: "application/json"
 }).done(res => {
     Workers.waitForCompletion(res.celery_task_id, error => {
@@ -328,8 +328,8 @@ from app.plugins import GlobalDataStore, UserDataStore
 
 # from a mount point
 
-ds = GlobalDataStore('myplugin')
-uds = UserDataStore('myplugin', request.user)
+ds = GlobalDataStore('my-plugin')
+uds = UserDataStore('my-plugin', request.user)
 
 ds.set_string("key1", "string")
 ds.set_int("key2", 42)
@@ -349,7 +349,7 @@ Data saved in this manner is stored **unencrypted** in the *PluginDatum* table. 
 
 The easiest way to share your work is to open a pull request in the WebODM repository. At some point in the future we might create some sort of plugin repository where people can browse and download plugins, but we aren't quite there yet.
 
-You can also create a zip file of the entire plugin folder (e.g. `myplugin`) with the folder as the top level entry in the zip archive and distribute the zip file manually. Users can then install the plugin by pressing the **Load Plugin (.zip)** button when visiting **Administration** --> **Plugins**.
+You can also create a zip file of the entire plugin folder (e.g. `my-plugin`) with the folder as the top level entry in the zip archive and distribute the zip file manually. Users can then install the plugin by pressing the **Load Plugin (.zip)** button when visiting **Administration** --> **Plugins**.
 
 ## Final Tips
 
