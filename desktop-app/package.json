@@ -1,0 +1,76 @@
+{
+  "name": "webodm-desktop",
+  "version": "1.0.0",
+  "description": "Desktop wrapper for WebODM with NodeODM processing",
+  "main": "dist/main/index.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:main\"",
+    "dev:renderer": "webpack serve --config webpack.renderer.config.js --mode development",
+    "dev:main": "webpack --config webpack.main.config.js --mode development --watch",
+    "build": "npm run build:main && npm run build:renderer",
+    "build:main": "webpack --config webpack.main.config.js --mode production",
+    "build:renderer": "webpack --config webpack.renderer.config.js --mode production",
+    "start": "electron .",
+    "pack": "electron-builder",
+    "dist": "npm run build && electron-builder",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "webodm",
+    "opendronemap",
+    "photogrammetry",
+    "desktop"
+  ],
+  "author": "Custom Desktop UI",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "concurrently": "^8.2.0",
+    "electron": "^25.0.0",
+    "electron-builder": "^24.0.0",
+    "eslint": "^8.45.0",
+    "jest": "^29.6.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.1.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sqlite3": "^5.1.6",
+    "dockerode": "^4.0.0",
+    "axios": "^1.4.0",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.0",
+    "winston": "^3.10.0"
+  },
+  "build": {
+    "appId": "com.webodm.desktop",
+    "productName": "WebODM Desktop",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
+
