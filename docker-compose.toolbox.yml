@@ -1,0 +1,15 @@
+# Toolbox-specific overrides for Fedora/Podman/SELinux compatibility
+# This file adds SELinux labels (:Z and :z) to volume mounts required by Podman/SELinux
+# Without these labels, containers cannot access host files even with correct permissions
+version: '2.1'
+services:
+  db:
+    volumes:
+      - ${WO_DB_DIR}:/var/lib/postgresql/data:Z
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro,z
+  webapp:
+    volumes:
+      - ${WO_MEDIA_DIR}:/webodm/app/media:z
+  worker:
+    volumes:
+      - ${WO_MEDIA_DIR}:/webodm/app/media:z
