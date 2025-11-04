@@ -141,9 +141,8 @@ def add_default_presets():
         Preset.objects.update_or_create(name='High Resolution', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'dsm', 'value': True},
-                                                              {'name': 'pc-quality', 'value': 'high'},
-                                                              {'name': 'dem-resolution', 'value': "2.0"},
-                                                              {'name': 'orthophoto-resolution', 'value': "2.0"}]})
+                                                              {'name': 'dem-resolution', 'value': "1.0"},
+                                                              {'name': 'orthophoto-resolution', 'value': "1.0"}]})
         Preset.objects.update_or_create(name='Default', system=True,
                                         defaults={'options': [{'name': 'auto-boundary', 'value': True},
                                                               {'name': 'dsm', 'value': True}]})
