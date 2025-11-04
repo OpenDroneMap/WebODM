@@ -169,6 +169,9 @@ var Dropzone = function (_Emitter) {
          * The timeout for the XHR requests in milliseconds (since `v4.4.0`).
          */
         timeout: 30000,
+        
+        // Timeout when receiving a response from the server
+        serverTimeout: 30000,
 
         /**
          * How many file uploads to process in parallel (See the
@@ -1269,7 +1272,8 @@ var Dropzone = function (_Emitter) {
         this.on(eventName, this.options[eventName]);
       }
 
-      this.on("uploadprogress", function () {
+      this.on("uploadprogress", function (file) {
+        if (file && file.xhr) file.xhr._lastProgressUpdate = new Date().getTime();
         return _this3.updateTotalUploadProgress();
       });
 
@@ -2541,6 +2545,23 @@ var Dropzone = function (_Emitter) {
         formData.append(dataBlock.name, dataBlock.data, dataBlock.filename);
       }
 
+      // Server timeout check
+      // If no upload progress after X seconds, abort (retry)
+      xhr._serverCheck = setInterval(function(){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+          clearInterval(xhr._serverCheck);
+          xhr._serverCheck = null;
+          xhr._lastProgressUpdate = null;
+        }else{
+          if (xhr._lastProgressUpdate && new Date().getTime() - xhr._lastProgressUpdate > _this16.options.serverTimeout){
+            xhr.abort();
+            _this16._handleUploadError(files, xhr);
+            clearInterval(xhr._serverCheck);
+            xhr._serverCheck = null;
+            xhr._lastProgressUpdate = null;
+          }
+        }
+      }, parseInt(this.options.serverTimeout / 3));
       this.submitRequest(xhr, formData, files);
     }
 

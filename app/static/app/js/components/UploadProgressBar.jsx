@@ -29,7 +29,7 @@ class UploadProgressBar extends React.Component {
     return (
       <div className="upload-progress-bar">
         <div className="progress">
-          <div className={'progress-bar progress-bar-success progress-bar-striped ' + active} style={{width: percentage + '%'}}>
+          <div className={'progress-bar progress-bar-success ' + active} style={{width: percentage + '%'}}>
             {percentage}%
           </div>
         </div>
