@@ -313,6 +313,9 @@ class TaskViewSet(viewsets.ViewSet):
         # 50% of the time, raise an exception
         # import random
         # if random.random() < 0.5:
+        #     import time
+        #     time.sleep(10)
+        #     return Response('', status=524)
         #     raise exceptions.ValidationError(detail=_("Random upload failure for testing"))
 
         uploaded = task.handle_images_upload(files, chunk_info)
