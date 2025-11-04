@@ -2547,15 +2547,15 @@ var Dropzone = function (_Emitter) {
 
       // Server timeout check
       // If no upload progress after X seconds, abort (retry)
-      xhr._serverCheck = setInterval(() => {
+      xhr._serverCheck = setInterval(function(){
         if (xhr.readyState === XMLHttpRequest.DONE){
           clearInterval(xhr._serverCheck);
           xhr._serverCheck = null;
           xhr._lastProgressUpdate = null;
         }else{
-          if (xhr._lastProgressUpdate && new Date().getTime() - xhr._lastProgressUpdate > this.options.serverTimeout){
+          if (xhr._lastProgressUpdate && new Date().getTime() - xhr._lastProgressUpdate > _this16.options.serverTimeout){
             xhr.abort();
-            this._handleUploadError(files, xhr);
+            _this16._handleUploadError(files, xhr);
             clearInterval(xhr._serverCheck);
             xhr._serverCheck = null;
             xhr._lastProgressUpdate = null;
