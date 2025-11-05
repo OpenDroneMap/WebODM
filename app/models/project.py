@@ -37,7 +37,7 @@ class Project(models.Model):
 
     def delete(self, *args):
         # No tasks?
-        if self.task_set.count() == 0:
+        if not self.task_set.exists():
             # Just delete normally
 
             project_dir = self.get_project_dir()
