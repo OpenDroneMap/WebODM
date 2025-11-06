@@ -204,9 +204,9 @@ def get_pending_tasks():
 
 @app.task(ignore_result=True)
 def process_pending_tasks():
-    tasks = get_pending_tasks()
-    for task in tasks:
-        process_task.delay(task.id)
+    taskIds = get_pending_tasks().values_list('id', flat=True)
+    for task_id in tasks:
+        process_task.delay(task_id)
 
 
 @app.task(bind=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT)
