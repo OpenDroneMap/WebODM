@@ -31,7 +31,7 @@ from app import models, pending_actions
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from worker import tasks as worker_tasks
-from .common import get_and_check_project, get_asset_download_filename
+from .common import get_and_check_project, get_asset_download_filename, check_project_perms
 from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
@@ -102,7 +102,7 @@ class TaskViewSet(viewsets.ViewSet):
     A task represents a set of images and other input to be sent to a processing node.
     Once a processing node completes processing, results are stored in the task.
     """
-    queryset = models.Task.objects.all()
+    queryset = models.Task.objects.all().select_related('project')
     
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, parsers.FormParser, )
     ordering_fields = '__all__'
@@ -122,9 +122,9 @@ class TaskViewSet(viewsets.ViewSet):
         return [permission() for permission in permission_classes]
 
     def set_pending_action(self, pending_action, request, pk=None, project_pk=None, perms=('change_project', )):
-        get_and_check_project(request, project_pk, perms)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
+            check_project_perms(request, task.project, perms)
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
@@ -167,9 +167,9 @@ class TaskViewSet(viewsets.ViewSet):
 
         An optional "f" query param can be either: "text" (default), "json" or "raw"
         """
-        get_and_check_project(request, project_pk)
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
+            check_project_perms(request, task.project)
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
@@ -205,7 +205,7 @@ class TaskViewSet(viewsets.ViewSet):
             })
 
     def list(self, request, project_pk=None):
-        get_and_check_project(request, project_pk)
+        get_and_check_project(request, project_pk, defer=True)
         query = Q(project=project_pk)
 
         status = request.query_params.get('status')
@@ -245,7 +245,7 @@ class TaskViewSet(viewsets.ViewSet):
             raise exceptions.NotFound()
 
         if not (task.public or task.project.public):
-            get_and_check_project(request, task.project.id)
+            check_project_perms(request, task.project)
 
         serializer = TaskSerializer(task)
         return Response(serializer.data)
@@ -255,9 +255,9 @@ class TaskViewSet(viewsets.ViewSet):
         """
         Commit a task after all images have been uploaded
         """
-        get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
+            check_project_perms(request, task.project, ('change_project', ))
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
@@ -279,9 +279,9 @@ class TaskViewSet(viewsets.ViewSet):
         """
         Add images to a task
         """
-        get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
+            check_project_perms(request, task.project, ('change_project', ))
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
@@ -333,9 +333,9 @@ class TaskViewSet(viewsets.ViewSet):
         """
         Duplicate a task
         """
-        get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
+            check_project_perms(request, task.project, ('change_project', ))
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
@@ -354,8 +354,8 @@ class TaskViewSet(viewsets.ViewSet):
         align_task = None
         if align_to is not None and align_to != "auto" and align_to != "":
             try:
-                align_task = models.Task.objects.get(pk=align_to)
-                get_and_check_project(request, align_task.project.id, ('view_project', ))
+                align_task = models.Task.objects.select_related('project').get(pk=align_to)
+                check_project_perms(request, align_task.project, ('view_project', ))
             except ObjectDoesNotExist:
                 raise exceptions.ValidationError(detail=_("Cannot create task, alignment task is not valid"))
         
@@ -395,16 +395,16 @@ class TaskViewSet(viewsets.ViewSet):
 
 
     def update(self, request, pk=None, project_pk=None, partial=False):
-        get_and_check_project(request, project_pk, ('change_project', ))
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
+            check_project_perms(request, task.project, ('change_project', ))
         except (ObjectDoesNotExist, ValidationError):
             raise exceptions.NotFound()
 
         # Check that a user has access to reassign a project
         if 'project' in request.data:
             try:
-                get_and_check_project(request, request.data['project'], ('change_project', ))
+                get_and_check_project(request, request.data['project'], ('change_project', ), defer=True)
             except exceptions.NotFound:
                 raise exceptions.PermissionDenied()
 
@@ -423,7 +423,7 @@ class TaskViewSet(viewsets.ViewSet):
 
 
 class TaskNestedView(APIView):
-    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', )
+    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'potree_scene', ).select_related('project')
     permission_classes = (AllowAny, )
 
     def get_and_check_task(self, request, pk, annotate={}):
@@ -434,7 +434,7 @@ class TaskNestedView(APIView):
 
         # Check for permissions, unless the task is public
         if not (task.public or task.project.public):
-            get_and_check_project(request, task.project.id)
+            check_project_perms(request, task.project)
 
         return task
 
