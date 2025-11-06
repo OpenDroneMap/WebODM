@@ -54,8 +54,7 @@ class SettingAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         # if there's already an entry, do not allow adding
-        count = Setting.objects.all().count()
-        return count == 0
+        return not Setting.objects.exists()
 
 
 admin.site.register(Setting, SettingAdmin)

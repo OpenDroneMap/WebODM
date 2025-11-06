@@ -4,6 +4,7 @@ import L from 'leaflet';
 import PropTypes from 'prop-types';
 import '../css/LayersControl.scss';
 import LayersControlPanel from './LayersControlPanel';
+import { _ } from '../classes/gettext';
 
 class LayersControlButton extends React.Component {
   static propTypes = {
@@ -34,7 +35,7 @@ class LayersControlButton extends React.Component {
 
     return (<div className={showPanel ? "open" : ""}>
         <a href="javascript:void(0);" 
-            title="Layers"
+            title={_("Layers")}
             onClick={this.handleOpen} 
             className="leaflet-control-layers-control-button leaflet-bar-part theme-secondary"></a>
         <LayersControlPanel map={this.props.map} layers={this.props.layers} overlays={this.props.overlays} annotations={this.props.annotations} onClose={this.handleClose} />

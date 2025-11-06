@@ -206,7 +206,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         # Owner? Delete the project
         if project.owner == request.user or request.user.is_superuser:
-            get_and_check_project(request, pk, ('delete_project', ))
+            get_and_check_project(request, pk, ('delete_project', ), defer=True)
 
             return super().destroy(self, request, pk=pk)
         else:

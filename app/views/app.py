@@ -72,7 +72,7 @@ def map(request, project_pk=None, task_pk=None):
             raise Http404()
         
         if task_pk is not None:
-            task = get_object_or_404(Task.objects.defer('orthophoto_extent', 'dsm_extent', 'dtm_extent'), pk=task_pk, project=project)
+            task = get_object_or_404(Task.objects, pk=task_pk, project=project)
             title = task.name or task.id
             mapItems = [task.get_map_items()]
             projectInfo = None
