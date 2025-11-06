@@ -423,7 +423,7 @@ class TaskViewSet(viewsets.ViewSet):
 
 
 class TaskNestedView(APIView):
-    queryset = models.Task.objects.all().defer('orthophoto_extent', 'dtm_extent', 'dsm_extent', 'potree_scene', ).select_related('project')
+    queryset = models.Task.objects.all().select_related('project')
     permission_classes = (AllowAny, )
 
     def get_and_check_task(self, request, pk, annotate={}):
