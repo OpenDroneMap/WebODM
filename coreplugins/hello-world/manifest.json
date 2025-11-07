@@ -1,0 +1,13 @@
+{
+	"name": "Hello World",
+	"webodmMinVersion": "0.7.1",
+	"description": "An example plugin for development",
+	"version": "1.0.0",
+	"author": "Piero Toffanin",
+	"email": "pt@masseranolabs.com",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["examples"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": false,
+	"deprecated": false
+}

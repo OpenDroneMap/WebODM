@@ -37,7 +37,7 @@ class Project(models.Model):
 
     def delete(self, *args):
         # No tasks?
-        if self.task_set.count() == 0:
+        if not self.task_set.exists():
             # Just delete normally
 
             project_dir = self.get_project_dir()
@@ -90,7 +90,7 @@ class Project(models.Model):
         return [task.get_map_items() for task in self.task_set.filter(
                     status=status_codes.COMPLETED
                 ).filter(Q(orthophoto_extent__isnull=False) | Q(dsm_extent__isnull=False) | Q(dtm_extent__isnull=False))
-                .only('id', 'project_id')
+                .select_related('project')
                 .order_by('-created_at')]
 
     def get_public_info(self):

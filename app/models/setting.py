@@ -79,7 +79,7 @@ class Setting(models.Model):
 
 @receiver(signals.pre_save, sender=Setting, dispatch_uid="setting_pre_save")
 def setting_pre_save(sender, instance, **kwargs):
-    if Setting.objects.count() > 0 and instance.id != Setting.objects.get().id:
+    if Setting.objects.exists() and instance.id != Setting.objects.get().id:
         raise ValidationError("Can only create 1 %s instance" % Setting.__name__)
 
 

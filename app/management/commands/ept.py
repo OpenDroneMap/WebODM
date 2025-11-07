@@ -26,6 +26,7 @@ class Command(BaseCommand):
         count = 0
         for t in tasks:
             if t.check_ept(threads=options.get('threads')):
+                t.update_size(commit=True)
                 print(str(t))
                 count += 1
         

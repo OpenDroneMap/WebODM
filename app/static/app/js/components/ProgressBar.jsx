@@ -25,7 +25,7 @@ class ProgressBar extends React.Component {
     return (
       <div>
         <div className="progress">
-          <div className={'progress-bar progress-bar-success progress-bar-striped ' + active} style={{width: percentage + '%'}}>
+          <div className={'progress-bar progress-bar-success ' + active} style={{width: percentage + '%'}}>
             {percentage}%
           </div>
         </div>
