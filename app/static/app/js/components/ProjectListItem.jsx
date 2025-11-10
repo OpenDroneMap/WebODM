@@ -312,7 +312,9 @@ class ProjectListItem extends React.Component {
                     if (attempt < COMMIT_RETRIES){
                       console.warn(`Commit failed, retrying... (${attempt})`);
                       setTimeout(() => {
-                        commitUploads(attempt + 1);
+                        if (this.state.upload.uploading){
+                          commitUploads(attempt + 1);
+                        }
                       }, 5000 * attempt);
                     }else{
                       this.setUploadState({uploading: false, error: _("Cannot create new task. Please try again later.")});
