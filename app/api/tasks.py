@@ -255,6 +255,11 @@ class TaskViewSet(viewsets.ViewSet):
         """
         Commit a task after all images have been uploaded
         """
+        # import time
+        # time.sleep(10)
+        # return Response('', status=524)
+        # raise exceptions.ValidationError(detail=_("Random upload failure for testing"))
+
         try:
             task = self.queryset.get(pk=pk, project=project_pk)
             check_project_perms(request, task.project, ('change_project', ))
