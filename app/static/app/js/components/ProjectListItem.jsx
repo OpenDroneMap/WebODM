@@ -314,9 +314,8 @@ class ProjectListItem extends React.Component {
                       type: 'POST',
                       timeout: 30000,
                     }).done((task) => {
-                      this.setUploadState({uploading: false});
-  
                       if (task && task.id){
+                          this.setUploadState({uploading: false});
                           this.newTaskAdded();
                       }else{
                         if (attempt < COMMIT_RETRIES){
