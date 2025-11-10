@@ -306,7 +306,19 @@ class ProjectListItem extends React.Component {
             if (remainingFilesCount === 0 && this.state.upload.uploadedCount > 0){
                 // All files have uploaded!
                 const COMMIT_RETRIES = 10;
+
                 const commitUploads = (attempt) => {
+                  const retryCommit = () => {
+                    if (attempt < COMMIT_RETRIES){
+                      console.warn(`Commit failed, retrying... (${attempt})`);
+                      setTimeout(() => {
+                        commitUploads(attempt + 1);
+                      }, 5000 * attempt);
+                    }else{
+                      this.setUploadState({uploading: false, error: _("Cannot create new task. Please try again later.")});
+                    }
+                  };
+
                   $.ajax({
                       url: `/api/projects/${this.state.data.id}/tasks/${this.dz._taskInfo.id}/commit/`,
                       contentType: 'application/json',
@@ -318,24 +330,10 @@ class ProjectListItem extends React.Component {
                           this.setUploadState({uploading: false});
                           this.newTaskAdded();
                       }else{
-                        if (attempt < COMMIT_RETRIES){
-                          console.warn(`Commit failed, retrying... (${attempt})`);
-                          setTimeout(() => {
-                            commitUploads(attempt + 1);
-                          }, 5000 * attempt);
-                        }else{
-                            this.setUploadState({uploading: false, error: interpolate(_('Cannot create new task. Invalid response from server: %(error)s'), { error: JSON.stringify(task) }) });
-                        }
+                        retryCommit();
                       }
                     }).fail(() => {
-                      if (attempt < COMMIT_RETRIES){
-                        console.warn(`Commit failed, retrying... (${attempt})`);
-                        setTimeout(() => {
-                          commitUploads(attempt + 1);
-                        }, 5000 * attempt);
-                      }else{
-                        this.setUploadState({uploading: false, error: _("Cannot create new task. Please try again later.")});
-                      }
+                      retryCommit();
                     });
                 };
                 commitUploads(0);
