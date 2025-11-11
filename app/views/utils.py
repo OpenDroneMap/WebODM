@@ -56,7 +56,7 @@ def get_project_or_raise(pk=None, public_id=None):
 
             try:
                 r = Redirect.objects.get(**p)
-                raise HttpRedirect302(r.cluster_id)
+                raise HttpRedirect302(r.owner.profile.cluster_id)
             except Redirect.DoesNotExist:
                 raise err404
         else:
@@ -80,7 +80,7 @@ def get_task_or_raise(pk=None, project=None):
         if cluster_mode():
             try:
                 r = Redirect.objects.get(task_id=pk)
-                raise HttpRedirect302(r.cluster_id)
+                raise HttpRedirect302(r.owner.profile.cluster_id)
             except Redirect.DoesNotExist:
                 raise err404
         else:

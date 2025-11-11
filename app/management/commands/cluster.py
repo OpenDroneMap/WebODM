@@ -365,10 +365,10 @@ def redirect(username, to_cluster, dry_run=False, delete_projects_tasks=False):
             count = 0
             with transaction.atomic():
                 for p in user_projects:
-                    Redirect.objects.create(project_id=p.id, project_public_id=p.public_id, cluster_id=to_cluster)
+                    Redirect.objects.create(project_id=p.id, project_public_id=p.public_id, owner=p.owner)
                     count += 1
-                for p in user_tasks:
-                    Redirect.objects.create(task_id=p.id, cluster_id=to_cluster)
+                for t in user_tasks:
+                    Redirect.objects.create(task_id=t.id, owner=t.project.owner)
                     count += 1
 
                 print("Setup %s redirects" % count)

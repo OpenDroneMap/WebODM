@@ -137,6 +137,7 @@ class TestCluster(BootTestCase):
 
         self.assertEqual(Redirect.objects.filter(project_id=p.id, project_public_id=p.public_id).count(), 1)
         self.assertEqual(Redirect.objects.filter(task_id=t.id).count(), 1)
+        self.assertEqual(Redirect.objects.filter(task_id=t.id).first().owner, user)
         
         # Redirects should still work
         test_urls(status.HTTP_302_FOUND, "http://test5.dev")
