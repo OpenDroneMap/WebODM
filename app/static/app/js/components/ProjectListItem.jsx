@@ -147,7 +147,7 @@ class ProjectListItem extends React.Component {
           maxFilesize: 131072, // 128G
           timeout: 2147483647,
           chunking: true,
-          chunkSize: 8000000, // 8MB,
+          chunkSize: 4000000, // 4MB,
           retryChunks: true,
           retryChunksLimit: 20,
           
@@ -305,22 +305,40 @@ class ProjectListItem extends React.Component {
             const remainingFilesCount = this.state.upload.totalCount - this.state.upload.uploadedCount;
             if (remainingFilesCount === 0 && this.state.upload.uploadedCount > 0){
                 // All files have uploaded!
-                this.setUploadState({uploading: false});
+                const COMMIT_RETRIES = 10;
 
-                $.ajax({
-                    url: `/api/projects/${this.state.data.id}/tasks/${this.dz._taskInfo.id}/commit/`,
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    type: 'POST'
-                  }).done((task) => {
-                    if (task && task.id){
-                        this.newTaskAdded();
+                const commitUploads = (attempt) => {
+                  const retryCommit = () => {
+                    if (attempt < COMMIT_RETRIES){
+                      console.warn(`Commit failed, retrying... (${attempt})`);
+                      setTimeout(() => {
+                        if (this.state.upload.uploading){
+                          commitUploads(attempt + 1);
+                        }
+                      }, 5000 * attempt);
                     }else{
-                        this.setUploadState({error: interpolate(_('Cannot create new task. Invalid response from server: %(error)s'), { error: JSON.stringify(task) }) });
+                      this.setUploadState({uploading: false, error: _("Cannot create new task. Please try again later.")});
                     }
-                  }).fail(() => {
-                    this.setUploadState({error: _("Cannot create new task. Please try again later.")});
-                  });
+                  };
+
+                  $.ajax({
+                      url: `/api/projects/${this.state.data.id}/tasks/${this.dz._taskInfo.id}/commit/`,
+                      contentType: 'application/json',
+                      dataType: 'json',
+                      type: 'POST',
+                      timeout: 30000,
+                    }).done((task) => {
+                      if (task && task.id){
+                          this.setUploadState({uploading: false});
+                          this.newTaskAdded();
+                      }else{
+                        retryCommit();
+                      }
+                    }).fail(() => {
+                      retryCommit();
+                    });
+                };
+                commitUploads(0);
             }else if (this.dz.getQueuedFiles() === 0){
                 // Done but didn't upload all?
                 this.setUploadState({
