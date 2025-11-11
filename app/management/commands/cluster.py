@@ -307,6 +307,9 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
                     # to the project
                     for perm in permissions:
                         assert user.has_perm(perm, p)
+
+                    # Remove redirects
+                    Redirect.objects.filter(project_id=p.id).delete()
                 
                     print("[%s] (%s)" % (str(p), p.id))
                 
@@ -314,6 +317,9 @@ def importexport_user(action, username, dry_run=False, cluster_export_dir=None, 
                 for task in db['tasks']:
                     t = deserialize(task, user=user)
                     t.save()
+
+                    # Remove redirects
+                    Redirect.objects.filter(task_id=t.object.pk).delete()
                 
                     print("%s (%s)" % (str(t.object), t.object.project.id))
 

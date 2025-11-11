@@ -113,6 +113,21 @@ class TestCluster(BootTestCase):
         user.profile.refresh_from_db()
         self.assertEqual(user.profile.cluster_id, 2)
 
+        export_dir = os.path.join(settings.MEDIA_ROOT, "cluster_migrations", str(user.username))
+        if os.path.isdir(export_dir):
+            shutil.rmtree(export_dir)
+        
+        # Test export
+        call_command('cluster', 'export', '--user', user.username, '--dry-run')
+
+        # No exports should have been created
+        self.assertFalse(os.path.isdir(export_dir))
+
+        # Actual export
+        call_command('cluster', 'export', '--user', user.username)
+        self.assertTrue(os.path.isdir(export_dir))
+        self.assertEqual(len(os.listdir(export_dir)), 2) # db.json, projects
+
         # Setup redirect without deleting tasks/projects      
         call_command('cluster', 'redirect', '--user', user.username, '--to-cluster', '4')
 
@@ -138,7 +153,7 @@ class TestCluster(BootTestCase):
         self.assertEqual(Redirect.objects.filter(project_id=p.id, project_public_id=p.public_id).count(), 1)
         self.assertEqual(Redirect.objects.filter(task_id=t.id).count(), 1)
         self.assertEqual(Redirect.objects.filter(task_id=t.id).first().owner, user)
-        
+
         # Redirects should still work
         test_urls(status.HTTP_302_FOUND, "http://test5.dev")
         
@@ -151,7 +166,36 @@ class TestCluster(BootTestCase):
         self.assertEqual(Task.objects.filter(project__owner=other_user).count(), 1)
         self.assertTrue(os.path.isdir(other_assets_path))
         
+        # Test import fails (needs --merge, user exists)
+        with self.assertRaises(SystemExit):
+            call_command('cluster', 'import', '--user', user.username, '--dry-run')
 
+        call_command('cluster', 'import', '--user', user.username, '--merge', '--dry-run')
+
+        # Redirects should still work
+        test_urls(status.HTTP_302_FOUND, "http://test5.dev")
+
+        # No changes to filesystem / db
+        self.assertEqual(user.profile.cluster_id, 5)
+        self.assertEqual(Project.objects.filter(pk=p.id).count(), 0)
+        self.assertEqual(Task.objects.filter(pk=t.id).count(), 0)
+        self.assertFalse(os.path.isdir(assets_path))
+        self.assertEqual(Redirect.objects.all().count(), 3)
+
+        # Actual import
+        call_command('cluster', 'import', '--user', user.username, '--merge')
+        self.assertTrue(os.path.isdir(assets_path))
+        user.refresh_from_db()
+
+        # Cluster ID has reverted
+        self.assertEqual(user.profile.cluster_id, 2)
+
+        # Projects / tasks were imported
+        self.assertEqual(Project.objects.filter(pk=p.id).count(), 1)
+        self.assertEqual(Task.objects.filter(pk=t.id).count(), 1)
+
+        # Redirects were removed
+        self.assertEqual(Redirect.objects.all().count(), 0)
 
 
 
