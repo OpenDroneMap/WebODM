@@ -38,7 +38,7 @@ class ImagePopup extends React.Component {
     }
 
     getAltitude = () => {
-        if (this.props.feature && this.props.feature.geometry.coordinates.length >= 3){
+        if (this.props.feature && this.props.feature.geometry && this.props.feature.geometry.coordinates.length >= 3){
             const val = unitSystem().elevation(this.props.feature.geometry.coordinates[2]);
             return val.toString();
         }
