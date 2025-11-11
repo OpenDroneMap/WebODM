@@ -392,11 +392,18 @@ class TestApiTask(BootTransactionTestCase):
             for asset in list(task.ASSETS_MAP.keys()):
                 res = client.get("/api/projects/{}/tasks/{}/download/{}".format(project.id, task.id, asset))
                 self.assertEqual(res.status_code, status.HTTP_200_OK)
+                self.assertTrue('attachment' in res.get('Content-Disposition'))
 
             # We can stream downloads
             res = client.get("/api/projects/{}/tasks/{}/download/{}?_force_stream=1".format(project.id, task.id, list(task.ASSETS_MAP.keys())[0]))
             self.assertTrue(res.status_code == status.HTTP_200_OK)
             self.assertTrue(res.has_header('_stream'))
+
+            # We can inline downloads
+            res = client.get("/api/projects/{}/tasks/{}/download/{}?inline=1".format(project.id, task.id, list(task.ASSETS_MAP.keys())[0]))
+            self.assertTrue(res.status_code == status.HTTP_200_OK)
+            self.assertTrue(res.has_header('Content-Disposition'))
+            self.assertTrue('inline' in res.get('Content-Disposition'))
 
             # The tif files are valid Cloud Optimized GeoTIFF
             self.assertTrue(valid_cogeo(task.assets_path(task.ASSETS_MAP["orthophoto.tif"])))
