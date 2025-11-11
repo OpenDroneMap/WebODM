@@ -217,20 +217,40 @@ class ImagePopup extends React.Component {
             {loading ? <div><i className="fa fa-circle-notch fa-spin fa-fw"></i></div>
             : ""}
             {error !== "" ? <div style={{marginTop: "8px"}}>{error}</div>
-            : [
-                <div key="image" className={`image ${expandThumb ? "fullscreen" : ""} ${dragging ? "dragging" : ""}`} 
+            : <div>
+                <div className={`image ${expandThumb ? "fullscreen" : ""} ${dragging ? "dragging" : ""}`} 
                                 style={{marginTop: "8px"}}  
                                 ref={(domNode) => { this.image = domNode;}}>
                     {loading && expandThumb ? <div><i className="fa fa-circle-notch fa-spin fa-fw"></i></div> : ""}
                     <a draggable="false" onClick={this.onImgClick} href="javascript:void(0);" title={feature.properties.filename}><img draggable="false" style={{borderRadius: "4px", transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`}} src={imageUrl} onLoad={this.imageOnLoad} onError={this.imageOnError} /></a>
-                </div>,
-                <div key="download-image">
-                    <a href={downloadImageLink}><i className="fa fa-image"></i> {_("Download Image")}</a>
                 </div>
-            ]}
-            <div>
-                <a href={downloadShotsLink}><i className={assetDownload.icon}></i> {assetDownload.label} </a>
-            </div>
+                <div className="download-links">
+                    <div>
+                        <a href={downloadImageLink}><i className="fa fa-image"></i> {_("Download Image")}</a>
+                    </div>
+                    <div>
+                        <a href={downloadShotsLink}><i className={assetDownload.icon}></i> {assetDownload.label} </a>
+                    </div>
+                </div>
+                <div className="camera-coordinates">
+                    <table className="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td><strong>{_("Latitude")}:</strong></td>
+                                <td>{feature.geometry.coordinates[1]?.toFixed(10) || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>{_("Longitude")}:</strong></td>
+                                <td>{feature.geometry.coordinates[0]?.toFixed(10) || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>{_("Elevation")}:</strong></td>
+                                <td>{feature.geometry.coordinates[2]?.toFixed(4) || 'N/A'}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>}
         </div>);
     }
 }

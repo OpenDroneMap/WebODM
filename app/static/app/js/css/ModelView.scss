@@ -87,6 +87,12 @@
         }
     }
 
+    .image-popup{
+        .table-striped>tbody>tr:nth-of-type(odd){
+            background-color: #0c2f3f;
+        }
+    }
+
     /* Potree specific */
     #potree_map{
         position: absolute; 
