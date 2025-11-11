@@ -6,8 +6,7 @@ from django.utils.translation import ugettext as _
 from django.shortcuts import render
 
 from app.api.tasks import TaskSerializer
-from app.models import Task, Project
-from app.views.utils import get_permissions
+from app.views.utils import get_permissions, get_task_or_raise, get_project_or_raise, handle_302
 from django.views.decorators.csrf import ensure_csrf_cookie
 from webodm import settings
 
@@ -15,18 +14,19 @@ def get_public_task(task_pk):
     """
     Get a task and raise a 404 if it's not public
     """
-    task = get_object_or_404(Task, pk=task_pk)
+    task = get_task_or_raise(pk=task_pk)
     if not (task.public or task.project.public):
        raise Http404()
     return task
 
 def get_public_project(public_id):
-    project = get_object_or_404(Project, public_id=public_id)
+    project = get_project_or_raise(public_id=public_id)
     if not project.public:
         raise Http404()
     return project
 
 @ensure_csrf_cookie
+@handle_302
 def handle_map(request, template, uuid_type=None, uuid=None, hide_title=False):
     if uuid_type == 'task':
         task = get_public_task(uuid)
@@ -64,6 +64,7 @@ def map_iframe(request, uuid_type=None, uuid=None):
     return handle_map(request, 'app/public/map_iframe.html', uuid_type, uuid, True)
 
 @ensure_csrf_cookie
+@handle_302
 def handle_model_display(request, template, task_pk=None):
     task = get_public_task(task_pk)
 
@@ -84,6 +85,7 @@ def model_display(request, task_pk=None):
 def model_display_iframe(request, task_pk=None):
     return handle_model_display(request, 'app/public/3d_model_display_iframe.html', task_pk)
 
+@handle_302
 def task_json(request, task_pk=None):
     task = get_public_task(task_pk)
     serializer = TaskSerializer(task)

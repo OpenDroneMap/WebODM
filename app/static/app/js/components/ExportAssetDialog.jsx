@@ -23,7 +23,9 @@ class ExportAssetDialog extends React.Component {
     }
 
     handleSave = (cb) => {
-        this.exportAssetPanel.handleExport()(cb);
+        this.exportAssetPanel.handleExport()(cb, (progress) => {
+            if (this.exportAssetFormDialog) this.exportAssetFormDialog.updateSaveProgress(progress);
+        });
     }
     
     render(){
@@ -38,6 +40,7 @@ class ExportAssetDialog extends React.Component {
                     savingLabel={_("Downloading…")}
                     saveLabel={_("Download")}
                     saveAction={() => {}}
+                    ref={(domNode) => { this.exportAssetFormDialog = domNode; }}
                     handleSaveFunction={this.handleSave}
                     onHide={this.props.onHide}>
                   <ExportAssetPanel asset={this.props.asset} 
