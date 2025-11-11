@@ -34,7 +34,7 @@ class NewTaskPanel extends React.Component {
 
     this.state = {
       editTaskFormLoaded: false,
-      resizeMode: Storage.getItem('resize_mode') === null ? ResizeModes.YES : ResizeModes.fromString(Storage.getItem('resize_mode')),
+      resizeMode: Storage.getItem('resize_mode') === null ? ResizeModes.NO : ResizeModes.fromString(Storage.getItem('resize_mode')),
       resizeSize: parseInt(Storage.getItem('resize_size')) || 2048,
       alignTo: "auto",
       alignTasks: [], // loaded on mount if showAlign is true
