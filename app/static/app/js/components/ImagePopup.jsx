@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AssetDownloads from '../classes/AssetDownloads';
 import '../css/ImagePopup.scss';
+import { unitSystem, onUnitSystemChanged, offUnitSystemChanged } from '../classes/Units';
 import { _ } from '../classes/gettext';
 
 class ImagePopup extends React.Component {
@@ -21,7 +22,9 @@ class ImagePopup extends React.Component {
             translateX: 0,
             translateY: 0,
             scale: 1,
-            dragging: false
+            dragging: false,
+
+            altitude: this.getAltitude()
         }
     }
 
@@ -32,6 +35,18 @@ class ImagePopup extends React.Component {
 
     getThumbUrl(size){
         return `${this.getImageUrl()}?size=${size}`;
+    }
+
+    getAltitude = () => {
+        if (this.props.feature && this.props.feature.geometry.coordinates.length >= 3){
+            const val = unitSystem().elevation(this.props.feature.geometry.coordinates[2]);
+            return val.toString();
+        }
+        return "N/A";
+    }
+
+    updateAltitude = () => {
+        this.setState({altitude: this.getAltitude()});
     }
 
     componentDidMount(){
@@ -46,9 +61,11 @@ class ImagePopup extends React.Component {
             this.image.addEventListener("touchend", this.onTouchEnd);
             
         }
+        onUnitSystemChanged(this.updateAltitude);
     }
 
     componentWillUnmount(){
+        offUnitSystemChanged(this.updateAltitude);
         if (this.image){
             this.image.removeEventListener("fullscreenchange", this.onFullscreenChange);
             this.image.removeEventListener("wheel", this.onMouseWheel);
@@ -244,8 +261,8 @@ class ImagePopup extends React.Component {
                                 <td>{feature.geometry.coordinates[0]?.toFixed(10) || 'N/A'}</td>
                             </tr>
                             <tr>
-                                <td><strong>{_("Elevation")}:</strong></td>
-                                <td>{feature.geometry.coordinates[2]?.toFixed(4) || 'N/A'}</td>
+                                <td><strong>{_("Altitude")}:</strong></td>
+                                <td>{this.state.altitude}</td>
                             </tr>
                         </tbody>
                     </table>
