@@ -249,6 +249,7 @@ class ImagePopup extends React.Component {
                         <a href={downloadShotsLink}><i className={assetDownload.icon}></i> {assetDownload.label} </a>
                     </div>
                 </div>
+                {feature.geometry ?
                 <div className="camera-coordinates">
                     <table className="table table-striped">
                         <tbody>
@@ -266,7 +267,7 @@ class ImagePopup extends React.Component {
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div> : ""}
             </div>}
         </div>);
     }
