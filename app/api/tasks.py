@@ -510,11 +510,15 @@ class TaskDownloads(TaskNestedView):
             raise exceptions.NotFound(_("Asset does not exist"))
         
         download_filename = request.GET.get('filename', get_asset_download_filename(task, asset))
+        content_disposition = 'attachment'
+
+        if request.GET.get('inline') is not None:
+            content_disposition = 'inline'
 
         if is_stream:
-            return download_file_stream(request, asset_fs, 'attachment', download_filename=download_filename)
+            return download_file_stream(request, asset_fs, content_disposition, download_filename=download_filename)
         else:
-            return download_file_response(request, asset_fs, 'attachment', download_filename=download_filename)
+            return download_file_response(request, asset_fs, content_disposition, download_filename=download_filename)
 
 
 class TaskThumbnail(TaskNestedView):

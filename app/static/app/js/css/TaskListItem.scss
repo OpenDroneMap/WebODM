@@ -48,6 +48,7 @@
         display: flex;
         align-items: center;
         padding-right: 2px;
+        justify-content: flex-end;
     }
 
     @media screen and (max-width: 576px){
@@ -116,7 +117,7 @@
                 }
             }
 
-            .edit-button{
+            .last-button{
                 margin-right: 0px;
             }
 

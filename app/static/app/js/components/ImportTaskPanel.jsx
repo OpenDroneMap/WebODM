@@ -164,7 +164,7 @@ class ImportTaskPanel extends React.Component {
 
           <button type="button" className="close theme-color-primary" title="Close" onClick={this.cancel}><span aria-hidden="true">&times;</span></button>
           <h4>{_("Import Assets or Backups")}</h4>
-          <p><Trans params={{arrow: '<i class="glyphicon glyphicon-arrow-right"></i>'}}>{_("You can import .zip files that have been exported from existing tasks via Download Assets %(arrow)s All Assets | Backup.")}</Trans></p>
+          <p><Trans params={{arrow: '<i class="glyphicon glyphicon-arrow-right"></i>'}}>{_("You can import .zip files that have been exported from existing tasks via Download %(arrow)s All Assets | Backup.")}</Trans></p>
           
           <button disabled={this.state.uploading}
                   type="button" 
