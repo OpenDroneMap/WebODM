@@ -1,4 +1,5 @@
 .image-popup{
+    
     div{
         margin-top: 8px;
     }
@@ -45,4 +46,13 @@
             }
         }
     }   
+
+    div.download-links{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    div.camera-coordinates{
+        margin-top: 16px;
+    }
 }
