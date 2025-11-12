@@ -54157,10 +54157,8 @@
 			}
 
 			// The final area is half the magnitude of the resulting area vector.
-			// Magnitude = sqrt(Ax^2 + Ay^2 + Az^2)
-			const magnitude = Math.sqrt(areaVectorX * areaVectorX + areaVectorY * areaVectorY + areaVectorZ * areaVectorZ);
-
-			return magnitude / 2;
+			// area = sqrt(Ax^2 + Ay^2 + Az^2) / 2.0
+			return Math.sqrt(areaVectorX * areaVectorX + areaVectorY * areaVectorY + areaVectorZ * areaVectorZ) / 2.0;
 		};
 
 		getTotalDistance () {
