@@ -54096,20 +54096,71 @@
 			this.update();
 		};
 
-		getArea () {
-			let area = 0;
-			let j = this.points.length - 1;
-			for (let i = 0; i < this.points.length; i++) {
-				let p0 = this.points[0].position;
-				let p1 = this.points[i].position;
-				let p2 = this.points[j].position;
-				let a = (p2.y - p0.y) * (p1.z - p0.z) - (p2.z - p0.z) * (p1.y - p0.y);
-				let b = (p2.x - p0.x) * (p1.z - p0.z) - (p2.z - p0.z) * (p1.x - p0.x);
-				let c = (p2.x - p0.x) * (p1.y - p0.y) - (p2.y - p0.y) * (p1.x - p0.x);
-				area += Math.sqrt(a * a + b * b + c * c);
-				j = i;
+		// getArea () {
+		// 	let area = 0;
+		// 	let j = this.points.length - 1;
+		// 	for (let i = 0; i < this.points.length; i++) {
+		// 		let p0 = this.points[0].position;
+		// 		let p1 = this.points[i].position;
+		// 		let p2 = this.points[j].position;
+		// 		let a = (p2.y - p0.y) * (p1.z - p0.z) - (p2.z - p0.z) * (p1.y - p0.y);
+		// 		let b = (p2.x - p0.x) * (p1.z - p0.z) - (p2.z - p0.z) * (p1.x - p0.x);
+		// 		let c = (p2.x - p0.x) * (p1.y - p0.y) - (p2.y - p0.y) * (p1.x - p0.x);
+		// 		area += Math.sqrt(a * a + b * b + c * c);
+		// 		j = i;
+		// 	}
+		// 	return Math.abs(area / 2);
+		// };
+
+		getArea() {
+			if (this.points.length < 3) {
+				return 0;
 			}
-			return Math.abs(area / 2);
+
+			let areaVectorX = 0;
+			let areaVectorY = 0;
+			let areaVectorZ = 0;
+
+			const P0 = this.points[0].position;
+			const n = this.points.length;
+
+			// Loop through triangles P0, P_i, P_{i+1}. 
+			// The loop runs from i=1 up to n-1 (the second-to-last vertex).
+			// The vertices used are P0, P_i, and P_{i+1} (which wraps around using the modulo operator).
+			for (let i = 1; i < n; i++) {
+				// P_i (current vertex)
+				const Pi = this.points[i].position; 
+				
+				// P_{i+1} (next vertex)
+				const PiNext = this.points[(i + 1) % n].position; 
+
+				// Vector V01 = P_i - P0
+				const V0iX = Pi.x - P0.x;
+				const V0iY = Pi.y - P0.y;
+				const V0iZ = Pi.z - P0.z;
+
+				// Vector V02 = P_{i+1} - P0
+				const V0iNextX = PiNext.x - P0.x;
+				const V0iNextY = PiNext.y - P0.y;
+				const V0iNextZ = PiNext.z - P0.z;
+
+				// Calculate the Cross Product V0i x V0iNext = (a, b, c)
+				
+				const crossX = (V0iY * V0iNextZ) - (V0iZ * V0iNextY);
+				const crossY = (V0iZ * V0iNextX) - (V0iX * V0iNextZ);
+				const crossZ = (V0iX * V0iNextY) - (V0iY * V0iNextX);
+
+				// Sum the components of the cross product (area vector)
+				areaVectorX += crossX;
+				areaVectorY += crossY;
+				areaVectorZ += crossZ;
+			}
+
+			// The final area is half the magnitude of the resulting area vector.
+			// Magnitude = sqrt(Ax^2 + Ay^2 + Az^2)
+			const magnitude = Math.sqrt(areaVectorX * areaVectorX + areaVectorY * areaVectorY + areaVectorZ * areaVectorZ);
+
+			return magnitude / 2;
 		};
 
 		getTotalDistance () {
