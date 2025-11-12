@@ -10,7 +10,8 @@ import PropTypes from 'prop-types';
 import * as THREE from 'THREE';
 import $ from 'jquery';
 import { _, interpolate } from './classes/gettext';
-import { getUnitSystem, setUnitSystem } from './classes/Units';
+import UnitSelector from './components/UnitSelector';
+import { getUnitSystem, setUnitSystem, onUnitSystemChanged, offUnitSystemChanged } from './classes/Units';
 
 require('./vendor/OBJLoader');
 require('./vendor/MTLLoader');
@@ -315,17 +316,14 @@ class ModelView extends React.Component {
     viewer.setEDLEnabled(true);
     viewer.loadSettingsFromURL();
 
-    const currentUnit = getUnitSystem();
     const origSetUnit = viewer.setLengthUnitAndDisplayUnit;
+    onUnitSystemChanged(this.handleUnitSystemChanged);
+
     viewer.setLengthUnitAndDisplayUnit = (lengthUnit, displayUnit) => {
         if (displayUnit === 'm') setUnitSystem('metric');
-        else if (displayUnit === 'ft'){
-            // Potree doesn't have US/international imperial, so 
-            // we default to international unless the user has previously
-            // selected US
-            if (currentUnit === 'metric') setUnitSystem("imperial");
-            else setUnitSystem(currentUnit);
-        }
+        else if (displayUnit === 'ft') setUnitSystem("imperial");
+        else if (displayUnit === 'ft (US)') setUnitSystem("imperialUS");
+
         origSetUnit.call(viewer, lengthUnit, displayUnit);
     };
         
@@ -385,12 +383,8 @@ class ModelView extends React.Component {
           material.size = 1;
 
           viewer.fitToScreen();
-
-          if (getUnitSystem() === 'metric'){
-              viewer.setLengthUnitAndDisplayUnit('m', 'm');
-          }else{
-              viewer.setLengthUnitAndDisplayUnit('m', 'ft');
-          }
+        
+          this.handleUnitSystemChanged();
 
           // Load saved scene (if any)
           $.ajax({
@@ -481,6 +475,20 @@ class ModelView extends React.Component {
     
   }
 
+  handleUnitSystemChanged = () => {
+    if (!window.viewer) return;
+
+    const us = getUnitSystem();
+
+    if (us === 'metric'){
+        window.viewer.setLengthUnitAndDisplayUnit('m', 'm');
+    }else if (us === 'imperial'){
+        window.viewer.setLengthUnitAndDisplayUnit('m', 'ft');
+    }else if (us === 'imperialUS'){
+        window.viewer.setLengthUnitAndDisplayUnit('m', 'ft (US)');
+    }
+  }
+
   getCropCoordinates(){
     if (this.props.task.crop_projected && this.props.task.crop_projected.length >= 3){
         return this.props.task.crop_projected.map(coord => {
@@ -490,6 +498,7 @@ class ModelView extends React.Component {
   }
 
   componentWillUnmount(){
+    offUnitSystemChanged(this.handleUnitSystemChanged);
     viewer.renderer.domElement.removeEventListener( 'mousedown', this.handleRenderMouseClick );
     viewer.renderer.domElement.removeEventListener( 'mousemove', this.handleRenderMouseMove );
     viewer.renderer.domElement.removeEventListener( 'touchstart', this.handleRenderTouchStart );
@@ -770,6 +779,7 @@ class ModelView extends React.Component {
           </div>
 
           <div className={"model-action-buttons " + (this.state.modalOpen ? "modal-open" : "")}>
+            <UnitSelector />
             <AssetDownloadButtons 
                             task={this.props.task} 
                             direction="up" 

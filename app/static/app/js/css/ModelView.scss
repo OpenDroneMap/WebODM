@@ -93,6 +93,12 @@
         }
     }
 
+    .unit-selector{
+        height: 36px;
+        position: relative;
+        top: 2px;
+    }
+
     /* Potree specific */
     #potree_map{
         position: absolute; 

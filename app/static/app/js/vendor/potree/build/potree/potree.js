@@ -56373,7 +56373,8 @@
 
 	const LengthUnits = {
 		METER: {code: 'm', unitspermeter: 1.0},
-		FEET: {code: 'ft', unitspermeter: 3.28084},
+		FEET: {code: 'ft', unitspermeter: 1.0 / 0.3048},
+		FEET_US: {code: 'ft (US)', unitspermeter: 3937 / 1200},
 		INCH: {code: '\u2033', unitspermeter: 39.3701}
 	};
 
@@ -88708,6 +88709,9 @@ ENDSEC
 				case 'ft':
 					this.lengthUnit = LengthUnits.FEET;
 					break;
+				case 'ft (US)':
+					this.lengthUnit = LengthUnits.FEET_US;
+					break;
 				case 'in':
 					this.lengthUnit = LengthUnits.INCH;
 					break;
@@ -88719,6 +88723,9 @@ ENDSEC
 					break;
 				case 'ft':
 					this.lengthUnitDisplay = LengthUnits.FEET;
+					break;
+				case 'ft (US)':
+					this.lengthUnitDisplay = LengthUnits.FEET_US;
 					break;
 				case 'in':
 					this.lengthUnitDisplay = LengthUnits.INCH;
