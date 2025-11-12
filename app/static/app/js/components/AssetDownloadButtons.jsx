@@ -76,7 +76,7 @@ class AssetDownloadButtons extends React.Component {
           : ""}
 
           <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
-            <i className="glyphicon glyphicon-download"></i><span className="hidden-xs hidden-sm">{this.props.showLabel ? " " + _("Download Assets") : ""}</span>
+            <i className="glyphicon glyphicon-download"></i><span className="hidden-xs hidden-sm">{this.props.showLabel ? " " + _("Download") : ""}</span>
           </button>
           {this.props.showLabel ? 
           <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>

@@ -15,6 +15,7 @@ import Css from '../classes/Css';
 import Tags from '../classes/Tags';
 import Trans from './Trans';
 import Utils from '../classes/Utils';
+import PdfPopup from './PdfPopup';
 import { _, interpolate } from '../classes/gettext';
 
 class TaskListItem extends React.Component {
@@ -48,7 +49,8 @@ class TaskListItem extends React.Component {
       view: "basic",
       showMoveDialog: false,
       actionLoading: false,
-      thumbLoadFailed: false
+      thumbLoadFailed: false,
+      displayPdf: false
     }
 
     for (let k in props.data){
@@ -460,6 +462,17 @@ class TaskListItem extends React.Component {
     return out.join("/");
   }
 
+  displayPdf = (url, opts) => {
+    this.setState({displayPdf: {
+      url,
+      title: opts.title || ""
+    }})
+  }
+
+  hidePdf = () => {
+    this.setState({displayPdf: false});
+  }
+
   render() {
     const task = this.state.task;
     const name = task.name !== null ? task.name : interpolate(_("Task #%(number)s"), { number: task.id });
@@ -500,7 +513,7 @@ class TaskListItem extends React.Component {
 
       if (showAssetButtons){
         if (task.available_assets.indexOf("orthophoto.tif") !== -1 || task.available_assets.indexOf("dsm.tif") !== -1){
-          addActionButton(" " + _("View Map"), "btn-primary", "fa fa-globe", () => {
+          addActionButton(" " + _("Map"), "btn-primary", "fa fa-globe fa-fw", () => {
             location.href = `/map/project/${task.project}/task/${task.id}/`;
           });
         }else{
@@ -510,23 +523,36 @@ class TaskListItem extends React.Component {
         if (task.available_assets.indexOf("georeferenced_model.laz") !== -1 || 
             task.available_assets.indexOf("textured_model.glb") !== -1 ||
             task.available_assets.indexOf("textured_model.zip") !== -1){
-          addActionButton(" " + _("View 3D Model"), "btn-primary", "fa fa-cube", () => {
+          addActionButton(" " + _("3D Model"), "btn-primary", "fa fa-cube fa-fw", () => {
             location.href = `/3d/project/${task.project}/task/${task.id}/`;
           });
         }
+
+        if (task.available_assets.indexOf("report.pdf") !== -1){ 
+          addActionButton(" " + _("Report"), "btn-primary", "far fa-file-pdf fa-fw", () => {
+            console.log(task.name);
+            this.displayPdf(`/api/projects/${task.project}/tasks/${task.id}/download/report.pdf?inline=1`, { 
+              title: task.name || _("Report")
+            });
+          }, { className: "btn-margin-right" });
+        }
       }
 
-      if (editable || (!task.processing_node)){
-        addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
-          this.startEditing();
-        }, {
-          className: "inline"
-        });
+      if (this.props.hasPermission("delete")){
+          addActionButton(_("Delete"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
+            confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
+            defaultError: _("Cannot delete task.")
+          }), {
+            className: "pull-right last-button"
+          });
       }
 
       if ([statusCodes.QUEUED, statusCodes.RUNNING, null].indexOf(task.status) !== -1 &&
          (task.processing_node || imported) && this.props.hasPermission("change")){
-        addActionButton(_("Cancel"), "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: _("Cannot cancel task.")}));
+        addActionButton(_("Cancel"), "btn-primary", "glyphicon glyphicon-remove-circle", this.genActionApiCall("cancel", {defaultError: _("Cannot cancel task.")}),
+          {
+            className: "pull-right"
+          });
       }
 
       if ([statusCodes.FAILED, statusCodes.COMPLETED, statusCodes.CANCELED].indexOf(task.status) !== -1 &&
@@ -541,15 +567,17 @@ class TaskListItem extends React.Component {
                               null;
 
           addActionButton(_("Restart"), "btn-primary", "glyphicon glyphicon-repeat", this.genRestartAction(rerunFrom, {confirm: _("Are you sure you want to restart this task?")}), {
-            subItems: this.getRestartSubmenuItems()
+            subItems: this.getRestartSubmenuItems(),
+            className: "pull-right"
           });
       }
 
-      if (this.props.hasPermission("delete")){
-          addActionButton(_("Delete"), "btn-danger", "fa fa-trash fa-fw", this.genActionApiCall("remove", {
-            confirm: _("All information related to this task, including images, maps and models will be deleted. Continue?"),
-            defaultError: _("Cannot delete task.")
-          }));
+      if (editable || (!task.processing_node)){
+        addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
+          this.startEditing();
+        }, {
+          className: "inline"
+        });
       }
 
       actionButtons = (<div className="action-buttons">
@@ -560,15 +588,15 @@ class TaskListItem extends React.Component {
               const subItems = button.options.subItems || [];
               const className = button.options.className || "";
 
-              let buttonHtml = (<button type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
+              let buttonHtml = (<button title={button.label} type="button" className={"btn btn-sm " + button.className} onClick={button.onClick} disabled={disabled}>
                                 <i className={button.icon}></i>
-                                <span className="hidden-xs">{button.label}</span>
+                                <span className="hidden-xs hidden-sm">{button.label}</span>
                             </button>);
               if (subItems.length > 0){
                   // The button expands sub items
-                  buttonHtml = (<button type="button" className={"btn btn-sm " + button.className} data-toggle="dropdown" disabled={disabled}>
+                  buttonHtml = (<button title={button.label} type="button" className={"btn btn-sm " + button.className} data-toggle="dropdown" disabled={disabled}>
                         <i className={button.icon}></i>
-                        {button.label}
+                        <span className="hidden-xs hidden-sm">{button.label}</span>
                     </button>);
               }
 
@@ -692,6 +720,10 @@ class TaskListItem extends React.Component {
           </div>
           <div className="row clearfix">
             {actionButtons}
+            {this.state.displayPdf ? 
+              <PdfPopup url={this.state.displayPdf.url} 
+                        title={this.state.displayPdf.title}
+                        onClose={this.hidePdf} /> : ""}
           </div>
           <TaskPluginActionButtons task={task} disabled={disabled} />
         </div>

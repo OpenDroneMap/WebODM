@@ -1,0 +1,38 @@
+.pdf-popup{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0; 
+    z-index: 9999999999;
+    background: rgba(0, 0, 0, 0.8);
+
+    .pdf-popup-header{
+        display: flex;
+        justify-content: space-between;
+    }
+    .btn-close{
+        margin-top: 12px;
+        margin-right: 12px;
+        margin-bottom: 12px;
+    }
+    .pdf-popup-title{
+        color: #fefefe;
+        padding-top: 12px;
+        padding-left: 12px;
+        font-size: 20px;
+    }
+    .pdf-popup-content{
+        width: 100%;
+        height: 100%;
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: 0;
+        iframe{
+            width: 100%;
+            height: 100%;
+            height: calc(100% - 74px);
+            border: 0;
+        }
+    }
+}
