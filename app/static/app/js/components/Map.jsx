@@ -14,7 +14,6 @@ import ImagePopup from './ImagePopup';
 import GCPPopup from './GCPPopup';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
-import AssetDownloads from '../classes/AssetDownloads';
 import {addTempLayer} from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
