@@ -44,7 +44,28 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'project', 'processing_node', 'created_at', 'status', 'last_error')
     list_filter = ('status', 'project',)
     search_fields = ('id', 'name', 'project__name')
+    exclude = ('orthophoto_extent', 'dsm_extent', 'dtm_extent', 'crop', )
+    readonly_fields = ('orthophoto_extent_wkt', 'dsm_extent_wkt', 'dtm_extent_wkt', 'crop_wkt', )
 
+    def orthophoto_extent_wkt(self, obj):
+        if obj.orthophoto_extent:
+            return obj.orthophoto_extent.wkt
+        return None
+    
+    def dsm_extent_wkt(self, obj):
+        if obj.dsm_extent:
+            return obj.dsm_extent.wkt
+        return None
+    
+    def dtm_extent_wkt(self, obj):
+        if obj.dtm_extent:
+            return obj.dtm_extent.wkt
+        return None
+    
+    def crop_wkt(self, obj):
+        if obj.crop:
+            return obj.crop.wkt
+        return None
 
 admin.site.register(Task, TaskAdmin)
 
