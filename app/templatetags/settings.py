@@ -15,7 +15,7 @@ def task_options_docs_link():
 
 @register.simple_tag
 def gcp_docs_link():
-    return '<a href="%s" target="_blank">' % settings.GCP_DOCS_LINK
+    return settings.GCP_DOCS_LINK
 
 @register.simple_tag
 def reset_password_link():
