@@ -172,6 +172,18 @@ class NewTaskPanel extends React.Component {
     return this.mapPreview.getCropPolygon();
   };
 
+  getGcpFile = () => {
+    if (!this.props.getFiles) return null;
+
+    const files = this.props.getFiles();
+    for (let i = 0; i < files.length; i++){
+      const f = files[i];
+      if (f.type.indexOf("text") === 0 && ["geo.txt", "image_groups.txt"].indexOf(f.name.toLowerCase()) === -1){
+        return f;
+      }
+    }
+  }
+
   handlePolygonChange = () => {
     if (this.taskForm) this.taskForm.forceUpdate();
   }
@@ -236,6 +248,7 @@ class NewTaskPanel extends React.Component {
               inReview={this.state.inReview}
               suggestedTaskName={this.handleSuggestedTaskName}
               getCropPolygon={this.getCropPolygon}
+              getGcpFile={this.getGcpFile}
               ref={(domNode) => { if (domNode) this.taskForm = domNode; }}
             />
 
