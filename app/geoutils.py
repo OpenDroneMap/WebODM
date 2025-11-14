@@ -1,6 +1,7 @@
 import rasterio.warp
 import numpy as np
 from rasterio.crs import CRS
+from rasterio.warp import transform_bounds
 from osgeo import osr
 osr.DontUseExceptions()
 
@@ -100,3 +101,19 @@ def epsg_from_wkt(wkt):
     epsg = srs.GetAuthorityCode(None)
     if epsg is not None:
         return epsg
+
+
+def get_raster_bounds_wkt(raster_path, target_srs="EPSG:4326"):
+    with rasterio.open(raster_path) as src:
+        if src.crs is None:
+            return None
+
+        left, bottom, right, top = src.bounds
+        w, s, e, n = transform_bounds(
+            src.crs, 
+            target_srs, 
+            left, bottom, right, top
+        )
+
+        wkt = f"POLYGON(({w} {s}, {w} {n}, {e} {n}, {e} {s}, {w} {s}))"
+        return wkt

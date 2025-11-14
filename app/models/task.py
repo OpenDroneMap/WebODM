@@ -41,7 +41,7 @@ from app.cogeo import assure_cogeo
 from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
-from app.geoutils import geom_transform, epsg_from_wkt
+from app.geoutils import geom_transform, epsg_from_wkt, get_raster_bounds_wkt
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -1012,32 +1012,16 @@ class Task(models.Model):
                 except IOError as e:
                     logger.warning("Cannot create Cloud Optimized GeoTIFF for %s (%s). This will result in degraded visualization performance." % (raster_path, str(e)))
 
-                # Read extent and SRID
-                raster = GDALRaster(raster_path)
-                extent = OGRGeometry.from_bbox(raster.extent)
-
-                # Make sure PostGIS supports it
-                with connection.cursor() as cursor:
-                    cursor.execute("SELECT SRID FROM spatial_ref_sys WHERE SRID = %s", [raster.srid])
-                    if cursor.rowcount == 0:
-                        raise NodeServerError(gettext("Unsupported SRS %(code)s. Please make sure you picked a supported SRS.") % {'code': str(raster.srid)})
-
-                # It will be implicitly transformed into the SRID of the model’s field
-                # self.field = GEOSGeometry(...)
-                setattr(self, field, GEOSGeometry(extent.wkt, srid=raster.srid))
-
-                logger.info("Populated extent field with {} for {}".format(raster_path, self))
+                # Read extent
+                extent_wkt = get_raster_bounds_wkt(raster_path)
+                if extent_wkt is not None:
+                    extent = GEOSGeometry(extent_wkt, srid=4326)
+                    setattr(self, field, extent)
+                    logger.info("Populated extent field with {} for {}".format(raster_path, self))
+                else:
+                    logger.warning("Cannot populate extent field with {} for {}, not georeferenced".format(raster_path, self))
         
         self.check_ept()
-
-        # Flushes the changes to the *_extent fields
-        # and immediately reads them back into Python
-        # This is required because GEOS screws up the X/Y conversion
-        # from the raster CRS to 4326, whereas PostGIS seems to do it correctly :/
-        self.status = status_codes.RUNNING # avoid telling clients that task is completed prematurely
-        self.save()
-        self.refresh_from_db()
-
         self.update_available_assets_field()
         self.update_epsg_field()
         self.update_orthophoto_bands_field()
