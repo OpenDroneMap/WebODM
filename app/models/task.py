@@ -22,8 +22,6 @@ from shutil import copyfile
 import requests
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = 4096000000
-from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.gdal import OGRGeometry
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields
 from django.core.files.uploadedfile import InMemoryUploadedFile
