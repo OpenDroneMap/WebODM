@@ -35,7 +35,7 @@
 					<li>{% trans 'You need at least 5 images, but 16-32 is typically the minimum.' %}</li>
 					<li>{% trans 'Images must overlap by 65% or more. Aim for 70-72%' %}</li>
 					<li>{% trans 'For great 3D, images must overlap by 83%' %}</li>
-					<li>{% gcp_docs_link as gcp_link %}{% blocktrans with link_start=gcp_link|safe link_end='</a>' %}A {{link_start}}GCP File{{link_end}} is optional, but can increase georeferencing accuracy{% endblocktrans %}</li>
+					<li>{% gcp_docs_link as gcp_link %}{% blocktrans with link_start='<a href="'|add:gcp_link|add:'">'|safe link_end='</a>' %}A {{link_start}}GCP File{{link_end}} is optional, but can increase georeferencing accuracy{% endblocktrans %}</li>
 				</ul>
 			</p>
 		{% endif %}

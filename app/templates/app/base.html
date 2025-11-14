@@ -123,6 +123,9 @@
 <script>
 {% task_options_docs_link as to_link %}
 window.__taskOptionsDocsLink = "{{ to_link|safe }}";
+{% gcp_docs_link as gcp_link %}
+window.__gcpDocsLink = "{{ gcp_link|safe }}";
+
 
 $(function(){
     $(window).bind("load resize", function() {

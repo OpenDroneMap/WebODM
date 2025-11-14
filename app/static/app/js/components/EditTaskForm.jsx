@@ -28,7 +28,8 @@ class EditTaskForm extends React.Component {
       inReview: PropTypes.bool,
       task: PropTypes.object,
       suggestedTaskName: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-      getCropPolygon: PropTypes.func
+      getCropPolygon: PropTypes.func,
+      getGcpFile: PropTypes.func
   };
 
   constructor(props){
@@ -365,6 +366,16 @@ class EditTaskForm extends React.Component {
         let boundaryOpt = optsCopy.find(opt => opt.name === 'boundary');
         if (!boundaryOpt) optsCopy.push({name: 'boundary', value: JSON.stringify(poly)});
         else boundaryOpt.value = JSON.stringify(poly);
+      }
+    }
+
+    // If a processing node supports "crs" as an option
+    // and a GCP file is provided, and the user hasn't specified
+    // a preference, default to "gcp" (set the CRS to use the GCP's CRS)
+    if (this.props.getGcpFile){
+      if (this.props.getGcpFile() && optionNames['crs']){
+        let crsOpt = optsCopy.find(opt => opt.name === 'crs');
+        if (!crsOpt) optsCopy.push({name: 'crs', value: 'gcp'});
       }
     }
 
