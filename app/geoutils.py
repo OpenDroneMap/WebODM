@@ -1,6 +1,8 @@
 import rasterio.warp
 import numpy as np
 from rasterio.crs import CRS
+from osgeo import osr
+osr.DontUseExceptions()
 
 # GEOS has some weird bug where
 # we can't simply call geom.tranform(srid)
@@ -79,3 +81,22 @@ def geom_transform(geom, epsg):
         return list(zip(tx, ty))
     else:
         raise ValueError("Cannot transform complex geometries to WKT")
+
+
+def epsg_from_wkt(wkt):
+    srs = osr.SpatialReference()
+    if srs.ImportFromWkt(wkt) != 0:
+        return None
+    
+    epsg = srs.GetAuthorityCode(None)
+    if epsg is not None:
+        return None
+
+    # Try to get the 2D component
+    if srs.IsCompound():
+        if srs.DemoteTo2D() != 0:
+            return None
+
+    epsg = srs.GetAuthorityCode(None)
+    if epsg is not None:
+        return epsg

@@ -41,7 +41,7 @@ from app.cogeo import assure_cogeo
 from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
-from app.geoutils import geom_transform
+from app.geoutils import geom_transform, epsg_from_wkt
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -1225,8 +1225,18 @@ class Task(models.Model):
                 try:
                     with rasterio.open(asset_path) as f:
                         if f.crs is not None:
-                            epsg = f.crs.to_epsg()
-                            break # We assume all assets are in the same CRS
+                            code = f.crs.to_epsg()
+                            if code is not None:
+                                epsg = code
+                                break # We assume all assets are in the same CRS
+                            else:
+                                # Try to get code from WKT
+                                wkt = f.crs.to_wkt()
+                                if wkt is not None:
+                                    code = epsg_from_wkt(wkt)
+                                    if code is not None:
+                                        epsg = code
+                                        break
                 except Exception as e:
                     logger.warning(e)
 
