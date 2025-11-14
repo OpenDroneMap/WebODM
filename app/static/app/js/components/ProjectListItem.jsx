@@ -138,7 +138,7 @@ class ProjectListItem extends React.Component {
       this.dz = new Dropzone(this.dropzone, {
           paramName: "images",
           url : 'TO_BE_CHANGED',
-          parallelUploads: 4,
+          parallelUploads: 3,
           uploadMultiple: false,
           acceptedFiles: "image/*,text/plain,.las,.laz,video/*,.srt,.dng,.nef",
           autoProcessQueue: false,
@@ -147,7 +147,7 @@ class ProjectListItem extends React.Component {
           maxFilesize: 131072, // 128G
           timeout: 2147483647,
           chunking: true,
-          chunkSize: 4000000, // 4MB,
+          chunkSize: 8000000, // 8MB,
           retryChunks: true,
           retryChunksLimit: 20,
           
