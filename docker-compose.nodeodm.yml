@@ -10,7 +10,7 @@ services:
     environment:
       - WO_DEFAULT_NODES
   node-odm:
-    image: opendronemap/nodeodm
+    image: opendronemap/nodeodm:stable
     expose:
       - "3000"
     restart: unless-stopped
