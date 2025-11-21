@@ -3,6 +3,7 @@ import numpy as np
 from rasterio.crs import CRS
 from rasterio.warp import transform_bounds
 from osgeo import osr
+from functools import lru_cache
 osr.DontUseExceptions()
 
 # GEOS has some weird bug where
@@ -117,3 +118,27 @@ def get_raster_bounds_wkt(raster_path, target_srs="EPSG:4326"):
 
         wkt = f"POLYGON(({w} {s}, {w} {n}, {e} {n}, {e} {s}, {w} {s}))"
         return wkt
+
+@lru_cache(maxsize=1000)
+def get_srs_name_units_from_epsg(epsg):
+    if epsg is None:
+        return {'name': '', 'units': 'm'}
+    
+    srs = osr.SpatialReference()
+    if srs.ImportFromEPSG(epsg) != 0:
+        return {'name': '', 'units': 'm'}
+
+    name = srs.GetAttrValue("PROJCS")
+    if name is None:
+        name = srs.GetAttrValue("GEOGCS")
+    
+    if name is None:
+        return {'name': '', 'units': 'm'}
+    
+    units = srs.GetAttrValue('UNIT')
+    if units is None:
+        units = 'm'  # Default to meters
+    elif units not in ["m", "ft", "US survey foot"]:
+        units = 'm' # Unsupported
+
+    return {'name': name, 'units': units}

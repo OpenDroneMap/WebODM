@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import '../css/ExportAssetPanel.scss';
 import ErrorMessage from './ErrorMessage';
 import Storage from '../classes/Storage';
-import { _ } from '../classes/gettext';
+import { _, interpolate } from '../classes/gettext';
 import Utils from '../classes/Utils';
 import Workers from '../classes/Workers';
 
@@ -74,7 +74,7 @@ export default class ExportAssetPanel extends React.Component {
         error: "",
         format: props.exportFormats[0],
         epsg: this.props.task.epsg || null,
-        customEpsg: Storage.getItem("last_export_custom_epsg") || "4326",
+        customEpsg: Storage.getItem("last_export_custom_epsg") || "3857",
         resample: 0,
         exporting: false,
         progress: null
@@ -189,15 +189,21 @@ export default class ExportAssetPanel extends React.Component {
   render(){
     const {epsg, customEpsg, exporting, format, resample, progress } = this.state;
     const { exportFormats } = this.props;
-    const utmEPSG = this.props.task.epsg;
+    const projEPSG = this.props.task.epsg;
+    let projSrsName = this.props.task.srs?.name;
+    if (!projSrsName && projEPSG) projSrsName = `EPSG:${projEPSG}`;
+    else if (projSrsName && projEPSG) projSrsName = `${projSrsName} (EPSG:${projEPSG})`;
+
+    let resampleUnits = _("Meters").toLowerCase();
+    if (this.props.task.srs?.units != "m") resampleUnits = _("Feet").toLowerCase();
 
     const disabled = (epsg === "custom" && !customEpsg) || exporting;
 
-    let projection = utmEPSG ? (<div><div className="row form-group form-inline">
-    <label className="col-sm-3 control-label">{_("Projection:")}</label>
+    let projection = projEPSG ? (<div><div className="row form-group form-inline">
+    <label className="col-sm-3 control-label">{_("CRS:")}</label>
     <div className="col-sm-9 ">
-      <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
-        {utmEPSG ? <option value={utmEPSG}>UTM (EPSG:{utmEPSG})</option> : ""}
+      <select className="form-control crs" value={epsg} onChange={this.handleSelectEpsg} title={epsg == projEPSG ? projSrsName : ""}>
+        {projEPSG ? <option value={projEPSG}>{projSrsName}</option> : ""}
         <option value="4326">{_("Lat/Lon")} (EPSG:4326)</option>
         <option value="3857">{_("Web Mercator")} (EPSG:3857)</option>
         <option value="custom">{_("Custom")} EPSG</option>
@@ -225,7 +231,7 @@ export default class ExportAssetPanel extends React.Component {
         </div>
     </div>,
     this.isPointCloud() ? <div key={2} className="row form-group form-inline">
-        <label className="col-sm-3 control-label">{_("Resample (meters):")}</label>
+        <label className="col-sm-3 control-label">{interpolate(_("Resample (%(unit)s):"), { unit: resampleUnits })}</label>
         <div className="col-sm-9 ">
           <input type="number" min="0" className="form-control custom-interval" value={resample} onChange={this.handleChangeResample} />
         </div>
