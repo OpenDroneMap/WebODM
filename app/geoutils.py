@@ -2,9 +2,16 @@ import rasterio.warp
 import numpy as np
 from rasterio.crs import CRS
 from rasterio.warp import transform_bounds
-from osgeo import osr
+from osgeo import osr, gdal
 from functools import lru_cache
 osr.DontUseExceptions()
+
+SUPPORTED_UNITS = ["m", "ft", "US survey foot"]
+UNIT_TO_M = {
+    "m": 1.0,
+    "ft": 0.3048,
+    "US survey foot": 1200.0 / 3937.0,
+}
 
 # GEOS has some weird bug where
 # we can't simply call geom.tranform(srid)
@@ -138,7 +145,31 @@ def get_srs_name_units_from_epsg(epsg):
     units = srs.GetAttrValue('UNIT')
     if units is None:
         units = 'm'  # Default to meters
-    elif units not in ["m", "ft", "US survey foot"]:
+    elif units not in SUPPORTED_UNITS:
         units = 'm' # Unsupported
 
     return {'name': name, 'units': units}
+
+def get_raster_dem_to_meters_factor(raster_path):
+    unit = get_raster_dem_units(raster_path)
+    return UNIT_TO_M.get(unit, 1.0)
+
+def get_raster_dem_units(raster_path):
+    try:
+        ds = gdal.Open(raster_path, gdal.GA_ReadOnly)
+        if ds is None:
+            raise IOError(f"Cannot open {raster_path}")
+        
+        band = ds.GetRasterBand(1)
+        unit = band.GetUnitType()
+        ds = None
+
+        if unit is None or unit == "":
+            return "m"
+        elif unit in SUPPORTED_UNITS:
+            return unit
+        else:
+            return "m"
+    except Exception as e:
+        print(str(e))
+        return "m"

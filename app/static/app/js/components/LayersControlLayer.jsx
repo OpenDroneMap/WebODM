@@ -372,7 +372,7 @@ export default class LayersControlLayer extends React.Component {
 
     let cmapValues = null;
     if (colorMap){
-        cmapValues = (color_maps.find(c => c.key === colorMap) || {}).color_map;
+        cmapValues = (color_maps.find(c => c.key === colorMap) || {}).decoded_color_map;
     }
 
     let hmin = null;

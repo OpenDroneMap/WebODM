@@ -572,7 +572,7 @@ class TaskListItem extends React.Component {
           });
       }
 
-      if (editable || (!task.processing_node)){
+      if (editable || (!task.processing_node && !imported)){
         addActionButton(_("Edit"), "btn-primary pull-right edit-button", "glyphicon glyphicon-pencil", () => {
           this.startEditing();
         }, {
