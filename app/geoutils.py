@@ -150,6 +150,15 @@ def get_srs_name_units_from_epsg(epsg):
 
     return {'name': name, 'units': units}
 
+def get_rasterio_to_meters_factor(rasterio_ds):
+    units = rasterio_ds.units
+    if len(units) >= 1:
+        unit = units[0]
+        if unit is not None and unit != "" and unit in SUPPORTED_UNITS:
+            return UNIT_TO_M.get(unit, 1.0)
+    return 1.0
+
+
 def get_raster_dem_to_meters_factor(raster_path):
     unit = get_raster_dem_units(raster_path)
     return UNIT_TO_M.get(unit, 1.0)
@@ -171,5 +180,4 @@ def get_raster_dem_units(raster_path):
         else:
             return "m"
     except Exception as e:
-        print(str(e))
         return "m"

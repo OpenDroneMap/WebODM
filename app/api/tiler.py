@@ -25,7 +25,7 @@ from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list, get_auto_bands
 from .tasks import TaskNestedView
-from app.geoutils import geom_transform_wkt_bbox, get_raster_dem_to_meters_factor
+from app.geoutils import geom_transform_wkt_bbox, get_rasterio_to_meters_factor
 from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster, export_pointcloud
@@ -185,8 +185,12 @@ class Metadata(TaskNestedView):
         if not os.path.isfile(raster_path):
             raise exceptions.NotFound()
 
+        to_meter = 1.0
         try:
             with COGReader(raster_path) as src:
+                if tile_type in ['dsm', 'dtm']:
+                    to_meter = get_rasterio_to_meters_factor(src.dataset)
+
                 band_count = src.dataset.meta['count']
                 if boundaries_feature is not None:
                     cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
@@ -264,11 +268,9 @@ class Metadata(TaskNestedView):
         colormaps = []
         algorithms = []
         auto_bands = {'filter': '', 'match': None}
-        to_meter = 1.0
 
         if tile_type in ['dsm', 'dtm']:
             colormaps = ['viridis', 'jet', 'terrain', 'gist_earth', 'pastel1']
-            to_meter = get_raster_dem_to_meters_factor(raster_path)
         elif formula and bands:
             colormaps = ['rdylgn', 'spectral', 'rdylgn_r', 'spectral_r', 'rplumbo', 'discrete_ndvi',
                          'better_discrete_ndvi',
@@ -394,6 +396,7 @@ class Tiles(TaskNestedView):
         if not os.path.isfile(url):
             raise exceptions.NotFound()
 
+        to_meter = 1.0
         with COGReader(url) as src:
             if not src.tile_exists(z, x, y):
                 raise exceptions.NotFound(_("Outside of bounds"))
@@ -417,6 +420,9 @@ class Tiles(TaskNestedView):
                 vrt_options = {'cutline': cutline}
             else:
                 vrt_options = None
+
+            if tile_type in ['dsm', 'dtm']:
+                to_meter = get_rasterio_to_meters_factor(src.dataset)
 
             # Handle N-bands datasets for orthophotos (not plant health)
             if tile_type == 'orthophoto' and expr is None:
@@ -476,6 +482,8 @@ class Tiles(TaskNestedView):
             intensity = None
             try:
                 rescale_arr = list(map(float, rescale.split(",")))
+                if tile_type in ['dsm', 'dtm']:
+                    rescale_arr = [v / to_meter for v in rescale_arr]
             except ValueError:
                 raise exceptions.ValidationError(_("Invalid rescale value"))
 
