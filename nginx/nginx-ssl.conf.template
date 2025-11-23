@@ -16,7 +16,7 @@ http {
 
   # fallback in case we can't determine a type
   default_type application/octet-stream;
-  access_log off;
+  access_log /var/log/nginx/access.log '$remote_addr - [$time_local] "$request" $status';
   sendfile on;
 
   upstream app_server {
