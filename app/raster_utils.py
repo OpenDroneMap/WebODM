@@ -142,6 +142,7 @@ def export_raster(input, output, progress_callback=None, **opts):
     with COGReader(input) as ds_src:
         src = ds_src.dataset
         profile = src.meta.copy()
+        units = ds_src.dataset.units
         win = Window(0, 0, src.width, src.height)
             
         # Output format
@@ -349,6 +350,10 @@ def export_raster(input, output, progress_callback=None, **opts):
         elif dem:
             # Apply hillshading, colormaps to elevation
             with rasterio.open(output_raster, 'w', **profile) as dst:
+                # Copy units information
+                if export_format == "gtiff" and not rgb and len(units) == len(dst.units):
+                    dst.units = units
+
                 for idx, (w, dst_w) in enumerate(subwins):
                     p(f"Processing tile {idx}/{num_wins}", progress_per_win)
 
