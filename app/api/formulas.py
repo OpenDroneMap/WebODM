@@ -249,7 +249,7 @@ def get_auto_bands(orthophoto_bands, formula):
     max_bands = len(orthophoto_bands) - 1 # minus alpha
     filters = get_camera_filters_for(algo['expr'], max_bands)
     if not filters:
-        raise valueError(f"Cannot find filters for {algo} with max bands {max_bands}")
+        raise ValueError(f"Cannot find filters for {algo} with max bands {max_bands}")
 
     bands_lookup = get_bands_lookup()
     band_order = ""
