@@ -7,6 +7,7 @@ def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decima
         from osgeo import osr
         from scipy.optimize import curve_fit
         from scipy.interpolate import griddata
+        from app.geoutils import get_rasterio_to_meters_factor
         import numpy as np
         import json
         import warnings
@@ -18,12 +19,15 @@ def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decima
             raise IOError(f"{input_dem} does not exist")
 
         crs = None
+        to_meter = 1.0
+
         with rasterio.open(input_dem) as d:
             if d.crs is None:
                 raise ValueError(f"{input_dem} does not have a CRS")
             crs = osr.SpatialReference()
-            crs.ImportFromEPSG(d.crs.to_epsg())
-        
+            crs.ImportFromWkt(d.crs.to_wkt())
+            to_meter = get_rasterio_to_meters_factor(d)
+
         if pts is None and pts_epsg is None and geojson_polygon is not None:
             # Read GeoJSON points
             pts = read_polygon(geojson_polygon)
@@ -101,6 +105,7 @@ def calc_volume(input_dem, pts=None, pts_epsg=None, geojson_polygon=None, decima
             # Calculate volume
             diff = rast_dem - base
             volume = np.nansum(diff) * px_area
+            volume *= to_meter ** 3
 
             # import matplotlib.pyplot as plt
             # fig, ax = plt.subplots()
