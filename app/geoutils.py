@@ -151,6 +151,10 @@ def get_srs_name_units_from_epsg(epsg):
     return {'name': name, 'units': units}
 
 def get_rasterio_to_meters_factor(rasterio_ds):
+    if isinstance(rasterio_ds, str):
+        with rasterio.open(rasterio_ds, 'r') as ds:
+            return get_rasterio_to_meters_factor(ds)
+
     units = rasterio_ds.units
     if len(units) >= 1:
         unit = units[0]

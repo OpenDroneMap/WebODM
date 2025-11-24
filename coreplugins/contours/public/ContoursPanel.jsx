@@ -40,8 +40,8 @@ export default class ContoursPanel extends React.Component {
         simplify: Storage.getItem("last_contours_simplify_" + unitSystem) || defaultSimplify,
         customSimplify: Storage.getItem("last_contours_custom_simplify_" + unitSystem) || defaultSimplify,
         layer: "",
-        epsg: Storage.getItem("last_contours_epsg") || "4326",
-        customEpsg: Storage.getItem("last_contours_custom_epsg") || "4326",
+        epsg: props.tasks[0].epsg || "3857",
+        customEpsg: Storage.getItem("last_contours_custom_epsg") || "3857",
         layers: [],
         loading: true,
         task: props.tasks[0] || null,
@@ -277,6 +277,13 @@ export default class ContoursPanel extends React.Component {
             previewLoading, previewLayer, unitSystem } = this.state;
     const us = systems[unitSystem];
     const lengthUnit = us.lengthUnit(1); 
+    
+    const projEPSG = task.epsg;
+    let projSrsName = task.srs?.name;
+    if (!projSrsName && projEPSG) projSrsName = `EPSG:${projEPSG}`;
+    else if (projSrsName && projEPSG) projSrsName = `${projSrsName} (EPSG:${projEPSG})`;
+
+
 
     const intervalStart = unitSystem === "metric" ? 1 : 4;
     const intervalValues = [intervalStart / 4, intervalStart / 2, intervalStart, intervalStart * 2, intervalStart * 4];
@@ -353,9 +360,10 @@ export default class ContoursPanel extends React.Component {
         : ""}
 
         <div className="row form-group form-inline">
-          <label className="col-sm-3 control-label">{_("Projection:")}</label>
+          <label className="col-sm-3 control-label">{_("SRS:")}</label>
           <div className="col-sm-9 ">
-            <select className="form-control" value={epsg} onChange={this.handleSelectEpsg}>
+            <select className="form-control crs" value={epsg} onChange={this.handleSelectEpsg} title={epsg == projEPSG ? projSrsName : ""}>
+              {projEPSG ? <option value={projEPSG}>{projSrsName}</option> : ""}
               <option value="4326">{_("Lat/Lon")} (EPSG:4326)</option>
               <option value="3857">{_("Web Mercator")} (EPSG:3857)</option>
               <option value="custom">{_("Custom")} EPSG</option>
