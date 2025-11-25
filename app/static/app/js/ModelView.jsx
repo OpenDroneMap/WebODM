@@ -106,7 +106,8 @@ class TexturedModelMenu extends React.Component{
 
 class CamerasMenu extends React.Component{
     static propTypes = {
-        toggleCameras: PropTypes.func.isRequired
+        toggleCameras: PropTypes.func.isRequired,
+        changeCameraScale: PropTypes.func.isRequired
     }
 
     constructor(props){
@@ -117,19 +118,43 @@ class CamerasMenu extends React.Component{
         }
     }
 
+    componentDidMount(){
+        if (this.sldCameraSize){
+            $(this.sldCameraSize).slider({
+                min: 0.1, max: 4, step: 0.1,
+                value: 1.0,
+                slide: (event, ui) => {
+                    this.props.changeCameraScale(ui.value);
+                }
+            });
+        }
+    }
+
     handleClick = (e) => {
         this.setState({showCameras: e.target.checked});
         this.props.toggleCameras(e);
     }
 
     render(){
-        return (<label><input 
-                            type="checkbox" 
-                            checked={this.state.showCameras}
-                            onChange={this.handleClick}
-                        /> {_("Show Cameras")}</label>);
+        return (<div>
+            <div><label><input type="checkbox" 
+                    checked={this.state.showCameras}
+                    onChange={this.handleClick}
+                /> {_("Show Cameras")}</label>
+            </div>
+            <div style={{marginTop: 12}}>
+                <span>{_("Size")}</span>
+                <div ref={domNode => this.sldCameraSize = domNode}></div>
+            </div>
+            </div>);
     }
 }
+
+const CAMERA_SCALES = {
+    'm': 1.0,
+    'ft': 3.28,
+    'US survey foot': 3.28
+};
 
 class ModelView extends React.Component {
   static defaultProps = {
@@ -155,7 +180,8 @@ class ModelView extends React.Component {
       initializingModel: false,
       texModelLoadProgress: null,
       selectedCamera: null,
-      modalOpen: false
+      modalOpen: false,
+      cameraScale: CAMERA_SCALES[props.task.srs.units] || 1.0
     };
 
     this.pointCloud = null;
@@ -340,7 +366,10 @@ class ModelView extends React.Component {
       }
 
       if (this.hasCameras()){
-          window.ReactDOM.render(<CamerasMenu toggleCameras={this.toggleCameras}/>, $("#cameras_button").get(0));
+          window.ReactDOM.render(<CamerasMenu 
+                toggleCameras={this.toggleCameras}
+                changeCameraScale={this.changeCameraScale}
+            />, $("#cameras_button").get(0));
       }else{
           $("#cameras").hide();
           $("#cameras_container").hide();
@@ -479,13 +508,22 @@ class ModelView extends React.Component {
     if (!window.viewer) return;
 
     const us = getUnitSystem();
+    
+    // GDAL --> Potree
+    const UNIT_MAP = { 
+        'm': 'm',
+        'ft': 'ft',
+        'US survey foot': 'ft (US)'
+    };
+
+    const dsUnit = UNIT_MAP[this.props.task.srs.units] || 'm';
 
     if (us === 'metric'){
-        window.viewer.setLengthUnitAndDisplayUnit('m', 'm');
+        window.viewer.setLengthUnitAndDisplayUnit(dsUnit, 'm');
     }else if (us === 'imperial'){
-        window.viewer.setLengthUnitAndDisplayUnit('m', 'ft');
+        window.viewer.setLengthUnitAndDisplayUnit(dsUnit, 'ft');
     }else if (us === 'imperialUS'){
-        window.viewer.setLengthUnitAndDisplayUnit('m', 'ft (US)');
+        window.viewer.setLengthUnitAndDisplayUnit(dsUnit, 'ft (US)');
     }
   }
 
@@ -621,7 +659,7 @@ class ModelView extends React.Component {
                     });
 
                     cameraMesh.matrixAutoUpdate = false;
-                    let scale = 1.0;
+                    let scale = this.state.cameraScale;
                     // if (!this.pointCloud.projection) scale = 0.1;
 
                     cameraMesh.matrix.set(...getMatrix(feat.properties.translation, feat.properties.rotation, scale).elements);
@@ -659,6 +697,14 @@ class ModelView extends React.Component {
     this.cameraMeshes.forEach(cam => {
         cam.visible = !isVisible;
         cam.parent.visible = cam.visible;
+    });
+  }
+
+  changeCameraScale = (value) => {
+    if (this.cameraMeshes.length === 0) return;
+
+    this.cameraMeshes.forEach(cam => {
+        cam.parent.scale.setScalar(value);
     });
   }
 

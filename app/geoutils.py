@@ -1,6 +1,17 @@
 import rasterio.warp
 import numpy as np
 from rasterio.crs import CRS
+from rasterio.warp import transform_bounds
+from osgeo import osr, gdal
+from functools import lru_cache
+osr.DontUseExceptions()
+
+SUPPORTED_UNITS = ["m", "ft", "US survey foot"]
+UNIT_TO_M = {
+    "m": 1.0,
+    "ft": 0.3048,
+    "US survey foot": 1200.0 / 3937.0,
+}
 
 # GEOS has some weird bug where
 # we can't simply call geom.tranform(srid)
@@ -79,3 +90,75 @@ def geom_transform(geom, epsg):
         return list(zip(tx, ty))
     else:
         raise ValueError("Cannot transform complex geometries to WKT")
+
+
+def epsg_from_wkt(wkt):
+    srs = osr.SpatialReference()
+    if srs.ImportFromWkt(wkt) != 0:
+        return None
+    
+    epsg = srs.GetAuthorityCode(None)
+    if epsg is not None:
+        return None
+
+    # Try to get the 2D component
+    if srs.IsCompound():
+        if srs.DemoteTo2D() != 0:
+            return None
+
+    epsg = srs.GetAuthorityCode(None)
+    if epsg is not None:
+        return epsg
+
+
+def get_raster_bounds_wkt(raster_path, target_srs="EPSG:4326"):
+    with rasterio.open(raster_path) as src:
+        if src.crs is None:
+            return None
+
+        left, bottom, right, top = src.bounds
+        w, s, e, n = transform_bounds(
+            src.crs, 
+            target_srs, 
+            left, bottom, right, top
+        )
+
+        wkt = f"POLYGON(({w} {s}, {w} {n}, {e} {n}, {e} {s}, {w} {s}))"
+        return wkt
+
+@lru_cache(maxsize=1000)
+def get_srs_name_units_from_epsg(epsg):
+    if epsg is None:
+        return {'name': '', 'units': 'm'}
+    
+    srs = osr.SpatialReference()
+    if srs.ImportFromEPSG(epsg) != 0:
+        return {'name': '', 'units': 'm'}
+
+    name = srs.GetAttrValue("PROJCS")
+    if name is None:
+        name = srs.GetAttrValue("GEOGCS")
+    
+    if name is None:
+        return {'name': '', 'units': 'm'}
+    
+    units = srs.GetAttrValue('UNIT')
+    if units is None:
+        units = 'm'  # Default to meters
+    elif units not in SUPPORTED_UNITS:
+        units = 'm' # Unsupported
+
+    return {'name': name, 'units': units}
+
+def get_rasterio_to_meters_factor(rasterio_ds):
+    if isinstance(rasterio_ds, str):
+        with rasterio.open(rasterio_ds, 'r') as ds:
+            return get_rasterio_to_meters_factor(ds)
+
+    units = rasterio_ds.units
+    if len(units) >= 1:
+        unit = units[0]
+        if unit is not None and unit != "" and unit in SUPPORTED_UNITS:
+            return UNIT_TO_M.get(unit, 1.0)
+    return 1.0
+

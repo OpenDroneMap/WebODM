@@ -25,12 +25,13 @@ from .hsvblend import hsv_blend
 from .hillshade import LightSource
 from .formulas import lookup_formula, get_algorithm_list, get_auto_bands
 from .tasks import TaskNestedView
-from app.geoutils import geom_transform_wkt_bbox
+from app.geoutils import geom_transform_wkt_bbox, get_rasterio_to_meters_factor
 from rest_framework import exceptions
 from rest_framework.response import Response
 from worker.tasks import export_raster, export_pointcloud
 from django.utils.translation import gettext as _
 import warnings
+from functools import lru_cache
 
 # Disable: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix be returned.
 warnings.filterwarnings("ignore", category=NotGeoreferencedWarning)
@@ -47,7 +48,19 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 for custom_colormap in custom_colormaps:
     colormap = colormap.register(custom_colormap)
 
+@lru_cache(maxsize=128)
+def get_colormap_encoded_values(cmap):
+    values = colormap.get(cmap).values()
+    # values = [[R, G, B, A], [R, G, B, A], ...]
+    encoded_values = []
+    for rgba in values:
+        # Pack R, G, B, A (each 0-255) into a 32-bit integer
+        # Format: 0xRRGGBBAA (R in most significant byte)
+        encoded = (rgba[0] << 24) | (rgba[1] << 16) | (rgba[2] << 8) | rgba[3]
+        encoded_values.append(encoded)
 
+    return encoded_values
+    
 def get_zoom_safe(src_dst):
     minzoom, maxzoom = src_dst.spatial_info["minzoom"], src_dst.spatial_info["maxzoom"]
     if maxzoom < minzoom:
@@ -171,8 +184,13 @@ class Metadata(TaskNestedView):
         raster_path = get_raster_path(task, tile_type)
         if not os.path.isfile(raster_path):
             raise exceptions.NotFound()
+
+        to_meter = 1.0
         try:
             with COGReader(raster_path) as src:
+                if tile_type in ['dsm', 'dtm']:
+                    to_meter = get_rasterio_to_meters_factor(src.dataset)
+
                 band_count = src.dataset.meta['count']
                 if boundaries_feature is not None:
                     cutline = create_cutline(src.dataset, boundaries_feature, CRS.from_string('EPSG:4326'))
@@ -265,13 +283,22 @@ class Metadata(TaskNestedView):
         info['color_maps'] = []
         info['algorithms'] = algorithms
         info['auto_bands'] = auto_bands
+
+        if to_meter != 1.0:
+            for b in info['statistics']:
+                info['statistics'][b]['min'] *= to_meter
+                info['statistics'][b]['max'] *= to_meter
+                info['statistics'][b]['std'] *= to_meter
+                info['statistics'][b]['percentiles'][0] *= to_meter
+                info['statistics'][b]['percentiles'][1] *= to_meter
+                info['statistics'][b]['histogram'][1] = [n * to_meter for n in info['statistics'][b]['histogram'][1]]
         
         if colormaps:
             for cmap in colormaps:
                 try:
                     info['color_maps'].append({
                         'key': cmap,
-                        'color_map': colormap.get(cmap).values(),
+                        'color_map': get_colormap_encoded_values(cmap),
                         'label': cmap_labels.get(cmap, cmap)
                     })
                 except FileNotFoundError:
@@ -369,6 +396,7 @@ class Tiles(TaskNestedView):
         if not os.path.isfile(url):
             raise exceptions.NotFound()
 
+        to_meter = 1.0
         with COGReader(url) as src:
             if not src.tile_exists(z, x, y):
                 raise exceptions.NotFound(_("Outside of bounds"))
@@ -392,6 +420,9 @@ class Tiles(TaskNestedView):
                 vrt_options = {'cutline': cutline}
             else:
                 vrt_options = None
+
+            if tile_type in ['dsm', 'dtm']:
+                to_meter = get_rasterio_to_meters_factor(src.dataset)
 
             # Handle N-bands datasets for orthophotos (not plant health)
             if tile_type == 'orthophoto' and expr is None:
@@ -451,6 +482,8 @@ class Tiles(TaskNestedView):
             intensity = None
             try:
                 rescale_arr = list(map(float, rescale.split(",")))
+                if tile_type in ['dsm', 'dtm']:
+                    rescale_arr = [v / to_meter for v in rescale_arr]
             except ValueError:
                 raise exceptions.ValidationError(_("Invalid rescale value"))
 
