@@ -2,6 +2,6 @@
 0 0 1 * * root source /webodm/.cronenv; bash -c "/webodm/nginx/letsencrypt-autogen.sh"
 
 # Rotate logs
-0 0 * * * root logrotate -f /webodm/nginx/logrotate-nginx
+0 0 * * * root bash -c "logrotate -f /webodm/nginx/logrotate-nginx"
 
 # An empty line is required at the end of this file for a valid cron file.

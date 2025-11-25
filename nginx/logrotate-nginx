@@ -8,9 +8,7 @@
     create 0640 www-data adm
     sharedscripts
     postrotate
-        if [ -f /tmp/nginx.pid ]; then
-            kill -USR1 `cat /tmp/nginx.pid`
-        fi
+        [ -f /tmp/nginx.pid ] && kill -USR1 `cat /tmp/nginx.pid`
     endscript
     maxage 14
 }
