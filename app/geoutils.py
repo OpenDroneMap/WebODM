@@ -162,26 +162,3 @@ def get_rasterio_to_meters_factor(rasterio_ds):
             return UNIT_TO_M.get(unit, 1.0)
     return 1.0
 
-
-def get_raster_dem_to_meters_factor(raster_path):
-    unit = get_raster_dem_units(raster_path)
-    return UNIT_TO_M.get(unit, 1.0)
-
-def get_raster_dem_units(raster_path):
-    try:
-        ds = gdal.Open(raster_path, gdal.GA_ReadOnly)
-        if ds is None:
-            raise IOError(f"Cannot open {raster_path}")
-        
-        band = ds.GetRasterBand(1)
-        unit = band.GetUnitType()
-        ds = None
-
-        if unit is None or unit == "":
-            return "m"
-        elif unit in SUPPORTED_UNITS:
-            return unit
-        else:
-            return "m"
-    except Exception as e:
-        return "m"
