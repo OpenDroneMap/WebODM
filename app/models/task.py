@@ -1165,6 +1165,7 @@ class Task(models.Model):
             'public': self.public,
             'public_edit': self.public_edit,
             'epsg': self.epsg,
+            'srs': get_srs_name_units_from_epsg(self.epsg),
             'crop_projected': self.get_projected_crop() 
         }
 
