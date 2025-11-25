@@ -3,6 +3,7 @@ import os
 import time
 
 import threading
+import rasterio
 
 from worker.celery import app as celery
 import logging
@@ -23,6 +24,7 @@ from app import pending_actions
 from app.api.formulas import algos, get_camera_filters_for
 from app.api.tiler import ZOOM_EXTRA_LEVELS
 from app.cogeo import valid_cogeo
+from app.geoutils import get_rasterio_to_meters_factor
 from app.models import Project, Task
 from app.models.task import task_directory_path, full_task_directory_path, TaskInterruptedException
 from app.plugins.signals import task_completed, task_removed, task_removing
@@ -243,6 +245,9 @@ class TestApiTask(BootTransactionTestCase):
 
             # Extent should be null
             self.assertTrue(res.data['extent'] is None)
+
+            # Srs name should be ""
+            self.assertEqual(res.data['srs']['name'], "")
 
             # processing_node_name should be null
             self.assertTrue(res.data['processing_node_name'] is None)
@@ -668,6 +673,32 @@ class TestApiTask(BootTransactionTestCase):
                 self.assertEqual(len(metadata['statistics']), 1)
                 self.assertEqual(round(metadata['statistics']['1']['min'], 2), 156.91)
                 self.assertEqual(round(metadata['statistics']['1']['max'], 2), 164.94)
+
+            # Metadata when using ft DSM/DTM
+            for tile_type in ['dsm', 'dtm']:
+                for unit in ["ft", "US survey foot"]:
+
+                    # Change units
+                    dem = task.get_asset_download_path(tile_type + ".tif")
+                    with rasterio.open(dem, "r+") as f:
+                        self.assertIsNone(f.units[0], None)
+                        f.units = (unit, )
+                    
+                    to_unit = 1.0 / get_rasterio_to_meters_factor(dem)
+                    self.assertTrue(to_unit != 1.0)
+
+                    res = client.get("/api/projects/{}/tasks/{}/{}/metadata".format(project.id, task.id, tile_type))
+                    self.assertEqual(res.status_code, status.HTTP_200_OK)
+                    metadata = json.loads(res.content.decode("utf-8"))
+
+                    # Min/max values are what we expect them to be
+                    self.assertEqual(len(metadata['statistics']), 1)
+                    self.assertEqual(round(metadata['statistics']['1']['min'] * to_unit, 2), 156.91)
+                    self.assertEqual(round(metadata['statistics']['1']['max'] * to_unit, 2), 164.94)
+
+                    # Restore units
+                    with rasterio.open(dem, "r+") as f:
+                        f.units = (None, )
 
             # Can access individual tiles
             for tile_type in tile_types:
@@ -1139,6 +1170,11 @@ class TestApiTask(BootTransactionTestCase):
 
             # Extent should be set
             self.assertTrue(len(res.data['extent']), 4)
+
+            # SRS name/units should be set
+            self.assertEqual(res.data['srs']['name'], "WGS 84 / UTM zone 15N")
+            self.assertEqual(res.data['srs']['units'], "m")
+            
 
         # Can duplicate a task
         res = client.post("/api/projects/{}/tasks/{}/duplicate/".format(project.id, task.id))
