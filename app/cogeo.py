@@ -23,7 +23,11 @@ def valid_cogeo(src_path):
         return not errors and not warnings
     except ModuleNotFoundError:
         logger.warning("Using legacy cog_validate (osgeo.gdal package not found)")
-        from rio_cogeo.cogeo import cog_validate
+        try:
+            from rio_cogeo.cogeo import cog_validate
+        except ModuleNotFoundError:
+            logger.warning("Cannot use cog_validate (rio_cogeo is not installed)")
+            return False
         # Legacy
         return cog_validate(src_path, strict=True)
 
