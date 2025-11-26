@@ -6,7 +6,6 @@ import rasterio
 import re
 import subprocess
 from pipes import quote
-from rio_cogeo.cogeo import cog_validate, cog_translate
 from rio_tiler.utils import has_alpha_band
 from webodm import settings
 
@@ -24,6 +23,7 @@ def valid_cogeo(src_path):
         return not errors and not warnings
     except ModuleNotFoundError:
         logger.warning("Using legacy cog_validate (osgeo.gdal package not found)")
+        from rio_cogeo.cogeo import cog_validate
         # Legacy
         return cog_validate(src_path, strict=True)
 
@@ -131,6 +131,12 @@ def make_cogeo_legacy(src_path):
     This implementation does not require GDAL >= 3.1
     but sometimes (rarely) hangs for unknown reasons
     """
+    try:
+        from rio_cogeo.cogeo import cog_translate
+    except ModuleNotFoundError:
+        logger.warning("Cannot use cog_translate (rio_cogeo is not installed)")
+        return False
+
     tmpfile = tempfile.mktemp('_cogeo.tif', dir=settings.MEDIA_TMP)
     swapfile = tempfile.mktemp('_cogeo_swap.tif', dir=settings.MEDIA_TMP)
 
