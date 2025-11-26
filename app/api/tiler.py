@@ -188,8 +188,6 @@ class Metadata(TaskNestedView):
         to_meter = 1.0
         try:
             with COGReader(raster_path) as src:
-                if tile_type in ['dsm', 'dtm']:
-                    to_meter = get_rasterio_to_meters_factor(src.dataset)
 
                 band_count = src.dataset.meta['count']
                 if boundaries_feature is not None:
@@ -205,6 +203,16 @@ class Metadata(TaskNestedView):
                     vrt_options = {'cutline': cutline}
                 else:
                     vrt_options = None
+
+                if tile_type in ['dsm', 'dtm']:
+                    to_meter = get_rasterio_to_meters_factor(src.dataset)
+                    
+                    # WarpedVRT is really slow with compound CRSes
+                    # so we override the CRS to the 2D version for speed
+                    # in case there's one
+                    if vrt_options is None:
+                        vrt_options = {}
+                    vrt_options['src_crs'] = f"EPSG:{task.epsg}"
 
                 if has_alpha_band(src.dataset):
                     band_count -= 1
@@ -453,6 +461,13 @@ class Tiles(TaskNestedView):
             if tile_type in ["dsm", "dtm"]:
                 resampling = "bilinear"
                 padding = 16
+
+                # WarpedVRT is really slow with compound CRSes
+                # so we override the CRS to the 2D version for speed
+                # in case there's one
+                if vrt_options is None:
+                    vrt_options = {}
+                vrt_options['src_crs'] = f"EPSG:{task.epsg}"
 
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
