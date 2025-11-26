@@ -320,7 +320,7 @@ class Metadata(TaskNestedView):
             info['maxzoom'] = info['minzoom']
         info['maxzoom'] += ZOOM_EXTRA_LEVELS
         info['minzoom'] -= ZOOM_EXTRA_LEVELS
-        info['bounds'] = {'value': bounds if bounds is not None else src.bounds, 'crs': src.dataset.crs}
+        info['bounds'] = {'value': bounds if bounds is not None else src.bounds, 'crs': {'init': str(task.epsg)}}
 
         return Response(info)
 
