@@ -54236,7 +54236,8 @@
 				{ // coordinate labels
 					let coordinateLabel = this.coordinateLabels[0];
 					
-					let msg = position.toArray().map(p => Utils.addCommas(p.toFixed(2))).join(" / ");
+					let positions = position.toArray();
+					let msg = `${Utils.addCommas(positions[0].toFixed(3))} / ${Utils.addCommas(positions[1].toFixed(3))} / ${Utils.addCommas((positions[2] / window.viewer.lengthUnit.unitspermeter * window.viewer.lengthUnitDisplay.unitspermeter).toFixed(3))}`;
 					coordinateLabel.setText(msg);
 
 					coordinateLabel.visible = this.showCoordinates;
@@ -54405,8 +54406,8 @@
 					const N = AC.clone().cross(AB).normalize();
 
 					const center = Potree.Utils.computeCircleCenter(A, B, C);
-					const radius = center.distanceTo(A);
-
+					let radius = center.distanceTo(A);
+					if (isNaN(radius)) radius = 0;
 
 					const scale = radius / 20;
 					circleCenter.position.copy(center);
@@ -54429,11 +54430,16 @@
 					circleLine.position.copy(center);
 					circleLine.scale.set(radius, radius, radius);
 					circleLine.lookAt(target);
+
+					let suffix = "";
+					if(this.lengthUnit != null && this.lengthUnitDisplay != null){
+						radius = radius / this.lengthUnit.unitspermeter * this.lengthUnitDisplay.unitspermeter;
+						suffix = this.lengthUnitDisplay.code;
+					}
 					
 					circleRadiusLabel.visible = true;
 					circleRadiusLabel.position.copy(center.clone().add(B).multiplyScalar(0.5));
-					circleRadiusLabel.setText(`${radius.toFixed(3)}`);
-
+					circleRadiusLabel.setText(`${radius.toFixed(3)} ${suffix}`);
 				}
 			}
 
@@ -74176,13 +74182,13 @@ ENDSEC
 			for (let point of points) {
 				let x = Utils.addCommas(point.x.toFixed(3));
 				let y = Utils.addCommas(point.y.toFixed(3));
-				let z = Utils.addCommas(point.z.toFixed(3));
+				let z = Utils.addCommas((point.z / this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter).toFixed(3));
 
 				let row = $(`
 				<tr>
 					<td><span>${x}</span></td>
 					<td><span>${y}</span></td>
-					<td><span>${z}</span></td>
+					<td><span data-dyn-value="${point.z}">${z}</span></td>
 					<td align="right" style="width: 25%">
 						<img name="copy" title="copy" class="button-icon" src="${copyIconPath}" style="width: 16px; height: 16px"/>
 					</td>
@@ -74411,7 +74417,10 @@ ENDSEC
 			elCoordiantesContainer.append(this.createCoordinatesTable(this.measurement.points.map(p => p.position)));
 
 			let elArea = this.elContent.find(`#measurement_area`);
-			elArea.html(this.measurement.getArea().toFixed(3));
+			let area = this.measurement.getArea();
+			elArea.html((area / (this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnit.unitspermeter) * (this.viewer.lengthUnitDisplay.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter)).toFixed(3));
+			elArea.attr('data-dyn-value', area);
+			elArea.attr('data-dyn-type', 'area');			
 		}
 	};
 
@@ -74536,10 +74545,13 @@ ENDSEC
 				return Potree.Utils.addCommas(number.toFixed(3));
 			};
 
+			const convFactor = (1.0 / this.viewer.lengthUnit.unitspermeter) * this.viewer.lengthUnitDisplay.unitspermeter;
+
 			
-			const txtCenter = `${format(center.x)} ${format(center.y)} ${format(center.z)}`;
-			const txtRadius = format(radius);
-			const txtCircumference = format(circumference);
+			const txtXYCenter = `${format(center.x)} ${format(center.y)}`;
+			const txtZCenter = format(center.z * convFactor);
+			const txtRadius = format(radius * convFactor);
+			const txtCircumference = format(circumference * convFactor);
 
 			const thStyle = `style="text-align: left"`;
 			const tdStyle = `style="width: 100%; padding: 5px;"`;
@@ -74551,16 +74563,16 @@ ENDSEC
 			</tr>
 			<tr>
 				<td ${tdStyle} colspan="2">
-					${txtCenter}
+					<span>${txtXYCenter}</span> <span data-dyn-value="${center.z}">${txtZCenter}</span>
 				</td>
 			</tr>
 			<tr>
 				<th ${thStyle}>Radius: </th>
-				<td ${tdStyle}>${txtRadius}</td>
+				<td ${tdStyle} data-dyn-value="${radius}">${txtRadius}</td>
 			</tr>
 			<tr>
 				<th ${thStyle}>Circumference: </th>
-				<td ${tdStyle}>${txtCircumference}</td>
+				<td ${tdStyle} data-dyn-value="${circumference}">${txtCircumference}</td>
 			</tr>
 		`);
 		}
@@ -74575,7 +74587,7 @@ ENDSEC
 			<div class="measurement_content selectable">
 				<span class="coordinates_table_container"></span>
 				<br>
-				<span id="height_label">Height: </span><br>
+				<b>Height:</b> <span id="height_label"></span><br>
 
 				<!-- ACTIONS -->
 				<div style="display: flex; margin-top: 12px">
@@ -74612,10 +74624,11 @@ ENDSEC
 				let min = lowPoint.z;
 				let max = highPoint.z;
 				let height = max - min;
-				height = height.toFixed(3);
+				let displayHeight = height / this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter;
 
 				this.elHeightLabel = this.elContent.find(`#height_label`);
-				this.elHeightLabel.html(`<b>Height:</b> ${height}`);
+				this.elHeightLabel.text(`${displayHeight.toFixed(3)}`);
+				this.elHeightLabel.attr('data-dyn-value', height);
 			}
 		}
 	};
@@ -88731,6 +88744,26 @@ ENDSEC
 			}
 
 			this.dispatchEvent({ 'type': 'length_unit_changed', 'viewer': this, value: lengthUnitValue });
+			
+			let self = this;
+			$('#potree_sidebar_container [data-dyn-value]').each(function(){
+				const $el = $(this);
+				const dynValue = parseFloat($el.attr('data-dyn-value'));
+				if (isNaN(dynValue)) return;
+
+				const dynType = $el.attr('data-dyn-type');
+				
+				let lu = self.lengthUnit.unitspermeter;
+				let lud =  self.lengthUnitDisplay.unitspermeter;
+
+				// Update the unit text based on the new display unit
+				if (dynType === 'area') {
+					lud *= lud;
+					lu *= lu;
+				}
+
+				$el.text((dynValue / lu * lud).toFixed(3));
+			});
 		};
 
 		zoomTo(node, factor, animationDuration = 0){
