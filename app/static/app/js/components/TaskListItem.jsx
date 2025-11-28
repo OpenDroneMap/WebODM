@@ -496,7 +496,7 @@ class TaskListItem extends React.Component {
     let expanded = "";
     if (this.state.expanded){
       let showOrthophotoMissingWarning = false,
-          showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED,
+          showMemoryErrorWarning = this.state.memoryError && task.status == statusCodes.FAILED && window.location.hostname.indexOf("webodm.net") === -1,
           showTaskWarning = this.state.friendlyTaskError !== "" && task.status == statusCodes.FAILED,
           showExitedWithCodeOneHints = task.last_error === "Process exited with code 1" &&
                                        !showMemoryErrorWarning &&
