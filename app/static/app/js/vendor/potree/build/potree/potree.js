@@ -72575,6 +72575,8 @@ void main() {
 				});
 
 			let headerValues = [];
+			const skipFields = ["intensity", "return number", "number of returns", "source id", "gpsTime"];
+
 			for (let attribute of attributes) {
 				let itemSize = points.data[attribute].length / points.numPoints;
 
@@ -72586,16 +72588,17 @@ void main() {
 					for (let i = 0; i < itemSize; i++) {
 						headerValues.push(`${attribute}_${i}`);
 					}
-				} else {
+				} else if (skipFields.indexOf(attribute) === -1){
 					headerValues.push(attribute);
 				}
 			}
-			string = headerValues.join(', ') + '\n';
+			string = headerValues.join(',') + '\n';
 
 			for (let i = 0; i < points.numPoints; i++) {
 				let values = [];
 
 				for (let attribute of attributes) {
+					if (skipFields.indexOf(attribute) !== -1) continue;
 					let itemSize = points.data[attribute].length / points.numPoints;
 					let value = points.data[attribute]
 						.subarray(itemSize * i, itemSize * i + itemSize)
@@ -72603,7 +72606,7 @@ void main() {
 					values.push(value);
 				}
 
-				string += values.join(', ') + '\n';
+				string += values.join(',') + '\n';
 			}
 
 			return string;
@@ -73154,7 +73157,7 @@ void main() {
 							} else if (attributeName === "classification") {
 								html += `
 								<tr>
-									<td>${attributeName}</td>
+									<td style="padding-right: 4px">${attributeName}</td>
 									<td>${transform(value)}</td>
 								</tr>`;
 							}
@@ -73231,6 +73234,7 @@ void main() {
 						let trueElevationPosition = new Float32Array(originPos);
 						for(let i = 0; i < pointSet.numPoints; i++){
 							trueElevationPosition[3 * i + 2] += pointcloud.position.z;
+							trueElevationPosition[3 * i + 2] = trueElevationPosition[3 * i + 2] / this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter;
 						}
 
 						pointSet.data.position = trueElevationPosition;
@@ -75034,7 +75038,7 @@ ENDSEC
 
 				<br>
 
-				<input type="button" id="show_2d_profile" value="show 2d profile" style="width: 100%"/>
+				<input type="button" id="show_2d_profile" value="Show 2D Profile" style="width: 100%"/>
 
 				<!-- ACTIONS -->
 				<div style="display: flex; margin-top: 12px">
