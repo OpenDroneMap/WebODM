@@ -73122,24 +73122,20 @@ void main() {
 								transform = value => value / scale + offset;
 							}
 
-							
-
-							
-
 							if (attributeName === 'position') {
-								let values = [...position].map(v => Utils.addCommas(v.toFixed(3)));
+								let values = [...position];
 								html += `
 								<tr>
 									<td>x</td>
-									<td>${values[0]}</td>
+									<td>${Utils.addCommas(values[0].toFixed(3))}</td>
 								</tr>
 								<tr>
 									<td>y</td>
-									<td>${values[1]}</td>
+									<td>${Utils.addCommas(values[1].toFixed(3))}</td>
 								</tr>
 								<tr>
 									<td>z</td>
-									<td>${values[2]}</td>
+									<td>${Utils.addCommas((values[2] / this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter).toFixed(3))}</td>
 								</tr>`;
 							} else if (attributeName === 'rgba') {
 								html += `
@@ -73155,7 +73151,7 @@ void main() {
 									<td>${attributeName}</td>
 									<td>${value.toFixed(3)}</td>
 								</tr>`;
-							} else {
+							} else if (attributeName === "classification") {
 								html += `
 								<tr>
 									<td>${attributeName}</td>
@@ -73446,6 +73442,7 @@ void main() {
 				.innerTickSize(-width)
 				.outerTickSize(1)
 				.tickPadding(10)
+				.tickFormat(v => (v / this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter).toFixed(0))
 				.ticks(height / 20);
 
 			this.elXAxis = this.svg.append('g')
@@ -73572,7 +73569,7 @@ void main() {
 				.range([0, width]);
 			this.scaleY.domain([this.camera.bottom + this.camera.position.z, this.camera.top + this.camera.position.z])
 				.range([height, 0]);
-
+			
 			let marginLeft = this.renderArea[0].offsetLeft;
 
 			this.xAxis.scale(this.scaleX)
