@@ -72603,6 +72603,9 @@ void main() {
 					let value = points.data[attribute]
 						.subarray(itemSize * i, itemSize * i + itemSize)
 						.join(', ');
+					if (attribute === "mileage"){
+						value = value / window.viewer.lengthUnit.unitspermeter * window.viewer.lengthUnitDisplay.unitspermeter;
+					}
 					values.push(value);
 				}
 
@@ -73152,7 +73155,7 @@ void main() {
 								html += `
 								<tr>
 									<td>${attributeName}</td>
-									<td>${value.toFixed(3)}</td>
+									<td>${(value / this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter).toFixed(3)}</td>
 								</tr>`;
 							} else if (attributeName === "classification") {
 								html += `
@@ -73437,6 +73440,7 @@ void main() {
 				.orient('bottom')
 				.innerTickSize(-height)
 				.outerTickSize(1)
+				.tickFormat(v => (v / this.viewer.lengthUnit.unitspermeter * this.viewer.lengthUnitDisplay.unitspermeter).toFixed(0))
 				.tickPadding(10)
 				.ticks(width / 50);
 
