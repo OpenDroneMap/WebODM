@@ -18,23 +18,59 @@ export default defineConfig({
 			customCss: [
 				'./src/styles/custom.css',
 			],
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/OpenDroneMap/WebODM' }],
+			social: [
+				{ icon: 'discourse', label: 'Community Forum', href: 'https://community.opendronemap.org' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/OpenDroneMap/WebODM' }
+			],
 			sidebar: [
 				{
-					label: 'Quickstart',
-					slug: 'quickstart'
+					label: 'Installation',
+					slug: 'installation'
 				},
 				{
-					label: 'Reference',
-					autogenerate: { directory: 'reference' },
+					label: 'Hardware Requirements',
+					slug: 'hardware-requirements'
 				},
 				{
-					label: 'Contributing',
-					slug: 'contributing'
+					label: 'Common Tasks',
+					slug: 'common-tasks'
 				},
 				{
-					label: 'Plugin Development Guide',
-					slug: 'plugin-development-guide'
+					label: 'Frequently Asked Questions',
+					slug: 'faq'
+				},
+				{
+					label: 'Support the Project',
+					slug: 'support-the-project'
+				},
+				{
+					label: 'Developers',
+					items: [
+						{
+							label: 'Contributing',
+							slug: 'contributing'
+						},
+						{
+							label: 'Architecture',
+							slug: 'architecture'
+						},
+						{
+							label: 'Roadmap',
+							slug: 'roadmap'
+						},
+						{
+							label: 'Plugin Development Guide',
+							slug: 'plugin-development-guide'
+						},
+						{
+							label: 'API Quickstart',
+							slug: 'quickstart'
+						},
+						{
+							label: 'API Reference',
+							autogenerate: { directory: 'reference' },
+						},
+					]
 				},
 			],
 		}),
