@@ -1,5 +1,5 @@
 ---
-title: Quickstart
+title: API Quickstart
 template: doc
 ---
 
