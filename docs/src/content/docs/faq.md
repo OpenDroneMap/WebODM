@@ -3,6 +3,10 @@ title: Frequently Asked Questions
 template: doc
 ---
 
+## The software is not using all of my CPU cores / memory / GPU all of the times. Is it normal?
+
+Yes. The software tries to use all available resources, when possible, but not always. It’s normal to see 10-15% CPU utilization at several moments during processing and 0% GPU utilization for lots of times.
+
 ## Where Are My Files Stored?
 
 When using Docker, all processing results are stored in a docker volume and are not available on the host filesystem. There are two specific docker volumes of interest:
