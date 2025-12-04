@@ -68,7 +68,7 @@ To stop WebODM press CTRL+C or run:
 
 To update WebODM to the latest version use:
 
-```bash
+```
 ./webodm.sh update
 ```
 
