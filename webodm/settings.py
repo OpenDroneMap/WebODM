@@ -79,6 +79,10 @@ PLUGINS_BLACKLIST = [
     #'measure',
 ]
 
+# Do not run npm postinstall scripts when installing coreplugin dependencies,
+# workaround for core-js's postinstall script breaking under the MSIX PSF.
+PLUGINS_CORE_IGNORE_SCRIPTS = False
+
 # Serve media static files URLs even in production
 FORCE_MEDIA_STATICFILES = False
 
