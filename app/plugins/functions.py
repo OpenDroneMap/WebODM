@@ -92,7 +92,10 @@ def build_plugins():
                 npm = "npm"
                 if platform.system() == "Windows":
                     npm = "npm.cmd"
-                subprocess.call([npm, 'install'], cwd=plugin.get_path("public"))
+                command = [npm, 'install']
+                if plugin.is_persistent():
+                    command.append('--ignore-scripts')
+                subprocess.call(command, cwd=plugin.get_path("public"))
             except FileNotFoundError:
                 logger.warn("npm is not installed, will skip this plugin")
                 continue
