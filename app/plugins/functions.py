@@ -93,7 +93,7 @@ def build_plugins():
                 if platform.system() == "Windows":
                     npm = "npm.cmd"
                 command = [npm, 'install']
-                if settings.PLUGINS_CORE_IGNORE_SCRIPTS and plugin.is_persistent():
+                if plugin.is_persistent():
                     command.append('--ignore-scripts')
                 subprocess.call(command, cwd=plugin.get_path("public"))
             except FileNotFoundError:
