@@ -125,7 +125,7 @@
 window.__taskOptionsDocsLink = "{{ to_link|safe }}";
 {% gcp_docs_link as gcp_link %}
 window.__gcpDocsLink = "{{ gcp_link|safe }}";
-
+window.__loggedUser = "{{ user.username }}";
 
 $(function(){
     $(window).bind("load resize", function() {

@@ -94,7 +94,10 @@ html, body, section.main, .content, #wrapper, #page-wrapper{
         }
 
         li{
-            word-break: break-word;
+            overflow: hidden;
+            a{
+                word-break: auto-phrase;
+            }
         }
     }
 
