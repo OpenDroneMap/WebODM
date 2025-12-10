@@ -23,7 +23,13 @@ You can also skip the installation entirely and run WebODM from [webodm.net](htt
 
 Installers are available for purchase from [OpenDroneMap](https://opendronemap.org) and come with installation support.
 
-https://opendronemap.org/webodm/download/#installer
+https://opendronemap.org/webodm/download/
+
+:::note
+
+The Windows installer currently comes packaged with WebODM version 2.8.1. To access the latest 3.x version, use Docker.
+
+:::
 
 ### Docker
 
