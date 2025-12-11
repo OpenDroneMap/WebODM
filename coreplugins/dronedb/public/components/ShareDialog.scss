@@ -1,0 +1,89 @@
+.share-dialog {
+    .share-mode-option {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: #f9f9f9;
+        }
+
+        .help-text {
+            margin-left: 20px;
+            color: #777;
+            font-size: 12px;
+        }
+
+        input[type="radio"] {
+            margin-right: 8px;
+        }
+    }
+
+    .destination-select {
+        margin-top: 15px;
+        padding: 15px;
+        background: #f5f5f5;
+        border-radius: 4px;
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .files-summary {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f0f7ff;
+        border-radius: 4px;
+        border: 1px solid #d0e3f7;
+
+        h5 {
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+
+        .files-info {
+            margin-bottom: 10px;
+
+            .badge {
+                margin-right: 8px;
+                background: #337ab7;
+            }
+        }
+
+        .files-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 120px;
+            overflow-y: auto;
+
+            li {
+                padding: 3px 0;
+                font-size: 12px;
+                color: #555;
+
+                i {
+                    margin-right: 5px;
+                    color: #999;
+                }
+
+                &.more {
+                    color: #999;
+                    font-style: italic;
+                }
+            }
+        }
+    }
+}
