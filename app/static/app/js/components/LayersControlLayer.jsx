@@ -7,6 +7,7 @@ import Utils from '../classes/Utils';
 import Workers from '../classes/Workers';
 import ErrorMessage from './ErrorMessage';
 import ExportAssetPanel from './ExportAssetPanel';
+import ColorMaps from '../classes/ColorMaps';
 import PluginsAPI from '../classes/plugins/API';
 import $ from 'jquery';
 import { _, interpolate } from '../classes/gettext';
@@ -262,6 +263,7 @@ export default class LayersControlLayer extends React.Component {
     this.setState({histogramLoading: true});
     this.updateHistogramReq = $.getJSON(Utils.buildUrlWithQuery(this.meta.metaUrl, this.getLayerParams()))
         .done(mres => {
+            ColorMaps.decode(mres.color_maps);
             this.tmeta = this.props.layer[Symbol.for("tile-meta")] = mres;
             
             // Update rescale values
