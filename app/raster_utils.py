@@ -177,6 +177,10 @@ def export_raster(input, output, progress_callback=None, **opts):
                 path_base, _ = os.path.splitext(output)
                 output_raster = path_base + ".png.tif"
 
+        JPEG_PX_LIMIT = 65000 # Due to 16bit fields for w,h in JPEG standard
+        if jpg and (src.width > JPEG_PX_LIMIT or src.height > JPEG_PX_LIMIT):
+            raise Exception(f"Image is too large (> {JPEG_PX_LIMIT}px) for JPEG. Use TIFF (RGB) instead.")
+
         if export_format == "jpg":
             driver = "JPEG"
             profile.update(quality=90)
