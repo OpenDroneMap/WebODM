@@ -1,9 +1,15 @@
+import threading
+import time
+import json
+import requests
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from django.contrib.auth.models import User, Group
 from rest_framework import status
 from rest_framework.test import APIClient
 from app.models import Task, Project
 from nodeodm.models import ProcessingNode
 from worker.tasks import check_quotas
+from webodm import settings
 from .classes import BootTestCase
 
 class TestQuota(BootTestCase):
@@ -62,9 +68,51 @@ class TestQuota(BootTestCase):
         self.assertTrue("disk quota is being exceeded" in body)
         self.assertTrue("in 8 hours" in body)
 
-        # Running the workers check_quota function will not remove tasks
-        check_quotas()
-        self.assertEqual(len(Task.objects.filter(project__owner=user)), 2)
+        # Test that the quota exceeded notification callback works when set
+        received = {}
+
+        class WebhookHandler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                if self.path == '/hook':
+                    content_length = int(self.headers['Content-Length'])
+                    post_data = self.rfile.read(content_length)
+                    
+                    if self.headers.get('Content-Type', '').startswith('application/json'):
+                        received.update(json.loads(post_data.decode('utf-8')))
+                    
+                    self.send_response(200)
+                    self.end_headers()
+                    self.wfile.write(b'OK')
+
+        # Start server in background thread
+        server = HTTPServer(('localhost', 3050), WebhookHandler)
+        server_thread = threading.Thread(target=server.serve_forever)
+        server_thread.daemon = True
+        server_thread.start()
+        time.sleep(0.5)
+
+        try:
+            # Running the workers check_quota function will not remove tasks
+            check_quotas()
+            self.assertEqual(len(Task.objects.filter(project__owner=user)), 2)
+            self.assertTrue(user.profile.get_quota_deadline() is not None)
+            
+            # No notification was called
+            self.assertTrue('username' not in received)
+
+            # Retry, but with notifications
+            user.profile.clear_quota_deadline()
+            settings.QUOTA_EXCEEDED_NOTIFY_URL = "http://localhost:3050/hook"
+            check_quotas()
+            self.assertEqual(len(Task.objects.filter(project__owner=user)), 2)
+            self.assertEqual(received.get('username'), user.username)
+            self.assertEqual(received.get('quota_used'), user.profile.used_quota())
+            self.assertEqual(received.get('quota_total'), user.profile.quota)
+            self.assertEqual(received.get('deadline'), user.profile.get_quota_deadline())
+            settings.QUOTA_EXCEEDED_NOTIFY_URL = None
+            
+        finally:
+            server.shutdown()
 
         # Update grace period
         def check_quota_warning(hours, text):
