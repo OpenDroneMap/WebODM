@@ -221,7 +221,7 @@ class TaskListItem extends React.Component {
             uuid: this.state.task.uuid
           }
         ).done(json => {
-            if (json.success){
+            if (json.success || json.id){
               this.refresh();
               if (options.success !== undefined) options.success(json);
             }else{
@@ -580,6 +580,16 @@ class TaskListItem extends React.Component {
         });
       }
 
+      if (!task.last_error && task.status === null && (task.processing_node || imported) && task.partial && !task.pending_action && this.props.hasPermission("change")){
+        addActionButton(_("Start Processing"), "btn-primary", "glyphicon glyphicon-saved", this.genActionApiCall("commit", {
+            confirm: _("Have all images been uploaded?"),
+            defaultError: _("Cannot start processing task.")
+          }),
+          {
+            className: "pull-right"
+          });
+      }
+
       actionButtons = (<div className="action-buttons">
             {showAssetButtons ?
               <AssetDownloadButtons task={this.state.task} disabled={disabled} />
@@ -763,11 +773,11 @@ class TaskListItem extends React.Component {
       statusLabel = getStatusLabel(task.last_error, 'error');
     }else if (!task.processing_node && !imported && this.props.hasPermission("change") && task.status !== statusCodes.COMPLETED){
       statusLabel = getStatusLabel(_("Set a processing node"));
-      statusIcon = "fa fa-hourglass-3";
+      statusIcon = "far fa-hourglass";
       showEditLink = true;
     }else if (task.partial && !task.pending_action){
-      statusIcon = "fa fa-hourglass-3";
-      statusLabel = getStatusLabel(_("Waiting for image upload..."));
+      statusIcon = "far fa-hourglass";
+      statusLabel = getStatusLabel(_("Waiting to start processing..."));
     }else{
       let progress = 100;
       let type = 'done';
