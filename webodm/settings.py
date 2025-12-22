@@ -373,6 +373,9 @@ RESET_PASSWORD_LINK = ''
 # from an account that is exceeding a disk quota
 QUOTA_EXCEEDED_GRACE_PERIOD = 8
 
+# URL to call when an account is about to have some of its tasks removed
+QUOTA_EXCEEDED_NOTIFY_URL = None
+
 # Maximum number of processing nodes to show in "Processing Nodes" menus/dropdowns
 UI_MAX_PROCESSING_NODES = None
 
