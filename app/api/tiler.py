@@ -32,6 +32,7 @@ from worker.tasks import export_raster, export_pointcloud
 from django.utils.translation import gettext as _
 import warnings
 from functools import lru_cache
+from osgeo import osr
 
 # Disable: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix be returned.
 warnings.filterwarnings("ignore", category=NotGeoreferencedWarning)
@@ -212,7 +213,9 @@ class Metadata(TaskNestedView):
                     # in case there's one
                     if vrt_options is None:
                         vrt_options = {}
-                    vrt_options['src_crs'] = f"EPSG:{task.epsg}"
+
+                    if task.epsg is not None:
+                        vrt_options['src_crs'] = f"EPSG:{task.epsg}"
 
                 if has_alpha_band(src.dataset):
                     band_count -= 1
@@ -467,7 +470,9 @@ class Tiles(TaskNestedView):
                 # in case there's one
                 if vrt_options is None:
                     vrt_options = {}
-                vrt_options['src_crs'] = f"EPSG:{task.epsg}"
+
+                if task.epsg is not None:
+                    vrt_options['src_crs'] = f"EPSG:{task.epsg}"
 
             # Hillshading is not a local tile operation and
             # requires neighbor tiles to be rendered seamlessly
@@ -585,6 +590,7 @@ class Export(TaskNestedView):
         rescale = request.data.get('rescale')
         export_format = request.data.get('format', 'laz' if asset_type == 'georeferenced_model' else 'gtiff')
         epsg = request.data.get('epsg')
+        proj = request.data.get('proj')
         color_map = request.data.get('color_map')
         hillshade = request.data.get('hillshade')
         resample = request.data.get('resample', 0)
@@ -593,9 +599,13 @@ class Export(TaskNestedView):
         if bands == '': bands = None
         if rescale == '': rescale = None
         if epsg == '': epsg = None
+        if proj == '': proj = None
         if color_map == '': color_map = None
         if hillshade == '': hillshade = None
         if resample == '': resample = 0
+
+        if epsg is not None:
+            proj = None
 
         expr = None
 
@@ -629,6 +639,14 @@ class Export(TaskNestedView):
             except ValueError:
                 raise exceptions.ValidationError(_("Invalid EPSG code: %(value)s") % {'value': epsg})
         
+        if proj is not None:
+            try:
+                srs = osr.SpatialReference()
+                if srs.ImportFromProj4(proj) != 0:
+                    raise exceptions.ValidationError(_("Invalid PROJ string: %(value)s") % {'value': proj})
+            except Exception as e:
+                raise exceptions.ValidationError(_("Invalid PROJ string: %(value)s") % {'value': proj})
+
         if (formula and not bands) or (not formula and bands):
             raise exceptions.ValidationError(_("Both formula and bands parameters are required"))
 
@@ -687,7 +705,8 @@ class Export(TaskNestedView):
             if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
-                celery_task_id = export_raster.delay(url, epsg=epsg, 
+                celery_task_id = export_raster.delay(url, epsg=epsg,
+                                                        proj=proj, 
                                                         expression=expr, 
                                                         format=export_format, 
                                                         rescale=rescale, 
@@ -699,10 +718,11 @@ class Export(TaskNestedView):
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})
         elif asset_type == 'georeferenced_model':
             # Shortcut the process if no processing is required
-            if export_format == 'laz' and (epsg == task.epsg or epsg is None) and (resample is None or resample == 0) and task.crop is None:
+            if export_format == 'laz' and (task.epsg is not None and epsg == task.epsg or epsg is None) and (proj is None) and (resample is None or resample == 0) and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.laz'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
-                celery_task_id = export_pointcloud.delay(url, epsg=epsg, 
+                celery_task_id = export_pointcloud.delay(url, epsg=epsg,
+                                                            proj=proj, 
                                                             format=export_format,
                                                             resample=resample,
                                                             crop=task.crop.wkt if task.crop is not None else None,

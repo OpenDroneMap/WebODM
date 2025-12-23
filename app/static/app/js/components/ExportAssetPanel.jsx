@@ -75,6 +75,7 @@ export default class ExportAssetPanel extends React.Component {
         format: props.exportFormats[0],
         epsg: this.props.task.epsg || null,
         customEpsg: Storage.getItem("last_export_custom_epsg") || "3857",
+        customProj: Storage.getItem("last_export_custom_proj") || "",
         resample: 0,
         exporting: false,
         progress: null
@@ -84,7 +85,13 @@ export default class ExportAssetPanel extends React.Component {
   
 
   getEpsg = () => {
-    return this.state.epsg !== "custom" ? this.state.epsg : this.state.customEpsg;
+    if (this.state.epsg !== "proj"){
+      return this.state.epsg !== "custom" ? this.state.epsg : this.state.customEpsg;
+    }
+  }
+
+  getProj = () => {
+    if (this.state.epsg === "proj") return this.state.customProj;
   }
 
   handleSelectFormat = e => {
@@ -97,6 +104,10 @@ export default class ExportAssetPanel extends React.Component {
 
   handleChangeCustomEpsg = e => {
     this.setState({customEpsg: e.target.value});
+  }
+  
+  handleChangeCustomProj = e => {
+    this.setState({customProj: e.target.value});
   }
 
   handleChangeResample = e => {
@@ -116,6 +127,9 @@ export default class ExportAssetPanel extends React.Component {
 
       const epsg = this.getEpsg();
       if (epsg) params.epsg = this.getEpsg();
+
+      const proj = this.getProj();
+      if (proj) params.proj = this.getProj();
 
       if (this.state.resample > 0) params.resample = this.state.resample;
 
@@ -137,7 +151,8 @@ export default class ExportAssetPanel extends React.Component {
         this.setState({exporting: true, error: "", progress: null});
         const data = this.getExportParams(format);
 
-        if (this.state.epsg === "custom") Storage.setItem("last_export_custom_epsg", data.epsg);
+        if (this.state.epsg === "custom" && data.epsg) Storage.setItem("last_export_custom_epsg", data.epsg);
+        if (this.state.epsg === "proj" && data.proj) Storage.setItem("last_export_custom_proj", data.proj);
         
         this.exportReq = $.ajax({
                 type: 'POST',
@@ -187,7 +202,7 @@ export default class ExportAssetPanel extends React.Component {
   }
 
   render(){
-    const {epsg, customEpsg, exporting, format, resample, progress } = this.state;
+    const {epsg, customEpsg, customProj, exporting, format, resample, progress } = this.state;
     const { exportFormats } = this.props;
     const projEPSG = this.props.task.epsg;
     let projSrsName = this.props.task.srs?.name;
@@ -197,7 +212,9 @@ export default class ExportAssetPanel extends React.Component {
     let resampleUnits = _("Meters").toLowerCase();
     if (this.props.task.srs?.units != "m") resampleUnits = _("Feet").toLowerCase();
 
-    const disabled = (epsg === "custom" && !customEpsg) || exporting;
+    const disabled = (epsg === "custom" && !customEpsg) || 
+                     (epsg === "proj" && (!customProj || (typeof customProj === "string" && !customProj.toLowerCase().startsWith("+proj")))) || 
+                     exporting;
 
     let projection = projEPSG ? (<div><div className="row form-group form-inline">
     <label className="col-sm-3 control-label">{_("CRS:")}</label>
@@ -207,6 +224,7 @@ export default class ExportAssetPanel extends React.Component {
         <option value="4326">{_("Lat/Lon")} (EPSG:4326)</option>
         <option value="3857">{_("Web Mercator")} (EPSG:3857)</option>
         <option value="custom">{_("Custom")} EPSG</option>
+        <option value="proj">{_("Custom")} PROJ</option>
       </select>
     </div>
   </div>
@@ -215,6 +233,14 @@ export default class ExportAssetPanel extends React.Component {
       <label className="col-sm-3 control-label">EPSG:</label>
       <div className="col-sm-9 ">
         <input type="number" className="form-control custom-interval" value={customEpsg} onChange={this.handleChangeCustomEpsg} />
+      </div>
+    </div>
+  : ""}
+  {epsg === "proj" ? 
+    <div className="row form-group form-inline">
+      <label className="col-sm-3 control-label">PROJ:</label>
+      <div className="col-sm-9 ">
+        <input type="text" className="form-control control-proj" value={customProj} onChange={this.handleChangeCustomProj} />
       </div>
     </div>
   : ""}
