@@ -29,7 +29,7 @@ def export_pointcloud(input, output, **opts):
     elif proj:
         srs = osr.SpatialReference()
         if srs.ImportFromProj4(proj) != 0:
-            raise Exception(f"Invalid PROJ string: {f}")
+            raise Exception(f"Invalid PROJ string: {proj}")
         reprojection_args = ["reprojection",
                             "--filters.reprojection.out_srs=%s" % proj]
         
