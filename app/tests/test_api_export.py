@@ -80,6 +80,7 @@ class TestApiTask(BootTransactionTestCase):
 
             # Should have returned the id of the newly created task
             task = Task.objects.latest('created_at')
+            test_proj = "+proj=tmerc +lat_0=39.75527777777778 +lon_0=-104.8980555555556 +k=1.00025403 +x_0=182880.3657607315 +y_0=121920.2438404877 +ellps=GRS80 +units=us-ft +no_defs326"
 
             params = [
                 ('orthophoto', {'formula': 'NDVI', 'bands': 'RGN'}, status.HTTP_200_OK),
@@ -128,6 +129,7 @@ class TestApiTask(BootTransactionTestCase):
                 ('orthophoto', {'format': 'gtiff-rgb', 'rescale': "10,100"}, False, ".tif", status.HTTP_200_OK),
                 ('orthophoto', {'format': 'laz'}, False, ".tif", status.HTTP_400_BAD_REQUEST),
                 ('orthophoto', {'format': 'jpg', 'epsg': 4326}, False, ".jpg", status.HTTP_200_OK),
+                ('orthophoto', {'format': 'jpg', 'proj': test_proj}, False, ".jpg", status.HTTP_200_OK),
                 ('orthophoto', {'format': 'jpg', 'epsg': 4326, 'rescale': '10,200'}, False, ".jpg", status.HTTP_200_OK),
                 ('orthophoto', {'format': 'png'}, False, ".png", status.HTTP_200_OK),
                 ('orthophoto', {'format': 'kmz'}, False, ".kmz", status.HTTP_200_OK),
@@ -139,6 +141,7 @@ class TestApiTask(BootTransactionTestCase):
                 ('dsm', {'format': 'gtiff'}, True, ".tif", status.HTTP_200_OK),
                 ('dsm', {'epsg': 4326}, False, ".tif", status.HTTP_200_OK),
                 ('dsm', {'format': 'jpg', 'epsg': 4326}, False, ".jpg", status.HTTP_200_OK),
+                ('dsm', {'format': 'jpg', 'proj': test_proj}, False, ".jpg", status.HTTP_200_OK),
                 ('dsm', {'format': 'jpg', 'color_map': 'jet', 'hillshade': 0, 'epsg': 3857}, False, ".jpg", status.HTTP_200_OK),
                 ('dsm', {'epsg': 4326, 'format': 'jpg'}, False, ".jpg", status.HTTP_200_OK),
                 ('dsm', {'epsg': 4326, 'format': 'gtiff-rgb'}, False, ".tif", status.HTTP_200_OK),
@@ -155,12 +158,14 @@ class TestApiTask(BootTransactionTestCase):
                 
                 ('dtm', {'format': 'gtiff'}, True, ".tif", status.HTTP_200_OK),
                 ('dtm', {'epsg': 4326}, False, ".tif", status.HTTP_200_OK),
+                ('dtm', {'proj': test_proj}, False, ".tif", status.HTTP_200_OK),
 
                 ('georeferenced_model', {}, True, ".laz", status.HTTP_200_OK),
                 ('georeferenced_model', {'format': 'las'}, False, ".las", status.HTTP_200_OK),
                 ('georeferenced_model', {'format': 'ply'}, False, ".ply", status.HTTP_200_OK),
                 ('georeferenced_model', {'format': 'csv'}, False, ".csv", status.HTTP_200_OK),
                 ('georeferenced_model', {'format': 'las', 'epsg': 4326}, False, ".las", status.HTTP_200_OK),
+                ('georeferenced_model', {'format': 'las', 'proj': test_proj}, False, ".las", status.HTTP_200_OK),
 
                 ('georeferenced_model', {'format': 'tif'}, False, ".laz", status.HTTP_400_BAD_REQUEST),
             ]
