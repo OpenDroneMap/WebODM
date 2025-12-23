@@ -702,7 +702,7 @@ class Export(TaskNestedView):
 
         if asset_type in ['orthophoto', 'dsm', 'dtm']:
             # Shortcut the process if no processing is required
-            if export_format == 'gtiff' and (epsg == task.epsg or epsg is None) and expr is None and task.crop is None:
+            if export_format == 'gtiff' and ((task.epsg is not None and epsg == task.epsg) or epsg is None) and (proj is None) and expr is None and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
                 celery_task_id = export_raster.delay(url, epsg=epsg,
@@ -718,7 +718,7 @@ class Export(TaskNestedView):
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})
         elif asset_type == 'georeferenced_model':
             # Shortcut the process if no processing is required
-            if export_format == 'laz' and (task.epsg is not None and epsg == task.epsg or epsg is None) and (proj is None) and (resample is None or resample == 0) and task.crop is None:
+            if export_format == 'laz' and ((task.epsg is not None and epsg == task.epsg) or epsg is None) and (proj is None) and (resample is None or resample == 0) and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.laz'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
                 celery_task_id = export_pointcloud.delay(url, epsg=epsg,
