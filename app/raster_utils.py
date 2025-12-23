@@ -107,6 +107,7 @@ def export_raster(input, output, progress_callback=None, **opts):
             last_update = t
 
     epsg = opts.get('epsg')
+    proj = opts.get('proj')
     expression = opts.get('expression')
     export_format = opts.get('format')
     rescale = opts.get('rescale')
@@ -155,7 +156,7 @@ def export_raster(input, output, progress_callback=None, **opts):
         indexes = src.indexes
         output_raster = output
         jpg_background = 255 # white
-        reproject = src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg
+        reproject = src.crs is not None and ((epsg is not None and src.crs.to_epsg() != epsg) or proj is not None)
 
         # KMZ is special, we just export it as GeoTIFF
         # and then call GDAL to tile/package it
@@ -431,9 +432,14 @@ def export_raster(input, output, progress_callback=None, **opts):
         elif reproject:
             output_vrt = path_base + ".vrt"
 
+            if epsg is not None:
+                t_srs = f"EPSG:{epsg}"
+            elif proj is not None:
+                t_srs = proj
+
             subprocess.check_output(["gdalwarp", "-r", "near" if resampling == "nearest" else resampling, 
                                     "-of", "VRT",
-                                    "-t_srs", f"EPSG:{epsg}",
+                                    "-t_srs", t_srs,
                                     output_raster, output_vrt])
             gt_args = ["-r", resampling, "--config", "GDAL_CACHEMAX", "25%"]
             if bigtiff and not jpg and not png:

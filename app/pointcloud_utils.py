@@ -6,11 +6,13 @@ import rasterio
 from app.geoutils import geom_transform_wkt_bbox
 from django.contrib.gis.geos import GEOSGeometry
 from app.security import double_quote
+from osgeo import osr
 
 logger = logging.getLogger('app.logger')
 
 def export_pointcloud(input, output, **opts):
     epsg = opts.get('epsg')
+    proj = opts.get('proj')
     export_format = opts.get('format')
     resample = float(opts.get('resample', 0))
     crop_wkt = opts.get('crop')
@@ -24,7 +26,13 @@ def export_pointcloud(input, output, **opts):
     if epsg:
         reprojection_args = ["reprojection",
                             "--filters.reprojection.out_srs=%s" % double_quote("EPSG:" + str(epsg))]
-
+    elif proj:
+        srs = osr.SpatialReference()
+        if srs.ImportFromProj4(proj) != 0:
+            raise Exception(f"Invalid PROJ string: {proj}")
+        reprojection_args = ["reprojection",
+                            "--filters.reprojection.out_srs=%s" % proj]
+        
     if export_format == "ply":
         extra_args = ['--writers.ply.dims', 'X,Y,Z,Red,Green,Blue',
                       '--writers.ply.sized_types', 'false',
