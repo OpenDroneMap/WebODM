@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import struct
+import zlib
 import tempfile
 from datetime import datetime
 import uuid as uuid_module
@@ -957,15 +958,18 @@ class Task(models.Model):
     def extract_assets_and_complete(self):
         """
         Extracts assets/all.zip, populates task fields where required and assure COGs
-        It will raise a zipfile.BadZipFile exception is the archive is corrupted.
+        It will raise a zipfile.BadZipFile exception if the archive is corrupted.
         :return:
         """
         assets_dir = self.assets_path("")
         zip_path = self.assets_path("all.zip")
 
         # Extract from zip
-        with zipfile.ZipFile(zip_path, "r") as zip_h:
-            zip_h.extractall(assets_dir)
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_h:
+                zip_h.extractall(assets_dir)
+        except zlib.error as e:
+            raise zipfile.BadZipFile(str(e))
 
         logger.info("Extracted all.zip for {}".format(self))
         
