@@ -276,7 +276,7 @@ class TaskListItem extends React.Component {
   copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     this.setState({copiedToClipboard: true});
-    if (!this._clipboardTimeout){
+    if (this._clipboardTimeout){
       clearTimeout(this._clipboardTimeout);
       this._clipboardTimeout = null;
     }
