@@ -6,6 +6,7 @@ import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import ImagePopup from './components/ImagePopup';
+import Utils from './classes/Utils';
 import PropTypes from 'prop-types';
 import * as THREE from 'THREE';
 import $ from 'jquery';
@@ -300,7 +301,9 @@ class ModelView extends React.Component {
   }
 
   glbFilePath = () => {
-    return this.basePath() + '/textured_model/';
+    let url = this.basePath() + '/textured_model/';
+    if (Utils.isMobile()) url += "?platform=mobile";
+    return url;
   }
 
   mtlFilename = (cb) => {
@@ -682,9 +685,14 @@ class ModelView extends React.Component {
     // Using opacity we can still perform measurements
     viewer.setEDLOpacity(flag ? 1 : 0);
 
-    // for(let pointcloud of viewer.scene.pointclouds){
-    //     pointcloud.visible = flag;
-    // }
+    // On mobile, for performance and because opacity doesn't
+    // seem to work consistently, we remove the ability to do
+    // measurements
+    if (Utils.isMobile()){
+        for(let pointcloud of viewer.scene.pointclouds){
+            pointcloud.visible = flag;
+        }
+    }
   }
 
   toggleCameras = (e) => {
