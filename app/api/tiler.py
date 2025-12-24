@@ -323,7 +323,8 @@ class Metadata(TaskNestedView):
             info['maxzoom'] = info['minzoom']
         info['maxzoom'] += ZOOM_EXTRA_LEVELS
         info['minzoom'] -= ZOOM_EXTRA_LEVELS
-        info['bounds'] = {'value': bounds if bounds is not None else src.bounds, 'crs': {'init': str(task.epsg)}}
+        info['bounds'] = {'value': bounds if bounds is not None else src.bounds, 
+                          'crs': f"EPSG:{task.epsg}" if task.epsg is not None else task.wkt}
 
         return Response(info)
 
@@ -689,7 +690,7 @@ class Export(TaskNestedView):
         if not os.path.isfile(url):
             raise exceptions.NotFound()
 
-        if epsg is not None and task.epsg is None:
+        if epsg is not None and (task.epsg is None and task.wkt is None):
             raise exceptions.ValidationError(_("Cannot use epsg on non-georeferenced dataset"))
         
         # Strip unsafe chars, append suffix

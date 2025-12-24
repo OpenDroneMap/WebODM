@@ -1150,6 +1150,9 @@ class TestApiTask(BootTransactionTestCase):
             # EPSG should be populated
             self.assertEqual(task.epsg, 32615)
 
+            # WKT should not (because EPSG is)
+            self.assertIsNone(task.wkt)
+
             # Orthophoto bands should not be populated
             self.assertEqual(len(task.orthophoto_bands), 0)
 

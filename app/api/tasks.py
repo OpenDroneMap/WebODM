@@ -36,7 +36,7 @@ from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 from .fields import PolygonGeometryField
-from app.geoutils import geom_transform_wkt_bbox, get_srs_name_units_from_epsg
+from app.geoutils import geom_transform_wkt_bbox, get_srs_name_units_from_epsg_or_wkt
 from webodm import settings
 
 def flatten_files(request_files):
@@ -93,7 +93,7 @@ class TaskSerializer(serializers.ModelSerializer):
         return obj.get_extent()
     
     def get_srs(self, obj):
-        return get_srs_name_units_from_epsg(obj.epsg)
+        return get_srs_name_units_from_epsg_or_wkt(obj.epsg, obj.wkt)
 
     class Meta:
         model = models.Task
