@@ -30,9 +30,9 @@ class SwitchModeButton extends React.Component {
   handleClick(){
     if (this.props.task){
       const target = this.props.type === 'mapToModel' ? '3d' : 'map';
-
+      
       let url = this.props.public ? 
-                `../${target}/`
+                `/public/task/${this.props.task.id}/${target}/`
               : `/${target}/project/${this.props.task.project}/task/${this.props.task.id}/`;
       
       location.href = url;
