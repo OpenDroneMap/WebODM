@@ -226,11 +226,9 @@ export default class ExportAssetPanel extends React.Component {
     }else if (projWKT){
       firstOpt = (<option value={""}>{projSrsName}</option>);
     }
-    console.log(epsg);
+
     if (epsg == projEPSG) title = projSrsName;
     else if (epsg == "" && projWKT) title = projWKT;
-
-    console.log(projWKT)
 
     let projection = georeferenced ? (<div><div className="row form-group form-inline">
     <label className="col-sm-3 control-label">{_("CRS:")}</label>
