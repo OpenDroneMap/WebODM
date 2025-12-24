@@ -79,14 +79,20 @@ def geom_transform_wkt_bbox(geom, dataset, bbox_crs="geographic", wkt_crs="raste
         if close_ds:
             dataset.close()
 
-def geom_transform(geom, epsg):
+def geom_transform(geom, target_srs):
     if not geom.srid:
         raise ValueError("Geometry must have an SRID")
     
     coords = geom.tuple
     if len(coords) == 1:
         xs, ys = zip(*coords[0])
-        tx, ty = rasterio.warp.transform(CRS.from_epsg(geom.srid), CRS.from_epsg(epsg), xs, ys)
+
+        if isinstance(target_srs, int):
+            srs = CRS.from_epsg(target_srs)
+        elif isinstance(target_srs, str):
+            srs = CRS.from_wkt(target_srs)
+
+        tx, ty = rasterio.warp.transform(CRS.from_epsg(geom.srid), srs, xs, ys)
         return list(zip(tx, ty))
     else:
         raise ValueError("Cannot transform complex geometries to WKT")
@@ -127,13 +133,19 @@ def get_raster_bounds_wkt(raster_path, target_srs="EPSG:4326"):
         return wkt
 
 @lru_cache(maxsize=1000)
-def get_srs_name_units_from_epsg(epsg):
-    if epsg is None:
+def get_srs_name_units_from_epsg_or_wkt(epsg, wkt):
+    if epsg is None and wkt is None:
         return {'name': '', 'units': 'm'}
     
     srs = osr.SpatialReference()
-    if srs.ImportFromEPSG(epsg) != 0:
-        return {'name': '', 'units': 'm'}
+
+    if epsg is not None:
+        if srs.ImportFromEPSG(epsg) != 0:
+            return {'name': '', 'units': 'm'}
+    
+    if wkt is not None:
+        if srs.ImportFromWkt(wkt) != 0:
+            return {'name': '', 'units': 'm'}
 
     name = srs.GetAttrValue("PROJCS")
     if name is None:

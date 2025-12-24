@@ -323,6 +323,7 @@ class Metadata(TaskNestedView):
             info['maxzoom'] = info['minzoom']
         info['maxzoom'] += ZOOM_EXTRA_LEVELS
         info['minzoom'] -= ZOOM_EXTRA_LEVELS
+        # TODO!!!
         info['bounds'] = {'value': bounds if bounds is not None else src.bounds, 'crs': {'init': str(task.epsg)}}
 
         return Response(info)
@@ -689,7 +690,7 @@ class Export(TaskNestedView):
         if not os.path.isfile(url):
             raise exceptions.NotFound()
 
-        if epsg is not None and task.epsg is None:
+        if epsg is not None and (task.epsg is None and task.wkt is None):
             raise exceptions.ValidationError(_("Cannot use epsg on non-georeferenced dataset"))
         
         # Strip unsafe chars, append suffix
@@ -702,6 +703,7 @@ class Export(TaskNestedView):
 
         if asset_type in ['orthophoto', 'dsm', 'dtm']:
             # Shortcut the process if no processing is required
+            # TODO!!!
             if export_format == 'gtiff' and ((task.epsg is not None and epsg == task.epsg) or epsg is None) and (proj is None) and expr is None and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.tif'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:
@@ -718,6 +720,7 @@ class Export(TaskNestedView):
                 return Response({'celery_task_id': celery_task_id, 'filename': filename})
         elif asset_type == 'georeferenced_model':
             # Shortcut the process if no processing is required
+            # TODO!!!
             if export_format == 'laz' and ((task.epsg is not None and epsg == task.epsg) or epsg is None) and (proj is None) and (resample is None or resample == 0) and task.crop is None:
                 return Response({'url': '/api/projects/{}/tasks/{}/download/{}.laz'.format(task.project.id, task.id, asset_type), 'filename': filename})
             else:

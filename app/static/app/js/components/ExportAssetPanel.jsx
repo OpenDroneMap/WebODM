@@ -73,7 +73,7 @@ export default class ExportAssetPanel extends React.Component {
     this.state = {
         error: "",
         format: props.exportFormats[0],
-        epsg: this.props.task.epsg || null,
+        epsg: this.props.task.epsg || "",
         customEpsg: Storage.getItem("last_export_custom_epsg") || "3857",
         customProj: Storage.getItem("last_export_custom_proj") || "",
         resample: 0,
@@ -205,6 +205,8 @@ export default class ExportAssetPanel extends React.Component {
     const {epsg, customEpsg, customProj, exporting, format, resample, progress } = this.state;
     const { exportFormats } = this.props;
     const projEPSG = this.props.task.epsg;
+    const projWKT = this.props.task.wkt;
+    const georeferenced = this.props.task.epsg || this.props.task.wkt;
     let projSrsName = this.props.task.srs?.name;
     if (!projSrsName && projEPSG) projSrsName = `EPSG:${projEPSG}`;
     else if (projSrsName && projEPSG) projSrsName = `${projSrsName} (EPSG:${projEPSG})`;
@@ -216,11 +218,25 @@ export default class ExportAssetPanel extends React.Component {
                      (epsg === "proj" && (!customProj || (typeof customProj === "string" && !customProj.toLowerCase().startsWith("+proj")))) || 
                      exporting;
 
-    let projection = projEPSG ? (<div><div className="row form-group form-inline">
+    let firstOpt = "";
+    let title = "";
+
+    if (projEPSG){
+      firstOpt = (<option value={projEPSG}>{projSrsName}</option>);
+    }else if (projWKT){
+      firstOpt = (<option value={""}>{projSrsName}</option>);
+    }
+    console.log(epsg);
+    if (epsg == projEPSG) title = projSrsName;
+    else if (epsg == "" && projWKT) title = projWKT;
+
+    console.log(projWKT)
+
+    let projection = georeferenced ? (<div><div className="row form-group form-inline">
     <label className="col-sm-3 control-label">{_("CRS:")}</label>
     <div className="col-sm-9 ">
-      <select className="form-control crs" value={epsg} onChange={this.handleSelectEpsg} title={epsg == projEPSG ? projSrsName : ""}>
-        {projEPSG ? <option value={projEPSG}>{projSrsName}</option> : ""}
+      <select className="form-control crs" value={epsg} onChange={this.handleSelectEpsg} title={title}>
+        {firstOpt}
         <option value="4326">{_("Lat/Lon")} (EPSG:4326)</option>
         <option value="3857">{_("Web Mercator")} (EPSG:3857)</option>
         <option value="custom">{_("Custom")} EPSG</option>
