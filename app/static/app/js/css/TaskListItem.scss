@@ -168,4 +168,21 @@
             opacity: 0.9;
         }
     }
+
+    .task-id-link{
+        text-decoration: none !important;
+        color: inherit;
+        i{
+            margin-left: 4px;
+            display: none;
+        }
+        i.visible{
+            display: inline-block;
+        }
+        &:hover{
+            i{
+                display: inline-block;
+            }
+        }
+    }
 }
