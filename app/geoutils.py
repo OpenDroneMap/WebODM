@@ -154,6 +154,14 @@ def get_srs_name_units_from_epsg_or_wkt(epsg, wkt):
     if name is None:
         return {'name': '', 'units': 'm'}
     
+    if name == "unknown" and wkt is not None:
+        try:
+            proj = srs.ExportToProj4()
+            if proj is not None and proj != "":
+                name = proj
+        except:
+            pass
+    
     units = srs.GetAttrValue('UNIT')
     if units is None:
         units = 'm'  # Default to meters
