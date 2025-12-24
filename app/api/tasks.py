@@ -776,8 +776,13 @@ class TaskSafeTexturedModel(TaskNestedView):
         """
         task = self.get_and_check_task(request, pk)
 
+        platform = request.query_params.get('platform', '')
+        max_size_mb = 120
+        if platform == "mobile":
+            max_size_mb = 60
+
         try:
-            model_file = task.get_safe_textured_model()
+            model_file = task.get_safe_textured_model(max_size_mb=max_size_mb)
             return download_file_response(request, model_file, 'attachment')
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
