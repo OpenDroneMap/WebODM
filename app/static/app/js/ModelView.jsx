@@ -341,7 +341,11 @@ class ModelView extends React.Component {
     window.viewer = new Potree.Viewer(container);
     viewer.setEDLEnabled(true);
     viewer.setFOV(60);
-    viewer.setPointBudget(10*1000*1000);
+    if (Utils.isMobile()){
+        viewer.setPointBudget(2*1000*1000);
+    }else{
+        viewer.setPointBudget(10*1000*1000);
+    }
     viewer.setEDLEnabled(true);
     viewer.loadSettingsFromURL();
 
