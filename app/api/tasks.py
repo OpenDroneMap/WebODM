@@ -780,6 +780,8 @@ class TaskSafeTexturedModel(TaskNestedView):
         max_size_mb = 120
         if platform == "mobile":
             max_size_mb = 60
+        elif platform == "ios":
+            max_size_mb = 5
 
         try:
             model_file = task.get_safe_textured_model(max_size_mb=max_size_mb)
