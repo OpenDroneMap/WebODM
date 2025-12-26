@@ -302,7 +302,10 @@ class ModelView extends React.Component {
 
   glbFilePath = () => {
     let url = this.basePath() + '/textured_model/';
-    if (Utils.isMobile()) url += "?platform=mobile";
+    
+    if (Utils.isIOS()) url += "?platform=ios";
+    else if (Utils.isMobile()) url += "?platform=mobile";
+    
     return url;
   }
 
@@ -341,7 +344,14 @@ class ModelView extends React.Component {
     window.viewer = new Potree.Viewer(container);
     viewer.setEDLEnabled(true);
     viewer.setFOV(60);
-    viewer.setPointBudget(10*1000*1000);
+
+    if (Utils.isIOS()){
+        viewer.setPointBudget(1000*1000);
+    }else if (Utils.isMobile()){
+        viewer.setPointBudget(2*1000*1000);
+    }else{
+        viewer.setPointBudget(10*1000*1000);
+    }
     viewer.setEDLEnabled(true);
     viewer.loadSettingsFromURL();
 
