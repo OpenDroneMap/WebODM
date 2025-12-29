@@ -107,6 +107,7 @@ def export_raster(input, output, progress_callback=None, **opts):
             last_update = t
 
     epsg = opts.get('epsg')
+    proj = opts.get('proj')
     expression = opts.get('expression')
     export_format = opts.get('format')
     rescale = opts.get('rescale')
@@ -155,7 +156,7 @@ def export_raster(input, output, progress_callback=None, **opts):
         indexes = src.indexes
         output_raster = output
         jpg_background = 255 # white
-        reproject = src.crs is not None and epsg is not None and src.crs.to_epsg() != epsg
+        reproject = src.crs is not None and ((epsg is not None and src.crs.to_epsg() != epsg) or proj is not None)
 
         # KMZ is special, we just export it as GeoTIFF
         # and then call GDAL to tile/package it
@@ -176,6 +177,10 @@ def export_raster(input, output, progress_callback=None, **opts):
                 export_format = 'gtiff-rgb'
                 path_base, _ = os.path.splitext(output)
                 output_raster = path_base + ".png.tif"
+
+        JPEG_PX_LIMIT = 65000 # Due to 16bit fields for w,h in JPEG standard
+        if jpg and (src.width > JPEG_PX_LIMIT or src.height > JPEG_PX_LIMIT):
+            raise Exception(f"Image is too large (> {JPEG_PX_LIMIT}px) for JPEG. Use TIFF (RGB) instead.")
 
         if export_format == "jpg":
             driver = "JPEG"
@@ -427,9 +432,14 @@ def export_raster(input, output, progress_callback=None, **opts):
         elif reproject:
             output_vrt = path_base + ".vrt"
 
+            if epsg is not None:
+                t_srs = f"EPSG:{epsg}"
+            elif proj is not None:
+                t_srs = proj
+
             subprocess.check_output(["gdalwarp", "-r", "near" if resampling == "nearest" else resampling, 
                                     "-of", "VRT",
-                                    "-t_srs", f"EPSG:{epsg}",
+                                    "-t_srs", t_srs,
                                     output_raster, output_vrt])
             gt_args = ["-r", resampling, "--config", "GDAL_CACHEMAX", "25%"]
             if bigtiff and not jpg and not png:

@@ -50,7 +50,8 @@ class TaskListItem extends React.Component {
       showMoveDialog: false,
       actionLoading: false,
       thumbLoadFailed: false,
-      displayPdf: false
+      displayPdf: false,
+      copiedToClipboard: false,
     }
 
     for (let k in props.data){
@@ -221,7 +222,7 @@ class TaskListItem extends React.Component {
             uuid: this.state.task.uuid
           }
         ).done(json => {
-            if (json.success){
+            if (json.success || json.id){
               this.refresh();
               if (options.success !== undefined) options.success(json);
             }else{
@@ -270,6 +271,18 @@ class TaskListItem extends React.Component {
 
   stopEditing(){
     this.setState({editing: false});
+  }
+
+  copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    this.setState({copiedToClipboard: true});
+    if (this._clipboardTimeout){
+      clearTimeout(this._clipboardTimeout);
+      this._clipboardTimeout = null;
+    }
+    setTimeout(() => {
+      this.setState({copiedToClipboard: false});
+    }, 2000);
   }
 
   checkForCommonErrors(lines){
@@ -580,6 +593,16 @@ class TaskListItem extends React.Component {
         });
       }
 
+      if (!task.last_error && task.status === null && (task.processing_node || imported) && task.partial && !task.pending_action && this.props.hasPermission("change")){
+        addActionButton(_("Start Processing"), "btn-primary", "glyphicon glyphicon-saved", this.genActionApiCall("commit", {
+            confirm: _("Have all images been uploaded?"),
+            defaultError: _("Cannot start processing task.")
+          }),
+          {
+            className: "pull-right"
+          });
+      }
+
       actionButtons = (<div className="action-buttons">
             {showAssetButtons ?
               <AssetDownloadButtons task={this.state.task} disabled={disabled} />
@@ -630,13 +653,17 @@ class TaskListItem extends React.Component {
                 <table className="table table-condensed info-table">
                   <tbody>
                     <tr>
+                      <td><strong>{_("Task ID:")}</strong></td>
+                      <td><a title={_("Copy to clipboard")} onClick={() => this.copyToClipboard(task.id)} href="javascript:void(0)" className="task-id-link">{task.id} <i className={"clipboard " + (this.state.copiedToClipboard ? "fa fa-check visible" : "far fa-clipboard")}></i></a></td>
+                    </tr>
+                    <tr>
                       <td><strong>{_("Created on:")}</strong></td>
                       <td>{(new Date(task.created_at)).toLocaleString()}</td>
                     </tr>
-                    <tr>
+                    {task.status !== statusCodes.COMPLETED && <tr>
                       <td><strong>{_("Processing Node:")}</strong></td>
                       <td>{task.processing_node_name || "-"} ({task.auto_processing_node ? _("auto") : _("manual")})</td>
-                    </tr>
+                    </tr>}
                     {Array.isArray(task.options) &&
                     <tr>
                       <td><strong>{_("Options:")}</strong></td>
@@ -654,23 +681,24 @@ class TaskListItem extends React.Component {
                     </tr>}
                     {stats && stats.pointcloud && stats.pointcloud.points &&
                     <tr>
-                      <td><strong>{_("Reconstructed Points:")}</strong></td>
+                      <td><strong>{_("Points:")}</strong></td>
                       <td>{stats.pointcloud.points.toLocaleString()}</td>
                     </tr>}
                     {stats && stats.spatial_refs && stats.spatial_refs.length &&
                     <tr>
-                      <td><strong>{_("Spatial Reference:")}</strong></td>
+                      <td><strong>{_("Georeferencing:")}</strong></td>
                       <td>{this.spatialRefsToHuman(stats.spatial_refs)}</td>
+                    </tr>}
+                    {task.srs && task.srs.name && 
+                    <tr>
+                      <td><strong>{_("CRS:")}</strong></td>
+                      <td>{task.srs.name}</td>
                     </tr>}
                     {task.size > 0 && 
                     <tr>
                       <td><strong>{_("Disk Usage:")}</strong></td>
                       <td>{Utils.bytesToSize(task.size * 1024 * 1024)}</td>
                     </tr>}
-                    <tr>
-                      <td><strong>{_("Task ID:")}</strong></td>
-                      <td>{task.id}</td>
-                    </tr>
                     <tr>
                         <td><strong>{_("Task Output:")}</strong></td>
                         <td><div className="btn-group btn-toggle"> 
@@ -763,11 +791,11 @@ class TaskListItem extends React.Component {
       statusLabel = getStatusLabel(task.last_error, 'error');
     }else if (!task.processing_node && !imported && this.props.hasPermission("change") && task.status !== statusCodes.COMPLETED){
       statusLabel = getStatusLabel(_("Set a processing node"));
-      statusIcon = "fa fa-hourglass-3";
+      statusIcon = "far fa-hourglass";
       showEditLink = true;
     }else if (task.partial && !task.pending_action){
-      statusIcon = "fa fa-hourglass-3";
-      statusLabel = getStatusLabel(_("Waiting for image upload..."));
+      statusIcon = "far fa-hourglass";
+      statusLabel = getStatusLabel(_("Waiting to start processing..."));
     }else{
       let progress = 100;
       let type = 'done';

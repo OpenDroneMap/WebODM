@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 import struct
+import zlib
 import tempfile
 from datetime import datetime
 import uuid as uuid_module
@@ -39,7 +40,7 @@ from app.cogeo import assure_cogeo
 from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
-from app.geoutils import geom_transform, epsg_from_wkt, get_raster_bounds_wkt, get_srs_name_units_from_epsg
+from app.geoutils import geom_transform, epsg_from_wkt, get_raster_bounds_wkt, get_srs_name_units_from_epsg_or_wkt
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -286,6 +287,7 @@ class Task(models.Model):
     partial = models.BooleanField(default=False, help_text=_("A flag indicating whether this task is currently waiting for information or files to be uploaded before being considered for processing."), verbose_name=_("Partial"))
     potree_scene = fields.JSONField(default=dict, blank=True, help_text=_("Serialized potree scene information used to save/load measurements and camera view angle"), verbose_name=_("Potree Scene"))
     epsg = models.IntegerField(null=True, default=None, blank=True, help_text=_("EPSG code of the dataset (if georeferenced)"), verbose_name="EPSG")
+    wkt = models.TextField(null=True, default=None, blank=True, help_text=_("WKT definition of the dataset (if georeferenced and EPSG code is not available)"), verbose_name="WKT")
     tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Task tags"), verbose_name=_("Tags"))
     orthophoto_bands = fields.JSONField(default=list, blank=True, help_text=_("List of orthophoto bands"), verbose_name=_("Orthophoto Bands"))
     size = models.FloatField(default=0.0, blank=True, help_text=_("Size of the task on disk in megabytes"), verbose_name=_("Size"))
@@ -957,15 +959,18 @@ class Task(models.Model):
     def extract_assets_and_complete(self):
         """
         Extracts assets/all.zip, populates task fields where required and assure COGs
-        It will raise a zipfile.BadZipFile exception is the archive is corrupted.
+        It will raise a zipfile.BadZipFile exception if the archive is corrupted.
         :return:
         """
         assets_dir = self.assets_path("")
         zip_path = self.assets_path("all.zip")
 
         # Extract from zip
-        with zipfile.ZipFile(zip_path, "r") as zip_h:
-            zip_h.extractall(assets_dir)
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_h:
+                zip_h.extractall(assets_dir)
+        except zlib.error as e:
+            raise zipfile.BadZipFile(str(e))
 
         logger.info("Extracted all.zip for {}".format(self))
         
@@ -1021,7 +1026,7 @@ class Task(models.Model):
         
         self.check_ept()
         self.update_available_assets_field()
-        self.update_epsg_field()
+        self.update_georef_fields()
         self.update_orthophoto_bands_field()
         self.update_size()
         self.clear_task_assets_cache()
@@ -1140,7 +1145,8 @@ class Task(models.Model):
                     'camera_shots': camera_shots,
                     'ground_control_points': ground_control_points,
                     'epsg': self.epsg,
-                    'srs': get_srs_name_units_from_epsg(self.epsg),
+                    'wkt': self.wkt,
+                    'srs': get_srs_name_units_from_epsg_or_wkt(self.epsg, self.wkt),
                     'orthophoto_bands': self.orthophoto_bands,
                     'crop': self.crop is not None,
                     'extent': self.get_extent(),
@@ -1149,10 +1155,10 @@ class Task(models.Model):
         }
 
     def get_projected_crop(self):
-        if self.crop is None or self.epsg is None:
+        if self.crop is None or (self.epsg is None and self.wkt is None):
             return None
         
-        return geom_transform(self.crop, self.epsg)
+        return geom_transform(self.crop, self.epsg if self.epsg is not None else self.wkt)
 
     def get_model_display_params(self):
         """
@@ -1165,7 +1171,7 @@ class Task(models.Model):
             'public': self.public,
             'public_edit': self.public_edit,
             'epsg': self.epsg,
-            'srs': get_srs_name_units_from_epsg(self.epsg),
+            'srs': get_srs_name_units_from_epsg_or_wkt(self.epsg, self.wkt),
             'crop_projected': self.get_projected_crop() 
         }
 
@@ -1197,12 +1203,14 @@ class Task(models.Model):
         if commit: self.save()
 
     
-    def update_epsg_field(self, commit=False):
+    def update_georef_fields(self, commit=False):
         """
-        Updates the epsg field with the correct value
+        Updates the epsg and wkt field with the correct values
         :param commit: when True also saves the model, otherwise the user should manually call save()
         """
         epsg = None
+        wkt = None
+
         for asset in ['orthophoto.tif', 'dsm.tif', 'dtm.tif']:
             asset_path = self.assets_path(self.ASSETS_MAP[asset])
             if os.path.isfile(asset_path):
@@ -1227,12 +1235,18 @@ class Task(models.Model):
         # If point cloud is not georeferenced, dataset is not georeferenced
         # (2D assets might be using pseudo-georeferencing)
         point_cloud = self.assets_path(self.ASSETS_MAP['georeferenced_model.laz'])
-        if epsg is not None and os.path.isfile(point_cloud):
+        if (epsg is not None or wkt is not None) and os.path.isfile(point_cloud):
             if not is_pointcloud_georeferenced(point_cloud):
                 logger.info("{} is not georeferenced".format(self))
                 epsg = None
+                wkt = None
 
         self.epsg = epsg
+        if epsg is None:
+            self.wkt = wkt
+        else:
+            self.wkt = None # Only save one or the other
+
         if commit: self.save()
 
 

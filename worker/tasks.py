@@ -4,6 +4,7 @@ import tempfile
 import traceback
 import json
 import socket
+import requests
 
 import time
 from threading import Event, Thread
@@ -253,6 +254,27 @@ def check_quotas():
             deadline = p.get_quota_deadline()
             if deadline is None:
                 deadline = p.set_quota_deadline(settings.QUOTA_EXCEEDED_GRACE_PERIOD)
+
+                # Notify hook if needed
+                if settings.QUOTA_EXCEEDED_NOTIFY_URL is not None:
+                    for i in range(1, 11):
+                        try:
+                            r = requests.post(
+                                settings.QUOTA_EXCEEDED_NOTIFY_URL,
+                                json={
+                                    'username': p.user.username,
+                                    'quota_used': p.used_quota(),
+                                    'quota_total': p.quota,
+                                    'deadline': deadline
+                                },
+                                timeout=10
+                            )
+                            r.raise_for_status()
+                            break
+                        except:
+                            logger.warning(f"Failed to notify quota exceeded (attempt {i}): {str(e)}")
+                            time.sleep(i * 2)
+
             now = time.time()
             if now > deadline:
                 # deadline passed, delete tasks until quota is met

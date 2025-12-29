@@ -123,7 +123,11 @@ export default {
     },
 
     isMobile: function(){
-      return navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
+      return navigator.userAgent.match(/(android)|(webOS)/i) || this.isIOS();
+    },
+
+    isIOS: function(){
+      return navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)/i) || (navigator.userAgent.match(/Mac/i) && "ontouchend" in document);
     },
 
     userInputToFilename(text, extension = ""){

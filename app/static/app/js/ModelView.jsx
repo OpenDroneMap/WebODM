@@ -6,6 +6,7 @@ import AssetDownloadButtons from './components/AssetDownloadButtons';
 import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import ImagePopup from './components/ImagePopup';
+import Utils from './classes/Utils';
 import PropTypes from 'prop-types';
 import * as THREE from 'THREE';
 import $ from 'jquery';
@@ -300,7 +301,12 @@ class ModelView extends React.Component {
   }
 
   glbFilePath = () => {
-    return this.basePath() + '/textured_model/';
+    let url = this.basePath() + '/textured_model/';
+    
+    if (Utils.isIOS()) url += "?platform=ios";
+    else if (Utils.isMobile()) url += "?platform=mobile";
+    
+    return url;
   }
 
   mtlFilename = (cb) => {
@@ -338,7 +344,14 @@ class ModelView extends React.Component {
     window.viewer = new Potree.Viewer(container);
     viewer.setEDLEnabled(true);
     viewer.setFOV(60);
-    viewer.setPointBudget(10*1000*1000);
+
+    if (Utils.isIOS()){
+        viewer.setPointBudget(1000*1000);
+    }else if (Utils.isMobile()){
+        viewer.setPointBudget(2*1000*1000);
+    }else{
+        viewer.setPointBudget(10*1000*1000);
+    }
     viewer.setEDLEnabled(true);
     viewer.loadSettingsFromURL();
 
@@ -682,9 +695,14 @@ class ModelView extends React.Component {
     // Using opacity we can still perform measurements
     viewer.setEDLOpacity(flag ? 1 : 0);
 
-    // for(let pointcloud of viewer.scene.pointclouds){
-    //     pointcloud.visible = flag;
-    // }
+    // On mobile, for performance and because opacity doesn't
+    // seem to work consistently, we remove the ability to do
+    // measurements
+    if (Utils.isMobile()){
+        for(let pointcloud of viewer.scene.pointclouds){
+            pointcloud.visible = flag;
+        }
+    }
   }
 
   toggleCameras = (e) => {

@@ -36,7 +36,7 @@ from .tags import TagsField
 from app.security import path_traversal_check
 from django.utils.translation import gettext_lazy as _
 from .fields import PolygonGeometryField
-from app.geoutils import geom_transform_wkt_bbox, get_srs_name_units_from_epsg
+from app.geoutils import geom_transform_wkt_bbox, get_srs_name_units_from_epsg_or_wkt
 from webodm import settings
 
 def flatten_files(request_files):
@@ -93,7 +93,7 @@ class TaskSerializer(serializers.ModelSerializer):
         return obj.get_extent()
     
     def get_srs(self, obj):
-        return get_srs_name_units_from_epsg(obj.epsg)
+        return get_srs_name_units_from_epsg_or_wkt(obj.epsg, obj.wkt)
 
     class Meta:
         model = models.Task
@@ -776,8 +776,15 @@ class TaskSafeTexturedModel(TaskNestedView):
         """
         task = self.get_and_check_task(request, pk)
 
+        platform = request.query_params.get('platform', '')
+        max_size_mb = 120
+        if platform == "mobile":
+            max_size_mb = 60
+        elif platform == "ios":
+            max_size_mb = 5
+
         try:
-            model_file = task.get_safe_textured_model()
+            model_file = task.get_safe_textured_model(max_size_mb=max_size_mb)
             return download_file_response(request, model_file, 'attachment')
         except FileNotFoundError:
             raise exceptions.NotFound(_("Asset does not exist"))
