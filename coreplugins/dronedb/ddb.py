@@ -202,7 +202,7 @@ class DroneDB:
             if dataset_name is not None:
                 data['datasetName'] = dataset_name
 
-            # Always send form data (even if empty) as Registry requires the parameter
+            # Send form data body (fields are optional but body must be present for [FromForm] binding)
             response = self.wrapped_call('POST', self.__share_init_url, data=data)
 
             return response.json()['token']
