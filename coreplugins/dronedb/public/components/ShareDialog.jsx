@@ -47,10 +47,16 @@ export default class ShareDialog extends Component {
     formatBytes(bytes, decimals = 2) {
         if (bytes === 0) return '0 bytes';
         const k = 1024;
-        const dm = decimals || 2;
         const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+    }
+
+    componentWillUnmount() {
+        // Abort pending AJAX requests to prevent setState on unmounted component
+        if (this.infoRequest) this.infoRequest.abort();
+        if (this.orgsRequest) this.orgsRequest.abort();
+        if (this.datasetsRequest) this.datasetsRequest.abort();
     }
 
     handleOnShow = () => {
@@ -60,43 +66,69 @@ export default class ShareDialog extends Component {
             newDatasetName: this.props.taskName || ''
         });
 
-        // Load user info
-        $.get(`${this.props.apiURL}/info`)
-            .done(result => {
-                this.setState({ info: result });
+        // Load user info first, then organizations to avoid race condition
+        this.infoRequest = $.get(`${this.props.apiURL}/info`)
+            .done(infoResult => {
+                this.setState({ info: infoResult });
+
+                // Load organizations after info is available
+                this.orgsRequest = $.get(`${this.props.apiURL}/organizations`)
+                    .done(result => {
+                        const orgs = result.map(org => ({
+                            label: org.name !== org.slug ? `${org.name} (${org.slug})` : org.slug,
+                            value: org.slug
+                        }));
+
+                        this.setState({ organizations: orgs, loadingOrganizations: false });
+
+                        if (orgs.length > 0) {
+                            // Try to find user's personal organization using infoResult directly
+                            const userOrg = infoResult ?
+                                orgs.find(org => org.value === infoResult.username) : null;
+                            this.handleSelectOrganization(userOrg || orgs[0]);
+                        }
+                    })
+                    .fail((jqXHR) => {
+                        if (jqXHR.statusText === 'abort') return;
+                        const detail = jqXHR.responseJSON?.detail || jqXHR.statusText || 'Unknown error';
+                        this.setState({
+                            error: `Cannot load organizations: ${detail}`,
+                            loadingOrganizations: false
+                        });
+                    });
             })
-            .fail(() => {
+            .fail((jqXHR) => {
+                if (jqXHR.statusText === 'abort') return;
+                // If info fails, still try to load organizations
                 this.setState({ info: null });
-            });
-
-        // Load organizations
-        $.get(`${this.props.apiURL}/organizations`)
-            .done(result => {
-                const orgs = result.map(org => ({
-                    label: org.name !== org.slug ? `${org.name} (${org.slug})` : org.slug,
-                    value: org.slug
-                }));
-
-                this.setState({ organizations: orgs, loadingOrganizations: false });
-
-                if (orgs.length > 0) {
-                    // Try to find user's personal organization
-                    const userOrg = this.state.info ?
-                        orgs.find(org => org.value === this.state.info.username) : null;
-                    this.handleSelectOrganization(userOrg || orgs[0]);
-                }
-            })
-            .fail(() => {
-                this.setState({
-                    error: "Cannot load organizations. Check your credentials.",
-                    loadingOrganizations: false
-                });
+                this.orgsRequest = $.get(`${this.props.apiURL}/organizations`)
+                    .done(result => {
+                        const orgs = result.map(org => ({
+                            label: org.name !== org.slug ? `${org.name} (${org.slug})` : org.slug,
+                            value: org.slug
+                        }));
+                        this.setState({ organizations: orgs, loadingOrganizations: false });
+                        if (orgs.length > 0) {
+                            this.handleSelectOrganization(orgs[0]);
+                        }
+                    })
+                    .fail((jqXHR2) => {
+                        if (jqXHR2.statusText === 'abort') return;
+                        const detail = jqXHR2.responseJSON?.detail || jqXHR2.statusText || 'Unknown error';
+                        this.setState({
+                            error: `Cannot load organizations: ${detail}`,
+                            loadingOrganizations: false
+                        });
+                    });
             });
     };
 
     handleSelectOrganization = (e) => {
         if (!e) return;
         if (this.state.selectedOrganization?.value === e.value) return;
+
+        // Abort previous datasets request if any
+        if (this.datasetsRequest) this.datasetsRequest.abort();
 
         this.setState({
             selectedOrganization: e,
@@ -105,7 +137,7 @@ export default class ShareDialog extends Component {
             loadingDatasets: true
         });
 
-        $.get(`${this.props.apiURL}/organizations/${e.value}/datasets`)
+        this.datasetsRequest = $.get(`${this.props.apiURL}/organizations/${e.value}/datasets`)
             .done(result => {
                 const datasets = result.map(ds => ({
                     label: ds.name !== ds.slug ?
@@ -128,9 +160,11 @@ export default class ShareDialog extends Component {
                     createNewDataset: true
                 });
             })
-            .fail(() => {
+            .fail((jqXHR) => {
+                if (jqXHR.statusText === 'abort') return;
+                const detail = jqXHR.responseJSON?.detail || jqXHR.statusText || 'Unknown error';
                 this.setState({
-                    error: "Cannot load datasets.",
+                    error: `Cannot load datasets: ${detail}`,
                     loadingDatasets: false
                 });
             });
