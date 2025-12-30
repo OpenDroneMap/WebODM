@@ -2,6 +2,7 @@ from genericpath import isfile
 import importlib
 import json
 from posixpath import join
+import re
 import time
 import requests
 import os
@@ -23,6 +24,9 @@ from rest_framework.response import Response
 from rest_framework import status
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
+
+# Regex pattern for valid tag format: "org" or "org/dataset" with lowercase alphanumeric and hyphens
+TAG_PATTERN = re.compile(r'^[a-z0-9][a-z0-9\-]*(/[a-z0-9][a-z0-9\-]*)?$')
 
 def is_valid(file):
     _, file_extension = path.splitext(file)
@@ -331,6 +335,18 @@ class ShareTaskView(TaskView):
         # Get optional tag and datasetName from request
         tag = request.data.get('tag', None)
         dataset_name = request.data.get('datasetName', None) or task.name
+
+        # Validate tag format if provided
+        if tag is not None and tag.strip():
+            tag = tag.strip().lower()
+            if not TAG_PATTERN.match(tag):
+                return Response({
+                    'error': 'Invalid tag format. Must be "org" or "org/dataset" with lowercase alphanumeric characters and hyphens only.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Sanitize dataset_name (remove potentially dangerous characters)
+        if dataset_name:
+            dataset_name = dataset_name.strip()[:255]  # Limit length
 
         status_key = get_status_key(pk)
 
