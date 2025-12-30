@@ -49,10 +49,12 @@ export default class ShareButton extends React.Component {
         this.state = {
             taskInfo: null,
             error: '',
-            monitorTimeout: null,
             showDialog: false,
             filesToShare: []
         };
+
+        // Instance property for timeout (not in state)
+        this.monitorTimeout = null;
     }
 
     componentDidMount() {
@@ -116,10 +118,10 @@ export default class ShareButton extends React.Component {
             this.setState({ taskInfo });
             this.monitorProgress();
         }).fail(error => {
-            this.setState({
+            this.setState(prevState => ({
                 error: error.responseJSON?.error || 'Failed to start sharing',
-                taskInfo: { ...this.state.taskInfo, status: STATE_ERROR }
-            });
+                taskInfo: { ...prevState.taskInfo, status: STATE_ERROR }
+            }));
         });
     };
 
