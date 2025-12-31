@@ -97,7 +97,7 @@ async function main() {
                 encoder,
                 resize: [textureSize, textureSize],
                 targetFormat: undefined,
-                limitInputPixels: true,
+                limitInputPixels: false,
         }),
         draco({
             quantizationVolume: "scene"
