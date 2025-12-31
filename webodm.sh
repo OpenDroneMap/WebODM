@@ -339,8 +339,54 @@ check_command(){
 }
 
 environment_check(){
-	check_command "docker" "https://www.docker.com/"
-	check_docker_compose
+    if [[ $WO_DEBUG = "YES" ]]; then
+        local DOCKER_VERSION
+        local COMPOSE_VERSION
+        local MEDIA_DIR_OWNER
+        local DB_DIR_OWNER
+        echo "================================"
+        echo "Extra debugging information:"
+        echo "================================"
+        echo "Host environment: $OSTYPE"
+        if [[ "$(groups)" == *"docker"* ]]; then
+            echo "You are in the docker group"
+        else
+            echo "You are not in the docker group"
+        fi
+    fi
+    
+    check_command "docker" "https://www.docker.com/"
+    check_docker_compose
+
+    if [[ $WO_DEBUG = "YES" ]]; then
+        if [ -d $WO_MEDIA_DIR ]; then
+            MEDIA_DIR_OWNER=$(stat -c "%U" $WO_MEDIA_DIR)
+            if [[ $MEDIA_DIR_OWNER != $(whoami) ]]; then
+                echo "You do not own the media directory. It is owned by $MEDIA_DIR_OWNER."
+            fi
+        fi
+        if [ -d $WO_DB_DIR ]; then
+            DB_DIR_OWNER=$(stat -c "%U" $WO_DB_DIR)
+            if [[ $DB_DIR_OWNER != $(whoami) ]]; then
+                echo "You do not own the database directory. It is owned by $DB_DIR_OWNER."
+            fi
+
+        fi
+        DOCKER_VERSION=$(docker --version)
+        # remove stderr in case podman throws complaints, ensure only compose ver is taken
+        COMPOSE_VERSION=$($docker_compose version 2> /dev/null | head -n 1)
+        echo "Docker version: $DOCKER_VERSION"
+        echo "Compose version: $COMPOSE_VERSION"
+        if [ -z "$DOCKER_HOST" ]; then
+            echo "DOCKER_HOST is unset"
+            if [[ "$($docker_compose -v)" != "podman"* ]] && [[ "$DOCKER_VERSION" == "podman"* ]]; then
+                echo "You seem to be using podman with docker-compose instead of podman-compose. The above variable may need to be set, see https://docs.opendronemap.org/tutorials/#using-podman for more information."
+            fi
+        else
+            echo "DOCKER_HOST: $DOCKER_HOST"
+        fi
+        echo ""
+    fi
 }
 
 run(){
