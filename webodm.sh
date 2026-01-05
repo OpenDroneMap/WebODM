@@ -344,9 +344,6 @@ environment_check(){
         local COMPOSE_VERSION
         local MEDIA_DIR_OWNER
         local DB_DIR_OWNER
-        echo "================================"
-        echo "Extra debugging information:"
-        echo "================================"
         echo "Host environment: $OSTYPE"
         if [[ "$(groups)" == *"docker"* ]]; then
             echo "You are in the docker group"
