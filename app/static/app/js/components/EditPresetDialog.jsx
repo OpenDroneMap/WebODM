@@ -19,7 +19,7 @@ const PIPELINE_GROUPS = [
     {
         id: 'input',
         name: _('Input & Preprocessing'),
-        icon: 'fa-upload',
+        icon: 'fa-download',
         subgroups: [
             { id: 'camera', name: _('Camera Configuration') },
             { id: 'image-prep', name: _('Image Preprocessing') },
@@ -29,7 +29,7 @@ const PIPELINE_GROUPS = [
     {
         id: 'split-merge',
         name: _('Split/Merge (Large Datasets)'),
-        icon: 'fa-object-ungroup',
+        icon: 'fa-sitemap',
         subgroups: [
             { id: 'splitting', name: _('Splitting') },
             { id: 'merging', name: _('Merging') }
@@ -37,8 +37,8 @@ const PIPELINE_GROUPS = [
     },
     {
         id: 'sfm',
-        name: _('Structure from Motion'),
-        icon: 'fa-camera',
+        name: _('Sparese Reconstruction (SfM)'),
+        icon: 'fa-share-alt',
         subgroups: [
             { id: 'feature-extraction', name: _('Feature Extraction') },
             { id: 'feature-matching', name: _('Feature Matching') },
@@ -48,7 +48,7 @@ const PIPELINE_GROUPS = [
     },
     {
         id: 'mvs',
-        name: _('Dense Reconstruction'),
+        name: _('Dense Reconstruction (MVS)'),
         icon: 'fa-cubes',
         subgroups: [
             { id: 'depthmap', name: _('Depth Map Generation') }
@@ -56,7 +56,7 @@ const PIPELINE_GROUPS = [
     },
     {
         id: 'pointcloud',
-        name: _('Point Cloud Processing'),
+        name: _('Point Cloud Processing (PDAL)'),
         icon: 'fa-braille',
         subgroups: [
             { id: 'filtering', name: _('Filtering') },
@@ -65,7 +65,7 @@ const PIPELINE_GROUPS = [
     },
     {
         id: 'mesh',
-        name: _('Meshing'),
+        name: _('Meshing (Poisson)'),
         icon: 'fa-gem',
         subgroups: [
             { id: 'mesh-gen', name: _('Mesh Generation') }
@@ -73,23 +73,23 @@ const PIPELINE_GROUPS = [
     },
     {
         id: 'texturing',
-        name: _('Texturing'),
+        name: _('Texturing (MVS-Tex)'),
         icon: 'fa-image',
         subgroups: [
             { id: 'texture-opts', name: _('Texture Options') }
         ]
     },
     {
-        id: 'georef',
-        name: _('Georeferencing & Bounds'),
-        icon: 'fa-map-marker-alt',
+        id: 'outputbounds',
+        name: _('Bounds & Cropping'),
+        icon: 'fa-crop',
         subgroups: [
             { id: 'bounds', name: _('Boundary') }
         ]
     },
     {
         id: 'dem',
-        name: _('Digital Elevation Models'),
+        name: _('Digital Elevation Models (SMRF/GDAL)'),
         icon: 'fa-mountain',
         subgroups: [
             { id: 'dem-output', name: _('Output Selection') },
@@ -201,11 +201,11 @@ const OPTION_GROUP_MAP = {
     'texturing-keep-unseen-faces': { group: 'texturing', subgroup: 'texture-opts' },
     'texturing-skip-global-seam-leveling': { group: 'texturing', subgroup: 'texture-opts' },
     
-    // Georeferencing & Bounds - Boundary
-    'auto-boundary': { group: 'georef', subgroup: 'bounds' },
-    'auto-boundary-distance': { group: 'georef', subgroup: 'bounds' },
-    'boundary': { group: 'georef', subgroup: 'bounds' },
-    'crop': { group: 'georef', subgroup: 'bounds' },
+    // Bounds & cropping - Boundary
+    'auto-boundary': { group: 'outputbounds', subgroup: 'bounds' },
+    'auto-boundary-distance': { group: 'outputbounds', subgroup: 'bounds' },
+    'boundary': { group: 'outputbounds', subgroup: 'bounds' },
+    'crop': { group: 'outputbounds', subgroup: 'bounds' },
     
     // Digital Elevation Models - Output Selection
     'dsm': { group: 'dem', subgroup: 'dem-output' },
