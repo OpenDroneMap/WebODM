@@ -1,33 +1,100 @@
-.edit-preset-dialog{
-	.preset-name{
-        margin-bottom: 16px;
+.edit-preset-dialog {
+    .options-toolbar {
+        margin-bottom: 10px;
         display: flex;
-        label{
-            text-align: left;
+        gap: 5px;
+        
+        .btn {
+            padding: 4px 8px;
         }
     }
-    .info-button{
-        position: relative;
-        top: 1px;
-        left: 2px;
-    }
-    
-    .checkbox{
-        min-height: 45px;
+
+    .search-controls {
+        margin-bottom: 10px;
+        
+        .form-control {
+            margin-bottom: 0;
+        }
     }
 
-    .search-toggle{
-        position: absolute;
-        right: 24px;
-        top: 24px;
-        z-index: 2;
+    .options-container {
+        max-height: 60vh;
+        overflow-y: auto;
     }
 
-    .search-controls{
+    .option-group {
+        margin-bottom: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: #fff;
+        
+        .option-group-header {
+            padding: 10px 12px;
+            background: #f5f5f5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            border-radius: 3px 3px 0 0;
+            
+            &:hover {
+                background: #e8e8e8;
+            }
+            
+            .toggle-icon {
+                width: 12px;
+                color: #666;
+                font-size: 0.85em;
+            }
+            
+            .group-icon {
+                color: #337ab7;
+                width: 18px;
+                text-align: center;
+            }
+            
+            .group-name {
+                font-weight: 600;
+                flex: 1;
+            }
+            
+            .option-count {
+                color: #888;
+                font-size: 0.9em;
+            }
+        }
+        
+        .option-group-content {
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+    }
+
+    .option-subgroup {
         margin-bottom: 12px;
-        margin-right: 38px;
-        input{
-            height: 36px;
+        
+        &:last-child {
+            margin-bottom: 0;
         }
+        
+        .option-subgroup-header {
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .option-subgroup-content {
+            padding-left: 8px;
+        }
+    }
+
+    // Ensure the preset name row aligns properly
+    .preset-name {
+        margin-bottom: 15px;
     }
 }
