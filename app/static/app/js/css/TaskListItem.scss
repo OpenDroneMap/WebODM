@@ -42,6 +42,9 @@
         border-width: 1px;
         border-radius: 2px;
         margin-right: 16px;
+        & > i.fa{
+            font-size: 14px;
+        }
     }
 
     .actions{
