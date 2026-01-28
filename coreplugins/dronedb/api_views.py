@@ -2,6 +2,7 @@ from genericpath import isfile
 import importlib
 import json
 from posixpath import join
+import re
 import time
 import requests
 import os
@@ -24,20 +25,23 @@ from rest_framework import status
 
 VALID_IMAGE_EXTENSIONS = ['.tiff', '.tif', '.png', '.jpeg', '.jpg']
 
+# Regex pattern for valid tag format: "org" or "org/dataset" with lowercase alphanumeric and hyphens
+TAG_PATTERN = re.compile(r'^[a-z0-9][a-z0-9\-]*(/[a-z0-9][a-z0-9\-]*)?$')
+
 def is_valid(file):
     _, file_extension = path.splitext(file)
     return file_extension.lower() in VALID_IMAGE_EXTENSIONS or file == 'gcp_list.txt' or file == 'geo.txt'
 
 def get_settings(request):
     ds = get_current_plugin().get_user_data_store(request.user)
-    
+
     registry_url = ds.get_string('registry_url') or DEFAULT_HUB_URL
     username = ds.get_string('username') or None
     password = ds.get_string('password') or None
     token = ds.get_string('token') or None
 
     return registry_url, username, password, token
-    
+
 
 def update_token(request, token):
     ds = get_current_plugin().get_user_data_store(request.user)
@@ -70,7 +74,7 @@ class CheckCredentialsTaskView(TaskView):
 
             ddb = DroneDB(hub_url, username, password)
 
-            return Response({'success': ddb.login()}, status=status.HTTP_200_OK)      
+            return Response({'success': ddb.login()}, status=status.HTTP_200_OK)
 
         except(Exception) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -137,36 +141,36 @@ class VerifyUrlTaskView(TaskView):
 
         try:
 
-            result, org, ds, folder, count, size = verify_url(url, username, password).values() 
+            result, org, ds, folder, count, size = verify_url(url, username, password).values()
 
             if (not result):
-                return Response({'error': 'Invalid url.'}, status=status.HTTP_400_BAD_REQUEST)         
+                return Response({'error': 'Invalid url.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({'count': count, 'success': result, 'ds' : ds, 'org': org, 'folder': folder or None, 'size': size} 
+            return Response({'count': count, 'success': result, 'ds' : ds, 'org': org, 'folder': folder or None, 'size': size}
                     if org else {'success': False}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)    
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class InfoTaskView(TaskView):
     def get(self, request):
-            
+
         registry_url, username, _, _ = get_settings(request)
-     
+
         return Response({ 'hubUrl': registry_url, 'username': username }, status=status.HTTP_200_OK)
-           
+
 
 class ImportDatasetTaskView(TaskView):
     def post(self, request, project_pk=None, pk=None):
-                        
+
         task = self.get_and_check_task(request, pk)
 
         # Read form data
         ddb_url = request.data.get('ddb_url', None)
-                      
+
         if ddb_url == None:
             return Response({'error': 'DroneDB url must be set.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         registry_url, orgSlug, dsSlug, folder = parse_url(ddb_url).values()
 
         _, username, password, token = get_settings(request)
@@ -175,27 +179,27 @@ class ImportDatasetTaskView(TaskView):
         # Get the files from the folder
         rawfiles = ddb.get_files_list(orgSlug, dsSlug, folder)
         files = [file for file in rawfiles if is_valid(file['path'])]
-                        
-        # Verify that the folder url is valid    
+
+        # Verify that the folder url is valid
         if len(files) == 0:
             return Response({'error': 'Empty dataset or folder.'}, status=status.HTTP_400_BAD_REQUEST)
-              
+
         # Update the task with the new information
         task.console += "Importing {} images...\n".format(len(files))
         task.images_count = len(files)
         task.pending_action = pending_actions.IMPORT
         task.save()
-        
+
         # Associate the folder url with the project and task
         combined_id = "{}_{}".format(project_pk, pk)
-        
+
         datastore = get_current_plugin().get_global_data_store()
         datastore.set_json(combined_id, {
-            "ddbUrl": ddb_url, 
-            "token": ddb.token, 
+            "ddbUrl": ddb_url,
+            "token": ddb.token,
             "ddbWebUrl": "{}/r/{}/{}/{}".format(to_web_protocol(registry_url), orgSlug, dsSlug, folder.rstrip('/'))
         })
-        
+
         #ddb.refresh_token()
 
         # Start importing the files in the background
@@ -211,7 +215,7 @@ def import_files(task_id, carrier):
     from app.security import path_traversal_check
 
     files = carrier['files']
-    
+
     headers = {}
 
     if carrier['token'] != None:
@@ -225,15 +229,15 @@ def import_files(task_id, carrier):
         with open(path, 'wb') as fd:
             for chunk in download_stream.iter_content(4096):
                 fd.write(chunk)
-        
+
     logger.info("Will import {} files".format(len(files)))
     task = models.Task.objects.get(pk=task_id)
     task.create_task_directories()
     task.save()
-    
+
     try:
         downloaded_total = 0
-        for file in files: 
+        for file in files:
             download_file(task, file)
             task.check_if_canceled()
             models.Task.objects.filter(pk=task.id).update(upload_progress=(float(downloaded_total) / float(len(files))))
@@ -286,7 +290,7 @@ def ddb_cleanup(sender, task_id, **kwargs):
     logger.info("Info task {0} ({1})".format(str(task_id), status_key))
 
     datastore.del_key(status_key)
-    
+
 
 class StatusTaskView(TaskView):
     def get(self, request, pk):
@@ -295,7 +299,7 @@ class StatusTaskView(TaskView):
 
         # Associate the folder url with the project and task
         status_key = get_status_key(pk)
-        
+
         datastore = get_current_plugin().get_global_data_store()
 
         task_info = datastore.get_json(status_key, {
@@ -311,7 +315,7 @@ class StatusTaskView(TaskView):
         return Response(task_info, status=status.HTTP_200_OK)
 
 DRONEDB_ASSETS = [
-    'orthophoto.tif', 
+    'orthophoto.tif',
     'orthophoto.png',
     'georeferenced_model.laz',
     'dtm.tif',
@@ -321,15 +325,31 @@ DRONEDB_ASSETS = [
     'ground_control_points.geojson'
 ]
 
-class ShareTaskView(TaskView): 
+class ShareTaskView(TaskView):
     def post(self, request, pk):
 
         from app.plugins import logger
 
         task = self.get_and_check_task(request, pk)
 
+        # Get optional tag and datasetName from request
+        tag = request.data.get('tag', None)
+        dataset_name = request.data.get('datasetName', None) or task.name
+
+        # Validate tag format if provided
+        if tag is not None and tag.strip():
+            tag = tag.strip().lower()
+            if not TAG_PATTERN.match(tag):
+                return Response({
+                    'error': 'Invalid tag format. Must be "org" or "org/dataset" with lowercase alphanumeric characters and hyphens only.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Sanitize dataset_name (remove potentially dangerous characters)
+        if dataset_name:
+            dataset_name = dataset_name.strip()[:255]  # Limit length
+
         status_key = get_status_key(pk)
-        
+
         datastore = get_current_plugin().get_global_data_store()
 
         data = {
@@ -348,7 +368,7 @@ class ShareTaskView(TaskView):
 
         available_assets = [task.get_asset_file_or_stream(f) for f in list(set(task.available_assets) & set(DRONEDB_ASSETS))]
 
-        if 'textured_model.zip' in task.available_assets:            
+        if 'textured_model.zip' in task.available_assets:
             texture_files = [join(task.assets_path('odm_texturing'), f) for f in listdir(task.assets_path('odm_texturing')) if isfile(join(task.assets_path('odm_texturing'), f))]
             available_assets.extend(texture_files)
 
@@ -356,25 +376,25 @@ class ShareTaskView(TaskView):
 
         files = [{'path': f, 'name': f[len(assets_path)+1:], 'size': os.path.getsize(f)} for f in available_assets]
 
-        share_to_ddb.delay(pk, settings, files)
+        share_to_ddb.delay(pk, settings, files, tag, dataset_name)
 
-        return Response(data, status=status.HTTP_200_OK)        
+        return Response(data, status=status.HTTP_200_OK)
 
 
 @task
-def share_to_ddb(pk, settings, files):
-    
+def share_to_ddb(pk, settings, files, tag=None, dataset_name=None):
+
     from app.plugins import logger
-  
-    status_key = get_status_key(pk)        
+
+    status_key = get_status_key(pk)
     datastore = get_current_plugin().get_global_data_store()
 
     registry_url, username, password, token = settings
-    
+
     ddb = DroneDB(registry_url, username, password, token)
 
-    # Init share (to check)
-    share_token = ddb.share_init()
+    # Init share with optional tag and dataset name
+    share_token = ddb.share_init(tag=tag, dataset_name=dataset_name)
 
     status = datastore.get_json(status_key)
 
@@ -394,9 +414,9 @@ def share_to_ddb(pk, settings, files):
 
         while attempt < 3:
             try:
-                
+
                 attempt += 1
-                
+
                 up = ddb.share_upload(share_token, file['path'], file['name'])
 
                 logger.info("Uploaded " + file['name'] + " to Dronedb (hash: " + up['hash'] + ")")
@@ -405,7 +425,7 @@ def share_to_ddb(pk, settings, files):
                 status['uploadedSize'] += file['size']
 
                 datastore.set_json(status_key, status)
-            
+
                 break
 
             except Exception as e:
@@ -423,7 +443,7 @@ def share_to_ddb(pk, settings, files):
 
 
     res = ddb.share_commit(share_token)
-    
+
     status['status'] = 3 # Done
     status['shareUrl'] = registry_url + res['url']
 

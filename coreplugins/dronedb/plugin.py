@@ -3,14 +3,14 @@ from coreplugins.dronedb.app_views import LoadButtonsView
 from coreplugins.dronedb.ddb import DEFAULT_HUB_URL
 
 from .api_views import (
-    CheckUrlTaskView, 
-    FoldersTaskView, 
-    ImportDatasetTaskView, 
-    CheckCredentialsTaskView, 
-    OrganizationsTaskView, 
-    DatasetsTaskView, 
-    StatusTaskView, 
-    VerifyUrlTaskView, 
+    CheckUrlTaskView,
+    FoldersTaskView,
+    ImportDatasetTaskView,
+    CheckCredentialsTaskView,
+    OrganizationsTaskView,
+    DatasetsTaskView,
+    StatusTaskView,
+    VerifyUrlTaskView,
     InfoTaskView,
     ShareTaskView
 )
@@ -36,10 +36,10 @@ class Plugin(PluginBase):
         return ["load_buttons.js"]
 
     def include_css_files(self):
-        return ["build/ImportView.css", "style.css"]
+        return ["build/ImportView.css", "build/ShareButton.css", "style.css"]
 
     def build_jsx_components(self):
-        return ["ImportView.jsx", "ShareButton.jsx"]
+        return ["ImportView.jsx", "ShareButton.jsx", "components/ShareDialog.jsx"]
 
     def api_mount_points(self):
         return [
@@ -53,7 +53,7 @@ class Plugin(PluginBase):
             MountPoint("organizations", OrganizationsTaskView.as_view()),
             MountPoint("verifyurl", VerifyUrlTaskView.as_view()),
             MountPoint("info", InfoTaskView.as_view()),
-        ] 
+        ]
 
     def HomeView(self):
         @login_required
@@ -70,8 +70,8 @@ class Plugin(PluginBase):
                     ds.set_string('token', None)
                     messages.success(request, 'Settings updated.')
 
-            form = SettingsForm(initial={'username': ds.get_string('username', default=""), 
-                                         'password': ds.get_string('password', default=""), 
+            form = SettingsForm(initial={'username': ds.get_string('username', default=""),
+                                         'password': ds.get_string('password', default=""),
                                          'registry_url': ds.get_string('registry_url', default="") or DEFAULT_HUB_URL})
 
             return render(request, self.template_path("app.html"), {
@@ -80,7 +80,7 @@ class Plugin(PluginBase):
             })
 
         return home
-    
+
     def app_mount_points(self):
         return [
             MountPoint("$", self.HomeView()),
