@@ -117,6 +117,8 @@ def resize_image(image_path, resize_to, done=None):
             resized_height = int(height * ratio)
             xmp = im.info.get("xmp") or im.info.get("xml")
             exif = im.info.get("exif")
+            if exif is None:
+                exif = im.getexif().tobytes()
 
             im = im.resize((resized_width, resized_height), Image.LANCZOS)
             params = {}
