@@ -109,7 +109,6 @@ def resize_image(image_path, resize_to, done=None):
             max_side = max(width, height)
             if max_side < resize_to:
                 logger.warning('You asked to make {} bigger ({} --> {}), but we are not going to do that.'.format(image_path, max_side, resize_to))
-                im.close()
                 return {'path': image_path, 'resize_ratio': 1}
 
             ratio = float(resize_to) / float(max_side)
