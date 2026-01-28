@@ -143,20 +143,21 @@ def resize_image(image_path, resize_to, done=None):
         ratio = float(resize_to) / float(max_side)
         resized_width = int(width * ratio)
         resized_height = int(height * ratio)
+        xmp = im.info.get("xmp") or im.info.get("xml")
+        exif = im.info.get("exif")
 
         im = im.resize((resized_width, resized_height), Image.LANCZOS)
         params = {}
         if is_jpeg:
             params['quality'] = 100
+        
+        if xmp is not None:
+            params['xmp'] = xmp
 
-        if 'exif' in im.info:
-            exif_dict = piexif.load(im.info['exif'])
-            #exif_dict['Exif'][piexif.ExifIFD.PixelXDimension] = resized_width
-            #exif_dict['Exif'][piexif.ExifIFD.PixelYDimension] = resized_height
-            im.save(resized_image_path, exif=piexif.dump(exif_dict), **params)
-        else:
-            im.save(resized_image_path, **params)
-
+        if exif is not None:
+            params['exif'] = exif
+        
+        im.save(resized_image_path, **params)
         im.close()
 
         # Delete original image, rename resized image to original

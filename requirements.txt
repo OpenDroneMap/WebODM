@@ -30,7 +30,7 @@ openapi-codec==1.1.7
 packaging==16.8
 piexif==1.1.3
 pilkit==2.0
-Pillow==8.3.2
+pillow==11.3.0
 pip-autoremove==0.9.0
 psycopg2-binary==2.8.6
 PyJWT==1.5.3
