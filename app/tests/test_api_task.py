@@ -158,9 +158,9 @@ class TestApiTask(BootTransactionTestCase):
             with Image.open(resized_task.task_path("tiny_drone_image.jpg")) as im:
                 self.assertTrue(im.size[0] == img1.size[0] / 2.0)
 
-            # Except the multispectral image
+            # Including the multispectral image
             with Image.open(resized_task.task_path("tiny_drone_image_multispec.tif")) as im:
-                self.assertTrue(im.size[0] == img1.size[0])
+                self.assertTrue(im.size[0] == img1.size[0] / 2.0)
 
             # GCP should have been scaled
             with open(resized_task.task_path("gcp.txt")) as f:
