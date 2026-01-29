@@ -93,16 +93,30 @@ class TestApiTask(BootTransactionTestCase):
             img1_xmp = img1.info.get('xmp')
             self.assertTrue(img1_xmp is not None)
 
-            # Extract EXIF/XMP from multispec image using exiftool
-            ms_exif = ms_xmp = subprocess.run(['exiftool', 'app/fixtures/tiny_drone_image_multispec.tif'], 
-                        capture_output=True, text=True, check=True).stdout.strip()
-            self.assertTrue('''GPS Latitude                    : 50 deg 58' 53.02" N''' in ms_exif)
+            # Check EXIF/XMP
 
-            ms_xmp = subprocess.run(['exiftool', '-xmp', '-b', 'app/fixtures/tiny_drone_image_multispec.tif'], 
+            def extract_exif(file):
+                return subprocess.run(['exiftool', file], 
                         capture_output=True, text=True, check=True).stdout.strip()
+            def extract_xmp(file):
+                return subprocess.run(['exiftool', '-xmp', '-b', file], 
+                        capture_output=True, text=True, check=True).stdout.strip()
+
+
+            img1_exif_dump = extract_exif('app/fixtures/tiny_drone_image.jpg')
+            self.assertTrue('''GPS Latitude                    : 41 deg 13' 34.93" N''' in img1_exif_dump)
+            
+            img1_xmp_dump = extract_xmp('app/fixtures/tiny_drone_image.jpg')
+            self.assertTrue('<sensefly:CamID>11</sensefly:CamID>' in img1_xmp_dump)
+            
+            # EXIF/XMP from multispec image
+
+            ms_exif = extract_exif('app/fixtures/tiny_drone_image_multispec.tif')
+            self.assertTrue('''GPS Latitude                    : 50 deg 58' 53.02" N''' in ms_exif)
+            
+            ms_xmp = extract_xmp('app/fixtures/tiny_drone_image_multispec.tif')
             self.assertTrue('MicaSense:CaptureId="CqaClXcmhKgplT0yPCLE"' in ms_xmp)
             
-
 
             # Not authenticated?
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -178,6 +192,14 @@ class TestApiTask(BootTransactionTestCase):
                 self.assertEqual(im.info.get('xmp'), img1_xmp)
                 self.assertTrue(im.info.get('exif') is not None)
                 self.assertEqual(im.getexif().tobytes(), img1_exif)
+
+                # Exiftool agrees
+                resized_exif_dump = extract_exif(resized_task.task_path("tiny_drone_image.jpg"))
+                self.assertTrue('''GPS Latitude                    : 41 deg 13' 34.93" N''' in img1_exif_dump)
+                
+                resized_xmp_dump = extract_xmp(resized_task.task_path("tiny_drone_image.jpg"))
+                self.assertTrue('<sensefly:CamID>11</sensefly:CamID>' in resized_xmp_dump)
+                
 
             # Including the multispectral image
             # which has invalid exif data
