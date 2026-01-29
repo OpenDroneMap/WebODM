@@ -98,13 +98,13 @@ def resize_image(image_path, resize_to, done=None):
     :param done: optional callback
     :return: path and resize ratio
     """
+    is_jpeg = re.match(r'.*\.jpe?g$', image_path, re.IGNORECASE)
+    path, ext = os.path.splitext(image_path)
+    resized_image_path = os.path.join(path + '.resized' + ext)
+    exiftool = None
+
     try:
-        is_jpeg = re.match(r'.*\.jpe?g$', image_path, re.IGNORECASE)
-
         with Image.open(image_path) as im:
-            path, ext = os.path.splitext(image_path)
-            resized_image_path = os.path.join(path + '.resized' + ext)
-
             width, height = im.size
             max_side = max(width, height)
             if max_side < resize_to:
@@ -114,30 +114,42 @@ def resize_image(image_path, resize_to, done=None):
             ratio = float(resize_to) / float(max_side)
             resized_width = int(width * ratio)
             resized_height = int(height * ratio)
-            xmp = im.info.get("xmp") or im.info.get("xml")
+            xmp = im.info.get("xmp")
             exif = im.info.get("exif")
-            if exif is None:
-                exif = im.getexif().tobytes()
 
-            im = im.resize((resized_width, resized_height), Image.LANCZOS)
+            resized = im.resize((resized_width, resized_height), Image.LANCZOS)
             params = {}
             if is_jpeg:
                 params['quality'] = 100
             
-            if xmp is not None:
+            if xmp is not None and exif is not None:
                 params['xmp'] = xmp
-
-            if exif is not None:
                 params['exif'] = exif
-            
-            im.save(resized_image_path, **params)
+            else:
+                # This is either a TIFF or an image for which
+                # PIL's simple EXIF/XMP handling code is insufficient
+                exiftool = shutil.which('exiftool')
+                if not exiftool:
+                    raise Exception("Exiftool missing, but needed")
+
+            resized.save(resized_image_path, **params)
+
+            if exiftool:
+                subprocess.run([exiftool, '-tagsfromfile', image_path, '-all', '-unsafe', resized_image_path, '-overwrite_original_in_place'], 
+                               check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run([exiftool, '-tagsfromfile', image_path, '-xmp', resized_image_path, '-overwrite_original_in_place'], 
+                               check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         # Delete original image, rename resized image to original
         os.remove(image_path)
         os.rename(resized_image_path, image_path)
-
     except Exception as e:
         logger.warning("Cannot resize {}: {}.".format(image_path, str(e)))
+        
+        # Cleanup
+        if os.path.isfile(resized_image_path):
+            os.remove(resized_image_path)
+        
         if done is not None:
             done()
         return None

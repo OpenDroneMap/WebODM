@@ -40,6 +40,7 @@ from .utils import start_processing_node, clear_test_media_root, catch_signal
 # do not commit changes to the DB, so spawning a new thread will show no
 # data in it.
 from webodm import settings
+import subprocess
 logger = logging.getLogger('app.logger')
 
 DELAY = 2  # time to sleep for during process launch, background processing, etc.
@@ -85,8 +86,23 @@ class TestApiTask(BootTransactionTestCase):
             image2 = open("app/fixtures/tiny_drone_image_2.jpg", 'rb')
             multispec_image = open("app/fixtures/tiny_drone_image_multispec.tif", 'rb')
 
-
             img1 = Image.open("app/fixtures/tiny_drone_image.jpg")
+            ms_img = Image.open("app/fixtures/tiny_drone_image_multispec.tif")
+
+            img1_exif = img1.getexif().tobytes()
+            img1_xmp = img1.info.get('xmp')
+            self.assertTrue(img1_xmp is not None)
+
+            # Extract EXIF/XMP from multispec image using exiftool
+            ms_exif = ms_xmp = subprocess.run(['exiftool', 'app/fixtures/tiny_drone_image_multispec.tif'], 
+                        capture_output=True, text=True, check=True).stdout.strip()
+            self.assertTrue('''GPS Latitude                    : 50 deg 58' 53.02" N''' in ms_exif)
+
+            ms_xmp = subprocess.run(['exiftool', '-xmp', '-b', 'app/fixtures/tiny_drone_image_multispec.tif'], 
+                        capture_output=True, text=True, check=True).stdout.strip()
+            self.assertTrue('MicaSense:CaptureId="CqaClXcmhKgplT0yPCLE"' in ms_xmp)
+            
+
 
             # Not authenticated?
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
@@ -152,15 +168,32 @@ class TestApiTask(BootTransactionTestCase):
             image1.seek(0)
             image2.seek(0)
             gcp.seek(0)
-            multispec_image.seek(0)
 
             # Uploaded images should have been resized
             with Image.open(resized_task.task_path("tiny_drone_image.jpg")) as im:
-                self.assertTrue(im.size[0] == img1.size[0] / 2.0)
+                self.assertEqual(im.size[0], img1.size[0] / 2.0)
+
+                # Xmp and exif are preserved
+                self.assertTrue(im.info.get('xmp') is not None)
+                self.assertEqual(im.info.get('xmp'), img1_xmp)
+                self.assertTrue(im.info.get('exif') is not None)
+                self.assertEqual(im.getexif().tobytes(), img1_exif)
 
             # Including the multispectral image
+            # which has invalid exif data
             with Image.open(resized_task.task_path("tiny_drone_image_multispec.tif")) as im:
-                self.assertTrue(im.size[0] == img1.size[0] / 2.0)
+                self.assertEqual(im.size[0], img1.size[0] / 2.0)
+
+            # EXIF/XMP bytes are preserved
+            ms_resized_exif = subprocess.run(['exiftool', resized_task.task_path("tiny_drone_image_multispec.tif")], 
+                        capture_output=True, text=True, check=True).stdout.strip()
+            print(ms_resized_exif)
+            self.assertTrue('''GPS Latitude                    : 50 deg 58' 53.02" N''' in ms_resized_exif)
+
+            ms_resized_xmp = subprocess.run(['exiftool', '-xmp', '-b', resized_task.task_path("tiny_drone_image_multispec.tif")], 
+                        capture_output=True, text=True, check=True).stdout.strip()
+            self.assertTrue('MicaSense:CaptureId="CqaClXcmhKgplT0yPCLE"' in ms_resized_xmp)
+            
 
             # GCP should have been scaled
             with open(resized_task.task_path("gcp.txt")) as f:
@@ -209,6 +242,9 @@ class TestApiTask(BootTransactionTestCase):
 
                 image1.seek(0)
                 image2.seek(0)
+            
+            img1.close()
+            ms_img.close()
 
             # Cannot create a task with images[], name, but invalid processing node parameter
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
