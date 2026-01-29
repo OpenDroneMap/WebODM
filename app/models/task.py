@@ -12,6 +12,8 @@ from zipstream.ng import ZipStream
 import json
 import redis
 from shlex import quote
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 import errno
 import re
@@ -1334,12 +1336,14 @@ class Task(models.Model):
             return []
         # Add a signal to notify that we are resizing images
         from app.plugins import signals as plugin_signals
+
         plugin_signals.task_resizing_images.send_robust(sender=self.__class__, task_id=self.id)
 
         images_path = self.find_all_files_matching(r'.*\.(jpe?g|tiff?|png)$')
         total_images = len(images_path)
         resized_images_count = 0
         last_update = 0
+        lock = threading.Lock()
 
         def callback(retval=None):
             nonlocal last_update
@@ -1348,13 +1352,28 @@ class Task(models.Model):
 
             resized_images_count += 1
             if time.time() - last_update >= 2:
-                # Update progress
-                Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
-                self.check_if_canceled()
-                last_update = time.time()
+                with lock:
+                    # Update progress
+                    Task.objects.filter(pk=self.id).update(resize_progress=(float(resized_images_count) / float(total_images)))
+                    self.check_if_canceled()
+                    last_update = time.time()
 
-        resized_images = [im for im in list(map(partial(resize_image, resize_to=self.resize_to, done=callback), images_path)) 
-                          if im is not None]
+        max_workers = min(settings.WORKERS_MAX_THREADS, len(images_path))
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = []
+            for image_path in images_path:
+                future = executor.submit(resize_image, image_path, self.resize_to, callback)
+                futures.append(future)
+            
+            resized_images = []
+            for future in futures:
+                try:
+                    result = future.result()
+                    if result is not None:
+                        resized_images.append(result)
+                except Exception as e:
+                    logger.warning(f"Error resizing image: {str(e)}")
         
         Task.objects.filter(pk=self.id).update(resize_progress=1.0)
 
