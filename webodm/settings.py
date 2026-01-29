@@ -388,7 +388,7 @@ CLEANUP_PARTIAL_TASKS = 72
 CLEANUP_EMPTY_PROJECTS = None
 
 # Maximum number of threads that a worker should use for processing
-WORKERS_MAX_THREADS = 1
+WORKERS_MAX_THREADS = 2
 
 # Maximum number of seconds a worker task should take before being terminated
 WORKERS_MAX_TIME_LIMIT = None
