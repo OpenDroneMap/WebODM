@@ -109,7 +109,10 @@ def resize_image(image_path, resize_to, done=None):
             max_side = max(width, height)
             if max_side < resize_to:
                 logger.warning('You asked to make {} bigger ({} --> {}), but we are not going to do that.'.format(image_path, max_side, resize_to))
-                return {'path': image_path, 'resize_ratio': 1}
+                retval = {'path': image_path, 'resize_ratio': 1}
+                if done is not None:
+                    done(retval)
+                return retval
 
             ratio = float(resize_to) / float(max_side)
             resized_width = int(width * ratio)
@@ -122,12 +125,13 @@ def resize_image(image_path, resize_to, done=None):
             if is_jpeg:
                 params['quality'] = 100
             
-            if xmp is not None and exif is not None:
-                params['xmp'] = xmp
-                params['exif'] = exif
+            if is_jpeg:
+                if exif is not None:
+                    params['exif'] = exif
+                if xmp is not None:
+                    params['xmp'] = xmp
             else:
-                # This is either a TIFF or an image for which
-                # PIL's simple EXIF/XMP handling code is insufficient
+                # For TIFFs, we need to use exiftool
                 exiftool = shutil.which('exiftool')
                 if not exiftool:
                     raise Exception("Exiftool missing, but needed")

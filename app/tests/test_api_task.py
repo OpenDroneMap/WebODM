@@ -195,7 +195,7 @@ class TestApiTask(BootTransactionTestCase):
 
                 # Exiftool agrees
                 resized_exif_dump = extract_exif(resized_task.task_path("tiny_drone_image.jpg"))
-                self.assertTrue('''GPS Latitude                    : 41 deg 13' 34.93" N''' in img1_exif_dump)
+                self.assertTrue('''GPS Latitude                    : 41 deg 13' 34.93" N''' in resized_exif_dump)
                 
                 resized_xmp_dump = extract_xmp(resized_task.task_path("tiny_drone_image.jpg"))
                 self.assertTrue('<sensefly:CamID>11</sensefly:CamID>' in resized_xmp_dump)
