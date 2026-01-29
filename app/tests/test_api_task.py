@@ -209,7 +209,6 @@ class TestApiTask(BootTransactionTestCase):
             # EXIF/XMP bytes are preserved
             ms_resized_exif = subprocess.run(['exiftool', resized_task.task_path("tiny_drone_image_multispec.tif")], 
                         capture_output=True, text=True, check=True).stdout.strip()
-            print(ms_resized_exif)
             self.assertTrue('''GPS Latitude                    : 50 deg 58' 53.02" N''' in ms_resized_exif)
 
             ms_resized_xmp = subprocess.run(['exiftool', '-xmp', '-b', resized_task.task_path("tiny_drone_image_multispec.tif")], 
