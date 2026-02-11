@@ -45,7 +45,7 @@ const OPTS_GROUPS = [
     },
     {
         id: 'sfm',
-        name: _('Sparse Reconstruction (SfM)'),
+        name: _('Sparse Reconstruction'),
         icon: 'fa fa-share-alt',
         subgroups: [
             { id: 'feature-extraction', name: _('Feature Extraction') },
@@ -56,7 +56,7 @@ const OPTS_GROUPS = [
     },
     {
         id: 'mvs',
-        name: _('Dense Reconstruction (MVS)'),
+        name: _('Dense Reconstruction'),
         icon: 'fa fa-braille',
         subgroups: [
             { id: 'generation', name: _('Generation') },
@@ -82,7 +82,7 @@ const OPTS_GROUPS = [
     },
     {
         id: 'dem',
-        name: _('Digital Elevation Models (DEMs)'),
+        name: _('Digital Elevation Models'),
         icon: 'fa fa-chart-area',
         subgroups: [
             { id: 'dem-outputs', name: _('Outputs') },
@@ -117,7 +117,7 @@ const OPTS_GROUPS = [
     },
     {
         id: 'split-merge',
-        name: _('Split/Merge (Large Datasets)'),
+        name: _('Split/Merge'),
         icon: 'fa fa-sitemap',
         subgroups: [
             { id: 'splitting', name: _('Splitting') },
@@ -224,24 +224,23 @@ const OPTION_GROUP_MAP = {
     'smrf-threshold': { group: 'dem', subgroup: 'smrf' },
     'smrf-window': { group: 'dem', subgroup: 'smrf' },
     
-    // Orthophoto - Orthophoto Options
+    // Orthophoto
     'orthophoto-resolution': { group: 'orthophoto', subgroup: 'ortho-opts' },
     'fast-orthophoto': { group: 'orthophoto', subgroup: 'ortho-opts' },
     'orthophoto-cutline': { group: 'orthophoto', subgroup: 'ortho-opts' },
     'skip-orthophoto': { group: 'orthophoto', subgroup: 'ortho-opts' },
     'use-3dmesh': { group: 'orthophoto', subgroup: 'ortho-opts' },
     
-    // Export Formats - Export Options
+    // Export Formats
     '3d-tiles': { group: 'export', subgroup: 'export-opts' },
     'tiles': { group: 'export', subgroup: 'export-opts' },
     'skip-report': { group: 'export', subgroup: 'export-opts' },
     
-    // System & Pipeline Control - Performance
+    // System & Pipeline Control
     'max-concurrency': { group: 'system', subgroup: 'performance' },
     'no-gpu': { group: 'system', subgroup: 'performance' },
     'optimize-disk-space': { group: 'system', subgroup: 'performance' },
     
-    // System & Pipeline Control - Pipeline Control
     'rerun-from': { group: 'system', subgroup: 'pipeline' },
     'end-with': { group: 'system', subgroup: 'pipeline' }
 };
@@ -261,7 +260,7 @@ class EditPresetDialog extends React.Component {
     constructor(props){
         super(props);
 
-        // Refs to ProcessingNodeOption
+        // Refs to ProcessingNodeOption components
         this.options = {};
 
         // All collapsed by default
@@ -276,7 +275,8 @@ class EditPresetDialog extends React.Component {
             search: "",
             showSearch: false,
             collapsedGroups,
-            viewMode: 'grouped' // 'grouped' or 'flat'
+            viewMode: 'grouped', // 'grouped' or 'flat',
+            expanded: false
         };
 
         this.getFormData = this.getFormData.bind(this);
@@ -344,14 +344,14 @@ class EditPresetDialog extends React.Component {
         const collapsedGroups = {};
         OPTS_GROUPS.forEach(g => collapsedGroups[g.id] = false);
         collapsedGroups['ungrouped'] = false;
-        this.setState({ collapsedGroups });
+        this.setState({ collapsedGroups, expanded: true });
     }
 
     collapseAll = () => {
         const collapsedGroups = {};
         OPTS_GROUPS.forEach(g => collapsedGroups[g.id] = true);
         collapsedGroups['ungrouped'] = true;
-        this.setState({ collapsedGroups });
+        this.setState({ collapsedGroups, expanded: false });
     }
 
     toggleViewMode = () => {
@@ -436,22 +436,20 @@ class EditPresetDialog extends React.Component {
                         <span className="option-count">({totalOptions})</span>
                     </div>
                     
-                    {!isCollapsed && (
-                        <div className="option-group-content">
-                            {groupOptions.map(({ subgroup, options: subgroupOpts }) => (
-                                <div key={subgroup.id} className="option-subgroup">
-                                    {group.subgroups.length > 1 && (
-                                        <div className="option-subgroup-header">
-                                            {subgroup.name}
-                                        </div>
-                                    )}
-                                    <div className="option-subgroup-content">
-                                        {subgroupOpts.map(opt => this.renderOption(opt))}
+                    <div className="option-group-content" style={{display: isCollapsed ? "none" : "block"}}>
+                        {groupOptions.map(({ subgroup, options: subgroupOpts }) => (
+                            <div key={subgroup.id} className="option-subgroup">
+                                {group.subgroups.length > 1 && (
+                                    <div className="option-subgroup-header">
+                                        {subgroup.name}
                                     </div>
+                                )}
+                                <div className="option-subgroup-content">
+                                    {subgroupOpts.map(opt => this.renderOption(opt))}
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             );
         }).filter(Boolean);
@@ -488,7 +486,7 @@ class EditPresetDialog extends React.Component {
         return groupElements;
     }
 
-    // Render flat view (original behavior)
+    // Render flat view
     renderFlatOptions(options) {
         return options
             .filter(option => this.searchFilter(option))
@@ -496,11 +494,9 @@ class EditPresetDialog extends React.Component {
     }
 
     render(){
-        let options = PresetUtils.getAvailableOptions(this.props.preset.options, this.props.availableOptions);
+        let options = PresetUtils.getAvailableOptions(this.props.preset.options, this.props.availableOptions)
+                                 .filter(option => OPTS_BLACKLIST.indexOf(option.name.toLowerCase()) === -1);
         
-        // Filter blacklisted options
-        options = options.filter(option => OPTS_BLACKLIST.indexOf(option.name.toLowerCase()) === -1);
-
         return (
             <div className="edit-preset-dialog">
                 <FormDialog {...this.props}
@@ -515,11 +511,9 @@ class EditPresetDialog extends React.Component {
                     deleteAction={(this.props.preset.id !== -1 && !this.props.preset.system) ? this.props.deleteAction : undefined}>
                   
                   {!this.isCustomPreset() ? 
-                    [<div className="row preset-name" key="preset">
-                        <label className="col-sm-2 control-label">{_("Name")}</label>
-                        <div className="col-sm-10" style={{marginRight: "40px"}}>
-                          <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
-                        </div>
+                    [<div className="preset-name" key="preset">
+                        <label className="control-label">{_("Name")}</label>
+                        <input type="text" className="form-control" ref={(domNode) => { this.nameInput = domNode; }} value={this.state.name} onChange={this.handleChange('name')} />
                     </div>,
                     <hr key="hr"/>]
                   : ""}
@@ -532,11 +526,8 @@ class EditPresetDialog extends React.Component {
                           <i className={`fa fa-fw ${this.state.viewMode === 'grouped' ? 'fa-list' : 'fa-layer-group'}`}></i>
                       </button>
                       
-                      <button type="button" disabled={this.state.viewMode === 'flat'} className="btn btn-default btn-sm" title={_("Expand All")} onClick={this.expandAll}>
-                        <i className="fa fa-fw fa-angle-double-down"></i>
-                      </button>
-                      <button type="button" disabled={this.state.viewMode === 'flat'} className="btn btn-default btn-sm" title={_("Collapse All")} onClick={this.collapseAll}>
-                        <i className="fa fa-fw fa-angle-double-up"></i>
+                      <button type="button" disabled={this.state.viewMode === 'flat'} className="btn btn-default btn-sm" title={this.state.expanded ? _("Expand") : _("Collapse")} onClick={this.state.expanded ? this.collapseAll : this.expandAll}>
+                        <i className={"fa fa-fw fa-angle-double-" + (this.state.expanded ? "up" : "down")}></i>
                       </button>
                   </div>
 

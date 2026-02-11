@@ -82,8 +82,10 @@
         }
     }
 
-    // Ensure the preset name row aligns properly
     .preset-name {
-        margin-bottom: 15px;
+        display: flex;
+        label{
+            margin-right: 10px;
+        }
     }
 }
