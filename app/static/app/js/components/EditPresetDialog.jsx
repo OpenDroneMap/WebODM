@@ -45,8 +45,8 @@ const OPTS_GROUPS = [
     },
     {
         id: 'sfm',
-        name: _('Sparse Reconstruction'),
-        icon: 'fa fa-share-alt',
+        name: _('Structure From Motion'),
+        icon: 'fa fa-camera',
         subgroups: [
             { id: 'feature-extraction', name: _('Feature Extraction') },
             { id: 'feature-matching', name: _('Feature Matching') },
@@ -56,7 +56,7 @@ const OPTS_GROUPS = [
     },
     {
         id: 'mvs',
-        name: _('Dense Reconstruction'),
+        name: _('Point Cloud'),
         icon: 'fa fa-braille',
         subgroups: [
             { id: 'generation', name: _('Generation') },
@@ -99,11 +99,11 @@ const OPTS_GROUPS = [
         ]
     },
     {
-        id: 'export',
-        name: _('Export Formats'),
-        icon: 'fa fa-file-export',
+        id: 'tiles',
+        name: _('Tiles'),
+        icon: 'fas fa-th',
         subgroups: [
-            { id: 'export-opts', name: _('Export Options') }
+            { id: 'tiles-opts', name: _('Tiles Options') }
         ]
     },
     {
@@ -231,10 +231,9 @@ const OPTION_GROUP_MAP = {
     'skip-orthophoto': { group: 'orthophoto', subgroup: 'ortho-opts' },
     'use-3dmesh': { group: 'orthophoto', subgroup: 'ortho-opts' },
     
-    // Export Formats
-    '3d-tiles': { group: 'export', subgroup: 'export-opts' },
-    'tiles': { group: 'export', subgroup: 'export-opts' },
-    'skip-report': { group: 'export', subgroup: 'export-opts' },
+    // Tile Exports
+    '3d-tiles': { group: 'tiles', subgroup: 'tiles-opts' },
+    'tiles': { group: 'tiles', subgroup: 'tiles-opts' },
     
     // System & Pipeline Control
     'max-concurrency': { group: 'system', subgroup: 'performance' },
@@ -243,6 +242,8 @@ const OPTION_GROUP_MAP = {
     
     'rerun-from': { group: 'system', subgroup: 'pipeline' },
     'end-with': { group: 'system', subgroup: 'pipeline' }
+
+    // 'skip-report': { group: 'notsure', subgroup: 'notsure-opts' },
 };
 
 class EditPresetDialog extends React.Component {
