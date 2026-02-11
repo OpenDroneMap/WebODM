@@ -426,9 +426,9 @@ class EditPresetDialog extends React.Component {
             const totalOptions = groupOptions.reduce((sum, sg) => sum + sg.options.length, 0);
 
             return (
-                <div key={group.id} className="option-group">
+                <div key={group.id} className="option-group theme-border-highlight-8">
                     <div 
-                        className="option-group-header" 
+                        className="option-group-header theme-background-highlight" 
                         onClick={() => this.toggleGroup(group.id)}
                     >
                         <i className={`fa ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} toggle-icon`}></i>
@@ -441,7 +441,7 @@ class EditPresetDialog extends React.Component {
                         {groupOptions.map(({ subgroup, options: subgroupOpts }) => (
                             <div key={subgroup.id} className="option-subgroup">
                                 {group.subgroups.length > 1 && (
-                                    <div className="option-subgroup-header">
+                                    <div className="option-subgroup-header theme-border-highlight-9">
                                         {subgroup.name}
                                     </div>
                                 )}
@@ -462,9 +462,9 @@ class EditPresetDialog extends React.Component {
         if (ungroupedOptions.length > 0) {
             const isCollapsed = this.state.collapsedGroups['ungrouped'];
             groupElements.push(
-                <div key="ungrouped" className="option-group">
+                <div key="ungrouped" className="option-group theme-border-highlight-8">
                     <div 
-                        className="option-group-header"
+                        className="option-group-header theme-background-highlight"
                         onClick={() => this.toggleGroup('ungrouped')}
                     >
                         <i className={`fa ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} toggle-icon`}></i>
