@@ -239,11 +239,11 @@ const OPTION_GROUP_MAP = {
     'max-concurrency': { group: 'system', subgroup: 'performance' },
     'no-gpu': { group: 'system', subgroup: 'performance' },
     'optimize-disk-space': { group: 'system', subgroup: 'performance' },
+    'skip-report': { group: 'system', subgroup: 'performance' },
     
     'rerun-from': { group: 'system', subgroup: 'pipeline' },
     'end-with': { group: 'system', subgroup: 'pipeline' }
 
-    // 'skip-report': { group: 'notsure', subgroup: 'notsure-opts' },
 };
 
 class EditPresetDialog extends React.Component {
