@@ -72,7 +72,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     <<EOT
     # Install Python dependencies
     # Install pip
-    pip install pip==24.0 setuptools wheel
+    pip install -U pip setuptools wheel
     # Install Python requirements, including correct Python GDAL bindings.
     pip install -r requirements.txt "boto3==1.14.14" gdal[numpy]=="$(gdal-config --version).*"
 EOT
