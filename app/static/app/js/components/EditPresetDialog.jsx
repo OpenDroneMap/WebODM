@@ -14,93 +14,86 @@ if (!Object.values) {
 // Do not apply to WebODM, can cause confusion
 const OPTS_BLACKLIST = ['build-overviews', 'orthophoto-no-tiled', 'orthophoto-compression', 'orthophoto-png', 'orthophoto-kmz', 'pc-copc', 'pc-las', 'pc-ply', 'pc-csv', 'pc-ept', 'cog', 'gltf'];
 
-// Pipeline-ordered option groups with display metadata
-const PIPELINE_GROUPS = [
+// Option groups
+const OPTS_GROUPS = [
     {
         id: 'input',
         name: _('Input & Preprocessing'),
-        icon: 'fa-download',
+        icon: 'fa fa-image',
         subgroups: [
             { id: 'camera', name: _('Camera Configuration') },
-            { id: 'image-prep', name: _('Image Preprocessing') },
+            { id: 'masks', name: _('Masking') },
+            { id: 'multispectral', name: _('Multispectral') },
             { id: 'video', name: _('Video Input') }
         ]
     },
     {
-        id: 'split-merge',
-        name: _('Split/Merge (Large Datasets)'),
-        icon: 'fa-sitemap',
+        id: 'boundscrop',
+        name: _('Bounds & Cropping'),
+        icon: 'fa fa-crop',
         subgroups: [
-            { id: 'splitting', name: _('Splitting') },
-            { id: 'merging', name: _('Merging') }
+            { id: 'bounds', name: _('Boundary') }
+        ]
+    },
+    {
+        id: 'crs',
+        name: _('Coordinate Reference System'),
+        icon: 'fa fa-globe',
+        subgroups: [
+            { id: 'crs-opts', name: _('Options') },
         ]
     },
     {
         id: 'sfm',
-        name: _('Sparese Reconstruction (SfM)'),
-        icon: 'fa-share-alt',
+        name: _('Sparse Reconstruction (SfM)'),
+        icon: 'fa fa-share-alt',
         subgroups: [
             { id: 'feature-extraction', name: _('Feature Extraction') },
             { id: 'feature-matching', name: _('Feature Matching') },
-            { id: 'sparse-reconstruction', name: _('Sparse Reconstruction') },
-            { id: 'gps', name: _('GPS Priors') }
+            { id: 'sparse-reconstruction', name: _('Reconstruction') },
+            { id: 'gps', name: _('Georeferencing') }
         ]
     },
     {
         id: 'mvs',
         name: _('Dense Reconstruction (MVS)'),
-        icon: 'fa-cubes',
+        icon: 'fa fa-braille',
         subgroups: [
-            { id: 'depthmap', name: _('Depth Map Generation') }
-        ]
-    },
-    {
-        id: 'pointcloud',
-        name: _('Point Cloud Processing (PDAL)'),
-        icon: 'fa-braille',
-        subgroups: [
+            { id: 'generation', name: _('Generation') },
             { id: 'filtering', name: _('Filtering') },
             { id: 'postprocess', name: _('Post-Processing') }
         ]
     },
     {
         id: 'mesh',
-        name: _('Meshing (Poisson)'),
-        icon: 'fa-gem',
+        name: _('Meshing'),
+        icon: 'fa fa-cube',
         subgroups: [
             { id: 'mesh-gen', name: _('Mesh Generation') }
         ]
     },
     {
         id: 'texturing',
-        name: _('Texturing (MVS-Tex)'),
-        icon: 'fa-image',
+        name: _('Texturing'),
+        icon: 'fab fa-connectdevelop',
         subgroups: [
             { id: 'texture-opts', name: _('Texture Options') }
         ]
     },
     {
-        id: 'outputbounds',
-        name: _('Bounds & Cropping'),
-        icon: 'fa-crop',
-        subgroups: [
-            { id: 'bounds', name: _('Boundary') }
-        ]
-    },
-    {
         id: 'dem',
-        name: _('Digital Elevation Models (SMRF/GDAL)'),
-        icon: 'fa-mountain',
+        name: _('Digital Elevation Models (DEMs)'),
+        icon: 'fa fa-chart-area',
         subgroups: [
-            { id: 'dem-output', name: _('Output Selection') },
-            { id: 'dem-quality', name: _('Resolution & Quality') },
+            { id: 'dem-outputs', name: _('Outputs') },
+            { id: 'dem-generation', name: _('Resolution & Sampling') },
             { id: 'smrf', name: _('Ground Classification (SMRF)') }
         ]
     },
     {
         id: 'orthophoto',
         name: _('Orthophoto'),
-        icon: 'fa-map',
+        icon: 'fa fa-map',
         subgroups: [
             { id: 'ortho-opts', name: _('Orthophoto Options') }
         ]
@@ -108,7 +101,7 @@ const PIPELINE_GROUPS = [
     {
         id: 'export',
         name: _('Export Formats'),
-        icon: 'fa-file-export',
+        icon: 'fa fa-file-export',
         subgroups: [
             { id: 'export-opts', name: _('Export Options') }
         ]
@@ -116,82 +109,90 @@ const PIPELINE_GROUPS = [
     {
         id: 'system',
         name: _('System & Pipeline Control'),
-        icon: 'fa-cogs',
+        icon: 'fa fa-cogs',
         subgroups: [
             { id: 'performance', name: _('Performance') },
             { id: 'pipeline', name: _('Pipeline Control') }
         ]
-    }
+    },
+    {
+        id: 'split-merge',
+        name: _('Split/Merge (Large Datasets)'),
+        icon: 'fa fa-sitemap',
+        subgroups: [
+            { id: 'splitting', name: _('Splitting') },
+            { id: 'merging', name: _('Merging') }
+        ]
+    },
 ];
 
 // Map each option to its group and subgroup
 const OPTION_GROUP_MAP = {
-    // Input & Preprocessing - Camera Configuration
+    // Input & Preprocessing
     'camera-lens': { group: 'input', subgroup: 'camera' },
     'cameras': { group: 'input', subgroup: 'camera' },
-    'use-exif': { group: 'input', subgroup: 'camera' },
     'use-fixed-camera-params': { group: 'input', subgroup: 'camera' },
     'rolling-shutter': { group: 'input', subgroup: 'camera' },
     'rolling-shutter-readout': { group: 'input', subgroup: 'camera' },
+    'ignore-gsd': { group: 'input', subgroup: 'camera' },
     
-    // Input & Preprocessing - Image Preprocessing
-    'bg-removal': { group: 'input', subgroup: 'image-prep' },
-    'sky-removal': { group: 'input', subgroup: 'image-prep' },
-    'primary-band': { group: 'input', subgroup: 'image-prep' },
-    'radiometric-calibration': { group: 'input', subgroup: 'image-prep' },
-    'skip-band-alignment': { group: 'input', subgroup: 'image-prep' },
+    'bg-removal': { group: 'input', subgroup: 'masks' },
+    'sky-removal': { group: 'input', subgroup: 'masks' },
+
+    'primary-band': { group: 'input', subgroup: 'multispectral' },
+    'radiometric-calibration': { group: 'input', subgroup: 'multispectral' },
+    'skip-band-alignment': { group: 'input', subgroup: 'multispectral' },
+
     
-    // Input & Preprocessing - Video Input
     'video-limit': { group: 'input', subgroup: 'video' },
     'video-resolution': { group: 'input', subgroup: 'video' },
     
-    // Split/Merge - Splitting
+    // CRS
+    'crs': { group: 'crs', subgroup: 'crs-opts' },
+
+    // Split/Merge
     'split': { group: 'split-merge', subgroup: 'splitting' },
     'split-overlap': { group: 'split-merge', subgroup: 'splitting' },
     'sm-cluster': { group: 'split-merge', subgroup: 'splitting' },
     
-    // Split/Merge - Merging
     'merge': { group: 'split-merge', subgroup: 'merging' },
     'merge-skip-blending': { group: 'split-merge', subgroup: 'merging' },
     'sm-no-align': { group: 'split-merge', subgroup: 'merging' },
     
-    // Structure from Motion - Feature Extraction
+    // Structure from Motion
     'feature-type': { group: 'sfm', subgroup: 'feature-extraction' },
     'feature-quality': { group: 'sfm', subgroup: 'feature-extraction' },
     'min-num-features': { group: 'sfm', subgroup: 'feature-extraction' },
     
-    // Structure from Motion - Feature Matching
     'matcher-type': { group: 'sfm', subgroup: 'feature-matching' },
     'matcher-neighbors': { group: 'sfm', subgroup: 'feature-matching' },
     'matcher-order': { group: 'sfm', subgroup: 'feature-matching' },
     
-    // Structure from Motion - Sparse Reconstruction
     'sfm-algorithm': { group: 'sfm', subgroup: 'sparse-reconstruction' },
     'sfm-no-partial': { group: 'sfm', subgroup: 'sparse-reconstruction' },
     'use-hybrid-bundle-adjustment': { group: 'sfm', subgroup: 'sparse-reconstruction' },
     'min-track-length': { group: 'sfm', subgroup: 'sparse-reconstruction' },
     
-    // Structure from Motion - GPS Priors
     'force-gps': { group: 'sfm', subgroup: 'gps' },
     'gps-accuracy': { group: 'sfm', subgroup: 'gps' },
     'gps-z-offset': { group: 'sfm', subgroup: 'gps' },
+    'use-exif': { group: 'sfm', subgroup: 'gps' },
     
-    // Dense Reconstruction - Depth Map Generation
-    'pc-quality': { group: 'mvs', subgroup: 'depthmap' },
-    'ignore-gsd': { group: 'mvs', subgroup: 'depthmap' },
-    'depthmap-min-consistent-views': { group: 'mvs', subgroup: 'depthmap' },
+    // Dense
+    'pc-quality': { group: 'mvs', subgroup: 'generation' },
+    'pc-tile': { group: 'mvs', subgroup: 'generation' },
     
-    // Point Cloud Processing - Filtering
-    'pc-filter': { group: 'pointcloud', subgroup: 'filtering' },
-    'pc-skip-geometric': { group: 'pointcloud', subgroup: 'filtering' },
+    'depthmap-min-consistent-views': { group: 'mvs', subgroup: 'generation' },
     
-    // Point Cloud Processing - Post-Processing
-    'pc-classify': { group: 'pointcloud', subgroup: 'postprocess' },
-    'pc-rectify': { group: 'pointcloud', subgroup: 'postprocess' },
-    'pc-sample': { group: 'pointcloud', subgroup: 'postprocess' },
+    // MVS
+    'pc-filter': { group: 'mvs', subgroup: 'filtering' },
+    'pc-skip-geometric': { group: 'mvs', subgroup: 'filtering' },
+    'pc-sample': { group: 'mvs', subgroup: 'filtering' },
     
-    // Meshing - Mesh Generation
-    'use-3dmesh': { group: 'mesh', subgroup: 'mesh-gen' },
+    'pc-classify': { group: 'mvs', subgroup: 'postprocess' },
+    'pc-rectify': { group: 'mvs', subgroup: 'postprocess' },
+    
+    // Meshing
     'skip-3dmodel': { group: 'mesh', subgroup: 'mesh-gen' },
     'mesh-octree-depth': { group: 'mesh', subgroup: 'mesh-gen' },
     'mesh-size': { group: 'mesh', subgroup: 'mesh-gen' },
@@ -200,24 +201,24 @@ const OPTION_GROUP_MAP = {
     'texturing-single-material': { group: 'texturing', subgroup: 'texture-opts' },
     'texturing-keep-unseen-faces': { group: 'texturing', subgroup: 'texture-opts' },
     'texturing-skip-global-seam-leveling': { group: 'texturing', subgroup: 'texture-opts' },
+    'texturing-data-term': { group: 'texturing', subgroup: 'texture-opts' },
+    'texturing-regularization': { group: 'texturing', subgroup: 'texture-opts' },
     
-    // Bounds & cropping - Boundary
-    'auto-boundary': { group: 'outputbounds', subgroup: 'bounds' },
-    'auto-boundary-distance': { group: 'outputbounds', subgroup: 'bounds' },
-    'boundary': { group: 'outputbounds', subgroup: 'bounds' },
-    'crop': { group: 'outputbounds', subgroup: 'bounds' },
+    // Bounds/cropping
+    'auto-boundary': { group: 'boundscrop', subgroup: 'bounds' },
+    'auto-boundary-distance': { group: 'boundscrop', subgroup: 'bounds' },
+    'boundary': { group: 'boundscrop', subgroup: 'bounds' },
+    'crop': { group: 'boundscrop', subgroup: 'bounds' },
     
-    // Digital Elevation Models - Output Selection
-    'dsm': { group: 'dem', subgroup: 'dem-output' },
-    'dtm': { group: 'dem', subgroup: 'dem-output' },
+    // Digital Elevation Models
+    'dsm': { group: 'dem', subgroup: 'dem-outputs' },
+    'dtm': { group: 'dem', subgroup: 'dem-outputs' },
+    'dem-euclidean-map': { group: 'dem', subgroup: 'dem-outputs' },
     
-    // Digital Elevation Models - Resolution & Quality
-    'dem-resolution': { group: 'dem', subgroup: 'dem-quality' },
-    'dem-decimation': { group: 'dem', subgroup: 'dem-quality' },
-    'dem-gapfill-steps': { group: 'dem', subgroup: 'dem-quality' },
-    'dem-euclidean-map': { group: 'dem', subgroup: 'dem-quality' },
+    'dem-resolution': { group: 'dem', subgroup: 'dem-generation' },
+    'dem-decimation': { group: 'dem', subgroup: 'dem-generation' },
+    'dem-gapfill-steps': { group: 'dem', subgroup: 'dem-generation' },
     
-    // Digital Elevation Models - Ground Classification (SMRF)
     'smrf-scalar': { group: 'dem', subgroup: 'smrf' },
     'smrf-slope': { group: 'dem', subgroup: 'smrf' },
     'smrf-threshold': { group: 'dem', subgroup: 'smrf' },
@@ -225,9 +226,10 @@ const OPTION_GROUP_MAP = {
     
     // Orthophoto - Orthophoto Options
     'orthophoto-resolution': { group: 'orthophoto', subgroup: 'ortho-opts' },
-    'orthophoto-cutline': { group: 'orthophoto', subgroup: 'ortho-opts' },
     'fast-orthophoto': { group: 'orthophoto', subgroup: 'ortho-opts' },
+    'orthophoto-cutline': { group: 'orthophoto', subgroup: 'ortho-opts' },
     'skip-orthophoto': { group: 'orthophoto', subgroup: 'ortho-opts' },
+    'use-3dmesh': { group: 'orthophoto', subgroup: 'ortho-opts' },
     
     // Export Formats - Export Options
     '3d-tiles': { group: 'export', subgroup: 'export-opts' },
@@ -259,15 +261,15 @@ class EditPresetDialog extends React.Component {
     constructor(props){
         super(props);
 
-        // Refs to ProcessingNodeOption components
+        // Refs to ProcessingNodeOption
         this.options = {};
 
-        // Initialize collapsed state - all expanded by default
+        // All collapsed by default
         const collapsedGroups = {};
-        PIPELINE_GROUPS.forEach(g => {
-            collapsedGroups[g.id] = false;
+        OPTS_GROUPS.forEach(g => {
+            collapsedGroups[g.id] = true;
         });
-        collapsedGroups['ungrouped'] = false;
+        collapsedGroups['ungrouped'] = true;
 
         this.state = {
             name: props.preset.name,
@@ -340,14 +342,14 @@ class EditPresetDialog extends React.Component {
 
     expandAll = () => {
         const collapsedGroups = {};
-        PIPELINE_GROUPS.forEach(g => collapsedGroups[g.id] = false);
+        OPTS_GROUPS.forEach(g => collapsedGroups[g.id] = false);
         collapsedGroups['ungrouped'] = false;
         this.setState({ collapsedGroups });
     }
 
     collapseAll = () => {
         const collapsedGroups = {};
-        PIPELINE_GROUPS.forEach(g => collapsedGroups[g.id] = true);
+        OPTS_GROUPS.forEach(g => collapsedGroups[g.id] = true);
         collapsedGroups['ungrouped'] = true;
         this.setState({ collapsedGroups });
     }
@@ -364,7 +366,6 @@ class EditPresetDialog extends React.Component {
         }
     }
 
-    // Build a lookup of option name -> option data
     buildOptionsLookup(options) {
         const lookup = {};
         options.forEach(opt => {
@@ -373,15 +374,12 @@ class EditPresetDialog extends React.Component {
         return lookup;
     }
 
-    // Check if option passes search filter
-    passesSearchFilter(option) {
+    searchFilter(option) {
         if (!this.state.showSearch || this.state.search === "") return true;
         const searchLower = this.state.search.toLowerCase();
-        return option.name.toLowerCase().indexOf(searchLower) !== -1 ||
-               (option.help && option.help.toLowerCase().indexOf(searchLower) !== -1);
+        return option.name.toLowerCase().indexOf(searchLower) !== -1;
     }
 
-    // Render a single option
     renderOption(option) {
         return (
             <ProcessingNodeOption 
@@ -392,13 +390,11 @@ class EditPresetDialog extends React.Component {
         );
     }
 
-    // Render grouped view
     renderGroupedOptions(options) {
         const lookup = this.buildOptionsLookup(options);
         const assignedOptions = new Set();
 
-        const groupElements = PIPELINE_GROUPS.map(group => {
-            // Collect all options in this group's subgroups
+        const groupElements = OPTS_GROUPS.map(group => {
             const groupOptions = [];
             
             group.subgroups.forEach(subgroup => {
@@ -408,7 +404,7 @@ class EditPresetDialog extends React.Component {
                         return mapping.group === group.id && mapping.subgroup === subgroup.id;
                     })
                     .filter(optName => lookup[optName])
-                    .filter(optName => this.passesSearchFilter(lookup[optName]))
+                    .filter(optName => this.searchFilter(lookup[optName]))
                     .map(optName => {
                         assignedOptions.add(optName);
                         return lookup[optName];
@@ -435,7 +431,7 @@ class EditPresetDialog extends React.Component {
                         onClick={() => this.toggleGroup(group.id)}
                     >
                         <i className={`fa ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} toggle-icon`}></i>
-                        <i className={`fa ${group.icon} group-icon`}></i>
+                        <i className={`${group.icon} group-icon`}></i>
                         <span className="group-name">{group.name}</span>
                         <span className="option-count">({totalOptions})</span>
                     </div>
@@ -460,10 +456,9 @@ class EditPresetDialog extends React.Component {
             );
         }).filter(Boolean);
 
-        // Collect any ungrouped options (new options not yet in OPTION_GROUP_MAP)
         const ungroupedOptions = options
             .filter(opt => !assignedOptions.has(opt.name))
-            .filter(opt => this.passesSearchFilter(opt));
+            .filter(opt => this.searchFilter(opt));
 
         if (ungroupedOptions.length > 0) {
             const isCollapsed = this.state.collapsedGroups['ungrouped'];
@@ -496,7 +491,7 @@ class EditPresetDialog extends React.Component {
     // Render flat view (original behavior)
     renderFlatOptions(options) {
         return options
-            .filter(option => this.passesSearchFilter(option))
+            .filter(option => this.searchFilter(option))
             .map(option => this.renderOption(option));
     }
 
@@ -531,45 +526,38 @@ class EditPresetDialog extends React.Component {
 
                   <div className="options-toolbar">
                       <button type="button" className="btn btn-default btn-sm" title={_("Search")} onClick={this.toggleSearchControl}>
-                          <i className="fa fa-search"></i>
+                          <i className="fa fa-fw fa-search"></i>
                       </button>
                       <button type="button" className="btn btn-default btn-sm" title={this.state.viewMode === 'grouped' ? _("Flat View") : _("Grouped View")} onClick={this.toggleViewMode}>
-                          <i className={`fa ${this.state.viewMode === 'grouped' ? 'fa-list' : 'fa-layer-group'}`}></i>
+                          <i className={`fa fa-fw ${this.state.viewMode === 'grouped' ? 'fa-list' : 'fa-layer-group'}`}></i>
                       </button>
-                      {this.state.viewMode === 'grouped' && (
-                          <React.Fragment>
-                              <button type="button" className="btn btn-default btn-sm" title={_("Expand All")} onClick={this.expandAll}>
-                                  <i className="fa fa-angle-double-down"></i>
-                              </button>
-                              <button type="button" className="btn btn-default btn-sm" title={_("Collapse All")} onClick={this.collapseAll}>
-                                  <i className="fa fa-angle-double-up"></i>
-                              </button>
-                          </React.Fragment>
-                      )}
+                      
+                      <button type="button" disabled={this.state.viewMode === 'flat'} className="btn btn-default btn-sm" title={_("Expand All")} onClick={this.expandAll}>
+                        <i className="fa fa-fw fa-angle-double-down"></i>
+                      </button>
+                      <button type="button" disabled={this.state.viewMode === 'flat'} className="btn btn-default btn-sm" title={_("Collapse All")} onClick={this.collapseAll}>
+                        <i className="fa fa-fw fa-angle-double-up"></i>
+                      </button>
                   </div>
 
                   {this.state.showSearch && (
                     <div className="row search-controls">
-                        <div className="col-sm-12">
-                            <input 
-                                type="text" 
-                                className="form-control" 
-                                placeholder={_("Search options...")}
-                                value={this.state.search} 
-                                ref={(node) => { this.searchControl = node; }} 
-                                onChange={this.handleChange('search')} 
-                            />
-                        </div>
+                        <input 
+                            type="text" 
+                            className="form-control" 
+                            placeholder={_("Search options...")}
+                            value={this.state.search} 
+                            ref={(node) => { this.searchControl = node; }} 
+                            onChange={this.handleChange('search')} 
+                        />
                     </div>
                   )}
 
                   <div className="row options-container">
-                    <div className="col-sm-12">
-                        {this.state.viewMode === 'grouped' 
-                            ? this.renderGroupedOptions(options)
-                            : this.renderFlatOptions(options)
-                        }
-                    </div>
+                    {this.state.viewMode === 'grouped' 
+                        ? this.renderGroupedOptions(options)
+                        : this.renderFlatOptions(options)
+                    }
                   </div>
                 </FormDialog>
             </div>

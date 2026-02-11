@@ -1,6 +1,6 @@
 .edit-preset-dialog {
     .options-toolbar {
-        margin-bottom: 10px;
+        margin-bottom: 16px;
         display: flex;
         gap: 5px;
         
@@ -10,16 +10,11 @@
     }
 
     .search-controls {
-        margin-bottom: 10px;
+        margin-bottom: 16px;
         
         .form-control {
             margin-bottom: 0;
         }
-    }
-
-    .options-container {
-        max-height: 60vh;
-        overflow-y: auto;
     }
 
     .option-group {
@@ -44,12 +39,10 @@
             
             .toggle-icon {
                 width: 12px;
-                color: #666;
                 font-size: 0.85em;
             }
             
             .group-icon {
-                color: #337ab7;
                 width: 18px;
                 text-align: center;
             }
@@ -60,7 +53,6 @@
             }
             
             .option-count {
-                color: #888;
                 font-size: 0.9em;
             }
         }
@@ -79,11 +71,8 @@
         }
         
         .option-subgroup-header {
-            font-size: 0.85em;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            font-weight: bold;
+            margin-bottom: 16px;
             padding-bottom: 4px;
             border-bottom: 1px solid #eee;
         }
