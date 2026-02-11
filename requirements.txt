@@ -2,7 +2,7 @@ amqp==2.5.2
 appdirs==1.4.0
 APScheduler==3.2.0
 billiard==3.6.3.0
-celery==4.4.0
+https://github.com/OpenDroneMap/WebODM/releases/download/v3.1.1/celery-4.4.0-pytz.zip
 coreapi>=2.3.3
 Django==2.2.27
 django-appconf==1.0.2
