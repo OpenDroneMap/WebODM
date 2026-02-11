@@ -333,12 +333,9 @@ class EditPresetDialog extends React.Component {
     }
 
     toggleGroup = (groupId) => {
-        this.setState(prevState => ({
-            collapsedGroups: {
-                ...prevState.collapsedGroups,
-                [groupId]: !prevState.collapsedGroups[groupId]
-            }
-        }));
+        let { collapsedGroups } = this.state;
+        collapsedGroups[groupId] = !collapsedGroups[groupId];
+        this.setState({ collapsedGroups });
     }
 
     expandAll = () => {
