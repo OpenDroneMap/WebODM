@@ -72,9 +72,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     <<EOT
     # Install Python dependencies
     # Install pip
-    pip install -U pip setuptools==81.0.0 wheel
+    pip install -U pip==26.0.1 setuptools==67.0.0 wheel==0.46.3 cython==3.2.4
+    pip install numpy==1.26.2
     # Install Python requirements, including correct Python GDAL bindings.
-    pip install -r requirements.txt "boto3==1.14.14" gdal[numpy]=="$(gdal-config --version).*"
+    pip install -r requirements.txt "boto3==1.14.14" gdal[numpy]=="$(gdal-config --version).*" --no-build-isolation
 EOT
 
 # Install project Node dependencies
