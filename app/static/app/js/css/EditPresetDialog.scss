@@ -1,33 +1,111 @@
-.edit-preset-dialog{
-	.preset-name{
-        margin-bottom: 16px;
+.edit-preset-dialog {
+  .preset-name {
+    margin-bottom: 16px;
+    display: flex;
+    label {
+      text-align: left;
+    }
+  }
+  .info-button {
+    position: relative;
+    top: 1px;
+    left: 2px;
+  }
+
+  .checkbox {
+    min-height: 45px;
+  }
+
+  .toggle {
+    margin-right: 5px;
+    &.active-toggle {
+      background-color: #2c3e50;
+      border-color: #2c3e50;
+    }
+  }
+
+  .search-controls {
+    margin-bottom: 12px;
+    margin-right: 38px;
+    input {
+      height: 36px;
+    }
+  }
+  .search-controls {
+    width: 100%;
+  }
+
+  .form-control {
+    width: 100%;
+  }
+
+  .options-toggle-buttons {
+    margin-bottom: 15px;
+  }
+
+  .group {
+    color: #2c3e50;
+    margin-top: 10px;
+    border: 0.2px solid #ddd;
+    border-radius: 5px;
+
+    .toggle-icon {
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+
+    &[open] .toggle-icon {
+      transform: rotate(90deg);
+    }
+
+    &[open] .group-header {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .group-header {
+      border: 0.2px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background-color: #f7f7f7;
+
+      .group_information {
+        font-weight: bold;
         display: flex;
-        label{
-            text-align: left;
-        }
-    }
-    .info-button{
-        position: relative;
-        top: 1px;
-        left: 2px;
-    }
-    
-    .checkbox{
-        min-height: 45px;
+        flex-flow: row nowrap;
+        gap: 10px;
+        height: 100%;
+        align-items: center;
+      }
+
+      &:hover {
+        filter: brightness(0.95);
+      }
     }
 
-    .search-toggle{
-        position: absolute;
-        right: 24px;
-        top: 24px;
-        z-index: 2;
+    .group-body {
+      padding-left: 30px;
+      padding-right: 30px;
+      padding-top: 15px;
+      padding-bottom: 15px;
+      width: 100%;
     }
+  }
 
-    .search-controls{
-        margin-bottom: 12px;
-        margin-right: 38px;
-        input{
-            height: 36px;
-        }
+  .subgroup {
+    width: 100%;
+    .subgroup-heading {
+      font-weight: bold;
+      border-bottom: 0.5px solid #ddd;
+      width: 100%;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
     }
+  }
 }
