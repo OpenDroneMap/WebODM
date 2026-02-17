@@ -115,13 +115,13 @@ const OPTIONS_GROUPS = [
       {
         id: "feature-extraction",
         name: _("Feature Extraction"),
-        options: ["feature-type", "feature-quality", "min-num-features"],
+        options: ["feature-quality", "min-num-features", "feature-type"],
       },
 
       {
         id: "feature-matching",
         name: _("Feature Matching"),
-        options: ["matcher-type", "matcher-neighbours", "matcher-order"],
+        options: ["matcher-neighbors", "matcher-type", "matcher-order"],
       },
 
       {
@@ -138,7 +138,7 @@ const OPTIONS_GROUPS = [
       {
         id: "gps",
         name: _("Georeferencing"),
-        options: ["force-gps", "gps-accuracy", "gps-z-offset", "use-exif"],
+        options: ["gps-accuracy", "gps-z-offset", "force-gps", "use-exif"],
       },
     ],
   },
@@ -154,7 +154,7 @@ const OPTIONS_GROUPS = [
       {
         id: "generation",
         name: _("Generation"),
-        options: ["depthmap-min-consistent-views"],
+        options: ["pc-quality", "depthmap-min-consistent-views"],
       },
 
       {
@@ -182,7 +182,7 @@ const OPTIONS_GROUPS = [
       {
         id: "mesh-gen",
         name: _("Mesh Generation"),
-        options: ["skip-3dmodel", "mesh-octree-depth", "mesh-size"],
+        options: ["mesh-octree-depth", "mesh-size", "skip-3dmodel"],
       },
     ],
   },
@@ -199,8 +199,8 @@ const OPTIONS_GROUPS = [
         id: "texture-opts",
         name: _("Texture Options"),
         options: [
-          "texturing-single-material",
           "texturing-keep-unseen-faces",
+          "texturing-single-material",
           "texturing-skip-global-seam-leveling",
           "texturing-data-term",
           "texturing-regularization",
@@ -252,8 +252,8 @@ const OPTIONS_GROUPS = [
           "orthophoto-resolution",
           "fast-orthophoto",
           "orthophoto-cutline",
-          "skip-orthophoto",
           "use-3dmesh",
+          "skip-orthophoto",
         ],
       },
     ],
@@ -287,8 +287,8 @@ const OPTIONS_GROUPS = [
         id: "performance",
         name: _("Performance"),
         options: [
-          "max-concurrency",
           "no-gpu",
+          "max-concurrency",
           "optimize-disk-space",
           "skip-report",
         ],
@@ -520,7 +520,7 @@ class EditPresetDialog extends React.Component {
               <span>{group.name}</span>
             </span>
             <span className="groups_number-of-items">
-              {number_of_items_in_group}
+              {"(" + number_of_items_in_group + ")"}
             </span>
           </summary>
           <div className="group-body">
@@ -534,12 +534,18 @@ class EditPresetDialog extends React.Component {
   }
 
   renderSubGroup(subgroup, options) {
+    const availableOptions = subgroup.options
+      .filter((optionName) =>
+        options.some((option) => option.name === optionName),
+      )
+      .map((optionName) =>
+        options.find((option) => option.name === optionName),
+      );
+
     return (
       <div key={subgroup.name} className={"subgroup subgroup-" + subgroup.name}>
         <div className="subgroup-heading">{subgroup.name}</div>
-        {options
-          .filter((option) => subgroup.options.includes(option.name))
-          .map((option) => this.renderOption(option))}
+        {availableOptions.map((option) => this.renderOption(option))}
       </div>
     );
   }
