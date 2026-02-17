@@ -325,6 +325,238 @@ const OPTIONS_GROUPS = [
   },
 ];
 
+// Option groups
+const OPTS_GROUPS = [
+    {
+        id: 'input',
+        name: _('Input & Preprocessing'),
+        icon: 'fa fa-image',
+        subgroups: [
+            { id: 'camera', name: _('Camera Configuration') },
+            { id: 'masks', name: _('Masking') },
+            { id: 'multispectral', name: _('Multispectral') },
+            { id: 'video', name: _('Video Input') }
+        ]
+    },
+    {
+        id: 'boundscrop',
+        name: _('Bounds & Cropping'),
+        icon: 'fa fa-crop',
+        subgroups: [
+            { id: 'bounds', name: _('Boundary') }
+        ]
+    },
+    {
+        id: 'crs',
+        name: _('Coordinate Reference System'),
+        icon: 'fa fa-globe',
+        subgroups: [
+            { id: 'crs-opts', name: _('Options') },
+        ]
+    },
+    {
+        id: 'sfm',
+        name: _('Structure From Motion'),
+        icon: 'fa fa-camera',
+        subgroups: [
+            { id: 'feature-extraction', name: _('Feature Extraction') },
+            { id: 'feature-matching', name: _('Feature Matching') },
+            { id: 'sparse-reconstruction', name: _('Reconstruction') },
+            { id: 'gps', name: _('Georeferencing') }
+        ]
+    },
+    {
+        id: 'mvs',
+        name: _('Point Cloud'),
+        icon: 'fa fa-braille',
+        subgroups: [
+            { id: 'generation', name: _('Generation') },
+            { id: 'filtering', name: _('Filtering') },
+            { id: 'postprocess', name: _('Post-Processing') }
+        ]
+    },
+    {
+        id: 'mesh',
+        name: _('Meshing'),
+        icon: 'fa fa-cube',
+        subgroups: [
+            { id: 'mesh-gen', name: _('Mesh Generation') }
+        ]
+    },
+    {
+        id: 'texturing',
+        name: _('Texturing'),
+        icon: 'fab fa-connectdevelop',
+        subgroups: [
+            { id: 'texture-opts', name: _('Texture Options') }
+        ]
+    },
+    {
+        id: 'dem',
+        name: _('Digital Elevation Models'),
+        icon: 'fa fa-chart-area',
+        subgroups: [
+            { id: 'dem-outputs', name: _('Outputs') },
+            { id: 'dem-generation', name: _('Resolution & Sampling') },
+            { id: 'smrf', name: _('Ground Classification (SMRF)') }
+        ]
+    },
+    {
+        id: 'orthophoto',
+        name: _('Orthophoto'),
+        icon: 'fa fa-map',
+        subgroups: [
+            { id: 'ortho-opts', name: _('Orthophoto Options') }
+        ]
+    },
+    {
+        id: 'tiles',
+        name: _('Tiles'),
+        icon: 'fas fa-th',
+        subgroups: [
+            { id: 'tiles-opts', name: _('Tiles Options') }
+        ]
+    },
+    {
+        id: 'system',
+        name: _('System & Pipeline Control'),
+        icon: 'fa fa-cogs',
+        subgroups: [
+            { id: 'performance', name: _('Performance') },
+            { id: 'pipeline', name: _('Pipeline Control') }
+        ]
+    },
+    {
+        id: 'split-merge',
+        name: _('Split/Merge'),
+        icon: 'fa fa-sitemap',
+        subgroups: [
+            { id: 'splitting', name: _('Splitting') },
+            { id: 'merging', name: _('Merging') }
+        ]
+    },
+];
+
+// Map each option to its group and subgroup
+const OPTION_GROUP_MAP = {
+    // Input & Preprocessing
+    'camera-lens': { group: 'input', subgroup: 'camera' },
+    'cameras': { group: 'input', subgroup: 'camera' },
+    'use-fixed-camera-params': { group: 'input', subgroup: 'camera' },
+    'rolling-shutter': { group: 'input', subgroup: 'camera' },
+    'rolling-shutter-readout': { group: 'input', subgroup: 'camera' },
+    'ignore-gsd': { group: 'input', subgroup: 'camera' },
+    
+    'bg-removal': { group: 'input', subgroup: 'masks' },
+    'sky-removal': { group: 'input', subgroup: 'masks' },
+
+    'primary-band': { group: 'input', subgroup: 'multispectral' },
+    'radiometric-calibration': { group: 'input', subgroup: 'multispectral' },
+    'skip-band-alignment': { group: 'input', subgroup: 'multispectral' },
+
+    
+    'video-limit': { group: 'input', subgroup: 'video' },
+    'video-resolution': { group: 'input', subgroup: 'video' },
+    
+    // CRS
+    'crs': { group: 'crs', subgroup: 'crs-opts' },
+
+    // Split/Merge
+    'split': { group: 'split-merge', subgroup: 'splitting' },
+    'split-overlap': { group: 'split-merge', subgroup: 'splitting' },
+    'sm-cluster': { group: 'split-merge', subgroup: 'splitting' },
+    
+    'merge': { group: 'split-merge', subgroup: 'merging' },
+    'merge-skip-blending': { group: 'split-merge', subgroup: 'merging' },
+    'sm-no-align': { group: 'split-merge', subgroup: 'merging' },
+    
+    // Structure from Motion
+    'feature-type': { group: 'sfm', subgroup: 'feature-extraction' },
+    'feature-quality': { group: 'sfm', subgroup: 'feature-extraction' },
+    'min-num-features': { group: 'sfm', subgroup: 'feature-extraction' },
+    
+    'matcher-type': { group: 'sfm', subgroup: 'feature-matching' },
+    'matcher-neighbors': { group: 'sfm', subgroup: 'feature-matching' },
+    'matcher-order': { group: 'sfm', subgroup: 'feature-matching' },
+    
+    'sfm-algorithm': { group: 'sfm', subgroup: 'sparse-reconstruction' },
+    'sfm-no-partial': { group: 'sfm', subgroup: 'sparse-reconstruction' },
+    'use-hybrid-bundle-adjustment': { group: 'sfm', subgroup: 'sparse-reconstruction' },
+    'min-track-length': { group: 'sfm', subgroup: 'sparse-reconstruction' },
+    
+    'force-gps': { group: 'sfm', subgroup: 'gps' },
+    'gps-accuracy': { group: 'sfm', subgroup: 'gps' },
+    'gps-z-offset': { group: 'sfm', subgroup: 'gps' },
+    'use-exif': { group: 'sfm', subgroup: 'gps' },
+    
+    // Dense
+    'pc-quality': { group: 'mvs', subgroup: 'generation' },
+    'pc-tile': { group: 'mvs', subgroup: 'generation' },
+    
+    'depthmap-min-consistent-views': { group: 'mvs', subgroup: 'generation' },
+    
+    // MVS
+    'pc-filter': { group: 'mvs', subgroup: 'filtering' },
+    'pc-skip-geometric': { group: 'mvs', subgroup: 'filtering' },
+    'pc-sample': { group: 'mvs', subgroup: 'filtering' },
+    
+    'pc-classify': { group: 'mvs', subgroup: 'postprocess' },
+    'pc-rectify': { group: 'mvs', subgroup: 'postprocess' },
+    
+    // Meshing
+    'skip-3dmodel': { group: 'mesh', subgroup: 'mesh-gen' },
+    'mesh-octree-depth': { group: 'mesh', subgroup: 'mesh-gen' },
+    'mesh-size': { group: 'mesh', subgroup: 'mesh-gen' },
+    
+    // Texturing - Texture Options
+    'texturing-single-material': { group: 'texturing', subgroup: 'texture-opts' },
+    'texturing-keep-unseen-faces': { group: 'texturing', subgroup: 'texture-opts' },
+    'texturing-skip-global-seam-leveling': { group: 'texturing', subgroup: 'texture-opts' },
+    'texturing-data-term': { group: 'texturing', subgroup: 'texture-opts' },
+    'texturing-regularization': { group: 'texturing', subgroup: 'texture-opts' },
+    
+    // Bounds/cropping
+    'auto-boundary': { group: 'boundscrop', subgroup: 'bounds' },
+    'auto-boundary-distance': { group: 'boundscrop', subgroup: 'bounds' },
+    'boundary': { group: 'boundscrop', subgroup: 'bounds' },
+    'crop': { group: 'boundscrop', subgroup: 'bounds' },
+    
+    // Digital Elevation Models
+    'dsm': { group: 'dem', subgroup: 'dem-outputs' },
+    'dtm': { group: 'dem', subgroup: 'dem-outputs' },
+    'dem-euclidean-map': { group: 'dem', subgroup: 'dem-outputs' },
+    
+    'dem-resolution': { group: 'dem', subgroup: 'dem-generation' },
+    'dem-decimation': { group: 'dem', subgroup: 'dem-generation' },
+    'dem-gapfill-steps': { group: 'dem', subgroup: 'dem-generation' },
+    
+    'smrf-scalar': { group: 'dem', subgroup: 'smrf' },
+    'smrf-slope': { group: 'dem', subgroup: 'smrf' },
+    'smrf-threshold': { group: 'dem', subgroup: 'smrf' },
+    'smrf-window': { group: 'dem', subgroup: 'smrf' },
+    
+    // Orthophoto
+    'orthophoto-resolution': { group: 'orthophoto', subgroup: 'ortho-opts' },
+    'fast-orthophoto': { group: 'orthophoto', subgroup: 'ortho-opts' },
+    'orthophoto-cutline': { group: 'orthophoto', subgroup: 'ortho-opts' },
+    'skip-orthophoto': { group: 'orthophoto', subgroup: 'ortho-opts' },
+    'use-3dmesh': { group: 'orthophoto', subgroup: 'ortho-opts' },
+    
+    // Tile Exports
+    '3d-tiles': { group: 'tiles', subgroup: 'tiles-opts' },
+    'tiles': { group: 'tiles', subgroup: 'tiles-opts' },
+    
+    // System & Pipeline Control
+    'max-concurrency': { group: 'system', subgroup: 'performance' },
+    'no-gpu': { group: 'system', subgroup: 'performance' },
+    'optimize-disk-space': { group: 'system', subgroup: 'performance' },
+    'skip-report': { group: 'system', subgroup: 'performance' },
+    
+    'rerun-from': { group: 'system', subgroup: 'pipeline' },
+    'end-with': { group: 'system', subgroup: 'pipeline' }
+
+};
+
 class EditPresetDialog extends React.Component {
   static defaultProps = {};
 

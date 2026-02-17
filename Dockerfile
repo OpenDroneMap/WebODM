@@ -54,7 +54,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get -qq install -y nodejs
     # Python3.9, GDAL, PDAL, nginx, letsencrypt, psql
     apt-get install -y --no-install-recommends \
-        python$PYTHON_VERSION python$PYTHON_VERSION-venv python$PYTHON_VERSION-dev libpq-dev build-essential git libproj-dev gdal-bin pdal \
+        python$PYTHON_VERSION python$PYTHON_VERSION-venv python$PYTHON_VERSION-distutils python$PYTHON_VERSION-dev libpq-dev build-essential git libproj-dev gdal-bin pdal \
         libgdal-dev nginx certbot gettext-base cron postgresql-client gettext tzdata
     # Create virtualenv
     python$PYTHON_VERSION -m venv $WORKDIR/venv
@@ -72,9 +72,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     <<EOT
     # Install Python dependencies
     # Install pip
-    pip install pip==24.0
+    pip install -U pip==26.0.1 setuptools==67.0.0 wheel==0.46.3 cython==3.2.4
+    pip install numpy==1.26.2
     # Install Python requirements, including correct Python GDAL bindings.
-    pip install -r requirements.txt "boto3==1.14.14" gdal[numpy]=="$(gdal-config --version).*"
+    pip install -r requirements.txt "boto3==1.14.14" gdal[numpy]=="$(gdal-config --version).*" --no-build-isolation
 EOT
 
 # Install project Node dependencies

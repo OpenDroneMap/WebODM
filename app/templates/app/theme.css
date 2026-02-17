@@ -253,12 +253,21 @@ select.form-control option[disabled],
 	color: {{ theme_primary }};
 }
 pre.prettyprint,
-.form-control{
+.form-control,
+.theme-border-highlight{
 	border-color: {{ theme_highlight }};
 }
 pre.prettyprint:focus,
 .form-control:focus{
 	border-color: {% scalebyiv theme_highlight 0.7 %};
+}
+
+.theme-border-highlight-9{
+	border-color: {% scalebyiv theme_highlight 0.9 %};
+}
+
+.theme-border-highlight-8{
+	border-color: {% scalebyiv theme_highlight 0.8 %};
 }
 
 /* Dialog warning */

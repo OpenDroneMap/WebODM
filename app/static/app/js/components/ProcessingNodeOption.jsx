@@ -15,10 +15,12 @@ class ProcessingNodeOption extends React.Component {
     name: PropTypes.string.isRequired,
     defaultValue: PropTypes.oneOfType([
       PropTypes.string,
+      PropTypes.number,
       PropTypes.bool
     ]).isRequired,
     value: PropTypes.oneOfType([
       PropTypes.string,
+      PropTypes.number,
       PropTypes.bool
     ]),
     type: PropTypes.string,
