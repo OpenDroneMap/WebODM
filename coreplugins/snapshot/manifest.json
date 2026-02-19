@@ -1,0 +1,13 @@
+{
+	"name": "Snapshot Button",
+	"webodmMinVersion": "0.5.2",
+	"description": "A plugin to add a button for taking a snapshot of the map or 3D model.",
+	"version": "1.0.0",
+	"author": "Piero Toffanin",
+	"email": "pt@masseranolabs.com",
+	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"tags": ["snapshot"],
+	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"experimental": true,
+	"deprecated": false
+}
