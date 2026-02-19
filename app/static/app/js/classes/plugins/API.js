@@ -1,6 +1,7 @@
 import { EventEmitter } from 'fbemitter';
 import ApiFactory from './ApiFactory';
 import Map from './Map';
+import ModelView from './ModelView';
 import Dashboard from './Dashboard';
 import App from './App';
 import SharePopup from './SharePopup';
@@ -30,6 +31,7 @@ if (!window.PluginsAPI){
 
   window.PluginsAPI = {
     Map: factory.create(Map),
+    ModelView: factory.create(ModelView),
     Dashboard: factory.create(Dashboard),
     App: factory.create(App),
     SharePopup: factory.create(SharePopup),

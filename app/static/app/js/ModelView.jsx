@@ -8,6 +8,8 @@ import ShareButton from './components/ShareButton';
 import ImagePopup from './components/ImagePopup';
 import Utils from './classes/Utils';
 import PropTypes from 'prop-types';
+import PluginsAPI from './classes/plugins/API';
+import update from 'immutability-helper';
 import * as THREE from 'THREE';
 import $ from 'jquery';
 import { _, interpolate } from './classes/gettext';
@@ -182,7 +184,8 @@ class ModelView extends React.Component {
       texModelLoadProgress: null,
       selectedCamera: null,
       modalOpen: false,
-      cameraScale: CAMERA_SCALES[props.task.srs.units] || 1.0
+      cameraScale: CAMERA_SCALES[props.task.srs.units] || 1.0,
+      pluginActionButtons: []
     };
 
     this.pointCloud = null;
@@ -515,6 +518,13 @@ class ModelView extends React.Component {
     viewer.renderer.domElement.addEventListener( 'mousemove', this.handleRenderMouseMove );
     viewer.renderer.domElement.addEventListener( 'touchstart', this.handleRenderTouchStart );
     
+    PluginsAPI.ModelView.triggerAddActionButton({
+      viewer
+    }, (button) => {
+      this.setState(update(this.state, {
+        pluginActionButtons: {$push: [button]}
+      }));
+    });
   }
 
   handleUnitSystemChanged = () => {
@@ -851,6 +861,7 @@ class ModelView extends React.Component {
                             buttonClass="btn-secondary"
                             onModalOpen={() => this.setState({modalOpen: true})}
                             onModalClose={() => this.setState({modalOpen: false})} />
+            {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
             {(this.props.shareButtons && !this.props.public) ? 
             <ShareButton 
                 ref={(ref) => { this.shareButton = ref; }}

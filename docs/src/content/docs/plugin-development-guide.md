@@ -163,16 +163,17 @@ PluginsAPI.hook([
 
 ```
 
-| <div style="width:260px">Hook</div>                            | Triggered                                                                                  |
-| ------------------------------- | ------------------------------------------------------------------------------------------ |
-| `App.ready`                     | On DOM load                                                                                |
-| `Dashboard.addTaskActionButton` | When buttons have been added to a task (next to View Map, View 3D Model, ..)             |
-| `Dashboard.addNewTaskPanelItem` | When opening the panel after selecting images and GCPs                                    |
-| `Dashboard.addNewTaskButton`    | When buttons have been added to a project's panel (next to Select Images and GCP, Import)|
-| `Map.willAddControls`           | When Leaflet controls are about to be added                                                    |
-| `Map.didAddControls`            | When Leaflet controls have been added                                                          |
-| `Map.addActionButton`           | When action buttons (bottom right of the screen) are about to be added                    |
-| `SharePopup.addLinkControl`     | When rendering the Share dialog in Map View                                               |
+| <div style="width:260px">Hook</div> | Triggered                                                                                 |
+| ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| `App.ready`                         | On DOM load                                                                               |
+| `Dashboard.addTaskActionButton`     | When buttons have been added to a task (next to View Map, View 3D Model, ..)              |
+| `Dashboard.addNewTaskPanelItem`     | When opening the panel after selecting images and GCPs                                    |
+| `Dashboard.addNewTaskButton`        | When buttons have been added to a project's panel (next to Select Images and GCP, Import) |
+| `Map.willAddControls`               | When Leaflet controls are about to be added                                               |
+| `Map.didAddControls`                | When Leaflet controls have been added                                                     |
+| `Map.addActionButton`               | When action buttons (bottom right of the screen) are about to be added                    |
+| `ModelView.addActionButton`         | When action buttons (bottom right of the screen) are about to be added (in 3D Model)      |
+| `SharePopup.addLinkControl`         | When rendering the Share dialog in Map View                                               |
 
 ## Client Side Callbacks
 
