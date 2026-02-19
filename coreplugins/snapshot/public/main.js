@@ -52,6 +52,7 @@
         {
           type: "button",
           className: "btn btn-sm btn-secondary",
+          title: "Take snapshot",
           style: {padding: "5px 9px"},
           ref: function(el){ btnRef = el; },
           onClick: handleClick
