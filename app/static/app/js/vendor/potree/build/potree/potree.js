@@ -52173,7 +52173,7 @@
 			this.boundingBox = this.sphere.geometry.boundingBox;
 			this.add(this.sphere);
 
-			this.label.visible = false;
+			this.label.visible = true;
 
 
 			let frameGeometry = new Geometry();

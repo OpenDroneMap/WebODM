@@ -2,7 +2,6 @@ import React, { Component, Fragment } from "react";
 import PropTypes from 'prop-types';
 
 import ResizeModes from 'webodm/classes/ResizeModes';
-import { Modal, Button } from "react-bootstrap";
 import SelectUrlDialog from "./components/SelectUrlDialog";
 import ErrorDialog from "./components/ErrorDialog";
 import ConfigureNewTaskDialog from "./components/ConfigureNewTaskDialog";
@@ -85,15 +84,8 @@ export default class TaskView extends Component {
 		} = this.state;
 		return (
 			<Fragment>
-				{error ? <ErrorDialog errorMessage={error} /> : ""}				
-				<Button
-					bsStyle={"default"}
-					bsSize={"small"}
-					className={"platform-btn"}
-					onClick={this.handleClick}>
-						<i className={"ddb-icon fa-fw"} />
-						DroneDB Import
-				</Button>
+				{error ? <ErrorDialog errorMessage={error} /> : ""}
+				<li><a href="javascript:void(0)" onClick={this.handleClick}><i className={"ddb-icon fa-fw"}></i> From DroneDB</a></li>
 				<SelectUrlDialog
 						  show={isDialogOpen}						  
 						  onHide={this.onHideDialog}

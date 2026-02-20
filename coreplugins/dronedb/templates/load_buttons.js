@@ -1,4 +1,4 @@
-PluginsAPI.Dashboard.addNewTaskButton(
+PluginsAPI.Dashboard.addImportTaskItem(
 	["dronedb/build/ImportView.js"],
 	function(args, ImportView) {
         return React.createElement(ImportView, {

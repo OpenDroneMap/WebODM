@@ -40,6 +40,7 @@ class ProjectListItem extends React.Component {
       refreshing: false,
       importing: false,
       buttons: [],
+      importItems: [],
       sortKey: "-created_at",
       filterTags: [],
       selectedTags: [],
@@ -362,6 +363,14 @@ class ProjectListItem extends React.Component {
 
         this.setState(update(this.state, {
             buttons: {$push: [button]}
+        }));
+    });
+
+    PluginsAPI.Dashboard.triggerAddImportTaskItem({projectId: this.state.data.id, onNewTaskAdded: this.newTaskAdded}, (item) => {
+        if (!item) return;
+
+        this.setState(update(this.state, {
+            importItems: {$push: [item]}
         }));
     });
   }
@@ -695,10 +704,17 @@ class ProjectListItem extends React.Component {
                   <span className="hidden-xs">{_("Select Images and GCP")}</span>
                 </button>
                 <button type="button" 
-                      className="btn btn-default btn-sm"
-                      onClick={this.handleImportTask}>
-                  <i className="glyphicon glyphicon-import"></i> <span className="hidden-xs">{_("Import")}</span>
+                      className="btn btn-default btn-sm btn-import"
+                      data-toggle="dropdown">
+                  <i className="glyphicon glyphicon-import"></i> <span className="hidden-xs">{_("Import")}</span> <span className="caret hidden-xs"></span>
                 </button>
+                <ul className="dropdown-menu import-dropdown">
+                  <li><a href="javascript:void(0)" onClick={this.handleImportTask}><i className={"far fa-file-archive fa-fw"}></i> {_("Assets / Backups")}</a></li>
+                  <li><a href="javascript:void(0)" onClick={this.handleImportTask}><i className={"fas fa-database fa-fw"}></i> {_("External Data")}</a></li>
+                  {this.state.importItems.length ? 
+                    this.state.importItems.map((item, i) => <React.Fragment key={i}>{item}</React.Fragment>)
+                  : ""}
+                </ul>
                 {this.state.buttons.map((button, i) => <React.Fragment key={i}>{button}</React.Fragment>)}
               </div>
             : ""}
