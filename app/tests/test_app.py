@@ -170,12 +170,12 @@ class TestApp(BootTestCase):
         def test_public_task_views(client, expectedStatus):
             res = client.get('/public/task/{}/map/'.format(task.id))
             self.assertTrue(res.status_code == expectedStatus)
-            if expectesStatus == status.HTTP_200_OK:
+            if expectedStatus == status.HTTP_200_OK:
                 self.assertEqual(res.content.decode("utf-8").count('<meta property="og:image"'), 1)
 
             res = client.get('/public/task/{}/3d/'.format(task.id))
             self.assertTrue(res.status_code == expectedStatus)
-            if expectesStatus == status.HTTP_200_OK:
+            if expectedStatus == status.HTTP_200_OK:
                 self.assertEqual(res.content.decode("utf-8").count('<meta property="og:image"'), 1)
             
             res = client.get('/public/task/{}/iframe/3d/'.format(task.id))
@@ -190,7 +190,7 @@ class TestApp(BootTestCase):
             if project.public_id is not None:
                 res = client.get('/public/project/{}/map/'.format(project.public_id))
                 self.assertTrue(res.status_code == expectedStatus)
-                if expectesStatus == status.HTTP_200_OK:
+                if expectedStatus == status.HTTP_200_OK:
                     self.assertEqual(res.content.decode("utf-8").count('<meta property="og:image"'), 1)
                 res = client.get('/public/project/{}/iframe/map/'.format(project.public_id))
                 self.assertTrue(res.status_code == expectedStatus)
