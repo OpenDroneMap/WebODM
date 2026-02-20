@@ -35,6 +35,7 @@ def handle_map(request, template, uuid_type=None, uuid=None, hide_title=False):
         public_edit = task.public_edit
         permissions = get_permissions(request.user, task.project)
         projectInfo = None
+        thumb = f'/api/projects/{task.project.id}/tasks/{task.id}/thumbnail?size=630'
     else:
         project = get_public_project(uuid)
         title = project.name or project.id
@@ -42,9 +43,11 @@ def handle_map(request, template, uuid_type=None, uuid=None, hide_title=False):
         public_edit = project.public_edit
         permissions = get_permissions(request.user, project)
         projectInfo = project.get_public_info()
+        thumb = ''
 
     return render(request, template, {
         'title': title,
+        'thumb': thumb,
         'params': {
             'map-items': json.dumps(mapItems),
             'title': title if not hide_title else '',
@@ -67,9 +70,11 @@ def map_iframe(request, uuid_type=None, uuid=None):
 @handle_302
 def handle_model_display(request, template, task_pk=None):
     task = get_public_task(task_pk)
+    thumb = f'/api/projects/{task.project.id}/tasks/{task.id}/thumbnail?size=630'
 
     return render(request, template, {
             'title': task.name,
+            'thumb': thumb,
             'params': {
                 'task': json.dumps(task.get_model_display_params()),
                 'public': 'true',
