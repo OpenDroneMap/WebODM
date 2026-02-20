@@ -25,6 +25,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="author" content="WebODM Contributors">
     <meta name="robots" content="noindex, nofollow">
+    {% if thumb %}
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{title|default:"Login"}} - {{ SETTINGS.app_name }}" />
+    <meta property="og:image" content="{{ thumb }}" />
+    {% endif %}
     <link rel="icon" type="image/png" href="{% settings_image_url 'app_logo_favicon' %}" sizes="32x32">
 
     <link rel="stylesheet" type="text/css" href="{% static 'app/css/bootstrap.min.css' %}" />
