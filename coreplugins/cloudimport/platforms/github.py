@@ -6,7 +6,8 @@ from app.plugins import logger
 
 class Platform(CloudPlatform):
     def __init__(self):
-        super().__init__('GitHub', 'https://github.com/{owner}/{repo}/tree/{commit/branch/tag}/{path to folder}')
+        super().__init__('GitHub', 'fab fa-github fa-fw', 'https://github.com/{owner}/{repo}/tree/{commit/branch/tag}/{path to folder}')
+
 
     # Cloud Platform
     def parse_url(self, url):

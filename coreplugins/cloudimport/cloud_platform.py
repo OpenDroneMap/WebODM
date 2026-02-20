@@ -10,8 +10,9 @@ class CloudPlatform(ABC):
        Platforms have the concept of a folder or album, where files are stored. We will use the platform's API to 
        retrieve all the images in those folders, and import them into WebODM"""
 
-    def __init__(self, name, folder_url_example):
+    def __init__(self, name, icon, folder_url_example):
         self.name = name
+        self.icon = icon
         self.folder_url_example = folder_url_example
   
     def verify_folder_url(self, folder_url):
@@ -57,7 +58,7 @@ class CloudPlatform(ABC):
         return files
   
     def serialize(self, **kwargs):
-        return {'name': self.name, 'folder_url_example': self.folder_url_example, 'type': 'platform'} 
+        return {'name': self.name, 'icon': self.icon, 'folder_url_example': self.folder_url_example, 'type': 'platform'} 
   
     @abstractmethod
     def parse_url(self, url):

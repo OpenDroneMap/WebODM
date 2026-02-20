@@ -4,7 +4,8 @@ export default {
   endpoints: [
     "addTaskActionButton",
     "addNewTaskPanelItem",
-    "addNewTaskButton"
+    "addNewTaskButton",
+    "addImportTaskItem"
   ]
 };
 

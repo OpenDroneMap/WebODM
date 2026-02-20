@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import ResizeModes from 'webodm/classes/ResizeModes';
 
-import PlatformSelectButton from "./components/PlatformSelectButton";
 import PlatformDialog from "./components/PlatformDialog";
 import LibraryDialog from "./components/LibraryDialog";
 import ErrorDialog from "./components/ErrorDialog";
@@ -92,10 +91,7 @@ export default class TaskView extends Component {
 			{error ?
 				<ErrorDialog errorMessage={error} />
 			: ""}
-				<PlatformSelectButton
-					platforms={platforms}
-					onSelect={this.onSelectPlatform}
-				/>
+				{platforms.map(platform => <li><a href="javascript:void(0)" onClick={e => this.onSelectPlatform(platform)}><i className={platform.icon}></i> From {platform.name}</a></li>)}
 				{selectedFolder === null ?
 					<Fragment>
 						<PlatformDialog

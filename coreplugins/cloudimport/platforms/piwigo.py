@@ -6,7 +6,8 @@ from coreplugins.cloudimport.extensions.cloud_library import CloudLibrary
 
 class Platform(CloudLibrary):
     def __init__(self):
-        super().__init__('Piwigo', 'http://{server_url}/index.php?/category/{category_id}')
+        super().__init__('Piwigo', 'fa fa-icon-globe fa-fw', 'http://{server_url}/index.php?/category/{category_id}')
+    
     
     # Cloud Platform
     def platform_file_processing(self, files):

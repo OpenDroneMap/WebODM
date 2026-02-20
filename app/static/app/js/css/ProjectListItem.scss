@@ -151,4 +151,15 @@
         border-top-right-radius: 3px !important;
         border-bottom-right-radius: 3px !important;
     }
+
+    .import-dropdown{
+        right: 0;
+        left: auto;
+    }
+
+    .btn-import{
+        .caret{
+            margin-left: 8px;
+        }
+    }
 }
