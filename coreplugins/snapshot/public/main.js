@@ -18,7 +18,11 @@
     }).then(function(canvas) {
       var link = document.createElement('a');
       link.href = canvas.toDataURL();
-      link.download = (title ? title.replace(/\s+/g, '-').replace(/[^0-9a-zA-Z\-_]+/g, '') + '-' : '') + 'snapshot.png';
+      
+      var filename = title.replace(/\s+/g, '-').replace(/\//g, '-').replace(/[^0-9a-zA-Z-_]+/g, '') + (title ? '-' : '') + "snapshot.png";
+      filename = filename.replace(/-+/g, '-');
+
+      link.download = filename;
       link.click();
     });
   }
