@@ -191,7 +191,7 @@ class TestApp(BootTestCase):
                 res = client.get('/public/project/{}/map/'.format(project.public_id))
                 self.assertTrue(res.status_code == expectedStatus)
                 if expectedStatus == status.HTTP_200_OK:
-                    self.assertEqual(res.content.decode("utf-8").count('<meta property="og:image"'), 1)
+                    self.assertEqual(res.content.decode("utf-8").count('<meta property="og:image"'), 0)
                 res = client.get('/public/project/{}/iframe/map/'.format(project.public_id))
                 self.assertTrue(res.status_code == expectedStatus)
                 res = client.get('/api/projects/{}/tasks/{}/'.format(project.id, task.id))
