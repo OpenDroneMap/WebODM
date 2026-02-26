@@ -29,7 +29,7 @@ if [[ $platform = "MacOS / OSX" ]]; then
 fi
 
 # Load default values
-source "${__dirname}/.env"
+set -a; source "${__dirname}/.env"; set +a
 DEFAULT_PORT="$WO_PORT"
 DEFAULT_HOST="$WO_HOST"
 DEFAULT_MEDIA_DIR="$WO_MEDIA_DIR"
