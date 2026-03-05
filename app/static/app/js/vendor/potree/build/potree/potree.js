@@ -79714,6 +79714,11 @@ ENDSEC
 
 				if(object){
 					object.visible = false;
+				}else {
+					// Root node: uncheck all children
+					data.node.children.forEach(childId => {
+						tree.jstree('uncheck_node', childId);
+					});
 				}
 			});
 
@@ -79722,6 +79727,11 @@ ENDSEC
 
 				if(object){
 					object.visible = true;
+				}else {
+					// Root node: check all children
+					data.node.children.forEach(childId => {
+						tree.jstree('check_node', childId);
+					});
 				}
 			});
 
