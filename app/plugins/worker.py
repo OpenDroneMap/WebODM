@@ -1,4 +1,4 @@
-import inspect
+import importlib
 from worker.celery import app
 from webodm import settings
 
@@ -8,23 +8,20 @@ def run_function_async(func, *args, **kwargs):
     """
     Run a function asynchronously using Celery.
     Plugins should use this function so that they don't
-    have to register new Celery tasks at startup. Functions
-    should import any required library at the top of the function body.
-    :param {Function} a function to execute
+    have to register new Celery tasks at startup.
+    :param {Function} a module-level function to execute
     """
-    source = inspect.getsource(func)
-    return eval_async.delay(source, func.__name__, *args, **kwargs)
+    return call_async.delay(func.__module__, func.__qualname__, *args, **kwargs)
 
 
 @app.task(bind=True, time_limit=settings.WORKERS_MAX_TIME_LIMIT)
-def eval_async(self, source, funcname, *args, **kwargs):
+def call_async(self, module_path, funcname, *args, **kwargs):
     """
-    Run Python code asynchronously using Celery.
+    Run a Python function asynchronously using Celery.
     It's recommended to use run_function_async instead.
     """
-    ns = {}
-    code = compile(source, 'file', 'exec')
-    eval(code, ns, ns)
+    module = importlib.import_module(module_path)
+    func = getattr(module, funcname)
 
     if kwargs.get("with_progress"):
         def progress_callback(status, perc):
@@ -32,4 +29,4 @@ def eval_async(self, source, funcname, *args, **kwargs):
         kwargs['progress_callback'] = progress_callback
         del kwargs['with_progress']
 
-    return ns[funcname](*args, **kwargs)
+    return func(*args, **kwargs)
