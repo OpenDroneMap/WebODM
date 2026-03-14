@@ -3,33 +3,32 @@ title: Installation
 template: doc
 ---
 
-There are two ways to install WebODM on your machine:
+:::tip[Did You Know?]
 
-| Install Method                        | Price | Operating Systems     | Installation Support |
-| ------------------------------------- | ----- | --------------------- | -------------------- |
-| [WebODM Installer](#webodm-installer) | Paid  | Windows, macOS        | ✅                   |
-| [Docker](#docker)                     | Free  | Windows, macOS, Linux | Community            |
-
-
-:::tip
-
-You can also skip the installation entirely and run WebODM from [webodm.net](https://webodm.net)
+You can skip the installation and run WebODM from [webodm.net](https://webodm.net), which supports the developer of the software ❤ Try it for [free](https://webodm.net).
 
 :::
 
 ## Installation on your machine
 
-### WebODM Installer
+There are two ways to install WebODM on your machine:
 
-Installers are available for purchase from [OpenDroneMap](https://opendronemap.org) and come with installation support.
+| Install Method                 | Cost | Operating Systems     | Installation Support |
+| ------------------------------ | ---- | --------------------- | -------------------- |
+| [Installer](#webodm-installer) | Paid | Windows, macOS        | ✅                   |
+| [Docker](#docker)              | Free | Windows, macOS, Linux | Community            |
 
-https://opendronemap.org/webodm/download/
+### Installer
 
 :::note
 
 The Windows installer currently comes packaged with WebODM version 2.8.1. To access the latest 3.x version, use Docker.
 
 :::
+
+Installers are available for purchase from [OpenDroneMap](https://opendronemap.org) and come with installation support.
+
+https://opendronemap.org/webodm/download/
 
 ### Docker
 
