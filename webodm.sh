@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eo pipefail
 __dirname=$(cd "$(dirname "$0")"; pwd -P)
 cd "${__dirname}"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export COMPOSE_FILE=docker-compose.yml:docker-compose.build.yml
 WAIT_SECONDS=20
