@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Launch a development worker so that changes in a dev
 # environment can be refreshed
 

@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "devenv.sh is deprecated! Use \"./webodm.sh start --dev\" instead."
