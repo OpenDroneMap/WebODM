@@ -16,6 +16,7 @@ import Tags from '../classes/Tags';
 import Trans from './Trans';
 import Utils from '../classes/Utils';
 import PdfPopup from './PdfPopup';
+import { unitSystem } from '../classes/Units';
 import { _, interpolate } from '../classes/gettext';
 
 class TaskListItem extends React.Component {
@@ -645,7 +646,8 @@ class TaskListItem extends React.Component {
           </div>);
 
       const stats = task.statistics;
-    
+      const us = unitSystem();
+
       expanded = (
         <div className="expanded-panel">
           <div className="row">
@@ -673,12 +675,12 @@ class TaskListItem extends React.Component {
                     {stats && stats.gsd && 
                     <tr>
                       <td><strong>{_("Average GSD:")}</strong></td>
-                      <td>{parseFloat(stats.gsd.toFixed(2)).toLocaleString()} cm</td>
+                      <td>{us.length(parseFloat(stats.gsd) / 100, {gsd: true}).toString()}</td>
                     </tr>}
                     {stats && stats.area &&
                     <tr>
                       <td><strong>{_("Area:")}</strong></td>
-                      <td>{parseFloat(stats.area.toFixed(2)).toLocaleString()} m&sup2;</td>
+                       <td>{us.area(parseFloat(stats.area)).toString()}</td>
                     </tr>}
                     {stats && stats.pointcloud && stats.pointcloud.points &&
                     <tr>

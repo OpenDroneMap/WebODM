@@ -8,9 +8,9 @@ describe('Metric system', () => {
     const lengths = [
         [1, "1 m"],
         [0.01, "1 cm"],
-        [0.0154, "1.5 cm"],
+        [0.0154, "1.54 cm"],
         [0.99, "99 cm"],
-        [0.995555, "99.6 cm"],
+        [0.995555, "99.56 cm"],
         [1.01, "1.01 m"],
         [999, "999 m"],
         [1000, "1 km"],
@@ -115,6 +115,20 @@ describe('Imperial systems', () => {
 
     temperatures.forEach(v => {
       expect(imperial.temperature(v[0]).toString()).toBe(v[1]);
+    });
+  });
+
+  it('it should display inches for GSD lengths', () => {
+    const { imperial, imperialUS } = systems;
+
+    const gsdLengths = [
+        [1, "39.37 in", "39.37 in"],
+        [0.0254, "1 in", "1 in"],
+    ];
+
+    gsdLengths.forEach(l => {
+      expect(imperial.length(l[0], { gsd: true }).toString()).toBe(l[1]);
+      expect(imperialUS.length(l[0], { gsd: true }).toString()).toBe(l[2]);
     });
   });
 });

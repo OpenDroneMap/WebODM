@@ -36,6 +36,13 @@ const units = {
       label: _("Feet"),
       type: types.LENGTH
     },
+    inches:{
+      factor: 100 / 2.54,
+      abbr: 'in',
+      round: 2,
+      label: _("Inches"),
+      type: types.LENGTH
+    },
     hectares: {
       factor: 0.0001,
       abbr: 'ha',
@@ -60,7 +67,7 @@ const units = {
     centimeters: {
       factor: 100,
       abbr: 'cm',
-      round: 1,
+      round: 2,
       label: _("Centimeters"),
       type: types.LENGTH
     },
@@ -285,6 +292,7 @@ class MetricSystem extends UnitSystem{
 
     lengthUnit(meters, opts = {}){
         if (opts.fixedUnit) return units.meters;
+        if (opts.gsd) return units.centimeters;
 
         if (meters < 1) return units.centimeters;
         else if (meters >= 1000) return units.kilometers;
@@ -325,6 +333,10 @@ class ImperialSystem extends UnitSystem{
         return units.sqfeet;
     }
 
+    inches(){
+        return units.inches;
+    }
+
     miles(){
         return units.miles;
     }
@@ -343,6 +355,7 @@ class ImperialSystem extends UnitSystem{
     
     lengthUnit(meters, opts = {}){
         if (opts.fixedUnit) return this.feet();
+        if (opts.gsd) return this.inches();
 
         const feet = this.feet().factor * meters;
         if (feet >= 5280) return this.miles();
@@ -382,6 +395,10 @@ class ImperialUSSystem extends ImperialSystem{
 
     sqfeet(){
         return units.sqfeet_us;
+    }
+
+    inches(){
+        return units.inches;
     }
 
     miles(){
