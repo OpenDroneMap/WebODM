@@ -149,7 +149,8 @@ const OPTION_GROUP_MAP = {
     
     // CRS
     'crs': { group: 'crs', subgroup: 'crs-opts' },
-
+    'report-units': { group: 'crs', subgroup: 'crs-opts' },
+    
     // Split/Merge
     'split': { group: 'split-merge', subgroup: 'splitting' },
     'split-overlap': { group: 'split-merge', subgroup: 'splitting' },
