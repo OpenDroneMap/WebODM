@@ -1372,7 +1372,7 @@ class Task(models.Model):
                     self.check_if_canceled()
                     last_update = time.time()
 
-        max_workers = min(settings.WORKERS_MAX_THREADS, len(images_path))
+        max_workers = max(1, min(settings.WORKERS_MAX_THREADS, len(images_path)))
         
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = []
