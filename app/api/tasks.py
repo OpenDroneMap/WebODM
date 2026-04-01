@@ -58,6 +58,7 @@ class TaskSerializer(serializers.ModelSerializer):
     can_rerun_from = serializers.SerializerMethodField()
     statistics = serializers.SerializerMethodField()
     extent = serializers.SerializerMethodField()
+    media = serializers.SerializerMethodField()
     tags = TagsField(required=False)
     crop = PolygonGeometryField(required=False, allow_null=True)
     srs = serializers.SerializerMethodField()
@@ -95,6 +96,9 @@ class TaskSerializer(serializers.ModelSerializer):
     
     def get_srs(self, obj):
         return get_srs_name_units_from_epsg_or_wkt(obj.epsg, obj.wkt)
+
+    def get_media(self, obj):
+        return len(obj.media) if obj.media else 0
 
     class Meta:
         model = models.Task

@@ -144,6 +144,35 @@ export default {
 
     isNumeric(n){
       return !isNaN(parseFloat(n)) && isFinite(n);
+    },
+
+    dynamicLoad(resources = [], windowObject){
+      if (window[windowObject]) return Promise.resolve();
+
+      const promises = [];
+
+      resources.forEach(href => {
+        if (href.lastIndexOf(".css") !== -1){
+          promises.push(new Promise((resolve, reject) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.onload = resolve;
+            link.onerror = reject;
+            document.head.appendChild(link);
+          }));
+        }else if (href.lastIndexOf(".js") !== -1){
+          promises.push(new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = href;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          }));
+        }
+      });
+
+      return Promise.all(promises);
     }
 };
 

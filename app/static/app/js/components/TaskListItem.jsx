@@ -10,6 +10,7 @@ import HistoryNav from '../classes/HistoryNav';
 import PropTypes from 'prop-types';
 import TaskPluginActionButtons from './TaskPluginActionButtons';
 import MoveTaskDialog from './MoveTaskDialog';
+import ManageMediaDialog from './ManageMediaDialog';
 import PipelineSteps from '../classes/PipelineSteps';
 import Css from '../classes/Css';
 import Tags from '../classes/Tags';
@@ -53,6 +54,7 @@ class TaskListItem extends React.Component {
       thumbLoadFailed: false,
       displayPdf: false,
       copiedToClipboard: false,
+      showMediaDialog: false,
     }
 
     for (let k in props.data){
@@ -545,12 +547,15 @@ class TaskListItem extends React.Component {
 
         if (task.available_assets.indexOf("report.pdf") !== -1){ 
           addActionButton(" " + _("Report"), "btn-primary", "far fa-file-pdf fa-fw", () => {
-            console.log(task.name);
             this.displayPdf(`/api/projects/${task.project}/tasks/${task.id}/download/report.pdf?inline=1`, { 
               title: task.name || _("Report")
             });
           }, { className: "btn-margin-right" });
         }
+
+        addActionButton(" " + _("Media"), "btn-primary", "fa fa-image fa-fw", () => {
+          this.setState({showMediaDialog: true});
+        });
       }
 
       if (this.props.hasPermission("delete")){
@@ -649,7 +654,7 @@ class TaskListItem extends React.Component {
       const us = unitSystem();
 
       expanded = (
-        <div className="expanded-panel">
+        <div className="expanded-panel theme-secondary">
           <div className="row">
             <div className="col-md-12 no-padding">
               <div className="col-md-9 col-sm-10 no-padding">
@@ -687,16 +692,16 @@ class TaskListItem extends React.Component {
                       <td><strong>{_("Points:")}</strong></td>
                       <td>{stats.pointcloud.points.toLocaleString()}</td>
                     </tr>}
-                    {stats && stats.spatial_refs && stats.spatial_refs.length &&
+                    {stats && stats.spatial_refs && stats.spatial_refs.length ?
                     <tr>
                       <td><strong>{_("Georeferencing:")}</strong></td>
                       <td>{this.spatialRefsToHuman(stats.spatial_refs)}</td>
-                    </tr>}
-                    {task.srs && task.srs.name && 
+                    </tr> : null}
+                    {task.srs && task.srs.name ?
                     <tr>
                       <td><strong>{_("CRS:")}</strong></td>
                       <td>{task.srs.name}</td>
-                    </tr>}
+                    </tr> : null}
                     {task.size > 0 && 
                     <tr>
                       <td><strong>{_("Disk Usage:")}</strong></td>
@@ -877,6 +882,14 @@ class TaskListItem extends React.Component {
                 ref={(domNode) => { this.moveTaskDialog = domNode; }}
                 onHide={() => this.setState({showMoveDialog: false})}
                 saveAction={this.moveTaskAction}
+            />
+        : ""}
+        {this.state.showMediaDialog ?
+            <ManageMediaDialog
+                task={task}
+                projectId={task.project}
+                canEdit={this.props.hasPermission("change")}
+                onClose={() => this.setState({showMediaDialog: false})}
             />
         : ""}
         <div className="row">

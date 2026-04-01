@@ -1,20 +1,29 @@
 .map{
     position: relative; 
 
+    .video-marker-spinner{
+        background: none;
+        border: none;
+        i{
+            font-size: 28px;
+            color: #4A90D9;
+        }
+    }
+
     .opacity-slider{
         border-radius: 4px;
         text-align: center;
-        width: 220px;
+        width: 170px;
         position: absolute;
         bottom: 20px;
         left: 50%;
-        margin-left: -100px;
+        margin-left: -75px;
         z-index: 999;
         padding-bottom: 6px;
         .opacity-slider-label{
             display: inline-block;
             position: relative;
-            top: 2px;
+            top: 3px;
         }
     }
 
@@ -24,6 +33,10 @@
         width: 30px;
         height: 30px;
         background-size: 22px;
+    }
+
+    .leaflet-fade-anim  .leaflet-popup{
+        transition: none;
     }
 
     .leaflet-popup-content{

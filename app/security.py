@@ -1,6 +1,7 @@
 from django.core.exceptions import SuspiciousFileOperation
 from shlex import _find_unsafe
 import os
+import re
 
 def path_traversal_check(unsafe_path, known_safe_path):
     known_safe_path = os.path.abspath(known_safe_path)
@@ -23,3 +24,10 @@ def double_quote(s):
     # use double quotes, and prefix double quotes with a \
     # the string $"b is then quoted as "$\"b"
     return '"' + s.replace('"', '\\\"') + '"'
+
+def sanitize_filename(filename):
+    filename = filename.replace('/', '').replace('\\', '')
+    name, ext = os.path.splitext(filename)
+    name = re.sub(r'[^\w\s.\-]', '', name).strip().strip('.')
+    ext = re.sub(r'[^\w.]', '', ext)
+    return name + ext

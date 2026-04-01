@@ -42,6 +42,8 @@ from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
 from app.geoutils import geom_transform, epsg_from_wkt, get_raster_bounds_wkt, get_srs_name_units_from_epsg_or_wkt
+from app.imageutils import extract_gps_from_image
+from app.video import extract_subtitles, srt_file_for_video, extract_gps_from_srt, VIDEO_EXTENSIONS as VIDEO_MOD_EXTENSIONS
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from pyodm.exceptions import NodeResponseError, NodeConnectionError, NodeServerError, OdmError
@@ -50,8 +52,10 @@ from app.classes.gcp import GCPFile
 from .project import Project
 from django.utils.translation import gettext_lazy as _, gettext
 
+
 from functools import partial
 import subprocess
+import glob
 from app.classes.console import Console
 
 logger = logging.getLogger('app.logger')
@@ -284,6 +288,7 @@ class Task(models.Model):
     size = models.FloatField(default=0.0, blank=True, help_text=_("Size of the task on disk in megabytes"), verbose_name=_("Size"))
     compacted = models.BooleanField(default=False, help_text=_("A flag indicating whether this task was compacted"), verbose_name=_("Compact"))
     crop = GeometryField(null=True, blank=True, srid=4326, help_text=_("Polygon defining the crop area of this task"), verbose_name=_("Crop Polygon"))
+    media = fields.JSONField(default=list, blank=True, help_text=_("List of media files associated with this task"), verbose_name=_("Media"))
 
     
     class Meta:
@@ -385,6 +390,12 @@ class Task(models.Model):
         Get a path relative to the place where assets are stored
         """
         return self.task_path("assets", *args)
+
+    def media_directory_path(self, *args):
+        """
+        Get a path relative to the media directory for this task
+        """
+        return self.assets_path("media", *args)
 
     def data_path(self, *args):
         """
@@ -1028,6 +1039,7 @@ class Task(models.Model):
         self.update_available_assets_field()
         self.update_georef_fields()
         self.update_orthophoto_bands_field()
+        self.update_media_field()
         self.update_size()
         self.clear_task_assets_cache()
         self.potree_scene = {}
@@ -1134,6 +1146,10 @@ class Task(models.Model):
         ground_control_points = ''
         if 'ground_control_points.geojson' in self.available_assets: ground_control_points = '/api/projects/{}/tasks/{}/download/ground_control_points.geojson'.format(self.project.id, self.id)
 
+        media = ''
+        if isinstance(self.media, list) and len(self.media) > 0:
+             media = '/api/projects/{}/tasks/{}/media.geojson'.format(self.project.id, self.id)
+
         return {
             'tiles': [{'url': self.get_tile_base_url(t), 'type': t} for t in types],
             'meta': {
@@ -1151,6 +1167,7 @@ class Task(models.Model):
                     'orthophoto_bands': self.orthophoto_bands,
                     'crop': self.crop is not None,
                     'extent': self.get_extent(),
+                    'media': media
                 }
             }
         }
@@ -1270,6 +1287,117 @@ class Task(models.Model):
 
         self.orthophoto_bands = bands
         if commit: self.save()
+
+    PHOTO_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.tif', '.tiff'}
+    VIDEO_EXTENSIONS = VIDEO_MOD_EXTENSIONS
+    MEDIA_EXTENSIONS = PHOTO_EXTENSIONS | VIDEO_EXTENSIONS | {'.srt'}
+    MEDIA_TYPE_ORDER = {'photo': 0, 'pano': 1, 'video': 2}
+
+    @staticmethod
+    def get_media_type(filepath):
+        ext = os.path.splitext(filepath)[1].lower()
+        if ext in Task.VIDEO_EXTENSIONS:
+            return 'video'
+        if ext in Task.PHOTO_EXTENSIONS:
+            if Task._is_panorama(filepath):
+                return 'pano'
+            return 'photo'
+        return None
+
+    @staticmethod
+    def _is_panorama(filepath):
+        try:
+            exiftool = shutil.which('exiftool')
+            if exiftool:
+                result = subprocess.run(
+                    [exiftool, '-ProjectionType', '-s3', filepath],
+                    capture_output=True, text=True, timeout=10
+                )
+                proj = result.stdout.strip().lower()
+                if proj in ('equirectangular', 'cylindrical'):
+                    return True
+        except Exception:
+            pass
+        try:
+            with Image.open(filepath) as im:
+                w, h = im.size
+                if h > 0 and w / h >= 2.0:
+                    return True
+        except Exception:
+            pass
+        return False
+
+    def build_media_entry(self, filepath):
+        filename = os.path.basename(filepath)
+        media_type = self.get_media_type(filepath)
+        if media_type is None:
+            return None
+
+        size = os.path.getsize(filepath)
+        geolocation = None
+
+        existing = None
+        if self.media:
+            for entry in self.media:
+                if entry.get('filename') == filename:
+                    existing = entry
+                    break   
+
+        entry = {
+            'type': media_type,
+            'filename': filename,
+            'description': existing.get('description', '') if existing else '',
+            'size': size,
+        }
+
+        if media_type in ['photo', 'pano']:
+            geolocation = extract_gps_from_image(filepath)
+            if media_type == 'pano':
+                try:
+                    with Image.open(filepath) as im:
+                        entry['width'] = im.size[0]
+                        entry['height'] = im.size[1]
+                except Exception:
+                    pass
+
+        elif media_type == 'video':
+            # Try to extract SRT, parse geolocation at t = 0
+            if extract_subtitles(filepath):
+                srt_file = srt_file_for_video(filepath)
+                geolocation = extract_gps_from_srt(srt_file)
+                entry['srt'] = True
+        
+        entry['geolocation'] = geolocation
+        
+        return entry
+
+    def update_media_field(self, commit=False):
+        media_dir = self.media_directory_path()
+        if not os.path.isdir(media_dir):
+            if self.media:
+                self.media = []
+                if commit:
+                    self.save()
+            return
+
+        entries = []
+        for f in os.listdir(media_dir):
+            fp = os.path.join(media_dir, f)
+            if not os.path.isfile(fp):
+                continue
+            entry = self.build_media_entry(fp)
+            if entry is not None:
+                entries.append(entry)
+
+        entries.sort(key=lambda e: (self.MEDIA_TYPE_ORDER.get(e['type'], 99), e['filename'].lower()))
+        self.media = entries
+        if commit:
+            self.save()
+    
+    def get_media_entry(self, filename):
+        for entry in self.media:
+            if entry.get('filename') == filename:
+                return entry
 
     def delete(self, using=None, keep_parents=False):
         task_id = self.id

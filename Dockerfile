@@ -145,6 +145,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     # Install webpack, webpack CLI
     npm install --quiet -g webpack@5.89.0
     npm install --quiet -g webpack-cli@5.1.4
+    # Install ffmpeg
+    python app/scripts/install_ffmpeg.py
     # Cleanup of build requirements
     apt-get autoremove -y
     apt-get clean
