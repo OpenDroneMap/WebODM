@@ -552,10 +552,6 @@ class TaskListItem extends React.Component {
             });
           }, { className: "btn-margin-right" });
         }
-
-        addActionButton(" " + _("Media"), "btn-primary", "fa fa-image fa-fw", () => {
-          this.setState({showMediaDialog: true});
-        });
       }
 
       if (this.props.hasPermission("delete")){
@@ -842,6 +838,13 @@ class TaskListItem extends React.Component {
     // Ability to change options
     if (editable || (!task.processing_node && this.props.hasPermission("change"))){
         taskActions.push(<li key="edit"><a href="javascript:void(0)" onClick={this.startEditing}><i className="glyphicon glyphicon-pencil"></i>{_("Edit")}</a></li>);
+    }
+
+    // Media
+    if (task.status === statusCodes.COMPLETED){
+      taskActions.push(
+            <li key="media"><a href="javascript:void(0)" onClick={() => { this.setState({showMediaDialog: true}); }}><i className="fa fa-image"></i>{_("Media")}</a></li>,
+      );
     }
 
     if (editable){
