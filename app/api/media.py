@@ -292,7 +292,7 @@ class TaskVideoFlightPath(TaskMediaBase):
         parser = SrtFileParser(srt_path)
         coords, timestamps = parser.get_linestring(resolution=resolution)
         if coords is None:
-            raise exceptions.NotFound(detail="No GPS data in SRT")
+            raise exceptions.NotFound(detail="Not enough GPS data in SRT")
 
         return Response({
             "type": "Feature",
