@@ -109,7 +109,8 @@ RUN <<EOT
     python manage.py collectstatic --noinput
     python manage.py rebuildplugins
     python manage.py translate build --safe
-    # Final cleanup
+    # Install ffmpeg
+    python /webodm/app/scripts/install_ffmpeg.py
     # Remove stale temp files
     rm -rf /tmp/* /var/tmp/*
     # Remove auto-generated secret key (happens on import of settings when none is defined)
@@ -145,8 +146,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     # Install webpack, webpack CLI
     npm install --quiet -g webpack@5.89.0
     npm install --quiet -g webpack-cli@5.1.4
-    # Install ffmpeg
-    python3 /webodm/app/scripts/install_ffmpeg.py
     # Cleanup of build requirements
     apt-get autoremove -y
     apt-get clean
@@ -157,6 +156,7 @@ EOT
 
 COPY --from=build /staging/entwine/build/install/bin/entwine /usr/bin/entwine
 COPY --from=build /staging/entwine/build/install/lib/libentwine* /usr/lib/
+COPY --from=build /usr/bin/ffmpeg /usr/bin/ffmpeg
 COPY --from=build $WORKDIR ./
 
 VOLUME /webodm/app/media
