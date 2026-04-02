@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery';
 import '../css/ManageMediaDialog.scss';
 import PropTypes from 'prop-types';
 import ErrorMessage from './ErrorMessage';
