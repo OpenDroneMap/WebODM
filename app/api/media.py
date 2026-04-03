@@ -27,8 +27,8 @@ MAX_MEDIA_FILE_SIZE = 128 * 1024 * 1024 * 1024  # 128 GB
 
 class TaskMediaBase(TaskNestedView):
     @staticmethod
-    def _lock_task(task_pk):
-        return models.Task.objects.select_for_update().get(pk=task_pk)
+    def _lock_task(task):
+        return models.Task.objects.select_for_update().get(pk=task.pk)
 
 
 class TaskMediaList(TaskMediaBase):
@@ -155,26 +155,29 @@ class TaskMediaUpload(TaskMediaBase):
 
         added = []
         if len(uploaded) > 0:
+            new_entries = {}
+            for name in uploaded:
+                fp = os.path.join(media_dir, name)
+
+                # Handle special case for SRT files
+                # if a SRT file is uploaded after a video file
+                # we need to re-parse the video file rather than the SRT file
+                base, ext = os.path.splitext(name)
+                if ext.lower() == ".srt":
+                    video_file = video_file_for_srt(fp)
+                    if video_file is not None:
+                        fp = video_file
+                        name = os.path.basename(fp)
+
+                entry = task.build_media_entry(fp)
+                if entry is not None:
+                    new_entries[name] = entry
+                    added.append(entry)
+
             with transaction.atomic():
-                task = self._lock_task(task.pk)
+                task = self._lock_task(task)
                 existing = {e['filename']: e for e in task.media}
-                for name in uploaded:
-                    fp = os.path.join(media_dir, name)
-
-                    # Handle special case for SRT files
-                    # if a SRT file is uploaded after a video file
-                    # we need to re-parse the video file rather than the SRT file
-                    base, ext = os.path.splitext(name)
-                    if ext.lower() == ".srt":
-                        video_file = video_file_for_srt(fp)
-                        if video_file is not None:
-                            fp = video_file
-                            name = os.path.basename(fp)
-
-                    entry = task.build_media_entry(fp)
-                    if entry is not None:
-                        existing[name] = entry
-                        added.append(entry)
+                existing.update(new_entries)
                 entries = list(existing.values())
                 entries.sort(key=lambda e: (
                     task.MEDIA_TYPE_ORDER.get(e['type'], 99),
@@ -206,10 +209,11 @@ class TaskMediaManage(TaskMediaBase):
         task = self.get_and_check_task(request, pk)
         check_project_perms(request, task.project, perms=("change_project", ))
         
+        if not task.media:
+            raise exceptions.NotFound()
+
         with transaction.atomic():
-            task = self._lock_task(task.pk)
-            if not task.media:
-                raise exceptions.NotFound()
+            task = self._lock_task(task)
 
             found = False
             for entry in task.media:
@@ -252,7 +256,7 @@ class TaskMediaManage(TaskMediaBase):
         os.remove(filepath)
 
         with transaction.atomic():
-            task = self._lock_task(task.pk)
+            task = self._lock_task(task)
             task.media = [e for e in task.media if e['filename'] != filename]
             task.update_size()
             task.save()
