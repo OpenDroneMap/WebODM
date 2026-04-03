@@ -149,29 +149,33 @@ class TaskMediaUpload(TaskMediaBase):
             
             fsize = os.path.getsize(dst_path)
             if fsize > MAX_MEDIA_FILE_SIZE:
-                os.unlink(tmp_path)
+                os.unlink(dst_path)
                 raise exceptions.ValidationError(detail=_("File exceeds maximum allowed size"))
-            uploaded[name] = fsize
+            uploaded[name] = {
+                'size': fsize,
+                'safe_name': safe_name
+            }
 
         added = []
         if len(uploaded) > 0:
             new_entries = {}
             for name in uploaded:
-                fp = os.path.join(media_dir, name)
+                safe_name = uploaded[name]['safe_name']
+                fp = os.path.join(media_dir, safe_name)
 
                 # Handle special case for SRT files
                 # if a SRT file is uploaded after a video file
                 # we need to re-parse the video file rather than the SRT file
-                base, ext = os.path.splitext(name)
+                base, ext = os.path.splitext(safe_name)
                 if ext.lower() == ".srt":
                     video_file = video_file_for_srt(fp)
                     if video_file is not None:
                         fp = video_file
-                        name = os.path.basename(fp)
+                        safe_name = os.path.basename(fp)
 
                 entry = task.build_media_entry(fp)
                 if entry is not None:
-                    new_entries[name] = entry
+                    new_entries[safe_name] = entry
                     added.append(entry)
 
             with transaction.atomic():
@@ -187,7 +191,7 @@ class TaskMediaUpload(TaskMediaBase):
                 task.update_size()
                 task.save()
 
-        result = {'success': True, 'uploaded': uploaded, 'added': added}
+        result = {'success': True, 'uploaded': {name: uploaded[name]['size'] for name in uploaded}, 'added': added}
         return Response(result, status=status.HTTP_200_OK)
 
 

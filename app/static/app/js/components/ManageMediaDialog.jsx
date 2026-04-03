@@ -139,7 +139,7 @@ class ManageMediaDialog extends React.Component {
         .on("complete", (file) => {
             // Retry
             const retry = () => {
-                const MAX_RETRIES = 20;
+                const MAX_RETRIES = 5;
 
                 if (!file.accepted){
                   throw new Error(interpolate(_('%(filename)s is not a valid file'), {filename: file.name }));
@@ -150,7 +150,7 @@ class ManageMediaDialog extends React.Component {
                     const totalBytesSent = this.state.totalBytesSent - file.trackedBytesSent;
                     const progress = totalBytesSent / this.state.totalBytes * 100;
         
-                    this.setUploadState({
+                    this.setState({
                         progress,
                         totalBytesSent,
                     });

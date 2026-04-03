@@ -43,6 +43,19 @@ class TestMedia(BootTestCase):
         self.assertEqual(len(task.media), 1)
         self.assertEqual(task.media[0]['type'], 'photo')
 
+        # Upload photo with bad filename
+        img = create_test_image()
+        img.name = 'test$%.jpg'
+        res = client.post("/api/projects/{}/tasks/{}/media/upload".format(project.id, task.id), {'file': img}, format='multipart')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.data['success'])
+        self.assertTrue('test$%.jpg' in res.data['uploaded'])
+        self.assertEqual(res.data['added'][0]['filename'], 'test.jpg') # sanitized
+
+        # Can delete using sanitized name
+        res = client.delete("/api/projects/{}/tasks/{}/media/manage/test.jpg".format(project.id, task.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
         # No access from another user (upload)
         img2 = create_test_image()
         res = other_client.post("/api/projects/{}/tasks/{}/media/upload".format(project.id, task.id), {'file': img2}, format='multipart')
