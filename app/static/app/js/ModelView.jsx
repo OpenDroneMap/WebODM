@@ -372,7 +372,11 @@ class ModelView extends React.Component {
     viewer.loadGUI(() => {
       viewer.setLanguage('en');
       $("#menu_tools").next().show();
-      viewer.toggleSidebar();
+
+    // Don't open sidebar on small screens
+    if (window.innerWidth > 600) {
+        viewer.toggleSidebar();
+    }
 
       if (this.hasTexturedModel()){
           window.ReactDOM.render(<TexturedModelMenu selected={this.props.modelType === 'mesh'} toggleTexturedModel={this.toggleTexturedModel}/>, $("#textured_model_button").get(0));
