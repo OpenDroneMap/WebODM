@@ -17,7 +17,7 @@ class TestPanorama(BootTestCase):
     def tearDown(self):
         pass
 
-    def test_panorama_tile(self):
+    def test_panorama_tiles(self):
         user = User.objects.get(username="testuser")
         project = Project.objects.create(owner=user, name="pano test")
         task = Task.objects.create(project=project)
@@ -25,7 +25,6 @@ class TestPanorama(BootTestCase):
         client.login(username="testuser", password="test1234")
         other_client = APIClient()
         other_client.login(username="testuser2", password="test1234")
-
 
         media_dir = task.media_directory_path()
         os.makedirs(media_dir, exist_ok=True)
