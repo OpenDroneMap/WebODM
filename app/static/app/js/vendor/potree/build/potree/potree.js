@@ -55726,6 +55726,7 @@
 			this.scene = null;
 			this._title = args.title || 'No Title';
 			this._description = args.description || '';
+			this._link = args.link || '';
 			this.offset = new Vector3();
 			this.uuid = MathUtils.generateUUID();
 
@@ -55776,16 +55777,36 @@
 
 			this.elTitlebar = this.domElement.find('.annotation-titlebar');
 			this.elTitle = this.elTitlebar.find('.annotation-label');
-			this.elTitle.append(this._title);
+			this.elTitle.text(this._title);
 			this.elDescription = this.domElement.find('.annotation-description');
 			this.elDescriptionClose = this.elDescription.find('.annotation-description-close');
 			// this.elDescriptionContent = this.elDescription.find(".annotation-description-content");
+			this.elLink = this.domElement.find('.annotation-link');
+			this.elLink.text(this._link);
 
 			this.clickTitle = () => {
 				if(this.hasView()){
 					this.moveHere(this.scene.getActiveCamera());
 				}
 				this.dispatchEvent({type: 'click', target: this});
+
+				if (this._link){
+					try{
+						const url = new URL(this._link);
+						if (url.protocol === 'http:' || url.protocol === 'https:'){
+							const isExternal = url.hostname !== window.location.hostname;
+							let proceed = true;
+							if (isExternal) {
+								proceed = confirm(`You are leaving this site to go to ${url.hostname}. Do you want to continue?`);
+							}
+							if (proceed) {
+								window.open(url.toString(), '_blank', 'noopener,noreferrer');
+							}
+						}
+					}catch(err){
+						// pass
+					}
+				}
 			};
 
 			this.elTitle.click(this.clickTitle);
@@ -56059,7 +56080,7 @@
 
 			this._title = title;
 			this.elTitle.empty();
-			this.elTitle.append(this._title);
+			this.elTitle.text(this._title);
 
 			this.dispatchEvent({
 				type: "annotation_changed",
@@ -56080,7 +56101,26 @@
 
 			const elDescriptionContent = this.elDescription.find(".annotation-description-content");
 			elDescriptionContent.empty();
-			elDescriptionContent.append(this._description);
+			elDescriptionContent.text(this._description);
+
+			this.dispatchEvent({
+				type: "annotation_changed",
+				annotation: this,
+			});
+		}
+
+		get link () {
+			return this._link;
+		}
+
+		set link (link) {
+			if (this._link === link) {
+				return;
+			}
+
+			this._link = link;
+			this.elLink.empty();
+			this.elLink.text(this._link);
 
 			this.dispatchEvent({
 				type: "annotation_changed",
@@ -56202,7 +56242,7 @@
 
 				if (this._description) {
 					this.descriptionVisible = true;
-					this.elDescription.fadeIn(200);
+					this.elDescription.fadeIn(1);
 					this.elDescription.css('position', 'relative');
 				}
 			} else {
@@ -56217,6 +56257,7 @@
 		}
 
 		hasView () {
+			if (!this.cameraTarget) return false;
 			let hasPosTargetView = this.cameraTarget.x != null;
 			hasPosTargetView = hasPosTargetView && this.cameraPosition.x != null;
 
@@ -64557,6 +64598,7 @@ void main() {
 			uuid: annotation.uuid,
 			title: annotation.title.toString(),
 			description: annotation.description,
+			link: annotation.link,
 			position: annotation.position.toArray(),
 			offset: annotation.offset.toArray(),
 			children: [],
@@ -65428,6 +65470,7 @@ void main() {
 
 
 		annotation.description = item.description;
+		annotation.link = item.link;
 		annotation.uuid = item.uuid;
 
 		if(item.offset){
@@ -72080,7 +72123,7 @@ void main() {
 					let coordinates = feature.getGeometry().getCoordinates();
 					let p = this.map.getPixelFromCoordinate(coordinates);
 
-					this.elTooltip.html(annotation.title);
+					this.elTooltip.text(annotation.title);
 					this.elTooltip.css('display', '');
 					this.elTooltip.css('left', `${p[0]}px`);
 					this.elTooltip.css('top', `${p[1]}px`);
@@ -75428,7 +75471,9 @@ ENDSEC
 						Can be multiple lines long. TODO: the user should be able
 						to modify title and description. 
 				</div>
-
+				
+				<div class="heading">Link</div>
+				<div id="annotation_link" contenteditable="true"></div>
 			</div>
 
 		</div>
@@ -75445,18 +75490,25 @@ ENDSEC
 						{duration: 3000});
 			});
 
-			this.elTitle = this.elContent.find("#annotation_title").html(annotation.title);
-			this.elDescription = this.elContent.find("#annotation_description").html(annotation.description);
+			this.elTitle = this.elContent.find("#annotation_title").text(annotation.title);
+			this.elDescription = this.elContent.find("#annotation_description").text(annotation.description);
+			this.elLink = this.elContent.find("#annotation_link").text(annotation.link);
+			
 
 			this.elTitle[0].addEventListener("input", () => {
-				const title = this.elTitle.html();
+				const title = this.elTitle.text();
 				annotation.title = title;
 
 			}, false);
 
 			this.elDescription[0].addEventListener("input", () => {
-				const description = this.elDescription.html();
+				const description = this.elDescription.text();
 				annotation.description = description;
+			}, false);
+
+			this.elLink[0].addEventListener("input", () => {
+				const link = this.elLink.text();
+				annotation.link = link;
 			}, false);
 
 			this.update();
@@ -75470,10 +75522,8 @@ ENDSEC
 			elContent.find("#annotation_position_y").html(pos[1]);
 			elContent.find("#annotation_position_z").html(pos[2]);
 
-			elTitle.html(annotation.title);
-			elDescription.html(annotation.description);
-
-
+			elTitle.text(annotation.title);
+			elDescription.text(annotation.description);
 		}
 	};
 
@@ -79776,19 +79826,30 @@ ENDSEC
 				createNode(measurementID, profile.name, icon, profile);
 			};
 
+			let escapeHTML = (str) => {
+				return str.replace(/[&<>"']/g, function(m) {
+					return {
+					'&': '&amp;',
+					'<': '&lt;',
+					'>': '&gt;',
+					'"': '&quot;',
+					"'": '&#39;'
+					}[m];
+				});
+			};
+
 			let onAnnotationAdded = (e) => {
 				let annotation = e.annotation;
 
 				let annotationIcon = `${Potree.resourcePath}/icons/annotation.svg`;
 				let parentID = this.annotationMapping.get(annotation.parent);
-				let annotationID = createNode(parentID, annotation.title, annotationIcon, annotation);
+				let annotationID = createNode(parentID, escapeHTML(annotation.title), annotationIcon, annotation);
 				this.annotationMapping.set(annotation, annotationID);
 
 				annotation.addEventListener("annotation_changed", (e) => {
 					let annotationsRoot = $("#jstree_scene").jstree().get_json("annotations");
 					let jsonNode = annotationsRoot.children.find(child => child.data.uuid === annotation.uuid);
-					
-					$.jstree.reference(jsonNode.id).rename_node(jsonNode.id, annotation.title);
+					$.jstree.reference(jsonNode.id).rename_node(jsonNode.id, escapeHTML(annotation.title));
 				});
 			};
 
