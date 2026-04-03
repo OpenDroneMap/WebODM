@@ -72,28 +72,28 @@ def render_tile(filepath, face_index, tile_left, tile_top, tile_w, tile_h, size_
     py_lo, py_hi = float(norm_py.min()), float(norm_py.max())
     px_lo, px_hi = float(norm_px.min()), float(norm_px.max())
 
-    img = Image.open(filepath)
-    orig_w, orig_h = img.size
+    with Image.open(filepath) as img:
+        orig_w, orig_h = img.size
 
-    needed = max(tile_w, tile_h) * 4
-    if needed < min(orig_w, orig_h):
-        img.draft('RGB', (needed, needed * orig_h // orig_w))
+        needed = max(tile_w, tile_h) * 4
+        if needed < min(orig_w, orig_h):
+            img.draft('RGB', (needed, needed * orig_h // orig_w))
 
-    aw, ah = img.size
+        aw, ah = img.size
 
-    src_top = max(0, int(py_lo * ah) - 2)
-    src_bot = min(ah, int(py_hi * ah) + 2)
+        src_top = max(0, int(py_lo * ah) - 2)
+        src_bot = min(ah, int(py_hi * ah) + 2)
 
-    if px_hi - px_lo < 0.5:
-        src_left = max(0, int(px_lo * aw) - 2)
-        src_right = min(aw, int(px_hi * aw) + 2)
-    else:
-        src_left, src_right = 0, aw
+        if px_hi - px_lo < 0.5:
+            src_left = max(0, int(px_lo * aw) - 2)
+            src_right = min(aw, int(px_hi * aw) + 2)
+        else:
+            src_left, src_right = 0, aw
 
-    region = img.crop((src_left, src_top, src_right, src_bot))
-    if region.mode != 'RGB':
-        region = region.convert('RGB')
-    arr = np.asarray(region)
+        region = img.crop((src_left, src_top, src_right, src_bot))
+        if region.mode != 'RGB':
+            region = region.convert('RGB')
+        arr = np.asarray(region)
 
     px = np.clip(norm_px * aw - src_left, 0, arr.shape[1] - 1).astype(np.int32)
     py = np.clip(norm_py * ah - src_top, 0, arr.shape[0] - 1).astype(np.int32)
