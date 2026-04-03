@@ -399,7 +399,7 @@ class ManageMediaDialog extends React.Component {
               totalCount={this.state.totalCount}
               format={(perc) => {
                 if (parseFloat(perc) === 100) return _("Finalizing... please wait");
-                return perc;
+                return `${perc}%`;
               }}
             />
             <button
