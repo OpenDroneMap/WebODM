@@ -106,7 +106,7 @@ class TestMedia(BootTestCase):
         self.assertEqual(task.media[0]['description'], 'hello')
 
         # No access from another user (patch)
-        res = other_client.patch("/api/projects/{}/tasks/{}/media/manage/.format(project.id, task.id)a.jpg", {'description': 'x'}, format='json')
+        res = other_client.patch("/api/projects/{}/tasks/{}/media/manage/a.jpg".format(project.id, task.id), {'description': 'x'}, format='json')
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Download
