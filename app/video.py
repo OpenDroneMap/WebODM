@@ -26,7 +26,7 @@ def match_single(regexes, line, dtype=int):
                 res = match.group(1)
                 return transform(res)
     except Exception as e:
-        log.WARNING("Cannot parse SRT line \"%s\": %s" % (line, str(e)))
+        logger.warning("Cannot parse SRT line \"%s\": %s" % (line, str(e)))
 
     return None
 
@@ -352,7 +352,7 @@ def extract_gps_from_srt(srt_path):
         parser.parse()
         return parser.get_gps(datetime(1900, 1, 1))
     except Exception as e:
-        logger.warning(f"Cannot extrat GPS from {srt_path}: {str(e)}")
+        logger.warning(f"Cannot extract GPS from {srt_path}: {str(e)}")
 
 def srt_file_for_video(video_path):
     base, ext = os.path.splitext(video_path)
