@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --sl-font: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
 [data-theme="dark"] .site-title img {
     filter: invert(1);
 }

@@ -11,7 +11,7 @@ You can skip the installation and run WebODM from [webodm.net](https://webodm.ne
 
 ## Installation on your machine
 
-There are two ways to install WebODM on your machine:
+<!-- There are two ways to install WebODM on your machine:
 
 | Install Method                 | Cost | Operating Systems     | Installation Support |
 | ------------------------------ | ---- | --------------------- | -------------------- |
@@ -28,9 +28,9 @@ The Windows installer currently comes packaged with WebODM version 2.8.1. To acc
 
 Installers are available for purchase from [OpenDroneMap](https://opendronemap.org) and come with installation support.
 
-https://opendronemap.org/webodm/download/
+https://opendronemap.org/webodm/download/ 
 
-### Docker
+### Docker -->
 
 To install WebODM on your machine with docker, first install:
 
