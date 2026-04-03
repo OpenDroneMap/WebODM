@@ -11,7 +11,7 @@ import MediaView from './MediaView';
 import { _, interpolate } from '../classes/gettext';
 
 const MAX_FILE_SIZE = 128 * 1024 * 1024 * 1024;
-const ACCEPTED_EXTENSIONS = '.jpg,.jpeg,.png,.tif,.tiff,.mp4,.mov,.avi,.mkv,.webm,.srt';
+const ACCEPTED_EXTENSIONS = '.jpg,.jpeg,.png,.mp4,.mov,.avi,.mkv,.webm,.srt';
 
 class ManageMediaDialog extends React.Component {
   static defaultProps = {

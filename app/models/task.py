@@ -1288,7 +1288,7 @@ class Task(models.Model):
         self.orthophoto_bands = bands
         if commit: self.save()
 
-    PHOTO_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.tif', '.tiff'}
+    PHOTO_EXTENSIONS = {'.jpg', '.jpeg', '.png'}
     VIDEO_EXTENSIONS = VIDEO_MOD_EXTENSIONS
     MEDIA_EXTENSIONS = PHOTO_EXTENSIONS | VIDEO_EXTENSIONS | {'.srt'}
     MEDIA_TYPE_ORDER = {'photo': 0, 'pano': 1, 'video': 2}
