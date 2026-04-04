@@ -1,6 +1,29 @@
 from PIL import Image
 from PIL.ExifTags import Base as ExifBase, GPS as GPSTags
+import shutil
+import subprocess
 
+def is_panorama(filepath):
+    try:
+        exiftool = shutil.which('exiftool')
+        if exiftool:
+            result = subprocess.run(
+                [exiftool, '-ProjectionType', '-s3', filepath],
+                capture_output=True, text=True, timeout=10
+            )
+            proj = result.stdout.strip().lower()
+            if proj in ('equirectangular', 'cylindrical'):
+                return True
+    except Exception:
+        pass
+    try:
+        with Image.open(filepath) as im:
+            w, h = im.size
+            if h > 0 and w / h >= 2.0:
+                return True
+    except Exception:
+        pass
+    return False
 
 def extract_gps_from_image(filepath):
     try:

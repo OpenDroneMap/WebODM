@@ -42,7 +42,7 @@ from app.pointcloud_utils import is_pointcloud_georeferenced
 from app.testwatch import testWatch
 from app.security import path_traversal_check
 from app.geoutils import geom_transform, epsg_from_wkt, get_raster_bounds_wkt, get_srs_name_units_from_epsg_or_wkt
-from app.imageutils import extract_gps_from_image
+from app.imageutils import extract_gps_from_image, is_panorama
 from app.video import extract_subtitles, srt_file_for_video, extract_gps_from_srt, VIDEO_EXTENSIONS as VIDEO_MOD_EXTENSIONS
 from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
@@ -1299,33 +1299,10 @@ class Task(models.Model):
         if ext in Task.VIDEO_EXTENSIONS:
             return 'video'
         if ext in Task.PHOTO_EXTENSIONS:
-            if Task._is_panorama(filepath):
+            if is_panorama(filepath):
                 return 'pano'
             return 'photo'
         return None
-
-    @staticmethod
-    def _is_panorama(filepath):
-        try:
-            exiftool = shutil.which('exiftool')
-            if exiftool:
-                result = subprocess.run(
-                    [exiftool, '-ProjectionType', '-s3', filepath],
-                    capture_output=True, text=True, timeout=10
-                )
-                proj = result.stdout.strip().lower()
-                if proj in ('equirectangular', 'cylindrical'):
-                    return True
-        except Exception:
-            pass
-        try:
-            with Image.open(filepath) as im:
-                w, h = im.size
-                if h > 0 and w / h >= 2.0:
-                    return True
-        except Exception:
-            pass
-        return False
 
     def build_media_entry(self, filepath):
         filename = os.path.basename(filepath)
