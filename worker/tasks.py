@@ -3,7 +3,6 @@ import shutil
 import tempfile
 import traceback
 import json
-import socket
 import requests
 
 import time
@@ -41,23 +40,6 @@ def update_nodes_info():
     processing_nodes = ProcessingNode.objects.all()
     for processing_node in processing_nodes:
         processing_node.update_node_info()
-
-        # Workaround for mysterious "webodm_node-odm-1" or "webodm-node-odm-1" hostname switcharoo on Mac
-        # Technically we already check for the correct hostname during setup, 
-        # but sometimes that doesn't work?
-        check_hostname = 'webodm_node-odm-1'
-        if processing_node.hostname == check_hostname and not processing_node.is_online():
-            try:
-                socket.gethostbyname(processing_node.hostname)
-            except:
-                # Hostname was invalid, try renaming
-                processing_node.hostname = 'webodm-node-odm-1'
-                processing_node.update_node_info()
-                if processing_node.is_online():
-                    logger.info("Found and fixed webodm_node-odm-1 hostname switcharoo")
-                else:
-                    processing_node.hostname = check_hostname
-                processing_node.save()
 
 @app.task(ignore_result=True)
 def cleanup_projects():
