@@ -161,6 +161,11 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameter
 
+if [[ "${WO_DEFAULT_NODES}" -gt 1 ]]; then
+	echo "ATTENTION: --default-nodes values greater than 1 are no longer supported."
+	export WO_DEFAULT_NODES="1"
+fi
+
 usage(){
   echo "Usage: $0 <command>"
   echo
@@ -182,7 +187,7 @@ usage(){
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
   echo "	--db-dir	<path>	Path where the Postgres db data will be stored to (default: $DEFAULT_DB_DIR (docker named volume))"
-  echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: $DEFAULT_NODES)"
+  echo "	--default-nodes	Whether to create a processing node attached to WebODM on startup (default: $DEFAULT_NODES)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
@@ -509,16 +514,12 @@ start(){
 
  	if [[ $ipv6 = true ]]; then
         command+=" -f docker-compose.ipv6.yml"
-    	fi
+	fi
 
 	command="$command up"
 
 	if [[ $detached = true ]]; then
 		command+=" -d"
-	fi
-
-	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
-		command+=" --scale node-odm=$WO_DEFAULT_NODES"
 	fi
 
 	run "$command"

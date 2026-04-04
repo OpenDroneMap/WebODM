@@ -6,11 +6,10 @@ version: '2.1'
 services:
   webapp:
     depends_on:
-      - node-odm
-    environment:
-      - WO_DEFAULT_NODES
-  node-odm:
+      - node-odm-1
+  node-odm-1:
     image: opendronemap/nodeodm:stable
+    container_name: node-odm-1
     expose:
       - "3000"
     restart: unless-stopped

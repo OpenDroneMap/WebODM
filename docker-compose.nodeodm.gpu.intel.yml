@@ -6,13 +6,12 @@ version: '2.1'
 services:
   webapp:
     depends_on:
-      - node-odm
-    environment:
-      - WO_DEFAULT_NODES
-  node-odm:
+      - node-odm-1
+  node-odm-1:
     environment:
       - RENDER_GROUP_ID
     image: opendronemap/nodeodm:gpu.intel
+    container_name: node-odm-1
     devices:
       - "/dev/dri"
     expose:
