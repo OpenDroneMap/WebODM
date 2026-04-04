@@ -318,6 +318,9 @@ class TestApiTask(BootTransactionTestCase):
             # Orthophoto bands field should be an empty list
             self.assertEqual(len(task.orthophoto_bands), 0)
 
+            # Media field should be 0
+            self.assertEqual(res.data['media'], 0)
+
             # Size should be zero
             self.assertEqual(task.size, 0)
 

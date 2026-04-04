@@ -1,7 +1,8 @@
+import math
 import rasterio.warp
 import numpy as np
 from rasterio.crs import CRS
-from rasterio.warp import transform_bounds
+from rasterio.warp import transform, transform_bounds
 from osgeo import osr, gdal
 from functools import lru_cache
 osr.DontUseExceptions()
@@ -182,3 +183,18 @@ def get_rasterio_to_meters_factor(rasterio_ds):
             return UNIT_TO_M.get(unit, 1.0)
     return 1.0
 
+def utm_crs_from_lonlat(lon, lat):
+    utm_zone = (int(math.floor((lon + 180.0) / 6.0)) % 60) + 1
+    epsg = 32600 + utm_zone if lat >= 0 else 32700 + utm_zone
+    return CRS.from_epsg(4326), CRS.from_epsg(epsg)
+
+def utm_transformers_from_lonlat(lon, lat):
+    source_srs, target_srs = utm_crs_from_lonlat(lon, lat)
+
+    def ll_to_utm(lon, lat, alt=0.0):
+        return [p[0] for p in transform(source_srs, target_srs, [lon], [lat])] + [alt]
+
+    def utm_to_ll(x, y, alt=0.0):
+        return [p[0] for p in transform(target_srs, source_srs, [x], [y])] + [alt]
+
+    return ll_to_utm, utm_to_ll

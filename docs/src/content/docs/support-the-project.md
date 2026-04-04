@@ -5,7 +5,7 @@ template: doc
 
 There are many ways to contribute back to the project:
 
- - You can purchase an [installer](https://opendronemap.org/webodm/download/), [cloud processing](https://webodm.net) or a [book](https://odmbook.com/).
+ - You can purchase [cloud processing](https://webodm.net) or a [book](https://odmbook.com/).
  - Help us test new and existing features and report [bugs](https://www.github.com/OpenDroneMap/WebODM/issues) and [feedback](http://community.opendronemap.org/c/webodm).
  - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
  - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm)

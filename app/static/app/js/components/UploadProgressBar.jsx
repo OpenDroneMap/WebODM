@@ -9,13 +9,18 @@ class UploadProgressBar extends React.Component {
     progress: PropTypes.number,
     totalBytesSent: PropTypes.number,
     totalBytes: PropTypes.number,
-    totalCount: PropTypes.number // number of files
+    totalCount: PropTypes.number, // number of files
+    format: PropTypes.func
   }
 
   render() {
     let percentage = (this.props.progress !== undefined ? 
                      this.props.progress : 
                      0).toFixed(2);
+    
+    let percLabel = `${percentage}%`;
+    if (typeof this.props.format === 'function') percLabel = this.props.format(percentage);
+    
     let bytes = this.props.totalBytesSent !== undefined && this.props.totalBytes !== undefined ? 
               ' ' + interpolate(_("remaining to upload: %(bytes)s"), { bytes: Utils.bytesToSize(this.props.totalBytes - this.props.totalBytesSent)}) : 
                "";
@@ -30,7 +35,7 @@ class UploadProgressBar extends React.Component {
       <div className="upload-progress-bar">
         <div className="progress">
           <div className={'progress-bar progress-bar-success ' + active} style={{width: percentage + '%'}}>
-            {percentage}%
+            {percLabel}
           </div>
         </div>
         <div className="text-left small upload-label">

@@ -12,6 +12,7 @@ import $ from 'jquery';
 import ErrorMessage from './ErrorMessage';
 import ImagePopup from './ImagePopup';
 import GCPPopup from './GCPPopup';
+import MediaView from './MediaView';
 import SwitchModeButton from './SwitchModeButton';
 import ShareButton from './ShareButton';
 import {addTempLayer} from '../classes/TempLayer';
@@ -78,6 +79,7 @@ class Map extends React.Component {
     this.autolayers = null;
     this.taskCount = 1;
     this.addedCameraShots = {};
+    this.addedMediaLayer = {};
     this.zIndexGroupMap = {};
     this.ious = {};
 
@@ -454,6 +456,84 @@ class Map extends React.Component {
             let mapBounds = this.mapBounds || Leaflet.latLngBounds();
             mapBounds.extend(bounds);
             this.mapBounds = mapBounds;
+
+            // Add media layer if available
+            if (meta.task && meta.task.media && !this.addedMediaLayer[meta.task.id]){
+                const mediaTypes = ['photo', 'pano', 'video'];
+                const mediaIcons = mediaTypes.reduce((obj, type) => {
+                  obj[type] = L.icon({
+                    iconUrl: `/static/app/js/icons/marker-media-${type}.png`,
+                    iconSize: [41, 46],
+                    iconAnchor: [17, 46],
+                  })
+                  return obj;
+                }, {});
+                  
+                const mediaLayer = new L.MarkersCanvas();
+                
+                mediaLayer.lazyLoad = (cb) => {
+                  $.getJSON(meta.task.media)
+                    .done((geojson) => {
+                      if (geojson.type === 'FeatureCollection'){
+                        let markers = [];
+  
+                        geojson.features.forEach(s => {
+                          if (!s.properties) return;
+                          if (mediaTypes.indexOf(s.properties.type) === -1) return;
+
+                          let marker = L.marker(
+                            [s.geometry.coordinates[1], s.geometry.coordinates[0]],
+                            { icon: mediaIcons[s.properties.type] }
+                          );
+                          markers.push(marker);
+
+                          marker.on('click', (e) => {
+                            const basePath = `/api/projects/${meta.task.project}/tasks/${meta.task.id}/media`;
+
+                            if (s.properties.type === 'video' && s.properties.srt) {
+                              this.openVideoWithFlightPath(basePath, s.properties, marker, mediaLayer);
+                              return;
+                            }
+
+                            const container = document.createElement('div');
+                            ReactDOM.render(<MediaView
+                              basePath={basePath}
+                              media={s.properties}
+                              autoOpen
+                              onClose={() => {
+                                ReactDOM.unmountComponentAtNode(container);
+                                container.remove();
+                                this.map.closePopup();
+                              }}
+                            />, container);
+                            document.body.appendChild(container);
+                          });
+
+                        });
+  
+                        mediaLayer.addMarkers(markers, this.map);
+                      }
+                      cb();
+                    }).fail(() => {
+                      cb(new Error("Cannot load media markers"))
+                    });
+                };
+                mediaLayer[Symbol.for("meta")] = {
+                  name: _("Media"), 
+                  icon: "fa fa-image fa-fw",
+                  zIndexGroup
+                };
+                if (this.taskCount > 1){
+                  // Assign to a group
+                  mediaLayer[Symbol.for("meta")].group = {id: meta.task.id, name: meta.task.name};
+                }
+
+                this.setState(update(this.state, {
+                    overlays: {$push: [mediaLayer]}
+                }));
+
+                this.addedMediaLayer[meta.task.id] = true;
+            }
 
             // Add camera shots layer if available
             if (meta.task && meta.task.camera_shots && !this.addedCameraShots[meta.task.id]){
@@ -1055,6 +1135,188 @@ _('Example:'),
     if (this.shareButton) this.shareButton.hidePopup();
   }
 
+  openVideoWithFlightPath = (basePath, media, marker, mediaLayer) => {
+    if (marker._flightPathLoading) return;
+    marker._flightPathLoading = true;
+
+    const flightPathUrl = `${basePath}/video/${encodeURIComponent(media.filename)}/flightpath.geojson`;
+
+    const markerLatLng = marker.getLatLng();
+    const spinnerIcon = L.divIcon({
+      className: 'video-marker-spinner',
+      html: '<i class="fa fa-circle-notch fa-spin"></i>',
+      iconSize: [41, 46],
+      iconAnchor: [15, 44]
+    });
+    const spinnerMarker = L.marker(markerLatLng, { icon: spinnerIcon }).addTo(this.map);
+
+    const onFlightPathLoaded = (feature) => {
+      if (!feature || !feature.geometry || !feature.geometry.coordinates || feature.geometry.coordinates.length < 2) {
+        return;
+      }
+      marker._flightPathFeature = feature; // cache
+      mediaLayer.removeMarker(marker);
+
+      const coords = feature.geometry.coordinates;
+      const timestamps = feature.properties.timestamps;
+      const latLngs = coords.map(c => [c[1], c[0]]);
+
+      const flightPathLine = L.polyline(latLngs, {
+        color: '#4A90D9',
+        weight: 4,
+        opacity: 0.8
+      }).addTo(this.map);
+
+      const startDot = L.circleMarker(latLngs[0], {
+        radius: 8,
+        color: '#fff',
+        weight: 2,
+        fillColor: '#2ECC71',
+        fillOpacity: 1
+      }).addTo(this.map);
+
+      const endDot = L.circleMarker(latLngs[latLngs.length - 1], {
+        radius: 8,
+        color: '#fff',
+        weight: 2,
+        fillColor: '#E74C3C',
+        fillOpacity: 1
+      }).addTo(this.map);
+
+      const positionDot = L.circleMarker(latLngs[0], {
+        radius: 8,
+        color: '#fff',
+        weight: 2,
+        fillColor: '#FF9E67',
+        fillOpacity: 1
+      }).addTo(this.map);
+
+      const mapEl = this.container.parentElement;
+      const mapHeight = mapEl ? mapEl.clientHeight : 0;
+      this.map.fitBounds(flightPathLine.getBounds(), {
+        paddingTopLeft: [50, mapHeight / 2 + 50],
+        paddingBottomRight: [50, 50]
+      });
+
+      const getPositionAtTime = (currentTime) => {
+        if (!timestamps || timestamps.length < 2) return latLngs[0];
+        if (currentTime <= timestamps[0]) return latLngs[0];
+        if (currentTime >= timestamps[timestamps.length - 1]) return latLngs[latLngs.length - 1];
+
+        for (let i = 1; i < timestamps.length; i++) {
+          if (currentTime <= timestamps[i]) {
+            const t0 = timestamps[i - 1];
+            const t1 = timestamps[i];
+            const frac = (currentTime - t0) / (t1 - t0);
+            const lat = latLngs[i - 1][0] + frac * (latLngs[i][0] - latLngs[i - 1][0]);
+            const lng = latLngs[i - 1][1] + frac * (latLngs[i][1] - latLngs[i - 1][1]);
+            return [lat, lng];
+          }
+        }
+        return latLngs[latLngs.length - 1];
+      };
+
+      const getTimeAtPoint = (latlng) => {
+        if (!timestamps || timestamps.length < 2) return 0;
+
+        let bestDist = Infinity;
+        let bestTime = 0;
+
+        for (let i = 1; i < latLngs.length; i++) {
+          const ax = latLngs[i - 1][1], ay = latLngs[i - 1][0];
+          const bx = latLngs[i][1], by = latLngs[i][0];
+          const px = latlng.lng, py = latlng.lat;
+
+          const dx = bx - ax, dy = by - ay;
+          const lenSq = dx * dx + dy * dy;
+          let t = lenSq > 0 ? ((px - ax) * dx + (py - ay) * dy) / lenSq : 0;
+          t = Math.max(0, Math.min(1, t));
+
+          const cx = ax + t * dx, cy = ay + t * dy;
+          const dist = (px - cx) * (px - cx) + (py - cy) * (py - cy);
+
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestTime = timestamps[i - 1] + t * (timestamps[i] - timestamps[i - 1]);
+          }
+        }
+        return bestTime;
+      };
+
+      let videoEl = null;
+      let animFrameId = null;
+
+      flightPathLine.on('click', (e) => {
+        if (videoEl) {
+          L.DomEvent.stopPropagation(e);
+          videoEl.currentTime = getTimeAtPoint(e.latlng);
+        }
+      });
+      
+      let cleanupCalled = false;
+      const cleanup = () => {
+        if (cleanupCalled) return;
+        cleanupCalled = true;
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        this.map.removeLayer(flightPathLine);
+        this.map.removeLayer(startDot);
+        this.map.removeLayer(endDot);
+        this.map.removeLayer(positionDot);
+        mediaLayer.addMarker(marker, this.map);
+        marker._flightPathLoading = false;
+        ReactDOM.unmountComponentAtNode(container);
+        container.remove();
+      };
+
+      const mapContainer = this.container.parentElement;
+      const container = document.createElement('div');
+      ReactDOM.render(<MediaView
+        basePath={basePath}
+        media={media}
+        autoOpen
+        halfScreen
+        mapContainer={mapContainer}
+        onVideoElement={(el) => {
+          videoEl = el;
+          const tick = () => {
+            positionDot.setLatLng(getPositionAtTime(el.currentTime));
+            animFrameId = requestAnimationFrame(tick);
+          };
+          animFrameId = requestAnimationFrame(tick);
+        }}
+        onClose={cleanup}
+      />, container);
+      document.body.appendChild(container);
+    };
+
+    // Check cache
+    if (marker._flightPathFeature){
+      onFlightPathLoaded(marker._flightPathFeature);
+      this.map.removeLayer(spinnerMarker);
+      marker._flightPathLoading = false;
+    }else{
+      $.getJSON(flightPathUrl)
+        .done(onFlightPathLoaded)
+        .fail(() => {
+          const container = document.createElement('div');
+          ReactDOM.render(<MediaView
+            basePath={basePath}
+            media={media}
+            autoOpen
+            onClose={() => {
+              ReactDOM.unmountComponentAtNode(container);
+              container.remove();
+            }}
+          />, container);
+          document.body.appendChild(container);
+        })
+        .always(() => {
+          this.map.removeLayer(spinnerMarker);
+          marker._flightPathLoading = false;
+        });
+    }
+  }
+
   render() {
     return (
       <div style={{height: "100%"}} className="map">
@@ -1062,7 +1324,7 @@ _('Example:'),
 
         <ErrorMessage bind={[this, 'error']} />
         <div className="opacity-slider theme-secondary hidden-xs">
-            <div className="opacity-slider-label">{_("Opacity:")}</div> <input type="range" className="opacity" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
+            <div className="opacity-slider-label" title={_("Opacity")}><i className="fa fa-adjust"></i></div> <input type="range" className="opacity" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
         <Standby 

@@ -7,3 +7,9 @@ import $ from 'jquery';
 
 // Bootstrap mocks
 $.prototype.modal = () => {};
+
+global.IntersectionObserver = class IntersectionObserverMock{
+	constructor(){}
+	observe(){}
+	disconnect(){}
+}
