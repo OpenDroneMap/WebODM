@@ -5,10 +5,10 @@ template: doc
 
 There are many ways to contribute back to the project:
 
- - You can purchase [cloud processing](https://webodm.net) or a [book](https://odmbook.com/).
- - Help us test new and existing features and report [bugs](https://www.github.com/OpenDroneMap/WebODM/issues) and [feedback](http://community.opendronemap.org/c/webodm).
- - [Share](http://community.opendronemap.org/c/datasets) your aerial datasets.
- - Help answer questions on the community [forum](http://community.opendronemap.org/c/webodm)
+ - You can purchase [processing power](https://webodm.net) or a [book](https://odmbook.com/).
+ - Help us test new and existing features and [report](https://www.github.com/WebODM/WebODM/issues) bugs and feedback.
+ - Share your aerial datasets.
+ - Join a [community](https://webodm.org/community)
  - ⭐️ us on GitHub.
  - Help us [translate](#translations) WebODM in your language.
  - Spread the word about WebODM on social media.
@@ -28,7 +28,7 @@ If you want to preview your translation work, start WebODM in developer mode:
 ./webodm.sh restart --dev
 ```
 
-Then edit the [LOCALES](https://github.com/OpenDroneMap/WebODM/blob/master/LOCALES) file to include your translation locale code. Finally, visit the `Developer Tools` panel from WebODM's dashboard and press the `Download and Replace Translation Files` button:
+Then edit the [LOCALES](https://github.com/WebODM/WebODM/blob/master/LOCALES) file to include your translation locale code. Finally, visit the `Developer Tools` panel from WebODM's dashboard and press the `Download and Replace Translation Files` button:
 
 ![image](https://user-images.githubusercontent.com/1951843/102927263-a294a100-4464-11eb-956e-888b73dc5b94.png)
 
@@ -36,7 +36,7 @@ The latest translation files from weblate.org will be downloaded and applied to 
 
 ## Become a Contributor
 
-The easiest way to get started is to take a look at our list of [outstanding issues](https://github.com/OpenDroneMap/WebODM/issues) and pick one. You can also fix/improve something entirely new based on your experience with WebODM. All ideas are considered and people of all skill levels are welcome to contribute.
+The easiest way to get started is to take a look at our list of [outstanding issues](https://github.com/WebODM/WebODM/issues) and pick one. You can also fix/improve something entirely new based on your experience with WebODM. All ideas are considered and people of all skill levels are welcome to contribute.
 
 You don't necessarily need to be a developer to become a contributor. We can use your help to write better documentation and improve the user interface texts and visuals.
 

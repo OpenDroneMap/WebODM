@@ -5,19 +5,19 @@ template: doc
 
 Making a code contribution might seem intimidating, but it's not too difficult:
 
-1. Make a fork of the [WebODM repository](https://github.com/OpenDroneMap/WebODM/)
+1. Make a fork of the [WebODM repository](https://github.com/WebODM/WebODM/)
 2. Clone your repository in a directory
 3. Create a new branch: `git checkout -b branchname`.
 4. [Setup a development environment](#setup-a-development-environment) with [docker](#docker-setup).
 5. Commit the changes: `git commit -a -m "describe your changes"`
 6. Push the changes to your repository: `git push origin branchname`
-7. Create a [pull request](https://github.com/OpenDroneMap/WebODM/compare) 
+7. Create a [pull request](https://github.com/WebODM/WebODM/compare) 
 
-We don't have many rules. Follow the guidelines indicated in the [Contributing](https://github.com/OpenDroneMap/WebODM/blob/master/CONTRIBUTING.md) document, be nice to others and you'll do great! :)
+We don't have many rules. Follow the guidelines indicated in the [Contributing](https://github.com/WebODM/WebODM/blob/master/CONTRIBUTING.md) document, be nice to others and you'll do great! :)
 
 ## Setup a Development Environment
 
-Follow the [WebODM docker installation instructions](https://github.com/OpenDroneMap/WebODM##manual-installation-docker), then run:
+Follow the [WebODM docker installation instructions](https://github.com/WebODM/WebODM##manual-installation-docker), then run:
 
 `./webodm.sh start --dev`
 
@@ -33,9 +33,9 @@ To run the unit tests, simply type:
 
 ## Apply Changes In Production
 
-Once you're done making changes, if you start WebODM in production mode (without the `--dev` flag), you will notice that your changes are missing. This is because `webodm.sh` uses the `opendronemap/webodm_webapp` docker image to launch WebODM, which doesn't have your changes. To apply the changes, you need to rebuild the docker image locally:
+Once you're done making changes, if you start WebODM in production mode (without the `--dev` flag), you will notice that your changes are missing. This is because `webodm.sh` uses the `webodm/webodm_webapp` docker image to launch WebODM, which doesn't have your changes. To apply the changes, you need to rebuild the docker image locally:
 
-`docker build -t opendronemap/webodm_webapp .`
+`docker build -t webodm/webodm_webapp .`
 
 You can also modify the `docker-compose.yml` file to point to a different image.
 

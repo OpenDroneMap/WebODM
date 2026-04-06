@@ -13,14 +13,14 @@ export default defineConfig({
 			},
 			favicon: './src/assets/favicon.svg',
 			editLink: {
-				baseUrl: 'https://github.com/OpenDroneMap/WebODM/edit/master/docs/',
+				baseUrl: 'https://github.com/WebODM/WebODM/edit/master/docs/',
 			},
 			customCss: [
 				'./src/styles/custom.css',
 			],
 			social: [
-				{ icon: 'discourse', label: 'Community Forum', href: 'https://community.opendronemap.org' },
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/OpenDroneMap/WebODM' }
+				{ icon: 'discourse', label: 'Community', href: 'https://webodm.org/community' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/WebODM/WebODM' }
 			],
 			sidebar: [
 				{

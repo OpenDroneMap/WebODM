@@ -5,9 +5,9 @@
 	"version": "0.1.0",
 	"author": "Piero Toffanin",
 	"email": "pt@masseranolabs.com",
-	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"repository": "https://github.com/WebODM/WebODM",
 	"tags": ["gcp", "posm"],
-	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"homepage": "https://github.com/WebODM/WebODM",
 	"experimental": true,
 	"deprecated": false
 }

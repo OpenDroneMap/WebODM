@@ -31,9 +31,9 @@ The plugin system doesn't try to impose strict standards. What you build is up t
 	"version": "1.0.0",
 	"author": "Your name",
 	"email": "your@email.here",
-	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"repository": "https://github.com/WebODM/WebODM",
 	"tags": ["descriptive", "tags"],
-	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"homepage": "https://github.com/WebODM/WebODM",
 	"experimental": false,
 	"deprecated": false
 }
