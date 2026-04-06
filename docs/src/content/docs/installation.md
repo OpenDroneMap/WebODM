@@ -11,38 +11,21 @@ You can skip the installation and run WebODM from [webodm.net](https://webodm.ne
 
 ## Installation on your machine
 
-<!-- There are two ways to install WebODM on your machine:
+If you're on Windows or macOS, the easiest way is to [download](https://webodm.org/download) the installer for your platform.
 
-| Install Method                 | Cost | Operating Systems     | Installation Support |
-| ------------------------------ | ---- | --------------------- | -------------------- |
-| [Installer](#webodm-installer) | Paid | Windows, macOS        | ✅                   |
-| [Docker](#docker)              | Free | Windows, macOS, Linux | Community            |
+If you're on Linux, you need to use docker (see below).
 
-### Installer
-
-:::note
-
-The Windows installer currently comes packaged with WebODM version 2.8.1. To access the latest 3.x version, use Docker.
-
-:::
-
-Installers are available for purchase from [OpenDroneMap](https://opendronemap.org) and come with installation support.
-
-https://opendronemap.org/webodm/download/ 
-
-### Docker -->
+### Docker
 
 To install WebODM on your machine with docker, first install:
 
   - [Git](https://git-scm.com/downloads)
   - [Docker](https://www.docker.com/)
 
-Windows users should install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) and:
+Windows and macOS users should install Docker Desktop. Then:
 
-1. Make sure Linux containers are enabled (Switch to Linux Containers)
-2. Give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for Windows) by going to `Settings -- Resources`
-3. Select where on your hard drive you want virtual hard drives to reside (`Settings -- Resources -- Advanced`).
-4. (optional) If you want to run the processing component (NodeODM) with GPU acceleration, install [WSL](https://learn.microsoft.com/windows/wsl/) and [set up GPU acceleration](https://learn.microsoft.com/windows/wsl/tutorials/gpu-compute). It's supported on Windows 11 or Windows 10, version 21H2 or higher. If you're just getting started, don't worry about this one.
+1. Give Docker enough CPUs (default 2) and RAM (>4Gb, 16Gb better but leave some for the operating system) by going to `Settings -- Resources`
+2. Select where on your hard drive you want virtual hard drives to reside (`Settings -- Resources -- Advanced`).
 
 Then:
 
