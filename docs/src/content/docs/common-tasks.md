@@ -51,6 +51,6 @@ Small customizations such as changing the application colors, name, logo, or add
 
 More advanced customizations can be achieved by [writing plugins](/plugin-development-guide/). This is the preferred way to add new functionality to WebODM since it requires less effort than maintaining a separate fork. The plugin system features server-side signals that can be used to be notified of various events, a ES6/React build system, a dynamic client-side API for adding elements to the UI, a built-in data store, an async task runner, hooks to add menu items and functions to rapidly inject CSS, Javascript and Django views.
 
-To learn more, start from the [plugin development guide](https://docs.webodm.org/plugin-development-guide/). It's also helpful to study the source code of [existing plugins](https://github.com/OpenDroneMap/WebODM/tree/master/coreplugins).
+To learn more, start from the [plugin development guide](https://docs.webodm.org/plugin-development-guide/). It's also helpful to study the source code of [existing plugins](https://github.com/WebODM/WebODM/tree/master/coreplugins).
 
-If a particular hook / signal for your plugin does not yet exist, [request it](https://github.com/OpenDroneMap/WebODM/issues). We are adding hooks and signals as we go.
+If a particular hook / signal for your plugin does not yet exist, [request it](https://github.com/WebODM/WebODM/issues). We are adding hooks and signals as we go.

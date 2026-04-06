@@ -5,9 +5,9 @@
 	"version": "0.0.2",
 	"author": "Luca Di Leo",
 	"email": "support@dronedb.app",
-	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"repository": "https://github.com/WebODM/WebODM",
 	"tags": ["ddb", "DroneDB", "cloud"],
-	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"homepage": "https://github.com/WebODM/WebODM",
 	"experimental": true,
 	"deprecated": false
 }

@@ -5,12 +5,12 @@
   "version": "0.1.0",
   "author": "Diego Acuña, Greenbot Labs",
   "email": "dacuna@greenbot.cl",
-  "repository": "https://github.com/OpenDroneMap/WebODM",
+  "repository": "https://github.com/WebODM/WebODM",
   "tags": [
     "plugin",
     "charts"
   ],
-  "homepage": "https://github.com/OpenDroneMap/WebODM",
+  "homepage": "https://github.com/WebODM/WebODM",
   "experimental": false,
   "deprecated": false
 }

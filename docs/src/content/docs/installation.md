@@ -5,7 +5,7 @@ template: doc
 
 :::tip[Did You Know?]
 
-You can skip the installation and run WebODM from [webodm.net](https://webodm.net), which supports the developer of the software ❤ Try it for [free](https://webodm.net).
+You can skip the installation and run WebODM from [webodm.net](https://webodm.net), which supports the development of the software ❤ Try it for [free](https://webodm.net).
 
 :::
 
@@ -49,7 +49,7 @@ Then:
 * Open Git Bash (Windows), or from the command line (Mac / Linux / WSL), type:
 
 ```bash
-git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1
+git clone https://github.com/WebODM/WebODM --config core.autocrlf=input --depth 1
 cd WebODM
 ./webodm.sh start
 ```
@@ -90,7 +90,7 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 4. Run `sudo apt-get upgrade`
 5. Install [docker-compose](https://docs.docker.com/compose/install/). Do not install via apt for 24.04 onward.
 6. Run `sudo apt-get install python-pip`
-7. Run `git clone https://github.com/OpenDroneMap/WebODM --config core.autocrlf=input --depth 1`
+7. Run `git clone https://github.com/WebODM/WebODM --config core.autocrlf=input --depth 1`
 8. cd WebODM (Linux is case sensitive)
 9. `sudo ./webodm.sh start`
 10. You now can access WebODM via the public IP address for your Google instance. Remember the default port of 8000.

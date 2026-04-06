@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('app_name', models.CharField(help_text='The name of your application', max_length=255)),
                 ('app_logo', models.ImageField(help_text='A 512x512 logo of your application (.png or .jpeg)', upload_to='settings/')),
                 ('organization_name', models.CharField(blank=True, default='WebODM', help_text='The name of your organization', max_length=255, null=True)),
-                ('organization_website', models.URLField(blank=True, default='https://github.com/OpenDroneMap/WebODM/', help_text='The website URL of your organization', max_length=255, null=True)),
+                ('organization_website', models.URLField(blank=True, default='https://github.com/WebODM/WebODM/', help_text='The website URL of your organization', max_length=255, null=True)),
             ],
         ),
         migrations.CreateModel(

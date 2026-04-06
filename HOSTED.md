@@ -13,4 +13,4 @@ In order to share public links (accessible from anybody on the internet) you nee
  
 ## Self-Host
 
-Pick a cloud service provider (e.g. [DigitalOcean](https://www.digitalocean.com/)) and [install WebODM](https://github.com/OpenDroneMap/WebODM?tab=readme-ov-file#run-it-on-the-cloud-google-compute-amazon-aws). Then import your tasks on the newly created instance in order to share links with others.
+Pick a cloud service provider (e.g. [DigitalOcean](https://www.digitalocean.com/)) and [install WebODM](https://docs.webodm.org/installation/#google-compute-amazon-aws). Then import your tasks on the newly created instance in order to share links with others.

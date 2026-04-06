@@ -9,17 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OpenDroneMap/WebODM.git"
+    "url": "git+https://github.com/WebODM/WebODM.git"
   },
   "keywords": [
-    "opendronemap"
+    "webodm"
   ],
   "author": "Piero Toffanin",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/OpenDroneMap/WebODM/issues"
+    "url": "https://github.com/WebODM/WebODM/issues"
   },
-  "homepage": "https://github.com/OpenDroneMap/WebODM#readme",
+  "homepage": "https://github.com/WebODM/WebODM#readme",
   "dependencies": {
     "@babel/core": "^7.0.0-beta.54",
     "@babel/plugin-proposal-class-properties": "^7.0.0-beta.54",
