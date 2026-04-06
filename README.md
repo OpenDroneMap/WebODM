@@ -8,7 +8,7 @@ A user-friendly, commercial grade software for drone image processing. Generate 
 
 # Getting Started
  
- * [Download][https://webodm.org/download]
+ * [Download](https://webodm.org/download)
  * [Documentation](https://docs.webodm.org/)
  * [Hardware Requirements](https://docs.webodm.org/hardware-requirements/)
  * [Support the Project](https://docs.webodm.org/support-the-project/)
