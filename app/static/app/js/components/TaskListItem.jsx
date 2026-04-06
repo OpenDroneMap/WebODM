@@ -307,7 +307,7 @@ class TaskListItem extends React.Component {
         </ul>`, link: `<a href='https://docs.webodm.net/references/create-successful-maps' target='_blank'>${_("here")}</a>`})});
       }else if (line.indexOf("Illegal instruction") !== -1 ||
                 line.indexOf("Child returned 132") !== -1){
-        this.setState({friendlyTaskError: interpolate(_("It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See %(link)s for more information."), { link: `<a href='https://github.com/WebODM/WebODM#common-troubleshooting'>${_("this page")}</a>` } )});
+        this.setState({friendlyTaskError: interpolate(_("It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See %(link)s for more information."), { link: `<a href='https://docs.webodm.org/installation/#common-troubleshooting'>${_("this page")}</a>` } )});
       }else if (line.indexOf("Child returned 127") !== -1){
         this.setState({friendlyTaskError: _("The processing node is missing a program necessary to complete the task. This might indicate a corrupted installation. If you built OpenDroneMap, please check that all programs built without errors.")});
       }
