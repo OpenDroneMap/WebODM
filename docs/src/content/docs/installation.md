@@ -5,7 +5,7 @@ template: doc
 
 :::tip[Did You Know?]
 
-You can skip the installation and run WebODM from [webodm.net](https://webodm.net), which supports the developer of the software ❤ Try it for [free](https://webodm.net).
+You can skip the installation and run WebODM from [webodm.net](https://webodm.net), which supports the development of the software ❤ Try it for [free](https://webodm.net).
 
 :::
 
