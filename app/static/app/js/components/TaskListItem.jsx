@@ -742,7 +742,7 @@ class TaskListItem extends React.Component {
               {showTaskWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span dangerouslySetInnerHTML={{__html: this.state.friendlyTaskError}} /></div> : ""}
 
-              {showExitedWithCodeOneHints ?
+              {showExitedWithCodeOneHints && window.__taskOptionsDocsLink ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
                   <Trans params={{link: `<a href="${window.__taskOptionsDocsLink}" target="_blank">${window.__taskOptionsDocsLink.replace("https://", "")}</a>` }}>{_("\"Process exited with code 1\" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the Task Options. Check the documentation at %(link)s")}</Trans>
                 </div>
