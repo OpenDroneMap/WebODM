@@ -9,7 +9,7 @@ The trademark names include:
 
 The trademark logos include:
 
- ![WebODM](https://opendronemap.org/wp-content/uploads/2018/07/webodm-icon-64x64.png)
+ ![WebODM](https://github.com/user-attachments/assets/f209a5f6-a2d5-43be-b82a-a05422fd54d4)
 
 However, this is not a complete list of names, logos, and brand features, all of which are subject to these guidelines.
 

@@ -377,7 +377,7 @@ environment_check(){
         if [ -z "$DOCKER_HOST" ]; then
             echo "DOCKER_HOST is unset"
             if [[ "$($docker_compose -v)" != "podman"* ]] && [[ "$DOCKER_VERSION" == "podman"* ]]; then
-                echo "You seem to be using podman with docker-compose instead of podman-compose. The above variable may need to be set, see https://docs.opendronemap.org/tutorials/#using-podman for more information."
+                echo "You seem to be using podman with docker-compose instead of podman-compose. The above variable may need to be set, see https://docs.webodm.org/tutorials/using-podman/ for more information."
             fi
         else
             echo "DOCKER_HOST: $DOCKER_HOST"
