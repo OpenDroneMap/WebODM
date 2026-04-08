@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='dsm_extent',
-            field=django.contrib.gis.db.models.fields.GeometryField(blank=True, help_text='Extent of the DSM created by OpenDroneMap', null=True, srid=4326),
+            field=django.contrib.gis.db.models.fields.GeometryField(blank=True, help_text='Extent of the DSM created by ODM', null=True, srid=4326),
         ),
         migrations.AddField(
             model_name='task',
             name='dtm_extent',
-            field=django.contrib.gis.db.models.fields.GeometryField(blank=True, help_text='Extent of the DTM created by OpenDroneMap', null=True, srid=4326),
+            field=django.contrib.gis.db.models.fields.GeometryField(blank=True, help_text='Extent of the DTM created by ODM', null=True, srid=4326),
         ),
     ]

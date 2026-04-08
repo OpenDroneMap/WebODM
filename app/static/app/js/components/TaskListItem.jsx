@@ -309,7 +309,7 @@ class TaskListItem extends React.Component {
                 line.indexOf("Child returned 132") !== -1){
         this.setState({friendlyTaskError: interpolate(_("It looks like this computer might be too old. WebODM requires a computer with a 64-bit CPU supporting MMX, SSE, SSE2, SSE3 and SSSE3 instruction set support or higher. You can still run WebODM if you compile your own docker images. See %(link)s for more information."), { link: `<a href='https://docs.webodm.org/installation/#common-troubleshooting'>${_("this page")}</a>` } )});
       }else if (line.indexOf("Child returned 127") !== -1){
-        this.setState({friendlyTaskError: _("The processing node is missing a program necessary to complete the task. This might indicate a corrupted installation. If you built OpenDroneMap, please check that all programs built without errors.")});
+        this.setState({friendlyTaskError: _("The processing node is missing a program necessary to complete the task. This might indicate a corrupted installation. If you built ODM, please check that all programs built without errors.")});
       }
     }
   }
@@ -742,7 +742,7 @@ class TaskListItem extends React.Component {
               {showTaskWarning ?
               <div className="task-warning"><i className="fa fa-support"></i> <span dangerouslySetInnerHTML={{__html: this.state.friendlyTaskError}} /></div> : ""}
 
-              {showExitedWithCodeOneHints ?
+              {showExitedWithCodeOneHints && window.__taskOptionsDocsLink ?
               <div className="task-warning"><i className="fa fa-info-circle"></i> <div className="inline">
                   <Trans params={{link: `<a href="${window.__taskOptionsDocsLink}" target="_blank">${window.__taskOptionsDocsLink.replace("https://", "")}</a>` }}>{_("\"Process exited with code 1\" means that part of the processing failed. Sometimes it's a problem with the dataset, sometimes it can be solved by tweaking the Task Options. Check the documentation at %(link)s")}</Trans>
                 </div>

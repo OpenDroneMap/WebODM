@@ -398,13 +398,13 @@ WORKERS_MAX_TIME_LIMIT = None
 AUTO_LOGIN_USER = None
 
 # Link to GCP docs
-GCP_DOCS_LINK = "https://docs.opendronemap.org/gcp/#gcp-file-format"
+GCP_DOCS_LINK = "https://docs.webodm.org/ground-control-points/#gcp-file-format"
 
 # Link to general docs
-DOCS_LINK = "https://docs.opendronemap.org"
+DOCS_LINK = "https://docs.webodm.org"
 
 # Link to task options docs
-TASK_OPTIONS_DOCS_LINK = "https://docs.opendronemap.org/arguments/"
+TASK_OPTIONS_DOCS_LINK = ""
 
 # Whether to display onboarding instructions and 
 # automatically create a first project on first login
