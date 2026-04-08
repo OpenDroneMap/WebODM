@@ -1,6 +1,6 @@
 [submodule "nodeodm/external/NodeODM"]
 	path = nodeodm/external/NodeODM
-	url = https://github.com/OpenDroneMap/NodeODM
+	url = https://github.com/WebODM/NodeODM
 [submodule "locale"]
 	path = locale
-	url = https://github.com/OpenDroneMap/WebODM-Locale
+	url = https://github.com/WebODM/WebODM-Locale
