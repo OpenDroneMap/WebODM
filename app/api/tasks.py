@@ -835,13 +835,16 @@ class TaskExternalImportUpload(APIView):
         if asset_file_candidates is None: 
             raise exceptions.ValidationError(detail=_("Invalid file type"))
 
+        ext_aliases = {
+            '.tiff': '.tif'
+        }
         for f in asset_file_candidates:
-            if os.path.splitext(f)[1].lower() == file_ext.lower():
+            if os.path.splitext(f)[1].lower() == ext_aliases.get(file_ext.lower(), file_ext.lower()):
                 asset_file = f
                 break
 
         if asset_file is None:
-            raise exceptions.ValidationError(detail=_("Invalid file type"))
+            raise exceptions.ValidationError(detail=_("Invalid file type (extension mismatch)"))
 
         chunk_index = request.data.get('dzchunkindex')
         uuid = request.data.get('dzuuid') 
