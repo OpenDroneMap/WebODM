@@ -2,6 +2,8 @@ name: Build and Publish Docker Image
 
 on:
   push:
+    paths-ignore:
+    - 'README.md'
     branches:
     - master
     tags:
