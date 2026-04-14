@@ -586,6 +586,9 @@ update(){
 		echo "Skipping source update (git not found)"
 	else
 		if [[ -d .git ]]; then
+			if [[ -d "locale" ]] && [[ -n "$(ls -A locale)" ]]; then
+				run "git submodule sync"
+			fi
 			run "git pull origin master"
 		else
 			echo "Skipping source update (.git directory not found)"
