@@ -9,7 +9,7 @@ from django.conf import settings
 """
 Same as Django's TemporaryFileUploadHandler, but closes the file
 after the upload is completed as not to hog the number of open fd limits
-(see https://github.com/OpenDroneMap/WebODM/issues/233)
+(see https://github.com/WebODM/WebODM/issues/233)
 """
 class TemporaryFileUploadHandler(FileUploadHandler):
     """

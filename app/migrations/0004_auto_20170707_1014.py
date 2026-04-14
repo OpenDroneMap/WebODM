@@ -20,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='orthophoto_extent',
-            field=django.contrib.gis.db.models.fields.GeometryField(blank=True, help_text='Extent of the orthophoto created by OpenDroneMap', null=True, srid=4326),
+            field=django.contrib.gis.db.models.fields.GeometryField(blank=True, help_text='Extent of the orthophoto created by ODM', null=True, srid=4326),
         ),
     ]

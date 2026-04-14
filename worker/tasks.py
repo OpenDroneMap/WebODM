@@ -158,8 +158,8 @@ def process_task(taskId):
             task.process()
         except Exception as e:
             logger.error(
-                "Uncaught error! This is potentially bad. Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
-                    e, traceback.format_exc()))
+                "Uncaught error while processing task {}. This is potentially bad. Please report it to http://github.com/WebODM/WebODM/issues: {} {}".format(
+                    taskId, e, traceback.format_exc()))
             if settings.TESTING: raise e
     finally:
         if cancel_monitor is not None:

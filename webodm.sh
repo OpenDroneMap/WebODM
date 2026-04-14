@@ -382,7 +382,7 @@ environment_check(){
         if [ -z "$DOCKER_HOST" ]; then
             echo "DOCKER_HOST is unset"
             if [[ "$($docker_compose -v)" != "podman"* ]] && [[ "$DOCKER_VERSION" == "podman"* ]]; then
-                echo "You seem to be using podman with docker-compose instead of podman-compose. The above variable may need to be set, see https://docs.opendronemap.org/tutorials/#using-podman for more information."
+                echo "You seem to be using podman with docker-compose instead of podman-compose. The above variable may need to be set, see https://docs.webodm.org/tutorials/using-podman/ for more information."
             fi
         else
             echo "DOCKER_HOST: $DOCKER_HOST"
@@ -592,7 +592,7 @@ resetpassword(){
 		if docker exec "$container_hash" bash -c "echo \"from django.contrib.auth.models import User;from django.contrib.auth.hashers import make_password;u=User.objects.filter(is_superuser=True)[0];u.password=make_password('$newpass');u.save();print('The following user was changed: {}'.format(u.username));\" | python manage.py shell"; then
 			echo -e "\033[1mPassword changed!\033[0m"
 		else
-			echo -e "\033[91mCould not change administrator password. If you need help, please visit https://github.com/OpenDroneMap/WebODM/issues/ \033[39m"
+			echo -e "\033[91mCould not change administrator password. If you need help, please visit https://github.com/WebODM/WebODM/issues/ \033[39m"
 		fi
 	else
 		usage

@@ -8,7 +8,7 @@ services:
     depends_on:
       - node-odm-1
   node-odm-1:
-    image: opendronemap/nodeodm:stable
+    image: webodm/nodeodm
     container_name: node-odm-1
     expose:
       - "3000"

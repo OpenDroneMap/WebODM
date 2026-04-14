@@ -5,13 +5,13 @@
 	"version": "0.1.0",
 	"author": "Ronald W. Machado",
 	"email": "ronadlwilsonmachado@gmail.com",
-	"repository": "https://github.com/OpenDroneMap/WebODM",
+	"repository": "https://github.com/WebODM/WebODM",
 	"tags": [
 		"notification",
 		"email",
 		"smtp"
 	],
-	"homepage": "https://github.com/OpenDroneMap/WebODM",
+	"homepage": "https://github.com/WebODM/WebODM",
 	"experimental": false,
 	"deprecated": false
 }
