@@ -208,8 +208,7 @@ usage(){
 }
 
 detect_gpus(){
-	export GPU_AMD=false
-	export GPU_INTEL=false
+	# export GPU_AMD=false
 	export GPU_NVIDIA=false
 
 	if [ "${platform}" = "Linux" ]; then
@@ -236,22 +235,16 @@ detect_gpus(){
 			return
 		fi
 
-		if lspci | grep "VGA.*Intel"; then
-			echo "GPU_INTEL has been found"
-			export GPU_INTEL=true
-			set -e
-			return
-		fi
-
 		# Total guess.  Need to look into AMD.
-		if lspci | grep "VGA.*AMD"; then
-			echo "GPU_AMD has been found"
-			export GPU_AMD=true
-			set -e
-			return
-		fi
+		# if lspci | grep "VGA.*AMD"; then
+		# 	echo "GPU_AMD has been found"
+		# 	export GPU_AMD=true
+		# 	set -e
+		# 	return
+		# fi
 
-		if ! $GPU_NVIDIA && ! $GPU_INTEL && ! $GPU_AMD; then
+		# if ! $GPU_NVIDIA && ! $GPU_AMD; then
+		if ! $GPU_NVIDIA; then
 			echo "Warning: GPU use was requested, but no GPU has been found"
 			set -e
 		fi
@@ -260,20 +253,8 @@ detect_gpus(){
 	fi
 }
 
-prepare_intel_render_group(){
-	if [ "${platform}" = "Linux" ]; then
-		if [ "${GPU_INTEL}" = true ]; then
-			RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
-		else
-			RENDER_GROUP_ID=0
-		fi
-		export RENDER_GROUP_ID
-	fi
-}
-
 if [[ $gpu = true ]]; then
 	detect_gpus
-	prepare_intel_render_group
 fi
 
 docker_compose="docker-compose"
@@ -443,8 +424,6 @@ start(){
     if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-		elif [ "${GPU_INTEL}" = true ]; then
-			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
 		else
 			command+=" -f docker-compose.nodeodm.yml"
 		fi
