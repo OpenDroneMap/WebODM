@@ -305,6 +305,7 @@ class ProjectListItem extends React.Component {
             }
         })
         .on("queuecomplete", () => {
+          setTimeout(() => {
             const remainingFilesCount = this.state.upload.totalCount - this.state.upload.uploadedCount;
             if (remainingFilesCount === 0 && this.state.upload.uploadedCount > 0){
                 // All files have uploaded!
@@ -349,6 +350,7 @@ class ProjectListItem extends React.Component {
                     error: interpolate(_('%(count)s files cannot be uploaded. As a reminder, only images (.jpg, .tif, .png) and GCP files (.txt) can be uploaded. Try again.'), { count: remainingFilesCount })
                 });
             }
+          }, 100);
         })
         .on("reset", () => {
           this.resetUploadState();
