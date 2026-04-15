@@ -22,8 +22,12 @@ class Command(BaseCommand):
         }
 
         if options.get('label'):
-            ProcessingNode.objects.update_or_create(label=options.get('label'), 
-                defaults=defaults)
+            try:
+                ProcessingNode.objects.update_or_create(label=options.get('label'), 
+                    defaults=defaults)
+            except ProcessingNode.MultipleObjectsReturned:
+                ProcessingNode.objects.update_or_create(hostname=options.get('host'), 
+                    defaults=defaults)
         else:
             ProcessingNode.objects.update_or_create(hostname=options.get('host'), 
                 defaults=defaults)
