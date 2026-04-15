@@ -385,6 +385,9 @@ class TaskMediaThumbnail(TaskMediaBase):
         try:
             if ext in models.Task.PHOTO_EXTENSIONS:
                 with Image.open(filepath) as im:
+                    if im.mode != "RGB":
+                        im = im.convert("RGB")
+                    
                     im.thumbnail((thumb_size, thumb_size))
                     buf = io.BytesIO()
                     fmt = 'JPEG'
@@ -399,4 +402,5 @@ class TaskMediaThumbnail(TaskMediaBase):
             else:
                 raise RuntimeError
         except Exception as e:
+            print(str(e))
             raise exceptions.ValidationError(detail="Thumbnail not supported for this media")
