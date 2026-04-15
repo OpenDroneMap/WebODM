@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 import re
 import os
+import sys
 from rasterio.warp import transform as rio_transform
 from app.geoutils import utm_transformers_from_lonlat, utm_crs_from_lonlat
 
@@ -359,16 +360,25 @@ def srt_file_for_video(video_path):
     srt_file = base + '.srt'
     return srt_file
 
+def isfile_case_sensitive(f):
+    if sys.platform == 'win32':
+        # os.path.isfile on Windows is case insensitive
+        if not os.path.isfile(f):
+            return False
+        return os.path.realpath(f) == os.path.abspath(f)
+    else:
+        return os.path.isfile(f)
+
 def video_file_for_srt(srt_path):
     base, ext = os.path.splitext(srt_path)
     
     for video_ext in VIDEO_EXTENSIONS:
         video_path = base + video_ext
-        if os.path.isfile(video_path):
+        if isfile_case_sensitive(video_path):
             return video_path
         
         video_path = base + video_ext.upper()
-        if os.path.isfile(video_path):
+        if isfile_case_sensitive(video_path):
             return video_path
         
     return None
@@ -394,7 +404,7 @@ def extract_subtitles(video_path):
         process.communicate()
         logger.warning(f"Error: ffmpeg error while extracting subs from {video_path}: {str(e)}")
 
-    return os.path.isfile(srt_file)
+    return isfile_case_sensitive(srt_file)
 
 def extract_jpeg_bytes_from_video(video_path, width=256, timestamp="00:00:01", quality=4):
     command = [
