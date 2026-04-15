@@ -246,7 +246,7 @@ class TaskMediaManage(TaskMediaBase):
         except SuspiciousFileOperation:
             raise exceptions.NotFound()
 
-        if not len([e for e in task.media if e['filename'] == filename]):
+        if task.get_media_entry(filename) is None:
             raise exceptions.NotFound()
 
         # If video, check if we need to delete SRT
@@ -402,5 +402,4 @@ class TaskMediaThumbnail(TaskMediaBase):
             else:
                 raise RuntimeError
         except Exception as e:
-            print(str(e))
             raise exceptions.ValidationError(detail="Thumbnail not supported for this media")
