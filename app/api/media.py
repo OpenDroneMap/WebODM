@@ -246,7 +246,7 @@ class TaskMediaManage(TaskMediaBase):
         except SuspiciousFileOperation:
             raise exceptions.NotFound()
 
-        if not os.path.isfile(filepath):
+        if not len([e for e in task.media if e['filename'] == filename]):
             raise exceptions.NotFound()
 
         # If video, check if we need to delete SRT
@@ -257,7 +257,8 @@ class TaskMediaManage(TaskMediaBase):
             if os.path.isfile(srt_file):
                 os.remove(srt_file)
 
-        os.remove(filepath)
+        if os.path.isfile(filepath):
+            os.remove(filepath)
 
         with transaction.atomic():
             task = self._lock_task(task)
