@@ -101,7 +101,4 @@ package-lock.json
 .initialized
 .DS_Store
 
-# Debian builds
-dpkg/build
-dpkg/deb
 .secret_key

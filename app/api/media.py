@@ -246,7 +246,7 @@ class TaskMediaManage(TaskMediaBase):
         except SuspiciousFileOperation:
             raise exceptions.NotFound()
 
-        if not os.path.isfile(filepath):
+        if task.get_media_entry(filename) is None:
             raise exceptions.NotFound()
 
         # If video, check if we need to delete SRT
@@ -257,7 +257,8 @@ class TaskMediaManage(TaskMediaBase):
             if os.path.isfile(srt_file):
                 os.remove(srt_file)
 
-        os.remove(filepath)
+        if os.path.isfile(filepath):
+            os.remove(filepath)
 
         with transaction.atomic():
             task = self._lock_task(task)
@@ -384,6 +385,9 @@ class TaskMediaThumbnail(TaskMediaBase):
         try:
             if ext in models.Task.PHOTO_EXTENSIONS:
                 with Image.open(filepath) as im:
+                    if im.mode != "RGB":
+                        im = im.convert("RGB")
+                    
                     im.thumbnail((thumb_size, thumb_size))
                     buf = io.BytesIO()
                     fmt = 'JPEG'

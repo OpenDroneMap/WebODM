@@ -161,6 +161,11 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameter
 
+if [[ "${WO_DEFAULT_NODES}" -gt 1 ]]; then
+	echo "ATTENTION: --default-nodes values greater than 1 are no longer supported."
+	export WO_DEFAULT_NODES="1"
+fi
+
 usage(){
   echo "Usage: $0 <command>"
   echo
@@ -182,7 +187,7 @@ usage(){
   echo "	--hostname	<hostname>	Set the hostname that WebODM will be accessible from (default: $DEFAULT_HOST)"
   echo "	--media-dir	<path>	Path where processing results will be stored to (default: $DEFAULT_MEDIA_DIR (docker named volume))"
   echo "	--db-dir	<path>	Path where the Postgres db data will be stored to (default: $DEFAULT_DB_DIR (docker named volume))"
-  echo "	--default-nodes	The amount of default NodeODM nodes attached to WebODM on startup (default: $DEFAULT_NODES)"
+  echo "	--default-nodes	Whether to create a processing node attached to WebODM on startup (default: $DEFAULT_NODES)"
   echo "	--with-micmac	Create a NodeMICMAC node attached to WebODM on startup. Experimental! (default: disabled)"
   echo "	--ssl	Enable SSL and automatically request and install a certificate from letsencrypt.org. (default: $DEFAULT_SSL)"
   echo "	--ssl-key	<path>	Manually specify a path to the private key file (.pem) to use with nginx to enable SSL (default: None)"
@@ -203,8 +208,7 @@ usage(){
 }
 
 detect_gpus(){
-	export GPU_AMD=false
-	export GPU_INTEL=false
+	# export GPU_AMD=false
 	export GPU_NVIDIA=false
 
 	if [ "${platform}" = "Linux" ]; then
@@ -231,22 +235,16 @@ detect_gpus(){
 			return
 		fi
 
-		if lspci | grep "VGA.*Intel"; then
-			echo "GPU_INTEL has been found"
-			export GPU_INTEL=true
-			set -e
-			return
-		fi
-
 		# Total guess.  Need to look into AMD.
-		if lspci | grep "VGA.*AMD"; then
-			echo "GPU_AMD has been found"
-			export GPU_AMD=true
-			set -e
-			return
-		fi
+		# if lspci | grep "VGA.*AMD"; then
+		# 	echo "GPU_AMD has been found"
+		# 	export GPU_AMD=true
+		# 	set -e
+		# 	return
+		# fi
 
-		if ! $GPU_NVIDIA && ! $GPU_INTEL && ! $GPU_AMD; then
+		# if ! $GPU_NVIDIA && ! $GPU_AMD; then
+		if ! $GPU_NVIDIA; then
 			echo "Warning: GPU use was requested, but no GPU has been found"
 			set -e
 		fi
@@ -255,20 +253,8 @@ detect_gpus(){
 	fi
 }
 
-prepare_intel_render_group(){
-	if [ "${platform}" = "Linux" ]; then
-		if [ "${GPU_INTEL}" = true ]; then
-			RENDER_GROUP_ID=$(getent group render | cut -d":" -f3)
-		else
-			RENDER_GROUP_ID=0
-		fi
-		export RENDER_GROUP_ID
-	fi
-}
-
 if [[ $gpu = true ]]; then
 	detect_gpus
-	prepare_intel_render_group
 fi
 
 docker_compose="docker-compose"
@@ -438,8 +424,6 @@ start(){
     if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-		elif [ "${GPU_INTEL}" = true ]; then
-			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
 		else
 			command+=" -f docker-compose.nodeodm.yml"
 		fi
@@ -509,16 +493,12 @@ start(){
 
  	if [[ $ipv6 = true ]]; then
         command+=" -f docker-compose.ipv6.yml"
-    	fi
+	fi
 
 	command="$command up"
 
 	if [[ $detached = true ]]; then
 		command+=" -d"
-	fi
-
-	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
-		command+=" --scale node-odm=$WO_DEFAULT_NODES"
 	fi
 
 	run "$command"
@@ -529,8 +509,6 @@ down(){
 
 	if [ "${GPU_NVIDIA}" = true ]; then
 		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-	elif [ "${GPU_INTEL}" = true ]; then
-		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
 	else
 		command+=" -f docker-compose.nodeodm.yml"
 	fi
@@ -606,6 +584,9 @@ update(){
 		echo "Skipping source update (git not found)"
 	else
 		if [[ -d .git ]]; then
+			if [[ -d "locale" ]] && [[ -n "$(ls -A locale)" ]]; then
+				run "git submodule sync"
+			fi
 			run "git pull origin master"
 		else
 			echo "Skipping source update (.git directory not found)"
@@ -617,8 +598,6 @@ update(){
 	if [[ $WO_DEFAULT_NODES -gt 0 ]]; then
 		if [ "${GPU_NVIDIA}" = true ]; then
 			command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-		elif [ "${GPU_INTEL}" = true ]; then
-			command+=" -f docker-compose.nodeodm.gpu.intel.yml"
 		else
 			command+=" -f docker-compose.nodeodm.yml"
 		fi
@@ -643,8 +622,6 @@ elif [[ $1 = "stop" ]]; then
 
 	if [ "${GPU_NVIDIA}" = true ]; then
 		command+=" -f docker-compose.nodeodm.gpu.nvidia.yml"
-	elif [ "${GPU_INTEL}" = true ]; then
-		command+=" -f docker-compose.nodeodm.gpu.intel.yml"
 	else
 		command+=" -f docker-compose.nodeodm.yml"
 	fi
