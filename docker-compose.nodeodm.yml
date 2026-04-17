@@ -6,12 +6,12 @@ version: '2.1'
 services:
   webapp:
     depends_on:
-      - node-odm-1
+      - node-odx-1
     environment:
       - WO_DEFAULT_NODES
-  node-odm-1:
-    image: webodm/nodeodm
-    container_name: node-odm-1
+  node-odx-1:
+    image: webodm/nodeodx
+    container_name: node-odx-1
     expose:
       - "3000"
     restart: unless-stopped

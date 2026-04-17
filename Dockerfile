@@ -99,7 +99,7 @@ RUN <<EOT
     # Setup cron
     chmod 0644 ./nginx/crontab
     ln -s ./nginx/crontab /var/spool/cron/crontabs/root
-    # NodeODM setup
+    # NodeODX setup
     chmod +x ./nginx/letsencrypt-autogen.sh
     ./nodeodm/setup.sh
     ./nodeodm/cleanup.sh

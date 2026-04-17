@@ -336,7 +336,7 @@ class TestApiTask(BootTransactionTestCase):
                     self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
             # Neither should an individual tile
-            # Z/X/Y coords are chosen based on node-odm test dataset for orthophoto_tiles/
+            # Z/X/Y coords are chosen based on node-odx test dataset for orthophoto_tiles/
             res = client.get("/api/projects/{}/tasks/{}/orthophoto/tiles/16/16020/42443.png".format(project.id, task.id))
             self.assertTrue(res.status_code == status.HTTP_404_NOT_FOUND)
 
@@ -1123,7 +1123,7 @@ class TestApiTask(BootTransactionTestCase):
                             {'name': 'rerun-from', 'value': 'odm_meshing'}]
             task.save()
 
-            # 2. Remove the task directly from node-odm (simulate a task purge)
+            # 2. Remove the task directly from node-odx (simulate a task purge)
             self.assertTrue(task.processing_node.remove_task(task.uuid))
 
             # 3. Restart the task
@@ -1176,7 +1176,7 @@ class TestApiTask(BootTransactionTestCase):
             self.assertTrue(len(os.listdir(task.assets_path())) > 0)
             self.assertEqual(len(task.scan_images()), 0)            
 
-        # Restart node-odm as to not generate orthophotos
+        # Restart node-odx as to not generate orthophotos
         testWatch.clear()
         with start_processing_node(["--test_skip_orthophotos"]):
             res = client.post("/api/projects/{}/tasks/".format(project.id), {
