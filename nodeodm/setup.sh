@@ -8,7 +8,7 @@ cd "${__dirname}"
 if [[ ! -z ${TEST_BUILD+x} ]]; then
     cd external/NodeODM
     npm install --quiet
-    echo "NodeODM is setup"
+    echo "NodeODX is setup"
 else
     echo "TEST_BUILD is not set"
 fi
