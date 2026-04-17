@@ -288,7 +288,7 @@ class ModelView extends React.Component {
 
   objFilePath = (cb) => {
     // Mostly for backward compatibility
-    // as newer versions of ODM do not have 
+    // as newer versions of ODX do not have 
     // a odm_textured_model.obj
     const geoUrl = this.texturedModelDirectoryPath() + 'odm_textured_model_geo.obj';
     const nongeoUrl = this.texturedModelDirectoryPath() + 'odm_textured_model.obj';
@@ -314,7 +314,7 @@ class ModelView extends React.Component {
 
   mtlFilename = (cb) => {
     // Mostly for backward compatibility
-    // as newer versions of ODM do not have 
+    // as newer versions of ODX do not have 
     // a odm_textured_model.mtl
     const geoUrl = this.texturedModelDirectoryPath() + 'odm_textured_model_geo.mtl';
 

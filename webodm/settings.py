@@ -2,7 +2,6 @@ import os, sys, json
 
 import datetime
 
-import tzlocal
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -166,7 +165,7 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = tzlocal.get_localzone().zone
+TIME_ZONE = 'Etc/UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
