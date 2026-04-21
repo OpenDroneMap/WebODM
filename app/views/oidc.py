@@ -18,13 +18,71 @@ from webodm import settings
 logger = logging.getLogger('app.logger')
 
 
+def get_oidc_providers():
+    providers = []
+    configured = getattr(settings, 'OIDC_AUTH_PROVIDERS', []) or []
+    for i, provider in enumerate(configured):
+        if not isinstance(provider, dict):
+            continue
+
+        client_id = provider.get('client_id', '')
+        client_secret = provider.get('client_secret', '')
+        auth_endpoint = provider.get('auth_endpoint', '')
+        token_endpoint = provider.get('token_endpoint', '')
+        userinfo_endpoint = provider.get('userinfo_endpoint', '')
+        name = provider.get('name', '')
+
+        if not client_id or not client_secret or not auth_endpoint or not token_endpoint or not userinfo_endpoint or not name:
+            continue
+
+        providers.append({
+            'index': i,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'auth_endpoint': auth_endpoint,
+            'token_endpoint': token_endpoint,
+            'userinfo_endpoint': userinfo_endpoint,
+            'name': name,
+            'icon': provider.get('icon') or 'fa fa-lock',
+        })
+
+    return providers
+
+
+def get_oidc_provider(provider_index):
+    try:
+        idx = int(provider_index)
+    except (TypeError, ValueError):
+        return None
+
+    providers = get_oidc_providers()
+    if idx < 0 or idx >= len(providers):
+        return None
+    return providers[idx]
+
+
 def safe_next(request, next_url):
     if is_safe_url(url=next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
         return next_url
     return settings.LOGIN_REDIRECT_URL
 
-def oidc_login(request):
-    if not settings.OIDC_CLIENT_ID:
+
+def oidc_enabled():
+    return len(get_oidc_providers()) > 0
+
+
+def _create_oidc_username(subject):
+    base = 'oidc_' + hashlib.sha256(subject.encode('utf-8')).hexdigest()[:24]
+    candidate = base
+    suffix = 1
+    while User.objects.filter(username=candidate).exists():
+        candidate = '%s_%s' % (base, suffix)
+        suffix += 1
+    return candidate
+
+def oidc_login(request, provider_index):
+    provider = get_oidc_provider(provider_index)
+    if not provider:
         return redirect(settings.LOGIN_URL)
 
     next_url = safe_next(request, request.GET.get('next', settings.LOGIN_REDIRECT_URL))
@@ -32,21 +90,23 @@ def oidc_login(request):
 
     request.session['oidc_state'] = state
     request.session['oidc_next'] = next_url
+    request.session['oidc_provider_index'] = provider['index']
 
-    callback_url = request.build_absolute_uri(reverse('oidc_callback'))
+    callback_url = request.build_absolute_uri(reverse('oidc_callback', kwargs={'provider_index': provider['index']}))
     params = {
         'response_type': 'code',
-        'client_id': settings.OIDC_CLIENT_ID,
+        'client_id': provider['client_id'],
         'redirect_uri': callback_url,
         'scope': 'openid email',
         'state': state,
     }
 
-    return redirect('%s?%s' % (settings.OIDC_AUTHORIZATION_ENDPOINT, urlencode(params)))
+    return redirect('%s?%s' % (provider['auth_endpoint'], urlencode(params)))
 
 
-def oidc_callback(request):
-    if not settings.OIDC_CLIENT_ID:
+def oidc_callback(request, provider_index):
+    provider = get_oidc_provider(provider_index)
+    if not provider:
         return redirect(settings.LOGIN_URL)
 
     provider_error = request.GET.get('error')
@@ -60,22 +120,27 @@ def oidc_callback(request):
         messages.error(request, _('Invalid SSO state. Please try again.'))
         return redirect(settings.LOGIN_URL)
 
+    session_provider_index = request.session.pop('oidc_provider_index', None)
+    if session_provider_index != provider['index']:
+        messages.error(request, _('Invalid SSO provider. Please try again.'))
+        return redirect(settings.LOGIN_URL)
+
     code = request.GET.get('code')
     if not code:
         messages.error(request, _('Missing SSO authorization code.'))
         return redirect(settings.LOGIN_URL)
 
-    callback_url = request.build_absolute_uri(reverse('oidc_callback'))
+    callback_url = request.build_absolute_uri(reverse('oidc_callback', kwargs={'provider_index': provider['index']}))
 
     try:
         token_response = requests.post(
-            settings.OIDC_TOKEN_ENDPOINT,
+            provider['token_endpoint'],
             data={
                 'grant_type': 'authorization_code',
                 'code': code,
                 'redirect_uri': callback_url,
-                'client_id': settings.OIDC_CLIENT_ID,
-                'client_secret': settings.OIDC_CLIENT_SECRET,
+                'client_id': provider['client_id'],
+                'client_secret': provider['client_secret'],
             },
             headers={'Accept': 'application/json'},
             timeout=15,
@@ -95,7 +160,7 @@ def oidc_callback(request):
 
     try:
         userinfo_response = requests.get(
-            settings.OIDC_USERINFO_ENDPOINT,
+            provider['userinfo_endpoint'],
             headers={
                 'Authorization': 'Bearer %s' % access_token,
                 'Accept': 'application/json'
@@ -110,17 +175,21 @@ def oidc_callback(request):
         return redirect(settings.LOGIN_URL)
 
     subject = claims.get('sub')
-    email = claims.get('email', '').strip()
-    if not subject or not email:
-        logger.warning('OIDC claims missing required sub or email')
+    if not subject:
+        logger.warning('OIDC claims missing required sub')
         messages.error(request, _('SSO login failed.'))
         return redirect(settings.LOGIN_URL)
 
     try:
         user = User.objects.get(profile__oidc_sub=subject)
     except User.DoesNotExist:
-        user = User.objects.create_user(username=email)
+        username = _create_oidc_username(subject)
+        user = User.objects.create_user(username=username)
         user.profile.oidc_sub = subject
+        email = (claims.get('email') or '').strip().lower()
+        if email != '':
+            user.email = email
+        user.save()
         user.profile.save()
 
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')

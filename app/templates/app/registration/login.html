@@ -12,6 +12,7 @@
     {% is_single_user_mode as autologin %}
     {% has_external_auth as ext_auth %}
     {% has_oidc_auth as oidc_auth %}
+    {% oidc_auth_providers as oidc_providers %}
     {% reset_password_link as reset_pwd_link %}
 
     {% if autologin %}
@@ -20,13 +21,16 @@
     
     {% if oidc_auth %}
     <div class="form-horizontal top-buffer" id="oidcLoginContainer">
+        {% for provider in oidc_providers %}
         <div class="form-group">
             <div class="col-sm-12 text-center">
-                <a id="oidcLoginButton" class="btn btn-default" href="{% url 'oidc_login' %}"><i class="fa fa-lock"></i> {% trans 'Login with SSO' %}</a>
-                <div style="margin-top: 8px">
-                    <a id="oidcOtherLogin" href="javascript:oidcOtherLogin()">{% trans 'Manual login' %}</a>
-                </div>
+                <a class="btn btn-default oidcLoginButton" href="{% url 'oidc_login' provider.index %}"><i class="{{ provider.icon }}"></i> {% blocktrans with provider_name=provider.name %}Login with {{ provider_name }}{% endblocktrans %}</a>
             </div>
+        </div>
+        {% endfor %}
+
+        <div style="text-align: center; margin-top: 8px">
+            <a id="oidcOtherLogin" href="javascript:oidcOtherLogin()">{% trans 'Manual login' %}</a>
         </div>
     </div>
     <script>
@@ -35,10 +39,12 @@
             $("#loginForm").toggle();
         }
         (function(){
-            var button = document.getElementById("oidcLoginButton");
-            if (!button) return;
             var next = new URLSearchParams(new URL(window.location.href).search).get('next');
-            if (next) button.href = button.href + "?next=" + encodeURIComponent(next);
+            if (!next) return;
+            var buttons = document.querySelectorAll('.oidcLoginButton');
+            for (var i = 0; i < buttons.length; i++){
+                buttons[i].href = buttons[i].href + "?next=" + encodeURIComponent(next);
+            }
         })();
     </script>
     {% endif %}

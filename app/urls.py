@@ -47,10 +47,10 @@ urlpatterns = [
     url(r'^i18n/', include('django.conf.urls.i18n')),
 ] + root_url_patterns()
 
-if settings.OIDC_CLIENT_ID and settings.OIDC_CLIENT_SECRET and settings.OIDC_AUTHORIZATION_ENDPOINT and settings.OIDC_TOKEN_ENDPOINT and settings.OIDC_USERINFO_ENDPOINT:
+if oidc_views.oidc_enabled():
     urlpatterns += [
-            url(r'^oidc/login/$', oidc_views.oidc_login, name='oidc_login'),
-            url(r'^oidc/callback/$', oidc_views.oidc_callback, name='oidc_callback'),
+        url(r'^oidc/login/(?P<provider_index>[0-9]+)/$', oidc_views.oidc_login, name='oidc_login'),
+        url(r'^oidc/callback/(?P<provider_index>[0-9]+)/$', oidc_views.oidc_callback, name='oidc_callback'),
     ]
 
 handler404 = app_views.handler404
