@@ -11,6 +11,7 @@
 
     {% is_single_user_mode as autologin %}
     {% has_external_auth as ext_auth %}
+    {% has_oidc_auth as oidc_auth %}
     {% reset_password_link as reset_pwd_link %}
 
     {% if autologin %}
@@ -45,6 +46,24 @@
             </div>
         </div>
     </form>
+
+    {% if oidc_auth %}
+    <div class="form-horizontal top-buffer" id="oidcLoginContainer">
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <a id="oidcLoginButton" class="btn btn-default" href="{% url 'oidc_login' %}">{% trans 'Login with SSO' %}</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function(){
+            var button = document.getElementById("oidcLoginButton");
+            if (!button) return;
+            var next = new URLSearchParams(new URL(window.location.href).search).get('next');
+            if (next) button.href = button.href + "?next=" + encodeURIComponent(next);
+        })();
+    </script>
+    {% endif %}
 
     {% if ext_auth %}
     <div class="text-center" id="authLoading">

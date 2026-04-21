@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 from django.views.i18n import JavaScriptCatalog
 
-from .views import app as app_views, public as public_views, dev as dev_views
+from .views import app as app_views, public as public_views, dev as dev_views, oidc as oidc_views
 from .plugins.views import app_view_handler, root_url_patterns
 
 from app.boot import boot
@@ -46,6 +46,12 @@ urlpatterns = [
     url(r'^jsi18n/', JavaScriptCatalog.as_view(packages=['app']), name='javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 ] + root_url_patterns()
+
+if settings.OIDC_CLIENT_ID and settings.OIDC_CLIENT_SECRET and settings.OIDC_AUTHORIZATION_ENDPOINT and settings.OIDC_TOKEN_ENDPOINT and settings.OIDC_USERINFO_ENDPOINT:
+    urlpatterns += [
+            url(r'^oidc/login/$', oidc_views.oidc_login, name='oidc_login'),
+            url(r'^oidc/callback/$', oidc_views.oidc_callback, name='oidc_callback'),
+    ]
 
 handler404 = app_views.handler404
 handler500 = app_views.handler500

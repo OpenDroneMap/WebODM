@@ -25,6 +25,14 @@ def reset_password_link():
 def has_external_auth():
     return settings.EXTERNAL_AUTH_ENDPOINT != ""
 
+@register.simple_tag
+def has_oidc_auth():
+    return bool(settings.OIDC_CLIENT_ID) and \
+           bool(settings.OIDC_CLIENT_SECRET) and \
+           bool(settings.OIDC_AUTHORIZATION_ENDPOINT) and \
+           bool(settings.OIDC_TOKEN_ENDPOINT) and \
+           bool(settings.OIDC_USERINFO_ENDPOINT)
+
 @register.filter
 def disk_size(megabytes):
     k = 1000

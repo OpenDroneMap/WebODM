@@ -358,6 +358,13 @@ NODE_OPTIMISTIC_MODE = False
 # URL to external auth endpoint
 EXTERNAL_AUTH_ENDPOINT = ''
 
+# OpenID Connect (OIDC) authentication
+OIDC_CLIENT_ID = ''
+OIDC_CLIENT_SECRET = ''
+OIDC_AUTHORIZATION_ENDPOINT = ''
+OIDC_TOKEN_ENDPOINT = ''
+OIDC_USERINFO_ENDPOINT = ''
+
 # Enable cluster mode for this instance by setting an integer ID >= 1
 CLUSTER_ID = None
 

@@ -14,6 +14,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     quota = models.FloatField(default=-1, blank=True, help_text=_("Maximum disk quota in megabytes"), verbose_name=_("Quota"))
     cluster_id = models.IntegerField(blank=True, null=True, help_text=_("Cluster Id this user is assigned to"), verbose_name=_("Cluster Id"))
+    oidc_sub = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text=_("OIDC Subject used for SSO"), verbose_name=_("OIDC Subject"))
 
     def has_quota(self):
         return self.quota != -1
