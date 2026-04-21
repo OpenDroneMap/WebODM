@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 from django.views.i18n import JavaScriptCatalog
 
-from .views import app as app_views, public as public_views, dev as dev_views
+from .views import app as app_views, public as public_views, dev as dev_views, oidc as oidc_views
 from .plugins.views import app_view_handler, root_url_patterns
 
 from app.boot import boot
@@ -41,6 +41,9 @@ urlpatterns = [
 
     url(r'^about/$', app_views.about, name='about'),
     url(r'^dev-tools/(?P<action>.*)$', dev_views.dev_tools, name='dev_tools'),
+
+    url(r'^oidc/login/(?P<provider_index>[0-9]+)/$', oidc_views.oidc_login, name='oidc_login'),
+    url(r'^oidc/callback/$', oidc_views.oidc_callback, name='oidc_callback'),
 
     # TODO: add caching: https://docs.djangoproject.com/en/3.1/topics/i18n/translation/#note-on-performance
     url(r'^jsi18n/', JavaScriptCatalog.as_view(packages=['app']), name='javascript-catalog'),

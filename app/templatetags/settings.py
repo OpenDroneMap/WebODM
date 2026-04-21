@@ -5,6 +5,7 @@ import time
 from django import template
 from webodm import settings
 from django.utils.translation import gettext as _
+from app.oidc_providers import get_oidc_providers
 
 register = template.Library()
 logger = logging.getLogger('app.logger')
@@ -24,6 +25,14 @@ def reset_password_link():
 @register.simple_tag
 def has_external_auth():
     return settings.EXTERNAL_AUTH_ENDPOINT != ""
+
+@register.simple_tag
+def has_oidc_auth():
+    return len(get_oidc_providers()) > 0
+
+@register.simple_tag
+def oidc_auth_providers():
+    return get_oidc_providers()
 
 @register.filter
 def disk_size(megabytes):
