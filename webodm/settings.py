@@ -361,6 +361,11 @@ EXTERNAL_AUTH_ENDPOINT = ''
 # OpenID Connect (OIDC) authentication
 OIDC_AUTH_PROVIDERS = []
 
+# OpenID Connect (IODC) list of authorized e-mails
+# when set, rejects any user who's email does not match an entry (domain-wide matches supported)
+# e.g. ["@myorg.com", "exactuser@otherorg.com"]
+OIDC_AUTH_EMAILS = None
+
 # Enable cluster mode for this instance by setting an integer ID >= 1
 CLUSTER_ID = None
 
