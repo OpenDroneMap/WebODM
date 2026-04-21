@@ -8,6 +8,14 @@
             <p><strong>{% trans "Invalid credentials." %}</strong> {% trans "Note that both fields are case-sensitive." %}</p>
         </div>
     {% endif %}
+    {% block messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endblock %}
 
     {% is_single_user_mode as autologin %}
     {% has_external_auth as ext_auth %}
@@ -24,7 +32,7 @@
         {% for provider in oidc_providers %}
         <div class="form-group">
             <div class="col-sm-12 text-center">
-                <a class="btn btn-default oidcLoginButton" href="{% url 'oidc_login' provider.index %}"><i class="{{ provider.icon }}"></i> {% blocktrans with provider_name=provider.name %}Login with {{ provider_name }}{% endblocktrans %}</a>
+                <a class="btn btn-primary oidcLoginButton" href="{% url 'oidc_login' forloop.counter0 %}"><i class="{{ provider.icon }}"></i> {% blocktrans with provider_name=provider.name %}Login with {{ provider_name }}{% endblocktrans %}</a>
             </div>
         </div>
         {% endfor %}
@@ -61,7 +69,7 @@
         </script>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default"><i class="fa fa-lock"></i> {% trans 'Login' %}</button>
+              <button type="submit" class="btn btn-primary"><i class="fa fa-lock"></i> {% trans 'Login' %}</button>
             </div>
             <div class="top-buffer col-sm-offset-2 col-sm-10">
                 {% if reset_pwd_link != '' %}

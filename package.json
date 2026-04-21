@@ -1,6 +1,6 @@
 {
   "name": "WebODM",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "User-friendly, extendable application and API for processing aerial imagery.",
   "main": "index.js",
   "scripts": {
