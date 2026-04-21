@@ -27,11 +27,7 @@ def has_external_auth():
 
 @register.simple_tag
 def has_oidc_auth():
-    return bool(settings.OIDC_CLIENT_ID) and \
-           bool(settings.OIDC_CLIENT_SECRET) and \
-           bool(settings.OIDC_AUTHORIZATION_ENDPOINT) and \
-           bool(settings.OIDC_TOKEN_ENDPOINT) and \
-           bool(settings.OIDC_USERINFO_ENDPOINT)
+    return bool(settings.OIDC_CLIENT_ID)
 
 @register.filter
 def disk_size(megabytes):
