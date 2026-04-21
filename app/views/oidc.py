@@ -1,5 +1,4 @@
 import logging
-import hashlib
 from urllib.parse import urlencode
 
 import requests
@@ -16,39 +15,10 @@ from django.db.utils import IntegrityError
 from webodm import settings
 from django.http import Http404
 from django.db import transaction
+from app.oidc_providers import get_oidc_providers
 
 
 logger = logging.getLogger('app.logger')
-
-
-def get_oidc_providers():
-    providers = []
-    configured = getattr(settings, 'OIDC_AUTH_PROVIDERS', []) or []
-    for i, provider in enumerate(configured):
-        if not isinstance(provider, dict):
-            continue
-
-        client_id = provider.get('client_id', '')
-        client_secret = provider.get('client_secret', '')
-        auth_endpoint = provider.get('auth_endpoint', '')
-        token_endpoint = provider.get('token_endpoint', '')
-        userinfo_endpoint = provider.get('userinfo_endpoint', '')
-        name = provider.get('name', '')
-
-        if not client_id or not client_secret or not auth_endpoint or not token_endpoint or not userinfo_endpoint or not name:
-            continue
-
-        providers.append({
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'auth_endpoint': auth_endpoint,
-            'token_endpoint': token_endpoint,
-            'userinfo_endpoint': userinfo_endpoint,
-            'name': name,
-            'icon': provider.get('icon') or 'fa fa-lock',
-        })
-
-    return providers
 
 
 def get_oidc_provider(provider_index):
@@ -190,6 +160,10 @@ def oidc_callback(request):
             except IntegrityError:
                 messages.warning(request, _('Cannot create user. A username already exists with the same e-mail.'))
                 return redirect(settings.LOGIN_URL)
+
+    if not user.is_active:
+        messages.warning(request, _('This account is disabled. Please contact an administrator.'))
+        return redirect(settings.LOGIN_URL)
 
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 

@@ -5,7 +5,7 @@ import time
 from django import template
 from webodm import settings
 from django.utils.translation import gettext as _
-from app.views.oidc import get_oidc_providers
+from app.oidc_providers import get_oidc_providers
 
 register = template.Library()
 logger = logging.getLogger('app.logger')
