@@ -149,6 +149,23 @@ def oidc_callback(request):
         messages.warning(request, _('SSO login failed.'))
         return redirect(settings.LOGIN_URL)
 
+    # Check if it's authorized
+    authorized = True
+    if settings.OIDC_AUTH_EMAILS:
+        authorized = False
+        for ae in settings.OIDC_AUTH_EMAILS:
+            if ae.startswith("@") and email.endswith(ae):
+                authorized = True
+                break
+            elif ae == email:
+                authorized = True
+                break
+    
+    if not authorized:
+        logger.warning('OIDC email not authorized: %s' % email)
+        messages.warning(request, _('SSO login failed.'))
+        return redirect(settings.LOGIN_URL)
+
     try:
         user = User.objects.get(profile__oidc_sub=subject)
     except User.DoesNotExist:
