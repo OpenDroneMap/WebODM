@@ -50,7 +50,7 @@ urlpatterns = [
 if oidc_views.oidc_enabled():
     urlpatterns += [
         url(r'^oidc/login/(?P<provider_index>[0-9]+)/$', oidc_views.oidc_login, name='oidc_login'),
-        url(r'^oidc/callback/(?P<provider_index>[0-9]+)/$', oidc_views.oidc_callback, name='oidc_callback'),
+        url(r'^oidc/callback/$', oidc_views.oidc_callback, name='oidc_callback'),
     ]
 
 handler404 = app_views.handler404

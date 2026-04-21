@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.utils.http import is_safe_url
 from django.utils.translation import ugettext as _
+from django.db.utils import IntegrityError
 
 from webodm import settings
 
@@ -92,7 +93,7 @@ def oidc_login(request, provider_index):
     request.session['oidc_next'] = next_url
     request.session['oidc_provider_index'] = provider['index']
 
-    callback_url = request.build_absolute_uri(reverse('oidc_callback', kwargs={'provider_index': provider['index']}))
+    callback_url = request.build_absolute_uri(reverse('oidc_callback'))
     params = {
         'response_type': 'code',
         'client_id': provider['client_id'],
@@ -104,9 +105,11 @@ def oidc_login(request, provider_index):
     return redirect('%s?%s' % (provider['auth_endpoint'], urlencode(params)))
 
 
-def oidc_callback(request, provider_index):
-    provider = get_oidc_provider(provider_index)
+def oidc_callback(request):
+    session_provider_index = request.session.pop('oidc_provider_index', None)
+    provider = get_oidc_provider(session_provider_index)
     if not provider:
+        messages.error(request, _('Invalid SSO provider. Please try again.'))
         return redirect(settings.LOGIN_URL)
 
     provider_error = request.GET.get('error')
@@ -120,17 +123,12 @@ def oidc_callback(request, provider_index):
         messages.error(request, _('Invalid SSO state. Please try again.'))
         return redirect(settings.LOGIN_URL)
 
-    session_provider_index = request.session.pop('oidc_provider_index', None)
-    if session_provider_index != provider['index']:
-        messages.error(request, _('Invalid SSO provider. Please try again.'))
-        return redirect(settings.LOGIN_URL)
-
     code = request.GET.get('code')
     if not code:
         messages.error(request, _('Missing SSO authorization code.'))
         return redirect(settings.LOGIN_URL)
 
-    callback_url = request.build_absolute_uri(reverse('oidc_callback', kwargs={'provider_index': provider['index']}))
+    callback_url = request.build_absolute_uri(reverse('oidc_callback'))
 
     try:
         token_response = requests.post(
@@ -159,7 +157,7 @@ def oidc_callback(request, provider_index):
         return redirect(settings.LOGIN_URL)
 
     try:
-        userinfo_response = requests.get(
+        userinfo = requests.get(
             provider['userinfo_endpoint'],
             headers={
                 'Authorization': 'Bearer %s' % access_token,
@@ -168,28 +166,29 @@ def oidc_callback(request, provider_index):
             timeout=15,
             verify=True,
         )
-        claims = userinfo_response.json()
+        claims = userinfo.json()
     except Exception as e:
         logger.warning('OIDC userinfo request failed: %s', str(e))
         messages.error(request, _('SSO login failed.'))
         return redirect(settings.LOGIN_URL)
 
     subject = claims.get('sub')
-    if not subject:
-        logger.warning('OIDC claims missing required sub')
+    email = claims.get('email', '').strip()
+    if not subject or not email:
+        logger.warning('OIDC claims missing required sub or email')
         messages.error(request, _('SSO login failed.'))
         return redirect(settings.LOGIN_URL)
 
     try:
         user = User.objects.get(profile__oidc_sub=subject)
     except User.DoesNotExist:
-        username = _create_oidc_username(subject)
-        user = User.objects.create_user(username=username)
+        try:
+            user = User.objects.create_user(username=email)
+        except IntegrityError:
+            messages.error(request, _('Cannot create user. A username already exists with the same e-mail.'))
+            return redirect(settings.LOGIN_URL)
+
         user.profile.oidc_sub = subject
-        email = (claims.get('email') or '').strip().lower()
-        if email != '':
-            user.email = email
-        user.save()
         user.profile.save()
 
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
