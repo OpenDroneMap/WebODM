@@ -9,8 +9,6 @@ from django.test import RequestFactory
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from rest_framework import status
-
 from webodm import settings
 from .classes import BootTestCase
 
