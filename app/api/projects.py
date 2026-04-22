@@ -174,8 +174,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     group_perms_map = {}
                     for perm in form_perms:
                         if perm.get('groupname'):
-                            if perm['groupname']:
-                                group_perms_map[perm['groupname']] = perm['permissions']
+                            group_perms_map[perm['groupname']] = perm['permissions']
                         elif not perm.get('owner') and perm.get('username'):
                             perms_map[perm['username']] = perm['permissions']
 
