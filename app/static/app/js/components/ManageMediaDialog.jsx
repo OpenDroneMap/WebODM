@@ -391,7 +391,7 @@ class ManageMediaDialog extends React.Component {
     if (!canEdit) return null;
 
     return (
-      <div ref={(el) => (this.dropzone = el)} className="media-upload-area">
+      <div className="media-upload-area">
         <button
           ref={(el) => (this.uploadBtn = el)}
           disabled={uploading}
@@ -508,7 +508,7 @@ class ManageMediaDialog extends React.Component {
     return (
       <div ref={(el) => (this.modal = el)} className="modal manage-media-dialog" tabIndex="-1" data-backdrop="static">
         <div className="modal-dialog modal-lg">
-          <div className="modal-content">
+          <div ref={(el) => (this.dropzone = el)} className="modal-content">
             <div className="modal-header">
               <button type="button" className="close" onClick={this.handleClose}>
                 <span>&times;</span>
