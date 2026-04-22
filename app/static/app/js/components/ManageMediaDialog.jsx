@@ -70,6 +70,14 @@ class ManageMediaDialog extends React.Component {
       if (this._mounted) this.props.onClose();
     });
 
+    // Prevent drag/drop events from leaking through the modal
+    ['dragenter', 'dragover', 'dragleave', 'drop', 'dragend'].forEach(eventName => {
+      $(this.modal).on(eventName, e => {
+        e.stopPropagation();
+        e.preventDefault();
+      });
+    });
+
     this.fetchMedia();
 
     if (this.props.canEdit && this.dropzone) {
@@ -244,6 +252,9 @@ class ManageMediaDialog extends React.Component {
 
   componentWillUnmount() {
     this._mounted = false;
+    ['dragenter', 'dragover', 'dragleave', 'drop', 'dragend'].forEach(eventName => {
+      $(this.modal).off(eventName);
+    });
     if (this.dz) {
       this.dz.destroy();
       this.dz = null;
@@ -380,7 +391,7 @@ class ManageMediaDialog extends React.Component {
     if (!canEdit) return null;
 
     return (
-      <div ref={(el) => (this.dropzone = el)} className="media-upload-area">
+      <div className="media-upload-area">
         <button
           ref={(el) => (this.uploadBtn = el)}
           disabled={uploading}
@@ -497,7 +508,7 @@ class ManageMediaDialog extends React.Component {
     return (
       <div ref={(el) => (this.modal = el)} className="modal manage-media-dialog" tabIndex="-1" data-backdrop="static">
         <div className="modal-dialog modal-lg">
-          <div className="modal-content">
+          <div ref={(el) => (this.dropzone = el)} className="modal-content">
             <div className="modal-header">
               <button type="button" className="close" onClick={this.handleClose}>
                 <span>&times;</span>
