@@ -70,6 +70,14 @@ class ManageMediaDialog extends React.Component {
       if (this._mounted) this.props.onClose();
     });
 
+    // Prevent drag/drop events from leaking through the modal
+    ['dragenter', 'dragover', 'dragleave', 'drop', 'dragend'].forEach(eventName => {
+      $(this.modal).on(eventName, e => {
+        e.stopPropagation();
+        e.preventDefault();
+      });
+    });
+
     this.fetchMedia();
 
     if (this.props.canEdit && this.dropzone) {
@@ -244,6 +252,9 @@ class ManageMediaDialog extends React.Component {
 
   componentWillUnmount() {
     this._mounted = false;
+    ['dragenter', 'dragover', 'dragleave', 'drop', 'dragend'].forEach(eventName => {
+      $(this.modal).off(eventName);
+    });
     if (this.dz) {
       this.dz.destroy();
       this.dz = null;
