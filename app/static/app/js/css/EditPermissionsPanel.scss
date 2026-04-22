@@ -71,7 +71,13 @@
         flex-grow: 0.33;
     }
 
-    .add-new{
+    .add-perm-buttons{
         margin-top: 4px;
+        .add-new + .add-new{
+            margin-left: 6px;
+        }
+    }
+    .add-new{
+        margin-top: 0;
     }
 }

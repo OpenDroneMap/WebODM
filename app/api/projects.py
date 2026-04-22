@@ -1,12 +1,18 @@
 import re
-from guardian.shortcuts import get_perms, get_users_with_perms, assign_perm, remove_perm
+from guardian.shortcuts import (
+    get_perms,
+    get_users_with_perms,
+    get_groups_with_perms,
+    assign_perm,
+    remove_perm,
+)
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from django_filters import rest_framework as filters
 from django.db import transaction
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Q
@@ -142,6 +148,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
                            'permissions': normalized_perm_names(perms[user])})
         
         result.sort(key=lambda r: r['owner'], reverse=True)
+
+        group_perms = get_groups_with_perms(project, attach_perms=True)
+        for group in group_perms:
+            result.append({'groupname': group.name,
+                           'permissions': normalized_perm_names(group_perms[group])})
+
         return Response(result, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
@@ -157,10 +169,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
                 form_perms = request.data.get('permissions')
                 if form_perms is not None:
-                    # Build perms map (ignore owners, empty usernames)
+                    # Build perms maps (ignore owners, empty usernames). If groupname is set, it takes precedence.
                     perms_map = {}
+                    group_perms_map = {}
                     for perm in form_perms:
-                        if not perm.get('owner') and perm.get('username'):
+                        if perm.get('groupname'):
+                            if perm['groupname']:
+                                group_perms_map[perm['groupname']] = perm['permissions']
+                        elif not perm.get('owner') and perm.get('username'):
                             perms_map[perm['username']] = perm['permissions']
 
                     db_perms = get_users_with_perms(project, attach_perms=True, with_group_users=False)
@@ -178,9 +194,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     
                     # Check users to add/edit
                     for username in perms_map:
+                        user = User.objects.get(username=username)
                         for p in ["add", "change", "delete", "view"]:
                             perm = p + "_project"
-                            user = User.objects.get(username=username)
 
                             # Skip owners
                             if project.owner == user:
@@ -194,9 +210,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
                             elif p in perms_map[username] and not user.has_perm(perm, project):
                                 assign_perm(perm, user, project)
 
-        except User.DoesNotExist as e:
+                    db_group_perms = get_groups_with_perms(project, attach_perms=True)
+
+                    for group in db_group_perms:
+                        if group_perms_map.get(group.name) is None:
+                            for p in db_group_perms[group]:
+                                remove_perm(p, group, project)
+
+                    for groupname in group_perms_map:
+                        group = Group.objects.get(name=groupname)
+                        for p in ["add", "change", "delete", "view"]:
+                            codename = p + "_project"
+                            gp = set(get_perms(group, project))
+                            if codename in gp and p not in group_perms_map[groupname]:
+                                remove_perm(codename, group, project)
+                            elif p in group_perms_map[groupname] and codename not in gp:
+                                assign_perm(codename, group, project)
+
+        except User.DoesNotExist:
             return Response({'error': _("Invalid user in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
-        except AttributeError as e:
+        except Group.DoesNotExist:
+            return Response({'error': _("Invalid group in permissions list")}, status=status.HTTP_400_BAD_REQUEST)
+        except AttributeError:
             return Response({'error': _("Invalid permissions")}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success': True}, status=status.HTTP_200_OK)
