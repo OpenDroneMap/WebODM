@@ -16,6 +16,7 @@ from .tiler import TileJson, Bounds, Metadata, Tiles, Export
 from .potree import Scene, CameraView
 from .workers import CheckTask, GetTaskResult
 from .users import UsersList
+from .groups import GroupsList
 from .externalauth import ExternalTokenAuth
 from webodm import settings
 
@@ -83,6 +84,7 @@ urlpatterns = [
 
 if settings.ENABLE_USERS_API:
     urlpatterns.append(url(r'users', UsersList.as_view()))
+    urlpatterns.append(url(r'groups', GroupsList.as_view()))
 
 if settings.EXTERNAL_AUTH_ENDPOINT != '':
     urlpatterns.append(url(r'^external-token-auth/', ExternalTokenAuth.as_view()))

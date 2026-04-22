@@ -1,6 +1,6 @@
 import logging
 import os
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rest_framework import status
 from rest_framework.test import APIClient
 from app.models import Project
@@ -168,7 +168,61 @@ class TestApiProjects(BootTestCase):
         self.assertTrue(os.path.isdir(task_dir))
         self.assertTrue(os.path.isdir(project_dir))
 
-        
+    def test_project_group_permissions(self):
+        client = APIClient()
+        user = User.objects.get(username="testuser")
+        other_user = User.objects.get(username="testuser2")
 
+        group = Group.objects.create(name="ProjectReaders")
+        other_user.groups.add(group)
 
-        
+        project = Project.objects.create(
+            owner=user,
+            name="group perm project"
+        )
+
+        client.login(username="testuser", password="test1234")
+        other_client = APIClient()
+        other_client.login(username="testuser2", password="test1234")
+
+        res = other_client.get("/api/projects/{}/".format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+        res = client.post("/api/projects/{}/edit/".format(project.id), {
+            'permissions': [{'groupname': 'NoSuchGroup', 'permissions': ['view']}]
+        }, format="json")
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        res = client.post("/api/projects/{}/edit/".format(project.id), {
+            'permissions': [{'groupname': 'ProjectReaders', 'permissions': ['view']}]
+        }, format="json")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = other_client.get("/api/projects/{}/".format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = client.get("/api/projects/{}/permissions/".format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        group_rows = [r for r in res.data if r.get('groupname') == 'ProjectReaders']
+        self.assertEqual(len(group_rows), 1)
+        self.assertIn('view', group_rows[0]['permissions'])
+        self.assertTrue('X-Groups-Count' in res)
+        self.assertEqual(int(res['X-Groups-Count']), 2)
+
+        res = client.get("/api/groups/?search=Project&limit=10")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        names = [g['name'] for g in res.data]
+        self.assertIn('ProjectReaders', names)
+
+        anon = APIClient()
+        res = anon.get("/api/groups/?search=P")
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        res = client.post("/api/projects/{}/edit/".format(project.id), {
+            'permissions': []
+        }, format="json")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = other_client.get("/api/projects/{}/".format(project.id))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
