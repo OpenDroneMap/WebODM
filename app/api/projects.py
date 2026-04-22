@@ -154,7 +154,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             result.append({'groupname': group.name,
                            'permissions': normalized_perm_names(group_perms[group])})
 
-        return Response(result, status=status.HTTP_200_OK)
+        response = Response(result, status=status.HTTP_200_OK)
+        response['X-Groups-Count'] = Group.objects.count()
+        return response
     
     @action(detail=True, methods=['post'])
     def edit(self, request, pk=None):

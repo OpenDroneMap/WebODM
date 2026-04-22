@@ -24,6 +24,7 @@ class EditPermissionsPanel extends React.Component {
     this.state = {
       error: "",
       loading: false,
+      showAddGroup: false,
       permissions: [],
       validUsernames: {},
       validGroupnames: {},
@@ -38,10 +39,12 @@ class EditPermissionsPanel extends React.Component {
   }
 
   loadPermissions = () => {
-    this.setState({loading: true, permissions: []});
+    this.setState({loading: true, permissions: [], showAddGroup: false});
 
     this.permsRequest = 
-      $.getJSON(`/api/projects/${this.props.projectId}/permissions/`, json => {
+      $.getJSON(`/api/projects/${this.props.projectId}/permissions/`, (json, _, xhr) => {
+        const groupsCount = xhr.getResponseHeader('X-Groups-Count') || 0;
+
         let validUsernames = {};
         let validGroupnames = {};
         const permissions = [];
@@ -54,7 +57,7 @@ class EditPermissionsPanel extends React.Component {
             permissions.push({ ...p, kind: 'user' });
           }
         });
-        this.setState({ validUsernames, validGroupnames, permissions });
+        this.setState({ validUsernames, validGroupnames, permissions, showAddGroup: groupsCount >= 2 });
       })
       .fail(() => {
         this.setState({error: _("Cannot load permissions.")});
@@ -322,7 +325,7 @@ class EditPermissionsPanel extends React.Component {
             <i className="fa fa-circle-notch fa-spin fa-fw perms-loading"></i>
             : [permissions, <div key="add-new" className="add-perm-buttons">
                 <button type="button" title={_("Add user")} onClick={this.addNewPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-user-plus"></i></button>
-                <button type="button" title={_("Add group")} onClick={this.addNewGroupPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-users"></i></button>
+                {this.state.showAddGroup ? <button type="button" title={_("Add group")} onClick={this.addNewGroupPermission} className="btn btn-default btn-sm add-new"><i className="fa fa-users"></i></button> : ""}
             </div>]}
           </div>
         </div>

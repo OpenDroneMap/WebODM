@@ -206,6 +206,8 @@ class TestApiProjects(BootTestCase):
         group_rows = [r for r in res.data if r.get('groupname') == 'ProjectReaders']
         self.assertEqual(len(group_rows), 1)
         self.assertIn('view', group_rows[0]['permissions'])
+        self.assertTrue('X-Groups-Count' in res)
+        self.assertEqual(int(res['X-Groups-Count']), 2)
 
         res = client.get("/api/groups/?search=Project&limit=10")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
