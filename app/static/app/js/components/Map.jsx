@@ -740,7 +740,6 @@ class Map extends React.Component {
     if (showBackground) {
       this.basemaps = {};
       const basemaps = this.props.basemaps;
-      console.log(basemaps)
       if (basemaps.length > 0) {
         basemaps.forEach(bm => {
           let layer;

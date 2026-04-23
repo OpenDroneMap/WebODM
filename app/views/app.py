@@ -62,7 +62,6 @@ def dashboard(request):
         'onboarding': settings.DASHBOARD_ONBOARDING,
         'params': {
             'permissions': json.dumps(permissions),
-            'basemaps': json.dumps(Basemap.get_cached_basemaps())
         }.items()
     })
 
