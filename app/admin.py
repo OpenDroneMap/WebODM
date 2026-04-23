@@ -18,6 +18,7 @@ from app.models import Preset
 from app.models import Plugin
 from app.models import Profile
 from app.models import Redirect
+from app.models import Basemap
 from app.plugins import get_plugin_by_name, enable_plugin, disable_plugin, delete_plugin, valid_plugin, \
     get_plugins_persistent_path, clear_plugins_cache, init_plugins
 from .models import Project, Task, Setting, Theme
@@ -116,6 +117,26 @@ class ThemeAdmin(admin.ModelAdmin):
 
 admin.site.register(Theme, ThemeAdmin)
 admin.site.register(PluginDatum, admin.ModelAdmin)
+
+
+class BasemapModelForm(forms.ModelForm):
+    class Meta:
+        model = Basemap
+        fields = '__all__'
+        widgets = {
+            'minzoom': forms.NumberInput(attrs={'min': 0, 'max': 99}),
+            'maxzoom': forms.NumberInput(attrs={'min': 0, 'max': 99}),
+        }
+
+
+class BasemapAdmin(admin.ModelAdmin):
+    form = BasemapModelForm
+    list_display = ('label', 'type', 'maxzoom', 'layers', 'default')
+    list_filter = ('type', 'default')
+    search_fields = ('label', 'url', 'layers')
+    list_display_links = ('label', )
+
+admin.site.register(Basemap, BasemapAdmin)
 
 if settings.CLUSTER_ID is not None:
     admin.site.register(Redirect, admin.ModelAdmin)
