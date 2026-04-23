@@ -26,8 +26,8 @@ class TestBasemap(BootTestCase):
             type='tms',
             url='//tiles-a/{z}/{x}/{y}.png',
             label='A',
-            max_zoom=20,
-            min_zoom=0,
+            maxzoom=20,
+            minzoom=0,
         )
 
         b2 = Basemap.objects.create(
@@ -35,8 +35,8 @@ class TestBasemap(BootTestCase):
             type='tms',
             url='//tiles-b/{z}/{x}/{y}.png',
             label='B',
-            max_zoom=20,
-            min_zoom=0,
+            maxzoom=20,
+            minzoom=0,
         )
 
         b1.refresh_from_db()
