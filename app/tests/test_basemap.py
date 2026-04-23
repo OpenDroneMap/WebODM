@@ -1,4 +1,3 @@
-import importlib
 import json
 
 from django.test import Client
@@ -27,8 +26,8 @@ class TestBasemap(BootTestCase):
             type='tms',
             url='//tiles-a/{z}/{x}/{y}.png',
             label='A',
-            maxZoom=20,
-            minZoom=0,
+            max_zoom=20,
+            min_zoom=0,
         )
 
         b2 = Basemap.objects.create(
@@ -36,8 +35,8 @@ class TestBasemap(BootTestCase):
             type='tms',
             url='//tiles-b/{z}/{x}/{y}.png',
             label='B',
-            maxZoom=20,
-            minZoom=0,
+            max_zoom=20,
+            min_zoom=0,
         )
 
         b1.refresh_from_db()

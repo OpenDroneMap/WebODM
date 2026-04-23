@@ -124,14 +124,14 @@ class BasemapModelForm(forms.ModelForm):
         model = Basemap
         fields = '__all__'
         widgets = {
-            'minZoom': forms.NumberInput(attrs={'min': 0, 'max': 99}),
-            'maxZoom': forms.NumberInput(attrs={'min': 0, 'max': 99}),
+            'minzoom': forms.NumberInput(attrs={'min': 0, 'max': 99}),
+            'maxzoom': forms.NumberInput(attrs={'min': 0, 'max': 99}),
         }
 
 
 class BasemapAdmin(admin.ModelAdmin):
     form = BasemapModelForm
-    list_display = ('label', 'type', 'maxZoom', 'layers', 'default')
+    list_display = ('label', 'type', 'maxzoom', 'layers', 'default')
     list_filter = ('type', 'default')
     search_fields = ('label', 'url', 'layers')
     list_display_links = ('label', )

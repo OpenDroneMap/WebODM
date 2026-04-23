@@ -12,12 +12,12 @@ class Basemap(models.Model):
 
     type = models.CharField(max_length=8, choices=[('tms', 'TMS'),('wms', 'WMS')], default='tms', verbose_name=_("Type"))
     url = models.CharField(max_length=1024, blank=False, null=False, verbose_name=_("URL"))
-    label = models.CharField(max_length=255, blank=False, null=False, verbose_name=_("Label"))
+    label = models.CharField(max_length=255, blank=False, null=False, unique=True, verbose_name=_("Label"))
     attribution = models.CharField(max_length=2048, blank=True, null=True, verbose_name=_("Attribution"))
-    maxZoom = models.PositiveSmallIntegerField(default=20,
+    maxzoom = models.PositiveSmallIntegerField(default=20,
                                                validators=[MinValueValidator(0), MaxValueValidator(99)],
                                                verbose_name=_("Max zoom"))
-    minZoom = models.PositiveSmallIntegerField(default=0,
+    minzoom = models.PositiveSmallIntegerField(default=0,
                                                validators=[MinValueValidator(0), MaxValueValidator(99)],
                                                verbose_name=_("Min zoom"))
     subdomains = models.CharField(max_length=255, blank=True, null=True, verbose_name=_("Subdomains"))
@@ -62,8 +62,8 @@ class Basemap(models.Model):
                 'url': bm.url,
                 'label': bm.label,
                 'attribution': bm.attribution,
-                'maxZoom': bm.maxZoom,
-                'minZoom': bm.minZoom,
+                'maxzoom': bm.maxzoom,
+                'minzoom': bm.minzoom,
             }
 
             if bm.subdomains:
@@ -74,6 +74,9 @@ class Basemap(models.Model):
 
             if bm.format:
                 item['format'] = bm.format
+
+            if bm.styles:
+                item['styles'] = bm.styles
 
             basemaps.append(item)
 
