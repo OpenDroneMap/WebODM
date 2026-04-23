@@ -85,17 +85,7 @@ DEFAULT_THEME_CSS = ''
 #   transparent: WMS transparency (default True)
 BASEMAPS = [
     {
-        "type": "wms",
-        "url": "https://imageserver.gisdata.mn.gov/cgi-bin/wms?",
-        "label": "Minnesota Composite Imagery",
-        "attribution": "&copy; <a href='https://www.mngeo.state.mn.us/'>MnGeo</a>, Minnesota Geospatial Information Office",
-        "maxZoom": 20,
-        "minZoom": 4,
-        "layers": "nc13ft",
-        "format": "image/jpeg",
-        "transparent": True
-    },
-    {
+        "default": True,
         "type": "tms",
         "url": "//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
         "attribution": "Map data: &copy; Google Maps",

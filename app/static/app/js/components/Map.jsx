@@ -748,7 +748,7 @@ class Map extends React.Component {
             layer = L.tileLayer.wms(src.url, {
               layers: src.layers,
               format: src.format || 'image/png',
-              transparent: src.transparent !== false,
+              transparent: (src.format || 'image/png') == 'image/png',
               attribution: src.attribution,
               maxZoom: (src.maxZoom || 21) + 99,
               maxNativeZoom: src.maxZoom || 21,
