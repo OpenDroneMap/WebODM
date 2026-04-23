@@ -7,14 +7,14 @@
     }
 
     .standby{
-        z-index: 1001;
+        z-index: 1002;
     }
 
     .download-control{
         position: absolute;
         left: 8px;
         top: 8px;
-        z-index: 1000;
+        z-index: 1001;
         .btn:active, .btn:focus{
             outline: none;
         }
