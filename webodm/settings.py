@@ -73,45 +73,6 @@ DESKTOP_MODE = False
 # Default CSS to add to theme
 DEFAULT_THEME_CSS = ''
 
-# Basemaps available in the map viewer. Each entry has:
-#   type: "tms", "wmts", or "wms"
-#   url: tile URL template (TMS/WMTS) or WMS endpoint URL
-#   label: display name
-#   attribution: HTML-safe attribution string
-#   maxZoom, minZoom: zoom range
-#   subdomains: subdomain array (TMS/WMTS only)
-#   layers: WMS layer name(s) — required for "wms" type
-#   format: WMS format (default "image/png")
-#   transparent: WMS transparency (default True)
-BASEMAPS = [
-    {
-        "default": True,
-        "type": "tms",
-        "url": "//{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
-        "attribution": "Map data: &copy; Google Maps",
-        "label": "Google Maps Hybrid",
-        "maxZoom": 21,
-        "minZoom": 0,
-        "subdomains": ["mt0", "mt1", "mt2", "mt3"]
-    },
-    {
-        "type": "tms",
-        "url": "//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        "attribution": "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
-        "label": "ESRI Satellite",
-        "maxZoom": 21,
-        "minZoom": 0
-    },
-    {
-        "type": "tms",
-        "url": "//tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "attribution": '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        "label": "OpenStreetMap",
-        "maxZoom": 19,
-        "minZoom": 0
-    }
-]
-
 # Plugins never to load
 PLUGINS_BLACKLIST = [
     #'measure',

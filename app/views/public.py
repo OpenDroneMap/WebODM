@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from django.shortcuts import render
 
 from app.api.tasks import TaskSerializer
+from app.models import Basemap
 from app.views.utils import get_permissions, get_task_or_raise, get_project_or_raise, handle_302
 from django.views.decorators.csrf import ensure_csrf_cookie
 from webodm import settings
@@ -57,7 +58,7 @@ def handle_map(request, template, uuid_type=None, uuid=None, hide_title=False):
             'selected-map-type': request.GET.get('t', 'auto'),
             'permissions': json.dumps(permissions),
             'project': json.dumps(projectInfo),
-            'basemaps': json.dumps(settings.BASEMAPS)
+            'basemaps': json.dumps(Basemap.get_cached_basemaps())
         }.items()
     })
 

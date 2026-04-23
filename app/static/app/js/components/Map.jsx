@@ -740,33 +740,35 @@ class Map extends React.Component {
     if (showBackground) {
       this.basemaps = {};
       const basemaps = this.props.basemaps;
-
+      console.log(basemaps)
       if (basemaps.length > 0) {
-        basemaps.forEach((src, idx) => {
+        basemaps.forEach(bm => {
           let layer;
-          if (src.type === 'wms') {
-            layer = L.tileLayer.wms(src.url, {
-              layers: src.layers,
-              format: src.format || 'image/png',
-              transparent: (src.format || 'image/png') == 'image/png',
-              attribution: src.attribution,
-              maxZoom: (src.maxZoom || 21) + 99,
-              maxNativeZoom: src.maxZoom || 21,
-              minZoom: src.minZoom || 0
+          if (bm.type === 'wms') {
+            layer = L.tileLayer.wms(bm.url, {
+              layers: bm.layers || '0',
+              styles: bm.styles || 'default',
+              format: bm.format || 'image/png',
+              transparent: (bm.format || 'image/png') == 'image/png',
+              attribution: bm.attribution || bm.label,
+              maxZoom: (bm.maxZoom || 21) + 99,
+              maxNativeZoom: bm.maxZoom || 21,
+              minZoom: bm.minZoom || 0,
             });
           } else {
-            const { url, ...props } = src;
+            const { url, ...props } = bm;
             const tileProps = Utils.clone(props);
             tileProps.maxNativeZoom = tileProps.maxZoom;
             tileProps.maxZoom = tileProps.maxZoom + 99;
+            if (!tileProps.attribution) tileProps.attribution = tileProps.label || '';
             layer = L.tileLayer(url, tileProps);
           }
 
-          if (idx === 0) {
+          if (bm['default']) {
             layer.addTo(this.map);
           }
 
-          this.basemaps[src.label] = layer;
+          this.basemaps[bm.label] = layer;
         });
       }
 

@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from guardian.shortcuts import get_objects_for_user
 
 from nodeodm.models import ProcessingNode
-from app.models import Project, Task
+from app.models import Project, Task, Basemap
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
@@ -62,7 +62,7 @@ def dashboard(request):
         'onboarding': settings.DASHBOARD_ONBOARDING,
         'params': {
             'permissions': json.dumps(permissions),
-            'basemaps': json.dumps(settings.BASEMAPS)
+            'basemaps': json.dumps(Basemap.get_cached_basemaps())
         }.items()
     })
 
@@ -96,7 +96,7 @@ def map(request, project_pk=None, task_pk=None):
                 'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
                 'permissions': json.dumps(get_permissions(request.user, project)),
                 'project': json.dumps(projectInfo),
-                'basemaps': json.dumps(settings.BASEMAPS),
+                'basemaps': json.dumps(Basemap.get_cached_basemaps()),
             }.items()
         })
 
