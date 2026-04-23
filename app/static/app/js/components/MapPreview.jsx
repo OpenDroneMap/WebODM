@@ -8,7 +8,6 @@ import ErrorMessage from './ErrorMessage';
 import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
-import Basemaps from '../classes/Basemaps';
 import Standby from './Standby';
 import exifr from '../vendor/exifr';
 import '../vendor/leaflet/leaflet-markers-canvas';
@@ -68,19 +67,19 @@ class MapPreview extends React.Component {
 
     this.basemaps = {};
     
-    Basemaps.forEach((src, idx) => {
-    const { url, ...props } = src;
-    const tileProps = Utils.clone(props);
-    tileProps.maxNativeZoom = tileProps.maxZoom;
-    tileProps.maxZoom = tileProps.maxZoom + 99;
-    const layer = L.tileLayer(url, tileProps);
+    // Basemaps.forEach((src, idx) => {
+    //   const { url, ...props } = src;
+    //   const tileProps = Utils.clone(props);
+    //   tileProps.maxNativeZoom = tileProps.maxZoom;
+    //   tileProps.maxZoom = tileProps.maxZoom + 99;
+    //   const layer = L.tileLayer(url, tileProps);
 
-    if (idx === 2) {
-        layer.addTo(this.map);
-    }
+    //   if (idx === 2) {
+    //       layer.addTo(this.map);
+    //   }
 
-    this.basemaps[props.label] = layer;
-    });
+    //   this.basemaps[props.label] = layer;
+    // });
 
     const customLayer = L.layerGroup();
     customLayer.on("add", a => {

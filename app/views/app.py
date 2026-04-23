@@ -61,7 +61,8 @@ def dashboard(request):
         'no_tasks': no_tasks,
         'onboarding': settings.DASHBOARD_ONBOARDING,
         'params': {
-            'permissions': json.dumps(permissions)
+            'permissions': json.dumps(permissions),
+            'basemaps': json.dumps(settings.BASEMAPS)
         }.items()
     })
 
@@ -95,6 +96,7 @@ def map(request, project_pk=None, task_pk=None):
                 'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
                 'permissions': json.dumps(get_permissions(request.user, project)),
                 'project': json.dumps(projectInfo),
+                'basemaps': json.dumps(settings.BASEMAPS),
             }.items()
         })
 

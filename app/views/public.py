@@ -56,7 +56,8 @@ def handle_map(request, template, uuid_type=None, uuid=None, hide_title=False):
             'share-buttons': 'false' if settings.DESKTOP_MODE else 'true',
             'selected-map-type': request.GET.get('t', 'auto'),
             'permissions': json.dumps(permissions),
-            'project': json.dumps(projectInfo)
+            'project': json.dumps(projectInfo),
+            'basemaps': json.dumps(settings.BASEMAPS)
         }.items()
     })
 

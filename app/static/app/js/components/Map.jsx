@@ -18,7 +18,7 @@ import ShareButton from './ShareButton';
 import {addTempLayer} from '../classes/TempLayer';
 import PropTypes from 'prop-types';
 import PluginsAPI from '../classes/plugins/API';
-import Basemaps from '../classes/Basemaps';
+
 import Standby from './Standby';
 import LayersControl from './LayersControl';
 import AssetDownloadButtons from './AssetDownloadButtons';
@@ -44,7 +44,8 @@ class Map extends React.Component {
     publicEdit: false,
     shareButtons: true,
     permissions: ["view"],
-    thermal: false
+    thermal: false,
+    basemaps: []
   };
 
   static propTypes = {
@@ -56,7 +57,8 @@ class Map extends React.Component {
     shareButtons: PropTypes.bool,
     permissions: PropTypes.array,
     thermal: PropTypes.bool,
-    project: PropTypes.object
+    project: PropTypes.object,
+    basemaps: PropTypes.array
   };
 
   constructor(props) {
@@ -737,32 +739,48 @@ class Map extends React.Component {
 
     if (showBackground) {
       this.basemaps = {};
-      
-      Basemaps.forEach((src, idx) => {
-        const { url, ...props } = src;
-        const tileProps = Utils.clone(props);
-        tileProps.maxNativeZoom = tileProps.maxZoom;
-        tileProps.maxZoom = tileProps.maxZoom + 99;
-        const layer = L.tileLayer(url, tileProps);
+      const basemaps = this.props.basemaps;
 
-        if (idx === 0) {
-          layer.addTo(this.map);
-        }
+      if (basemaps.length > 0) {
+        basemaps.forEach((src, idx) => {
+          let layer;
+          if (src.type === 'wms') {
+            layer = L.tileLayer.wms(src.url, {
+              layers: src.layers,
+              format: src.format || 'image/png',
+              transparent: src.transparent !== false,
+              attribution: src.attribution,
+              maxZoom: (src.maxZoom || 21) + 99,
+              maxNativeZoom: src.maxZoom || 21,
+              minZoom: src.minZoom || 0
+            });
+          } else {
+            const { url, ...props } = src;
+            const tileProps = Utils.clone(props);
+            tileProps.maxNativeZoom = tileProps.maxZoom;
+            tileProps.maxZoom = tileProps.maxZoom + 99;
+            layer = L.tileLayer(url, tileProps);
+          }
 
-        this.basemaps[props.label] = layer;
-      });
+          if (idx === 0) {
+            layer.addTo(this.map);
+          }
+
+          this.basemaps[src.label] = layer;
+        });
+      }
 
       const customLayer = L.layerGroup();
       customLayer.on("add", a => {
         const defaultCustomBm = window.localStorage.getItem('lastCustomBasemap') || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-      
+
         let url = window.prompt([_('Enter a tile URL template. Valid coordinates are:'),
 _('{z}, {x}, {y} for Z/X/Y tile scheme'),
-_('{-y} for flipped TMS-style Y coordinates'),
+_('{−y} for flipped TMS-style Y coordinates'),
 '',
 _('Example:'),
 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'].join("\n"), defaultCustomBm);
-        
+
         if (url){
           customLayer.clearLayers();
           const l = L.tileLayer(url, {
@@ -774,7 +792,7 @@ _('Example:'),
           l.bringToBack();
           window.localStorage.setItem('lastCustomBasemap', url);
         }
-      });
+     });
       this.basemaps[_("Custom")] = customLayer;
       this.basemaps[_("None")] = L.layerGroup();
     }

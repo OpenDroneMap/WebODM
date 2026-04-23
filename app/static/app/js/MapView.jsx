@@ -14,7 +14,8 @@ class MapView extends React.Component {
     publicEdit: false,
     shareButtons: true,
     permissions: ["view"],
-    project: null
+    project: null,
+    basemaps: []
   };
 
   static propTypes = {
@@ -25,7 +26,8 @@ class MapView extends React.Component {
       publicEdit: PropTypes.bool,
       shareButtons: PropTypes.bool,
       permissions: PropTypes.array,
-      project: PropTypes.object
+      project: PropTypes.object,
+      basemaps: PropTypes.array
   };
 
   constructor(props){
@@ -174,6 +176,7 @@ class MapView extends React.Component {
                 permissions={this.props.permissions}
                 thermal={isThermal}
                 project={this.props.project}
+                basemaps={this.props.basemaps}
             />
         </div>
       </div>);
