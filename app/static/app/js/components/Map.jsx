@@ -111,7 +111,11 @@ class Map extends React.Component {
 
   tdPopupButtonUrl = (task) => {
     if (this.props.public){
-      return `/public/task/${task.id}/3d/`;
+      if (location.href.indexOf("/iframe/") !== -1){
+        return `/public/task/${task.id}/iframe/3d/`;
+      }else{
+        return `/public/task/${task.id}/3d/`;
+      }
     }else{
       return `/3d/project/${task.project}/task/${task.id}/`;
     }
