@@ -31,9 +31,14 @@ class SwitchModeButton extends React.Component {
     if (this.props.task){
       const target = this.props.type === 'mapToModel' ? '3d' : 'map';
       
-      let url = this.props.public ? 
-                `/public/task/${this.props.task.id}/${target}/`
-              : `/${target}/project/${this.props.task.project}/task/${this.props.task.id}/`;
+      let url = `/${target}/project/${this.props.task.project}/task/${this.props.task.id}/`;
+      if (this.props.public){
+        if (location.href.indexOf("/iframe/") !== -1){
+          url = `/public/task/${this.props.task.id}/iframe/${target}/`;
+        }else{
+          url = `/public/task/${this.props.task.id}/${target}/`;
+        }
+      }
       
       location.href = url;
     }
