@@ -5,5 +5,5 @@ version: '2.1'
 services:
   node-odx-1:
     volumes:
-      - ${WO_NODE_DIR}/data:/var/www/data:Z,delegated
-      - ${WO_NODE_DIR}/tmp:/var/www/tmp:Z,delegated
+      - ${WO_NODE_DIR}/data:/var/www/data:Z
+      - ${WO_NODE_DIR}/tmp:/var/www/tmp:Z
