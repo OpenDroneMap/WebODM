@@ -34,7 +34,6 @@ class Project(models.Model):
     public_edit = models.BooleanField(default=False, help_text=_("A flag indicating whether this public project can be edited"), verbose_name=_("Public Edit"))
     public_id = models.UUIDField(db_index=True, default=None, unique=True, blank=True, null=True, help_text=_("Public identifier of the project"), verbose_name=_("Public Id"))
     
-
     def delete(self, *args):
         # No tasks?
         if not self.task_set.exists():

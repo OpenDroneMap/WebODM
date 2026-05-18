@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import './css/Dashboard.scss';
 import ProjectList from './components/ProjectList';
 import EditProjectDialog from './components/EditProjectDialog';
+import Storage from './classes/Storage';
 import Utils from './classes/Utils';
 import {
   BrowserRouter as Router,
@@ -54,6 +55,7 @@ class Dashboard extends React.Component {
       let q = Utils.queryParams(location);
       if (q.page === undefined) q.page = 1;
       else q.page = parseInt(q.page);
+      if (q.ordering === undefined) q.ordering = Storage.getItem("project_ordering") || "";
 
       return <ProjectList
                 source={`/api/projects/${Utils.toSearchQuery(q)}`}

@@ -48,7 +48,7 @@ class ProjectListItem extends React.Component {
       importingExternal: false,
       buttons: [],
       importItems: [],
-      sortKey: "-created_at",
+      sortKey: Storage.getItem("task_ordering") || "-created_at",
       filterTags: [],
       selectedTags: [],
       filterText: ""
@@ -656,6 +656,7 @@ class ProjectListItem extends React.Component {
   sortChanged = key => {
     if (this.taskList){
       this.setState({sortKey: key});
+      Storage.setItem("task_ordering", key);
       setTimeout(() => {
         this.taskList.refresh();
       }, 0);
@@ -721,6 +722,7 @@ class ProjectListItem extends React.Component {
     const userTags = Tags.userTags(data.tags);
     let deleteWarning = _("All tasks, images and models associated with this project will be permanently deleted. Are you sure you want to continue?");
     if (!data.owned) deleteWarning = _("This project was shared with you. It will not be deleted, but simply hidden from your dashboard. Continue?")
+    const ordering = Storage.getItem("task_ordering") || "-created_at";
 
     return (
       <li className={"project-list-item list-group-item " + (refreshing ? "refreshing" : "")}
@@ -840,7 +842,7 @@ class ProjectListItem extends React.Component {
                   <a href="javascript:void(0);" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {_("Sort")}
                   </a>
-                  <SortPanel selected="-created_at" items={this.sortItems} onChange={this.sortChanged} />
+                  <SortPanel selected={ordering} items={this.sortItems} onChange={this.sortChanged} />
                 </div>
               </div> : ""}
 
