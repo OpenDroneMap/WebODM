@@ -18,7 +18,7 @@ class Paginator extends React.Component {
         
         this.state = {
             searchText: decodeSearch(q.search || ""),
-            sortKey: q.ordering || Storage.getItem("dashboard_ordering") || "-created_at"
+            sortKey: q.ordering || Storage.getItem("project_ordering") || "-created_at"
         }
 
         this.sortItems = [{
@@ -80,7 +80,7 @@ class Paginator extends React.Component {
     sortChanged = key => {
         this.setState({sortKey: key});
         setTimeout(() => {
-            Storage.setItem("dashboard_ordering", key);
+            Storage.setItem("project_ordering", key);
             this.props.history.push({search: this.getQueryForPage(this.props.currentPage)});
         }, 0);
     }
