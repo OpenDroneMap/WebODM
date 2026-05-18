@@ -3,6 +3,7 @@ import '../css/Paginator.scss';
 import { Link, withRouter  } from 'react-router-dom';
 import SortPanel from './SortPanel';
 import Utils from '../classes/Utils';
+import Storage from '../classes/Storage';
 import { _ } from '../classes/gettext';
 
 let decodeSearch = (search) => {
@@ -17,7 +18,7 @@ class Paginator extends React.Component {
         
         this.state = {
             searchText: decodeSearch(q.search || ""),
-            sortKey: q.ordering || "-created_at"
+            sortKey: q.ordering || Storage.getItem("dashboard_ordering") || "-created_at"
         }
 
         this.sortItems = [{
@@ -79,6 +80,7 @@ class Paginator extends React.Component {
     sortChanged = key => {
         this.setState({sortKey: key});
         setTimeout(() => {
+            Storage.setItem("dashboard_ordering", key);
             this.props.history.push({search: this.getQueryForPage(this.props.currentPage)});
         }, 0);
     }
