@@ -69,6 +69,7 @@ class ShareButton extends React.Component {
         <button 
           type="button"
           onClick={this.handleClick}
+          title={_("Share")}
           className={"shareButton btn btn-sm " + (isPublic ? "btn-primary" : "btn-secondary")}>
           <i className="fa fa-share-alt"></i> {_("Share")}
         </button>

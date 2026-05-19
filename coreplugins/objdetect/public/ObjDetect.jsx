@@ -33,6 +33,7 @@ class ObjDetectButton extends React.Component {
     return (<div className={showPanel ? "open" : ""}>
         <a href="javascript:void(0);" 
             onClick={this.handleOpen} 
+            title={_("Object Detection")}
             className="leaflet-control-objdetect-button leaflet-bar-part theme-secondary"></a>
         <ObjDetectPanel map={this.props.map} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
     </div>);
