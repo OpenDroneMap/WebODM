@@ -2,6 +2,7 @@ import L from 'leaflet';
 import ReactDOM from 'ReactDOM';
 import React from 'React';
 import PropTypes from 'prop-types';
+import { _ } from 'webodm/classes/gettext';
 import './Contours.scss';
 import ContoursPanel from './ContoursPanel';
 
@@ -33,6 +34,7 @@ class ContoursButton extends React.Component {
     return (<div className={showPanel ? "open" : ""}>
         <a href="javascript:void(0);" 
             onClick={this.handleOpen} 
+            title={_("Contours")}
             className="leaflet-control-contours-button leaflet-bar-part theme-secondary"></a>
         <ContoursPanel map={this.props.map} isShowed={showPanel} tasks={this.props.tasks} onClose={this.handleClose} />
     </div>);
