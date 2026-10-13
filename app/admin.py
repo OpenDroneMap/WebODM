@@ -1,4 +1,5 @@
 import os
+import json
 import tempfile
 import zipfile
 import shutil
@@ -241,7 +242,7 @@ class PluginAdmin(admin.ModelAdmin):
         for p in get_plugins():
             installed[p.get_name()] = p.get_manifest().get('version', '')
         extra_context = extra_context or {}
-        extra_context['installed_plugins'] = installed
+        extra_context['installed_plugins'] = json.dumps(installed)
         extra_context['webodm_version'] = settings.VERSION
         extra_context['can_build'] = shutil.which("webpack") is not None
         return super().changelist_view(request, extra_context=extra_context)
@@ -348,6 +349,12 @@ class PluginAdmin(admin.ModelAdmin):
                     raise ValueError(
                         "This doesn't look like a plugin. Are plugin.py and manifest.json in the proper place?")
 
+                try:
+                    with open(os.path.join(plugin_path, "manifest.json")) as f:
+                        display_name = json.load(f).get("name") or plugin_name
+                except Exception:
+                    display_name = plugin_name
+
                 dest_path = get_plugins_persistent_path(plugin_name)
                 if os.path.exists(dest_path):
                     if not upgrade:
@@ -372,7 +379,7 @@ class PluginAdmin(admin.ModelAdmin):
                 if upgrade:
                     message = _("Plugin %(plugin)s updated successfully. Please restart WebODM to apply the changes.") % {'plugin': plugin_name}
                 else:
-                    message = _("Plugin added successfully")
+                    message = _("%(plugin)s installed successfully") % {'plugin': display_name}
                 success = True
                 level = messages.INFO
             except Exception as e:
