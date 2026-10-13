@@ -3,6 +3,7 @@ import ReactDOM from 'ReactDOM';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
 import csrf from './django/csrf';
+import ErrorMessage from './components/ErrorMessage';
 import './css/PluginBrowser.scss';
 import { _, interpolate } from './classes/gettext';
 
@@ -30,6 +31,15 @@ class PluginBrowserItem extends React.Component {
         error: PropTypes.string,
         onInstall: PropTypes.func.isRequired
     };
+
+    constructor(props){
+        super(props);
+        this.state = { error: props.error || "" };
+    }
+
+    componentDidUpdate(prevProps){
+        if (prevProps.error !== this.props.error) this.setState({error: this.props.error || ""});
+    }
 
     handleInstall = () => {
         this.props.onInstall(this.props.plugin, this.props.installed);
@@ -62,7 +72,7 @@ class PluginBrowserItem extends React.Component {
     }
 
     render(){
-        const { plugin, error } = this.props;
+        const { plugin } = this.props;
 
         return (<div className="plugin-browser-item theme-border">
             <div className="plugin-info">
@@ -71,7 +81,7 @@ class PluginBrowserItem extends React.Component {
                 {plugin.deprecated === true ? <span className="plugin-tag theme-color-button-danger">{_("Deprecated")}</span> : ""}
                 {plugin.author ? <p className="plugin-author">{interpolate(_("by %(author)s"), { author: plugin.author })}</p> : ""}
                 <p className="plugin-desc">{plugin.description || ""}</p>
-                {error ? <p className="plugin-error theme-color-button-danger">{error}</p> : ""}
+                <ErrorMessage bind={[this, 'error']} className="plugin-error" />
             </div>
             <div className="plugin-action">
                 {this.renderButton()}
@@ -171,7 +181,6 @@ class PluginBrowserDialog extends React.Component {
 
     handleInstall = (p, upgrade) => {
         if (this.state.installing) return;
-        if (upgrade && !window.confirm(_("Update this plugin? The current version will be replaced."))) return;
 
         const errors = Object.assign({}, this.state.errors);
         delete errors[p.id];
@@ -236,7 +245,7 @@ class PluginBrowserDialog extends React.Component {
     renderList(){
         const { plugins, loadError, search, installed, installing, installingLabel, errors } = this.state;
 
-        if (loadError) return (<div className="plugin-browser-message theme-color-button-danger">{loadError}</div>);
+        if (loadError) return (<ErrorMessage bind={[this, 'loadError']} closeable={false} />);
         if (!plugins) return (<div className="plugin-browser-message"><i className="fa fa-circle-notch fa-spin"></i></div>);
 
         const q = search.trim().toLowerCase();
@@ -244,7 +253,7 @@ class PluginBrowserDialog extends React.Component {
         if (!shown.length) return (<div className="plugin-browser-message text-muted">{_("No plugins found.")}</div>);
 
         return shown.map(p => {
-            const isInstalled = Object.prototype.hasOwnProperty.call(installed, p.id);
+            const isInstalled = installed[p.id] !== undefined;
             return (<PluginBrowserItem key={p.id}
                 plugin={p}
                 installed={isInstalled}
