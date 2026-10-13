@@ -203,8 +203,6 @@ class PluginBrowserDialog extends React.Component {
                     credentials: "same-origin",
                     redirect: "manual"
                 }).then(r => {
-                    if (r.status === 413) throw new Error(_("The plugin is too large to be uploaded to this server. Increase the maximum upload size of your web server."));
-                    if (r.status === 403 || r.type === "opaqueredirect") throw new Error(_("Your session has expired. Please reload the page and try again."));
                     if (!r.ok) throw new Error(_("WebODM could not install the plugin:") + " " + r.status + " " + r.statusText);
                     return r.json().catch(() => {
                         throw new Error(_("WebODM could not install the plugin:") + " " + r.status + " " + r.statusText);
