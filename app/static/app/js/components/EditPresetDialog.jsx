@@ -142,7 +142,11 @@ const OPTION_GROUP_MAP = {
     'primary-band': { group: 'input', subgroup: 'multispectral' },
     'radiometric-calibration': { group: 'input', subgroup: 'multispectral' },
     'skip-band-alignment': { group: 'input', subgroup: 'multispectral' },
-
+    'thermal-distance': { group: 'input', subgroup: 'multispectral' },
+    'thermal-humidity': { group: 'input', subgroup: 'multispectral' },
+    'thermal-emissivity': { group: 'input', subgroup: 'multispectral' },
+    'thermal-ambient-temperature': { group: 'input', subgroup: 'multispectral' },
+    'thermal-reflected-temperature': { group: 'input', subgroup: 'multispectral' },
     
     'video-limit': { group: 'input', subgroup: 'video' },
     'video-resolution': { group: 'input', subgroup: 'video' },
