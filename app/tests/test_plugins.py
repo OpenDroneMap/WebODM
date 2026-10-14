@@ -1,9 +1,15 @@
 import os
 import shutil
+import json
+import hashlib
+import urllib.request
 
 import sys
+import time
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 from rest_framework import status
 
@@ -16,6 +22,17 @@ from app.plugins import sync_plugin_db, get_plugins_persistent_path
 from app.plugins.data_store import InvalidDataStoreValue
 from app.plugins.pyutils import parse_requirements, compute_file_md5, requirements_installed
 from .classes import BootTestCase
+
+
+def fetch(url, timeout, retries=5):
+    for i in range(retries + 1):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "WebODM"}), timeout=timeout) as r:
+                return r.read()
+        except Exception:
+            if i == retries:
+                raise
+            time.sleep(2 ** i)
 
 
 class TestPlugins(BootTestCase):
@@ -214,6 +231,9 @@ class TestPlugins(BootTestCase):
         self.assertContains(res, '<a class="button" href="#" disabled>Enable</a>')
         self.assertContains(res, "<script src='/plugins/test/test.js'></script>")
 
+        self.assertContains(res, 'data-can-build="true"')
+        self.assertContains(res, 'data-webodm-version="{}"'.format(settings.VERSION))
+                
         # Disable
         res = c.get('/admin/app/plugin/test/disable/', follow=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -280,7 +300,7 @@ class TestPlugins(BootTestCase):
         res = c.post('/admin/app/plugin/actions/upload/', {'file': plugin_file}, follow=True)
         self.assertRedirects(res, '/admin/app/plugin/')
         messages = list(res.context['messages'])
-        self.assertTrue('Plugin added successfully' in str(messages[0]))
+        self.assertTrue('installed successfully' in str(messages[0]))
         self.assertTrue(os.path.exists(get_plugins_persistent_path("testabc")))
         plugin_file.seek(0)
 
@@ -307,6 +327,30 @@ class TestPlugins(BootTestCase):
         res = c.get('/plugins/testabc/file.txt')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
+        # Can install the dronedb plugin from the plugin repository
+        repo = "https://plugins.webodm.org"
+        index = json.loads(fetch(repo + "/index.json", 30))
+        ddb = [p for p in index['plugins'] if p['id'] == 'dronedb'][0]
+        ddb_zip = fetch(repo + ddb['url'], 60)
+        self.assertEqual(hashlib.sha256(ddb_zip).hexdigest(), ddb['sha256'])
+
+        res = c.post('/admin/app/plugin/actions/upload/', {
+            'file': SimpleUploadedFile('dronedb.zip', ddb_zip, content_type='application/zip'),
+            'sha256': ddb['sha256'],
+            'json': '1'
+        })
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.json()['success'], res.json()['message'])
+        self.assertEqual(Plugin.objects.filter(pk='dronedb').count(), 1)
+
+        ddb_plugin = get_plugin_by_name('dronedb', only_active=False)
+        self.assertFalse(ddb_plugin is None)
+
+        res = c.get('/admin/app/plugin/dronedb/delete/', follow=True)
+        self.assertRedirects(res, '/admin/app/plugin/')
+        self.assertEqual(Plugin.objects.filter(pk='dronedb').count(), 0)
+        self.assertFalse(os.path.exists(get_plugins_persistent_path("dronedb")))
+        
         c.logout()
 
         # Can still access the paths as anonymous

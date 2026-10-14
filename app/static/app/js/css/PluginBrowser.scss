@@ -1,0 +1,71 @@
+.plugin-browser-dialog{
+    .modal-title{
+        padding-top: 4px;
+    }
+
+    .plugin-browser-search{
+        margin-bottom: 12px;
+    }
+
+    .plugin-browser-message{
+        padding: 32px 0;
+        text-align: center;
+    }
+}
+
+.plugin-browser-item{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid;
+
+    &:last-child{
+        border-bottom: none;
+    }
+
+    .plugin-info{
+        flex: 1;
+        min-width: 0;
+
+        p{
+            margin: 0;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        .plugin-author{
+            margin-bottom: 4px;
+            font-size: 90%;
+        }
+
+        .plugin-error{
+            margin-top: 4px;
+        }
+    }
+
+    .plugin-name{
+        font-weight: bold;
+        margin-right: 8px;
+    }
+
+    .plugin-tag{
+        margin-right: 8px;
+    }
+
+    .plugin-badge{
+        display: inline-block;
+        padding: 0 8px;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+    }
+
+    .plugin-action{
+        flex-shrink: 0;
+        text-align: right;
+
+        .btn{
+            font-size: inherit;
+        }
+    }
+}

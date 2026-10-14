@@ -14,7 +14,6 @@ from app.models import Preset
 from app.models import Theme
 from app.plugins import init_plugins
 from nodeodm.models import ProcessingNode
-# noinspection PyUnresolvedReferencesapp/boot.py#L20
 from webodm.settings import MEDIA_ROOT
 from . import signals
 import logging

@@ -158,8 +158,8 @@ class PluginBase(ABC):
             return "plugins/{}/templates/{}".format(self.get_name(), path)
 
 
-    def path_exists(self, path):
-        return os.path.exists(self.get_path(path))
+    def path_exists(self, *path):
+        return os.path.exists(self.get_path(os.path.join(*path)))
 
     def include_js_files(self):
         """

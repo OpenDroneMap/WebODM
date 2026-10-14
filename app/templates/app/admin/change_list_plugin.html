@@ -20,6 +20,11 @@
            id="plugin-upload-file"
            onchange="document.getElementById('plugin-upload-form').submit();"
            accept=".zip"/>
+    <span data-plugin-browser
+          data-installed="{{ installed_plugins }}"
+          data-webodm-version="{{ webodm_version }}"
+          data-can-build="{{ can_build|yesno:'true,false' }}"
+          data-upload-url="{% url 'admin:plugin-upload' %}"></span>
     <button type="submit" class="btn btn-sm btn-primary" onclick="document.getElementById('plugin-upload-file').click(); return false;">
       <i class="glyphicon glyphicon-upload"></i> {% trans 'Load Plugin (.zip)' %}
     </button>
@@ -27,4 +32,7 @@
 </div>
 <h1>{% trans 'Manage Plugins' %}</h1>
 <div style="clear: both;"></div>
+
+{% load render_bundle from webpack_loader %}
+{% render_bundle 'PluginBrowser' attrs='async' %}
 {% endblock %}
