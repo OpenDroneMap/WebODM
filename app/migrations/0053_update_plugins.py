@@ -86,9 +86,6 @@ def update_plugins(apps, schema_editor):
         return
 
     os.makedirs(plugins_path, exist_ok=True)
-    if not os.path.isfile(os.path.join(plugins_path, "__init__.py")):
-        with open(os.path.join(plugins_path, "__init__.py"), "w") as f:
-            f.write("\n")
 
     for name in names:
         if name not in index:
