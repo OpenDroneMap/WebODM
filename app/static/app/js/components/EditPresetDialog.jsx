@@ -134,6 +134,7 @@ const OPTION_GROUP_MAP = {
     'use-fixed-camera-params': { group: 'input', subgroup: 'camera' },
     'rolling-shutter': { group: 'input', subgroup: 'camera' },
     'rolling-shutter-readout': { group: 'input', subgroup: 'camera' },
+    'rolling-shutter-correction': { group: 'input', subgroup: 'camera' },
     'ignore-gsd': { group: 'input', subgroup: 'camera' },
     
     'bg-removal': { group: 'input', subgroup: 'masks' },
